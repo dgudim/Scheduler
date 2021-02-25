@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/backround"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#B8B8B8"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:layout_marginBottom="1dp"
+            android:background="#FFFFFF"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/isDone"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:background="#FFFFFF"
+                android:backgroundTint="#FFFFFF"
+                android:textAllCaps="false"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/todoText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="#FFFFFF"
+                android:gravity="center_vertical"
+                android:lines="5"
+                android:maxLines="5"
+                android:minLines="1"
+                android:text="@string/app_name"
+                android:textColor="#000000"
+                android:textSize="18sp" />
+
+            <ImageView
+                android:id="@+id/settings"
+                android:layout_width="27dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:background="#FFFFFF"
+                android:contentDescription="@string/action_settings"
+                app:srcCompat="@drawable/gears_icon" />
+
+            <ImageView
+                android:id="@+id/deletionButton"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_gravity="center_vertical"
+                android:background="#FFFFFF"
+                android:contentDescription="@string/delete_item"
+                app:srcCompat="@drawable/trash_can" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

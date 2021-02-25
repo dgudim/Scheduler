@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Scheduler</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Back</string>
+    <string name="delete_item">Delete item</string>
+
+    <string name="settings_update_in_background">Обновлять в фоне</string>
+    <string name="settings_update_on_startup">Обновлять при запуске(включи если выключено обновление в фоне)</string>
+    <string name="settings_show_checked_items_on_lock">Показывать сегодняшние выполненые дела на экране блокировки</string>
+    <string name="settings_show_yesterday_items">Показывать вчерашние дела в списке</string>
+    <string name="settings_show_yesterday_items_lock">Показывать вчерашние дела на экране блокировки</string>
+    <string name="settings_show_yesterday_checked_items">Показывать вчерашние выполненые дела в списке</string>
+    <string name="settings_show_yesterday_checked_items_lock">Показывать вчерашние выполненые дела на экране блокировки</string>
+    <string name="settings_show_global_items_lock">Показывать общие дела на экране блокировки</string>
+
+    <string name="settings_font_size">Размер шрифта(Экран блокировки):%d</string>
+
+    <string name="settings_default_color">Цвет фона для сегодняшних дел(Экран блокировки)</string>
+    <string name="settings_yesterday_color">Цвет фона для вчерашних дел(Экран блокировки)</string>
+    <string name="settings_default_bevel_color">Цвет контура для сегодняшних дел(Экран блокировки)</string>
+    <string name="settings_yesterday_bevel_color">Цвет контура для вчерашних дел(Экран блокировки)</string>
+    <string name="settings_global_color">Цвет фона для общих дел(Экран блокировки)</string>
+    <string name="settings_global_bevel_color">Цвет контура для общих дел(Экран блокировки)</string>
+
+    <string name="settings_default_bevel_thickness">Толщина контура для сегодняшних дел(Экран блокировки):%d</string>
+    <string name="settings_yesterday_bevel_thickness">Толщина контура для вчерашних дел(Экран блокировки):%d</string>
+    <string name="settings_global_bevel_thickness">Толщина контура для общих дел(Экран блокировки):%d</string>
+
+    <string name="settings_reset_to_defaults">Сбросить настройки</string>
+    <string name="settings_update_bg">Обновить фон</string>
+</resources>
