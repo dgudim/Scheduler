@@ -64,7 +64,6 @@ public class SecondFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         new File(rootDir, "bg.jpg").delete();
-                        dialog.dismiss();
                     }
                 });
                 builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -191,7 +190,6 @@ public class SecondFragment extends Fragment {
                         preferences.edit().clear().commit();
                         preferences.edit().putBoolean("settingsModified", true).apply();
                         SecondFragment.this.onViewCreated(view, savedInstanceState);
-                        dialog.dismiss();
                     }
                 });
                 builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -207,14 +205,14 @@ public class SecondFragment extends Fragment {
 
     }
 
-    void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final String key, int defValue, final int stringRecouce) {
-        displayTo.setText(getString(stringRecouce, preferences.getInt(key, defValue)));
+    void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final String key, int defValue, final int stringResource) {
+        displayTo.setText(getString(stringResource, preferences.getInt(key, defValue)));
         seekBar.setProgress(preferences.getInt(key, defValue));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(getString(stringRecouce, progress));
+                displayTo.setText(getString(stringResource, progress));
                 preferences.edit().putInt(key, progress).apply();
                 preferences.edit().putBoolean("settingsModified", true).apply();
             }

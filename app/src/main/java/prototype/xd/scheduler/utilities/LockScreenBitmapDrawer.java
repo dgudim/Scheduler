@@ -6,15 +6,11 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 
 import androidx.core.math.MathUtils;
-
-import org.apache.commons.lang.WordUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,82 +18,36 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import prototype.xd.scheduler.entities.TodoListEntry;
+
 import static prototype.xd.scheduler.utilities.DateManager.*;
+import static prototype.xd.scheduler.utilities.Logger.INFO;
+import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.ScalingUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 
 public class LockScreenBitmapDrawer {
 
-    private static String currentBitmapLongestText = "";
-    private static int globalI;
+    public static String currentBitmapLongestText = "";
 
-    private static Paint textPaint, whitePaint, redPaint, grayPaint, grayRedPaint, greenPaint, grayGreenPaint;
     public static int displayWidth;
     public static int displayHeight;
-    private static int maxChars;
     private static Point displayCenter;
-    public static float h;
-    private static float kM;
-    private static int pad, pad_yesterday, pad_global;
-
-    static boolean showYesterdayCompletedItemsOnLock;
-    public static boolean showYesterdayCompletedItemsInList;
-    public static boolean showYesterdayItemsInList;
-    static boolean showYesterdayItemsOnLock;
-    static boolean showTodayCompletedTasksOnLock;
-    public static boolean showGlobalItemsOnLock;
 
     private static boolean initialised = false;
 
     static WallpaperManager wallpaperManager_static;
-    static DisplayMetrics displayMetrics_static;
-    static SharedPreferences preferences_static;
+    public static DisplayMetrics displayMetrics_static;
+    public static SharedPreferences preferences_static;
 
     public static void initialiseBitmapDrawer(WallpaperManager wallpaperManager, final SharedPreferences preferences, DisplayMetrics displayMetrics) {
         wallpaperManager_static = wallpaperManager;
         displayMetrics_static = displayMetrics;
         preferences_static = preferences;
         if (!initialised) {
-            pad = preferences.getInt("defaultBevelThickness", 5);
-            pad_yesterday = preferences.getInt("yesterdayBevelThickness", 5);
-            pad_global = preferences.getInt("globalBevelThickness", 5);
-
-            int defaultBgColor = preferences.getInt("todayBgColor", 0xFFFFFFFF);
-            int yesterdayBgColor = preferences.getInt("yesterdayBgColor", 0xFFFFCCCC);
-            int defaultPadColor = preferences.getInt("todayBevelColor", 0xFF888888);
-            int yesterdayPadColor = preferences.getInt("yesterdayBevelColor", 0xFFFF8888);
-            int globalBgColor = preferences.getInt("globalBgColor", 0xFFCCFFCC);
-            int globalPadColor = preferences.getInt("globalBevelColor", 0xFF88FF88);
-
-            showYesterdayCompletedItemsOnLock = preferences.getBoolean("yesterdayItemsLock", false);
-            showYesterdayCompletedItemsInList = preferences.getBoolean("yesterdayItemsList", false);
-            showYesterdayItemsInList = preferences.getBoolean("yesterdayTasks", true);
-            showYesterdayItemsOnLock = preferences.getBoolean("yesterdayTasksLock", true);
-
-            showTodayCompletedTasksOnLock = preferences.getBoolean("completedTasks", false);
-            showGlobalItemsOnLock = preferences.getBoolean("globalTasksLock", true);
-
-            whitePaint = createNewPaint(defaultBgColor);
-            redPaint = createNewPaint(yesterdayBgColor);
-            grayPaint = createNewPaint(defaultPadColor);
-            grayRedPaint = createNewPaint(yesterdayPadColor);
-            greenPaint = createNewPaint(globalBgColor);
-            grayGreenPaint = createNewPaint(globalPadColor);
-
             displayWidth = displayMetrics.widthPixels;
             displayHeight = displayMetrics.heightPixels;
             displayCenter = new Point(displayWidth / 2, displayHeight / 2);
-
-            int fontSize = preferences.getInt("fontSize", 21);
-
-            h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, displayMetrics);
-            textPaint = createNewPaint(Color.BLACK);
-            textPaint.setTextSize(h);
-            textPaint.setTextAlign(Paint.Align.CENTER);
-            kM = h * 1.1f;
-            maxChars = (int) ((displayWidth - Math.max(pad, pad_yesterday) * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
-
             initialised = true;
         }
     }
@@ -126,6 +76,7 @@ public class LockScreenBitmapDrawer {
                     drawStringsOnBitmap(bitmap);
 
                     wallpaperManager_static.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
+                    log(INFO, "set wallpaper");
 
                     bitmap.recycle();
                 } catch (Exception e) {
@@ -141,108 +92,56 @@ public class LockScreenBitmapDrawer {
         Canvas canvas = new Canvas(src);
         canvas.drawBitmap(src, 0, 0, null);
 
-        ArrayList<String> toAdd = filterOnlyNotDoneItems(loadEntries(currentDate), showTodayCompletedTasksOnLock);
-        ArrayList<String> toAdd_yesterday = filterOnlyNotDoneItems(loadEntries(yesterdayDate), showYesterdayCompletedItemsOnLock);
-        ArrayList<String> toAdd_global = filterOnlyNotDoneItems(loadEntries("list_global"), true);
+        ArrayList<TodoListEntry> toAdd = filterItems(loadEntries());
 
-        float rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText) / 2 + 10, 1, displayWidth / 2f - pad);
-        float rWidth_yesterday = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText) / 2 + 10, 1, displayWidth / 2f - pad_yesterday);
-        float rWidth_global = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText) / 2 + 10, 1, displayWidth / 2f - pad_global);
-
-        int size = toAdd.size();
-        if (showYesterdayItemsOnLock) {
-            size += toAdd_yesterday.size();
-        }
-        if (showGlobalItemsOnLock) {
-            size += toAdd_global.size();
+        for (int i = 0; i < toAdd.size(); i++) {
+            toAdd.get(i).reloadParams();
+            // TODO: 26.02.2021 update only if needed
         }
 
-        float maxHeight = (size * kM) / 2;
+        //float maxHeight = (toAdd.size() * kM) / 2;
+        float maxHeight = 0;
 
-        globalI = 0;
-        drawBgOnCanvas(toAdd, canvas, maxHeight, rWidth, pad, 0);
-        if (showYesterdayItemsOnLock) {
-            drawBgOnCanvas(toAdd_yesterday, canvas, maxHeight, rWidth_yesterday, pad_yesterday, 1);
-        }
-        if (showGlobalItemsOnLock) {
-            drawBgOnCanvas(toAdd_global, canvas, maxHeight, rWidth_global, pad_global, 2);
-        }
-
-        globalI = 0;
+        drawBgOnCanvas(toAdd, canvas, maxHeight);
         drawTextListOnCanvas(toAdd, canvas, maxHeight);
-        if (showYesterdayItemsOnLock) {
-            drawTextListOnCanvas(toAdd_yesterday, canvas, maxHeight);
-        }
-        if (showGlobalItemsOnLock) {
-            drawTextListOnCanvas(toAdd_global, canvas, maxHeight);
-        }
     }
 
-    private static void drawTextListOnCanvas(ArrayList<String> toAdd, Canvas canvas, float maxHeight) {
+    private static void drawTextListOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = toAdd.size() - 1; i >= 0; i--) {
-            if (!toAdd.get(i).equals(" ")) {
-                canvas.drawText(toAdd.get(i), displayCenter.x, displayCenter.y + maxHeight - kM * globalI, textPaint);
-            }
-            globalI++;
+            canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i, toAdd.get(i).textPaint);
         }
     }
 
-    private static void drawBgOnCanvas(ArrayList<String> toAdd, Canvas canvas, float maxHeight, float rWidth, int pad, int colorModifier) {
-        Paint gPaint = grayPaint;
-        Paint wPaint = whitePaint;
-        switch (colorModifier) {
-            case (1):
-                gPaint = grayRedPaint;
-                wPaint = redPaint;
-                break;
-            case (2):
-                gPaint = grayGreenPaint;
-                wPaint = greenPaint;
-                break;
-        }
+    private static void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = toAdd.size() - 1; i >= 0; i--) {
-            if (!toAdd.get(i).equals(" ")) {
 
-                canvas.drawRect(displayCenter.x + rWidth + pad,
-                        displayCenter.y + maxHeight + h / 2f - kM * globalI,
-                        displayCenter.x - rWidth - pad,
-                        displayCenter.y + maxHeight - kM * (globalI + 1) - pad, gPaint);
+            canvas.drawRect(displayCenter.x + toAdd.get(i).rWidth + toAdd.get(i).padSize,
+                    displayCenter.y + maxHeight + toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
+                    displayCenter.x - toAdd.get(i).rWidth - toAdd.get(i).padSize,
+                    displayCenter.y + maxHeight - toAdd.get(i).kM * (i + 1) - toAdd.get(i).padSize, toAdd.get(i).padPaint);
 
-                canvas.drawRect(displayCenter.x + rWidth,
-                        displayCenter.y + maxHeight + h / 2f - kM * globalI,
-                        displayCenter.x - rWidth,
-                        displayCenter.y + maxHeight - kM * (globalI + 1), wPaint);
-            }
-            globalI++;
+            canvas.drawRect(displayCenter.x + toAdd.get(i).rWidth,
+                    displayCenter.y + maxHeight + toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
+                    displayCenter.x - toAdd.get(i).rWidth,
+                    displayCenter.y + maxHeight - toAdd.get(i).kM * (i + 1), toAdd.get(i).bgPaint);
         }
     }
 
-    private static ArrayList<String> filterOnlyNotDoneItems(ArrayList<String> input, boolean skipFilter) {
-        ArrayList<String> toAdd = new ArrayList<>();
+    private static ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input) {
+        ArrayList<TodoListEntry> toAdd = new ArrayList<>();
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).endsWith("_0") || skipFilter) {
+            if ((input.get(i).showOnLock && !input.get(i).completed) || input.get(i).showOnLock_ifCompleted) {
+                toAdd.add(input.get(i));
                 String addition = "";
-                if (input.get(i).endsWith("_1")) {
+                if (input.get(i).completed) {
                     addition = " (Выполнено)";
+                    input.get(i).splitText(" (Выполнено)");
                 }
-                String addS = input.get(i).substring(0, input.get(i).length() - 2);
-                if (textPaint.measureText(addS + addition) > displayWidth) {
-                    toAdd.addAll(Arrays.asList(makeNewLines(addS + addition)));
-                } else {
-                    toAdd.add(addS + addition);
-                }
-                toAdd.add(" ");
-                if (addS.length() + addition.length() > currentBitmapLongestText.length()) {
-                    currentBitmapLongestText = addS + addition;
+                if (input.get(i).textValue.length() + addition.length() > currentBitmapLongestText.length()) {
+                    currentBitmapLongestText = input.get(i).textValue + addition;
                 }
             }
         }
         return toAdd;
     }
-
-
-    private static String[] makeNewLines(String input) {
-        return WordUtils.wrap(input, maxChars, "\n", true).split("\n");
-    }
-
 }

@@ -17,20 +17,19 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.entities.TodoListEntry;
+
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
 import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.showYesterdayCompletedItemsInList;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.showYesterdayItemsInList;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 public class ListViewAdapter extends BaseAdapter {
 
     Context context;
-    ArrayList<String> todoList;
-    ArrayList<String> yesterdayCompletedItems;
+    ArrayList<TodoListEntry> todoList;
 
     LayoutInflater inflater;
     ListView currentTodoListView;
@@ -39,12 +38,7 @@ public class ListViewAdapter extends BaseAdapter {
     public ListViewAdapter(FirstFragment fragment, ListView currentTodoListView) {
         this.fragment = fragment;
         this.context = fragment.getContext();
-        this.todoList = loadEntries(currentlySelectedDate);
-        yesterdayCompletedItems = new ArrayList<>();
-        if (showYesterdayItemsInList) {
-            mergeArrays(loadEntries(yesterdayDate));
-        }
-        todoList.addAll(loadEntries("list_global"));
+        this.todoList = fragment.todoList;
         this.currentTodoListView = currentTodoListView;
         inflater = LayoutInflater.from(context);
     }
@@ -64,62 +58,35 @@ public class ListViewAdapter extends BaseAdapter {
         return 0;
     }
 
-    public void mergeArrays(ArrayList<String> yesterdayEntries) {
-        if (currentlySelectedDate.equals(currentDate)) {
-            for (int i = 0; i < yesterdayEntries.size(); i++) {
-                todoList.add(yesterdayEntries.get(i) + "_Y");
-            }
-        }
-    }
-
-    public void updateData(boolean reconstructBitmap) {
-        todoList = loadEntries(currentlySelectedDate);
-        if (showYesterdayItemsInList) {
-            mergeArrays(loadEntries(yesterdayDate));
-        }
-        todoList.addAll(loadEntries("list_global"));
-        if (reconstructBitmap) {
-            constructBitmap();
-        }
+    public void updateData() {
+        this.todoList = fragment.todoList;
+        constructBitmap();
         notifyDataSetChanged();
     }
 
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
 
-        boolean hide = !showYesterdayCompletedItemsInList && todoList.get(i).endsWith("_1_Y");
+        boolean show = todoList.get(i).showInList_ifCompleted || (!todoList.get(i).completed && todoList.get(i).showInList);
+        if (todoList.get(i).isYesterdayEntry || (!todoList.get(i).isGlobalEntry && !todoList.get(i).isYesterdayEntry)) {
+            show = show && todoList.get(i).associatedDate.equals(currentlySelectedDate);
+        }
+
         view = inflater.inflate(R.layout.list_selection, null);
 
-        if (!hide) {
+        if (show) {
             final CheckBox isDone = view.findViewById(R.id.isDone);
 
             final TextView todoText = view.findViewById(R.id.todoText);
 
-            int params = 1;
-            final boolean global;
-
-            if (todoList.get(i).endsWith("_Y")) {
-                todoText.setTextColor(Color.parseColor("#CC0000"));
-                params = 2;
+            if (todoList.get(i).completed) {
+                todoText.setTextColor(todoList.get(i).fontColor_list_completed);
+            } else {
+                todoText.setTextColor(todoList.get(i).fontColor_list);
             }
 
-            global = todoList.get(i).endsWith("_G");
-            if (global) {
-                todoText.setTextColor(Color.parseColor("#00CC00"));
-            }
-
-            if (todoList.get(i).endsWith("_1") || todoList.get(i).endsWith("_1_Y")) {
-                if (params == 1) {
-                    todoText.setTextColor(Color.parseColor("#CCCCCC"));
-                } else {
-                    todoText.setTextColor(Color.parseColor("#FFCCCC"));
-                }
-            }
-
-            todoText.setText(todoList.get(i).substring(0, todoList.get(i).length() - params * 2));
+            todoText.setText(todoList.get(i).textValue);
             ImageView delete = view.findViewById(R.id.deletionButton);
-
-            final int finalParams = params;
 
             delete.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -132,21 +99,9 @@ public class ListViewAdapter extends BaseAdapter {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (!global) {
-                                if (finalParams == 1) {
-                                    fragment.todoList.remove(i);
-                                    saveEntries(currentlySelectedDate, fragment.todoList);
-                                } else {
-                                    ArrayList<String> yesterdayList = loadEntries(yesterdayDate);
-                                    yesterdayList.remove(i - fragment.todoList.size());
-                                    saveEntries(yesterdayDate, yesterdayList);
-                                }
-                            } else {
-                                fragment.globalList.remove(i - todoList.size() + fragment.globalList.size());
-                                saveEntries("list_global", fragment.globalList);
-                            }
-                            updateData(true);
-                            dialog.dismiss();
+                            fragment.todoList.remove(i);
+                            saveEntries(fragment.todoList);
+                            updateData();
                         }
                     });
 
@@ -160,41 +115,27 @@ public class ListViewAdapter extends BaseAdapter {
                     alert.show();
                 }
             });
-            isDone.setChecked(todoList.get(i).endsWith("_1") || todoList.get(i).endsWith("_1_Y"));
+            isDone.setChecked(todoList.get(i).completed);
             isDone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String modifier = "0";
-                    if (isDone.isChecked()) modifier = "1";
-                    if (!global) {
-                        if (finalParams == 1) {
-                            if (isDone.isChecked()) {
-                                todoText.setTextColor(Color.parseColor("#000000"));
-                            } else {
-                                todoText.setTextColor(Color.parseColor("#CCCCCC"));
-                            }
-                            fragment.todoList.set(i, todoList.get(i).substring(0, todoList.get(i).length() - 1) + modifier);
-                            saveEntries(currentlySelectedDate, fragment.todoList);
-                        } else {
-                            if (isDone.isChecked()) {
-                                todoText.setTextColor(Color.parseColor("#CC0000"));
-                            } else {
-                                todoText.setTextColor(Color.parseColor("#FFCCCC"));
-                            }
-                            ArrayList<String> yesterdayList = loadEntries(yesterdayDate);
-                            yesterdayList.set(i - fragment.todoList.size(), todoList.get(i).substring(0, todoList.get(i).length() - 3) + modifier);
-                            saveEntries(yesterdayDate, yesterdayList);
-                        }
-                    } else {
-                        fragment.todoList.add(todoList.get(i).substring(0, todoList.get(i).length() - 2) + "_0");
-                        saveEntries(currentlySelectedDate, fragment.todoList);
 
-                        fragment.globalList.remove(i - todoList.size() + fragment.globalList.size());
-                        saveEntries("list_global", fragment.globalList);
+                    if (!todoList.get(i).isGlobalEntry) {
+                        if (isDone.isChecked()) {
+                            todoText.setTextColor(todoList.get(i).fontColor_list_completed);
+                        } else {
+                            todoText.setTextColor(todoList.get(i).fontColor_list);
+                        }
+                        fragment.todoList.get(i).changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()), true, true);
+                        saveEntries(fragment.todoList);
+                    } else {
+                        fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate, true, true);
+                        saveEntries(fragment.todoList);
                     }
-                    updateData(true);
+                    updateData();
                 }
             });
+
             todoText.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -202,8 +143,7 @@ public class ListViewAdapter extends BaseAdapter {
 
                     final EditText input = new EditText(context);
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
-                    input.setText(todoList.get(i).substring(0, todoList.get(i).length() - finalParams * 2));
-                    final String modifier = todoList.get(i).substring(todoList.get(i).length() - finalParams * 2);
+                    input.setText(todoList.get(i).textValue);
                     alert.setView(input);
 
                     alert.setTitle("Изменить");
@@ -211,43 +151,19 @@ public class ListViewAdapter extends BaseAdapter {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (!global) {
-                                if (finalParams == 1) {
-                                    fragment.todoList.set(i, input.getText() + modifier);
-                                    saveEntries(currentlySelectedDate, fragment.todoList);
-                                } else {
-                                    ArrayList<String> yesterdayList = loadEntries(yesterdayDate);
-                                    yesterdayList.set(i - fragment.todoList.size(), input.getText() + modifier);
-                                    saveEntries(yesterdayDate, yesterdayList);
-                                }
-                            } else {
-                                fragment.globalList.set(i - todoList.size() + fragment.globalList.size(), input.getText() + "_G");
-                                saveEntries("list_global", fragment.globalList);
-                            }
-                            updateData(true);
-                            dialog.dismiss();
+                            fragment.todoList.get(i).changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString(), true, true);
+                            saveEntries(fragment.todoList);
+                            updateData();
                         }
                     });
 
-                    if (!global) {
+                    if (!fragment.todoList.get(i).isGlobalEntry) {
                         alert.setNeutralButton("Переместить в общий список", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
-                                if (finalParams == 1) {
-                                    fragment.globalList.add(input.getText() + "_G");
-                                    fragment.todoList.remove(i);
-                                    saveEntries(currentlySelectedDate, fragment.todoList);
-                                    saveEntries("list_global", fragment.globalList);
-                                } else {
-                                    fragment.globalList.add(input.getText() + "_G");
-                                    ArrayList<String> yesterdayList = loadEntries(yesterdayDate);
-                                    yesterdayList.remove(i - fragment.todoList.size());
-                                    saveEntries(yesterdayDate, yesterdayList);
-                                    saveEntries("list_global", fragment.globalList);
-                                }
-
-                                updateData(true);
+                                fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL", true, true);
+                                saveEntries(fragment.todoList);
+                                updateData();
                             }
                         });
                     }

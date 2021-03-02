@@ -32,10 +32,8 @@ import prototype.xd.scheduler.entities.TodoListEntry;
 
 import static prototype.xd.scheduler.utilities.DateManager.*;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.*;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.initialiseBitmapDrawer;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.showGlobalItemsOnLock;
 import static prototype.xd.scheduler.utilities.Utilities.createRootIfNeeded;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
@@ -53,7 +51,6 @@ public class FirstFragment extends Fragment {
     ListViewAdapter listViewAdapter;
 
     ArrayList<TodoListEntry> todoList;
-    ArrayList<TodoListEntry> globalList;
 
     SharedPreferences preferences;
     DisplayMetrics displayMetrics;
@@ -84,20 +81,18 @@ public class FirstFragment extends Fragment {
 
         final CalendarView datePicker = view.findViewById(R.id.calendar);
 
+        todoList = loadEntries();
+
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
         listViewAdapter = new ListViewAdapter(FirstFragment.this, listView);
         listView.setAdapter(listViewAdapter);
 
-        todoList = loadEntries(currentlySelectedDate);
-        globalList = loadEntries("list_global");
-
         datePicker.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
                 updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-                todoList = loadEntries(currentlySelectedDate);
-                listViewAdapter.updateData(false);
+                listViewAdapter.updateData();
             }
         });
 
@@ -115,20 +110,18 @@ public class FirstFragment extends Fragment {
                 builder.setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        todoList.add(new TodoListEntry(new String[]{"associatedDate", currentlySelectedDate, "completed0"}, "default"));
-                        saveEntries(currentlySelectedDate, todoList);
-                        listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
-                        dialog.dismiss();
+                        todoList.add(new TodoListEntry(new String[]{"value", input.getText().toString(), "associatedDate", currentlySelectedDate, "completed", "false"}, "default"));
+                        saveEntries(todoList);
+                        listViewAdapter.updateData();
                     }
                 });
 
                 builder.setNegativeButton("Добавить в общий список", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        globalList.add(new TodoListEntry(new String[]{"associatedDate", "GLOBAL", "completed0"}, "default"));
-                        saveEntries("list_global", globalList);
-                        listViewAdapter.updateData(showGlobalItemsOnLock);
-                        dialog.dismiss();
+                        todoList.add(new TodoListEntry(new String[]{"value", input.getText().toString(), "associatedDate", "GLOBAL", "completed", "false"}, "default"));
+                        saveEntries(todoList);
+                        listViewAdapter.updateData();
                     }
                 });
 
@@ -156,11 +149,7 @@ public class FirstFragment extends Fragment {
         }
 
         if (updateInBackground) {
-            Intent serviceIntent = new Intent(getActivity(), prototype.xd.scheduler.BackgroudUpdateService.class);
-            serviceIntent.putExtra("prototype.xd.scheduler.DWidth", displayWidth);
-            serviceIntent.putExtra("prototype.xd.scheduler.DHeight", displayHeight);
-            serviceIntent.putExtra("prototype.xd.scheduler.HConst", h);
-            getContext().startService(serviceIntent);
+            getContext().startService(new Intent(getActivity(), prototype.xd.scheduler.BackgroudUpdateService.class));
         }
 
     }

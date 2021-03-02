@@ -1,17 +1,22 @@
 package prototype.xd.scheduler.utilities;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class DateManager {
 
     public static String currentDate = "none";
     public static String currentlySelectedDate = "none";
     public static String yesterdayDate = "none";
-    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/M/d");
+    static DateFormat dateFormat = new SimpleDateFormat("yyyy/M/d", Locale.ROOT);
 
     public static void updateDate(String selectedDate, boolean updateCurrentlySelected) {
-        currentDate = dtf.format(LocalDateTime.now()).replace("/", "_");
+        currentDate = getCurrentDate();
         yesterdayDate = getYesterdayDate();
         if (updateCurrentlySelected) {
             if (selectedDate.equals("none")) {
@@ -23,11 +28,17 @@ public class DateManager {
     }
 
     private static String getYesterdayDate() {
-        String day = currentDate.substring(currentDate.length() - 1);
-        String otherPart = currentDate.substring(0, currentDate.length() - 1);
-        if (Integer.parseInt(day) > 0) {
-            return otherPart + (Integer.parseInt(day) - 1);
-        } else return "";
+        return dateFormat.format(getDate(-1)).replace("/", "_");
+    }
+
+    private static String getCurrentDate() {
+        return dateFormat.format(getDate(0)).replace("/", "_");
+    }
+
+    private static Date getDate(int dayShift) {
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, dayShift);
+        return cal.getTime();
     }
 
 }
