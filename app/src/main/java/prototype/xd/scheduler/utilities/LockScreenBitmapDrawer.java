@@ -94,37 +94,45 @@ public class LockScreenBitmapDrawer {
 
         ArrayList<TodoListEntry> toAdd = filterItems(loadEntries());
 
+        float totalHeight = 0;
         for (int i = 0; i < toAdd.size(); i++) {
-            toAdd.get(i).reloadParams();
-            // TODO: 26.02.2021 update only if needed
+            totalHeight += toAdd.get(i).kM + toAdd.get(i).h;
         }
+        totalHeight /= 2f;
 
-        //float maxHeight = (toAdd.size() * kM) / 2;
-        float maxHeight = 0;
-
-        drawBgOnCanvas(toAdd, canvas, maxHeight);
-        drawTextListOnCanvas(toAdd, canvas, maxHeight);
+        drawBgOnCanvas(toAdd, canvas, totalHeight);
+        drawTextListOnCanvas(toAdd, canvas, totalHeight);
     }
 
     private static void drawTextListOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = toAdd.size() - 1; i >= 0; i--) {
-            canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i, toAdd.get(i).textPaint);
+            canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i * 2, toAdd.get(i).textPaint);
+            // TODO: 03.03.2021 draw split lines
         }
     }
 
     private static void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = toAdd.size() - 1; i >= 0; i--) {
 
-            canvas.drawRect(displayCenter.x + toAdd.get(i).rWidth + toAdd.get(i).padSize,
-                    displayCenter.y + maxHeight + toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
-                    displayCenter.x - toAdd.get(i).rWidth - toAdd.get(i).padSize,
-                    displayCenter.y + maxHeight - toAdd.get(i).kM * (i + 1) - toAdd.get(i).padSize, toAdd.get(i).padPaint);
+            drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
+                    -toAdd.get(i).rWidth - toAdd.get(i).padSize,
+                    toAdd.get(i).h / 2f - toAdd.get(i).kM * i * 2,
+                    toAdd.get(i).rWidth + toAdd.get(i).padSize,
+                    -toAdd.get(i).kM * (i * 2 + 1) - toAdd.get(i).padSize);
 
-            canvas.drawRect(displayCenter.x + toAdd.get(i).rWidth,
-                    displayCenter.y + maxHeight + toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
-                    displayCenter.x - toAdd.get(i).rWidth,
-                    displayCenter.y + maxHeight - toAdd.get(i).kM * (i + 1), toAdd.get(i).bgPaint);
+            drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
+                    -toAdd.get(i).rWidth,
+                    toAdd.get(i).h / 2f - toAdd.get(i).kM * i * 2,
+                    toAdd.get(i).rWidth,
+                    -toAdd.get(i).kM * (i * 2 + 1));
         }
+    }
+
+    private static void drawRectRelativeToTheCenter(Canvas canvas, Paint paint, float maxHeight, float left, float top, float right, float bottom) {
+        canvas.drawRect(displayCenter.x + left,
+                displayCenter.y + maxHeight + top,
+                displayCenter.x + right,
+                displayCenter.y + maxHeight + bottom, paint);
     }
 
     private static ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input) {

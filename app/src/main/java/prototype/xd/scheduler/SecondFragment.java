@@ -139,13 +139,13 @@ public class SecondFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Intent serviceIntent = new Intent(getActivity(), prototype.xd.scheduler.BackgroudUpdateService.class);
+                    Intent serviceIntent = new Intent(getActivity(), BackgroundUpdateService.class);
                     serviceIntent.putExtra("prototype.xd.scheduler.DWidth", displayWidth);
                     serviceIntent.putExtra("prototype.xd.scheduler.DHeight", displayMetrics.heightPixels);
                     serviceIntent.putExtra("prototype.xd.scheduler.HConst", h);
                     getContext().startService(serviceIntent);
                 } else {
-                    getContext().stopService(new Intent(getActivity(), prototype.xd.scheduler.BackgroudUpdateService.class));
+                    getContext().stopService(new Intent(getActivity(), BackgroundUpdateService.class));
                 }
             }
         });

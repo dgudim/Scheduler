@@ -1,16 +1,10 @@
 package prototype.xd.scheduler.entities;
 
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.TypedValue;
 
 import androidx.core.math.MathUtils;
 
-import java.util.ArrayList;
-
-import prototype.xd.scheduler.R;
-
-import static org.apache.commons.lang.ArrayUtils.add;
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
@@ -56,6 +50,7 @@ public class TodoListEntry {
     public Paint textPaint;
     public Paint bgPaint;
     public Paint padPaint;
+    private boolean resourcesValid;
 
     public boolean isTodayEntry;
     public boolean isYesterdayEntry;
@@ -150,8 +145,9 @@ public class TodoListEntry {
         fontSize = preferences_static.getInt("fontSize", 21);
         fontColor = 0xFF000000;
         setParams((String[]) addAll(group.params, params));
-        initialiseDisplayData();
-        // TODO: 01.03.2021 initialise only if needed to reduce memory usage
+        if (!resourcesValid) {
+            initialiseDisplayData();
+        }
     }
 
     private void initialiseDisplayData() {
@@ -167,6 +163,8 @@ public class TodoListEntry {
         padPaint = createNewPaint(padColor);
 
         splitText("");
+
+        resourcesValid = true;
     }
 
     public void splitText(String addition) {
@@ -174,7 +172,7 @@ public class TodoListEntry {
     }
 
     private void setParams(String[] params) {
-        for (int i = 0; i < params.length; i++) {
+        for (int i = 0; i < params.length; i += 2) {
             switch (params[i]) {
                 case (TEXT_VALUE):
                     textValue = params[i + 1];
@@ -210,14 +208,11 @@ public class TodoListEntry {
         }
     }
 
-    public void changeParameter(String name, String value, boolean addIfNotPresent, boolean reloadAfter) {
+    public void changeParameter(String name, String value, boolean addIfNotPresent, boolean reloadAfter, boolean invalidateResources) {
         boolean changed = false;
         for (int i = 0; i < params.length; i++) {
             if (params[i].equals(name)) {
                 params[i + 1] = value;
-                if (reloadAfter) {
-                    reloadParams();
-                }
                 changed = true;
                 break;
             }
@@ -228,10 +223,10 @@ public class TodoListEntry {
             newParams[newParams.length - 1] = value;
             newParams[newParams.length - 2] = name;
             params = newParams;
-            if (reloadAfter) {
-                reloadParams();
-            }
+        }
+        resourcesValid = !invalidateResources;
+        if (reloadAfter) {
+            reloadParams();
         }
     }
-
 }

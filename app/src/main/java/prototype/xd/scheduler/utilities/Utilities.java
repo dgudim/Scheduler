@@ -6,7 +6,9 @@ import org.apache.commons.lang.WordUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -31,23 +33,12 @@ public class Utilities {
     @SuppressWarnings("unchecked")
     public static ArrayList<TodoListEntry> loadEntries() {
         try {
-            File file = new File(rootDir, "list");
-            File file_g = new File(rootDir, "list_groupData");
 
-            FileInputStream f = new FileInputStream(file);
-            ObjectInputStream s = new ObjectInputStream(f);
-            FileInputStream f_g = new FileInputStream(file_g);
-            ObjectInputStream s_g = new ObjectInputStream(f_g);
-            // TODO: 01.03.2021 add function to save(load) an object
-
-            ArrayList<String[]> entryParams = (ArrayList<String[]>) s.readObject();
-            ArrayList<String> entryGroupNames = (ArrayList<String>) s_g.readObject();
-            s.close();
-            s_g.close();
+            ArrayList<String[]> entryParams = (ArrayList<String[]>) loadObject("list");
+            ArrayList<String> entryGroupNames = (ArrayList<String>) loadObject("list_groupData");
 
             if (!(entryParams.size() == entryGroupNames.size())) {
                 log(WARNING, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
-                throw new IllegalAccessException();
             }
 
             ArrayList<TodoListEntry> readEntries = new ArrayList<>();
@@ -55,7 +46,7 @@ public class Utilities {
                 readEntries.add(new TodoListEntry(entryParams.get(i), entryGroupNames.get(i)));
             }
 
-            return readEntries;
+            return sortEntries(readEntries);
         } catch (Exception e) {
             log(INFO, "no todo list");
             return new ArrayList<>();
@@ -64,8 +55,6 @@ public class Utilities {
 
     public static void saveEntries(ArrayList<TodoListEntry> entries) {
         try {
-            File file = new File(rootDir, "list");
-            File file_g = new File(rootDir, "list_groupData");
             ArrayList<String[]> entryParams = new ArrayList<>();
             ArrayList<String> entryGroupNames = new ArrayList<>();
 
@@ -74,18 +63,53 @@ public class Utilities {
                 entryGroupNames.add(entries.get(i).group.name);
             }
 
-            FileOutputStream fos = new FileOutputStream(file);
-            ObjectOutputStream s = new ObjectOutputStream(fos);
-            s.writeObject(entryParams);
-            s.close();
-
-            FileOutputStream fos_g = new FileOutputStream(file_g);
-            ObjectOutputStream s_g = new ObjectOutputStream(fos_g);
-            s_g.writeObject(entryGroupNames);
-            s_g.close();
+            saveObject("list", entryParams);
+            saveObject("list_groupData", entryGroupNames);
+            log(INFO, "saving todo list");
         } catch (Exception e) {
             log(ERROR, "missing permission, failed to save todo list");
         }
+    }
+
+    public static Object loadObject(String fileName) throws IOException, ClassNotFoundException {
+        File file = new File(rootDir, fileName);
+        FileInputStream f = new FileInputStream(file);
+        ObjectInputStream s = new ObjectInputStream(f);
+        Object object = s.readObject();
+        s.close();
+        return object;
+    }
+
+    public static void saveObject(String fileName, Object object) throws IOException {
+        File file = new File(rootDir, fileName);
+        FileOutputStream f = new FileOutputStream(file);
+        ObjectOutputStream s = new ObjectOutputStream(f);
+        s.writeObject(object);
+        s.close();
+    }
+
+    private static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {
+        ArrayList<TodoListEntry> yesterdayEntries = new ArrayList<>();
+        ArrayList<TodoListEntry> todayEntries = new ArrayList<>();
+        ArrayList<TodoListEntry> globalEntries = new ArrayList<>();
+        ArrayList<TodoListEntry> otherEntries = new ArrayList<>();
+        for (int i = 0; i < entries.size(); i++) {
+            if (entries.get(i).isTodayEntry) {
+                todayEntries.add(entries.get(i));
+            } else if (entries.get(i).isYesterdayEntry) {
+                yesterdayEntries.add(entries.get(i));
+            } else if (entries.get(i).isGlobalEntry) {
+                globalEntries.add(entries.get(i));
+            } else {
+                otherEntries.add(entries.get(i));
+            }
+        }
+        ArrayList<TodoListEntry> merged = new ArrayList<>();
+        merged.addAll(todayEntries);
+        merged.addAll(globalEntries);
+        merged.addAll(yesterdayEntries);
+        merged.addAll(otherEntries);
+        return merged;
     }
 
     public static String[] makeNewLines(String input, int maxChars) {

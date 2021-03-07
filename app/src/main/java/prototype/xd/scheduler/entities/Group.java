@@ -1,25 +1,19 @@
 package prototype.xd.scheduler.entities;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+import static prototype.xd.scheduler.utilities.Utilities.loadObject;
+import static prototype.xd.scheduler.utilities.Utilities.saveObject;
 
 public class Group {
 
     public String name = "default";
 
     String[] params = new String[]{};
-    static File groupFile = new File(rootDir, "groups");
-    static File groupFile_names = new File(rootDir, "groupNames");
 
     public Group(String groupName) {
         ArrayList<Group> groups = readGroupFile();
@@ -43,16 +37,9 @@ public class Group {
 
     private static ArrayList<Group> readGroupFile() {
         try {
-            FileInputStream f = new FileInputStream(groupFile);
-            ObjectInputStream s = new ObjectInputStream(f);
 
-            FileInputStream f_g = new FileInputStream(groupFile_names);
-            ObjectInputStream s_g = new ObjectInputStream(f_g);
-
-            ArrayList<String[]> groupParams = (ArrayList<String[]>) s.readObject();
-            ArrayList<String> groupNames = (ArrayList<String>) s_g.readObject();
-            s.close();
-            s_g.close();
+            ArrayList<String[]> groupParams = (ArrayList<String[]>) loadObject("groups");
+            ArrayList<String> groupNames = (ArrayList<String>) loadObject("groupNames");
 
             if (!(groupParams.size() == groupNames.size())) {
                 log(WARNING, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
@@ -72,11 +59,6 @@ public class Group {
 
     private static void saveGroupsFile(ArrayList<Group> groups) {
         try {
-            FileOutputStream fos = new FileOutputStream(groupFile);
-            ObjectOutputStream s = new ObjectOutputStream(fos);
-
-            FileOutputStream fos_g = new FileOutputStream(groupFile_names);
-            ObjectOutputStream s_g = new ObjectOutputStream(fos_g);
 
             ArrayList<String[]> groupParams = new ArrayList<>();
             ArrayList<String> groupNames = new ArrayList<>();
@@ -85,10 +67,9 @@ public class Group {
                 groupNames.add(groups.get(i).name);
             }
 
-            s.writeObject(groupParams);
-            s.close();
-            s_g.writeObject(groupNames);
-            s_g.close();
+            saveObject("groups", groupParams);
+            saveObject("groupNames", groupNames);
+
         } catch (Exception e) {
             log(ERROR, "missing permission, failed to save groups file");
         }

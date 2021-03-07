@@ -3,7 +3,6 @@ package prototype.xd.scheduler;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +18,8 @@ import java.util.ArrayList;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 
-import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
-import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
-import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 public class ListViewAdapter extends BaseAdapter {
@@ -126,10 +122,10 @@ public class ListViewAdapter extends BaseAdapter {
                         } else {
                             todoText.setTextColor(todoList.get(i).fontColor_list);
                         }
-                        fragment.todoList.get(i).changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()), true, true);
+                        fragment.todoList.get(i).changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()), true, true, true);
                         saveEntries(fragment.todoList);
                     } else {
-                        fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate, true, true);
+                        fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate, true, true, true);
                         saveEntries(fragment.todoList);
                     }
                     updateData();
@@ -151,7 +147,7 @@ public class ListViewAdapter extends BaseAdapter {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            fragment.todoList.get(i).changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString(), true, true);
+                            fragment.todoList.get(i).changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString(), true, true, false);
                             saveEntries(fragment.todoList);
                             updateData();
                         }
@@ -161,7 +157,7 @@ public class ListViewAdapter extends BaseAdapter {
                         alert.setNeutralButton("Переместить в общий список", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL", true, true);
+                                fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL", true, true, true);
                                 saveEntries(fragment.todoList);
                                 updateData();
                             }

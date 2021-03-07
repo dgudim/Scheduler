@@ -21,7 +21,7 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
 
-public class BackgroudUpdateService extends Service {
+public class BackgroundUpdateService extends Service {
 
     private static final String NOTIF_ID = "1";
     private static final String NOTIF_CHANNEL_ID = "Background update service";

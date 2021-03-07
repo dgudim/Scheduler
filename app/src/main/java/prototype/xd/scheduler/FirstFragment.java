@@ -119,6 +119,9 @@ public class FirstFragment extends Fragment {
                 builder.setNegativeButton("Добавить в общий список", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        for(int i = 0; i<1000; i++){
+                            todoList.add(new TodoListEntry(new String[]{"value", input.getText().toString(), "associatedDate", "GLOBAL", "completed", "false"}, "default"));
+                        }
                         todoList.add(new TodoListEntry(new String[]{"value", input.getText().toString(), "associatedDate", "GLOBAL", "completed", "false"}, "default"));
                         saveEntries(todoList);
                         listViewAdapter.updateData();
@@ -149,7 +152,7 @@ public class FirstFragment extends Fragment {
         }
 
         if (updateInBackground) {
-            getContext().startService(new Intent(getActivity(), prototype.xd.scheduler.BackgroudUpdateService.class));
+            getContext().startService(new Intent(getActivity(), BackgroundUpdateService.class));
         }
 
     }

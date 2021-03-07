@@ -16,7 +16,7 @@
         android:screenOrientation="portrait">
         <service
             android:enabled="true"
-            android:name="prototype.xd.scheduler.BackgroudUpdateService" />
+            android:name="prototype.xd.scheduler.BackgroundUpdateService" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
