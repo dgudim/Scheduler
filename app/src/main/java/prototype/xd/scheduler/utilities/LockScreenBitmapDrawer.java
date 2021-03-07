@@ -15,16 +15,21 @@ import androidx.core.math.MathUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 import static prototype.xd.scheduler.utilities.DateManager.*;
+import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
+import static prototype.xd.scheduler.utilities.Utilities.loadObject;
+import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+import static prototype.xd.scheduler.utilities.Utilities.saveObject;
 
 public class LockScreenBitmapDrawer {
 
@@ -93,38 +98,72 @@ public class LockScreenBitmapDrawer {
         canvas.drawBitmap(src, 0, 0, null);
 
         ArrayList<TodoListEntry> toAdd = filterItems(loadEntries());
+        for (int i = 0; i < toAdd.size(); i++) {
+            toAdd.get(i).initialiseDisplayData();
+            toAdd.get(i).splitText();
+        }
 
         float totalHeight = 0;
         for (int i = 0; i < toAdd.size(); i++) {
-            totalHeight += toAdd.get(i).kM + toAdd.get(i).h;
+            totalHeight += toAdd.get(i).h * toAdd.get(i).textValueSplit.length;
+            if (toAdd.get(i).textValueSplit.length == 1) {
+                totalHeight += toAdd.get(i).kM;
+            }
         }
         totalHeight /= 2f;
 
-        drawBgOnCanvas(toAdd, canvas, totalHeight);
-        drawTextListOnCanvas(toAdd, canvas, totalHeight);
+        ArrayList<TodoListEntry> toAddSplit = new ArrayList<>();
+        for (int i = toAdd.size() - 1; i >= 0; i--) {
+            for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
+                TodoListEntry splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
+                copyDisplayData(toAdd.get(i), splitEntry);
+                splitEntry.changeParameter(TodoListEntry.TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
+                toAddSplit.add(splitEntry);
+            }
+            TodoListEntry blankEntry = new TodoListEntry();
+            blankEntry.textValue = "_BLANK_";
+            blankEntry.h = 10;
+            blankEntry.kM = 10 * 1.1f;
+            toAddSplit.add(blankEntry);
+        }
+
+        drawBgOnCanvas(toAddSplit, canvas, totalHeight);
+        drawTextListOnCanvas(toAddSplit, canvas, totalHeight);
+    }
+
+    private static void copyDisplayData(TodoListEntry from, TodoListEntry to) {
+        to.padPaint = from.padPaint;
+        to.bgPaint = from.bgPaint;
+        to.textPaint = from.textPaint;
+        to.h = from.h;
+        to.kM = from.kM;
+        to.maxChars = from.maxChars;
+        to.rWidth = from.rWidth;
     }
 
     private static void drawTextListOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
-        for (int i = toAdd.size() - 1; i >= 0; i--) {
-            canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i * 2, toAdd.get(i).textPaint);
-            // TODO: 03.03.2021 draw split lines
+        for (int i = 0; i < toAdd.size(); i++) {
+            if (!toAdd.get(i).textValue.equals("_BLANK_")) {
+                canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i, toAdd.get(i).textPaint);
+            }
         }
     }
 
     private static void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
-        for (int i = toAdd.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < toAdd.size(); i++) {
+            if (!toAdd.get(i).textValue.equals("_BLANK_")) {
+                drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
+                        -toAdd.get(i).rWidth - toAdd.get(i).padSize,
+                        toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
+                        toAdd.get(i).rWidth + toAdd.get(i).padSize,
+                        -toAdd.get(i).kM * (i + 1) - toAdd.get(i).padSize);
 
-            drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
-                    -toAdd.get(i).rWidth - toAdd.get(i).padSize,
-                    toAdd.get(i).h / 2f - toAdd.get(i).kM * i * 2,
-                    toAdd.get(i).rWidth + toAdd.get(i).padSize,
-                    -toAdd.get(i).kM * (i * 2 + 1) - toAdd.get(i).padSize);
-
-            drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
-                    -toAdd.get(i).rWidth,
-                    toAdd.get(i).h / 2f - toAdd.get(i).kM * i * 2,
-                    toAdd.get(i).rWidth,
-                    -toAdd.get(i).kM * (i * 2 + 1));
+                drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
+                        -toAdd.get(i).rWidth,
+                        toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
+                        toAdd.get(i).rWidth,
+                        -toAdd.get(i).kM * (i + 1));
+            }
         }
     }
 
@@ -143,8 +182,8 @@ public class LockScreenBitmapDrawer {
                 String addition = "";
                 if (input.get(i).completed) {
                     addition = " (Выполнено)";
-                    input.get(i).splitText(" (Выполнено)");
                 }
+                input.get(i).textValue += addition;
                 if (input.get(i).textValue.length() + addition.length() > currentBitmapLongestText.length()) {
                     currentBitmapLongestText = input.get(i).textValue + addition;
                 }

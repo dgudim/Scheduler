@@ -24,13 +24,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
-
 import java.io.File;
 
 import static prototype.xd.scheduler.utilities.ScalingUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 public class SecondFragment extends Fragment {
 
@@ -96,42 +94,42 @@ public class SecondFragment extends Fragment {
         todayBgColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue("todayBgColor", (ImageView) v, 0xFFFFFFFF);
+                invokeColorDialogue("todayBgColor", (ImageView) v, 0xFFFFFFFF, getContext());
             }
         });
 
         yesterdayBgColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue("yesterdayBgColor", (ImageView) v, 0xFFFFCCCC);
+                invokeColorDialogue("yesterdayBgColor", (ImageView) v, 0xFFFFCCCC, getContext());
             }
         });
 
         todayBevelColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue("todayBevelColor", (ImageView) v, 0xFF888888);
+                invokeColorDialogue("todayBevelColor", (ImageView) v, 0xFF888888, getContext());
             }
         });
 
         yesterdayBevelColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue("yesterdayBevelColor", (ImageView) v, 0xFFFF8888);
+                invokeColorDialogue("yesterdayBevelColor", (ImageView) v, 0xFFFF8888, getContext());
             }
         });
 
         globalBgColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue("globalBgColor", (ImageView) v, 0xFFCCFFCC);
+                invokeColorDialogue("globalBgColor", (ImageView) v, 0xFFCCFFCC, getContext());
             }
         });
 
         globalBevelColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue("globalBevelColor", (ImageView) v, 0xFF88FF88);
+                invokeColorDialogue("globalBevelColor", (ImageView) v, 0xFF88FF88, getContext());
             }
         });
 
@@ -153,22 +151,22 @@ public class SecondFragment extends Fragment {
         addSeekBarChangeListener(
                 (TextView) (view.findViewById(R.id.textSizeDescripton)),
                 (SeekBar) (view.findViewById(R.id.fontSizeBar)),
-                "fontSize", 21, R.string.settings_font_size);
+                "fontSize", 21, R.string.settings_font_size, this);
 
         addSeekBarChangeListener(
                 (TextView) (view.findViewById(R.id.defaultBevelThickness)),
                 (SeekBar) (view.findViewById(R.id.defaultBevelThicknessBar)),
-                "defaultBevelThickness", 5, R.string.settings_default_bevel_thickness);
+                "defaultBevelThickness", 5, R.string.settings_default_bevel_thickness, this);
 
         addSeekBarChangeListener(
                 (TextView) (view.findViewById(R.id.yesterdayBevelThickness)),
                 (SeekBar) (view.findViewById(R.id.yesterdaytBevelThicknessBar)),
-                "yesterdayBevelThickness", 5, R.string.settings_yesterday_bevel_thickness);
+                "yesterdayBevelThickness", 5, R.string.settings_yesterday_bevel_thickness, this);
 
         addSeekBarChangeListener(
                 (TextView) (view.findViewById(R.id.globalBevelThickness)),
                 (SeekBar) (view.findViewById(R.id.globalBevelThicknessBar)),
-                "globalBevelThickness", 5, R.string.settings_global_bevel_thickness);
+                "globalBevelThickness", 5, R.string.settings_global_bevel_thickness, this);
 
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayItemsLockSwitch), "yesterdayItemsLock", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayItemsListSwitch), "yesterdayItemsList", false, null);
@@ -205,30 +203,6 @@ public class SecondFragment extends Fragment {
 
     }
 
-    void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final String key, int defValue, final int stringResource) {
-        displayTo.setText(getString(stringResource, preferences.getInt(key, defValue)));
-        seekBar.setProgress(preferences.getInt(key, defValue));
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(getString(stringResource, progress));
-                preferences.edit().putInt(key, progress).apply();
-                preferences.edit().putBoolean("settingsModified", true).apply();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-    }
-
     void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defValue, final CompoundButton.OnCheckedChangeListener listener) {
         tSwitch.setChecked(preferences.getBoolean(key, defValue));
         tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -241,31 +215,6 @@ public class SecondFragment extends Fragment {
                 }
             }
         });
-    }
-
-    void invokeColorDialogue(final String key, final ImageView target, final int defValue) {
-        ColorPickerDialogBuilder
-                .with(getContext())
-                .setTitle("Выберите цвет")
-                .initialColor(preferences.getInt(key, defValue))
-                .showAlphaSlider(false)
-                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                .density(12)
-                .setPositiveButton("Применить", new ColorPickerClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                        preferences.edit().putInt(key, selectedColor).apply();
-                        preferences.edit().putBoolean("settingsModified", true).apply();
-                        target.setImageBitmap(createSolidColorCircle(preferences.getInt(key, defValue)));
-                    }
-                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        })
-                .build()
-                .show();
     }
 
 }

@@ -1,6 +1,17 @@
 package prototype.xd.scheduler.utilities;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Environment;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
+
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import org.apache.commons.lang.WordUtils;
 
@@ -13,12 +24,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.FirstFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
+import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.preferences_static;
 import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.ScalingUtilities.createSolidColorCircle;
 
 public class Utilities {
 
@@ -114,5 +128,102 @@ public class Utilities {
 
     public static String[] makeNewLines(String input, int maxChars) {
         return WordUtils.wrap(input, maxChars, "\n", true).split("\n");
+    }
+
+    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final String key, int defValue, final int stringResource, final Fragment fragment) {
+        displayTo.setText(fragment.getString(stringResource, preferences_static.getInt(key, defValue)));
+        seekBar.setProgress(preferences_static.getInt(key, defValue));
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                displayTo.setText(fragment.getString(stringResource, progress));
+                preferences_static.edit().putInt(key, progress).apply();
+                preferences_static.edit().putBoolean("settingsModified", true).apply();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
+
+    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final Fragment fragment, final TodoListEntry todoListEntry, final String parameter) {
+        displayTo.setText(fragment.getString(stringResource, value));
+        seekBar.setProgress(value);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                displayTo.setText(fragment.getString(stringResource, progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
+                preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+            }
+        });
+    }
+
+    public static void invokeColorDialogue(final String key, final ImageView target, final int defValue, Context context) {
+        ColorPickerDialogBuilder
+                .with(context)
+                .setTitle("Выберите цвет")
+                .initialColor(preferences_static.getInt(key, defValue))
+                .showAlphaSlider(false)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setPositiveButton("Применить", new ColorPickerClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                        preferences_static.edit().putInt(key, selectedColor).apply();
+                        preferences_static.edit().putBoolean("settingsModified", true).apply();
+                        target.setImageBitmap(createSolidColorCircle(preferences_static.getInt(key, defValue)));
+                    }
+                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        })
+                .build()
+                .show();
+    }
+
+    public static void invokeColorDialogue(final int value, final ImageView target, Context context, final TodoListEntry todoListEntry, final String parameter, final boolean setReconstructFlag) {
+        ColorPickerDialogBuilder
+                .with(context)
+                .setTitle("Выберите цвет")
+                .initialColor(value)
+                .showAlphaSlider(false)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setPositiveButton("Применить", new ColorPickerClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                        todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
+                        target.setImageBitmap(createSolidColorCircle(selectedColor));
+                        preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", setReconstructFlag).apply();
+                    }
+                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        })
+                .build()
+                .show();
     }
 }

@@ -16,6 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/backgroudSecondLayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
@@ -28,7 +29,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:background="#FFFFFF"
                 android:backgroundTint="#FFFFFF"
                 android:textAllCaps="false"
                 android:textSize="18sp" />
@@ -39,7 +39,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:background="#FFFFFF"
                 android:gravity="center_vertical"
                 android:lines="5"
                 android:maxLines="5"
@@ -53,7 +52,6 @@
                 android:layout_width="27dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0"
-                android:background="#FFFFFF"
                 android:contentDescription="@string/action_settings"
                 app:srcCompat="@drawable/gears_icon" />
 
@@ -62,7 +60,6 @@
                 android:layout_width="54dp"
                 android:layout_height="54dp"
                 android:layout_gravity="center_vertical"
-                android:background="#FFFFFF"
                 android:contentDescription="@string/delete_item"
                 app:srcCompat="@drawable/trash_can" />
         </LinearLayout>

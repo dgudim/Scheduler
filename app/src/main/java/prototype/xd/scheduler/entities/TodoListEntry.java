@@ -12,6 +12,7 @@ import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.currentBit
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayMetrics_static;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayWidth;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.preferences_static;
+import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.ScalingUtilities.createNewPaint;
@@ -24,20 +25,21 @@ public class TodoListEntry {
     public Group group;
 
     public int bgColor_lock;
+    public int bgColor_list;
     public int fontColor_list;
     public int fontColor_list_completed;
 
-    int padColor;
+    public int padColor;
 
     public int fontSize;
     public float h;
     public float kM;
-    int maxChars;
+    public int maxChars;
     public float rWidth;
 
     public int padSize;
 
-    public int fontColor;
+    public int fontColor_lock;
 
     public boolean showOnLock;
     public boolean showOnLock_ifCompleted;
@@ -50,7 +52,6 @@ public class TodoListEntry {
     public Paint textPaint;
     public Paint bgPaint;
     public Paint padPaint;
-    private boolean resourcesValid;
 
     public boolean isTodayEntry;
     public boolean isYesterdayEntry;
@@ -63,10 +64,16 @@ public class TodoListEntry {
     public static final String SHOW_ON_LOCK = "lock";
     public static final String FONT_SIZE = "fontSize";
     public static final String PAD_SIZE = "padSize";
-    public static final String FONT_COLOR = "fontColor";
-    public static final String BACKGROUND_COLOR = "bgColor";
+    public static final String FONT_COLOR_LOCK = "fontColor_lock";
+    public static final String FONT_COLOR_LIST = "fontColor_list";
+    public static final String BACKGROUND_COLOR_LOCK = "bgColor_lock";
+    public static final String BACKGROUND_COLOR_LIST = "bgColor_list";
     public static final String PAD_COLOR = "padColor";
     public static final String ASSOCIATED_DATE = "associatedDate";
+
+    public TodoListEntry(){
+
+    }
 
     public TodoListEntry(String[] params, String groupName) {
         group = new Group(groupName);
@@ -143,16 +150,14 @@ public class TodoListEntry {
             }
         }
         fontSize = preferences_static.getInt("fontSize", 21);
-        fontColor = 0xFF000000;
+        fontColor_lock = 0xFF000000;
+        bgColor_list = 0xFFFFFFFF;
         setParams((String[]) addAll(group.params, params));
-        if (!resourcesValid) {
-            initialiseDisplayData();
-        }
     }
 
-    private void initialiseDisplayData() {
+    public void initialiseDisplayData() {
         h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, displayMetrics_static);
-        textPaint = createNewPaint(fontColor);
+        textPaint = createNewPaint(fontColor_lock);
         textPaint.setTextSize(h);
         textPaint.setTextAlign(Paint.Align.CENTER);
         kM = h * 1.1f;
@@ -162,13 +167,11 @@ public class TodoListEntry {
         bgPaint = createNewPaint(bgColor_lock);
         padPaint = createNewPaint(padColor);
 
-        splitText("");
-
-        resourcesValid = true;
+        log(INFO, "loaded display data for " + textValue);
     }
 
-    public void splitText(String addition) {
-        textValueSplit = makeNewLines(textValue + addition, maxChars);
+    public void splitText() {
+        textValueSplit = makeNewLines(textValue, maxChars);
     }
 
     private void setParams(String[] params) {
@@ -189,11 +192,17 @@ public class TodoListEntry {
                 case (PAD_SIZE):
                     padSize = Integer.parseInt(params[i + 1]);
                     break;
-                case (FONT_COLOR):
-                    fontColor = Integer.parseInt(params[i + 1]);
+                case (FONT_COLOR_LOCK):
+                    fontColor_lock = Integer.parseInt(params[i + 1]);
                     break;
-                case (BACKGROUND_COLOR):
+                case (FONT_COLOR_LIST):
+                    fontColor_list = Integer.parseInt(params[i + 1]);
+                    break;
+                case (BACKGROUND_COLOR_LOCK):
                     bgColor_lock = Integer.parseInt(params[i + 1]);
+                    break;
+                case (BACKGROUND_COLOR_LIST):
+                    bgColor_list = Integer.parseInt(params[i + 1]);
                     break;
                 case (PAD_COLOR):
                     padColor = Integer.parseInt(params[i + 1]);
@@ -208,7 +217,7 @@ public class TodoListEntry {
         }
     }
 
-    public void changeParameter(String name, String value, boolean addIfNotPresent, boolean reloadAfter, boolean invalidateResources) {
+    public void changeParameter(String name, String value) {
         boolean changed = false;
         for (int i = 0; i < params.length; i++) {
             if (params[i].equals(name)) {
@@ -217,16 +226,13 @@ public class TodoListEntry {
                 break;
             }
         }
-        if (!changed && addIfNotPresent) {
+        if (!changed) {
             String[] newParams = new String[params.length + 2];
             System.arraycopy(params, 0, newParams, 0, params.length);
             newParams[newParams.length - 1] = value;
             newParams[newParams.length - 2] = name;
             params = newParams;
         }
-        resourcesValid = !invalidateResources;
-        if (reloadAfter) {
-            reloadParams();
-        }
+        reloadParams();
     }
 }

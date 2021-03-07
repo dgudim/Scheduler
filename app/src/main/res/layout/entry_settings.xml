@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:rotationX="0">
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="805dp"
+        android:layout_height="wrap_content"
         android:background="#C5C3C3"
         android:orientation="vertical"
         android:padding="5dp"
@@ -52,37 +52,72 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView2"
+            android:id="@+id/cardView5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="3dp"
             app:cardCornerRadius="5dp">
 
             <LinearLayout
-                android:id="@+id/linearLayout4"
+                android:id="@+id/linearLayout34"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#FFFFFF"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/textView34"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="150"
                     android:background="#FFFFFF"
                     android:gravity="center_vertical"
-                    android:text="@string/settings_pad_color_on_lock"
+                    android:text="@string/settings_text_color_on_lock"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
                 <ImageView
-                    android:id="@+id/padColor_lock"
+                    android:id="@+id/textColor_lock"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_weight="1"
                     android:background="#FFFFFF"
-                    android:contentDescription="@string/settings_pad_color_on_lock" />
+                    android:contentDescription="@string/settings_text_color_on_lock" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView333"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            app:cardCornerRadius="5dp">
+
+            <LinearLayout
+                android:id="@+id/linearLayout533"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView533"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="150"
+                    android:background="#FFFFFF"
+                    android:gravity="center_vertical"
+                    android:text="@string/settings_bg_color_in_list"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/backgroundColor_list"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="#FFFFFF"
+                    android:contentDescription="@string/settings_bg_color_in_list" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -118,6 +153,41 @@
                     android:layout_weight="1"
                     android:background="#FFFFFF"
                     android:contentDescription="@string/settings_bg_color_on_lock" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            app:cardCornerRadius="5dp">
+
+            <LinearLayout
+                android:id="@+id/linearLayout4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="150"
+                    android:background="#FFFFFF"
+                    android:gravity="center_vertical"
+                    android:text="@string/settings_pad_color_on_lock"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+
+                <ImageView
+                    android:id="@+id/padColor_lock"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:background="#FFFFFF"
+                    android:contentDescription="@string/settings_pad_color_on_lock" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

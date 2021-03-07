@@ -48,9 +48,9 @@ public class FirstFragment extends Fragment {
     };
 
     ListView listView;
-    ListViewAdapter listViewAdapter;
+    public ListViewAdapter listViewAdapter;
 
-    ArrayList<TodoListEntry> todoList;
+    public ArrayList<TodoListEntry> todoList;
 
     SharedPreferences preferences;
     DisplayMetrics displayMetrics;
@@ -92,7 +92,7 @@ public class FirstFragment extends Fragment {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
                 updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-                listViewAdapter.updateData();
+                listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
             }
         });
 
@@ -110,21 +110,26 @@ public class FirstFragment extends Fragment {
                 builder.setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        todoList.add(new TodoListEntry(new String[]{"value", input.getText().toString(), "associatedDate", currentlySelectedDate, "completed", "false"}, "default"));
+                        TodoListEntry newEntry = new TodoListEntry(new String[]{
+                                "value", input.getText().toString(),
+                                "associatedDate", currentlySelectedDate,
+                                "completed", "false"}, "default");
+                        todoList.add(newEntry);
                         saveEntries(todoList);
-                        listViewAdapter.updateData();
+                        listViewAdapter.updateData((newEntry.showOnLock && !newEntry.completed) || newEntry.showOnLock_ifCompleted);
                     }
                 });
 
                 builder.setNegativeButton("Добавить в общий список", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        for(int i = 0; i<1000; i++){
-                            todoList.add(new TodoListEntry(new String[]{"value", input.getText().toString(), "associatedDate", "GLOBAL", "completed", "false"}, "default"));
-                        }
-                        todoList.add(new TodoListEntry(new String[]{"value", input.getText().toString(), "associatedDate", "GLOBAL", "completed", "false"}, "default"));
+                        TodoListEntry newEntry = new TodoListEntry(new String[]{
+                                "value", input.getText().toString(),
+                                "associatedDate", "GLOBAL",
+                                "completed", "false"}, "default");
+                        todoList.add(newEntry);
                         saveEntries(todoList);
-                        listViewAdapter.updateData();
+                        listViewAdapter.updateData((newEntry.showOnLock && !newEntry.completed) || newEntry.showOnLock_ifCompleted);
                     }
                 });
 
