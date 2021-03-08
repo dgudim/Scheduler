@@ -10,26 +10,17 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
 
-import androidx.core.math.MathUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 
-import static prototype.xd.scheduler.utilities.DateManager.*;
-import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
-import static prototype.xd.scheduler.utilities.Utilities.loadObject;
-import static prototype.xd.scheduler.utilities.Utilities.rootDir;
-import static prototype.xd.scheduler.utilities.Utilities.saveObject;
 
 public class LockScreenBitmapDrawer {
 
@@ -120,11 +111,7 @@ public class LockScreenBitmapDrawer {
                 splitEntry.changeParameter(TodoListEntry.TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
                 toAddSplit.add(splitEntry);
             }
-            TodoListEntry blankEntry = new TodoListEntry();
-            blankEntry.textValue = "_BLANK_";
-            blankEntry.h = 10;
-            blankEntry.kM = 10 * 1.1f;
-            toAddSplit.add(blankEntry);
+            toAddSplit.add(new TodoListEntry());
         }
 
         drawBgOnCanvas(toAddSplit, canvas, totalHeight);
@@ -153,10 +140,10 @@ public class LockScreenBitmapDrawer {
         for (int i = 0; i < toAdd.size(); i++) {
             if (!toAdd.get(i).textValue.equals("_BLANK_")) {
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
-                        -toAdd.get(i).rWidth - toAdd.get(i).padSize,
+                        -toAdd.get(i).rWidth - toAdd.get(i).bevelSize,
                         toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
-                        toAdd.get(i).rWidth + toAdd.get(i).padSize,
-                        -toAdd.get(i).kM * (i + 1) - toAdd.get(i).padSize);
+                        toAdd.get(i).rWidth + toAdd.get(i).bevelSize,
+                        -toAdd.get(i).kM * (i + 1) - toAdd.get(i).bevelSize);
 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
                         -toAdd.get(i).rWidth,

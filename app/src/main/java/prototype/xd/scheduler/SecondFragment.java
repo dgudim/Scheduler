@@ -29,10 +29,9 @@ import java.io.File;
 import static prototype.xd.scheduler.utilities.ScalingUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
+import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 public class SecondFragment extends Fragment {
-
-    private File rootDir;
 
     private SharedPreferences preferences;
 
@@ -43,7 +42,6 @@ public class SecondFragment extends Fragment {
 
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        rootDir = new File(Environment.getExternalStorageDirectory().toString() + "/Scheduler");
 
         preferences = getContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
 

@@ -29,14 +29,16 @@
     <string name="settings_default_bevel_thickness">Толщина контура для сегодняшних дел(Экран блокировки):%d</string>
     <string name="settings_yesterday_bevel_thickness">Толщина контура для вчерашних дел(Экран блокировки):%d</string>
     <string name="settings_global_bevel_thickness">Толщина контура для общих дел(Экран блокировки):%d</string>
+    <string name="settings_bevel_thickness">Толщина контура (Экран блокировки):%d</string>
 
     <string name="settings_reset_to_defaults">Сбросить настройки</string>
     <string name="settings_update_bg">Обновить фон</string>
+    <string name="settings_add_group">Добавить группу</string>
 
     <string name="settings_text_color_in_list">Цвет шрифта в списке</string>
     <string name="settings_text_color_on_lock">Цвет шрифта на экране блокировки</string>
-    <string name="settings_pad_color_on_lock">Цвет контура на экране блокировки</string>
-    <string name="settings_pad_size_on_lock">Толщина контура на экране блокировки:%d</string>
+    <string name="settings_bevel_color_on_lock">Цвет контура на экране блокировки</string>
+    <string name="settings_bevel_size_on_lock">Толщина контура на экране блокировки:%d</string>
     <string name="settings_bg_color_on_lock">Цвет фона на экране блокировки</string>
     <string name="settings_bg_color_in_list">Цвет фона в списке</string>
     <string name="settings_show_on_lock">Показывать на экране блокировки</string>

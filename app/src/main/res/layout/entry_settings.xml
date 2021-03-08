@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:rotationX="0">
@@ -177,7 +176,7 @@
                     android:layout_weight="150"
                     android:background="#FFFFFF"
                     android:gravity="center_vertical"
-                    android:text="@string/settings_pad_color_on_lock"
+                    android:text="@string/settings_bevel_color_on_lock"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
@@ -187,7 +186,7 @@
                     android:layout_height="50dp"
                     android:layout_weight="1"
                     android:background="#FFFFFF"
-                    android:contentDescription="@string/settings_pad_color_on_lock" />
+                    android:contentDescription="@string/settings_bevel_color_on_lock" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -228,6 +227,88 @@
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            app:cardCornerRadius="5dp">
+
+            <LinearLayout
+                android:id="@+id/linearLayout7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/bevelThicknessDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="50"
+                    android:background="#FFFFFF"
+                    android:text="@string/settings_bevel_thickness"
+                    android:textColor="#000000"
+                    android:textSize="18sp" />
+
+                <SeekBar
+                    android:id="@+id/bevelThicknessBar"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:max="15"
+                    android:min="0"
+                    android:progress="3" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView144"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="1.5dp"
+                android:layout_marginBottom="3dp"
+                android:layout_weight="150"
+                app:cardCornerRadius="5dp">
+
+                <Spinner
+                    android:id="@+id/groupSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView145"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="1.5dp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="5dp">
+
+                <ImageView
+                    android:id="@+id/addGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/settings_add_group"
+                    app:srcCompat="@android:drawable/ic_menu_add" />
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

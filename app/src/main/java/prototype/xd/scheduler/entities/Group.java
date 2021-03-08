@@ -1,5 +1,9 @@
 package prototype.xd.scheduler.entities;
 
+import android.annotation.SuppressLint;
+
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
 import static prototype.xd.scheduler.utilities.Logger.ERROR;
@@ -35,7 +39,7 @@ public class Group {
         this.params = params;
     }
 
-    private static ArrayList<Group> readGroupFile() {
+    public static ArrayList<Group> readGroupFile() {
         try {
 
             ArrayList<String[]> groupParams = (ArrayList<String[]>) loadObject("groups");
@@ -86,5 +90,11 @@ public class Group {
         groups.add(new Group("default", new String[]{}));
         saveGroupsFile(groups);
         return groups;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name;
     }
 }

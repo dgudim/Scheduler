@@ -28,7 +28,6 @@ import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 public class ListViewAdapter extends BaseAdapter {
 
     Context context;
-    ArrayList<TodoListEntry> todoList;
 
     LayoutInflater inflater;
     ListView currentTodoListView;
@@ -37,19 +36,18 @@ public class ListViewAdapter extends BaseAdapter {
     public ListViewAdapter(FirstFragment fragment, ListView currentTodoListView) {
         this.fragment = fragment;
         this.context = fragment.getContext();
-        this.todoList = fragment.todoList;
         this.currentTodoListView = currentTodoListView;
         inflater = LayoutInflater.from(context);
     }
 
     @Override
     public int getCount() {
-        return todoList.size();
+        return fragment.todoList.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return todoList.get(i);
+        return fragment.todoList.get(i);
     }
 
     @Override
@@ -58,7 +56,6 @@ public class ListViewAdapter extends BaseAdapter {
     }
 
     public void updateData(boolean reconstructBitmap) {
-        this.todoList = fragment.todoList;
         if (reconstructBitmap) {
             constructBitmap();
         }
@@ -68,7 +65,7 @@ public class ListViewAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
 
-        final TodoListEntry currentEntry = todoList.get(i);
+        final TodoListEntry currentEntry = fragment.todoList.get(i);
 
         boolean show = currentEntry.showInList_ifCompleted || (!currentEntry.completed && currentEntry.showInList);
         if (currentEntry.isYesterdayEntry || !currentEntry.isGlobalEntry) {
@@ -131,11 +128,6 @@ public class ListViewAdapter extends BaseAdapter {
                 public void onClick(View view) {
 
                     if (!currentEntry.isGlobalEntry) {
-                        if (isDone.isChecked()) {
-                            todoText.setTextColor(currentEntry.fontColor_list_completed);
-                        } else {
-                            todoText.setTextColor(currentEntry.fontColor_list);
-                        }
                         fragment.todoList.get(i).changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
                     } else {
                         fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);

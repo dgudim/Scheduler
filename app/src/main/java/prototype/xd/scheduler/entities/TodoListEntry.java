@@ -31,13 +31,13 @@ public class TodoListEntry {
 
     public int padColor;
 
-    public int fontSize;
-    public float h;
-    public float kM;
-    public int maxChars;
-    public float rWidth;
+    public int fontSize = 0;
+    public float h = 0;
+    public float kM = 0;
+    public int maxChars = 0;
+    public float rWidth = 0;
 
-    public int padSize;
+    public int bevelSize = 0;
 
     public int fontColor_lock;
 
@@ -46,16 +46,16 @@ public class TodoListEntry {
     public boolean showInList;
     public boolean showInList_ifCompleted;
 
-    public String textValue;
+    public String textValue = "_BLANK_";
     public String[] textValueSplit;
 
     public Paint textPaint;
     public Paint bgPaint;
     public Paint padPaint;
 
-    public boolean isTodayEntry;
-    public boolean isYesterdayEntry;
-    public boolean isGlobalEntry;
+    public boolean isTodayEntry = false;
+    public boolean isYesterdayEntry = false;
+    public boolean isGlobalEntry = false;
 
     public String[] params;
 
@@ -63,15 +63,15 @@ public class TodoListEntry {
     public static final String IS_COMPLETED = "completed";
     public static final String SHOW_ON_LOCK = "lock";
     public static final String FONT_SIZE = "fontSize";
-    public static final String PAD_SIZE = "padSize";
+    public static final String BEVEL_SIZE = "padSize";
     public static final String FONT_COLOR_LOCK = "fontColor_lock";
     public static final String FONT_COLOR_LIST = "fontColor_list";
     public static final String BACKGROUND_COLOR_LOCK = "bgColor_lock";
     public static final String BACKGROUND_COLOR_LIST = "bgColor_list";
-    public static final String PAD_COLOR = "padColor";
+    public static final String BEVEL_COLOR = "padColor";
     public static final String ASSOCIATED_DATE = "associatedDate";
 
-    public TodoListEntry(){
+    public TodoListEntry() {
 
     }
 
@@ -93,7 +93,7 @@ public class TodoListEntry {
 
                     bgColor_lock = preferences_static.getInt("todayBgColor", 0xFFFFFFFF);
                     padColor = preferences_static.getInt("todayBevelColor", 0xFF888888);
-                    padSize = preferences_static.getInt("defaultBevelThickness", 5);
+                    bevelSize = preferences_static.getInt("defaultBevelThickness", 5);
 
                     fontColor_list = preferences_static.getInt("todayFontColor_list", 0xFF000000);
                     fontColor_list_completed = preferences_static.getInt("todayFontColor_list_completed", 0xFFCCCCCC);
@@ -104,12 +104,14 @@ public class TodoListEntry {
                     showOnLock_ifCompleted = preferences_static.getBoolean("completedTasks", false);
 
                     isTodayEntry = true;
+                    isYesterdayEntry = false;
+                    isGlobalEntry = false;
 
                 } else if (params[i + 1].equals(yesterdayDate)) {
 
                     bgColor_lock = preferences_static.getInt("yesterdayBgColor", 0xFFFFCCCC);
                     padColor = preferences_static.getInt("yesterdayBevelColor", 0xFFFF8888);
-                    padSize = preferences_static.getInt("yesterdayBevelThickness", 5);
+                    bevelSize = preferences_static.getInt("yesterdayBevelThickness", 5);
 
                     fontColor_list = preferences_static.getInt("yesterdayFontColor_list", 0xFFCC0000);
                     fontColor_list_completed = preferences_static.getInt("yesterdayFontColor_list_completed", 0xFFFFCCCC);
@@ -120,22 +122,26 @@ public class TodoListEntry {
                     showOnLock = preferences_static.getBoolean("yesterdayTasksLock", true);
 
                     isYesterdayEntry = true;
+                    isGlobalEntry = false;
+                    isTodayEntry = false;
 
                 } else if (params[i + 1].equals("GLOBAL")) {
 
                     bgColor_lock = preferences_static.getInt("globalBgColor", 0xFFCCFFCC);
                     padColor = preferences_static.getInt("globalBevelColor", 0xFF88FF88);
-                    padSize = preferences_static.getInt("globalBevelThickness", 5);
+                    bevelSize = preferences_static.getInt("globalBevelThickness", 5);
 
                     fontColor_list = preferences_static.getInt("globalFontColor_list", 0xFF00CC00);
                     fontColor_list_completed = fontColor_list;
 
-                    showOnLock_ifCompleted = false;
-                    showInList_ifCompleted = false;
+                    showOnLock_ifCompleted = true;
+                    showInList_ifCompleted = true;
                     showInList = true;
                     showOnLock = preferences_static.getBoolean("globalTasksLock", true);
 
                     isGlobalEntry = true;
+                    isYesterdayEntry = false;
+                    isTodayEntry = false;
                 } else {
                     fontColor_list = 0xFF000000;
                     fontColor_list_completed = 0xFFCCCCCC;
@@ -145,7 +151,9 @@ public class TodoListEntry {
                     showOnLock = false;
                     showOnLock_ifCompleted = false;
 
-                    isTodayEntry = true;
+                    isYesterdayEntry = false;
+                    isGlobalEntry = false;
+                    isTodayEntry = false;
                 }
             }
         }
@@ -161,8 +169,8 @@ public class TodoListEntry {
         textPaint.setTextSize(h);
         textPaint.setTextAlign(Paint.Align.CENTER);
         kM = h * 1.1f;
-        maxChars = (int) ((displayWidth - padSize * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
-        rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText) / 2 + 10, 1, displayWidth / 2f - padSize);
+        maxChars = (int) ((displayWidth - bevelSize * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
+        rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText) / 2 + 10, 1, displayWidth / 2f - bevelSize);
 
         bgPaint = createNewPaint(bgColor_lock);
         padPaint = createNewPaint(padColor);
@@ -189,8 +197,8 @@ public class TodoListEntry {
                 case (FONT_SIZE):
                     fontSize = Integer.parseInt(params[i + 1]);
                     break;
-                case (PAD_SIZE):
-                    padSize = Integer.parseInt(params[i + 1]);
+                case (BEVEL_SIZE):
+                    bevelSize = Integer.parseInt(params[i + 1]);
                     break;
                 case (FONT_COLOR_LOCK):
                     fontColor_lock = Integer.parseInt(params[i + 1]);
@@ -204,7 +212,7 @@ public class TodoListEntry {
                 case (BACKGROUND_COLOR_LIST):
                     bgColor_list = Integer.parseInt(params[i + 1]);
                     break;
-                case (PAD_COLOR):
+                case (BEVEL_COLOR):
                     padColor = Integer.parseInt(params[i + 1]);
                     break;
                 case (ASSOCIATED_DATE):
