@@ -15,9 +15,12 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -28,8 +31,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
+import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.*;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
@@ -103,9 +108,34 @@ public class FirstFragment extends Fragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Добавить пункт");
 
-                final EditText input = new EditText(getContext());
+                View addView = LayoutInflater.from(getContext()).inflate(R.layout.add_entry_dialogue, null);
+                final EditText input = addView.findViewById(R.id.editTextTextPersonName);
+
+                final String[] currentGroup = {"Ничего"};
+
+                final ArrayList<Group> groupList = readGroupFile();
+                final ArrayList<String> groupNames = new ArrayList<>();
+                for(Group group: groupList){
+                    groupNames.add(group.name);
+                }
+                final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
+                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, groupNames);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down vieww
+                groupSpinner.setAdapter(arrayAdapter);
+                groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        currentGroup[0] = groupNames.get(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
+                builder.setView(addView);
 
                 builder.setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
                     @Override
@@ -113,7 +143,7 @@ public class FirstFragment extends Fragment {
                         TodoListEntry newEntry = new TodoListEntry(new String[]{
                                 "value", input.getText().toString(),
                                 "associatedDate", currentlySelectedDate,
-                                "completed", "false"}, "default");
+                                "completed", "false"}, currentGroup[0]);
                         todoList.add(newEntry);
                         saveEntries(todoList);
                         listViewAdapter.updateData((newEntry.showOnLock && !newEntry.completed) || newEntry.showOnLock_ifCompleted);
@@ -126,7 +156,7 @@ public class FirstFragment extends Fragment {
                         TodoListEntry newEntry = new TodoListEntry(new String[]{
                                 "value", input.getText().toString(),
                                 "associatedDate", "GLOBAL",
-                                "completed", "false"}, "default");
+                                "completed", "false"}, currentGroup[0]);
                         todoList.add(newEntry);
                         saveEntries(todoList);
                         listViewAdapter.updateData((newEntry.showOnLock && !newEntry.completed) || newEntry.showOnLock_ifCompleted);

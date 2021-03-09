@@ -10,12 +10,13 @@ import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.loadObject;
 import static prototype.xd.scheduler.utilities.Utilities.saveObject;
 
 public class Group {
 
-    public String name = "default";
+    public String name = "Ничего";
 
     String[] params = new String[]{};
 
@@ -56,12 +57,13 @@ public class Group {
 
             return groups;
         } catch (Exception e) {
+            logException(e);
             log(INFO, "no groups file, creating one");
             return createDefaultGroupFile();
         }
     }
 
-    private static void saveGroupsFile(ArrayList<Group> groups) {
+    public static void saveGroupsFile(ArrayList<Group> groups) {
         try {
 
             ArrayList<String[]> groupParams = new ArrayList<>();
@@ -79,15 +81,17 @@ public class Group {
         }
     }
 
-    public static void createGroup(String name, String[] params) {
+    public static Group createGroup(String name, String[] params) {
         ArrayList<Group> groups = readGroupFile();
-        groups.add(new Group(name, params));
+        Group createdGroup = new Group(name, params);
+        groups.add(createdGroup);
         saveGroupsFile(groups);
+        return createdGroup;
     }
 
     private static ArrayList<Group> createDefaultGroupFile() {
         ArrayList<Group> groups = new ArrayList<>();
-        groups.add(new Group("default", new String[]{}));
+        groups.add(new Group("Ничего", new String[]{}));
         saveGroupsFile(groups);
         return groups;
     }

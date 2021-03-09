@@ -5,6 +5,8 @@ import android.util.TypedValue;
 
 import androidx.core.math.MathUtils;
 
+import java.util.ArrayList;
+
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
@@ -71,6 +73,8 @@ public class TodoListEntry {
     public static final String BEVEL_COLOR = "padColor";
     public static final String ASSOCIATED_DATE = "associatedDate";
 
+    // TODO: 08.03.2021 add priority sorting
+
     public TodoListEntry() {
 
     }
@@ -83,6 +87,53 @@ public class TodoListEntry {
 
     public void changeGroup(String groupName) {
         group = new Group(groupName);
+        reloadParams();
+    }
+
+    public void changeGroup(Group group) {
+        this.group = group;
+        reloadParams();
+    }
+
+    public String[] getDisplayParams() {
+        ArrayList<String> displayParams = new ArrayList<>();
+        for (int i = 0; i < params.length; i += 2) {
+
+            if (params[i].equals(FONT_SIZE)
+                    || params[i].equals(SHOW_ON_LOCK)
+                    || params[i].equals(BEVEL_SIZE)
+                    || params[i].equals(FONT_COLOR_LOCK)
+                    || params[i].equals(FONT_COLOR_LIST)
+                    || params[i].equals(BACKGROUND_COLOR_LOCK)
+                    || params[i].equals(BACKGROUND_COLOR_LIST)
+                    || params[i].equals(BEVEL_COLOR)) {
+                displayParams.add(params[i]);
+                displayParams.add(params[i + 1]);
+            }
+        }
+        String[] displayParams_new = new String[displayParams.size()];
+        for (int i = 0; i < displayParams.size(); i++) {
+            displayParams_new[i] = displayParams.get(i);
+        }
+        return displayParams_new;
+    }
+
+    public void removeDisplayParams() {
+        ArrayList<String> displayParams = new ArrayList<>();
+        for (int i = 0; i < params.length; i += 2) {
+
+            if (params[i].equals(TEXT_VALUE)
+                    || params[i].equals(ASSOCIATED_DATE)
+                    || params[i].equals(IS_COMPLETED)) {
+                displayParams.add(params[i]);
+                displayParams.add(params[i + 1]);
+            }
+        }
+        String[] params_new = new String[displayParams.size()];
+        for (int i = 0; i < displayParams.size(); i++) {
+            params_new[i] = displayParams.get(i);
+        }
+        params = params_new;
         reloadParams();
     }
 
@@ -145,6 +196,9 @@ public class TodoListEntry {
                 } else {
                     fontColor_list = 0xFF000000;
                     fontColor_list_completed = 0xFFCCCCCC;
+                    bgColor_lock = 0xFFFFFFFF;
+                    padColor = 0xFF888888;
+                    bevelSize = 5;
 
                     showInList = true;
                     showInList_ifCompleted = true;
