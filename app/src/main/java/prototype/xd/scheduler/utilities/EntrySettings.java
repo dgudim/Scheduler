@@ -3,7 +3,6 @@ package prototype.xd.scheduler.utilities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.DataSetObserver;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 
 import prototype.xd.scheduler.FirstFragment;
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.SecondFragment;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
@@ -32,11 +30,10 @@ import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
 import static prototype.xd.scheduler.entities.TodoListEntry.*;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayHeight;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.preferences_static;
 import static prototype.xd.scheduler.utilities.ScalingUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
@@ -200,6 +197,7 @@ public class EntrySettings {
                                     saveGroupsFile(groupList);
                                     entry.removeDisplayParams();
                                     entry.changeGroup(createdGroup);
+                                    preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                                 }
                             });
 
@@ -308,6 +306,9 @@ public class EntrySettings {
                 (TextView) (settingsView.findViewById(R.id.bevelThicknessDescription)),
                 (SeekBar) (settingsView.findViewById(R.id.bevelThicknessBar)),
                 entry.bevelSize, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE);
+
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch), entry.showOnLock, entry, SHOW_ON_LOCK);
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockCompletedSwitch), entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED);
     }
 
 }

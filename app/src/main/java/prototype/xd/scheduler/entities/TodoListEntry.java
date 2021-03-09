@@ -64,6 +64,7 @@ public class TodoListEntry {
     public static final String TEXT_VALUE = "value";
     public static final String IS_COMPLETED = "completed";
     public static final String SHOW_ON_LOCK = "lock";
+    public static final String SHOW_ON_LOCK_COMPLETED = "lock_completed";
     public static final String FONT_SIZE = "fontSize";
     public static final String BEVEL_SIZE = "padSize";
     public static final String FONT_COLOR_LOCK = "fontColor_lock";
@@ -247,6 +248,9 @@ public class TodoListEntry {
                     break;
                 case (SHOW_ON_LOCK):
                     showOnLock = Boolean.parseBoolean(params[i + 1]);
+                    break;
+                case (SHOW_ON_LOCK_COMPLETED):
+                    showOnLock_ifCompleted = Boolean.parseBoolean(params[i + 1]);
                     break;
                 case (FONT_SIZE):
                     fontSize = Integer.parseInt(params[i + 1]);

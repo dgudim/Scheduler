@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/editTextTextPersonName"
+        android:id="@+id/entryNameEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -30,7 +30,7 @@
             android:layout_weight="150"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName"/>
+            app:layout_constraintTop_toBottomOf="@+id/entryNameEditText"/>
 
 
 

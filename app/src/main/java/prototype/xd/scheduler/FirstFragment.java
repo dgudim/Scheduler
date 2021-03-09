@@ -109,7 +109,7 @@ public class FirstFragment extends Fragment {
                 builder.setTitle("Добавить пункт");
 
                 View addView = LayoutInflater.from(getContext()).inflate(R.layout.add_entry_dialogue, null);
-                final EditText input = addView.findViewById(R.id.editTextTextPersonName);
+                final EditText input = addView.findViewById(R.id.entryNameEditText);
 
                 final String[] currentGroup = {"Ничего"};
 

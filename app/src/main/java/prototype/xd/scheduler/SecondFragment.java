@@ -28,6 +28,7 @@ import java.io.File;
 
 import static prototype.xd.scheduler.utilities.ScalingUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
@@ -200,19 +201,4 @@ public class SecondFragment extends Fragment {
         });
 
     }
-
-    void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defValue, final CompoundButton.OnCheckedChangeListener listener) {
-        tSwitch.setChecked(preferences.getBoolean(key, defValue));
-        tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                preferences.edit().putBoolean(key, tSwitch.isChecked()).apply();
-                preferences.edit().putBoolean("settingsModified", true).apply();
-                if (!(listener == null)) {
-                    listener.onCheckedChanged(buttonView, isChecked);
-                }
-            }
-        });
-    }
-
 }

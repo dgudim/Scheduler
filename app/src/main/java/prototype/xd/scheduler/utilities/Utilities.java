@@ -3,8 +3,10 @@ package prototype.xd.scheduler.utilities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Environment;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -173,6 +175,31 @@ public class Utilities {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
                 preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+            }
+        });
+    }
+
+    public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defValue, final CompoundButton.OnCheckedChangeListener listener) {
+        tSwitch.setChecked(preferences_static.getBoolean(key, defValue));
+        tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                preferences_static.edit().putBoolean(key, isChecked).apply();
+                preferences_static.edit().putBoolean("settingsModified", true).apply();
+                if (!(listener == null)) {
+                    listener.onCheckedChanged(buttonView, isChecked);
+                }
+            }
+        });
+    }
+
+    public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter) {
+        tSwitch.setChecked(value);
+        tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                entry.changeParameter(parameter, String.valueOf(isChecked));
+                preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", (entry.showOnLock && !entry.completed) || entry.showOnLock_ifCompleted).apply();
             }
         });
     }
