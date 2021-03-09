@@ -108,7 +108,7 @@ public class ListViewAdapter extends BaseAdapter {
                         public void onClick(DialogInterface dialog, int which) {
                             fragment.todoList.remove(i);
                             saveEntries(fragment.todoList);
-                            updateData((currentEntry.showOnLock && !currentEntry.completed) || currentEntry.showOnLock_ifCompleted);
+                            updateData(currentEntry.getLockViewState());
                         }
                     });
 
@@ -127,13 +127,15 @@ public class ListViewAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
 
+                    boolean prevViewState = currentEntry.getLockViewState();
                     if (!currentEntry.isGlobalEntry) {
-                        fragment.todoList.get(i).changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
+                        currentEntry.changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
                     } else {
-                        fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
+                        currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
                     }
                     saveEntries(fragment.todoList);
-                    updateData((currentEntry.showOnLock && !currentEntry.completed) || currentEntry.showOnLock_ifCompleted);
+                    boolean newViewState = currentEntry.getLockViewState();
+                    updateData(!(prevViewState == newViewState));
                 }
             });
 
@@ -152,19 +154,19 @@ public class ListViewAdapter extends BaseAdapter {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            fragment.todoList.get(i).changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
+                            currentEntry.changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
                             saveEntries(fragment.todoList);
-                            updateData((currentEntry.showOnLock && !currentEntry.completed) || currentEntry.showOnLock_ifCompleted);
+                            updateData(currentEntry.getLockViewState());
                         }
                     });
 
-                    if (!fragment.todoList.get(i).isGlobalEntry) {
+                    if (!currentEntry.isGlobalEntry) {
                         alert.setNeutralButton("Переместить в общий список", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                fragment.todoList.get(i).changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
+                                currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
                                 saveEntries(fragment.todoList);
-                                updateData((currentEntry.showOnLock && !currentEntry.completed) || currentEntry.showOnLock_ifCompleted);
+                                updateData(currentEntry.getLockViewState());
                             }
                         });
                     }

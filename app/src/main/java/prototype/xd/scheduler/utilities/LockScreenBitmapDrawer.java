@@ -69,10 +69,12 @@ public class LockScreenBitmapDrawer {
                                 .copy(Bitmap.Config.ARGB_8888, true);
                     }
 
+                    float time = System.nanoTime();
+                    log(INFO, "setting wallpaper");
                     drawStringsOnBitmap(bitmap);
 
                     wallpaperManager_static.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    log(INFO, "set wallpaper");
+                    log(INFO, "set wallpaper, took " + (System.currentTimeMillis() - time) / 1000000000f + "s");
 
                     bitmap.recycle();
                 } catch (Exception e) {
@@ -164,7 +166,7 @@ public class LockScreenBitmapDrawer {
     private static ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input) {
         ArrayList<TodoListEntry> toAdd = new ArrayList<>();
         for (int i = 0; i < input.size(); i++) {
-            if ((input.get(i).showOnLock && !input.get(i).completed) || input.get(i).showOnLock_ifCompleted) {
+            if (input.get(i).getLockViewState()) {
                 toAdd.add(input.get(i));
                 String addition = "";
                 if (input.get(i).completed) {

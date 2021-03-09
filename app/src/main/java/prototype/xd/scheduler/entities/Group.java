@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities;
 
 import android.annotation.SuppressLint;
+import android.hardware.camera2.params.BlackLevelPattern;
 
 import androidx.annotation.NonNull;
 
@@ -16,7 +17,8 @@ import static prototype.xd.scheduler.utilities.Utilities.saveObject;
 
 public class Group {
 
-    public String name = "Ничего";
+    public static final String BLANK_NAME = "Ничего";
+    public String name = BLANK_NAME;
 
     String[] params = new String[]{};
 
@@ -76,6 +78,8 @@ public class Group {
             saveObject("groups", groupParams);
             saveObject("groupNames", groupNames);
 
+            log(INFO, "saving groups file");
+
         } catch (Exception e) {
             log(ERROR, "missing permission, failed to save groups file");
         }
@@ -91,7 +95,7 @@ public class Group {
 
     private static ArrayList<Group> createDefaultGroupFile() {
         ArrayList<Group> groups = new ArrayList<>();
-        groups.add(new Group("Ничего", new String[]{}));
+        groups.add(new Group(BLANK_NAME, new String[]{}));
         saveGroupsFile(groups);
         return groups;
     }

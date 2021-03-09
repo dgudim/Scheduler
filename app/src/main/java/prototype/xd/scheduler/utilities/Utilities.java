@@ -198,8 +198,10 @@ public class Utilities {
         tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                boolean prevViewState = entry.getLockViewState();
                 entry.changeParameter(parameter, String.valueOf(isChecked));
-                preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", (entry.showOnLock && !entry.completed) || entry.showOnLock_ifCompleted).apply();
+                boolean currViewState = entry.getLockViewState();
+                preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", !(prevViewState == currViewState)).apply();
             }
         });
     }
@@ -224,9 +226,7 @@ public class Utilities {
             public void onClick(DialogInterface dialog, int which) {
 
             }
-        })
-                .build()
-                .show();
+        }).build().show();
     }
 
     public static void invokeColorDialogue(final int value, final ImageView target, Context context, final TodoListEntry todoListEntry, final String parameter, final boolean setReconstructFlag) {
@@ -249,8 +249,6 @@ public class Utilities {
             public void onClick(DialogInterface dialog, int which) {
 
             }
-        })
-                .build()
-                .show();
+        }).build().show();
     }
 }

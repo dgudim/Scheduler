@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
+import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.*;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
@@ -111,7 +112,7 @@ public class FirstFragment extends Fragment {
                 View addView = LayoutInflater.from(getContext()).inflate(R.layout.add_entry_dialogue, null);
                 final EditText input = addView.findViewById(R.id.entryNameEditText);
 
-                final String[] currentGroup = {"Ничего"};
+                final String[] currentGroup = {BLANK_NAME};
 
                 final ArrayList<Group> groupList = readGroupFile();
                 final ArrayList<String> groupNames = new ArrayList<>();
@@ -146,7 +147,7 @@ public class FirstFragment extends Fragment {
                                 "completed", "false"}, currentGroup[0]);
                         todoList.add(newEntry);
                         saveEntries(todoList);
-                        listViewAdapter.updateData((newEntry.showOnLock && !newEntry.completed) || newEntry.showOnLock_ifCompleted);
+                        listViewAdapter.updateData(newEntry.getLockViewState());
                     }
                 });
 
@@ -159,7 +160,7 @@ public class FirstFragment extends Fragment {
                                 "completed", "false"}, currentGroup[0]);
                         todoList.add(newEntry);
                         saveEntries(todoList);
-                        listViewAdapter.updateData((newEntry.showOnLock && !newEntry.completed) || newEntry.showOnLock_ifCompleted);
+                        listViewAdapter.updateData(newEntry.getLockViewState());
                     }
                 });
 

@@ -91,9 +91,17 @@ public class TodoListEntry {
         reloadParams();
     }
 
+    public void resetGroup() {
+        changeGroup("Ничего");
+    }
+
     public void changeGroup(Group group) {
         this.group = group;
         reloadParams();
+    }
+
+    public boolean getLockViewState() {
+        return (showOnLock && !completed) || showOnLock_ifCompleted;
     }
 
     public String[] getDisplayParams() {

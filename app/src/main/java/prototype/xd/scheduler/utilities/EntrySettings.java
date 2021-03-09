@@ -26,6 +26,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
+import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
@@ -96,7 +97,7 @@ public class EntrySettings {
                         @Override
                         public boolean onLongClick(View view) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            if (groupNames.get(position).equals("Ничего")) {
+                            if (groupNames.get(position).equals(BLANK_NAME)) {
                                 builder.setTitle("Нельзя переименовать эту группу");
                                 builder.setMessage("Ты сломаешь сброс настроек");
 
@@ -121,6 +122,37 @@ public class EntrySettings {
                                             saveEntries(fragment.todoList);
                                         }
                                         notifyDataSetChanged();
+                                    }
+                                });
+
+                                builder.setNeutralButton("Удалить группу", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                        builder.setTitle("Удалить");
+                                        builder.setMessage("Вы уверены?");
+
+                                        builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                groupList.remove(groupSpinner.getSelectedItemPosition());
+                                                groupNames.remove(groupSpinner.getSelectedItemPosition());
+                                                saveGroupsFile(groupList);
+                                                entry.resetGroup();
+                                                saveEntries(fragment.todoList);
+                                                groupSpinner.setSelection(0);
+                                                notifyDataSetChanged();
+                                            }
+                                        });
+
+                                        builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+
+                                        builder.show();
                                     }
                                 });
 
@@ -177,7 +209,7 @@ public class EntrySettings {
                 builder.setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (input.getText().toString().equals("Ничего")) {
+                        if (input.getText().toString().equals(BLANK_NAME)) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
                             builder.setTitle("Нельзя создать группу с таким названием");
                             builder.setMessage("Ты сломаешь сброс настроек");
@@ -245,7 +277,7 @@ public class EntrySettings {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         entry.removeDisplayParams();
-                        entry.changeGroup("Ничего");
+                        entry.resetGroup();
                         saveEntries(fragment.todoList);
                         preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                         initialise(entry, context, fragment, settingsView);
