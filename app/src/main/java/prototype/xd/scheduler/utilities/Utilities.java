@@ -19,12 +19,13 @@ import org.apache.commons.lang.WordUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import prototype.xd.scheduler.FirstFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
@@ -104,7 +105,7 @@ public class Utilities {
         s.close();
     }
 
-    private static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {
+    public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {
         ArrayList<TodoListEntry> yesterdayEntries = new ArrayList<>();
         ArrayList<TodoListEntry> todayEntries = new ArrayList<>();
         ArrayList<TodoListEntry> globalEntries = new ArrayList<>();
@@ -120,11 +121,15 @@ public class Utilities {
                 otherEntries.add(entries.get(i));
             }
         }
+
         ArrayList<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
         merged.addAll(yesterdayEntries);
         merged.addAll(otherEntries);
+        Collections.sort(merged, new TodoListEntryGroupComparator());
+        Collections.sort(merged, new TodoListEntryPriorityComparator());
+
         return merged;
     }
 
@@ -156,7 +161,7 @@ public class Utilities {
         });
     }
 
-    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final Fragment fragment, final TodoListEntry todoListEntry, final String parameter) {
+    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final FirstFragment fragment, final TodoListEntry todoListEntry, final String parameter) {
         displayTo.setText(fragment.getString(stringResource, value));
         seekBar.setProgress(value);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -174,6 +179,7 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
+                saveEntries(fragment.todoListEntries);
                 preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
             }
         });
@@ -193,14 +199,16 @@ public class Utilities {
         });
     }
 
-    public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter) {
+    public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter, final FirstFragment fragment) {
         tSwitch.setChecked(value);
         tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 boolean prevViewState = entry.getLockViewState();
                 entry.changeParameter(parameter, String.valueOf(isChecked));
+                saveEntries(fragment.todoListEntries);
                 boolean currViewState = entry.getLockViewState();
+                // TODO: 09.03.2021 fix lockscreen not updating when switch is off -> on
                 preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", !(prevViewState == currViewState)).apply();
             }
         });
@@ -250,5 +258,19 @@ public class Utilities {
 
             }
         }).build().show();
+    }
+}
+
+class TodoListEntryPriorityComparator implements Comparator<TodoListEntry>{
+    @Override
+    public int compare(TodoListEntry o1, TodoListEntry o2) {
+        return Integer.compare(o2.priority, o1.priority);
+    }
+}
+
+class TodoListEntryGroupComparator implements Comparator<TodoListEntry>{
+    @Override
+    public int compare(TodoListEntry o1, TodoListEntry o2) {
+        return Integer.compare(o1.group.name.hashCode(), o2.group.name.hashCode());
     }
 }

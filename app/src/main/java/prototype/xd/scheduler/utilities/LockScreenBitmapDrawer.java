@@ -31,6 +31,7 @@ public class LockScreenBitmapDrawer {
     private static Point displayCenter;
 
     private static boolean initialised = false;
+    private static boolean forceMaxRWidth = false;
 
     static WallpaperManager wallpaperManager_static;
     public static DisplayMetrics displayMetrics_static;
@@ -53,6 +54,7 @@ public class LockScreenBitmapDrawer {
         if (!initialised) {
             throw new RuntimeException("Bitmap drawer not initialised");
         }
+        forceMaxRWidth = preferences_static.getBoolean("forceMaxRWidthOnLock", false);
         new Thread(new Runnable() {
             public void run() {
                 try {
@@ -98,16 +100,17 @@ public class LockScreenBitmapDrawer {
 
         float totalHeight = 0;
         for (int i = 0; i < toAdd.size(); i++) {
-            totalHeight += toAdd.get(i).h * toAdd.get(i).textValueSplit.length;
-            if (toAdd.get(i).textValueSplit.length == 1) {
-                totalHeight += toAdd.get(i).kM;
-            }
+            totalHeight += toAdd.get(i).h * toAdd.get(i).textValueSplit.length + toAdd.get(i).kM;
         }
+        totalHeight += toAdd.get(0).kM * 2;
         totalHeight /= 2f;
 
         ArrayList<TodoListEntry> toAddSplit = new ArrayList<>();
         for (int i = toAdd.size() - 1; i >= 0; i--) {
             for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
+                if(forceMaxRWidth){
+                    toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelSize;
+                }
                 TodoListEntry splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
                 copyDisplayData(toAdd.get(i), splitEntry);
                 splitEntry.changeParameter(TodoListEntry.TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);

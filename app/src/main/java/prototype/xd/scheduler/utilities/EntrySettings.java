@@ -53,7 +53,7 @@ public class EntrySettings {
         alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                saveEntries(fragment.todoList);
+                saveEntries(fragment.todoListEntries);
                 fragment.listViewAdapter.updateData(preferences_static.getBoolean("need_to_reconstruct_bitmap", false));
                 preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", false).apply();
             }
@@ -96,11 +96,10 @@ public class EntrySettings {
 
                         @Override
                         public boolean onLongClick(View view) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                             if (groupNames.get(position).equals(BLANK_NAME)) {
                                 builder.setTitle("Нельзя переименовать эту группу");
                                 builder.setMessage("Ты сломаешь сброс настроек");
-
                             } else {
                                 builder.setTitle("Изменить");
 
@@ -114,14 +113,22 @@ public class EntrySettings {
                                 builder.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        groupNames.set(position, input.getText().toString());
-                                        groupList.get(position).name = input.getText().toString();
-                                        saveGroupsFile(groupList);
-                                        if (groupSpinner.getSelectedItemPosition() == position) {
-                                            entry.group.name = input.getText().toString();
-                                            saveEntries(fragment.todoList);
+                                        if(!input.getText().toString().equals(BLANK_NAME)) {
+                                            groupNames.set(position, input.getText().toString());
+                                            groupList.get(position).name = input.getText().toString();
+                                            saveGroupsFile(groupList);
+                                            if (groupSpinner.getSelectedItemPosition() == position) {
+                                                entry.group.name = input.getText().toString();
+                                                saveEntries(fragment.todoListEntries);
+                                            }
+                                            notifyDataSetChanged();
+                                        }else{
+                                            dialog.dismiss();
+                                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                            builder.setTitle("Нельзя так называть группу");
+                                            builder.setMessage("Ты сломаешь сброс настроек");
+                                            builder.show();
                                         }
-                                        notifyDataSetChanged();
                                     }
                                 });
 
@@ -139,7 +146,7 @@ public class EntrySettings {
                                                 groupNames.remove(groupSpinner.getSelectedItemPosition());
                                                 saveGroupsFile(groupList);
                                                 entry.resetGroup();
-                                                saveEntries(fragment.todoList);
+                                                saveEntries(fragment.todoListEntries);
                                                 groupSpinner.setSelection(0);
                                                 notifyDataSetChanged();
                                             }
@@ -182,7 +189,7 @@ public class EntrySettings {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!groupNames.get(position).equals(entry.group.name)) {
                     entry.changeGroup(groupNames.get(position));
-                    saveEntries(fragment.todoList);
+                    saveEntries(fragment.todoListEntries);
                     preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                     initialise(entry, context, fragment, settingsView);
                 }
@@ -250,7 +257,7 @@ public class EntrySettings {
                             saveGroupsFile(groupList);
                             entry.removeDisplayParams();
                             entry.changeGroup(createdGroup);
-                            saveEntries(fragment.todoList);
+                            saveEntries(fragment.todoListEntries);
                         }
                     }
                 });
@@ -278,7 +285,7 @@ public class EntrySettings {
                     public void onClick(DialogInterface dialog, int which) {
                         entry.removeDisplayParams();
                         entry.resetGroup();
-                        saveEntries(fragment.todoList);
+                        saveEntries(fragment.todoListEntries);
                         preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                         initialise(entry, context, fragment, settingsView);
                     }
@@ -330,17 +337,17 @@ public class EntrySettings {
         });
 
         addSeekBarChangeListener(
-                (TextView) (settingsView.findViewById(R.id.textSizeDescription)),
-                (SeekBar) (settingsView.findViewById(R.id.fontSizeBar)),
-                entry.fontSize, R.string.settings_font_size, fragment, entry, FONT_SIZE);
-
-        addSeekBarChangeListener(
                 (TextView) (settingsView.findViewById(R.id.bevelThicknessDescription)),
                 (SeekBar) (settingsView.findViewById(R.id.bevelThicknessBar)),
                 entry.bevelSize, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE);
 
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch), entry.showOnLock, entry, SHOW_ON_LOCK);
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockCompletedSwitch), entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED);
+        addSeekBarChangeListener(
+                (TextView) (settingsView.findViewById(R.id.priorityDescription)),
+                (SeekBar) (settingsView.findViewById(R.id.priorityBar)),
+                entry.priority, R.string.settings_priority, fragment, entry, PRIORITY);
+
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch), entry.showOnLock, entry, SHOW_ON_LOCK, fragment);
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockCompletedSwitch), entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED, fragment);
     }
 
 }

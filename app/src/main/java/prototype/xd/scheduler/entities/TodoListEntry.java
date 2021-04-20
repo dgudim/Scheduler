@@ -41,6 +41,8 @@ public class TodoListEntry {
 
     public int bevelSize = 0;
 
+    public int priority = 0;
+
     public int fontColor_lock;
 
     public boolean showOnLock;
@@ -73,8 +75,7 @@ public class TodoListEntry {
     public static final String BACKGROUND_COLOR_LIST = "bgColor_list";
     public static final String BEVEL_COLOR = "padColor";
     public static final String ASSOCIATED_DATE = "associatedDate";
-
-    // TODO: 08.03.2021 add priority sorting
+    public static final String PRIORITY = "priority";
 
     public TodoListEntry() {
 
@@ -115,7 +116,8 @@ public class TodoListEntry {
                     || params[i].equals(FONT_COLOR_LIST)
                     || params[i].equals(BACKGROUND_COLOR_LOCK)
                     || params[i].equals(BACKGROUND_COLOR_LIST)
-                    || params[i].equals(BEVEL_COLOR)) {
+                    || params[i].equals(BEVEL_COLOR)
+                    || params[i].equals(PRIORITY)) {
                 displayParams.add(params[i]);
                 displayParams.add(params[i + 1]);
             }
@@ -260,9 +262,6 @@ public class TodoListEntry {
                 case (SHOW_ON_LOCK_COMPLETED):
                     showOnLock_ifCompleted = Boolean.parseBoolean(params[i + 1]);
                     break;
-                case (FONT_SIZE):
-                    fontSize = Integer.parseInt(params[i + 1]);
-                    break;
                 case (BEVEL_SIZE):
                     bevelSize = Integer.parseInt(params[i + 1]);
                     break;
@@ -280,6 +279,9 @@ public class TodoListEntry {
                     break;
                 case (BEVEL_COLOR):
                     padColor = Integer.parseInt(params[i + 1]);
+                    break;
+                case (PRIORITY):
+                    priority = Integer.parseInt(params[i + 1]);
                     break;
                 case (ASSOCIATED_DATE):
                     associatedDate = params[i + 1];

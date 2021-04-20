@@ -191,7 +191,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/cardView4"
+            android:id="@+id/cardView43"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
@@ -199,31 +199,31 @@
             app:cardCornerRadius="5dp">
 
             <LinearLayout
-                android:id="@+id/linearLayout"
+                android:id="@+id/linearLayout66"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#FFFFFF"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/textSizeDescription"
+                    android:id="@+id/priorityDescription"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="50"
                     android:background="#FFFFFF"
-                    android:text="@string/settings_font_size"
+                    android:text="@string/settings_priority"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
                 <SeekBar
-                    android:id="@+id/fontSizeBar"
+                    android:id="@+id/priorityBar"
                     style="@style/Widget.AppCompat.SeekBar.Discrete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
                     android:max="40"
-                    android:min="10"
-                    android:progress="21" />
+                    android:min="0"
+                    android:progress="0" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

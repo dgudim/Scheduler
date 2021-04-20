@@ -14,8 +14,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.EntrySettings;
 
@@ -24,6 +22,7 @@ import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate
 import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
+import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 public class ListViewAdapter extends BaseAdapter {
 
@@ -42,30 +41,31 @@ public class ListViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return fragment.todoList.size();
+        return fragment.todoListEntries.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return fragment.todoList.get(i);
+        return fragment.todoListEntries.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return 0;
+        return i;
     }
 
     public void updateData(boolean reconstructBitmap) {
         if (reconstructBitmap) {
             constructBitmap();
         }
+        fragment.todoListEntries = sortEntries(fragment.todoListEntries);
         notifyDataSetChanged();
     }
 
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
 
-        final TodoListEntry currentEntry = fragment.todoList.get(i);
+        final TodoListEntry currentEntry = fragment.todoListEntries.get(i);
 
         boolean show = currentEntry.showInList_ifCompleted || (!currentEntry.completed && currentEntry.showInList);
         if (currentEntry.isYesterdayEntry || !currentEntry.isGlobalEntry) {
@@ -106,8 +106,8 @@ public class ListViewAdapter extends BaseAdapter {
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            fragment.todoList.remove(i);
-                            saveEntries(fragment.todoList);
+                            fragment.todoListEntries.remove(i);
+                            saveEntries(fragment.todoListEntries);
                             updateData(currentEntry.getLockViewState());
                         }
                     });
@@ -133,7 +133,7 @@ public class ListViewAdapter extends BaseAdapter {
                     } else {
                         currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
                     }
-                    saveEntries(fragment.todoList);
+                    saveEntries(fragment.todoListEntries);
                     boolean newViewState = currentEntry.getLockViewState();
                     updateData(!(prevViewState == newViewState));
                 }
@@ -155,7 +155,7 @@ public class ListViewAdapter extends BaseAdapter {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             currentEntry.changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
-                            saveEntries(fragment.todoList);
+                            saveEntries(fragment.todoListEntries);
                             updateData(currentEntry.getLockViewState());
                         }
                     });
@@ -165,7 +165,7 @@ public class ListViewAdapter extends BaseAdapter {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
-                                saveEntries(fragment.todoList);
+                                saveEntries(fragment.todoListEntries);
                                 updateData(currentEntry.getLockViewState());
                             }
                         });

@@ -46,7 +46,7 @@ import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 public class FirstFragment extends Fragment {
 
-    private static String[] PERMISSIONS = {
+    private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.SET_WALLPAPER,
@@ -56,7 +56,7 @@ public class FirstFragment extends Fragment {
     ListView listView;
     public ListViewAdapter listViewAdapter;
 
-    public ArrayList<TodoListEntry> todoList;
+    public ArrayList<TodoListEntry> todoListEntries;
 
     SharedPreferences preferences;
     DisplayMetrics displayMetrics;
@@ -87,7 +87,7 @@ public class FirstFragment extends Fragment {
 
         final CalendarView datePicker = view.findViewById(R.id.calendar);
 
-        todoList = loadEntries();
+        todoListEntries = loadEntries();
 
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
@@ -145,8 +145,8 @@ public class FirstFragment extends Fragment {
                                 "value", input.getText().toString(),
                                 "associatedDate", currentlySelectedDate,
                                 "completed", "false"}, currentGroup[0]);
-                        todoList.add(newEntry);
-                        saveEntries(todoList);
+                        todoListEntries.add(newEntry);
+                        saveEntries(todoListEntries);
                         listViewAdapter.updateData(newEntry.getLockViewState());
                     }
                 });
@@ -158,8 +158,8 @@ public class FirstFragment extends Fragment {
                                 "value", input.getText().toString(),
                                 "associatedDate", "GLOBAL",
                                 "completed", "false"}, currentGroup[0]);
-                        todoList.add(newEntry);
-                        saveEntries(todoList);
+                        todoListEntries.add(newEntry);
+                        saveEntries(todoListEntries);
                         listViewAdapter.updateData(newEntry.getLockViewState());
                     }
                 });

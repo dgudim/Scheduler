@@ -16,11 +16,14 @@
     <string name="settings_show_yesterday_checked_items">Показывать вчерашние выполненые дела в списке</string>
     <string name="settings_show_yesterday_checked_items_lock">Показывать вчерашние выполненые дела на экране блокировки</string>
     <string name="settings_show_global_items_lock">Показывать общие дела на экране блокировки</string>
+    <string name="settings_max_rWidth_lock">Ширина дела на весь экран на экране блокировки</string>
 
     <string name="settings_show_items_lock">Показывать на экране блокировки</string>
     <string name="settings_show_items_lock_completed">Показывать на экране блокировки если выполнено</string>
 
     <string name="settings_font_size">Размер шрифта(Экран блокировки):%d</string>
+
+    <string name="settings_priority">Приоритет:%d</string>
 
     <string name="settings_default_color">Цвет фона для сегодняшних дел(Экран блокировки)</string>
     <string name="settings_yesterday_color">Цвет фона для вчерашних дел(Экран блокировки)</string>

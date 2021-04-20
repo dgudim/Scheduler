@@ -174,6 +174,7 @@ public class SecondFragment extends Fragment {
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayTasksSwitch), "yesterdayTasks", true, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayTasksLockSwitch), "yesterdayTasksLock", true, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.globalItemsSwitch), "globalTasksLock", true, null);
+        addSwitchChangeListener((Switch) view.findViewById(R.id.itemWidthSwitch), "forceMaxRWidthOnLock", false, null);
 
         view.findViewById(R.id.resetSettingsButton).setOnClickListener(new View.OnClickListener() {
             @Override
