@@ -18,6 +18,8 @@
     <string name="settings_show_global_items_lock">Показывать общие дела на экране блокировки</string>
     <string name="settings_max_rWidth_lock">Ширина дела на весь экран на экране блокировки</string>
 
+    <string name="settings_state_symbol">⬧</string>
+
     <string name="settings_show_items_lock">Показывать на экране блокировки</string>
     <string name="settings_show_items_lock_completed">Показывать на экране блокировки если выполнено</string>
 

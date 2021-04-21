@@ -30,6 +30,16 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/font_color_list_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/textView3"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -63,6 +73,16 @@
                 android:layout_height="wrap_content"
                 android:background="#FFFFFF"
                 android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/font_color_lock_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/textView34"
@@ -100,6 +120,16 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/background_color_list_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/textView533"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -133,6 +163,16 @@
                 android:layout_height="wrap_content"
                 android:background="#FFFFFF"
                 android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/background_color_lock_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/textView5"
@@ -170,6 +210,16 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/bevel_color_lock_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/textView4"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -203,27 +253,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#FFFFFF"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/priorityDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="50"
-                    android:background="#FFFFFF"
-                    android:text="@string/settings_priority"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
+                    android:id="@+id/priority_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-                <SeekBar
-                    android:id="@+id/priorityBar"
-                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
-                    android:max="40"
-                    android:min="0"
-                    android:progress="0" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/priorityDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:background="#FFFFFF"
+                        android:text="@string/settings_priority"
+                        android:textColor="#000000"
+                        android:textSize="18sp" />
+
+                    <SeekBar
+                        android:id="@+id/priorityBar"
+                        style="@style/Widget.AppCompat.SeekBar.Discrete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#FFFFFF"
+                        android:max="40"
+                        android:min="0"
+                        android:progress="0" />
+
+                </LinearLayout>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -237,33 +303,49 @@
             app:cardCornerRadius="5dp">
 
             <LinearLayout
-                android:id="@+id/linearLayout7"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/bevelThicknessDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="50"
-                    android:background="#FFFFFF"
-                    android:text="@string/settings_bevel_thickness"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
+                    android:id="@+id/bevel_size_state"
+                    android:layout_width="15dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-                <SeekBar
-                    android:id="@+id/bevelThicknessBar"
-                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                <LinearLayout
+                    android:id="@+id/linearLayout7"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:max="15"
-                    android:min="0"
-                    android:progress="3" />
+                    android:orientation="vertical">
 
+                    <TextView
+                        android:id="@+id/bevelThicknessDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:background="#FFFFFF"
+                        android:text="@string/settings_bevel_thickness"
+                        android:textColor="#000000"
+                        android:textSize="18sp" />
+
+                    <SeekBar
+                        android:id="@+id/bevelThicknessBar"
+                        style="@style/Widget.AppCompat.SeekBar.Discrete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#FFFFFF"
+                        android:max="15"
+                        android:min="0"
+                        android:progress="3" />
+
+                </LinearLayout>
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
@@ -274,13 +356,29 @@
             android:layout_marginBottom="3dp"
             app:cardCornerRadius="5dp">
 
-            <Switch
-                android:id="@+id/showOnLockSwitch"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:text="@string/settings_show_items_lock"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/show_on_lock_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Switch
+                    android:id="@+id/showOnLockSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:text="@string/settings_show_items_lock"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
@@ -291,13 +389,29 @@
             android:layout_marginBottom="3dp"
             app:cardCornerRadius="5dp">
 
-            <Switch
-                android:id="@+id/showOnLockCompletedSwitch"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:text="@string/settings_show_items_lock_completed"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/show_on_lock_if_completed_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Switch
+                    android:id="@+id/showOnLockCompletedSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:text="@string/settings_show_items_lock_completed"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
@@ -351,4 +465,5 @@
 
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
