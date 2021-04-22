@@ -185,7 +185,7 @@ public class ListViewAdapter extends BaseAdapter {
             settings.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new EntrySettings(inflater, currentEntry, context, fragment);
+                    new EntrySettings(inflater, currentEntry, context, fragment, fragment.todoListEntries);
                 }
             });
             return view;

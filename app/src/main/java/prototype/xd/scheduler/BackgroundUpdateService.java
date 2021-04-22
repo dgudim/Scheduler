@@ -81,7 +81,7 @@ public class BackgroundUpdateService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
                 notificationIntent, 0);
 
-        startForeground(1, new NotificationCompat.Builder(context, createNotificationChannel(NOTIF_ID, NOTIF_CHANNEL_ID)).setOngoing(true)
+        startForeground(1, new NotificationCompat.Builder(context, createNotificationChannel()).setOngoing(true)
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText("Service is running in background")
@@ -94,20 +94,22 @@ public class BackgroundUpdateService extends Service {
         updateDate("none", false);
         String lastDate = preferences.getString("date", "");
 
-        if (!lastDate.equals(currentDate)) {
+        if (lastDate.equals(currentDate)) {
             constructBitmap();
             preferences.edit().putString("date", currentDate).apply();
         }
 
     }
 
-    private String createNotificationChannel(String channelId, String channelName) {
-        NotificationChannel chan = new NotificationChannel(channelId,
-                channelName, NotificationManager.IMPORTANCE_MIN);
+    private String createNotificationChannel() {
+        NotificationChannel chan = new NotificationChannel(
+                NOTIF_ID,
+                NOTIF_CHANNEL_ID,
+                NotificationManager.IMPORTANCE_MIN);
         chan.setLightColor(Color.BLUE);
         chan.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
         NotificationManager service = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         service.createNotificationChannel(chan);
-        return channelId;
+        return NOTIF_ID;
     }
 }

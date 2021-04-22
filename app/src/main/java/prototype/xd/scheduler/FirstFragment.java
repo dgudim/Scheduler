@@ -121,8 +121,9 @@ public class FirstFragment extends Fragment {
                 }
                 final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
                 final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, groupNames);
-                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down vieww
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
                 groupSpinner.setAdapter(arrayAdapter);
+                groupSpinner.setSelection(groupNames.indexOf(BLANK_NAME));
                 groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

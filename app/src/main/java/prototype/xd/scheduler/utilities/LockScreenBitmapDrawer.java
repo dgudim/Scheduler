@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 
+import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
@@ -60,7 +61,7 @@ public class LockScreenBitmapDrawer {
                 try {
 
                     Bitmap bitmap;
-                    File bg = new File(Utilities.rootDir, "bg.jpg");
+                    File bg = getBackgroundAccordingToDayAndTime( "bg.jpg");
 
                     if (!bg.exists()) {
                         bitmap = BitmapFactory.decodeFileDescriptor(wallpaperManager_static.getWallpaperFile(WallpaperManager.FLAG_LOCK).getFileDescriptor())
@@ -71,12 +72,12 @@ public class LockScreenBitmapDrawer {
                                 .copy(Bitmap.Config.ARGB_8888, true);
                     }
 
-                    float time = System.nanoTime();
+                    float time = System.currentTimeMillis();
                     log(INFO, "setting wallpaper");
                     drawStringsOnBitmap(bitmap);
 
                     wallpaperManager_static.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    log(INFO, "set wallpaper, took " + (System.currentTimeMillis() - time) / 1000000000f + "s");
+                    log(INFO, "set wallpaper" + (System.currentTimeMillis() - time) / 1000f + "s");
 
                     bitmap.recycle();
                 } catch (Exception e) {

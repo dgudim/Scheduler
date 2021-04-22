@@ -54,6 +54,8 @@
 
     <string name="save">Сохранить</string>
     <string name="close">Закрыть</string>
+    <string name="add_widget">Добавить виджет</string>
+    <string name="fadDescription">add item</string>
 
 
 </resources>

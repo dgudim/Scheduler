@@ -161,7 +161,7 @@ public class Utilities {
         });
     }
 
-    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final FirstFragment fragment, final TodoListEntry todoListEntry, final String parameter) {
+    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final FirstFragment fragment, final TodoListEntry todoListEntry, final String parameter, final TextView stateIcon) {
         displayTo.setText(fragment.getString(stringResource, value));
         seekBar.setProgress(value);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -181,6 +181,7 @@ public class Utilities {
                 todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
                 saveEntries(fragment.todoListEntries);
                 preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                todoListEntry.setStateIconColor(stateIcon, parameter);
             }
         });
     }
@@ -199,7 +200,7 @@ public class Utilities {
         });
     }
 
-    public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter, final FirstFragment fragment) {
+    public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter, final FirstFragment fragment, final TextView stateIcon) {
         tSwitch.setChecked(value);
         tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -210,6 +211,7 @@ public class Utilities {
                 boolean currViewState = entry.getLockViewState();
                 // TODO: 09.03.2021 fix lockscreen not updating when switch is off -> on
                 preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", !(prevViewState == currViewState)).apply();
+                entry.setStateIconColor(stateIcon, parameter);
             }
         });
     }
@@ -237,7 +239,7 @@ public class Utilities {
         }).build().show();
     }
 
-    public static void invokeColorDialogue(final int value, final ImageView target, Context context, final TodoListEntry todoListEntry, final String parameter, final boolean setReconstructFlag) {
+    public static void invokeColorDialogue(final int value, final ImageView target, Context context, final TodoListEntry todoListEntry, final String parameter, final boolean setReconstructFlag, final TextView stateIcon) {
         ColorPickerDialogBuilder
                 .with(context)
                 .setTitle("Выберите цвет")
@@ -251,6 +253,7 @@ public class Utilities {
                         todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
                         target.setImageBitmap(createSolidColorCircle(selectedColor));
                         preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", setReconstructFlag).apply();
+                        todoListEntry.setStateIconColor(stateIcon, parameter);
                     }
                 }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
             @Override

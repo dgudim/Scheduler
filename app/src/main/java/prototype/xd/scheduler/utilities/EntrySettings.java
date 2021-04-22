@@ -42,11 +42,11 @@ public class EntrySettings {
 
     FirstFragment fragment;
 
-    public EntrySettings(final LayoutInflater inflater, final TodoListEntry entry, final Context context, final FirstFragment fragment) {
+    public EntrySettings(final LayoutInflater inflater, final TodoListEntry entry, final Context context, final FirstFragment fragment, ArrayList<TodoListEntry> allEntries) {
 
         View settingsView = inflater.inflate(R.layout.entry_settings, null);
 
-        initialise(entry, context, fragment, settingsView);
+        initialise(entry, context, fragment, settingsView, allEntries);
 
         final AlertDialog.Builder alert = new AlertDialog.Builder(context);
 
@@ -63,7 +63,7 @@ public class EntrySettings {
         alert.show();
     }
 
-    private void initialise(final TodoListEntry entry, final Context context, final FirstFragment fragment, final View settingsView) {
+    private void initialise(final TodoListEntry entry, final Context context, final FirstFragment fragment, final View settingsView, final ArrayList<TodoListEntry> allEntries) {
         this.fragment = fragment;
 
         ImageView fontColor_list_view = settingsView.findViewById(R.id.textColor_list);
@@ -77,6 +77,26 @@ public class EntrySettings {
         bgColor_list_view.setImageBitmap(createSolidColorCircle(entry.bgColor_list));
         bgColor_lock_view.setImageBitmap(createSolidColorCircle(entry.bgColor_lock));
         padColor_lock_view.setImageBitmap(createSolidColorCircle(entry.padColor));
+
+        final TextView fontColor_list_view_state = settingsView.findViewById(R.id.font_color_list_state);
+        final TextView fontColor_lock_view_state = settingsView.findViewById(R.id.font_color_lock_state);
+        final TextView bgColor_list_view_state = settingsView.findViewById(R.id.background_color_list_state);
+        final TextView bgColor_lock_view_state = settingsView.findViewById(R.id.background_color_lock_state);
+        final TextView padColor_lock_view_state = settingsView.findViewById(R.id.bevel_color_lock_state);
+        TextView priority_state = settingsView.findViewById(R.id.priority_state);
+        TextView padSize_state = settingsView.findViewById(R.id.bevel_size_state);
+        TextView show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
+        TextView show_on_lock_if_completed_state = settingsView.findViewById(R.id.show_on_lock_if_completed_state);
+
+        entry.setStateIconColor(fontColor_list_view_state, FONT_COLOR_LIST);
+        entry.setStateIconColor(fontColor_lock_view_state, FONT_COLOR_LOCK);
+        entry.setStateIconColor(bgColor_list_view_state, BACKGROUND_COLOR_LIST);
+        entry.setStateIconColor(bgColor_lock_view_state, BACKGROUND_COLOR_LOCK);
+        entry.setStateIconColor(padColor_lock_view_state, BEVEL_COLOR);
+        entry.setStateIconColor(padSize_state, BEVEL_SIZE);
+        entry.setStateIconColor(priority_state, PRIORITY);
+        entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
+        entry.setStateIconColor(show_on_lock_if_completed_state, SHOW_ON_LOCK_COMPLETED);
 
         final ArrayList<Group> groupList = readGroupFile();
         final ArrayList<String> groupNames = new ArrayList<>();
@@ -115,12 +135,15 @@ public class EntrySettings {
                                     public void onClick(DialogInterface dialog, int which) {
                                         if(!input.getText().toString().equals(BLANK_NAME)) {
                                             groupNames.set(position, input.getText().toString());
+                                            String origName = groupList.get(position).name;
                                             groupList.get(position).name = input.getText().toString();
                                             saveGroupsFile(groupList);
-                                            if (groupSpinner.getSelectedItemPosition() == position) {
-                                                entry.group.name = input.getText().toString();
-                                                saveEntries(fragment.todoListEntries);
+                                            for(TodoListEntry entry: allEntries){
+                                                if(entry.group.name.equals(origName)){
+                                                    entry.group.name = input.getText().toString();
+                                                }
                                             }
+                                            saveEntries(fragment.todoListEntries);
                                             notifyDataSetChanged();
                                         }else{
                                             dialog.dismiss();
@@ -142,12 +165,17 @@ public class EntrySettings {
                                         builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
+                                                String origName = groupNames.get(groupSpinner.getSelectedItemPosition());
                                                 groupList.remove(groupSpinner.getSelectedItemPosition());
                                                 groupNames.remove(groupSpinner.getSelectedItemPosition());
                                                 saveGroupsFile(groupList);
-                                                entry.resetGroup();
+                                                for(TodoListEntry entry: allEntries){
+                                                    if(entry.group.name.equals(origName)){
+                                                        entry.resetGroup();
+                                                    }
+                                                }
                                                 saveEntries(fragment.todoListEntries);
-                                                groupSpinner.setSelection(0);
+                                                groupSpinner.setSelection(groupNames.indexOf(BLANK_NAME));
                                                 notifyDataSetChanged();
                                             }
                                         });
@@ -191,7 +219,7 @@ public class EntrySettings {
                     entry.changeGroup(groupNames.get(position));
                     saveEntries(fragment.todoListEntries);
                     preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
-                    initialise(entry, context, fragment, settingsView);
+                    initialise(entry, context, fragment, settingsView, allEntries);
                 }
             }
 
@@ -234,8 +262,12 @@ public class EntrySettings {
                                     Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                                     groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
                                     saveGroupsFile(groupList);
-                                    entry.removeDisplayParams();
-                                    entry.changeGroup(createdGroup);
+                                    for(TodoListEntry entry: allEntries){
+                                        if(entry.group.name.equals(input.getText().toString())){
+                                            entry.removeDisplayParams();
+                                            entry.changeGroup(createdGroup);
+                                        }
+                                    }
                                     preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                                 }
                             });
@@ -287,7 +319,7 @@ public class EntrySettings {
                         entry.resetGroup();
                         saveEntries(fragment.todoListEntries);
                         preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
-                        initialise(entry, context, fragment, settingsView);
+                        initialise(entry, context, fragment, settingsView, allEntries);
                     }
                 });
                 builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -304,50 +336,50 @@ public class EntrySettings {
         fontColor_list_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue(entry.fontColor_list, (ImageView) v, context, entry, FONT_COLOR_LIST, false);
+                invokeColorDialogue(entry.fontColor_list, (ImageView) v, context, entry, FONT_COLOR_LIST, false, fontColor_list_view_state);
             }
         });
 
         fontColor_lock_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue(entry.fontColor_lock, (ImageView) v, context, entry, FONT_COLOR_LOCK, true);
+                invokeColorDialogue(entry.fontColor_lock, (ImageView) v, context, entry, FONT_COLOR_LOCK, true, fontColor_lock_view_state);
             }
         });
 
         bgColor_list_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue(entry.bgColor_list, (ImageView) v, context, entry, BACKGROUND_COLOR_LIST, false);
+                invokeColorDialogue(entry.bgColor_list, (ImageView) v, context, entry, BACKGROUND_COLOR_LIST, false, bgColor_list_view_state);
             }
         });
 
         bgColor_lock_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue(entry.bgColor_lock, (ImageView) v, context, entry, BACKGROUND_COLOR_LOCK, true);
+                invokeColorDialogue(entry.bgColor_lock, (ImageView) v, context, entry, BACKGROUND_COLOR_LOCK, true, bgColor_lock_view_state);
             }
         });
 
         padColor_lock_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                invokeColorDialogue(entry.padColor, (ImageView) v, context, entry, BEVEL_COLOR, true);
+                invokeColorDialogue(entry.padColor, (ImageView) v, context, entry, BEVEL_COLOR, true, padColor_lock_view_state);
             }
         });
 
         addSeekBarChangeListener(
                 (TextView) (settingsView.findViewById(R.id.bevelThicknessDescription)),
                 (SeekBar) (settingsView.findViewById(R.id.bevelThicknessBar)),
-                entry.bevelSize, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE);
+                entry.bevelSize, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE, padSize_state);
 
         addSeekBarChangeListener(
                 (TextView) (settingsView.findViewById(R.id.priorityDescription)),
                 (SeekBar) (settingsView.findViewById(R.id.priorityBar)),
-                entry.priority, R.string.settings_priority, fragment, entry, PRIORITY);
+                entry.priority, R.string.settings_priority, fragment, entry, PRIORITY, priority_state);
 
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch), entry.showOnLock, entry, SHOW_ON_LOCK, fragment);
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockCompletedSwitch), entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED, fragment);
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch), entry.showOnLock, entry, SHOW_ON_LOCK, fragment, show_on_lock_state);
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockCompletedSwitch), entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED, fragment, show_on_lock_if_completed_state);
     }
 
 }

@@ -1,13 +1,16 @@
 package prototype.xd.scheduler.entities;
 
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.TypedValue;
+import android.widget.TextView;
 
 import androidx.core.math.MathUtils;
 
 import java.util.ArrayList;
 
 import static org.apache.commons.lang.ArrayUtils.addAll;
+import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.currentBitmapLongestText;
@@ -93,7 +96,7 @@ public class TodoListEntry {
     }
 
     public void resetGroup() {
-        changeGroup("Ничего");
+        changeGroup(BLANK_NAME);
     }
 
     public void changeGroup(Group group) {
@@ -244,6 +247,44 @@ public class TodoListEntry {
     }
 
     public void splitText() {
+
+        if(associatedDate.equals("GLOBAL")){
+            associatedDate = "0_0_0";
+        }
+
+        String[] dateParts = associatedDate.split("_");
+        int month = Integer.parseInt(dateParts[1]);
+        int day = Integer.parseInt(dateParts[2]);
+
+        String[] dateParts_current = currentDate.split("_");
+        int month_current = Integer.parseInt(dateParts_current[1]);
+        int day_current = Integer.parseInt(dateParts_current[2]);
+
+        String textValue = this.textValue;
+
+        int dayOffset = day - day_current;
+        int monthOffset = month - month_current;
+
+        if(monthOffset == 0){
+            if (dayOffset > 0) {
+                switch (dayOffset) {
+                    case (1):
+                        textValue += " (Через день)";
+                        break;
+                    case (2):
+                    case (3):
+                    case (4):
+                        textValue += " (Через " + dayOffset + " дня)";
+                        break;
+                    default:
+                        textValue += " (Через " + dayOffset + " дней)";
+                        break;
+                }
+            }
+        }else if (monthOffset > 0){
+            textValue += " (Больше чем через месяц)";
+        }
+
         textValueSplit = makeNewLines(textValue, maxChars);
     }
 
@@ -310,5 +351,29 @@ public class TodoListEntry {
             params = newParams;
         }
         reloadParams();
+    }
+
+    public void setStateIconColor(TextView icon, String parameter) {
+        boolean containedInGroupParams = false;
+        boolean containedInPersonalParams = false;
+        for (int i = 0; i < group.params.length; i += 2) {
+            if (group.params[i].equals(parameter)) {
+                containedInGroupParams = true;
+                break;
+            }
+        }
+        for (int i = 0; i < params.length; i += 2) {
+            if (params[i].equals(parameter)) {
+                containedInPersonalParams = true;
+                break;
+            }
+        }
+        if (containedInGroupParams && containedInPersonalParams) {
+            icon.setTextColor(Color.BLUE);
+        } else if (containedInGroupParams) {
+            icon.setTextColor(Color.YELLOW);
+        } else if (containedInPersonalParams) {
+            icon.setTextColor(Color.GREEN);
+        }
     }
 }
