@@ -209,8 +209,9 @@ public class Utilities {
                 entry.changeParameter(parameter, String.valueOf(isChecked));
                 saveEntries(fragment.todoListEntries);
                 boolean currViewState = entry.getLockViewState();
-                // TODO: 09.03.2021 fix lockscreen not updating when switch is off -> on
-                preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", !(prevViewState == currViewState)).apply();
+                if (!(prevViewState == currViewState)) {
+                    preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                }
                 entry.setStateIconColor(stateIcon, parameter);
             }
         });
@@ -264,14 +265,14 @@ public class Utilities {
     }
 }
 
-class TodoListEntryPriorityComparator implements Comparator<TodoListEntry>{
+class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
         return Integer.compare(o2.priority, o1.priority);
     }
 }
 
-class TodoListEntryGroupComparator implements Comparator<TodoListEntry>{
+class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
         return Integer.compare(o1.group.name.hashCode(), o2.group.name.hashCode());

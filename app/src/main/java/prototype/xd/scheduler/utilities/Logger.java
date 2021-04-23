@@ -11,8 +11,8 @@ import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 public class Logger {
 
-    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("y.M.d  h:m");
-    private static File logFile = new File(rootDir, "log.txt");
+    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("y.M.d  h:m");
+    private static final File logFile = new File(rootDir, "log.txt");
 
     public static final String INFO = "  [INFO]: ";
     public static final String WARNING = "  [WARNING]: ";

@@ -126,16 +126,13 @@ public class ListViewAdapter extends BaseAdapter {
             isDone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
-                    boolean prevViewState = currentEntry.getLockViewState();
                     if (!currentEntry.isGlobalEntry) {
                         currentEntry.changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
                     } else {
                         currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
                     }
                     saveEntries(fragment.todoListEntries);
-                    boolean newViewState = currentEntry.getLockViewState();
-                    updateData(!(prevViewState == newViewState));
+                    updateData(true);
                 }
             });
 

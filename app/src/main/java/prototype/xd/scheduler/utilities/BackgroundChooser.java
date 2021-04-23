@@ -43,8 +43,13 @@ public class BackgroundChooser {
             hour_string = "ночь";
         }
 
-        if (new File(rootDir, day_string + "_" + hour_string + ".jpg").exists()) {
-            return new File(rootDir, day_string + "_" + hour_string + ".jpg");
+        File fullName = new File(rootDir, day_string + "_" + hour_string + ".jpg");
+        File halfName = new File(rootDir, day_string + ".jpg");
+
+        if (fullName.exists()) {
+            return fullName;
+        } else if (halfName.exists()) {
+            return halfName;
         }
         return new File(rootDir, defValue);
     }

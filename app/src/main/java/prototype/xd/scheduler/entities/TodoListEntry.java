@@ -105,7 +105,7 @@ public class TodoListEntry {
     }
 
     public boolean getLockViewState() {
-        return (showOnLock && !completed) || showOnLock_ifCompleted;
+        return (showOnLock && !completed) || (showOnLock_ifCompleted && completed);
     }
 
     public String[] getDisplayParams() {
@@ -248,7 +248,7 @@ public class TodoListEntry {
 
     public void splitText() {
 
-        if(associatedDate.equals("GLOBAL")){
+        if (associatedDate.equals("GLOBAL")) {
             associatedDate = "0_0_0";
         }
 
@@ -265,7 +265,7 @@ public class TodoListEntry {
         int dayOffset = day - day_current;
         int monthOffset = month - month_current;
 
-        if(monthOffset == 0){
+        if (monthOffset == 0) {
             if (dayOffset > 0) {
                 switch (dayOffset) {
                     case (1):
@@ -281,7 +281,7 @@ public class TodoListEntry {
                         break;
                 }
             }
-        }else if (monthOffset > 0){
+        } else if (monthOffset > 0) {
             textValue += " (Больше чем через месяц)";
         }
 

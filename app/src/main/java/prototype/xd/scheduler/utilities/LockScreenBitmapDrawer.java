@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 
 import java.io.File;
@@ -61,23 +62,24 @@ public class LockScreenBitmapDrawer {
                 try {
 
                     Bitmap bitmap;
-                    File bg = getBackgroundAccordingToDayAndTime( "bg.jpg");
+                    File bg = getBackgroundAccordingToDayAndTime("bg.jpg");
 
                     if (!bg.exists()) {
                         bitmap = BitmapFactory.decodeFileDescriptor(wallpaperManager_static.getWallpaperFile(WallpaperManager.FLAG_LOCK).getFileDescriptor())
                                 .copy(Bitmap.Config.ARGB_8888, true);
+                        bitmap = Bitmap.createBitmap(bitmap, (int) (bitmap.getWidth() / 2f - displayWidth / 2f), 0, displayWidth, bitmap.getHeight());
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(bg));
                     } else {
                         bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
                                 .copy(Bitmap.Config.ARGB_8888, true);
                     }
 
-                    float time = System.currentTimeMillis();
+                    float time = System.nanoTime();
                     log(INFO, "setting wallpaper");
                     drawStringsOnBitmap(bitmap);
 
                     wallpaperManager_static.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    log(INFO, "set wallpaper" + (System.currentTimeMillis() - time) / 1000f + "s");
+                    log(INFO, "set wallpaper" + (System.nanoTime() - time) / 1000000000f + "s");
 
                     bitmap.recycle();
                 } catch (Exception e) {
@@ -94,34 +96,37 @@ public class LockScreenBitmapDrawer {
         canvas.drawBitmap(src, 0, 0, null);
 
         ArrayList<TodoListEntry> toAdd = filterItems(loadEntries());
-        for (int i = 0; i < toAdd.size(); i++) {
-            toAdd.get(i).initialiseDisplayData();
-            toAdd.get(i).splitText();
-        }
+        if (!toAdd.isEmpty()) {
 
-        float totalHeight = 0;
-        for (int i = 0; i < toAdd.size(); i++) {
-            totalHeight += toAdd.get(i).h * toAdd.get(i).textValueSplit.length + toAdd.get(i).kM;
-        }
-        totalHeight += toAdd.get(0).kM * 2;
-        totalHeight /= 2f;
-
-        ArrayList<TodoListEntry> toAddSplit = new ArrayList<>();
-        for (int i = toAdd.size() - 1; i >= 0; i--) {
-            for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
-                if(forceMaxRWidth){
-                    toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelSize;
-                }
-                TodoListEntry splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
-                copyDisplayData(toAdd.get(i), splitEntry);
-                splitEntry.changeParameter(TodoListEntry.TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
-                toAddSplit.add(splitEntry);
+            for (int i = 0; i < toAdd.size(); i++) {
+                toAdd.get(i).initialiseDisplayData();
+                toAdd.get(i).splitText();
             }
-            toAddSplit.add(new TodoListEntry());
-        }
 
-        drawBgOnCanvas(toAddSplit, canvas, totalHeight);
-        drawTextListOnCanvas(toAddSplit, canvas, totalHeight);
+            float totalHeight = 0;
+            for (int i = 0; i < toAdd.size(); i++) {
+                totalHeight += toAdd.get(i).h * toAdd.get(i).textValueSplit.length + toAdd.get(i).kM;
+            }
+            totalHeight += toAdd.get(0).kM * 2;
+            totalHeight /= 2f;
+
+            ArrayList<TodoListEntry> toAddSplit = new ArrayList<>();
+            for (int i = toAdd.size() - 1; i >= 0; i--) {
+                for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
+                    if (forceMaxRWidth) {
+                        toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelSize;
+                    }
+                    TodoListEntry splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
+                    copyDisplayData(toAdd.get(i), splitEntry);
+                    splitEntry.changeParameter(TodoListEntry.TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
+                    toAddSplit.add(splitEntry);
+                }
+                toAddSplit.add(new TodoListEntry());
+            }
+
+            drawBgOnCanvas(toAddSplit, canvas, totalHeight);
+            drawTextListOnCanvas(toAddSplit, canvas, totalHeight);
+        }
     }
 
     private static void copyDisplayData(TodoListEntry from, TodoListEntry to) {
@@ -145,6 +150,7 @@ public class LockScreenBitmapDrawer {
     private static void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
             if (!toAdd.get(i).textValue.equals("_BLANK_")) {
+
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
                         -toAdd.get(i).rWidth - toAdd.get(i).bevelSize,
                         toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
@@ -161,6 +167,7 @@ public class LockScreenBitmapDrawer {
     }
 
     private static void drawRectRelativeToTheCenter(Canvas canvas, Paint paint, float maxHeight, float left, float top, float right, float bottom) {
+
         canvas.drawRect(displayCenter.x + left,
                 displayCenter.y + maxHeight + top,
                 displayCenter.x + right,
