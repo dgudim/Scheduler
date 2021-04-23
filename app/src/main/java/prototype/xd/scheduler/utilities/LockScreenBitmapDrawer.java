@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.util.DisplayMetrics;
 
 import java.io.File;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 
+import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
@@ -141,7 +141,7 @@ public class LockScreenBitmapDrawer {
 
     private static void drawTextListOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
-            if (!toAdd.get(i).textValue.equals("_BLANK_")) {
+            if (!toAdd.get(i).textValue.equals(blankTextValue)) {
                 canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i, toAdd.get(i).textPaint);
             }
         }
@@ -149,7 +149,7 @@ public class LockScreenBitmapDrawer {
 
     private static void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
-            if (!toAdd.get(i).textValue.equals("_BLANK_")) {
+            if (!toAdd.get(i).textValue.equals(blankTextValue)) {
 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
                         -toAdd.get(i).rWidth - toAdd.get(i).bevelSize,
