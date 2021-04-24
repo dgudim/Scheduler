@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SecondFragment">
+    tools:context=".SecondFragment"
+    tools:ignore="UseSwitchCompatOrMaterialXml">
 
     <ScrollView
         android:layout_width="0dp"
@@ -23,6 +24,61 @@
             android:paddingLeft="5dp"
             android:paddingTop="5dp"
             android:paddingRight="5dp">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView77"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                app:cardCornerRadius="5dp">
+
+                <Switch
+                    android:id="@+id/adaptiveColorSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:text="@string/settings_adaptive_color"
+                    android:textSize="18sp" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView453"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                app:cardCornerRadius="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/adaptive_color_balance_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:background="#FFFFFF"
+                        android:text="@string/settings_adaptive_color_balance"
+                        android:textColor="#000000"
+                        android:textSize="18sp" />
+
+                    <SeekBar
+                        android:id="@+id/adaptive_color_balance_bar"
+                        style="@android:style/Widget.Material.SeekBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#FFFFFF"
+                        android:max="1000"
+                        android:min="0"
+                        android:progress="0" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView"

@@ -168,6 +168,11 @@ public class SecondFragment extends Fragment {
                 (SeekBar) (view.findViewById(R.id.globalBevelThicknessBar)),
                 "globalBevelThickness", 5, R.string.settings_global_bevel_thickness, this);
 
+        addSeekBarChangeListener(
+                (TextView) (view.findViewById(R.id.adaptive_color_balance_description)),
+                (SeekBar) (view.findViewById(R.id.adaptive_color_balance_bar)),
+                "adaptiveColorBalance", 500, R.string.settings_adaptive_color_balance, this);
+
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayItemsLockSwitch), "yesterdayItemsLock", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayItemsListSwitch), "yesterdayItemsList", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.startupUpdateSwitch), "startupUpdate", false, null);
@@ -176,6 +181,7 @@ public class SecondFragment extends Fragment {
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayTasksLockSwitch), "yesterdayTasksLock", true, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.globalItemsSwitch), "globalTasksLock", true, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.itemWidthSwitch), "forceMaxRWidthOnLock", false, null);
+        addSwitchChangeListener((Switch) view.findViewById(R.id.adaptiveColorSwitch), "adaptiveColorEnabled", false, null);
 
         view.findViewById(R.id.resetSettingsButton).setOnClickListener(new View.OnClickListener() {
             @Override

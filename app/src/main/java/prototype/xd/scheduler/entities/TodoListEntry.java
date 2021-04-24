@@ -253,8 +253,8 @@ public class TodoListEntry {
         fontSize = preferences_static.getInt("fontSize", 21);
         fontColor_lock = 0xFF000000;
         bgColor_list = 0xFFFFFFFF;
-        adaptiveColorEnabled = false;
-        adaptiveColorBalance = 500;
+        adaptiveColorEnabled = preferences_static.getBoolean("adaptiveColorEnabled", false);
+        adaptiveColorBalance = preferences_static.getInt("adaptiveColorBalance", 500);
         adaptiveColor = 0xFFFFFFFF;
         priority = 0;
         setParams((String[]) addAll(group.params, params));
