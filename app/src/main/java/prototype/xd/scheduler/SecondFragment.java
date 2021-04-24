@@ -1,5 +1,6 @@
 package prototype.xd.scheduler;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.os.Bundle;
-import android.os.Environment;
 
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -26,12 +26,13 @@ import androidx.fragment.app.Fragment;
 
 import java.io.File;
 
-import static prototype.xd.scheduler.utilities.ScalingUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
+@SuppressWarnings({"ResultOfMethodCallIgnored", "ApplySharedPref"})
 public class SecondFragment extends Fragment {
 
     private SharedPreferences preferences;

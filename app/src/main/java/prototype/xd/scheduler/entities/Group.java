@@ -1,8 +1,5 @@
 package prototype.xd.scheduler.entities;
 
-import android.annotation.SuppressLint;
-import android.hardware.camera2.params.BlackLevelPattern;
-
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -42,6 +39,7 @@ public class Group {
         this.params = params;
     }
 
+    @SuppressWarnings("unchecked")
     public static ArrayList<Group> readGroupFile() {
         try {
 

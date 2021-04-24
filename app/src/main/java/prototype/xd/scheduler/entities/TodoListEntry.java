@@ -12,6 +12,7 @@ import java.util.Calendar;
 
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.currentBitmapLongestText;
@@ -21,9 +22,8 @@ import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.preference
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.ScalingUtilities.createNewPaint;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
-import static prototype.xd.scheduler.utilities.Utilities.mixTwoColors;
 
 public class TodoListEntry {
 

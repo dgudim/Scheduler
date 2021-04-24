@@ -32,7 +32,7 @@ import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
 import static prototype.xd.scheduler.entities.TodoListEntry.*;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.preferences_static;
-import static prototype.xd.scheduler.utilities.ScalingUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;

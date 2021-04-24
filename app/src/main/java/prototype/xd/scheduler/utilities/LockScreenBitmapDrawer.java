@@ -19,10 +19,10 @@ import prototype.xd.scheduler.entities.TodoListEntry;
 
 import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Utilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 
 public class LockScreenBitmapDrawer {
@@ -188,6 +188,7 @@ public class LockScreenBitmapDrawer {
                 displayCenter.y + maxHeight + bottom, paint);
     }
 
+    @SuppressWarnings("StringConcatenationInLoop")
     private static ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input) {
         ArrayList<TodoListEntry> toAdd = new ArrayList<>();
         for (int i = 0; i < input.size(); i++) {

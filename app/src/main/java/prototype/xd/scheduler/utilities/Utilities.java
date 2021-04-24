@@ -1,9 +1,8 @@
 package prototype.xd.scheduler.utilities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Environment;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -37,8 +36,9 @@ import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.ScalingUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 
+@SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
 public class Utilities {
 
     public static File rootDir = new File(Environment.getExternalStorageDirectory().toString() + "/.Scheduler");
@@ -49,7 +49,6 @@ public class Utilities {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static ArrayList<TodoListEntry> loadEntries() {
         try {
 
@@ -264,43 +263,6 @@ public class Utilities {
             }
         }).build().show();
     }
-
-    public static int mixTwoColors(int color1, int color2, double balance) {
-        Color c1 = Color.valueOf(color1);
-        Color c2 = Color.valueOf(color2);
-        float r = (float) (c1.red() * (1 - balance) + c2.red() * balance);
-        float g = (float) (c1.green() * (1 - balance) + c2.green() * balance);
-        float b = (float) (c1.blue() * (1 - balance) + c2.blue() * balance);
-        return Color.rgb(r, g, b);
-    }
-
-    public static int getAverageColor(Bitmap bitmap) {
-        if (bitmap == null) return Color.TRANSPARENT;
-
-        int redBucket = 0;
-        int greenBucket = 0;
-        int blueBucket = 0;
-
-        int pixelCount = bitmap.getWidth() * bitmap.getHeight();
-        int[] pixels = new int[pixelCount];
-        bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-        for (int y = 0, h = bitmap.getHeight(); y < h; y++) {
-            for (int x = 0, w = bitmap.getWidth(); x < w; x++) {
-                int color = pixels[x + y * w]; // x + y * width
-                redBucket += (color >> 16) & 0xFF; // Color.red
-                greenBucket += (color >> 8) & 0xFF; // Color.greed
-                blueBucket += (color & 0xFF); // Color.blue
-            }
-        }
-
-        return Color.argb(
-                255,
-                redBucket / pixelCount,
-                greenBucket / pixelCount,
-                blueBucket / pixelCount);
-    }
-
 }
 
 class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
