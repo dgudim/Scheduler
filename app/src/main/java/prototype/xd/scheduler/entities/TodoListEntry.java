@@ -1,6 +1,5 @@
 package prototype.xd.scheduler.entities;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.TypedValue;
@@ -11,7 +10,6 @@ import androidx.core.math.MathUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import static java.lang.Integer.min;
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
