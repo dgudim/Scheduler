@@ -52,6 +52,7 @@ public class EntrySettings {
     TextView padSize_state;
     TextView show_on_lock_state;
     TextView show_on_lock_if_completed_state;
+    TextView adaptiveColor_bar_state;
 
     public EntrySettings(final LayoutInflater inflater, final TodoListEntry entry, final Context context, final FirstFragment fragment, ArrayList<TodoListEntry> allEntries) {
 
@@ -95,11 +96,12 @@ public class EntrySettings {
         bgColor_list_view_state = settingsView.findViewById(R.id.background_color_list_state);
         bgColor_lock_view_state = settingsView.findViewById(R.id.background_color_lock_state);
         padColor_lock_view_state = settingsView.findViewById(R.id.bevel_color_lock_state);
-        adaptiveColor_state = settingsView.findViewById(R.id.adaptive_color_state);
         priority_state = settingsView.findViewById(R.id.priority_state);
         padSize_state = settingsView.findViewById(R.id.bevel_size_state);
         show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
         show_on_lock_if_completed_state = settingsView.findViewById(R.id.show_on_lock_if_completed_state);
+        adaptiveColor_state = settingsView.findViewById(R.id.adaptive_color_state);
+        adaptiveColor_bar_state = settingsView.findViewById(R.id.adaptive_color_balance_state);
 
         updateAllIndicators();
 
@@ -386,6 +388,11 @@ public class EntrySettings {
                 (SeekBar) (settingsView.findViewById(R.id.priorityBar)),
                 entry.priority, R.string.settings_priority, fragment, entry, PRIORITY, priority_state);
 
+        addSeekBarChangeListener(
+                (TextView) (settingsView.findViewById(R.id.adaptive_color_balance_description)),
+                (SeekBar) (settingsView.findViewById(R.id.adaptive_color_balance_bar)),
+                entry.adaptiveColorBalance, R.string.settings_adaptive_color_balance, fragment, entry, ADAPTIVE_COLOR_BALANCE, adaptiveColor_bar_state);
+
         addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch),
                 entry.showOnLock, entry, SHOW_ON_LOCK,
                 fragment, show_on_lock_state);
@@ -410,6 +417,7 @@ public class EntrySettings {
         entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
         entry.setStateIconColor(show_on_lock_if_completed_state, SHOW_ON_LOCK_COMPLETED);
         entry.setStateIconColor(adaptiveColor_state, ADAPTIVE_COLOR);
+        entry.setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE);
     }
 
 }

@@ -163,7 +163,7 @@ public class Utilities {
     }
 
     public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final FirstFragment fragment, final TodoListEntry todoListEntry, final String parameter, final TextView stateIcon) {
-        displayTo.setText(fragment.getString(stringResource, value));
+        displayTo.setText(fragment.getString(stringResource, (int) value));
         seekBar.setProgress(value);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -265,12 +265,12 @@ public class Utilities {
         }).build().show();
     }
 
-    public static int mixTwoColors(int color1, int color2) {
+    public static int mixTwoColors(int color1, int color2, double balance) {
         Color c1 = Color.valueOf(color1);
         Color c2 = Color.valueOf(color2);
-        float r = (c1.red() + c2.red()) / 2f;
-        float g = (c1.green() + c2.green()) / 2f;
-        float b = (c1.blue() + c2.blue()) / 2f;
+        float r = (float) (c1.red() * (1 - balance) + c2.red() * balance);
+        float g = (float) (c1.green() * (1 - balance) + c2.green() * balance);
+        float b = (float) (c1.blue() * (1 - balance) + c2.blue() * balance);
         return Color.rgb(r, g, b);
     }
 

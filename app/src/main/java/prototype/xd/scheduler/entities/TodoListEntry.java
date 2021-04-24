@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.core.math.MathUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import static java.lang.Integer.min;
 import static org.apache.commons.lang.ArrayUtils.addAll;
@@ -40,6 +41,7 @@ public class TodoListEntry {
     public int padColor;
 
     public boolean adaptiveColorEnabled;
+    public int adaptiveColorBalance;
     public int adaptiveColor;
 
     public int fontSize = 0;
@@ -84,6 +86,7 @@ public class TodoListEntry {
     public static final String BACKGROUND_COLOR_LOCK = "bgColor_lock";
     public static final String BACKGROUND_COLOR_LIST = "bgColor_list";
     public static final String ADAPTIVE_COLOR = "adaptiveColor";
+    public static final String ADAPTIVE_COLOR_BALANCE = "adaptiveColorBalance";
     public static final String BEVEL_COLOR = "padColor";
     public static final String ASSOCIATED_DATE = "associatedDate";
     public static final String PRIORITY = "priority";
@@ -253,6 +256,7 @@ public class TodoListEntry {
         fontColor_lock = 0xFF000000;
         bgColor_list = 0xFFFFFFFF;
         adaptiveColorEnabled = false;
+        adaptiveColorBalance = 500;
         adaptiveColor = 0xFFFFFFFF;
         priority = 0;
         setParams((String[]) addAll(group.params, params));
@@ -268,8 +272,8 @@ public class TodoListEntry {
         rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText) / 2 + 10, 1, displayWidth / 2f - bevelSize);
 
         if (adaptiveColorEnabled) {
-            bgPaint = createNewPaint(mixTwoColors(bgColor_lock, adaptiveColor));
-            padPaint = createNewPaint(mixTwoColors(padColor, adaptiveColor));
+            bgPaint = createNewPaint(mixTwoColors(bgColor_lock, adaptiveColor, adaptiveColorBalance / 1000d));
+            padPaint = createNewPaint(mixTwoColors(padColor, adaptiveColor, adaptiveColorBalance / 1000d));
         } else {
             bgPaint = createNewPaint(bgColor_lock);
             padPaint = createNewPaint(padColor);
@@ -280,45 +284,87 @@ public class TodoListEntry {
 
     public void splitText() {
 
-        if (associatedDate.equals("GLOBAL")) {
-            associatedDate = "0_0_0";
-        }
+        if (!associatedDate.equals("GLOBAL")) {
+            String[] dateParts = associatedDate.split("_");
+            int year = Integer.parseInt(dateParts[0]);
+            int month = Integer.parseInt(dateParts[1]);
+            int day = Integer.parseInt(dateParts[2]);
 
-        String[] dateParts = associatedDate.split("_");
-        int month = Integer.parseInt(dateParts[1]);
-        int day = Integer.parseInt(dateParts[2]);
+            String[] dateParts_current = currentDate.split("_");
+            int year_current = Integer.parseInt(dateParts_current[0]);
+            int month_current = Integer.parseInt(dateParts_current[1]);
+            int day_current = Integer.parseInt(dateParts_current[2]);
 
-        String[] dateParts_current = currentDate.split("_");
-        int month_current = Integer.parseInt(dateParts_current[1]);
-        int day_current = Integer.parseInt(dateParts_current[2]);
+            String textValue = this.textValue;
 
-        String textValue = this.textValue;
+            int dayShift;
 
-        int fullMonths = min(month, month_current);
-        int firstDay = (month - fullMonths) * 31 + day;
-        int secondDay = (month_current - fullMonths) * 31 + day_current;
-        int dayOffset = firstDay - secondDay;
+            if (month == month_current) {
+                dayShift = day - day_current;
+            } else {
+                long now = System.currentTimeMillis();
 
-        if (dayOffset < 31) {
-            if (dayOffset > 0) {
-                switch (dayOffset) {
-                    case (1):
-                        textValue += " (Через день)";
-                        break;
-                    case (2):
-                    case (3):
-                    case (4):
-                        textValue += " (Через " + dayOffset + " дня)";
-                        break;
-                    default:
-                        textValue += " (Через " + dayOffset + " дней)";
-                        break;
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(now);
+                calendar.add(Calendar.MONTH, month - month_current);
+                calendar.add(Calendar.DATE, day - day_current);
+                long previous = calendar.getTimeInMillis();
+                dayShift = (int) ((previous - now) / (1000 * 3600 * 24));
+            }
+
+            if (year == year_current) {
+                if (dayShift < 31 && dayShift > -31) {
+                    if (dayShift > 0) {
+                        switch (dayShift) {
+                            case (1):
+                                textValue += " (Завтра)";
+                                break;
+                            case (2):
+                            case (3):
+                            case (4):
+                            case (22):
+                            case (23):
+                            case (24):
+                                textValue += " (Через " + dayShift + " дня)";
+                                break;
+                            default:
+                                textValue += " (Через " + dayShift + " дней)";
+                                break;
+                        }
+                    } else if (dayShift < 0) {
+                        switch (dayShift) {
+                            case (-1):
+                                textValue += " (Вчера)";
+                                break;
+                            case (-2):
+                            case (-3):
+                            case (-4):
+                            case (-22):
+                            case (-23):
+                            case (-24):
+                                textValue += " (" + -dayShift + " дня назад)";
+                                break;
+                            default:
+                                textValue += " (" + -dayShift + " дней назад)";
+                                break;
+                        }
+                    }
+                } else {
+                    if (dayShift < 0) {
+                        textValue += " (> месяца назад)(" + associatedDate.replace("_", "/") + ")";
+                    } else {
+                        textValue += " (> чем через месяц)(" + associatedDate.replace("_", "/") + ")";
+                    }
+                }
+            } else {
+                if (year > year_current) {
+                    textValue += " (В следующем году)(" + associatedDate.replace("_", "/") + ")";
+                } else {
+                    textValue += " (В прошлом году)(" + associatedDate.replace("_", "/") + ")";
                 }
             }
-        } else {
-            textValue += " (Больше чем через месяц)";
+            textValueSplit = makeNewLines(textValue, maxChars);
         }
-
         textValueSplit = makeNewLines(textValue, maxChars);
     }
 
@@ -363,6 +409,9 @@ public class TodoListEntry {
                     break;
                 case (ADAPTIVE_COLOR):
                     adaptiveColorEnabled = Boolean.parseBoolean(params[i + 1]);
+                    break;
+                case (ADAPTIVE_COLOR_BALANCE):
+                    adaptiveColorBalance = Integer.parseInt(params[i + 1]);
                     break;
                 default:
                     log(WARNING, "unknown parameter: " + params[i] + " entry textValue: " + textValue);
