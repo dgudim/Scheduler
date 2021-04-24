@@ -22,6 +22,7 @@ import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAc
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Utilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 
 public class LockScreenBitmapDrawer {
@@ -62,7 +63,7 @@ public class LockScreenBitmapDrawer {
                 try {
 
                     Bitmap bitmap;
-                    File bg = getBackgroundAccordingToDayAndTime("bg.jpg");
+                    File bg = getBackgroundAccordingToDayAndTime();
 
                     if (!bg.exists()) {
                         bitmap = BitmapFactory.decodeFileDescriptor(wallpaperManager_static.getWallpaperFile(WallpaperManager.FLAG_LOCK).getFileDescriptor())
@@ -97,6 +98,17 @@ public class LockScreenBitmapDrawer {
 
         ArrayList<TodoListEntry> toAdd = filterItems(loadEntries());
         if (!toAdd.isEmpty()) {
+
+            int adaptiveColor = 0;
+
+            for (int i = 0; i < toAdd.size(); i++) {
+                if(toAdd.get(i).adaptiveColorEnabled){
+                    if(adaptiveColor == 0){
+                        adaptiveColor = getAverageColor(src);
+                    }
+                    toAdd.get(i).adaptiveColor = adaptiveColor;
+                }
+            }
 
             for (int i = 0; i < toAdd.size(); i++) {
                 toAdd.get(i).initialiseDisplayData();
@@ -150,6 +162,8 @@ public class LockScreenBitmapDrawer {
     private static void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
             if (!toAdd.get(i).textValue.equals(blankTextValue)) {
+
+
 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
                         -toAdd.get(i).rWidth - toAdd.get(i).bevelSize,

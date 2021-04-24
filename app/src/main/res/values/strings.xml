@@ -51,6 +51,7 @@
     <string name="settings_bg_color_in_list">Цвет фона в списке</string>
     <string name="settings_show_on_lock">Показывать на экране блокировки</string>
     <string name="settings_show_on_lock_if_completed">Показывать на экране блокировки если выполнено</string>
+    <string name="adaptive_color">Подстраивать цвет под цвет фона</string>
 
     <string name="save">Сохранить</string>
     <string name="close">Закрыть</string>

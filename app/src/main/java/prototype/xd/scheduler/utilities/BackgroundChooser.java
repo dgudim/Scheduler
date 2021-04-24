@@ -7,12 +7,12 @@ import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 public class BackgroundChooser {
 
-    static File getBackgroundAccordingToDayAndTime(String defValue) {
+    static File getBackgroundAccordingToDayAndTime() {
         final Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DAY_OF_WEEK);
         int hour = cal.get(Calendar.HOUR_OF_DAY);
-        String day_string = "";
-        String hour_string = "";
+        String day_string;
+        String hour_string;
         switch (day) {
             case (1):
                 day_string = "воскресенье";
@@ -35,6 +35,9 @@ public class BackgroundChooser {
             case (7):
                 day_string = "суббота";
                 break;
+            default:
+                day_string = "bg";
+                break;
         }
 
         if (hour > 7 && hour < 21) {
@@ -48,10 +51,9 @@ public class BackgroundChooser {
 
         if (fullName.exists()) {
             return fullName;
-        } else if (halfName.exists()) {
+        } else {
             return halfName;
         }
-        return new File(rootDir, defValue);
     }
 
 }

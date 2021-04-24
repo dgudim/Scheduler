@@ -2,6 +2,8 @@ package prototype.xd.scheduler.utilities;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Environment;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -146,7 +148,6 @@ public class Utilities {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 displayTo.setText(fragment.getString(stringResource, progress));
                 preferences_static.edit().putInt(key, progress).apply();
-                preferences_static.edit().putBoolean("settingsModified", true).apply();
             }
 
             @Override
@@ -156,7 +157,7 @@ public class Utilities {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                preferences_static.edit().putBoolean("settingsModified", true).apply();
             }
         });
     }
@@ -205,10 +206,10 @@ public class Utilities {
         tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                boolean prevViewState = entry.getLockViewState();
+                double prevViewState = entry.getLockViewHash();
                 entry.changeParameter(parameter, String.valueOf(isChecked));
                 saveEntries(fragment.todoListEntries);
-                boolean currViewState = entry.getLockViewState();
+                double currViewState = entry.getLockViewHash();
                 if (!(prevViewState == currViewState)) {
                     preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                 }
@@ -263,6 +264,43 @@ public class Utilities {
             }
         }).build().show();
     }
+
+    public static int mixTwoColors(int color1, int color2) {
+        Color c1 = Color.valueOf(color1);
+        Color c2 = Color.valueOf(color2);
+        float r = (c1.red() + c2.red()) / 2f;
+        float g = (c1.green() + c2.green()) / 2f;
+        float b = (c1.blue() + c2.blue()) / 2f;
+        return Color.rgb(r, g, b);
+    }
+
+    public static int getAverageColor(Bitmap bitmap) {
+        if (bitmap == null) return Color.TRANSPARENT;
+
+        int redBucket = 0;
+        int greenBucket = 0;
+        int blueBucket = 0;
+
+        int pixelCount = bitmap.getWidth() * bitmap.getHeight();
+        int[] pixels = new int[pixelCount];
+        bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        for (int y = 0, h = bitmap.getHeight(); y < h; y++) {
+            for (int x = 0, w = bitmap.getWidth(); x < w; x++) {
+                int color = pixels[x + y * w]; // x + y * width
+                redBucket += (color >> 16) & 0xFF; // Color.red
+                greenBucket += (color >> 8) & 0xFF; // Color.greed
+                blueBucket += (color & 0xFF); // Color.blue
+            }
+        }
+
+        return Color.argb(
+                255,
+                redBucket / pixelCount,
+                greenBucket / pixelCount,
+                blueBucket / pixelCount);
+    }
+
 }
 
 class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {

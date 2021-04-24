@@ -41,6 +41,17 @@ import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 public class EntrySettings {
 
     FirstFragment fragment;
+    TodoListEntry entry;
+    TextView fontColor_list_view_state;
+    TextView fontColor_lock_view_state;
+    TextView bgColor_list_view_state;
+    TextView bgColor_lock_view_state;
+    TextView padColor_lock_view_state;
+    TextView adaptiveColor_state;
+    TextView priority_state;
+    TextView padSize_state;
+    TextView show_on_lock_state;
+    TextView show_on_lock_if_completed_state;
 
     public EntrySettings(final LayoutInflater inflater, final TodoListEntry entry, final Context context, final FirstFragment fragment, ArrayList<TodoListEntry> allEntries) {
 
@@ -65,6 +76,7 @@ public class EntrySettings {
 
     private void initialise(final TodoListEntry entry, final Context context, final FirstFragment fragment, final View settingsView, final ArrayList<TodoListEntry> allEntries) {
         this.fragment = fragment;
+        this.entry = entry;
 
         ImageView fontColor_list_view = settingsView.findViewById(R.id.textColor_list);
         ImageView fontColor_lock_view = settingsView.findViewById(R.id.textColor_lock);
@@ -78,25 +90,18 @@ public class EntrySettings {
         bgColor_lock_view.setImageBitmap(createSolidColorCircle(entry.bgColor_lock));
         padColor_lock_view.setImageBitmap(createSolidColorCircle(entry.padColor));
 
-        final TextView fontColor_list_view_state = settingsView.findViewById(R.id.font_color_list_state);
-        final TextView fontColor_lock_view_state = settingsView.findViewById(R.id.font_color_lock_state);
-        final TextView bgColor_list_view_state = settingsView.findViewById(R.id.background_color_list_state);
-        final TextView bgColor_lock_view_state = settingsView.findViewById(R.id.background_color_lock_state);
-        final TextView padColor_lock_view_state = settingsView.findViewById(R.id.bevel_color_lock_state);
-        TextView priority_state = settingsView.findViewById(R.id.priority_state);
-        TextView padSize_state = settingsView.findViewById(R.id.bevel_size_state);
-        TextView show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
-        TextView show_on_lock_if_completed_state = settingsView.findViewById(R.id.show_on_lock_if_completed_state);
+        fontColor_list_view_state = settingsView.findViewById(R.id.font_color_list_state);
+        fontColor_lock_view_state = settingsView.findViewById(R.id.font_color_lock_state);
+        bgColor_list_view_state = settingsView.findViewById(R.id.background_color_list_state);
+        bgColor_lock_view_state = settingsView.findViewById(R.id.background_color_lock_state);
+        padColor_lock_view_state = settingsView.findViewById(R.id.bevel_color_lock_state);
+        adaptiveColor_state = settingsView.findViewById(R.id.adaptive_color_state);
+        priority_state = settingsView.findViewById(R.id.priority_state);
+        padSize_state = settingsView.findViewById(R.id.bevel_size_state);
+        show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
+        show_on_lock_if_completed_state = settingsView.findViewById(R.id.show_on_lock_if_completed_state);
 
-        entry.setStateIconColor(fontColor_list_view_state, FONT_COLOR_LIST);
-        entry.setStateIconColor(fontColor_lock_view_state, FONT_COLOR_LOCK);
-        entry.setStateIconColor(bgColor_list_view_state, BACKGROUND_COLOR_LIST);
-        entry.setStateIconColor(bgColor_lock_view_state, BACKGROUND_COLOR_LOCK);
-        entry.setStateIconColor(padColor_lock_view_state, BEVEL_COLOR);
-        entry.setStateIconColor(padSize_state, BEVEL_SIZE);
-        entry.setStateIconColor(priority_state, PRIORITY);
-        entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
-        entry.setStateIconColor(show_on_lock_if_completed_state, SHOW_ON_LOCK_COMPLETED);
+        updateAllIndicators();
 
         final ArrayList<Group> groupList = readGroupFile();
         final ArrayList<String> groupNames = new ArrayList<>();
@@ -133,19 +138,19 @@ public class EntrySettings {
                                 builder.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if(!input.getText().toString().equals(BLANK_NAME)) {
+                                        if (!input.getText().toString().equals(BLANK_NAME)) {
                                             groupNames.set(position, input.getText().toString());
                                             String origName = groupList.get(position).name;
                                             groupList.get(position).name = input.getText().toString();
                                             saveGroupsFile(groupList);
-                                            for(TodoListEntry entry: allEntries){
-                                                if(entry.group.name.equals(origName)){
+                                            for (TodoListEntry entry : allEntries) {
+                                                if (entry.group.name.equals(origName)) {
                                                     entry.group.name = input.getText().toString();
                                                 }
                                             }
                                             saveEntries(fragment.todoListEntries);
                                             notifyDataSetChanged();
-                                        }else{
+                                        } else {
                                             dialog.dismiss();
                                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                             builder.setTitle("Нельзя так называть группу");
@@ -169,13 +174,14 @@ public class EntrySettings {
                                                 groupList.remove(groupSpinner.getSelectedItemPosition());
                                                 groupNames.remove(groupSpinner.getSelectedItemPosition());
                                                 saveGroupsFile(groupList);
-                                                for(TodoListEntry entry: allEntries){
-                                                    if(entry.group.name.equals(origName)){
+                                                for (TodoListEntry entry : allEntries) {
+                                                    if (entry.group.name.equals(origName)) {
                                                         entry.resetGroup();
                                                     }
                                                 }
                                                 saveEntries(fragment.todoListEntries);
                                                 groupSpinner.setSelection(groupNames.indexOf(BLANK_NAME));
+                                                updateAllIndicators();
                                                 notifyDataSetChanged();
                                             }
                                         });
@@ -262,12 +268,13 @@ public class EntrySettings {
                                     Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                                     groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
                                     saveGroupsFile(groupList);
-                                    for(TodoListEntry entry: allEntries){
-                                        if(entry.group.name.equals(input.getText().toString())){
+                                    for (TodoListEntry entry : allEntries) {
+                                        if (entry.group.name.equals(input.getText().toString())) {
                                             entry.removeDisplayParams();
                                             entry.changeGroup(createdGroup);
                                         }
                                     }
+                                    updateAllIndicators();
                                     preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                                 }
                             });
@@ -290,6 +297,7 @@ public class EntrySettings {
                             entry.removeDisplayParams();
                             entry.changeGroup(createdGroup);
                             saveEntries(fragment.todoListEntries);
+                            updateAllIndicators();
                         }
                     }
                 });
@@ -378,8 +386,30 @@ public class EntrySettings {
                 (SeekBar) (settingsView.findViewById(R.id.priorityBar)),
                 entry.priority, R.string.settings_priority, fragment, entry, PRIORITY, priority_state);
 
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch), entry.showOnLock, entry, SHOW_ON_LOCK, fragment, show_on_lock_state);
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockCompletedSwitch), entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED, fragment, show_on_lock_if_completed_state);
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch),
+                entry.showOnLock, entry, SHOW_ON_LOCK,
+                fragment, show_on_lock_state);
+
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockCompletedSwitch),
+                entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED,
+                fragment, show_on_lock_if_completed_state);
+
+        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.adaptiveColorSwitch),
+                entry.adaptiveColorEnabled, entry, ADAPTIVE_COLOR,
+                fragment, adaptiveColor_state);
+    }
+
+    void updateAllIndicators() {
+        entry.setStateIconColor(fontColor_list_view_state, FONT_COLOR_LIST);
+        entry.setStateIconColor(fontColor_lock_view_state, FONT_COLOR_LOCK);
+        entry.setStateIconColor(bgColor_list_view_state, BACKGROUND_COLOR_LIST);
+        entry.setStateIconColor(bgColor_lock_view_state, BACKGROUND_COLOR_LOCK);
+        entry.setStateIconColor(padColor_lock_view_state, BEVEL_COLOR);
+        entry.setStateIconColor(padSize_state, BEVEL_SIZE);
+        entry.setStateIconColor(priority_state, PRIORITY);
+        entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
+        entry.setStateIconColor(show_on_lock_if_completed_state, SHOW_ON_LOCK_COMPLETED);
+        entry.setStateIconColor(adaptiveColor_state, ADAPTIVE_COLOR);
     }
 
 }

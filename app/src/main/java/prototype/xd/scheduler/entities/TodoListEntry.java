@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.entities;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.TypedValue;
@@ -9,6 +10,7 @@ import androidx.core.math.MathUtils;
 
 import java.util.ArrayList;
 
+import static java.lang.Integer.min;
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
@@ -22,6 +24,7 @@ import static prototype.xd.scheduler.utilities.Logger.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.ScalingUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
+import static prototype.xd.scheduler.utilities.Utilities.mixTwoColors;
 
 public class TodoListEntry {
 
@@ -35,6 +38,9 @@ public class TodoListEntry {
     public int fontColor_list_completed;
 
     public int padColor;
+
+    public boolean adaptiveColorEnabled;
+    public int adaptiveColor;
 
     public int fontSize = 0;
     public float h = 0;
@@ -53,7 +59,8 @@ public class TodoListEntry {
     public boolean showInList;
     public boolean showInList_ifCompleted;
 
-    public String textValue = "_BLANK_";
+    public static final String blankTextValue = "_BLANK_";
+    public String textValue = blankTextValue;
     public String[] textValueSplit;
 
     public Paint textPaint;
@@ -76,6 +83,7 @@ public class TodoListEntry {
     public static final String FONT_COLOR_LIST = "fontColor_list";
     public static final String BACKGROUND_COLOR_LOCK = "bgColor_lock";
     public static final String BACKGROUND_COLOR_LIST = "bgColor_list";
+    public static final String ADAPTIVE_COLOR = "adaptiveColor";
     public static final String BEVEL_COLOR = "padColor";
     public static final String ASSOCIATED_DATE = "associatedDate";
     public static final String PRIORITY = "priority";
@@ -108,6 +116,21 @@ public class TodoListEntry {
         return (showOnLock && !completed) || (showOnLock_ifCompleted && completed);
     }
 
+    public double getLockViewHash() {
+        double displayHash = 543;
+        if (getLockViewState()) {
+            displayHash = displayHash * 100 + 66;
+        }
+        if (adaptiveColorEnabled) {
+            displayHash = displayHash * 1000 + 789;
+        }
+        displayHash = displayHash * Integer.valueOf(adaptiveColor * 100 + 13).hashCode();
+        displayHash = displayHash / (double) Integer.valueOf(bgColor_lock * 100 + 13).hashCode();
+        displayHash = displayHash * Integer.valueOf(fontColor_lock * 100 + 67).hashCode();
+        displayHash = displayHash / (double) Integer.valueOf(padColor * 100 + 42).hashCode();
+        return displayHash;
+    }
+
     public String[] getDisplayParams() {
         ArrayList<String> displayParams = new ArrayList<>();
         for (int i = 0; i < params.length; i += 2) {
@@ -120,7 +143,8 @@ public class TodoListEntry {
                     || params[i].equals(BACKGROUND_COLOR_LOCK)
                     || params[i].equals(BACKGROUND_COLOR_LIST)
                     || params[i].equals(BEVEL_COLOR)
-                    || params[i].equals(PRIORITY)) {
+                    || params[i].equals(PRIORITY)
+                    || params[i].equals(ADAPTIVE_COLOR)) {
                 displayParams.add(params[i]);
                 displayParams.add(params[i + 1]);
             }
@@ -228,6 +252,9 @@ public class TodoListEntry {
         fontSize = preferences_static.getInt("fontSize", 21);
         fontColor_lock = 0xFF000000;
         bgColor_list = 0xFFFFFFFF;
+        adaptiveColorEnabled = false;
+        adaptiveColor = 0xFFFFFFFF;
+        priority = 0;
         setParams((String[]) addAll(group.params, params));
     }
 
@@ -240,8 +267,13 @@ public class TodoListEntry {
         maxChars = (int) ((displayWidth - bevelSize * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText) / 2 + 10, 1, displayWidth / 2f - bevelSize);
 
-        bgPaint = createNewPaint(bgColor_lock);
-        padPaint = createNewPaint(padColor);
+        if (adaptiveColorEnabled) {
+            bgPaint = createNewPaint(mixTwoColors(bgColor_lock, adaptiveColor));
+            padPaint = createNewPaint(mixTwoColors(padColor, adaptiveColor));
+        } else {
+            bgPaint = createNewPaint(bgColor_lock);
+            padPaint = createNewPaint(padColor);
+        }
 
         log(INFO, "loaded display data for " + textValue);
     }
@@ -262,10 +294,12 @@ public class TodoListEntry {
 
         String textValue = this.textValue;
 
-        int dayOffset = day - day_current;
-        int monthOffset = month - month_current;
+        int fullMonths = min(month, month_current);
+        int firstDay = (month - fullMonths) * 31 + day;
+        int secondDay = (month_current - fullMonths) * 31 + day_current;
+        int dayOffset = firstDay - secondDay;
 
-        if (monthOffset == 0) {
+        if (dayOffset < 31) {
             if (dayOffset > 0) {
                 switch (dayOffset) {
                     case (1):
@@ -281,7 +315,7 @@ public class TodoListEntry {
                         break;
                 }
             }
-        } else if (monthOffset > 0) {
+        } else {
             textValue += " (Больше чем через месяц)";
         }
 
@@ -326,6 +360,9 @@ public class TodoListEntry {
                     break;
                 case (ASSOCIATED_DATE):
                     associatedDate = params[i + 1];
+                    break;
+                case (ADAPTIVE_COLOR):
+                    adaptiveColorEnabled = Boolean.parseBoolean(params[i + 1]);
                     break;
                 default:
                     log(WARNING, "unknown parameter: " + params[i] + " entry textValue: " + textValue);
@@ -374,6 +411,8 @@ public class TodoListEntry {
             icon.setTextColor(Color.YELLOW);
         } else if (containedInPersonalParams) {
             icon.setTextColor(Color.GREEN);
+        } else {
+            icon.setTextColor(Color.GRAY);
         }
     }
 }
