@@ -1,29 +1,45 @@
 package prototype.xd.scheduler.utilities;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.WallpaperManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.os.Looper;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.hasFingerPrint;
+import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
+import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 public class LockScreenBitmapDrawer {
 
@@ -40,7 +56,9 @@ public class LockScreenBitmapDrawer {
     public static DisplayMetrics displayMetrics_static;
     public static SharedPreferences preferences_static;
 
-    public static void initialiseBitmapDrawer(WallpaperManager wallpaperManager, final SharedPreferences preferences, DisplayMetrics displayMetrics) {
+    private static Context context_static;
+
+    public static void initialiseBitmapDrawer(WallpaperManager wallpaperManager, final SharedPreferences preferences, DisplayMetrics displayMetrics, Context context) {
         wallpaperManager_static = wallpaperManager;
         displayMetrics_static = displayMetrics;
         preferences_static = preferences;
@@ -50,29 +68,97 @@ public class LockScreenBitmapDrawer {
             displayCenter = new Point(displayWidth / 2, displayHeight / 2);
             initialised = true;
         }
+        context_static = context;
+    }
+
+    public static void constructBitmap() {
+        constructBitmap(null);
     }
 
     @SuppressLint("MissingPermission")
-    public static void constructBitmap() {
+    public static void constructBitmap(Bitmap lockscreenBitmapOverride) {
         if (!initialised) {
             throw new RuntimeException("Bitmap drawer not initialised");
         }
         forceMaxRWidth = preferences_static.getBoolean("forceMaxRWidthOnLock", false);
+
+        final Bitmap bitmapFromLock;
+        if (lockscreenBitmapOverride == null) {
+            bitmapFromLock = BitmapFactory.decodeFileDescriptor(
+                    wallpaperManager_static.getWallpaperFile(WallpaperManager.FLAG_LOCK).getFileDescriptor())
+                    .copy(Bitmap.Config.ARGB_8888, true);
+        } else {
+            bitmapFromLock = lockscreenBitmapOverride;
+        }
+
+        final File bg = getBackgroundAccordingToDayAndTime(preferences_static);
+        final String[] currentName = {bg.getName()};
+
+        if (!hasFingerPrint(bitmapFromLock) && !currentName[0].equals("bg.png")) {
+            final AlertDialog.Builder alert = new AlertDialog.Builder(context_static);
+
+            alert.setTitle("В какой день использовать новый фон?");
+
+            final CharSequence[] availableDays = new CharSequence[]{"понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "общий"};
+
+            alert.setItems(availableDays, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    currentName[0] = availableDays[which] + ".png";
+                    if (availableDays[which].equals("общий")) {
+                        currentName[0] = "bg.png";
+                    }
+                    dialog.dismiss();
+                }
+            });
+
+            alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    startBitmapThread(currentName[0], bitmapFromLock);
+                }
+            });
+
+            alert.show();
+        } else {
+            startBitmapThread(currentName[0], bitmapFromLock);
+        }
+
+    }
+
+    private static void startBitmapThread(final String selectedDay, final Bitmap bitmapFromLock_input) {
         new Thread(new Runnable() {
             public void run() {
                 try {
-
                     Bitmap bitmap;
-                    File bg = getBackgroundAccordingToDayAndTime();
+                    File bg = getBackgroundAccordingToDayAndTime(preferences_static);
+                    Bitmap bitmapFromLock = bitmapFromLock_input;
 
-                    if (!bg.exists()) {
-                        bitmap = BitmapFactory.decodeFileDescriptor(wallpaperManager_static.getWallpaperFile(WallpaperManager.FLAG_LOCK).getFileDescriptor())
-                                .copy(Bitmap.Config.ARGB_8888, true);
-                        bitmap = Bitmap.createBitmap(bitmap, (int) (bitmap.getWidth() / 2f - displayWidth / 2f), 0, displayWidth, bitmap.getHeight());
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(bg));
+                    if (!hasFingerPrint(bitmapFromLock)) {
+                        if (bg.exists()) {
+                            bg.delete();
+                        }
+
+                        bitmapFromLock = Bitmap.createBitmap(bitmapFromLock, (int) (bitmapFromLock.getWidth() / 2f - displayWidth / 2f), 0, displayWidth, bitmapFromLock.getHeight());
+                        fingerPrintBitmap(bitmapFromLock).compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(rootDir, selectedDay)));
+                        bitmap = bitmapFromLock;
+                        if (!selectedDay.equals(bg.getName())) {
+                            constructBitmap(bitmap);
+                            throw new InterruptedException("New background set to other date, constructing with current instead");
+                        }
                     } else {
-                        bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
-                                .copy(Bitmap.Config.ARGB_8888, true);
+                        if (bg.exists()) {
+                            bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
+                                    .copy(Bitmap.Config.ARGB_8888, true);
+                        } else {
+                            File defFile = new File(rootDir, "bg.png");
+                            if (defFile.exists()) {
+                                bitmap = BitmapFactory.decodeStream(new FileInputStream(defFile))
+                                        .copy(Bitmap.Config.ARGB_8888, true);
+                            } else {
+                                throw new FileNotFoundException("No available background to load");
+                            }
+                        }
                     }
 
                     float time = System.nanoTime();
@@ -90,7 +176,6 @@ public class LockScreenBitmapDrawer {
         }).start();
     }
 
-
     private static void drawStringsOnBitmap(Bitmap src) {
 
         Canvas canvas = new Canvas(src);
@@ -102,8 +187,8 @@ public class LockScreenBitmapDrawer {
             int adaptiveColor = 0;
 
             for (int i = 0; i < toAdd.size(); i++) {
-                if(toAdd.get(i).adaptiveColorEnabled){
-                    if(adaptiveColor == 0){
+                if (toAdd.get(i).adaptiveColorEnabled) {
+                    if (adaptiveColor == 0) {
                         adaptiveColor = getAverageColor(src);
                     }
                     toAdd.get(i).adaptiveColor = adaptiveColor;
@@ -162,7 +247,6 @@ public class LockScreenBitmapDrawer {
     private static void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
             if (!toAdd.get(i).textValue.equals(blankTextValue)) {
-
 
 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,

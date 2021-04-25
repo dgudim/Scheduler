@@ -10,6 +10,8 @@ import android.graphics.Rect;
 
 import java.io.File;
 
+import static java.lang.Math.random;
+
 public class BitmapUtilities {
 
     /**
@@ -226,6 +228,26 @@ public class BitmapUtilities {
                 redBucket / pixelCount,
                 greenBucket / pixelCount,
                 blueBucket / pixelCount);
+    }
+
+    public static Bitmap fingerPrintBitmap(Bitmap bitmap) {
+        for (int i = 0; i < 3; i++) {
+            for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
+                bitmap.setPixel(i2, i, 0);
+            }
+        }
+        return bitmap;
+    }
+
+    public static boolean hasFingerPrint(Bitmap bitmap) {
+        for (int i = 0; i < 3; i++) {
+            for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
+                if(!(bitmap.getPixel(i2, i) == -16777216)){
+                    return false;
+                };
+            }
+        }
+        return true;
     }
 
 }

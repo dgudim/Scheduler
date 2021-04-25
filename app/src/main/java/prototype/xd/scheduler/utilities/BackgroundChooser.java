@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
+import android.content.SharedPreferences;
+
 import java.io.File;
 import java.util.Calendar;
 
@@ -7,12 +9,17 @@ import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 public class BackgroundChooser {
 
-    static File getBackgroundAccordingToDayAndTime() {
+    static File getBackgroundAccordingToDayAndTime(SharedPreferences preferences) {
+
+        File defaultName = new File(rootDir, "bg.png");
+
+        if (!preferences.getBoolean("adaptiveBackgroundEnabled", true)) {
+            return defaultName;
+        }
+
         final Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DAY_OF_WEEK);
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        String day_string;
-        String hour_string;
+        String day_string = "bg";
         switch (day) {
             case (1):
                 day_string = "воскресенье";
@@ -35,24 +42,14 @@ public class BackgroundChooser {
             case (7):
                 day_string = "суббота";
                 break;
-            default:
-                day_string = "bg";
-                break;
         }
 
-        if (hour > 7 && hour < 21) {
-            hour_string = "день";
-        } else {
-            hour_string = "ночь";
-        }
+        File dayName = new File(rootDir, day_string + ".png");
 
-        File fullName = new File(rootDir, day_string + "_" + hour_string + ".jpg");
-        File halfName = new File(rootDir, day_string + ".jpg");
-
-        if (fullName.exists()) {
-            return fullName;
+        if (!defaultName.exists()) {
+            return defaultName;
         } else {
-            return halfName;
+            return dayName;
         }
     }
 

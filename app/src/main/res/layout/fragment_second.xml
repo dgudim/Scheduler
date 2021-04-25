@@ -26,6 +26,24 @@
             android:paddingRight="5dp">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardView776"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                app:cardCornerRadius="5dp">
+
+                <Switch
+                    android:id="@+id/adaptiveBackgroundSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:text="@string/settings_adaptive_background"
+                    android:textSize="18sp" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
                 android:id="@+id/cardView77"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

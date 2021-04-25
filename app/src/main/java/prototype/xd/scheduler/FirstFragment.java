@@ -80,7 +80,7 @@ public class FirstFragment extends Fragment {
         displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        initialiseBitmapDrawer(wallpaperManager, preferences, displayMetrics);
+        initialiseBitmapDrawer(wallpaperManager, preferences, displayMetrics, getContext());
 
         boolean updateInBackground = preferences.getBoolean("bgUpdate", true);
         boolean updateOnStart = preferences.getBoolean("startupUpdate", false);

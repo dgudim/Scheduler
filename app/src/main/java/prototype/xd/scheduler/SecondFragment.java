@@ -56,12 +56,19 @@ public class SecondFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Oбновить фон?");
+                builder.setTitle("Удалить все сохраненные фоны?");
 
                 builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new File(rootDir, "bg.jpg").delete();
+                        new File(rootDir, "bg.png").delete();
+                        new File(rootDir, "понедельник.png").delete();
+                        new File(rootDir, "вторник.png").delete();
+                        new File(rootDir, "среда.png").delete();
+                        new File(rootDir, "четверг.png").delete();
+                        new File(rootDir, "пятница.png").delete();
+                        new File(rootDir, "суббота.png").delete();
+                        new File(rootDir, "воскресенье.png").delete();
                     }
                 });
                 builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -182,6 +189,7 @@ public class SecondFragment extends Fragment {
         addSwitchChangeListener((Switch) view.findViewById(R.id.globalItemsSwitch), "globalTasksLock", true, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.itemWidthSwitch), "forceMaxRWidthOnLock", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.adaptiveColorSwitch), "adaptiveColorEnabled", false, null);
+        addSwitchChangeListener((Switch) view.findViewById(R.id.adaptiveBackgroundSwitch), "adaptiveBackgroundEnabled", true, null);
 
         view.findViewById(R.id.resetSettingsButton).setOnClickListener(new View.OnClickListener() {
             @Override
