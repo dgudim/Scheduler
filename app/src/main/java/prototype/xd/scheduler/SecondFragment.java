@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import java.io.File;
 
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
@@ -62,13 +63,9 @@ public class SecondFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         new File(rootDir, "bg.png").delete();
-                        new File(rootDir, "понедельник.png").delete();
-                        new File(rootDir, "вторник.png").delete();
-                        new File(rootDir, "среда.png").delete();
-                        new File(rootDir, "четверг.png").delete();
-                        new File(rootDir, "пятница.png").delete();
-                        new File(rootDir, "суббота.png").delete();
-                        new File(rootDir, "воскресенье.png").delete();
+                        for (int i = 0; i < 7; i++) {
+                            new File(rootDir, availableDays[i] + ".png").delete();
+                        }
                     }
                 });
                 builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {

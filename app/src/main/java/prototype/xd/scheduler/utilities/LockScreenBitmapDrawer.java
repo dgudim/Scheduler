@@ -33,6 +33,7 @@ import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAc
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hasFingerPrint;
+import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
@@ -98,8 +99,6 @@ public class LockScreenBitmapDrawer {
             final AlertDialog.Builder alert = new AlertDialog.Builder(context_static);
 
             alert.setTitle("В какой день использовать новый фон?");
-
-            final CharSequence[] availableDays = new CharSequence[]{"понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "общий"};
 
             alert.setItems(availableDays, new DialogInterface.OnClickListener() {
                 @Override

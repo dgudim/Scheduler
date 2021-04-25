@@ -12,6 +12,7 @@ public class DateManager {
     public static String currentlySelectedDate = "none";
     public static String yesterdayDate = "none";
     static DateFormat dateFormat = new SimpleDateFormat("yyyy/M/d", Locale.ROOT);
+    public static final CharSequence[] availableDays = new CharSequence[]{"понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "общий"};
 
     public static void updateDate(String selectedDate, boolean updateCurrentlySelected) {
         currentDate = getCurrentDate();
