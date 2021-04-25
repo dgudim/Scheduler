@@ -20,7 +20,13 @@ public class BackgroundChooser {
 
         final Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DAY_OF_WEEK);
-        CharSequence day_string = availableDays[day - 1];
+        CharSequence day_string;
+        if(day == 1){
+            day_string = availableDays[6];
+        }else{
+            day_string = availableDays[day - 2];
+        }
+
 
         File dayName = new File(rootDir, day_string + ".png");
 

@@ -10,6 +10,7 @@ import android.graphics.Rect;
 
 import java.io.File;
 
+import static java.lang.Math.max;
 import static java.lang.Math.random;
 
 public class BitmapUtilities {
@@ -223,6 +224,12 @@ public class BitmapUtilities {
             }
         }
 
+        if (max(max(redBucket, greenBucket), blueBucket) / pixelCount < 200) {
+            redBucket += 50 * pixelCount;
+            greenBucket += 50 * pixelCount;
+            blueBucket += 50 * pixelCount;
+        }
+
         return Color.argb(
                 255,
                 redBucket / pixelCount,
@@ -242,9 +249,10 @@ public class BitmapUtilities {
     public static boolean hasFingerPrint(Bitmap bitmap) {
         for (int i = 0; i < 3; i++) {
             for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
-                if(!(bitmap.getPixel(i2, i) == -16777216)){
+                if (!(bitmap.getPixel(i2, i) == -16777216)) {
                     return false;
-                };
+                }
+                ;
             }
         }
         return true;
