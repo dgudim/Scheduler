@@ -94,7 +94,7 @@ public class BackgroundUpdateService extends Service {
         updateDate("none", false);
         String lastDate = preferences.getString("date", "");
 
-        if (lastDate.equals(currentDate)) {
+        if (!lastDate.equals(currentDate)) {
             lockScreenBitmapDrawer.constructBitmap();
             preferences.edit().putString("date", currentDate).apply();
         }

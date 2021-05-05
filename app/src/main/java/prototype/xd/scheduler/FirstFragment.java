@@ -3,13 +3,11 @@ package prototype.xd.scheduler;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.WallpaperManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,61 +38,63 @@ import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
-import static prototype.xd.scheduler.utilities.DateManager.*;
+import static prototype.xd.scheduler.utilities.DateManager.currentDate;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
+import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.Utilities.createRootIfNeeded;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 public class FirstFragment extends Fragment {
-
+    
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.SET_WALLPAPER,
             Manifest.permission.FOREGROUND_SERVICE,
     };
-
+    
     ListView listView;
     public ListViewAdapter listViewAdapter;
-
+    
     public ArrayList<TodoListEntry> todoListEntries;
-
+    
     LockScreenBitmapDrawer lockScreenBitmapDrawer;
-
+    
     Timer queueTimer;
-
+    
     Activity rootActivity;
-
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_first, container, false);
     }
-
+    
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        
         rootActivity = getActivity();
-
+        
         verifyStoragePermissions(rootActivity);
-
+        
         createRootIfNeeded();
         updateDate("none", true);
-
+        
         lockScreenBitmapDrawer = new LockScreenBitmapDrawer(getContext());
-
+        
         boolean updateInBackground = preferences.getBoolean("bgUpdate", true);
         boolean updateOnStart = preferences.getBoolean("startupUpdate", false);
-
+        
         final CalendarView datePicker = view.findViewById(R.id.calendar);
-
+        
         todoListEntries = loadEntries();
-
+        
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
         listViewAdapter = new ListViewAdapter(FirstFragment.this, listView, lockScreenBitmapDrawer);
         listView.setAdapter(listViewAdapter);
-
+        
         datePicker.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
@@ -102,19 +102,19 @@ public class FirstFragment extends Fragment {
                 listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
             }
         });
-
+        
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Добавить пункт");
-
+                
                 View addView = LayoutInflater.from(getContext()).inflate(R.layout.add_entry_dialogue, null);
                 final EditText input = addView.findViewById(R.id.entryNameEditText);
-
+                
                 final String[] currentGroup = {BLANK_NAME};
-
+                
                 final ArrayList<Group> groupList = readGroupFile();
                 final ArrayList<String> groupNames = new ArrayList<>();
                 for (Group group : groupList) {
@@ -130,16 +130,16 @@ public class FirstFragment extends Fragment {
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         currentGroup[0] = groupNames.get(position);
                     }
-
+                    
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
-
+                    
                     }
                 });
-
+                
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 builder.setView(addView);
-
+                
                 builder.setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -152,7 +152,7 @@ public class FirstFragment extends Fragment {
                         listViewAdapter.updateData(newEntry.getLockViewState());
                     }
                 });
-
+                
                 builder.setNegativeButton("Добавить в общий список", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -165,21 +165,21 @@ public class FirstFragment extends Fragment {
                         listViewAdapter.updateData(newEntry.getLockViewState());
                     }
                 });
-
+                
                 builder.setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-
+                
                 builder.show();
             }
         });
-
+        
         final GifImageView loadingGif = view.findViewById(R.id.loadingIcon);
         final TextView loadingText = view.findViewById(R.id.queueText);
-
+        
         queueTimer = new Timer();
         queueTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -188,21 +188,21 @@ public class FirstFragment extends Fragment {
                 rootActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(lockScreenBitmapDrawer.currentlyProcessingBitmap){
+                        if (lockScreenBitmapDrawer.currentlyProcessingBitmap) {
                             loadingGif.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             loadingGif.setVisibility(View.GONE);
                         }
-                        if(lockScreenBitmapDrawer.needBitmapProcessing){
+                        if (lockScreenBitmapDrawer.needBitmapProcessing) {
                             loadingText.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             loadingText.setVisibility(View.GONE);
                         }
                     }
                 });
             }
         }, 0, 100);
-
+        
         view.findViewById(R.id.openSettingsButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -210,17 +210,17 @@ public class FirstFragment extends Fragment {
                 NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
         });
-
+        
         if (updateOnStart || preferences.getBoolean("settingsModified", false)) {
             preferences.edit().putBoolean("settingsModified", false).apply();
             lockScreenBitmapDrawer.constructBitmap();
         }
-
+        
         if (updateInBackground) {
             getContext().startService(new Intent(rootActivity, BackgroundUpdateService.class));
         }
     }
-
+    
     void verifyStoragePermissions(Activity activity) {
         boolean granted = true;
         for (int i = 0; i < PERMISSIONS.length; i++) {

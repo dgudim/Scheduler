@@ -242,7 +242,7 @@ public class EntrySettings {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Добавить текущую конфигурацию как группу?");
-                builder.setMessage("\n (Будут добавлены только те параметры, которые были изменены вручную)");
+                builder.setMessage("\n (Будут добавлены только те параметры, которые были изменены вручную)(Зеленые ромбики)");
 
                 final EditText input = new EditText(context);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
