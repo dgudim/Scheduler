@@ -46,6 +46,8 @@ public class LockScreenBitmapDrawer {
 
     private boolean initialised = false;
     private boolean forceMaxRWidth = false;
+    public boolean currentlyProcessingBitmap = false;
+    public boolean needBitmapProcessing = false;
 
     WallpaperManager wallpaperManager;
 
@@ -78,43 +80,54 @@ public class LockScreenBitmapDrawer {
         cachedBitmapFromLockScreen = bitmap.copy(Bitmap.Config.ARGB_8888, true);
     }
 
+    public void checkQueue(){
+        if(needBitmapProcessing && !currentlyProcessingBitmap){
+            constructBitmap();
+            needBitmapProcessing = false;
+        }
+    }
+
     public void constructBitmap() {
-        if (!initialised) {
-            throw new RuntimeException("Bitmap drawer not initialised");
-        }
-        forceMaxRWidth = preferences.getBoolean("forceMaxRWidthOnLock", false);
+        if (!currentlyProcessingBitmap) {
+            if (!initialised) {
+                throw new RuntimeException("Bitmap drawer not initialised");
+            }
+            currentlyProcessingBitmap = true;
+            forceMaxRWidth = preferences.getBoolean("forceMaxRWidthOnLock", false);
 
-        final File bg = getBackgroundAccordingToDayAndTime();
-        final String[] currentName = {bg.getName()};
+            final File bg = getBackgroundAccordingToDayAndTime();
+            final String[] currentName = {bg.getName()};
 
-        if (!hasFingerPrint(cachedBitmapFromLockScreen) && !currentName[0].equals("bg.png")) {
-            final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+            if (!hasFingerPrint(cachedBitmapFromLockScreen) && !currentName[0].equals("bg.png")) {
+                final AlertDialog.Builder alert = new AlertDialog.Builder(context);
 
-            alert.setTitle("В какой день использовать новый фон?");
+                alert.setTitle("В какой день использовать новый фон?");
 
-            alert.setItems(availableDays, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    currentName[0] = availableDays[which] + ".png";
-                    if (availableDays[which].equals("общий")) {
-                        currentName[0] = "bg.png";
+                alert.setItems(availableDays, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        currentName[0] = availableDays[which] + ".png";
+                        if (availableDays[which].equals("общий")) {
+                            currentName[0] = "bg.png";
+                        }
+                        dialog.dismiss();
                     }
-                    dialog.dismiss();
-                }
-            });
+                });
 
-            alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    startBitmapThread(currentName[0]);
-                }
-            });
+                alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        startBitmapThread(currentName[0]);
+                    }
+                });
 
-            alert.show();
+                alert.show();
+            } else {
+                startBitmapThread(currentName[0]);
+            }
         } else {
-            startBitmapThread(currentName[0]);
+            needBitmapProcessing = true;
         }
-
     }
 
     private void startBitmapThread(final String selectedDay) {
@@ -130,7 +143,8 @@ public class LockScreenBitmapDrawer {
                         bitmapFromLock = Bitmap.createBitmap(bitmapFromLock, (int) (bitmapFromLock.getWidth() / 2f - displayWidth / 2f), 0, displayWidth, bitmapFromLock.getHeight());
                         fingerPrintBitmap(bitmapFromLock).compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(rootDir, selectedDay)));
 
-                        bitmap = BitmapFactory.decodeStream(new FileInputStream(new File(rootDir, selectedDay))).copy(Bitmap.Config.ARGB_8888, true);;
+                        bitmap = BitmapFactory.decodeStream(new FileInputStream(new File(rootDir, selectedDay))).copy(Bitmap.Config.ARGB_8888, true);
+                        ;
                         if (!selectedDay.equals(bg.getName())) {
                             cachedBitmapFromLockScreen.recycle();
                             cachedBitmapFromLockScreen = bitmap;
@@ -163,6 +177,7 @@ public class LockScreenBitmapDrawer {
                 } catch (Exception e) {
                     logException(e);
                 }
+                currentlyProcessingBitmap = false;
             }
         }).start();
     }

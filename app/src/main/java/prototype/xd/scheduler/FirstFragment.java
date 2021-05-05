@@ -28,7 +28,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import pl.droidsonroids.gif.GifImageView;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
@@ -58,6 +61,10 @@ public class FirstFragment extends Fragment {
 
     LockScreenBitmapDrawer lockScreenBitmapDrawer;
 
+    Timer queueTimer;
+
+    Activity rootActivity;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_first, container, false);
@@ -65,7 +72,10 @@ public class FirstFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        verifyStoragePermissions(this.getActivity());
+
+        rootActivity = getActivity();
+
+        verifyStoragePermissions(rootActivity);
 
         createRootIfNeeded();
         updateDate("none", true);
@@ -106,7 +116,7 @@ public class FirstFragment extends Fragment {
 
                 final ArrayList<Group> groupList = readGroupFile();
                 final ArrayList<String> groupNames = new ArrayList<>();
-                for(Group group: groupList){
+                for (Group group : groupList) {
                     groupNames.add(group.name);
                 }
                 final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
@@ -166,9 +176,30 @@ public class FirstFragment extends Fragment {
             }
         });
 
+        final GifImageView loadingGif = view.findViewById(R.id.loadingIcon);
+
+        queueTimer = new Timer();
+        queueTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                lockScreenBitmapDrawer.checkQueue();
+                rootActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(lockScreenBitmapDrawer.currentlyProcessingBitmap){
+                            loadingGif.setVisibility(View.VISIBLE);
+                        }else{
+                            loadingGif.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            }
+        }, 0, 1000);
+
         view.findViewById(R.id.openSettingsButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                queueTimer.cancel();
                 NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
         });
@@ -179,9 +210,8 @@ public class FirstFragment extends Fragment {
         }
 
         if (updateInBackground) {
-            getContext().startService(new Intent(getActivity(), BackgroundUpdateService.class));
+            getContext().startService(new Intent(rootActivity, BackgroundUpdateService.class));
         }
-
     }
 
     void verifyStoragePermissions(Activity activity) {
