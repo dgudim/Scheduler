@@ -106,18 +106,18 @@ public class LockScreenBitmapDrawer {
             alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    startBitmapThread(currentName[0], false);
+                    startBitmapThread(currentName[0]);
                 }
             });
 
             alert.show();
         } else {
-            startBitmapThread(currentName[0], false);
+            startBitmapThread(currentName[0]);
         }
 
     }
 
-    private void startBitmapThread(final String selectedDay, final boolean overrideFingerprintCheck) {
+    private void startBitmapThread(final String selectedDay) {
         new Thread(new Runnable() {
             public void run() {
                 try {
@@ -125,15 +125,16 @@ public class LockScreenBitmapDrawer {
                     File bg = getBackgroundAccordingToDayAndTime();
                     Bitmap bitmapFromLock = cachedBitmapFromLockScreen;
 
-                    if (!hasFingerPrint(bitmapFromLock) && !overrideFingerprintCheck) {
+                    if (!hasFingerPrint(bitmapFromLock)) {
 
                         bitmapFromLock = Bitmap.createBitmap(bitmapFromLock, (int) (bitmapFromLock.getWidth() / 2f - displayWidth / 2f), 0, displayWidth, bitmapFromLock.getHeight());
                         fingerPrintBitmap(bitmapFromLock).compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(rootDir, selectedDay)));
-                        bitmap = bitmapFromLock;
+
+                        bitmap = BitmapFactory.decodeStream(new FileInputStream(new File(rootDir, selectedDay))).copy(Bitmap.Config.ARGB_8888, true);;
                         if (!selectedDay.equals(bg.getName())) {
                             cachedBitmapFromLockScreen.recycle();
                             cachedBitmapFromLockScreen = bitmap;
-                            startBitmapThread(null, true);
+                            startBitmapThread(null);
                             throw new InterruptedException("New background set to other date, constructing with current instead");
                         }
                     } else {
