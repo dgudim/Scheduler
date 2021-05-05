@@ -19,6 +19,7 @@ import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -177,6 +178,7 @@ public class FirstFragment extends Fragment {
         });
 
         final GifImageView loadingGif = view.findViewById(R.id.loadingIcon);
+        final TextView loadingText = view.findViewById(R.id.queueText);
 
         queueTimer = new Timer();
         queueTimer.scheduleAtFixedRate(new TimerTask() {
@@ -190,6 +192,11 @@ public class FirstFragment extends Fragment {
                             loadingGif.setVisibility(View.VISIBLE);
                         }else{
                             loadingGif.setVisibility(View.GONE);
+                        }
+                        if(lockScreenBitmapDrawer.needBitmapProcessing){
+                            loadingText.setVisibility(View.VISIBLE);
+                        }else{
+                            loadingText.setVisibility(View.GONE);
                         }
                     }
                 });
