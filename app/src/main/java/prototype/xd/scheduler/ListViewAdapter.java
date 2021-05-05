@@ -16,11 +16,11 @@ import android.widget.TextView;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.EntrySettings;
+import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
 import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
@@ -31,11 +31,13 @@ public class ListViewAdapter extends BaseAdapter {
     LayoutInflater inflater;
     ListView currentTodoListView;
     FirstFragment fragment;
+    LockScreenBitmapDrawer lockScreenBitmapDrawer;
 
-    public ListViewAdapter(FirstFragment fragment, ListView currentTodoListView) {
+    public ListViewAdapter(FirstFragment fragment, ListView currentTodoListView, LockScreenBitmapDrawer lockScreenBitmapDrawer) {
         this.fragment = fragment;
         this.context = fragment.getContext();
         this.currentTodoListView = currentTodoListView;
+        this.lockScreenBitmapDrawer = lockScreenBitmapDrawer;
         inflater = LayoutInflater.from(context);
     }
 
@@ -56,7 +58,7 @@ public class ListViewAdapter extends BaseAdapter {
 
     public void updateData(boolean reconstructBitmap) {
         if (reconstructBitmap) {
-            constructBitmap();
+            lockScreenBitmapDrawer.constructBitmap();
         }
         fragment.todoListEntries = sortEntries(fragment.todoListEntries);
         notifyDataSetChanged();

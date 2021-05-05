@@ -1,16 +1,12 @@
 package prototype.xd.scheduler;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 import android.os.Bundle;
 
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +22,9 @@ import androidx.fragment.app.Fragment;
 
 import java.io.File;
 
+import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
+
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
@@ -36,7 +35,6 @@ import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 @SuppressWarnings({"ResultOfMethodCallIgnored", "ApplySharedPref"})
 public class SecondFragment extends Fragment {
 
-    private SharedPreferences preferences;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,13 +43,6 @@ public class SecondFragment extends Fragment {
 
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        preferences = getContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
-
-        final DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        final int displayWidth = displayMetrics.widthPixels;
-        final float h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, preferences.getInt("fontSize", 21), displayMetrics);
 
         view.findViewById(R.id.resetBgButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,11 +132,7 @@ public class SecondFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Intent serviceIntent = new Intent(getActivity(), BackgroundUpdateService.class);
-                    serviceIntent.putExtra("prototype.xd.scheduler.DWidth", displayWidth);
-                    serviceIntent.putExtra("prototype.xd.scheduler.DHeight", displayMetrics.heightPixels);
-                    serviceIntent.putExtra("prototype.xd.scheduler.HConst", h);
-                    getContext().startService(serviceIntent);
+                    getContext().startService(new Intent(getActivity(), BackgroundUpdateService.class));
                 } else {
                     getContext().stopService(new Intent(getActivity(), BackgroundUpdateService.class));
                 }

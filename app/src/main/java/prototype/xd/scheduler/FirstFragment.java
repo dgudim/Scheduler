@@ -4,10 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
@@ -33,13 +31,13 @@ import java.util.ArrayList;
 
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.*;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.initialiseBitmapDrawer;
 import static prototype.xd.scheduler.utilities.Utilities.createRootIfNeeded;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
@@ -58,8 +56,7 @@ public class FirstFragment extends Fragment {
 
     public ArrayList<TodoListEntry> todoListEntries;
 
-    SharedPreferences preferences;
-    DisplayMetrics displayMetrics;
+    LockScreenBitmapDrawer lockScreenBitmapDrawer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,14 +70,7 @@ public class FirstFragment extends Fragment {
         createRootIfNeeded();
         updateDate("none", true);
 
-        preferences = getContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
-
-        WallpaperManager wallpaperManager = WallpaperManager.getInstance(getContext());
-
-        displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-
-        initialiseBitmapDrawer(wallpaperManager, preferences, displayMetrics, getContext());
+        lockScreenBitmapDrawer = new LockScreenBitmapDrawer(getContext());
 
         boolean updateInBackground = preferences.getBoolean("bgUpdate", true);
         boolean updateOnStart = preferences.getBoolean("startupUpdate", false);
@@ -91,12 +81,12 @@ public class FirstFragment extends Fragment {
 
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        listViewAdapter = new ListViewAdapter(FirstFragment.this, listView);
+        listViewAdapter = new ListViewAdapter(FirstFragment.this, listView, lockScreenBitmapDrawer);
         listView.setAdapter(listViewAdapter);
 
         datePicker.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
-            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
                 listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
             }
@@ -185,7 +175,7 @@ public class FirstFragment extends Fragment {
 
         if (updateOnStart || preferences.getBoolean("settingsModified", false)) {
             preferences.edit().putBoolean("settingsModified", false).apply();
-            constructBitmap();
+            lockScreenBitmapDrawer.constructBitmap();
         }
 
         if (updateInBackground) {

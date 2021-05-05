@@ -252,7 +252,6 @@ public class BitmapUtilities {
                 if (!(bitmap.getPixel(i2, i) == -16777216)) {
                     return false;
                 }
-                ;
             }
         }
         return true;

@@ -26,12 +26,12 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
 import static prototype.xd.scheduler.entities.TodoListEntry.*;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.preferences_static;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
@@ -66,8 +66,8 @@ public class EntrySettings {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 saveEntries(fragment.todoListEntries);
-                fragment.listViewAdapter.updateData(preferences_static.getBoolean("need_to_reconstruct_bitmap", false));
-                preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", false).apply();
+                fragment.listViewAdapter.updateData(preferences.getBoolean("need_to_reconstruct_bitmap", false));
+                preferences.edit().putBoolean("need_to_reconstruct_bitmap", false).apply();
             }
         });
 
@@ -226,7 +226,7 @@ public class EntrySettings {
                 if (!groupNames.get(position).equals(entry.group.name)) {
                     entry.changeGroup(groupNames.get(position));
                     saveEntries(fragment.todoListEntries);
-                    preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                    preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                     initialise(entry, context, fragment, settingsView, allEntries);
                 }
             }
@@ -277,7 +277,7 @@ public class EntrySettings {
                                         }
                                     }
                                     updateAllIndicators();
-                                    preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                                    preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                                 }
                             });
 
@@ -328,7 +328,7 @@ public class EntrySettings {
                         entry.removeDisplayParams();
                         entry.resetGroup();
                         saveEntries(fragment.todoListEntries);
-                        preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                        preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                         initialise(entry, context, fragment, settingsView, allEntries);
                     }
                 });

@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.IBinder;
 
@@ -17,16 +16,17 @@ import androidx.core.app.NotificationCompat;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
+
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.constructBitmap;
 
 public class BackgroundUpdateService extends Service {
 
     private static final String NOTIF_ID = "1";
     private static final String NOTIF_CHANNEL_ID = "Background update service";
-    private SharedPreferences preferences;
-
+    LockScreenBitmapDrawer lockScreenBitmapDrawer;
 
     /**
      * Return the communication channel to the service.  May return null if
@@ -57,8 +57,6 @@ public class BackgroundUpdateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        preferences = getBaseContext().getSharedPreferences("prefs", Context.MODE_PRIVATE);
-
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -66,6 +64,8 @@ public class BackgroundUpdateService extends Service {
             }
         }, 0, 11 * 1000);
         //11 second delay
+
+        lockScreenBitmapDrawer = new LockScreenBitmapDrawer(getApplicationContext());
 
         startForeground();
 
@@ -95,7 +95,7 @@ public class BackgroundUpdateService extends Service {
         String lastDate = preferences.getString("date", "");
 
         if (lastDate.equals(currentDate)) {
-            constructBitmap();
+            lockScreenBitmapDrawer.constructBitmap();
             preferences.edit().putString("date", currentDate).apply();
         }
 

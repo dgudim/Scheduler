@@ -1,16 +1,15 @@
 package prototype.xd.scheduler.utilities;
 
-import android.content.SharedPreferences;
-
 import java.io.File;
 import java.util.Calendar;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 public class BackgroundChooser {
 
-    static File getBackgroundAccordingToDayAndTime(SharedPreferences preferences) {
+    static File getBackgroundAccordingToDayAndTime() {
 
         File defaultName = new File(rootDir, "bg.png");
 
@@ -26,7 +25,6 @@ public class BackgroundChooser {
         }else{
             day_string = availableDays[day - 2];
         }
-
 
         File dayName = new File(rootDir, day_string + ".png");
 

@@ -1,6 +1,5 @@
 package prototype.xd.scheduler.utilities;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Environment;
@@ -31,7 +30,7 @@ import java.util.Comparator;
 import prototype.xd.scheduler.FirstFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.preferences_static;
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.WARNING;
@@ -139,14 +138,14 @@ public class Utilities {
     }
 
     public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final String key, int defValue, final int stringResource, final Fragment fragment) {
-        displayTo.setText(fragment.getString(stringResource, preferences_static.getInt(key, defValue)));
-        seekBar.setProgress(preferences_static.getInt(key, defValue));
+        displayTo.setText(fragment.getString(stringResource, preferences.getInt(key, defValue)));
+        seekBar.setProgress(preferences.getInt(key, defValue));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 displayTo.setText(fragment.getString(stringResource, progress));
-                preferences_static.edit().putInt(key, progress).apply();
+                preferences.edit().putInt(key, progress).apply();
             }
 
             @Override
@@ -156,7 +155,7 @@ public class Utilities {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                preferences_static.edit().putBoolean("settingsModified", true).apply();
+                preferences.edit().putBoolean("settingsModified", true).apply();
             }
         });
     }
@@ -180,19 +179,19 @@ public class Utilities {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
                 saveEntries(fragment.todoListEntries);
-                preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                 todoListEntry.setStateIconColor(stateIcon, parameter);
             }
         });
     }
 
     public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defValue, final CompoundButton.OnCheckedChangeListener listener) {
-        tSwitch.setChecked(preferences_static.getBoolean(key, defValue));
+        tSwitch.setChecked(preferences.getBoolean(key, defValue));
         tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                preferences_static.edit().putBoolean(key, isChecked).apply();
-                preferences_static.edit().putBoolean("settingsModified", true).apply();
+                preferences.edit().putBoolean(key, isChecked).apply();
+                preferences.edit().putBoolean("settingsModified", true).apply();
                 if (!(listener == null)) {
                     listener.onCheckedChanged(buttonView, isChecked);
                 }
@@ -210,7 +209,7 @@ public class Utilities {
                 saveEntries(fragment.todoListEntries);
                 double currViewState = entry.getLockViewHash();
                 if (!(prevViewState == currViewState)) {
-                    preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                    preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                 }
                 entry.setStateIconColor(stateIcon, parameter);
             }
@@ -221,16 +220,16 @@ public class Utilities {
         ColorPickerDialogBuilder
                 .with(context)
                 .setTitle("Выберите цвет")
-                .initialColor(preferences_static.getInt(key, defValue))
+                .initialColor(preferences.getInt(key, defValue))
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
                 .setPositiveButton("Применить", new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                        preferences_static.edit().putInt(key, selectedColor).apply();
-                        preferences_static.edit().putBoolean("settingsModified", true).apply();
-                        target.setImageBitmap(createSolidColorCircle(preferences_static.getInt(key, defValue)));
+                        preferences.edit().putInt(key, selectedColor).apply();
+                        preferences.edit().putBoolean("settingsModified", true).apply();
+                        target.setImageBitmap(createSolidColorCircle(preferences.getInt(key, defValue)));
                     }
                 }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
             @Override
@@ -253,7 +252,7 @@ public class Utilities {
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                         todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
                         target.setImageBitmap(createSolidColorCircle(selectedColor));
-                        preferences_static.edit().putBoolean("need_to_reconstruct_bitmap", setReconstructFlag).apply();
+                        preferences.edit().putBoolean("need_to_reconstruct_bitmap", setReconstructFlag).apply();
                         todoListEntry.setStateIconColor(stateIcon, parameter);
                     }
                 }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
