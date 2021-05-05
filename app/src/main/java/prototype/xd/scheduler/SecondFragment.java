@@ -25,6 +25,7 @@ import java.io.File;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
@@ -53,7 +54,7 @@ public class SecondFragment extends Fragment {
                 builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new File(rootDir, "bg.png").delete();
+                        new File(rootDir, defaultBackgroundName).delete();
                         for (int i = 0; i < 7; i++) {
                             new File(rootDir, availableDays[i] + ".png").delete();
                         }

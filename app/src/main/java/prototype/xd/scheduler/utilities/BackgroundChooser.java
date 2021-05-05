@@ -9,9 +9,11 @@ import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 public class BackgroundChooser {
 
+    public static final String defaultBackgroundName = "bg.png";
+
     static File getBackgroundAccordingToDayAndTime() {
 
-        File defaultName = new File(rootDir, "bg.png");
+        File defaultName = new File(rootDir, defaultBackgroundName);
 
         if (!preferences.getBoolean("adaptiveBackgroundEnabled", true)) {
             return defaultName;

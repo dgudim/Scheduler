@@ -145,7 +145,8 @@ public class TodoListEntry {
                     || params[i].equals(BACKGROUND_COLOR_LIST)
                     || params[i].equals(BEVEL_COLOR)
                     || params[i].equals(PRIORITY)
-                    || params[i].equals(ADAPTIVE_COLOR)) {
+                    || params[i].equals(ADAPTIVE_COLOR)
+                    || params[i].equals(ADAPTIVE_COLOR_BALANCE)) {
                 displayParams.add(params[i]);
                 displayParams.add(params[i + 1]);
             }

@@ -24,6 +24,7 @@ import prototype.xd.scheduler.entities.TodoListEntry;
 import static prototype.xd.scheduler.MainActivity.displayMetrics;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
+import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
@@ -98,7 +99,7 @@ public class LockScreenBitmapDrawer {
             final File bg = getBackgroundAccordingToDayAndTime();
             final String[] currentName = {bg.getName()};
 
-            if (!hasFingerPrint(cachedBitmapFromLockScreen) && !currentName[0].equals("bg.png")) {
+            if (!hasFingerPrint(cachedBitmapFromLockScreen) && !currentName[0].equals(defaultBackgroundName)) {
                 final AlertDialog.Builder alert = new AlertDialog.Builder(context);
 
                 alert.setTitle("В какой день использовать новый фон?");
@@ -108,7 +109,7 @@ public class LockScreenBitmapDrawer {
                     public void onClick(DialogInterface dialog, int which) {
                         currentName[0] = availableDays[which] + ".png";
                         if (availableDays[which].equals("общий")) {
-                            currentName[0] = "bg.png";
+                            currentName[0] = defaultBackgroundName;
                         }
                         dialog.dismiss();
                     }
@@ -156,7 +157,7 @@ public class LockScreenBitmapDrawer {
                             bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
                                     .copy(Bitmap.Config.ARGB_8888, true);
                         } else {
-                            File defFile = new File(rootDir, "bg.png");
+                            File defFile = new File(rootDir, defaultBackgroundName);
                             if (defFile.exists()) {
                                 bitmap = BitmapFactory.decodeStream(new FileInputStream(defFile))
                                         .copy(Bitmap.Config.ARGB_8888, true);

@@ -201,7 +201,7 @@ public class FirstFragment extends Fragment {
                     }
                 });
             }
-        }, 0, 1000);
+        }, 0, 100);
 
         view.findViewById(R.id.openSettingsButton).setOnClickListener(new View.OnClickListener() {
             @Override
