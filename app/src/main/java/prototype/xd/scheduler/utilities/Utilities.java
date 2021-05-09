@@ -31,55 +31,55 @@ import prototype.xd.scheduler.FirstFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Logger.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.INFO;
 import static prototype.xd.scheduler.utilities.Logger.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 
 @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
 public class Utilities {
-
+    
     public static File rootDir = new File(Environment.getExternalStorageDirectory().toString() + "/.Scheduler");
-
+    
     public static void createRootIfNeeded() {
         if (!rootDir.exists()) {
             rootDir.mkdirs();
         }
     }
-
+    
     public static ArrayList<TodoListEntry> loadEntries() {
         try {
-
+            
             ArrayList<String[]> entryParams = (ArrayList<String[]>) loadObject("list");
             ArrayList<String> entryGroupNames = (ArrayList<String>) loadObject("list_groupData");
-
+            
             if (!(entryParams.size() == entryGroupNames.size())) {
                 log(WARNING, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
             }
-
+            
             ArrayList<TodoListEntry> readEntries = new ArrayList<>();
             for (int i = 0; i < entryParams.size(); i++) {
                 readEntries.add(new TodoListEntry(entryParams.get(i), entryGroupNames.get(i)));
             }
-
+            
             return sortEntries(readEntries);
         } catch (Exception e) {
             log(INFO, "no todo list");
             return new ArrayList<>();
         }
     }
-
+    
     public static void saveEntries(ArrayList<TodoListEntry> entries) {
         try {
             ArrayList<String[]> entryParams = new ArrayList<>();
             ArrayList<String> entryGroupNames = new ArrayList<>();
-
+            
             for (int i = 0; i < entries.size(); i++) {
                 entryParams.add(entries.get(i).params);
                 entryGroupNames.add(entries.get(i).group.name);
             }
-
+            
             saveObject("list", entryParams);
             saveObject("list_groupData", entryGroupNames);
             log(INFO, "saving todo list");
@@ -87,7 +87,7 @@ public class Utilities {
             log(ERROR, "missing permission, failed to save todo list");
         }
     }
-
+    
     public static Object loadObject(String fileName) throws IOException, ClassNotFoundException {
         File file = new File(rootDir, fileName);
         FileInputStream f = new FileInputStream(file);
@@ -96,7 +96,7 @@ public class Utilities {
         s.close();
         return object;
     }
-
+    
     public static void saveObject(String fileName, Object object) throws IOException {
         File file = new File(rootDir, fileName);
         FileOutputStream f = new FileOutputStream(file);
@@ -104,7 +104,7 @@ public class Utilities {
         s.writeObject(object);
         s.close();
     }
-
+    
     public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {
         ArrayList<TodoListEntry> yesterdayEntries = new ArrayList<>();
         ArrayList<TodoListEntry> todayEntries = new ArrayList<>();
@@ -121,7 +121,7 @@ public class Utilities {
                 otherEntries.add(entries.get(i));
             }
         }
-
+        
         ArrayList<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
@@ -129,52 +129,52 @@ public class Utilities {
         merged.addAll(otherEntries);
         Collections.sort(merged, new TodoListEntryGroupComparator());
         Collections.sort(merged, new TodoListEntryPriorityComparator());
-
+        
         return merged;
     }
-
+    
     public static String[] makeNewLines(String input, int maxChars) {
         return WordUtils.wrap(input, maxChars, "\n", true).split("\n");
     }
-
+    
     public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final String key, int defValue, final int stringResource, final Fragment fragment) {
         displayTo.setText(fragment.getString(stringResource, preferences.getInt(key, defValue)));
         seekBar.setProgress(preferences.getInt(key, defValue));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
+            
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 displayTo.setText(fragment.getString(stringResource, progress));
                 preferences.edit().putInt(key, progress).apply();
             }
-
+            
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+            
             }
-
+            
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 preferences.edit().putBoolean("settingsModified", true).apply();
             }
         });
     }
-
+    
     public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final FirstFragment fragment, final TodoListEntry todoListEntry, final String parameter, final TextView stateIcon) {
         displayTo.setText(fragment.getString(stringResource, (int) value));
         seekBar.setProgress(value);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
+            
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 displayTo.setText(fragment.getString(stringResource, progress));
             }
-
+            
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+            
             }
-
+            
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
@@ -184,7 +184,7 @@ public class Utilities {
             }
         });
     }
-
+    
     public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defValue, final CompoundButton.OnCheckedChangeListener listener) {
         tSwitch.setChecked(preferences.getBoolean(key, defValue));
         tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -198,24 +198,20 @@ public class Utilities {
             }
         });
     }
-
+    
     public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter, final FirstFragment fragment, final TextView stateIcon) {
         tSwitch.setChecked(value);
         tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                double prevViewState = entry.getLockViewHash();
                 entry.changeParameter(parameter, String.valueOf(isChecked));
                 saveEntries(fragment.todoListEntries);
-                double currViewState = entry.getLockViewHash();
-                if (!(prevViewState == currViewState)) {
-                    preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
-                }
+                preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
                 entry.setStateIconColor(stateIcon, parameter);
             }
         });
     }
-
+    
     public static void invokeColorDialogue(final String key, final ImageView target, final int defValue, Context context) {
         ColorPickerDialogBuilder
                 .with(context)
@@ -234,11 +230,11 @@ public class Utilities {
                 }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+            
             }
         }).build().show();
     }
-
+    
     public static void invokeColorDialogue(final int value, final ImageView target, Context context, final TodoListEntry todoListEntry, final String parameter, final boolean setReconstructFlag, final TextView stateIcon) {
         ColorPickerDialogBuilder
                 .with(context)
@@ -258,7 +254,7 @@ public class Utilities {
                 }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+            
             }
         }).build().show();
     }

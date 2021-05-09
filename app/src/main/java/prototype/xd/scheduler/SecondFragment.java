@@ -175,7 +175,8 @@ public class SecondFragment extends Fragment {
         addSwitchChangeListener((Switch) view.findViewById(R.id.itemWidthSwitch), "forceMaxRWidthOnLock", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.adaptiveColorSwitch), "adaptiveColorEnabled", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.adaptiveBackgroundSwitch), "adaptiveBackgroundEnabled", true, null);
-
+        addSwitchChangeListener((Switch) view.findViewById(R.id.adaptiveColorUnderlaySwitch), "adaptiveBackgroundUnderlayEnabled", false, null);
+        
         view.findViewById(R.id.resetSettingsButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

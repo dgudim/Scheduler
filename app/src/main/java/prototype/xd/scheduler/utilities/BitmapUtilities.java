@@ -11,10 +11,9 @@ import android.graphics.Rect;
 import java.io.File;
 
 import static java.lang.Math.max;
-import static java.lang.Math.random;
 
 public class BitmapUtilities {
-
+    
     /**
      * Utility function for decoding an image resource. The decoded bitmap will
      * be optimized for further scaling to the requested destination dimensions
@@ -35,21 +34,21 @@ public class BitmapUtilities {
         options.inJustDecodeBounds = false;
         options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, dstWidth,
                 dstHeight, scalingLogic);
-
+        
         return BitmapFactory.decodeResource(res, resId, options);
     }
-
+    
     public static Bitmap decodeFile(File src, int dstWidth, int dstHeight, ScalingLogic scalingLogic) {
-
+        
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(src.getPath(), options);
         options.inJustDecodeBounds = false;
         options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, dstWidth, dstHeight, scalingLogic);
-
+        
         return BitmapFactory.decodeFile(src.getPath(), options);
     }
-
+    
     /**
      * Utility function for creating a scaled version of an existing bitmap
      *
@@ -60,16 +59,16 @@ public class BitmapUtilities {
      * @return New scaled bitmap object
      */
     public static Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight, ScalingLogic scalingLogic) {
-
+        
         Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth, dstHeight, scalingLogic);
         Rect dstRect = calculateDstRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth, dstHeight, scalingLogic);
         Bitmap scaledBitmap = Bitmap.createBitmap(dstRect.width(), dstRect.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(scaledBitmap);
         canvas.drawBitmap(unscaledBitmap, srcRect, dstRect, new Paint(Paint.FILTER_BITMAP_FLAG));
-
+        
         return scaledBitmap;
     }
-
+    
     /**
      * ScalingLogic defines how scaling should be carried out if source and
      * destination image has different aspect ratio.
@@ -86,7 +85,7 @@ public class BitmapUtilities {
     public enum ScalingLogic {
         CROP, FIT
     }
-
+    
     /**
      * Calculate optimal down-sampling factor given the dimensions of a source
      * image, the dimensions of a destination area and a scaling logic.
@@ -103,7 +102,7 @@ public class BitmapUtilities {
         if (scalingLogic == ScalingLogic.FIT) {
             final float srcAspect = (float) srcWidth / (float) srcHeight;
             final float dstAspect = (float) dstWidth / (float) dstHeight;
-
+            
             if (srcAspect > dstAspect) {
                 return srcWidth / dstWidth;
             } else {
@@ -112,7 +111,7 @@ public class BitmapUtilities {
         } else {
             final float srcAspect = (float) srcWidth / (float) srcHeight;
             final float dstAspect = (float) dstWidth / (float) dstHeight;
-
+            
             if (srcAspect > dstAspect) {
                 return srcHeight / dstHeight;
             } else {
@@ -120,7 +119,7 @@ public class BitmapUtilities {
             }
         }
     }
-
+    
     /**
      * Calculates source rectangle for scaling bitmap
      *
@@ -136,7 +135,7 @@ public class BitmapUtilities {
         if (scalingLogic == ScalingLogic.CROP) {
             final float srcAspect = (float) srcWidth / (float) srcHeight;
             final float dstAspect = (float) dstWidth / (float) dstHeight;
-
+            
             if (srcAspect > dstAspect) {
                 final int srcRectWidth = (int) (srcHeight * dstAspect);
                 final int srcRectLeft = (srcWidth - srcRectWidth) / 2;
@@ -150,7 +149,7 @@ public class BitmapUtilities {
             return new Rect(0, 0, srcWidth, srcHeight);
         }
     }
-
+    
     /**
      * Calculates destination rectangle for scaling bitmap
      *
@@ -166,7 +165,7 @@ public class BitmapUtilities {
         if (scalingLogic == ScalingLogic.FIT) {
             final float srcAspect = (float) srcWidth / (float) srcHeight;
             final float dstAspect = (float) dstWidth / (float) dstHeight;
-
+            
             if (srcAspect > dstAspect) {
                 return new Rect(0, 0, dstWidth, (int) (dstWidth / srcAspect));
             } else {
@@ -176,13 +175,13 @@ public class BitmapUtilities {
             return new Rect(0, 0, dstWidth, dstHeight);
         }
     }
-
+    
     public static Paint createNewPaint(int color) {
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
         paint.setColor(color);
         return paint;
     }
-
+    
     public static Bitmap createSolidColorCircle(int color) {
         Bitmap solidColor = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(solidColor);
@@ -194,7 +193,7 @@ public class BitmapUtilities {
         canvas.drawCircle(500, 500, 461, paint);
         return solidColor;
     }
-
+    
     public static int mixTwoColors(int color1, int color2, double balance) {
         Color c1 = Color.valueOf(color1);
         Color c2 = Color.valueOf(color2);
@@ -203,40 +202,47 @@ public class BitmapUtilities {
         float b = (float) (c1.blue() * (1 - balance) + c2.blue() * balance);
         return Color.rgb(r, g, b);
     }
-
+    
     public static int getAverageColor(Bitmap bitmap) {
         if (bitmap == null) return Color.TRANSPARENT;
-
+        
         int redBucket = 0;
         int greenBucket = 0;
         int blueBucket = 0;
-
+        
         int pixelCount = bitmap.getWidth() * bitmap.getHeight();
         int[] pixels = new int[pixelCount];
         bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-
+        
+        int actualPixelCount = 0;
+        
         for (int y = 0, h = bitmap.getHeight(); y < h; y++) {
             for (int x = 0, w = bitmap.getWidth(); x < w; x++) {
                 int color = pixels[x + y * w]; // x + y * width
-                redBucket += (color >> 16) & 0xFF; // Color.red
-                greenBucket += (color >> 8) & 0xFF; // Color.greed
-                blueBucket += (color & 0xFF); // Color.blue
+                if (((color >> 16) & 0xFF + (color >> 8) & 0xFF + color & 0xFF) != 0) {
+                    redBucket += (color >> 16) & 0xFF; // Color.red
+                    greenBucket += (color >> 8) & 0xFF; // Color.greed
+                    blueBucket += (color & 0xFF); // Color.blue
+                    actualPixelCount++;
+                }
             }
         }
-
+        
+        pixelCount = actualPixelCount;
+        
         if (max(max(redBucket, greenBucket), blueBucket) / pixelCount < 200) {
             redBucket += 50 * pixelCount;
             greenBucket += 50 * pixelCount;
             blueBucket += 50 * pixelCount;
         }
-
+        
         return Color.argb(
                 255,
                 redBucket / pixelCount,
                 greenBucket / pixelCount,
                 blueBucket / pixelCount);
     }
-
+    
     public static Bitmap fingerPrintBitmap(Bitmap bitmap) {
         for (int i = 0; i < 3; i++) {
             for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
@@ -245,7 +251,7 @@ public class BitmapUtilities {
         }
         return bitmap;
     }
-
+    
     public static boolean hasFingerPrint(Bitmap bitmap) {
         for (int i = 0; i < 3; i++) {
             for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
@@ -256,5 +262,5 @@ public class BitmapUtilities {
         }
         return true;
     }
-
+    
 }
