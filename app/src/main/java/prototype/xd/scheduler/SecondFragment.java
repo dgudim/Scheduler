@@ -167,7 +167,6 @@ public class SecondFragment extends Fragment {
 
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayItemsLockSwitch), "yesterdayItemsLock", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayItemsListSwitch), "yesterdayItemsList", false, null);
-        addSwitchChangeListener((Switch) view.findViewById(R.id.startupUpdateSwitch), "startupUpdate", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.completedTasksSwitch), "completedTasks", false, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayTasksSwitch), "yesterdayTasks", true, null);
         addSwitchChangeListener((Switch) view.findViewById(R.id.yesterdayTasksLockSwitch), "yesterdayTasksLock", true, null);
@@ -187,7 +186,6 @@ public class SecondFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         preferences.edit().clear().commit();
-                        preferences.edit().putBoolean("settingsModified", true).apply();
                         SecondFragment.this.onViewCreated(view, savedInstanceState);
                     }
                 });

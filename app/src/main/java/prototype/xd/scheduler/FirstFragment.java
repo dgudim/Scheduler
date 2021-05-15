@@ -84,7 +84,6 @@ public class FirstFragment extends Fragment {
         lockScreenBitmapDrawer = new LockScreenBitmapDrawer(getContext());
         
         boolean updateInBackground = preferences.getBoolean("bgUpdate", true);
-        boolean updateOnStart = preferences.getBoolean("startupUpdate", false);
         
         final CalendarView datePicker = view.findViewById(R.id.calendar);
         
@@ -211,10 +210,7 @@ public class FirstFragment extends Fragment {
             }
         });
         
-        if (updateOnStart || preferences.getBoolean("settingsModified", false)) {
-            preferences.edit().putBoolean("settingsModified", false).apply();
-            lockScreenBitmapDrawer.constructBitmap();
-        }
+        lockScreenBitmapDrawer.constructBitmap();
         
         if (updateInBackground) {
             getContext().startService(new Intent(rootActivity, BackgroundUpdateService.class));

@@ -387,23 +387,6 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView8"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp"
-                app:cardCornerRadius="5dp">
-
-                <Switch
-                    android:id="@+id/startupUpdateSwitch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
-                    android:text="@string/settings_update_on_startup"
-                    android:textSize="18sp" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
                 android:id="@+id/cardView9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

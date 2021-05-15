@@ -155,7 +155,7 @@ public class Utilities {
             
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                preferences.edit().putBoolean("settingsModified", true).apply();
+            
             }
         });
     }
@@ -191,7 +191,6 @@ public class Utilities {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 preferences.edit().putBoolean(key, isChecked).apply();
-                preferences.edit().putBoolean("settingsModified", true).apply();
                 if (!(listener == null)) {
                     listener.onCheckedChanged(buttonView, isChecked);
                 }
@@ -224,7 +223,6 @@ public class Utilities {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
                         preferences.edit().putInt(key, selectedColor).apply();
-                        preferences.edit().putBoolean("settingsModified", true).apply();
                         target.setImageBitmap(createSolidColorCircle(preferences.getInt(key, defValue)));
                     }
                 }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
