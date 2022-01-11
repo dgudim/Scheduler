@@ -1,8 +1,29 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
+import static prototype.xd.scheduler.entities.Group.createGroup;
+import static prototype.xd.scheduler.entities.Group.readGroupFile;
+import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
+import static prototype.xd.scheduler.entities.TodoListEntry.ADAPTIVE_COLOR;
+import static prototype.xd.scheduler.entities.TodoListEntry.ADAPTIVE_COLOR_BALANCE;
+import static prototype.xd.scheduler.entities.TodoListEntry.BACKGROUND_COLOR_LIST;
+import static prototype.xd.scheduler.entities.TodoListEntry.BACKGROUND_COLOR_LOCK;
+import static prototype.xd.scheduler.entities.TodoListEntry.BEVEL_COLOR;
+import static prototype.xd.scheduler.entities.TodoListEntry.BEVEL_SIZE;
+import static prototype.xd.scheduler.entities.TodoListEntry.FONT_COLOR_LIST;
+import static prototype.xd.scheduler.entities.TodoListEntry.FONT_COLOR_LOCK;
+import static prototype.xd.scheduler.entities.TodoListEntry.PRIORITY;
+import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_ON_LOCK;
+import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_ON_LOCK_COMPLETED;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
+import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
+
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +32,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,18 +44,6 @@ import prototype.xd.scheduler.FirstFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-
-import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
-import static prototype.xd.scheduler.entities.Group.createGroup;
-import static prototype.xd.scheduler.entities.Group.readGroupFile;
-import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
-import static prototype.xd.scheduler.entities.TodoListEntry.*;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
-import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
-import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
-import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
-import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 public class EntrySettings {
 
@@ -62,13 +69,10 @@ public class EntrySettings {
 
         final AlertDialog.Builder alert = new AlertDialog.Builder(context);
 
-        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                saveEntries(fragment.todoListEntries);
-                fragment.listViewAdapter.updateData(preferences.getBoolean("need_to_reconstruct_bitmap", false));
-                preferences.edit().putBoolean("need_to_reconstruct_bitmap", false).apply();
-            }
+        alert.setOnDismissListener(dialog -> {
+            saveEntries(fragment.todoListEntries);
+            fragment.listViewAdapter.updateData(preferences.getBoolean("need_to_reconstruct_bitmap", false));
+            preferences.edit().putBoolean("need_to_reconstruct_bitmap", false).apply();
         });
 
         alert.setView(settingsView);
@@ -119,98 +123,75 @@ public class EntrySettings {
                 final View view = super.getView(position, convertView, parent);
                 view.setLongClickable(true);
                 if (convertView == null) {
-                    view.setOnLongClickListener(new View.OnLongClickListener() {
+                    view.setOnLongClickListener(view1 -> {
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        if (groupNames.get(position).equals(BLANK_NAME)) {
+                            builder.setTitle("Нельзя переименовать эту группу");
+                            builder.setMessage("Ты сломаешь сброс настроек");
+                        } else {
+                            builder.setTitle("Изменить");
 
-                        @Override
-                        public boolean onLongClick(View view) {
-                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            if (groupNames.get(position).equals(BLANK_NAME)) {
-                                builder.setTitle("Нельзя переименовать эту группу");
-                                builder.setMessage("Ты сломаешь сброс настроек");
-                            } else {
-                                builder.setTitle("Изменить");
+                            final EditText input = new EditText(context);
+                            input.setInputType(InputType.TYPE_CLASS_TEXT);
+                            input.setText(groupNames.get(position));
+                            input.setHint("Название");
 
-                                final EditText input = new EditText(context);
-                                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                                input.setText(groupNames.get(position));
-                                input.setHint("Название");
+                            builder.setView(input);
 
-                                builder.setView(input);
-
-                                builder.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (!input.getText().toString().equals(BLANK_NAME)) {
-                                            groupNames.set(position, input.getText().toString());
-                                            String origName = groupList.get(position).name;
-                                            groupList.get(position).name = input.getText().toString();
-                                            saveGroupsFile(groupList);
-                                            for (TodoListEntry entry : allEntries) {
-                                                if (entry.group.name.equals(origName)) {
-                                                    entry.group.name = input.getText().toString();
-                                                }
-                                            }
-                                            saveEntries(fragment.todoListEntries);
-                                            notifyDataSetChanged();
-                                        } else {
-                                            dialog.dismiss();
-                                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                            builder.setTitle("Нельзя так называть группу");
-                                            builder.setMessage("Ты сломаешь сброс настроек");
-                                            builder.show();
+                            builder.setPositiveButton("Сохранить", (dialog, which) -> {
+                                if (!input.getText().toString().equals(BLANK_NAME)) {
+                                    groupNames.set(position, input.getText().toString());
+                                    String origName = groupList.get(position).name;
+                                    groupList.get(position).name = input.getText().toString();
+                                    saveGroupsFile(groupList);
+                                    for (TodoListEntry entry1 : allEntries) {
+                                        if (entry1.group.name.equals(origName)) {
+                                            entry1.group.name = input.getText().toString();
                                         }
                                     }
-                                });
+                                    saveEntries(fragment.todoListEntries);
+                                    notifyDataSetChanged();
+                                } else {
+                                    dialog.dismiss();
+                                    final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+                                    builder1.setTitle("Нельзя так называть группу");
+                                    builder1.setMessage("Ты сломаешь сброс настроек");
+                                    builder1.show();
+                                }
+                            });
 
-                                builder.setNeutralButton("Удалить группу", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                        builder.setTitle("Удалить");
-                                        builder.setMessage("Вы уверены?");
+                            builder.setNeutralButton("Удалить группу", (dialog, which) -> {
+                                AlertDialog.Builder builder12 = new AlertDialog.Builder(context);
+                                builder12.setTitle("Удалить");
+                                builder12.setMessage("Вы уверены?");
 
-                                        builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                String origName = groupNames.get(groupSpinner.getSelectedItemPosition());
-                                                groupList.remove(groupSpinner.getSelectedItemPosition());
-                                                groupNames.remove(groupSpinner.getSelectedItemPosition());
-                                                saveGroupsFile(groupList);
-                                                for (TodoListEntry entry : allEntries) {
-                                                    if (entry.group.name.equals(origName)) {
-                                                        entry.resetGroup();
-                                                    }
-                                                }
-                                                saveEntries(fragment.todoListEntries);
-                                                groupSpinner.setSelection(groupNames.indexOf(BLANK_NAME));
-                                                updateAllIndicators();
-                                                notifyDataSetChanged();
-                                            }
-                                        });
-
-                                        builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        });
-
-                                        builder.show();
+                                builder12.setPositiveButton("Да", (dialog1, which1) -> {
+                                    String origName = groupNames.get(groupSpinner.getSelectedItemPosition());
+                                    groupList.remove(groupSpinner.getSelectedItemPosition());
+                                    groupNames.remove(groupSpinner.getSelectedItemPosition());
+                                    saveGroupsFile(groupList);
+                                    for (TodoListEntry entry1 : allEntries) {
+                                        if (entry1.group.name.equals(origName)) {
+                                            entry1.resetGroup();
+                                        }
                                     }
+                                    saveEntries(fragment.todoListEntries);
+                                    groupSpinner.setSelection(groupNames.indexOf(BLANK_NAME));
+                                    updateAllIndicators();
+                                    notifyDataSetChanged();
                                 });
 
-                                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
+                                builder12.setNegativeButton("Нет", (dialog12, which12) -> dialog12.dismiss());
+
+                                builder12.show();
+                            });
+
+                            builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
 
 
-                            }
-                            builder.show();
-                            return true;
                         }
+                        builder.show();
+                        return true;
                     });
                 }
                 return view;
@@ -237,171 +218,116 @@ public class EntrySettings {
             }
         });
 
-        add_group.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Добавить текущую конфигурацию как группу?");
-                builder.setMessage("\n (Будут добавлены только те параметры, которые были изменены вручную)(Зеленые ромбики)");
+        add_group.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Добавить текущую конфигурацию как группу?");
+            builder.setMessage("\n (Будут добавлены только те параметры, которые были изменены вручную)(Зеленые ромбики)");
 
-                final EditText input = new EditText(context);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                input.setHint("Название");
-                builder.setView(input);
+            final EditText input = new EditText(context);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            input.setHint("Название");
+            builder.setView(input);
 
-                builder.setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (input.getText().toString().equals(BLANK_NAME)) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setTitle("Нельзя создать группу с таким названием");
-                            builder.setMessage("Ты сломаешь сброс настроек");
+            builder.setPositiveButton("Добавить", (dialog, which) -> {
+                if (input.getText().toString().equals(BLANK_NAME)) {
+                    AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
+                    builder13.setTitle("Нельзя создать группу с таким названием");
+                    builder13.setMessage("Ты сломаешь сброс настроек");
 
-                            builder.show();
+                    builder13.show();
 
-                        } else if (groupNames.contains(input.getText().toString())) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setTitle("Группа с таким именем уже существует");
-                            builder.setMessage("Перезаписать?");
+                } else if (groupNames.contains(input.getText().toString())) {
+                    AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
+                    builder13.setTitle("Группа с таким именем уже существует");
+                    builder13.setMessage("Перезаписать?");
 
-                            builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
-                                    groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
-                                    saveGroupsFile(groupList);
-                                    for (TodoListEntry entry : allEntries) {
-                                        if (entry.group.name.equals(input.getText().toString())) {
-                                            entry.removeDisplayParams();
-                                            entry.changeGroup(createdGroup);
-                                        }
-                                    }
-                                    updateAllIndicators();
-                                    preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
-                                }
-                            });
-
-                            builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-
-                            builder.show();
-                        } else {
-                            Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
-                            groupNames.add(createdGroup.name);
-                            groupList.add(createdGroup);
-                            arrayAdapter.notifyDataSetChanged();
-                            groupSpinner.setSelection(groupNames.size() - 1);
-                            saveGroupsFile(groupList);
-                            entry.removeDisplayParams();
-                            entry.changeGroup(createdGroup);
-                            saveEntries(fragment.todoListEntries);
-                            updateAllIndicators();
+                    builder13.setPositiveButton("Да", (dialog14, which14) -> {
+                        Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
+                        groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
+                        saveGroupsFile(groupList);
+                        for (TodoListEntry entry12 : allEntries) {
+                            if (entry12.group.name.equals(input.getText().toString())) {
+                                entry12.removeDisplayParams();
+                                entry12.changeGroup(createdGroup);
+                            }
                         }
-                    }
-                });
-
-                builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-
-                builder.show();
-            }
-        });
-
-        settingsView.findViewById(R.id.settingsResetButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Сбросить настройки?");
-
-                builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        entry.removeDisplayParams();
-                        entry.resetGroup();
-                        saveEntries(fragment.todoListEntries);
+                        updateAllIndicators();
                         preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
-                        initialise(entry, context, fragment, settingsView, allEntries);
-                    }
-                });
-                builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                    });
 
-                builder.show();
-            }
+                    builder13.setNegativeButton("Нет", (dialog13, which13) -> dialog13.dismiss());
+
+                    builder13.show();
+                } else {
+                    Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
+                    groupNames.add(createdGroup.name);
+                    groupList.add(createdGroup);
+                    arrayAdapter.notifyDataSetChanged();
+                    groupSpinner.setSelection(groupNames.size() - 1);
+                    saveGroupsFile(groupList);
+                    entry.removeDisplayParams();
+                    entry.changeGroup(createdGroup);
+                    saveEntries(fragment.todoListEntries);
+                    updateAllIndicators();
+                }
+            });
+
+            builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+
+
+            builder.show();
         });
 
-        fontColor_list_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                invokeColorDialogue(entry.fontColor_list, (ImageView) v, context, entry, FONT_COLOR_LIST, false, fontColor_list_view_state);
-            }
+        settingsView.findViewById(R.id.settingsResetButton).setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Сбросить настройки?");
+
+            builder.setPositiveButton("Да", (dialog, which) -> {
+                entry.removeDisplayParams();
+                entry.resetGroup();
+                saveEntries(fragment.todoListEntries);
+                preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                initialise(entry, context, fragment, settingsView, allEntries);
+            });
+            builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+
+            builder.show();
         });
 
-        fontColor_lock_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                invokeColorDialogue(entry.fontColor_lock, (ImageView) v, context, entry, FONT_COLOR_LOCK, true, fontColor_lock_view_state);
-            }
-        });
+        fontColor_list_view.setOnClickListener(v -> invokeColorDialogue(entry.fontColor_list, (ImageView) v, context, entry, FONT_COLOR_LIST, false, fontColor_list_view_state));
 
-        bgColor_list_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                invokeColorDialogue(entry.bgColor_list, (ImageView) v, context, entry, BACKGROUND_COLOR_LIST, false, bgColor_list_view_state);
-            }
-        });
+        fontColor_lock_view.setOnClickListener(v -> invokeColorDialogue(entry.fontColor_lock, (ImageView) v, context, entry, FONT_COLOR_LOCK, true, fontColor_lock_view_state));
 
-        bgColor_lock_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                invokeColorDialogue(entry.bgColor_lock, (ImageView) v, context, entry, BACKGROUND_COLOR_LOCK, true, bgColor_lock_view_state);
-            }
-        });
+        bgColor_list_view.setOnClickListener(v -> invokeColorDialogue(entry.bgColor_list, (ImageView) v, context, entry, BACKGROUND_COLOR_LIST, false, bgColor_list_view_state));
 
-        padColor_lock_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                invokeColorDialogue(entry.padColor, (ImageView) v, context, entry, BEVEL_COLOR, true, padColor_lock_view_state);
-            }
-        });
+        bgColor_lock_view.setOnClickListener(v -> invokeColorDialogue(entry.bgColor_lock, (ImageView) v, context, entry, BACKGROUND_COLOR_LOCK, true, bgColor_lock_view_state));
+
+        padColor_lock_view.setOnClickListener(v -> invokeColorDialogue(entry.padColor, (ImageView) v, context, entry, BEVEL_COLOR, true, padColor_lock_view_state));
 
         addSeekBarChangeListener(
-                (TextView) (settingsView.findViewById(R.id.bevelThicknessDescription)),
-                (SeekBar) (settingsView.findViewById(R.id.bevelThicknessBar)),
+                settingsView.findViewById(R.id.bevelThicknessDescription),
+                settingsView.findViewById(R.id.bevelThicknessBar),
                 entry.bevelSize, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE, padSize_state);
 
         addSeekBarChangeListener(
-                (TextView) (settingsView.findViewById(R.id.priorityDescription)),
-                (SeekBar) (settingsView.findViewById(R.id.priorityBar)),
+                settingsView.findViewById(R.id.priorityDescription),
+                settingsView.findViewById(R.id.priorityBar),
                 entry.priority, R.string.settings_priority, fragment, entry, PRIORITY, priority_state);
 
         addSeekBarChangeListener(
-                (TextView) (settingsView.findViewById(R.id.adaptive_color_balance_description)),
-                (SeekBar) (settingsView.findViewById(R.id.adaptive_color_balance_bar)),
+                settingsView.findViewById(R.id.adaptive_color_balance_description),
+                settingsView.findViewById(R.id.adaptive_color_balance_bar),
                 entry.adaptiveColorBalance, R.string.settings_adaptive_color_balance, fragment, entry, ADAPTIVE_COLOR_BALANCE, adaptiveColor_bar_state);
 
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockSwitch),
+        addSwitchChangeListener(settingsView.findViewById(R.id.showOnLockSwitch),
                 entry.showOnLock, entry, SHOW_ON_LOCK,
                 fragment, show_on_lock_state);
 
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.showOnLockCompletedSwitch),
+        addSwitchChangeListener(settingsView.findViewById(R.id.showOnLockCompletedSwitch),
                 entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED,
                 fragment, show_on_lock_if_completed_state);
 
-        addSwitchChangeListener((Switch) settingsView.findViewById(R.id.adaptiveColorSwitch),
+        addSwitchChangeListener(settingsView.findViewById(R.id.adaptiveColorSwitch),
                 entry.adaptiveColorEnabled, entry, ADAPTIVE_COLOR,
                 fragment, adaptiveColor_state);
     }

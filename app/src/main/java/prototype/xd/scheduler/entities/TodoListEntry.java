@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.entities;
 
 import static org.apache.commons.lang.ArrayUtils.addAll;
-import static prototype.xd.scheduler.MainActivity.displayMetrics;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
@@ -15,6 +14,7 @@ import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.TypedValue;
@@ -239,13 +239,13 @@ public class TodoListEntry {
         setParams((String[]) addAll(group.params, params));
     }
     
-    public void initialiseDisplayData() {
-        h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, displayMetrics);
+    public void initialiseDisplayData(Context context) {
+        h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, context.getResources().getDisplayMetrics());
         kM = h * 1.1f;
         textPaint = createNewPaint(fontColor_lock);
         textPaint.setTextSize(h);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText) / 2 + 10, 1, displayWidth / 2f - bevelSize);
+        rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText), 1, displayWidth / 2f - bevelSize);
         maxChars = (int) ((displayWidth - bevelSize * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         
         log(INFO, "loaded display data for " + textValue);

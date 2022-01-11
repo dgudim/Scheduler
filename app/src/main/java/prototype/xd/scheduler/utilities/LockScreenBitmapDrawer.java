@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.MainActivity.displayMetrics;
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.MainActivity.windowMetrics;
 import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
@@ -66,8 +66,8 @@ public class LockScreenBitmapDrawer {
                 wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK).getFileDescriptor())
                 .copy(Bitmap.Config.ARGB_8888, true);
         if (!initialised) {
-            displayWidth = displayMetrics.widthPixels;
-            displayHeight = displayMetrics.heightPixels;
+            displayWidth = windowMetrics.getBounds().width();
+            displayHeight = windowMetrics.getBounds().height();
             displayCenter = new Point(displayWidth / 2, displayHeight / 2);
             initialised = true;
         }
@@ -179,7 +179,7 @@ public class LockScreenBitmapDrawer {
         if (!toAdd.isEmpty()) {
             
             for (int i = 0; i < toAdd.size(); i++) {
-                toAdd.get(i).initialiseDisplayData();
+                toAdd.get(i).initialiseDisplayData(context);
                 toAdd.get(i).splitText();
             }
             
@@ -187,7 +187,7 @@ public class LockScreenBitmapDrawer {
             for (int i = 0; i < toAdd.size(); i++) {
                 totalHeight += toAdd.get(i).h * toAdd.get(i).textValueSplit.length + toAdd.get(i).kM;
             }
-            totalHeight += toAdd.get(0).kM * 2;
+            totalHeight += toAdd.get(0).kM;
             totalHeight /= 2f;
             
             ArrayList<ArrayList<TodoListEntry>> splitEntries = new ArrayList<>();
@@ -315,7 +315,6 @@ public class LockScreenBitmapDrawer {
                 displayCenter.y + maxHeight + bottom, paint);
     }
     
-    @SuppressWarnings("StringConcatenationInLoop")
     private static ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input) {
         ArrayList<TodoListEntry> toAdd = new ArrayList<>();
         for (int i = 0; i < input.size(); i++) {
