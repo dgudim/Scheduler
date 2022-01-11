@@ -1,8 +1,13 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
+import static prototype.xd.scheduler.utilities.Logger.log;
+
 import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Environment;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -12,7 +17,6 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import org.apache.commons.lang.WordUtils;
@@ -24,25 +28,21 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 import prototype.xd.scheduler.FirstFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
-import static prototype.xd.scheduler.utilities.Logger.ERROR;
-import static prototype.xd.scheduler.utilities.Logger.INFO;
-import static prototype.xd.scheduler.utilities.Logger.WARNING;
-import static prototype.xd.scheduler.utilities.Logger.log;
-
-@SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
+@SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
 public class Utilities {
     
-    public static File rootDir = new File(Environment.getExternalStorageDirectory().toString() + "/.Scheduler");
+    public static File rootDir;
     
-    public static void createRootIfNeeded() {
+    public static void initStorage(Context context) {
+        rootDir = context.getExternalFilesDir("");
+        if(rootDir == null){
+            throw new NullPointerException("Shared storage not available wtf");
+        }
         if (!rootDir.exists()) {
             rootDir.mkdirs();
         }
@@ -51,8 +51,8 @@ public class Utilities {
     public static ArrayList<TodoListEntry> loadEntries() {
         try {
             
-            ArrayList<String[]> entryParams = (ArrayList<String[]>) loadObject("list");
-            ArrayList<String> entryGroupNames = (ArrayList<String>) loadObject("list_groupData");
+            ArrayList<String[]> entryParams = loadObject("list");
+            ArrayList<String> entryGroupNames = loadObject("list_groupData");
             
             if (!(entryParams.size() == entryGroupNames.size())) {
                 log(WARNING, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
@@ -88,13 +88,13 @@ public class Utilities {
         }
     }
     
-    public static Object loadObject(String fileName) throws IOException, ClassNotFoundException {
+    public static <T> T loadObject(String fileName) throws IOException, ClassNotFoundException {
         File file = new File(rootDir, fileName);
         FileInputStream f = new FileInputStream(file);
         ObjectInputStream s = new ObjectInputStream(f);
         Object object = s.readObject();
         s.close();
-        return object;
+        return (T)object;
     }
     
     public static void saveObject(String fileName, Object object) throws IOException {
@@ -127,8 +127,8 @@ public class Utilities {
         merged.addAll(globalEntries);
         merged.addAll(yesterdayEntries);
         merged.addAll(otherEntries);
-        Collections.sort(merged, new TodoListEntryGroupComparator());
-        Collections.sort(merged, new TodoListEntryPriorityComparator());
+        merged.sort(new TodoListEntryGroupComparator());
+        merged.sort(new TodoListEntryPriorityComparator());
         
         return merged;
     }
@@ -161,7 +161,7 @@ public class Utilities {
     }
     
     public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final FirstFragment fragment, final TodoListEntry todoListEntry, final String parameter, final TextView stateIcon) {
-        displayTo.setText(fragment.getString(stringResource, (int) value));
+        displayTo.setText(fragment.getString(stringResource, value));
         seekBar.setProgress(value);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
@@ -187,27 +187,21 @@ public class Utilities {
     
     public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defValue, final CompoundButton.OnCheckedChangeListener listener) {
         tSwitch.setChecked(preferences.getBoolean(key, defValue));
-        tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                preferences.edit().putBoolean(key, isChecked).apply();
-                if (!(listener == null)) {
-                    listener.onCheckedChanged(buttonView, isChecked);
-                }
+        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            preferences.edit().putBoolean(key, isChecked).apply();
+            if (!(listener == null)) {
+                listener.onCheckedChanged(buttonView, isChecked);
             }
         });
     }
     
     public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter, final FirstFragment fragment, final TextView stateIcon) {
         tSwitch.setChecked(value);
-        tSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                entry.changeParameter(parameter, String.valueOf(isChecked));
-                saveEntries(fragment.todoListEntries);
-                preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
-                entry.setStateIconColor(stateIcon, parameter);
-            }
+        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            entry.changeParameter(parameter, String.valueOf(isChecked));
+            saveEntries(fragment.todoListEntries);
+            preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+            entry.setStateIconColor(stateIcon, parameter);
         });
     }
     
@@ -219,18 +213,12 @@ public class Utilities {
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
-                .setPositiveButton("Применить", new ColorPickerClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                        preferences.edit().putInt(key, selectedColor).apply();
-                        target.setImageBitmap(createSolidColorCircle(preferences.getInt(key, defValue)));
-                    }
-                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            
-            }
-        }).build().show();
+                .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
+                    preferences.edit().putInt(key, selectedColor).apply();
+                    target.setImageBitmap(createSolidColorCircle(preferences.getInt(key, defValue)));
+                }).setNegativeButton("Отмена", (dialog, which) -> {
+                
+                }).build().show();
     }
     
     public static void invokeColorDialogue(final int value, final ImageView target, Context context, final TodoListEntry todoListEntry, final String parameter, final boolean setReconstructFlag, final TextView stateIcon) {
@@ -241,20 +229,14 @@ public class Utilities {
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
-                .setPositiveButton("Применить", new ColorPickerClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                        todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
-                        target.setImageBitmap(createSolidColorCircle(selectedColor));
-                        preferences.edit().putBoolean("need_to_reconstruct_bitmap", setReconstructFlag).apply();
-                        todoListEntry.setStateIconColor(stateIcon, parameter);
-                    }
-                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            
-            }
-        }).build().show();
+                .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
+                    todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
+                    target.setImageBitmap(createSolidColorCircle(selectedColor));
+                    preferences.edit().putBoolean("need_to_reconstruct_bitmap", setReconstructFlag).apply();
+                    todoListEntry.setStateIconColor(stateIcon, parameter);
+                }).setNegativeButton("Отмена", (dialog, which) -> {
+                
+                }).build().show();
     }
 }
 

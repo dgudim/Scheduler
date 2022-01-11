@@ -128,18 +128,7 @@ public class SecondFragment extends Fragment {
                 invokeColorDialogue("globalBevelColor", (ImageView) v, 0xFF88FF88, getContext());
             }
         });
-
-        addSwitchChangeListener((Switch) view.findViewById(R.id.bgUpdateSwitch), "bgUpdate", true, new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    getContext().startService(new Intent(getActivity(), BackgroundUpdateService.class));
-                } else {
-                    getContext().stopService(new Intent(getActivity(), BackgroundUpdateService.class));
-                }
-            }
-        });
-
+        
         addSeekBarChangeListener(
                 (TextView) (view.findViewById(R.id.textSizeDescripton)),
                 (SeekBar) (view.findViewById(R.id.fontSizeBar)),

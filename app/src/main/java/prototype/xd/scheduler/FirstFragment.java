@@ -1,10 +1,19 @@
 package prototype.xd.scheduler;
 
+import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
+import static prototype.xd.scheduler.entities.Group.readGroupFile;
+import static prototype.xd.scheduler.utilities.DateManager.currentDate;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
+import static prototype.xd.scheduler.utilities.DateManager.updateDate;
+import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
+import static prototype.xd.scheduler.utilities.Utilities.initStorage;
+import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
+import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
@@ -35,24 +44,11 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
-import static prototype.xd.scheduler.entities.Group.readGroupFile;
-import static prototype.xd.scheduler.utilities.DateManager.currentDate;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
-import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
-import static prototype.xd.scheduler.utilities.Utilities.createRootIfNeeded;
-import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
-import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
-
 public class FirstFragment extends Fragment {
     
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.SET_WALLPAPER,
-            Manifest.permission.FOREGROUND_SERVICE,
+            Manifest.permission.SET_WALLPAPER
     };
     
     ListView listView;
@@ -66,6 +62,8 @@ public class FirstFragment extends Fragment {
     
     Activity rootActivity;
     
+    Context context;
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_first, container, false);
@@ -78,12 +76,12 @@ public class FirstFragment extends Fragment {
         
         verifyStoragePermissions(rootActivity);
         
-        createRootIfNeeded();
+        context = getContext();
+        
+        initStorage(context);
         updateDate("none", true);
         
-        lockScreenBitmapDrawer = new LockScreenBitmapDrawer(getContext());
-        
-        boolean updateInBackground = preferences.getBoolean("bgUpdate", true);
+        lockScreenBitmapDrawer = new LockScreenBitmapDrawer(context);
         
         final CalendarView datePicker = view.findViewById(R.id.calendar);
         
@@ -94,86 +92,69 @@ public class FirstFragment extends Fragment {
         listViewAdapter = new ListViewAdapter(FirstFragment.this, listView, lockScreenBitmapDrawer);
         listView.setAdapter(listViewAdapter);
         
-        datePicker.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-                listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
-            }
+        datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
+            updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
+            listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
         });
         
         FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle("Добавить пункт");
-                
-                View addView = LayoutInflater.from(getContext()).inflate(R.layout.add_entry_dialogue, null);
-                final EditText input = addView.findViewById(R.id.entryNameEditText);
-                
-                final String[] currentGroup = {BLANK_NAME};
-                
-                final ArrayList<Group> groupList = readGroupFile();
-                final ArrayList<String> groupNames = new ArrayList<>();
-                for (Group group : groupList) {
-                    groupNames.add(group.name);
-                }
-                final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
-                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, groupNames);
-                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
-                groupSpinner.setAdapter(arrayAdapter);
-                groupSpinner.setSelection(groupNames.indexOf(BLANK_NAME));
-                groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        currentGroup[0] = groupNames.get(position);
-                    }
-                    
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    
-                    }
-                });
-                
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(addView);
-                
-                builder.setPositiveButton("Добавить", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        TodoListEntry newEntry = new TodoListEntry(new String[]{
-                                "value", input.getText().toString(),
-                                "associatedDate", currentlySelectedDate,
-                                "completed", "false"}, currentGroup[0]);
-                        todoListEntries.add(newEntry);
-                        saveEntries(todoListEntries);
-                        listViewAdapter.updateData(newEntry.getLockViewState());
-                    }
-                });
-                
-                builder.setNegativeButton("Добавить в общий список", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        TodoListEntry newEntry = new TodoListEntry(new String[]{
-                                "value", input.getText().toString(),
-                                "associatedDate", "GLOBAL",
-                                "completed", "false"}, currentGroup[0]);
-                        todoListEntries.add(newEntry);
-                        saveEntries(todoListEntries);
-                        listViewAdapter.updateData(newEntry.getLockViewState());
-                    }
-                });
-                
-                builder.setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                
-                builder.show();
+        fab.setOnClickListener(view1 -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Добавить пункт");
+            
+            View addView = LayoutInflater.from(context).inflate(R.layout.add_entry_dialogue, null);
+            final EditText input = addView.findViewById(R.id.entryNameEditText);
+            
+            final String[] currentGroup = {BLANK_NAME};
+            
+            final ArrayList<Group> groupList = readGroupFile();
+            final ArrayList<String> groupNames = new ArrayList<>();
+            for (Group group : groupList) {
+                groupNames.add(group.name);
             }
+            final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, groupNames);
+            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
+            groupSpinner.setAdapter(arrayAdapter);
+            groupSpinner.setSelection(groupNames.indexOf(BLANK_NAME));
+            groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
+                    currentGroup[0] = groupNames.get(position);
+                }
+                
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                
+                }
+            });
+            
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(addView);
+            
+            builder.setPositiveButton("Добавить", (dialog, which) -> {
+                TodoListEntry newEntry = new TodoListEntry(new String[]{
+                        "value", input.getText().toString(),
+                        "associatedDate", currentlySelectedDate,
+                        "completed", "false"}, currentGroup[0]);
+                todoListEntries.add(newEntry);
+                saveEntries(todoListEntries);
+                listViewAdapter.updateData(newEntry.getLockViewState());
+            });
+            
+            builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
+                TodoListEntry newEntry = new TodoListEntry(new String[]{
+                        "value", input.getText().toString(),
+                        "associatedDate", "GLOBAL",
+                        "completed", "false"}, currentGroup[0]);
+                todoListEntries.add(newEntry);
+                saveEntries(todoListEntries);
+                listViewAdapter.updateData(newEntry.getLockViewState());
+            });
+            
+            builder.setNeutralButton("Отмена", (dialog, which) -> dialog.dismiss());
+            
+            builder.show();
         });
         
         final GifImageView loadingGif = view.findViewById(R.id.loadingIcon);
@@ -184,37 +165,27 @@ public class FirstFragment extends Fragment {
             @Override
             public void run() {
                 lockScreenBitmapDrawer.checkQueue();
-                rootActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (lockScreenBitmapDrawer.currentlyProcessingBitmap) {
-                            loadingGif.setVisibility(View.VISIBLE);
-                        } else {
-                            loadingGif.setVisibility(View.GONE);
-                        }
-                        if (lockScreenBitmapDrawer.needBitmapProcessing) {
-                            loadingText.setVisibility(View.VISIBLE);
-                        } else {
-                            loadingText.setVisibility(View.GONE);
-                        }
+                rootActivity.runOnUiThread(() -> {
+                    if (lockScreenBitmapDrawer.currentlyProcessingBitmap) {
+                        loadingGif.setVisibility(View.VISIBLE);
+                    } else {
+                        loadingGif.setVisibility(View.GONE);
+                    }
+                    if (lockScreenBitmapDrawer.needBitmapProcessing) {
+                        loadingText.setVisibility(View.VISIBLE);
+                    } else {
+                        loadingText.setVisibility(View.GONE);
                     }
                 });
             }
         }, 0, 100);
         
-        view.findViewById(R.id.openSettingsButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                queueTimer.cancel();
-                NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_SecondFragment);
-            }
+        view.findViewById(R.id.openSettingsButton).setOnClickListener(v -> {
+            queueTimer.cancel();
+            NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_SecondFragment);
         });
         
         lockScreenBitmapDrawer.constructBitmap();
-        
-        if (updateInBackground) {
-            getContext().startService(new Intent(rootActivity, BackgroundUpdateService.class));
-        }
     }
     
     void verifyStoragePermissions(Activity activity) {

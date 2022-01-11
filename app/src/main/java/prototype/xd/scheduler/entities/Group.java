@@ -1,16 +1,16 @@
 package prototype.xd.scheduler.entities;
 
-import androidx.annotation.NonNull;
-
-import java.util.ArrayList;
-
-import static prototype.xd.scheduler.utilities.Logger.ERROR;
-import static prototype.xd.scheduler.utilities.Logger.INFO;
-import static prototype.xd.scheduler.utilities.Logger.WARNING;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.loadObject;
 import static prototype.xd.scheduler.utilities.Utilities.saveObject;
+
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
 
 public class Group {
 
@@ -39,12 +39,11 @@ public class Group {
         this.params = params;
     }
 
-    @SuppressWarnings("unchecked")
     public static ArrayList<Group> readGroupFile() {
         try {
 
-            ArrayList<String[]> groupParams = (ArrayList<String[]>) loadObject("groups");
-            ArrayList<String> groupNames = (ArrayList<String>) loadObject("groupNames");
+            ArrayList<String[]> groupParams = loadObject("groups");
+            ArrayList<String> groupNames = loadObject("groupNames");
 
             if (!(groupParams.size() == groupNames.size())) {
                 log(WARNING, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());

@@ -1,15 +1,5 @@
 package prototype.xd.scheduler.entities;
 
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.util.TypedValue;
-import android.widget.TextView;
-
-import androidx.core.math.MathUtils;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.MainActivity.displayMetrics;
 import static prototype.xd.scheduler.MainActivity.preferences;
@@ -20,10 +10,20 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.currentBitmapLongestText;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayWidth;
-import static prototype.xd.scheduler.utilities.Logger.INFO;
-import static prototype.xd.scheduler.utilities.Logger.WARNING;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
+
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.util.TypedValue;
+import android.widget.TextView;
+
+import androidx.core.math.MathUtils;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 
 public class TodoListEntry {
     

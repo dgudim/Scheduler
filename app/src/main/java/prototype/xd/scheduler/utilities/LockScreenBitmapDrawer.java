@@ -1,10 +1,24 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.MainActivity.displayMetrics;
+import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
+import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
+import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintBitmap;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.hasFingerPrint;
+import static prototype.xd.scheduler.utilities.DateManager.availableDays;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
+import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
+import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,21 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
-
-import static prototype.xd.scheduler.MainActivity.displayMetrics;
-import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
-import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
-import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintBitmap;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.hasFingerPrint;
-import static prototype.xd.scheduler.utilities.DateManager.availableDays;
-import static prototype.xd.scheduler.utilities.Logger.INFO;
-import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
-import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 public class LockScreenBitmapDrawer {
     
@@ -104,23 +103,15 @@ public class LockScreenBitmapDrawer {
                 
                 alert.setTitle("В какой день использовать новый фон?");
                 
-                alert.setItems(availableDays, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        currentName[0] = availableDays[which] + ".png";
-                        if (availableDays[which].equals("общий")) {
-                            currentName[0] = defaultBackgroundName;
-                        }
-                        dialog.dismiss();
+                alert.setItems(availableDays, (dialog, which) -> {
+                    currentName[0] = availableDays[which] + ".png";
+                    if (availableDays[which].equals("общий")) {
+                        currentName[0] = defaultBackgroundName;
                     }
+                    dialog.dismiss();
                 });
                 
-                alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        startBitmapThread(currentName[0]);
-                    }
-                });
+                alert.setOnDismissListener(dialog -> startBitmapThread(currentName[0]));
                 
                 alert.show();
             } else {
@@ -132,53 +123,51 @@ public class LockScreenBitmapDrawer {
     }
     
     private void startBitmapThread(final String selectedDay) {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Bitmap bitmap;
-                    File bg = getBackgroundAccordingToDayAndTime();
-                    Bitmap bitmapFromLock = cachedBitmapFromLockScreen;
+        new Thread(() -> {
+            try {
+                Bitmap bitmap;
+                File bg = getBackgroundAccordingToDayAndTime();
+                Bitmap bitmapFromLock = cachedBitmapFromLockScreen;
+                
+                if (!hasFingerPrint(bitmapFromLock)) {
                     
-                    if (!hasFingerPrint(bitmapFromLock)) {
-                        
-                        bitmapFromLock = Bitmap.createBitmap(bitmapFromLock, (int) (bitmapFromLock.getWidth() / 2f - displayWidth / 2f), 0, displayWidth, bitmapFromLock.getHeight());
-                        fingerPrintBitmap(bitmapFromLock).compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(rootDir, selectedDay)));
-                        
-                        bitmap = BitmapFactory.decodeStream(new FileInputStream(new File(rootDir, selectedDay))).copy(Bitmap.Config.ARGB_8888, true);
-                        
-                        if (!selectedDay.equals(bg.getName())) {
-                            cachedBitmapFromLockScreen.recycle();
-                            cachedBitmapFromLockScreen = bitmap;
-                            startBitmapThread(null);
-                            throw new InterruptedException("New background set to other date, constructing with current instead");
-                        }
+                    bitmapFromLock = Bitmap.createBitmap(bitmapFromLock, (int) (bitmapFromLock.getWidth() / 2f - displayWidth / 2f), 0, displayWidth, bitmapFromLock.getHeight());
+                    fingerPrintBitmap(bitmapFromLock).compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(rootDir, selectedDay)));
+                    
+                    bitmap = BitmapFactory.decodeStream(new FileInputStream(new File(rootDir, selectedDay))).copy(Bitmap.Config.ARGB_8888, true);
+                    
+                    if (!selectedDay.equals(bg.getName())) {
+                        cachedBitmapFromLockScreen.recycle();
+                        cachedBitmapFromLockScreen = bitmap;
+                        startBitmapThread(null);
+                        throw new InterruptedException("New background set to other date, constructing with current instead");
+                    }
+                } else {
+                    if (bg.exists()) {
+                        bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
+                                .copy(Bitmap.Config.ARGB_8888, true);
                     } else {
-                        if (bg.exists()) {
-                            bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
+                        File defFile = new File(rootDir, defaultBackgroundName);
+                        if (defFile.exists()) {
+                            bitmap = BitmapFactory.decodeStream(new FileInputStream(defFile))
                                     .copy(Bitmap.Config.ARGB_8888, true);
                         } else {
-                            File defFile = new File(rootDir, defaultBackgroundName);
-                            if (defFile.exists()) {
-                                bitmap = BitmapFactory.decodeStream(new FileInputStream(defFile))
-                                        .copy(Bitmap.Config.ARGB_8888, true);
-                            } else {
-                                throw new FileNotFoundException("No available background to load");
-                            }
+                            throw new FileNotFoundException("No available background to load");
                         }
                     }
-                    
-                    float time = System.nanoTime();
-                    log(INFO, "setting wallpaper");
-                    drawStringsOnBitmap(bitmap);
-                    setLockScreenBitmap(bitmap);
-                    log(INFO, "set wallpaper" + (System.nanoTime() - time) / 1000000000f + "s");
-                    
-                    bitmap.recycle();
-                } catch (Exception e) {
-                    logException(e);
                 }
-                currentlyProcessingBitmap = false;
+                
+                float time = System.nanoTime();
+                log(INFO, "setting wallpaper");
+                drawStringsOnBitmap(bitmap);
+                setLockScreenBitmap(bitmap);
+                log(INFO, "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
+                
+                bitmap.recycle();
+            } catch (Exception e) {
+                logException(e);
             }
+            currentlyProcessingBitmap = false;
         }).start();
     }
     

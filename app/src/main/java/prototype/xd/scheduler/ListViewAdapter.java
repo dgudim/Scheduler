@@ -1,8 +1,13 @@
 package prototype.xd.scheduler;
 
+import static prototype.xd.scheduler.utilities.DateManager.currentDate;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
+import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
+import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
+import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
+
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +22,6 @@ import android.widget.TextView;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.EntrySettings;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
-
-import static prototype.xd.scheduler.utilities.DateManager.currentDate;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
-import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
-import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
-import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 public class ListViewAdapter extends BaseAdapter {
 
@@ -97,96 +96,61 @@ public class ListViewAdapter extends BaseAdapter {
             ImageView delete = view.findViewById(R.id.deletionButton);
             ImageView settings = view.findViewById(R.id.settings);
 
-            delete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            delete.setOnClickListener(view1 -> {
 
-                    AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                    alert.setTitle("Удалить");
-                    alert.setMessage("Вы уверены?");
-                    alert.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                alert.setTitle("Удалить");
+                alert.setMessage("Вы уверены?");
+                alert.setPositiveButton("Да", (dialog, which) -> {
+                    fragment.todoListEntries.remove(i);
+                    saveEntries(fragment.todoListEntries);
+                    updateData(currentEntry.getLockViewState());
+                });
 
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            fragment.todoListEntries.remove(i);
-                            saveEntries(fragment.todoListEntries);
-                            updateData(currentEntry.getLockViewState());
-                        }
-                    });
+                alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
 
-                    alert.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    alert.show();
-                }
+                alert.show();
             });
             isDone.setChecked(currentEntry.completed);
-            isDone.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (!currentEntry.isGlobalEntry) {
-                        currentEntry.changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
-                    } else {
-                        currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
-                    }
+            isDone.setOnClickListener(view12 -> {
+                if (!currentEntry.isGlobalEntry) {
+                    currentEntry.changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
+                } else {
+                    currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
+                }
+                saveEntries(fragment.todoListEntries);
+                updateData(true);
+            });
+
+            todoText.setOnLongClickListener(v -> {
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+
+                final EditText input = new EditText(context);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setText(currentEntry.textValue);
+                alert.setView(input);
+
+                alert.setTitle("Изменить");
+                alert.setPositiveButton("Сохранить", (dialog, which) -> {
+                    currentEntry.changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
                     saveEntries(fragment.todoListEntries);
-                    updateData(true);
-                }
-            });
+                    updateData(currentEntry.getLockViewState());
+                });
 
-            todoText.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(context);
-
-                    final EditText input = new EditText(context);
-                    input.setInputType(InputType.TYPE_CLASS_TEXT);
-                    input.setText(currentEntry.textValue);
-                    alert.setView(input);
-
-                    alert.setTitle("Изменить");
-                    alert.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            currentEntry.changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
-                            saveEntries(fragment.todoListEntries);
-                            updateData(currentEntry.getLockViewState());
-                        }
+                if (!currentEntry.isGlobalEntry) {
+                    alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
+                        currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
+                        saveEntries(fragment.todoListEntries);
+                        updateData(currentEntry.getLockViewState());
                     });
-
-                    if (!currentEntry.isGlobalEntry) {
-                        alert.setNeutralButton("Переместить в общий список", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
-                                saveEntries(fragment.todoListEntries);
-                                updateData(currentEntry.getLockViewState());
-                            }
-                        });
-                    }
-
-                    alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-                    alert.show();
-                    return false;
                 }
+
+                alert.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+
+                alert.show();
+                return false;
             });
-            settings.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new EntrySettings(inflater, currentEntry, context, fragment, fragment.todoListEntries);
-                }
-            });
+            settings.setOnClickListener(v -> new EntrySettings(inflater, currentEntry, context, fragment, fragment.todoListEntries));
             return view;
         } else {
             TextView emptyView = new TextView(context);
