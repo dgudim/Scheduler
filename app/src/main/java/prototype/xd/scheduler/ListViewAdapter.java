@@ -94,7 +94,7 @@ public class ListViewAdapter extends BaseAdapter {
         if (view == null) {
             final TodoListEntry currentEntry = currentTodoListEntries.get(i);
             
-            view = inflater.inflate(R.layout.list_selection, parent);
+            view = inflater.inflate(R.layout.list_selection, parent, false);
             
             view.findViewById(R.id.backgroudSecondLayer).setBackgroundColor(currentEntry.bgColor_list);
             
