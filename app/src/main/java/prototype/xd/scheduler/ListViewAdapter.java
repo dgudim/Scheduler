@@ -91,24 +91,15 @@ public class ListViewAdapter extends BaseAdapter {
     @Override
     public View getView(final int i, View view, ViewGroup parent) {
         
+        final TodoListEntry currentEntry = currentTodoListEntries.get(i);
+        TextView todoText;
+        
         if (view == null) {
-            final TodoListEntry currentEntry = currentTodoListEntries.get(i);
             
             view = inflater.inflate(R.layout.list_selection, parent, false);
-            
-            view.findViewById(R.id.backgroudSecondLayer).setBackgroundColor(currentEntry.bgColor_list);
+            todoText = view.findViewById(R.id.todoText);
             
             final CheckBox isDone = view.findViewById(R.id.isDone);
-            
-            final TextView todoText = view.findViewById(R.id.todoText);
-            
-            if (currentEntry.completed) {
-                todoText.setTextColor(currentEntry.fontColor_list_completed);
-            } else {
-                todoText.setTextColor(currentEntry.fontColor_list);
-            }
-            
-            todoText.setText(currentEntry.textValue);
             ImageView delete = view.findViewById(R.id.deletionButton);
             ImageView settings = view.findViewById(R.id.settings);
             
@@ -167,7 +158,19 @@ public class ListViewAdapter extends BaseAdapter {
                 return false;
             });
             settings.setOnClickListener(v -> new EntrySettings(inflater, currentEntry, context, home, home.todoListEntries));
+        } else {
+            todoText = view.findViewById(R.id.todoText);
         }
+        
+        view.findViewById(R.id.backgroudSecondLayer).setBackgroundColor(currentEntry.bgColor_list);
+        
+        if (currentEntry.completed) {
+            todoText.setTextColor(currentEntry.fontColor_list_completed);
+        } else {
+            todoText.setTextColor(currentEntry.fontColor_list);
+        }
+        todoText.setText(currentEntry.textValue);
+
         return view;
     }
 }
