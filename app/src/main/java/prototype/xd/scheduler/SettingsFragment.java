@@ -22,12 +22,11 @@ import androidx.fragment.app.Fragment;
 import java.io.File;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored", "ApplySharedPref"})
-public class SecondFragment extends Fragment {
-
-
+public class SettingsFragment extends Fragment {
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_second, container, false);
+        return inflater.inflate(R.layout.fragment_settings, container, false);
     }
 
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
@@ -118,7 +117,7 @@ public class SecondFragment extends Fragment {
 
             builder.setPositiveButton("Да", (dialog, which) -> {
                 preferences.edit().clear().commit();
-                SecondFragment.this.onViewCreated(view, savedInstanceState);
+                SettingsFragment.this.onViewCreated(view, savedInstanceState);
             });
             builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
 

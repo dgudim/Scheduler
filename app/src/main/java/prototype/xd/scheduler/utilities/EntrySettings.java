@@ -40,14 +40,14 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-import prototype.xd.scheduler.FirstFragment;
+import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 public class EntrySettings {
 
-    FirstFragment fragment;
+    HomeFragment fragment;
     TodoListEntry entry;
     TextView fontColor_list_view_state;
     TextView fontColor_lock_view_state;
@@ -61,7 +61,7 @@ public class EntrySettings {
     TextView show_on_lock_if_completed_state;
     TextView adaptiveColor_bar_state;
 
-    public EntrySettings(final LayoutInflater inflater, final TodoListEntry entry, final Context context, final FirstFragment fragment, ArrayList<TodoListEntry> allEntries) {
+    public EntrySettings(final LayoutInflater inflater, final TodoListEntry entry, final Context context, final HomeFragment fragment, ArrayList<TodoListEntry> allEntries) {
 
         View settingsView = inflater.inflate(R.layout.entry_settings, null);
 
@@ -79,7 +79,7 @@ public class EntrySettings {
         alert.show();
     }
 
-    private void initialise(final TodoListEntry entry, final Context context, final FirstFragment fragment, final View settingsView, final ArrayList<TodoListEntry> allEntries) {
+    private void initialise(final TodoListEntry entry, final Context context, final HomeFragment fragment, final View settingsView, final ArrayList<TodoListEntry> allEntries) {
         this.fragment = fragment;
         this.entry = entry;
 

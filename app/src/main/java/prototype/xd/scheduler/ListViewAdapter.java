@@ -16,99 +16,115 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.EntrySettings;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class ListViewAdapter extends BaseAdapter {
-
-    Context context;
-
-    LayoutInflater inflater;
-    ListView currentTodoListView;
-    FirstFragment fragment;
-    LockScreenBitmapDrawer lockScreenBitmapDrawer;
-
-    public ListViewAdapter(FirstFragment fragment, ListView currentTodoListView, LockScreenBitmapDrawer lockScreenBitmapDrawer) {
-        this.fragment = fragment;
+    
+    private final Context context;
+    
+    private final LayoutInflater inflater;
+    private final HomeFragment home;
+    private final LockScreenBitmapDrawer lockScreenBitmapDrawer;
+    
+    public ArrayList<TodoListEntry> currentTodoListEntries;
+    public ArrayList<Integer> currentTodoListEntries_indexMap;
+    
+    public ListViewAdapter(HomeFragment fragment, LockScreenBitmapDrawer lockScreenBitmapDrawer) {
+        this.home = fragment;
         this.context = fragment.getContext();
-        this.currentTodoListView = currentTodoListView;
         this.lockScreenBitmapDrawer = lockScreenBitmapDrawer;
         inflater = LayoutInflater.from(context);
+        currentTodoListEntries = new ArrayList<>();
+        currentTodoListEntries_indexMap = new ArrayList<>();
+        updateCurrentEntries();
     }
-
+    
     @Override
     public int getCount() {
-        return fragment.todoListEntries.size();
+        return currentTodoListEntries.size();
     }
-
+    
     @Override
     public Object getItem(int i) {
-        return fragment.todoListEntries.get(i);
+        return currentTodoListEntries.get(i);
     }
-
+    
     @Override
     public long getItemId(int i) {
         return i;
     }
-
+    
+    public void updateCurrentEntries() {
+        currentTodoListEntries.clear();
+        currentTodoListEntries_indexMap.clear();
+        for (int i = 0; i < home.todoListEntries.size(); i++) {
+            TodoListEntry currentEntry = home.todoListEntries.get(i);
+            boolean show = currentEntry.showInList_ifCompleted || (!currentEntry.completed && currentEntry.showInList);
+            if (currentEntry.isYesterdayEntry || !currentEntry.isGlobalEntry) {
+                show = show && (currentEntry.associatedDate.equals(currentlySelectedDate) || currentEntry.associatedDate.equals(yesterdayDate));
+                if (currentEntry.isYesterdayEntry) {
+                    show = show && currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate);
+                }
+            }
+            if (show) {
+                currentTodoListEntries.add(currentEntry);
+                currentTodoListEntries_indexMap.add(i);
+            }
+        }
+    }
+    
     public void updateData(boolean reconstructBitmap) {
         if (reconstructBitmap) {
             lockScreenBitmapDrawer.constructBitmap();
         }
-        fragment.todoListEntries = sortEntries(fragment.todoListEntries);
-        notifyDataSetChanged();
+        home.todoListEntries = sortEntries(home.todoListEntries);
+        updateCurrentEntries();
+        home.rootActivity.runOnUiThread(this::notifyDataSetChanged);
     }
-
+    
     @Override
-    public View getView(final int i, View view, ViewGroup viewGroup) {
-
-        final TodoListEntry currentEntry = fragment.todoListEntries.get(i);
-
-        boolean show = currentEntry.showInList_ifCompleted || (!currentEntry.completed && currentEntry.showInList);
-        if (currentEntry.isYesterdayEntry || !currentEntry.isGlobalEntry) {
-            show = show && (currentEntry.associatedDate.equals(currentlySelectedDate) || currentEntry.associatedDate.equals(yesterdayDate));
-            if (currentEntry.isYesterdayEntry) {
-                show = show && currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate);
-            }
-        }
-
-        view = inflater.inflate(R.layout.list_selection, null);
-
-        if (show) {
-
+    public View getView(final int i, View view, ViewGroup parent) {
+        
+        if (view == null) {
+            final TodoListEntry currentEntry = currentTodoListEntries.get(i);
+            
+            view = inflater.inflate(R.layout.list_selection, parent);
+            
             view.findViewById(R.id.backgroudSecondLayer).setBackgroundColor(currentEntry.bgColor_list);
-
+            
             final CheckBox isDone = view.findViewById(R.id.isDone);
-
+            
             final TextView todoText = view.findViewById(R.id.todoText);
-
+            
             if (currentEntry.completed) {
                 todoText.setTextColor(currentEntry.fontColor_list_completed);
             } else {
                 todoText.setTextColor(currentEntry.fontColor_list);
             }
-
+            
             todoText.setText(currentEntry.textValue);
             ImageView delete = view.findViewById(R.id.deletionButton);
             ImageView settings = view.findViewById(R.id.settings);
-
+            
             delete.setOnClickListener(view1 -> {
-
+                
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 alert.setTitle("Удалить");
                 alert.setMessage("Вы уверены?");
                 alert.setPositiveButton("Да", (dialog, which) -> {
-                    fragment.todoListEntries.remove(i);
-                    saveEntries(fragment.todoListEntries);
+                    home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
+                    saveEntries(home.todoListEntries);
                     updateData(currentEntry.getLockViewState());
                 });
-
+                
                 alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
-
+                
                 alert.show();
             });
             isDone.setChecked(currentEntry.completed);
@@ -118,45 +134,40 @@ public class ListViewAdapter extends BaseAdapter {
                 } else {
                     currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
                 }
-                saveEntries(fragment.todoListEntries);
+                saveEntries(home.todoListEntries);
                 updateData(true);
             });
-
+            
             todoText.setOnLongClickListener(v -> {
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
-
+                
                 final EditText input = new EditText(context);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 input.setText(currentEntry.textValue);
                 alert.setView(input);
-
+                
                 alert.setTitle("Изменить");
                 alert.setPositiveButton("Сохранить", (dialog, which) -> {
                     currentEntry.changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
-                    saveEntries(fragment.todoListEntries);
+                    saveEntries(home.todoListEntries);
                     updateData(currentEntry.getLockViewState());
                 });
-
+                
                 if (!currentEntry.isGlobalEntry) {
                     alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
                         currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
-                        saveEntries(fragment.todoListEntries);
+                        saveEntries(home.todoListEntries);
                         updateData(currentEntry.getLockViewState());
                     });
                 }
-
+                
                 alert.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
-
+                
                 alert.show();
                 return false;
             });
-            settings.setOnClickListener(v -> new EntrySettings(inflater, currentEntry, context, fragment, fragment.todoListEntries));
-            return view;
-        } else {
-            TextView emptyView = new TextView(context);
-            emptyView.setVisibility(View.GONE);
-            emptyView.setHeight(0);
-            return emptyView;
+            settings.setOnClickListener(v -> new EntrySettings(inflater, currentEntry, context, home, home.todoListEntries));
         }
+        return view;
     }
 }

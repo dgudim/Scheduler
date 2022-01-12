@@ -44,7 +44,7 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
-public class FirstFragment extends Fragment {
+public class HomeFragment extends Fragment {
     
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -64,11 +64,16 @@ public class FirstFragment extends Fragment {
     
     Context context;
     
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_first, container, false);
+    public HomeFragment() {
+        super();
     }
     
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_home, container, false);
+    }
+    
+    @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
@@ -76,12 +81,14 @@ public class FirstFragment extends Fragment {
         
         verifyStoragePermissions(rootActivity);
         
-        context = getContext();
+        context = requireContext();
         
         initStorage(context);
         updateDate("none", true);
         
-        lockScreenBitmapDrawer = new LockScreenBitmapDrawer(context);
+        if (lockScreenBitmapDrawer == null) {
+            lockScreenBitmapDrawer = new LockScreenBitmapDrawer(context);
+        }
         
         final CalendarView datePicker = view.findViewById(R.id.calendar);
         
@@ -89,13 +96,13 @@ public class FirstFragment extends Fragment {
         
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        listViewAdapter = new ListViewAdapter(FirstFragment.this, listView, lockScreenBitmapDrawer);
+        listViewAdapter = new ListViewAdapter(HomeFragment.this, lockScreenBitmapDrawer);
         listView.setAdapter(listViewAdapter);
         
-        datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
-            updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-            listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
-        });
+        datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> new Thread(() -> {
+                    updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
+                    listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
+                }).start());
         
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(view1 -> {
@@ -182,19 +189,20 @@ public class FirstFragment extends Fragment {
         
         view.findViewById(R.id.openSettingsButton).setOnClickListener(v -> {
             queueTimer.cancel();
-            NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_SecondFragment);
+            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_HomeFragment_to_SettingsFragment);
         });
         
         lockScreenBitmapDrawer.constructBitmap();
     }
     
     void verifyStoragePermissions(Activity activity) {
-        boolean granted = true;
-        for (int i = 0; i < PERMISSIONS.length; i++) {
-            granted = granted && ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-        }
-        if (!granted) {
-            ActivityCompat.requestPermissions(activity, PERMISSIONS, 1);
+        boolean granted = false;
+        ActivityCompat.requestPermissions(activity, PERMISSIONS, 1);
+        while (!granted) {
+            granted = true;
+            for (String permission : PERMISSIONS) {
+                granted = granted && ActivityCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED;
+            }
         }
     }
 }

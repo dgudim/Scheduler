@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities;
 
 import static org.apache.commons.lang.ArrayUtils.addAll;
+import static prototype.xd.scheduler.MainActivity.displayMetrics;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
@@ -14,7 +15,6 @@ import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.TypedValue;
@@ -239,8 +239,8 @@ public class TodoListEntry {
         setParams((String[]) addAll(group.params, params));
     }
     
-    public void initialiseDisplayData(Context context) {
-        h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, context.getResources().getDisplayMetrics());
+    public void initialiseDisplayData() {
+        h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, displayMetrics);
         kM = h * 1.1f;
         textPaint = createNewPaint(fontColor_lock);
         textPaint.setTextSize(h);

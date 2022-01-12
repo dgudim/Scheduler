@@ -78,7 +78,7 @@ public class Group {
             log(INFO, "saving groups file");
 
         } catch (Exception e) {
-            log(ERROR, "missing permission, failed to save groups file");
+            log(ERROR, "failed to save groups file: " + e.getMessage());
         }
     }
 

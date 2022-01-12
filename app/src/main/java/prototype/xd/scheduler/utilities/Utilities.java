@@ -30,7 +30,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import prototype.xd.scheduler.FirstFragment;
+import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
@@ -160,7 +160,7 @@ public class Utilities {
         });
     }
     
-    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final FirstFragment fragment, final TodoListEntry todoListEntry, final String parameter, final TextView stateIcon) {
+    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, int value, final int stringResource, final HomeFragment fragment, final TodoListEntry todoListEntry, final String parameter, final TextView stateIcon) {
         displayTo.setText(fragment.getString(stringResource, value));
         seekBar.setProgress(value);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -195,7 +195,7 @@ public class Utilities {
         });
     }
     
-    public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter, final FirstFragment fragment, final TextView stateIcon) {
+    public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter, final HomeFragment fragment, final TextView stateIcon) {
         tSwitch.setChecked(value);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
