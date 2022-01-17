@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
+import static java.lang.Math.max;
+
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,8 +11,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import java.io.File;
-
-import static java.lang.Math.max;
 
 public class BitmapUtilities {
     
@@ -197,10 +197,11 @@ public class BitmapUtilities {
     public static int mixTwoColors(int color1, int color2, double balance) {
         Color c1 = Color.valueOf(color1);
         Color c2 = Color.valueOf(color2);
+        float a = (float) (c1.alpha() * (1 - balance) + c2.alpha() * balance);
         float r = (float) (c1.red() * (1 - balance) + c2.red() * balance);
         float g = (float) (c1.green() * (1 - balance) + c2.green() * balance);
         float b = (float) (c1.blue() * (1 - balance) + c2.blue() * balance);
-        return Color.rgb(r, g, b);
+        return Color.argb(a, r, g, b);
     }
     
     public static int getAverageColor(Bitmap bitmap) {

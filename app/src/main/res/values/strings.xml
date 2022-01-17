@@ -8,52 +8,57 @@
     <string name="previous">Back</string>
     <string name="delete_item">Delete item</string>
 
-    <string name="settings_update_in_background">Обновлять в фоне</string>
-    <string name="settings_update_on_startup">Обновлять при запуске(включи если выключено обновление в фоне)</string>
-    <string name="settings_show_checked_items_on_lock">Показывать сегодняшние выполненые дела на экране блокировки</string>
-    <string name="settings_show_yesterday_items">Показывать вчерашние дела в списке</string>
-    <string name="settings_show_yesterday_items_lock">Показывать вчерашние дела на экране блокировки</string>
-    <string name="settings_show_yesterday_checked_items">Показывать вчерашние выполненые дела в списке</string>
-    <string name="settings_show_yesterday_checked_items_lock">Показывать вчерашние выполненые дела на экране блокировки</string>
+    <string name="hide">Скрыть</string>
+
+    <string name="category_backgrounds">Фоны</string>
+    <string name="category_bevels">Контуры</string>
+    <string name="category_fonts">Шрифты</string>
+    <string name="category_visibility">Видимость</string>
+
+    <string name="settings_show_old_done_items_list">Показывать пропущенные выполненные дела в списке</string>
+    <string name="settings_show_new_done_items_list">Показывать будущие выполненные дела в списке</string>
     <string name="settings_show_global_items_lock">Показывать общие дела на экране блокировки</string>
     <string name="settings_max_rWidth_lock">Ширина дела на весь экран на экране блокировки</string>
 
     <string name="settings_state_symbol">⬧</string>
 
     <string name="settings_show_items_lock">Показывать на экране блокировки</string>
-    <string name="settings_show_items_lock_completed">Показывать на экране блокировки если выполнено</string>
 
     <string name="settings_font_size">Размер шрифта(Экран блокировки):%d</string>
 
     <string name="settings_priority">Приоритет:%d</string>
 
-    <string name="settings_default_color">Цвет фона для сегодняшних дел(Экран блокировки)</string>
-    <string name="settings_yesterday_color">Цвет фона для вчерашних дел(Экран блокировки)</string>
-    <string name="settings_default_bevel_color">Цвет контура для сегодняшних дел(Экран блокировки)</string>
-    <string name="settings_yesterday_bevel_color">Цвет контура для вчерашних дел(Экран блокировки)</string>
-    <string name="settings_global_color">Цвет фона для общих дел(Экран блокировки)</string>
-    <string name="settings_global_bevel_color">Цвет контура для общих дел(Экран блокировки)</string>
+    <string name="settings_default_color">Цвет фона для сегодняшних дел</string>
+    <string name="settings_old_color">Цвет фона для пропущенных дел</string>
+    <string name="settings_default_bevel_color">Цвет контура для сегодняшних дел</string>
+    <string name="settings_old_bevel_color">Цвет контура для пропущенных дел</string>
+    <string name="settings_new_color">Цвет фона для будущих дел</string>
+    <string name="settings_new_bevel_color">Цвет контура для будущих дел</string>
 
-    <string name="settings_default_bevel_thickness">Толщина контура для сегодняшних дел(Экран блокировки):%d</string>
-    <string name="settings_yesterday_bevel_thickness">Толщина контура для вчерашних дел(Экран блокировки):%d</string>
-    <string name="settings_global_bevel_thickness">Толщина контура для общих дел(Экран блокировки):%d</string>
-    <string name="settings_bevel_thickness">Толщина контура (Экран блокировки):%d</string>
+    <string name="settings_default_bevel_thickness">Толщина контура для сегодняшних дел:%d</string>
+    <string name="settings_old_bevel_thickness">Толщина контура для пропущенных дел:%d</string>
+    <string name="settings_new_bevel_thickness">Толщина контура для будущих дел:%d</string>
+
+    <string name="settings_default_font_color">Цвет шрифта для сегодняшних дел</string>
+    <string name="settings_old_font_color">Цвет шрифта для пропущенных дел</string>
+    <string name="settings_new_font_color">Цвет шрифта для будущих дел</string>
 
     <string name="settings_reset_to_defaults">Сбросить настройки</string>
     <string name="settings_update_bg">Сбросить фон</string>
     <string name="settings_add_group">Добавить группу</string>
 
-    <string name="settings_text_color_in_list">Цвет шрифта в списке</string>
-    <string name="settings_text_color_on_lock">Цвет шрифта на экране блокировки</string>
-    <string name="settings_bevel_color_on_lock">Цвет контура на экране блокировки</string>
-    <string name="settings_bevel_size_on_lock">Толщина контура на экране блокировки:%d</string>
-    <string name="settings_bg_color_on_lock">Цвет фона на экране блокировки</string>
-    <string name="settings_bg_color_in_list">Цвет фона в списке</string>
+    <string name="settings_text_color">Цвет шрифта</string>
+    <string name="settings_bevel_color">Цвет контура</string>
+    <string name="settings_bg_color">Цвет фона</string>
+    <string name="settings_bevel_thickness">Толщина контура:%d</string>
+
+    <string name="settings_show_days_beforehand">Показывать за %d дня/дней</string>
+    <string name="settings_show_days_after">Показывать после %d дня/дней</string>
     <string name="settings_show_on_lock">Показывать на экране блокировки</string>
     <string name="settings_show_on_lock_if_completed">Показывать на экране блокировки если выполнено</string>
     <string name="settings_adaptive_color">Подстраивать цвет дела под цвет фона</string>
     <string name="settings_adaptive_color_underlay">Подстраивать цвет дела под цвет фона непосредственно под делом</string>
-    <string name="settings_adaptive_color_balance">Баланс подстраиваемого цвета: %d (1000 - только доп цвет, 0 - только выбраный цвет)</string>
+    <string name="settings_adaptive_color_balance">Баланс подстраиваемого цвета: %d</string>
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
 
     <string name="save">Сохранить</string>

@@ -2,10 +2,10 @@ package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
-import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.text.InputType;
@@ -65,13 +65,12 @@ public class ListViewAdapter extends BaseAdapter {
         currentTodoListEntries_indexMap.clear();
         for (int i = 0; i < home.todoListEntries.size(); i++) {
             TodoListEntry currentEntry = home.todoListEntries.get(i);
-            boolean show = currentEntry.showInList_ifCompleted || (!currentEntry.completed && currentEntry.showInList);
-            if (currentEntry.isYesterdayEntry || !currentEntry.isGlobalEntry) {
-                show = show && (currentEntry.associatedDate.equals(currentlySelectedDate) || currentEntry.associatedDate.equals(yesterdayDate));
-                if (currentEntry.isYesterdayEntry) {
-                    show = show && currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate);
-                }
+            boolean visibilityFlag = (currentEntry.completed && currentEntry.showInList_ifCompleted) || (!currentEntry.completed && currentEntry.showInList);
+            boolean show = visibilityFlag;
+            if (!currentEntry.isGlobalEntry) {
+                show = show && (currentEntry.associatedDate.equals(currentlySelectedDate));
             }
+            show = show || (currentEntry.isNewEntry || currentEntry.isOldEntry) && currentlySelectedDate.equals(currentDate) && visibilityFlag;
             if (show) {
                 currentTodoListEntries.add(currentEntry);
                 currentTodoListEntries_indexMap.add(i);
@@ -88,89 +87,89 @@ public class ListViewAdapter extends BaseAdapter {
         home.rootActivity.runOnUiThread(this::notifyDataSetChanged);
     }
     
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(final int i, View view, ViewGroup parent) {
         
         final TodoListEntry currentEntry = currentTodoListEntries.get(i);
         TextView todoText;
+        CheckBox isDone;
         
         if (view == null) {
-            
             view = inflater.inflate(R.layout.list_selection, parent, false);
-            todoText = view.findViewById(R.id.todoText);
-            
-            final CheckBox isDone = view.findViewById(R.id.isDone);
-            ImageView delete = view.findViewById(R.id.deletionButton);
-            ImageView settings = view.findViewById(R.id.settings);
-            
-            delete.setOnClickListener(view1 -> {
-                
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                alert.setTitle("Удалить");
-                alert.setMessage("Вы уверены?");
-                alert.setPositiveButton("Да", (dialog, which) -> {
-                    home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
-                    saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
-                });
-                
-                alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
-                
-                alert.show();
-            });
-            isDone.setChecked(currentEntry.completed);
-            isDone.setOnClickListener(view12 -> {
-                if (!currentEntry.isGlobalEntry) {
-                    currentEntry.changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
-                } else {
-                    currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
-                }
-                saveEntries(home.todoListEntries);
-                updateData(true);
-            });
-            
-            todoText.setOnLongClickListener(v -> {
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                
-                final EditText input = new EditText(context);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                input.setText(currentEntry.textValue);
-                alert.setView(input);
-                
-                alert.setTitle("Изменить");
-                alert.setPositiveButton("Сохранить", (dialog, which) -> {
-                    currentEntry.changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
-                    saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
-                });
-                
-                if (!currentEntry.isGlobalEntry) {
-                    alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
-                        currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
-                        saveEntries(home.todoListEntries);
-                        updateData(currentEntry.getLockViewState());
-                    });
-                }
-                
-                alert.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
-                
-                alert.show();
-                return false;
-            });
-            settings.setOnClickListener(v -> new EntrySettings(inflater, currentEntry, context, home, home.todoListEntries));
-        } else {
-            todoText = view.findViewById(R.id.todoText);
         }
+        todoText = view.findViewById(R.id.todoText);
+        isDone = view.findViewById(R.id.isDone);
         
-        view.findViewById(R.id.backgroudSecondLayer).setBackgroundColor(currentEntry.bgColor_list);
+        ImageView delete = view.findViewById(R.id.deletionButton);
+        ImageView settings = view.findViewById(R.id.settings);
+        
+        delete.setOnClickListener(view1 -> {
+            
+            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+            alert.setTitle("Удалить");
+            alert.setMessage("Вы уверены?");
+            alert.setPositiveButton("Да", (dialog, which) -> {
+                home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
+                saveEntries(home.todoListEntries);
+                updateData(currentEntry.getLockViewState());
+            });
+            
+            alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+            
+            alert.show();
+        });
+        
+        isDone.setChecked(currentEntry.completed);
+        isDone.setOnClickListener(view12 -> {
+            if (!currentEntry.isGlobalEntry) {
+                currentEntry.changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
+            } else {
+                currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
+            }
+            saveEntries(home.todoListEntries);
+            updateData(true);
+        });
+        
+        view.findViewById(R.id.backgroudSecondLayer).setBackgroundColor(currentEntry.bgColor);
         
         if (currentEntry.completed) {
-            todoText.setTextColor(currentEntry.fontColor_list_completed);
+            todoText.setTextColor(currentEntry.fontColor_completed);
         } else {
-            todoText.setTextColor(currentEntry.fontColor_list);
+            todoText.setTextColor(currentEntry.fontColor);
         }
-        todoText.setText(currentEntry.textValue);
-
+        todoText.setText(currentEntry.textValue + currentEntry.getDayOffset());
+        
+        todoText.setOnLongClickListener(v -> {
+            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+            
+            final EditText input = new EditText(context);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            input.setText(currentEntry.textValue);
+            alert.setView(input);
+            
+            alert.setTitle("Изменить");
+            alert.setPositiveButton("Сохранить", (dialog, which) -> {
+                currentEntry.changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
+                saveEntries(home.todoListEntries);
+                updateData(currentEntry.getLockViewState());
+            });
+            
+            if (!currentEntry.isGlobalEntry) {
+                alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
+                    currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
+                    saveEntries(home.todoListEntries);
+                    updateData(currentEntry.getLockViewState());
+                });
+            }
+            
+            alert.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+            
+            alert.show();
+            return false;
+        });
+        settings.setOnClickListener(v -> new EntrySettings(inflater, currentEntry, context, home, home.todoListEntries));
+        
         return view;
     }
 }

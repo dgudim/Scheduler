@@ -7,16 +7,16 @@ import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
 import static prototype.xd.scheduler.entities.TodoListEntry.ADAPTIVE_COLOR;
 import static prototype.xd.scheduler.entities.TodoListEntry.ADAPTIVE_COLOR_BALANCE;
-import static prototype.xd.scheduler.entities.TodoListEntry.BACKGROUND_COLOR_LIST;
-import static prototype.xd.scheduler.entities.TodoListEntry.BACKGROUND_COLOR_LOCK;
+import static prototype.xd.scheduler.entities.TodoListEntry.BACKGROUND_COLOR;
 import static prototype.xd.scheduler.entities.TodoListEntry.BEVEL_COLOR;
 import static prototype.xd.scheduler.entities.TodoListEntry.BEVEL_SIZE;
-import static prototype.xd.scheduler.entities.TodoListEntry.FONT_COLOR_LIST;
-import static prototype.xd.scheduler.entities.TodoListEntry.FONT_COLOR_LOCK;
+import static prototype.xd.scheduler.entities.TodoListEntry.FONT_COLOR;
 import static prototype.xd.scheduler.entities.TodoListEntry.PRIORITY;
+import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_AFTER;
+import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_BEFOREHAND;
 import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_ON_LOCK;
-import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_ON_LOCK_COMPLETED;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
@@ -49,17 +49,16 @@ public class EntrySettings {
 
     HomeFragment fragment;
     TodoListEntry entry;
-    TextView fontColor_list_view_state;
-    TextView fontColor_lock_view_state;
-    TextView bgColor_list_view_state;
-    TextView bgColor_lock_view_state;
-    TextView padColor_lock_view_state;
+    TextView fontColor_view_state;
+    TextView bgColor_view_state;
+    TextView padColor_view_state;
     TextView adaptiveColor_state;
     TextView priority_state;
     TextView padSize_state;
     TextView show_on_lock_state;
-    TextView show_on_lock_if_completed_state;
     TextView adaptiveColor_bar_state;
+    TextView showDaysBeforehand_bar_state;
+    TextView showDaysAfter_bar_state;
 
     public EntrySettings(final LayoutInflater inflater, final TodoListEntry entry, final Context context, final HomeFragment fragment, ArrayList<TodoListEntry> allEntries) {
 
@@ -71,10 +70,10 @@ public class EntrySettings {
 
         alert.setOnDismissListener(dialog -> {
             saveEntries(fragment.todoListEntries);
-            fragment.listViewAdapter.updateData(preferences.getBoolean("need_to_reconstruct_bitmap", false));
-            preferences.edit().putBoolean("need_to_reconstruct_bitmap", false).apply();
+            fragment.listViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
+            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
         });
-
+        
         alert.setView(settingsView);
         alert.show();
     }
@@ -83,29 +82,24 @@ public class EntrySettings {
         this.fragment = fragment;
         this.entry = entry;
 
-        ImageView fontColor_list_view = settingsView.findViewById(R.id.textColor_list);
-        ImageView fontColor_lock_view = settingsView.findViewById(R.id.textColor_lock);
-        ImageView bgColor_list_view = settingsView.findViewById(R.id.backgroundColor_list);
-        ImageView bgColor_lock_view = settingsView.findViewById(R.id.backgroundColor_lock);
-        ImageView padColor_lock_view = settingsView.findViewById(R.id.padColor_lock);
+        ImageView fontColor_view = settingsView.findViewById(R.id.textColor);
+        ImageView bgColor_view = settingsView.findViewById(R.id.backgroundColor);
+        ImageView padColor_view = settingsView.findViewById(R.id.padColor);
         ImageView add_group = settingsView.findViewById(R.id.addGroup);
-        fontColor_list_view.setImageBitmap(createSolidColorCircle(entry.fontColor_list));
-        fontColor_lock_view.setImageBitmap(createSolidColorCircle(entry.fontColor_lock));
-        bgColor_list_view.setImageBitmap(createSolidColorCircle(entry.bgColor_list));
-        bgColor_lock_view.setImageBitmap(createSolidColorCircle(entry.bgColor_lock));
-        padColor_lock_view.setImageBitmap(createSolidColorCircle(entry.padColor));
-
-        fontColor_list_view_state = settingsView.findViewById(R.id.font_color_list_state);
-        fontColor_lock_view_state = settingsView.findViewById(R.id.font_color_lock_state);
-        bgColor_list_view_state = settingsView.findViewById(R.id.background_color_list_state);
-        bgColor_lock_view_state = settingsView.findViewById(R.id.background_color_lock_state);
-        padColor_lock_view_state = settingsView.findViewById(R.id.bevel_color_lock_state);
+        fontColor_view.setImageBitmap(createSolidColorCircle(entry.fontColor));
+        bgColor_view.setImageBitmap(createSolidColorCircle(entry.bgColor));
+        padColor_view.setImageBitmap(createSolidColorCircle(entry.bevelColor));
+        
+        fontColor_view_state = settingsView.findViewById(R.id.font_color_state);
+        bgColor_view_state = settingsView.findViewById(R.id.background_color_state);
+        padColor_view_state = settingsView.findViewById(R.id.bevel_color_state);
         priority_state = settingsView.findViewById(R.id.priority_state);
         padSize_state = settingsView.findViewById(R.id.bevel_size_state);
         show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
-        show_on_lock_if_completed_state = settingsView.findViewById(R.id.show_on_lock_if_completed_state);
         adaptiveColor_state = settingsView.findViewById(R.id.adaptive_color_state);
         adaptiveColor_bar_state = settingsView.findViewById(R.id.adaptive_color_balance_state);
+        showDaysBeforehand_bar_state = settingsView.findViewById(R.id.days_beforehand_state);
+        showDaysAfter_bar_state = settingsView.findViewById(R.id.days_after_state);
 
         updateAllIndicators();
 
@@ -207,7 +201,7 @@ public class EntrySettings {
                 if (!groupNames.get(position).equals(entry.group.name)) {
                     entry.changeGroup(groupNames.get(position));
                     saveEntries(fragment.todoListEntries);
-                    preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                    preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     initialise(entry, context, fragment, settingsView, allEntries);
                 }
             }
@@ -252,7 +246,7 @@ public class EntrySettings {
                             }
                         }
                         updateAllIndicators();
-                        preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                        preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     });
 
                     builder13.setNegativeButton("Нет", (dialog13, which13) -> dialog13.dismiss());
@@ -286,7 +280,7 @@ public class EntrySettings {
                 entry.removeDisplayParams();
                 entry.resetGroup();
                 saveEntries(fragment.todoListEntries);
-                preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                 initialise(entry, context, fragment, settingsView, allEntries);
             });
             builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
@@ -294,20 +288,16 @@ public class EntrySettings {
             builder.show();
         });
 
-        fontColor_list_view.setOnClickListener(v -> invokeColorDialogue(entry.fontColor_list, (ImageView) v, context, entry, FONT_COLOR_LIST, false, fontColor_list_view_state));
-
-        fontColor_lock_view.setOnClickListener(v -> invokeColorDialogue(entry.fontColor_lock, (ImageView) v, context, entry, FONT_COLOR_LOCK, true, fontColor_lock_view_state));
-
-        bgColor_list_view.setOnClickListener(v -> invokeColorDialogue(entry.bgColor_list, (ImageView) v, context, entry, BACKGROUND_COLOR_LIST, false, bgColor_list_view_state));
-
-        bgColor_lock_view.setOnClickListener(v -> invokeColorDialogue(entry.bgColor_lock, (ImageView) v, context, entry, BACKGROUND_COLOR_LOCK, true, bgColor_lock_view_state));
-
-        padColor_lock_view.setOnClickListener(v -> invokeColorDialogue(entry.padColor, (ImageView) v, context, entry, BEVEL_COLOR, true, padColor_lock_view_state));
+        fontColor_view.setOnClickListener(v -> invokeColorDialogue(entry.fontColor, (ImageView) v, context, entry, FONT_COLOR, true, fontColor_view_state));
+        
+        bgColor_view.setOnClickListener(v -> invokeColorDialogue(entry.bgColor, (ImageView) v, context, entry, BACKGROUND_COLOR, true, bgColor_view_state));
+        
+        padColor_view.setOnClickListener(v -> invokeColorDialogue(entry.bevelColor, (ImageView) v, context, entry, BEVEL_COLOR, true, padColor_view_state));
 
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.bevelThicknessDescription),
                 settingsView.findViewById(R.id.bevelThicknessBar),
-                entry.bevelSize, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE, padSize_state);
+                entry.bevelThickness, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE, padSize_state);
 
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.priorityDescription),
@@ -318,30 +308,33 @@ public class EntrySettings {
                 settingsView.findViewById(R.id.adaptive_color_balance_description),
                 settingsView.findViewById(R.id.adaptive_color_balance_bar),
                 entry.adaptiveColorBalance, R.string.settings_adaptive_color_balance, fragment, entry, ADAPTIVE_COLOR_BALANCE, adaptiveColor_bar_state);
+    
+        addSeekBarChangeListener(
+                settingsView.findViewById(R.id.show_days_beforehand_description),
+                settingsView.findViewById(R.id.show_days_beforehand_bar),
+                entry.dayOffset_right, R.string.settings_show_days_beforehand, fragment, entry, SHOW_DAYS_BEFOREHAND, showDaysBeforehand_bar_state);
+    
+        addSeekBarChangeListener(
+                settingsView.findViewById(R.id.show_days_after_description),
+                settingsView.findViewById(R.id.show_days_after_bar),
+                entry.dayOffset_left, R.string.settings_show_days_after, fragment, entry, SHOW_DAYS_AFTER, showDaysAfter_bar_state);
 
         addSwitchChangeListener(settingsView.findViewById(R.id.showOnLockSwitch),
                 entry.showOnLock, entry, SHOW_ON_LOCK,
                 fragment, show_on_lock_state);
-
-        addSwitchChangeListener(settingsView.findViewById(R.id.showOnLockCompletedSwitch),
-                entry.showOnLock_ifCompleted, entry, SHOW_ON_LOCK_COMPLETED,
-                fragment, show_on_lock_if_completed_state);
-
-        addSwitchChangeListener(settingsView.findViewById(R.id.adaptiveColorSwitch),
+        
+        addSwitchChangeListener(settingsView.findViewById(R.id.adaptive_color_switch),
                 entry.adaptiveColorEnabled, entry, ADAPTIVE_COLOR,
                 fragment, adaptiveColor_state);
     }
 
     void updateAllIndicators() {
-        entry.setStateIconColor(fontColor_list_view_state, FONT_COLOR_LIST);
-        entry.setStateIconColor(fontColor_lock_view_state, FONT_COLOR_LOCK);
-        entry.setStateIconColor(bgColor_list_view_state, BACKGROUND_COLOR_LIST);
-        entry.setStateIconColor(bgColor_lock_view_state, BACKGROUND_COLOR_LOCK);
-        entry.setStateIconColor(padColor_lock_view_state, BEVEL_COLOR);
+        entry.setStateIconColor(fontColor_view_state, FONT_COLOR);
+        entry.setStateIconColor(bgColor_view_state, BACKGROUND_COLOR);
+        entry.setStateIconColor(padColor_view_state, BEVEL_COLOR);
         entry.setStateIconColor(padSize_state, BEVEL_SIZE);
         entry.setStateIconColor(priority_state, PRIORITY);
         entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
-        entry.setStateIconColor(show_on_lock_if_completed_state, SHOW_ON_LOCK_COMPLETED);
         entry.setStateIconColor(adaptiveColor_state, ADAPTIVE_COLOR);
         entry.setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE);
     }

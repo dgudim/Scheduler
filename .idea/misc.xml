@@ -3,9 +3,20 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/fragment_home.xml" value="0.17747747747747747" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/account_entry.xml" value="0.30085470085470084" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/activity_main.xml" value="0.2512820512820513" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/add_entry_dialogue.xml" value="0.2512820512820513" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/calendar_entry.xml" value="0.5" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/color_entry.xml" value="0.5" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/content_main.xml" value="0.25" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/day_background_selection.xml" value="0.33" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/entry_settings.xml" value="0.33" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/fragment_home.xml" value="0.33" />
         <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/fragment_second.xml" value="0.33" />
-        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/list_selection.xml" value="0.23738738738738738" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/fragment_settings.xml" value="0.33" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/group_settings.xml" value="0.25769230769230766" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/list_selection.xml" value="0.33" />
+        <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/menu/menu_main.xml" value="0.33" />
       </map>
     </option>
   </component>
@@ -60,5 +71,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.5" />
+      </ProjectState>
+    </option>
   </component>
 </project>

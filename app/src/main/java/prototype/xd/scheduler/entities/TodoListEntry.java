@@ -7,7 +7,7 @@ import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
-import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
+import static prototype.xd.scheduler.utilities.DateManager.daysFromDate;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.currentBitmapLongestText;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayWidth;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
@@ -25,21 +25,22 @@ import androidx.core.math.MathUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import prototype.xd.scheduler.utilities.Keys;
+
 public class TodoListEntry {
     
     public String associatedDate;
+    public int dayOffset_left = 0;
+    public int dayOffset_right = 0;
     public boolean completed;
     public Group group;
     
-    public int bgColor_lock;
-    public int bgColor_list;
-    public int fontColor_list;
-    public int fontColor_list_completed;
-    
-    public int padColor;
+    public int bgColor;
+    public int fontColor;
+    public int fontColor_completed;
+    public int bevelColor;
     
     public boolean adaptiveColorEnabled;
-    public boolean adaptiveColorUnderlayEnabled;
     public int adaptiveColorBalance;
     public int adaptiveColor;
     
@@ -49,19 +50,17 @@ public class TodoListEntry {
     public int maxChars = 0;
     public float rWidth = 0;
     
-    public int bevelSize = 0;
+    public int bevelThickness = 0;
     
     public int priority = 0;
     
-    public int fontColor_lock;
-    
     public boolean showOnLock;
-    public boolean showOnLock_ifCompleted;
     public boolean showInList;
     public boolean showInList_ifCompleted;
     
     public static final String blankTextValue = "_BLANK_";
     public String textValue = blankTextValue;
+    public String dayOffset = "";
     public String[] textValueSplit;
     
     public Paint textPaint;
@@ -69,20 +68,22 @@ public class TodoListEntry {
     public Paint padPaint;
     
     public boolean isTodayEntry = false;
-    public boolean isYesterdayEntry = false;
     public boolean isGlobalEntry = false;
+    public boolean isOldEntry = false;
+    public boolean isNewEntry = false;
     
     public String[] params;
+    
+    public static final String DATE_FLAG_GLOBAL = "GLOBAL";
     
     public static final String TEXT_VALUE = "value";
     public static final String IS_COMPLETED = "completed";
     public static final String SHOW_ON_LOCK = "lock";
-    public static final String SHOW_ON_LOCK_COMPLETED = "lock_completed";
+    public static final String SHOW_DAYS_BEFOREHAND = "show_beforehand";
+    public static final String SHOW_DAYS_AFTER = "show_after";
     public static final String BEVEL_SIZE = "padSize";
-    public static final String FONT_COLOR_LOCK = "fontColor_lock";
-    public static final String FONT_COLOR_LIST = "fontColor_list";
-    public static final String BACKGROUND_COLOR_LOCK = "bgColor_lock";
-    public static final String BACKGROUND_COLOR_LIST = "bgColor_list";
+    public static final String FONT_COLOR = "fontColor";
+    public static final String BACKGROUND_COLOR = "bgColor";
     public static final String ADAPTIVE_COLOR = "adaptiveColor";
     public static final String ADAPTIVE_COLOR_BALANCE = "adaptiveColorBalance";
     public static final String BEVEL_COLOR = "padColor";
@@ -114,7 +115,7 @@ public class TodoListEntry {
     }
     
     public boolean getLockViewState() {
-        return (showOnLock && !completed) || (showOnLock_ifCompleted && completed);
+        return (showOnLock && !completed);
     }
     
     public String[] getDisplayParams() {
@@ -156,114 +157,111 @@ public class TodoListEntry {
     
     public void reloadParams() {
         for (int i = 0; i < params.length; i++) {
-            if (params[i].equals("associatedDate")) {
-                if (params[i + 1].equals(currentDate)) {
+            if (params[i].equals(ASSOCIATED_DATE)) {
+                
+                dayOffset_left = preferences.getInt(Keys.OLD_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_OLD_ITEMS_OFFSET);
+                dayOffset_right = preferences.getInt(Keys.NEW_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_NEW_ITEMS_OFFSET);
+                
+                long days_associated = daysFromDate(params[i + 1]);
+                long days_current = daysFromDate(currentDate);
+                if (params[i + 1].equals(currentDate) || params[i + 1].equals(DATE_FLAG_GLOBAL)) {
                     
-                    bgColor_lock = preferences.getInt("todayBgColor", 0xFFFFFFFF);
-                    padColor = preferences.getInt("todayBevelColor", 0xFF888888);
-                    bevelSize = preferences.getInt("defaultBevelThickness", 5);
+                    bgColor = preferences.getInt(Keys.TODAY_BG_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
+                    bevelColor = preferences.getInt(Keys.TODAY_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
+                    bevelThickness = preferences.getInt(Keys.TODAY_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
                     
-                    fontColor_list = preferences.getInt("todayFontColor_list", 0xFF000000);
-                    fontColor_list_completed = preferences.getInt("todayFontColor_list_completed", 0xFFCCCCCC);
+                    setFontColor(Keys.TODAY_FONT_COLOR, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
                     
                     showInList = true;
                     showInList_ifCompleted = true;
                     showOnLock = true;
-                    showOnLock_ifCompleted = preferences.getBoolean("completedTasks", false);
                     
-                    isTodayEntry = true;
-                    isYesterdayEntry = false;
-                    isGlobalEntry = false;
+                    if (params[i + 1].equals(DATE_FLAG_GLOBAL)) {
+                        showOnLock = preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
+                        isGlobalEntry = true;
+                    } else {
+                        isTodayEntry = true;
+                    }
                     
-                } else if (params[i + 1].equals(yesterdayDate)) {
+                } else if (days_associated < days_current && days_current - days_associated <= dayOffset_left) {
                     
-                    bgColor_lock = preferences.getInt("yesterdayBgColor", 0xFFFFCCCC);
-                    padColor = preferences.getInt("yesterdayBevelColor", 0xFFFF8888);
-                    bevelSize = preferences.getInt("yesterdayBevelThickness", 5);
+                    bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
+                    bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
+                    bevelThickness = preferences.getInt(Keys.OLD_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_OLD_BEVEL_THICKNESS);
                     
-                    fontColor_list = preferences.getInt("yesterdayFontColor_list", 0xFFCC0000);
-                    fontColor_list_completed = preferences.getInt("yesterdayFontColor_list_completed", 0xFFFFCCCC);
+                    setFontColor(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR);
                     
-                    showOnLock_ifCompleted = preferences.getBoolean("yesterdayItemsLock", false);
-                    showInList_ifCompleted = preferences.getBoolean("yesterdayItemsList", false);
-                    showInList = preferences.getBoolean("yesterdayTasks", true);
-                    showOnLock = preferences.getBoolean("yesterdayTasksLock", true);
-                    
-                    isYesterdayEntry = true;
-                    isGlobalEntry = false;
-                    isTodayEntry = false;
-                    
-                } else if (params[i + 1].equals("GLOBAL")) {
-                    
-                    bgColor_lock = preferences.getInt("globalBgColor", 0xFFCCFFCC);
-                    padColor = preferences.getInt("globalBevelColor", 0xFF88FF88);
-                    bevelSize = preferences.getInt("globalBevelThickness", 5);
-                    
-                    fontColor_list = preferences.getInt("globalFontColor_list", 0xFF00CC00);
-                    fontColor_list_completed = fontColor_list;
-                    
-                    showOnLock_ifCompleted = true;
-                    showInList_ifCompleted = true;
+                    showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_OLD_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_OLD_COMPLETED_ITEMS_IN_LIST);
                     showInList = true;
-                    showOnLock = preferences.getBoolean("globalTasksLock", true);
+                    showOnLock = true;
                     
-                    isGlobalEntry = true;
-                    isYesterdayEntry = false;
-                    isTodayEntry = false;
+                    isOldEntry = true;
+                } else if (days_associated > days_current && days_associated - days_current <= dayOffset_right) {
+                    
+                    bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
+                    bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
+                    bevelThickness = preferences.getInt(Keys.NEW_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_NEW_BEVEL_THICKNESS);
+                    
+                    setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
+                    
+                    showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_NEW_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_NEW_COMPLETED_ITEMS_IN_LIST);
+                    showInList = true;
+                    showOnLock = true;
+                    
+                    isNewEntry = true;
                 } else {
-                    fontColor_list = 0xFF000000;
-                    fontColor_list_completed = 0xFFCCCCCC;
-                    bgColor_lock = 0xFFFFFFFF;
-                    padColor = 0xFF888888;
-                    bevelSize = 5;
+                    fontColor = Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR;
+                    fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
+                    bgColor = Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR;
+                    bevelColor = Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR;
+                    bevelThickness = Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS;
                     
                     showInList = true;
                     showInList_ifCompleted = true;
                     showOnLock = false;
-                    showOnLock_ifCompleted = false;
-                    
-                    isYesterdayEntry = false;
-                    isGlobalEntry = false;
-                    isTodayEntry = false;
                 }
             }
         }
-        fontSize = preferences.getInt("fontSize", 21);
-        fontColor_lock = 0xFF000000;
-        bgColor_list = 0xFFFFFFFF;
-        adaptiveColorEnabled = preferences.getBoolean("adaptiveColorEnabled", false);
-        adaptiveColorBalance = preferences.getInt("adaptiveColorBalance", 500);
-        adaptiveColorUnderlayEnabled = preferences.getBoolean("adaptiveBackgroundUnderlayEnabled", false);
-        adaptiveColor = 0xFFFFFFFF;
+        
+        fontSize = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
+        adaptiveColorEnabled = preferences.getBoolean(Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
+        adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
+        adaptiveColor = 0xff_FFFFFF;
         priority = 0;
         setParams((String[]) addAll(group.params, params));
+    }
+    
+    private void setFontColor(String key, int defaultColor) {
+        fontColor = preferences.getInt(key, defaultColor);
+        fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
     }
     
     public void initialiseDisplayData() {
         h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, displayMetrics);
         kM = h * 1.1f;
-        textPaint = createNewPaint(fontColor_lock);
+        textPaint = createNewPaint(fontColor);
         textPaint.setTextSize(h);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText), 1, displayWidth / 2f - bevelSize);
-        maxChars = (int) ((displayWidth - bevelSize * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
+        rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText), 1, displayWidth / 2f - bevelThickness);
+        maxChars = (int) ((displayWidth - bevelThickness * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         
         log(INFO, "loaded display data for " + textValue);
     }
     
-    public void initializeBgAndPadPaints(){
+    public void initializeBgAndPadPaints() {
         if (adaptiveColorEnabled) {
-            bgPaint = createNewPaint(mixTwoColors(bgColor_lock, adaptiveColor, adaptiveColorBalance / 1000d));
-            padPaint = createNewPaint(mixTwoColors(padColor, adaptiveColor, adaptiveColorBalance / 1000d));
+            bgPaint = createNewPaint(mixTwoColors(bgColor, adaptiveColor, adaptiveColorBalance / 1000d));
+            padPaint = createNewPaint(mixTwoColors(bevelColor, adaptiveColor, adaptiveColorBalance / 1000d));
         } else {
-            bgPaint = createNewPaint(bgColor_lock);
-            padPaint = createNewPaint(padColor);
+            bgPaint = createNewPaint(bgColor);
+            padPaint = createNewPaint(bevelColor);
         }
     }
     
-    public void splitText() {
-        
+    public String getDayOffset() {
         if (!associatedDate.equals("GLOBAL")) {
+            dayOffset = "";
+
             String[] dateParts = associatedDate.split("_");
             int year = Integer.parseInt(dateParts[0]);
             int month = Integer.parseInt(dateParts[1]);
@@ -273,8 +271,6 @@ public class TodoListEntry {
             int year_current = Integer.parseInt(dateParts_current[0]);
             int month_current = Integer.parseInt(dateParts_current[1]);
             int day_current = Integer.parseInt(dateParts_current[2]);
-            
-            String textValue = this.textValue;
             
             int dayShift;
             
@@ -296,7 +292,7 @@ public class TodoListEntry {
                     if (dayShift > 0) {
                         switch (dayShift) {
                             case (1):
-                                textValue += " (Завтра)";
+                                dayOffset += " (Завтра)";
                                 break;
                             case (2):
                             case (3):
@@ -304,16 +300,16 @@ public class TodoListEntry {
                             case (22):
                             case (23):
                             case (24):
-                                textValue += " (Через " + dayShift + " дня)";
+                                dayOffset += " (Через " + dayShift + " дня)";
                                 break;
                             default:
-                                textValue += " (Через " + dayShift + " дней)";
+                                dayOffset += " (Через " + dayShift + " дней)";
                                 break;
                         }
                     } else if (dayShift < 0) {
                         switch (dayShift) {
                             case (-1):
-                                textValue += " (Вчера)";
+                                dayOffset += " (Вчера)";
                                 break;
                             case (-2):
                             case (-3):
@@ -321,31 +317,33 @@ public class TodoListEntry {
                             case (-22):
                             case (-23):
                             case (-24):
-                                textValue += " (" + -dayShift + " дня назад)";
+                                dayOffset += " (" + -dayShift + " дня назад)";
                                 break;
                             default:
-                                textValue += " (" + -dayShift + " дней назад)";
+                                dayOffset += " (" + -dayShift + " дней назад)";
                                 break;
                         }
                     }
                 } else {
                     if (dayShift < 0) {
-                        textValue += " (> месяца назад)(" + associatedDate.replace("_", "/") + ")";
+                        dayOffset += " (> месяца назад)(" + associatedDate.replace("_", "/") + ")";
                     } else {
-                        textValue += " (> чем через месяц)(" + associatedDate.replace("_", "/") + ")";
+                        dayOffset += " (> чем через месяц)(" + associatedDate.replace("_", "/") + ")";
                     }
                 }
             } else {
                 if (year > year_current) {
-                    textValue += " (В следующем году)(" + associatedDate.replace("_", "/") + ")";
+                    dayOffset += " (В следующем году)(" + associatedDate.replace("_", "/") + ")";
                 } else {
-                    textValue += " (В прошлом году)(" + associatedDate.replace("_", "/") + ")";
+                    dayOffset += " (В прошлом году)(" + associatedDate.replace("_", "/") + ")";
                 }
             }
-            textValueSplit = makeNewLines(textValue, maxChars);
-        } else {
-            textValueSplit = makeNewLines(textValue, maxChars);
         }
+        return dayOffset;
+    }
+    
+    public void splitText() {
+        textValueSplit = makeNewLines(textValue + getDayOffset(), maxChars);
     }
     
     private void setParams(String[] params) {
@@ -360,26 +358,23 @@ public class TodoListEntry {
                 case (SHOW_ON_LOCK):
                     showOnLock = Boolean.parseBoolean(params[i + 1]);
                     break;
-                case (SHOW_ON_LOCK_COMPLETED):
-                    showOnLock_ifCompleted = Boolean.parseBoolean(params[i + 1]);
+                case (SHOW_DAYS_BEFOREHAND):
+                    dayOffset_right = Integer.parseInt(params[i + 1]);
+                    break;
+                case (SHOW_DAYS_AFTER):
+                    dayOffset_left = Integer.parseInt(params[i + 1]);
                     break;
                 case (BEVEL_SIZE):
-                    bevelSize = Integer.parseInt(params[i + 1]);
+                    bevelThickness = Integer.parseInt(params[i + 1]);
                     break;
-                case (FONT_COLOR_LOCK):
-                    fontColor_lock = Integer.parseInt(params[i + 1]);
+                case (FONT_COLOR):
+                    fontColor = Integer.parseInt(params[i + 1]);
                     break;
-                case (FONT_COLOR_LIST):
-                    fontColor_list = Integer.parseInt(params[i + 1]);
-                    break;
-                case (BACKGROUND_COLOR_LOCK):
-                    bgColor_lock = Integer.parseInt(params[i + 1]);
-                    break;
-                case (BACKGROUND_COLOR_LIST):
-                    bgColor_list = Integer.parseInt(params[i + 1]);
+                case (BACKGROUND_COLOR):
+                    bgColor = Integer.parseInt(params[i + 1]);
                     break;
                 case (BEVEL_COLOR):
-                    padColor = Integer.parseInt(params[i + 1]);
+                    bevelColor = Integer.parseInt(params[i + 1]);
                     break;
                 case (PRIORITY):
                     priority = Integer.parseInt(params[i + 1]);

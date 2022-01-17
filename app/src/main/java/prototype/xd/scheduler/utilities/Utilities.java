@@ -2,6 +2,7 @@ package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
@@ -106,15 +107,15 @@ public class Utilities {
     }
     
     public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {
-        ArrayList<TodoListEntry> yesterdayEntries = new ArrayList<>();
+        ArrayList<TodoListEntry> oldEntries = new ArrayList<>();
         ArrayList<TodoListEntry> todayEntries = new ArrayList<>();
         ArrayList<TodoListEntry> globalEntries = new ArrayList<>();
         ArrayList<TodoListEntry> otherEntries = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
             if (entries.get(i).isTodayEntry) {
                 todayEntries.add(entries.get(i));
-            } else if (entries.get(i).isYesterdayEntry) {
-                yesterdayEntries.add(entries.get(i));
+            } else if (entries.get(i).isOldEntry) {
+                oldEntries.add(entries.get(i));
             } else if (entries.get(i).isGlobalEntry) {
                 globalEntries.add(entries.get(i));
             } else {
@@ -125,7 +126,7 @@ public class Utilities {
         ArrayList<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
-        merged.addAll(yesterdayEntries);
+        merged.addAll(oldEntries);
         merged.addAll(otherEntries);
         merged.sort(new TodoListEntryGroupComparator());
         merged.sort(new TodoListEntryPriorityComparator());
@@ -179,7 +180,7 @@ public class Utilities {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
                 saveEntries(fragment.todoListEntries);
-                preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+                preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                 todoListEntry.setStateIconColor(stateIcon, parameter);
             }
         });
@@ -200,7 +201,7 @@ public class Utilities {
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             saveEntries(fragment.todoListEntries);
-            preferences.edit().putBoolean("need_to_reconstruct_bitmap", true).apply();
+            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
             entry.setStateIconColor(stateIcon, parameter);
         });
     }
@@ -232,7 +233,7 @@ public class Utilities {
                 .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
                     todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
                     target.setImageBitmap(createSolidColorCircle(selectedColor));
-                    preferences.edit().putBoolean("need_to_reconstruct_bitmap", setReconstructFlag).apply();
+                    preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
                     todoListEntry.setStateIconColor(stateIcon, parameter);
                 }).setNegativeButton("Отмена", (dialog, which) -> {
                 

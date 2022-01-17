@@ -93,7 +93,7 @@ public class LockScreenBitmapDrawer {
                 throw new RuntimeException("Bitmap drawer not initialised");
             }
             currentlyProcessingBitmap = true;
-            forceMaxRWidth = preferences.getBoolean("forceMaxRWidthOnLock", false);
+            forceMaxRWidth = preferences.getBoolean(Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK);
             
             final File bg = getBackgroundAccordingToDayAndTime();
             final String[] currentName = {bg.getName()};
@@ -196,7 +196,7 @@ public class LockScreenBitmapDrawer {
                 ArrayList<TodoListEntry> splits = new ArrayList<>();
                 for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
                     if (forceMaxRWidth) {
-                        toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelSize;
+                        toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelThickness;
                     }
                     TodoListEntry splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
                     copyDisplayData(toAdd.get(i), splitEntry);
@@ -208,39 +208,29 @@ public class LockScreenBitmapDrawer {
                 toAddSplit.add(new TodoListEntry());
             }
             
-            int adaptiveColor = 0;
-            
             for (int i = 0; i < toAddSplit.size(); i++) {
                 if (toAddSplit.get(i).adaptiveColorEnabled && !toAddSplit.get(i).textValue.equals(blankTextValue)) {
-                    if (adaptiveColor == 0) {
-                        adaptiveColor = getAverageColor(src);
-                    }
-                    if (toAddSplit.get(i).adaptiveColorUnderlayEnabled) {
-                        
-                        int width = (int) (toAddSplit.get(i).rWidth * 2);
-                        int height = (int) (toAddSplit.get(i).h / 2f + toAddSplit.get(i).kM);
-                        int VOffset = (int) (displayCenter.y + totalHeight - toAddSplit.get(i).kM * (i + 1));
-                        int HOffset = (src.getWidth() - width) / 2;
-                        
-                        Rect destRect = new Rect(HOffset, VOffset, width + HOffset, height + VOffset);
-                        
-                        Bitmap cutBitmap = Bitmap.createBitmap(
-                                destRect.right,
-                                destRect.bottom, Bitmap.Config.ARGB_8888);
-                        
-                        Canvas canvas1 = new Canvas(cutBitmap);
-                        canvas1.drawBitmap(src, destRect, destRect, null);
-                        
-                        toAddSplit.get(i).adaptiveColor = getAverageColor(cutBitmap);
-                        cutBitmap.recycle();
-                    } else {
-                        toAddSplit.get(i).adaptiveColor = adaptiveColor;
-                    }
+                    int width = (int) (toAddSplit.get(i).rWidth * 2);
+                    int height = (int) (toAddSplit.get(i).h / 2f + toAddSplit.get(i).kM);
+                    int VOffset = (int) (displayCenter.y + totalHeight - toAddSplit.get(i).kM * (i + 1));
+                    int HOffset = (src.getWidth() - width) / 2;
+                    
+                    Rect destRect = new Rect(HOffset, VOffset, width + HOffset, height + VOffset);
+                    
+                    Bitmap cutBitmap = Bitmap.createBitmap(
+                            destRect.right,
+                            destRect.bottom, Bitmap.Config.ARGB_8888);
+                    
+                    Canvas canvas1 = new Canvas(cutBitmap);
+                    canvas1.drawBitmap(src, destRect, destRect, null);
+                    
+                    toAddSplit.get(i).adaptiveColor = getAverageColor(cutBitmap);
+                    cutBitmap.recycle();
                 }
             }
             
             for (ArrayList<TodoListEntry> splits : splitEntries) {
-                if (splits.get(0).adaptiveColorEnabled && splits.get(0).adaptiveColorUnderlayEnabled) {
+                if (splits.get(0).adaptiveColorEnabled) {
                     int red = 0;
                     int green = 0;
                     int blue = 0;
@@ -293,10 +283,10 @@ public class LockScreenBitmapDrawer {
             if (!toAdd.get(i).textValue.equals(blankTextValue)) {
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
-                        -toAdd.get(i).rWidth - toAdd.get(i).bevelSize,
+                        -toAdd.get(i).rWidth - toAdd.get(i).bevelThickness,
                         toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
-                        toAdd.get(i).rWidth + toAdd.get(i).bevelSize,
-                        -toAdd.get(i).kM * (i + 1) - toAdd.get(i).bevelSize);
+                        toAdd.get(i).rWidth + toAdd.get(i).bevelThickness,
+                        -toAdd.get(i).kM * (i + 1) - toAdd.get(i).bevelThickness);
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
                         -toAdd.get(i).rWidth,
@@ -320,13 +310,8 @@ public class LockScreenBitmapDrawer {
         for (int i = 0; i < input.size(); i++) {
             if (input.get(i).getLockViewState()) {
                 toAdd.add(input.get(i));
-                String addition = "";
-                if (input.get(i).completed) {
-                    addition = " (Выполнено)";
-                }
-                input.get(i).textValue += addition;
-                if (input.get(i).textValue.length() + addition.length() > currentBitmapLongestText.length()) {
-                    currentBitmapLongestText = input.get(i).textValue + addition;
+                if (input.get(i).textValue.length() > currentBitmapLongestText.length()) {
+                    currentBitmapLongestText = input.get(i).textValue;
                 }
             }
         }

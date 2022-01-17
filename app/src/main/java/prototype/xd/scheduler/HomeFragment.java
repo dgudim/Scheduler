@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.DateManager.yesterdayDate;
 import static prototype.xd.scheduler.utilities.Utilities.initStorage;
 import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
@@ -99,10 +98,10 @@ public class HomeFragment extends Fragment {
         listViewAdapter = new ListViewAdapter(HomeFragment.this, lockScreenBitmapDrawer);
         listView.setAdapter(listViewAdapter);
         
-        datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> new Thread(() -> {
-                    updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-                    listViewAdapter.updateData(currentlySelectedDate.equals(currentDate) || currentlySelectedDate.equals(yesterdayDate));
-                }).start());
+        datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
+            updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
+            listViewAdapter.updateData(currentlySelectedDate.equals(currentDate));
+        });
         
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(view1 -> {
@@ -141,9 +140,9 @@ public class HomeFragment extends Fragment {
             
             builder.setPositiveButton("Добавить", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
-                        "value", input.getText().toString(),
-                        "associatedDate", currentlySelectedDate,
-                        "completed", "false"}, currentGroup[0]);
+                        TodoListEntry.TEXT_VALUE, input.getText().toString(),
+                        TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate,
+                        TodoListEntry.IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
                 listViewAdapter.updateData(newEntry.getLockViewState());
@@ -151,9 +150,9 @@ public class HomeFragment extends Fragment {
             
             builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
-                        "value", input.getText().toString(),
-                        "associatedDate", "GLOBAL",
-                        "completed", "false"}, currentGroup[0]);
+                        TodoListEntry.TEXT_VALUE, input.getText().toString(),
+                        TodoListEntry.ASSOCIATED_DATE, TodoListEntry.DATE_FLAG_GLOBAL,
+                        TodoListEntry.IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
                 listViewAdapter.updateData(newEntry.getLockViewState());

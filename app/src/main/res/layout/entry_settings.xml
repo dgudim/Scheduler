@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#00000000"
     android:rotationX="0"
     tools:ignore="UseSwitchCompatOrMaterialXml">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#00000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,16 +20,100 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#C5C3C3"
+            android:background="#BFBFBF"
             android:orientation="vertical"
             android:padding="5dp">
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView77"
+                android:id="@+id/cardView0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                app:cardCornerRadius="5dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/show_on_lock_state"
+                        android:layout_width="15dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/settings_state_symbol"
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <Switch
+                        android:id="@+id/showOnLockSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#FFFFFF"
+                        android:text="@string/settings_show_items_lock"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                app:cardCornerRadius="5dp">
+
+                <LinearLayout
+                    android:id="@+id/linearLayout66"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#FFFFFF"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/priority_state"
+                        android:layout_width="15dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/settings_state_symbol"
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/priorityDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:background="#FFFFFF"
+                            android:text="@string/settings_priority"
+                            android:textColor="#000000"
+                            android:textSize="18sp" />
+
+                        <SeekBar
+                            android:id="@+id/priorityBar"
+                            style="@style/Widget.AppCompat.SeekBar.Discrete"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#FFFFFF"
+                            android:max="40"
+                            android:min="0"
+                            android:progress="0" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp"
                 app:cardCornerRadius="5dp">
 
                 <LinearLayout
@@ -45,7 +131,7 @@
                         android:textStyle="bold" />
 
                     <Switch
-                        android:id="@+id/adaptiveColorSwitch"
+                        android:id="@+id/adaptive_color_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="#FFFFFF"
@@ -110,96 +196,6 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                app:cardCornerRadius="5dp">
-
-                <LinearLayout
-                    android:id="@+id/linearLayout3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/font_color_list_state"
-                        android:layout_width="15dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="@string/settings_state_symbol"
-                        android:textAlignment="center"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="150"
-                        android:background="#FFFFFF"
-                        android:gravity="center_vertical"
-                        android:text="@string/settings_text_color_in_list"
-                        android:textColor="#000000"
-                        android:textSize="18sp" />
-
-                    <ImageView
-                        android:id="@+id/textColor_list"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_weight="1"
-                        android:background="#FFFFFF"
-                        android:contentDescription="@string/settings_text_color_in_list" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                app:cardCornerRadius="5dp">
-
-                <LinearLayout
-                    android:id="@+id/linearLayout34"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/font_color_lock_state"
-                        android:layout_width="15dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="@string/settings_state_symbol"
-                        android:textAlignment="center"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textView34"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="150"
-                        android:background="#FFFFFF"
-                        android:gravity="center_vertical"
-                        android:text="@string/settings_text_color_on_lock"
-                        android:textColor="#000000"
-                        android:textSize="18sp" />
-
-                    <ImageView
-                        android:id="@+id/textColor_lock"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_weight="1"
-                        android:background="#FFFFFF"
-                        android:contentDescription="@string/settings_text_color_on_lock" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
                 android:id="@+id/cardView333"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -214,7 +210,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/background_color_list_state"
+                        android:id="@+id/background_color_state"
                         android:layout_width="15dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -230,36 +226,36 @@
                         android:layout_weight="150"
                         android:background="#FFFFFF"
                         android:gravity="center_vertical"
-                        android:text="@string/settings_bg_color_in_list"
+                        android:text="@string/settings_bg_color"
                         android:textColor="#000000"
                         android:textSize="18sp" />
 
                     <ImageView
-                        android:id="@+id/backgroundColor_list"
+                        android:id="@+id/backgroundColor"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_weight="1"
                         android:background="#FFFFFF"
-                        android:contentDescription="@string/settings_bg_color_in_list" />
+                        android:contentDescription="@string/settings_bg_color" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView3"
+                android:id="@+id/cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="3dp"
                 app:cardCornerRadius="5dp">
 
                 <LinearLayout
-                    android:id="@+id/linearLayout5"
+                    android:id="@+id/linearLayout3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/background_color_lock_state"
+                        android:id="@+id/font_color_state"
                         android:layout_width="15dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -269,31 +265,30 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/textView5"
+                        android:id="@+id/textView3"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="150"
                         android:background="#FFFFFF"
                         android:gravity="center_vertical"
-                        android:text="@string/settings_bg_color_on_lock"
+                        android:text="@string/settings_text_color"
                         android:textColor="#000000"
                         android:textSize="18sp" />
 
                     <ImageView
-                        android:id="@+id/backgroundColor_lock"
+                        android:id="@+id/textColor"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_weight="1"
                         android:background="#FFFFFF"
-                        android:contentDescription="@string/settings_bg_color_on_lock" />
+                        android:contentDescription="@string/settings_text_color" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView2"
+                android:id="@+id/cardView24"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
                 app:cardCornerRadius="5dp">
 
                 <LinearLayout
@@ -304,7 +299,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/bevel_color_lock_state"
+                        android:id="@+id/bevel_color_state"
                         android:layout_width="15dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -320,71 +315,17 @@
                         android:layout_weight="150"
                         android:background="#FFFFFF"
                         android:gravity="center_vertical"
-                        android:text="@string/settings_bevel_color_on_lock"
+                        android:text="@string/settings_bevel_color"
                         android:textColor="#000000"
                         android:textSize="18sp" />
 
                     <ImageView
-                        android:id="@+id/padColor_lock"
+                        android:id="@+id/padColor"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_weight="1"
                         android:background="#FFFFFF"
-                        android:contentDescription="@string/settings_bevel_color_on_lock" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView43"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp"
-                app:cardCornerRadius="5dp">
-
-                <LinearLayout
-                    android:id="@+id/linearLayout66"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/priority_state"
-                        android:layout_width="15dp"
-                        android:layout_height="match_parent"
-                        android:text="@string/settings_state_symbol"
-                        android:textAlignment="center"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/priorityDescription"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:background="#FFFFFF"
-                            android:text="@string/settings_priority"
-                            android:textColor="#000000"
-                            android:textSize="18sp" />
-
-                        <SeekBar
-                            android:id="@+id/priorityBar"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="#FFFFFF"
-                            android:max="40"
-                            android:min="0"
-                            android:progress="0" />
-
-                    </LinearLayout>
-
+                        android:contentDescription="@string/settings_bevel_color" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -443,7 +384,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView7745"
+                android:id="@+id/cardView15"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
@@ -456,27 +397,48 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/show_on_lock_state"
+                        android:id="@+id/days_beforehand_state"
                         android:layout_width="15dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:text="@string/settings_state_symbol"
                         android:textAlignment="center"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <Switch
-                        android:id="@+id/showOnLockSwitch"
+                    <LinearLayout
+                        android:id="@+id/linearLayout8"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="#FFFFFF"
-                        android:text="@string/settings_show_items_lock"
-                        android:textSize="18sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/show_days_beforehand_description"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:background="#FFFFFF"
+                            android:text="@string/settings_show_days_beforehand"
+                            android:textColor="#000000"
+                            android:textSize="18sp" />
+
+                        <SeekBar
+                            android:id="@+id/show_days_beforehand_bar"
+                            style="@style/Widget.AppCompat.SeekBar.Discrete"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#FFFFFF"
+                            android:max="14"
+                            android:min="0"
+                            android:progress="1" />
+
+                    </LinearLayout>
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cardView74"
+                android:id="@+id/cardView16"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
@@ -489,21 +451,42 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/show_on_lock_if_completed_state"
+                        android:id="@+id/days_after_state"
                         android:layout_width="15dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:text="@string/settings_state_symbol"
                         android:textAlignment="center"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <Switch
-                        android:id="@+id/showOnLockCompletedSwitch"
+                    <LinearLayout
+                        android:id="@+id/linearLayout9"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="#FFFFFF"
-                        android:text="@string/settings_show_items_lock_completed"
-                        android:textSize="18sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/show_days_after_description"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:background="#FFFFFF"
+                            android:text="@string/settings_show_days_after"
+                            android:textColor="#000000"
+                            android:textSize="18sp" />
+
+                        <SeekBar
+                            android:id="@+id/show_days_after_bar"
+                            style="@style/Widget.AppCompat.SeekBar.Discrete"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="#FFFFFF"
+                            android:max="14"
+                            android:min="0"
+                            android:progress="1" />
+
+                    </LinearLayout>
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
@@ -556,7 +539,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_reset_to_defaults" />
-
 
         </LinearLayout>
     </ScrollView>

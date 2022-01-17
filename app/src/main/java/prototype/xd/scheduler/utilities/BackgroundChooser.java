@@ -1,11 +1,11 @@
 package prototype.xd.scheduler.utilities;
 
-import java.io.File;
-import java.util.Calendar;
-
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+
+import java.io.File;
+import java.util.Calendar;
 
 public class BackgroundChooser {
 
@@ -15,7 +15,7 @@ public class BackgroundChooser {
 
         File defaultName = new File(rootDir, defaultBackgroundName);
 
-        if (!preferences.getBoolean("adaptiveBackgroundEnabled", true)) {
+        if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, true)) {
             return defaultName;
         }
 
