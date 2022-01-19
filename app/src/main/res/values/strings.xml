@@ -4,8 +4,6 @@
     <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home Fragment</string>
     <string name="settings_fragment_label">Settings Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Back</string>
     <string name="delete_item">Delete item</string>
 
     <string name="hide">Скрыть</string>
@@ -14,6 +12,7 @@
     <string name="category_bevels">Контуры</string>
     <string name="category_fonts">Шрифты</string>
     <string name="category_visibility">Видимость</string>
+    <string name="category_system_calendars">Интеграция с системным календарём</string>
 
     <string name="settings_show_old_done_items_list">Показывать пропущенные выполненные дела в списке</string>
     <string name="settings_show_new_done_items_list">Показывать будущие выполненные дела в списке</string>
@@ -54,17 +53,11 @@
 
     <string name="settings_show_days_beforehand">Показывать за %d дня/дней</string>
     <string name="settings_show_days_after">Показывать после %d дня/дней</string>
-    <string name="settings_show_on_lock">Показывать на экране блокировки</string>
-    <string name="settings_show_on_lock_if_completed">Показывать на экране блокировки если выполнено</string>
     <string name="settings_adaptive_color">Подстраивать цвет дела под цвет фона</string>
-    <string name="settings_adaptive_color_underlay">Подстраивать цвет дела под цвет фона непосредственно под делом</string>
     <string name="settings_adaptive_color_balance">Баланс подстраиваемого цвета: %d</string>
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
 
-    <string name="save">Сохранить</string>
-    <string name="close">Закрыть</string>
-    <string name="add_widget">Добавить виджет</string>
-    <string name="fadDescription">add item</string>
+    <string name="fabDescription">add item</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>

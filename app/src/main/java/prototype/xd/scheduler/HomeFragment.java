@@ -6,7 +6,7 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Utilities.initStorage;
-import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
+import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 import android.Manifest;
@@ -47,13 +47,16 @@ public class HomeFragment extends Fragment {
     
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.SET_WALLPAPER
+            Manifest.permission.SET_WALLPAPER,
+            Manifest.permission.READ_CALENDAR,
+            Manifest.permission.WRITE_CALENDAR
     };
     
     ListView listView;
     public ListViewAdapter listViewAdapter;
     
     public ArrayList<TodoListEntry> todoListEntries;
+    public ArrayList<TodoListEntry> calendarEntries;
     
     LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
@@ -79,7 +82,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        rootActivity = getActivity();
+        rootActivity = requireActivity();
         
         verifyStoragePermissions(rootActivity);
         
@@ -94,7 +97,7 @@ public class HomeFragment extends Fragment {
         
         final CalendarView datePicker = view.findViewById(R.id.calendar);
         
-        todoListEntries = loadEntries();
+        todoListEntries = loadTodoEntries();
         
         listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
@@ -106,12 +109,13 @@ public class HomeFragment extends Fragment {
             listViewAdapter.updateData(currentlySelectedDate.equals(currentDate));
         });
         
+        LayoutInflater inflater = LayoutInflater.from(context);
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Добавить пункт");
             
-            View addView = LayoutInflater.from(context).inflate(R.layout.add_entry_dialogue, container, false);
+            View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
             final EditText input = addView.findViewById(R.id.entryNameEditText);
             
             final String[] currentGroup = {BLANK_NAME};

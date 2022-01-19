@@ -32,12 +32,12 @@ public class ListViewAdapter extends BaseAdapter {
     private final HomeFragment home;
     private final LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
-    public ArrayList<TodoListEntry> currentTodoListEntries;
-    public ArrayList<Integer> currentTodoListEntries_indexMap;
+    public final ArrayList<TodoListEntry> currentTodoListEntries;
+    public final ArrayList<Integer> currentTodoListEntries_indexMap;
     
     public ListViewAdapter(HomeFragment fragment, LockScreenBitmapDrawer lockScreenBitmapDrawer) {
         this.home = fragment;
-        this.context = fragment.getContext();
+        this.context = fragment.context;
         this.lockScreenBitmapDrawer = lockScreenBitmapDrawer;
         inflater = LayoutInflater.from(context);
         currentTodoListEntries = new ArrayList<>();
@@ -131,7 +131,7 @@ public class ListViewAdapter extends BaseAdapter {
             updateData(true);
         });
         
-        view.findViewById(R.id.backgroudSecondLayer).setBackgroundColor(currentEntry.bgColor);
+        view.findViewById(R.id.backgroundSecondLayer).setBackgroundColor(currentEntry.bgColor);
         
         if (currentEntry.completed) {
             todoText.setTextColor(currentEntry.fontColor_completed);
@@ -172,9 +172,7 @@ public class ListViewAdapter extends BaseAdapter {
             alert.show();
             return false;
         });
-        settings.setOnClickListener(v -> {
-            new EntrySettings(inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, context, home, home.todoListEntries);
-        });
+        settings.setOnClickListener(v -> new EntrySettings(inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, context, home, home.todoListEntries));
         
         return view;
     }

@@ -5,7 +5,6 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fffffe"
     tools:context=".HomeFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -23,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
-        android:contentDescription="@string/fadDescription"
+        android:contentDescription="@string/fabDescription"
         android:src="@android:drawable/ic_input_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

@@ -49,7 +49,7 @@ public class Utilities {
         }
     }
     
-    public static ArrayList<TodoListEntry> loadEntries() {
+    public static ArrayList<TodoListEntry> loadTodoEntries() {
         try {
             
             ArrayList<String[]> entryParams = loadObject("list");

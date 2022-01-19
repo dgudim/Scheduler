@@ -7,12 +7,12 @@ import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgrou
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.hasFingerPrint;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Utilities.loadEntries;
+import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 import android.annotation.SuppressLint;
@@ -98,7 +98,7 @@ public class LockScreenBitmapDrawer {
             final File bg = getBackgroundAccordingToDayAndTime();
             final String[] currentName = {bg.getName()};
             
-            if (!hasFingerPrint(cachedBitmapFromLockScreen) && !currentName[0].equals(defaultBackgroundName)) {
+            if (noFingerPrint(cachedBitmapFromLockScreen) && !currentName[0].equals(defaultBackgroundName)) {
                 final AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 
                 alert.setTitle("В какой день использовать новый фон?");
@@ -129,7 +129,7 @@ public class LockScreenBitmapDrawer {
                 File bg = getBackgroundAccordingToDayAndTime();
                 Bitmap bitmapFromLock = cachedBitmapFromLockScreen;
                 
-                if (!hasFingerPrint(bitmapFromLock)) {
+                if (noFingerPrint(bitmapFromLock)) {
                     
                     bitmapFromLock = Bitmap.createBitmap(bitmapFromLock, (int) (bitmapFromLock.getWidth() / 2f - displayWidth / 2f), 0, displayWidth, bitmapFromLock.getHeight());
                     fingerPrintBitmap(bitmapFromLock).compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(rootDir, selectedDay)));
@@ -175,7 +175,7 @@ public class LockScreenBitmapDrawer {
         
         Canvas canvas = new Canvas(src);
         
-        ArrayList<TodoListEntry> toAdd = filterItems(loadEntries());
+        ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries());
         if (!toAdd.isEmpty()) {
             
             for (int i = 0; i < toAdd.size(); i++) {

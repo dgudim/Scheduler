@@ -1,6 +1,7 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
@@ -10,17 +11,21 @@ import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
+import java.util.ArrayList;
 
+import prototype.xd.scheduler.calendarUtilities.SystemCalendar;
 import prototype.xd.scheduler.utilities.Keys;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored", "ApplySharedPref"})
@@ -33,9 +38,10 @@ public class SettingsFragment extends Fragment {
     
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Context context = requireContext();
         
         view.findViewById(R.id.resetBgButton).setOnClickListener(view1 -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Удалить все сохраненные фоны?");
             
             builder.setPositiveButton("Да", (dialog, which) -> {
@@ -73,20 +79,20 @@ public class SettingsFragment extends Fragment {
         oldFontColor.setImageBitmap(createSolidColorCircle(preferences.getInt(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR)));
         newFontColor.setImageBitmap(createSolidColorCircle(preferences.getInt(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR)));
         
-        todayBgColor.setOnClickListener(v -> invokeColorDialogue(Keys.TODAY_BG_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR, getContext()));
-        oldBgColor.setOnClickListener(v -> invokeColorDialogue(Keys.OLD_BG_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR, getContext()));
-        newBgColor.setOnClickListener(v -> invokeColorDialogue(Keys.NEW_BG_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR, getContext()));
+        todayBgColor.setOnClickListener(v -> invokeColorDialogue(Keys.TODAY_BG_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR, context));
+        oldBgColor.setOnClickListener(v -> invokeColorDialogue(Keys.OLD_BG_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR, context));
+        newBgColor.setOnClickListener(v -> invokeColorDialogue(Keys.NEW_BG_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR, context));
         
-        todayBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.TODAY_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR, getContext()));
-        oldBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.OLD_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR, getContext()));
-        newBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.NEW_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR, getContext()));
+        todayBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.TODAY_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR, context));
+        oldBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.OLD_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR, context));
+        newBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.NEW_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR, context));
     
-        todayFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.TODAY_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR, getContext()));
-        oldFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.OLD_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR, getContext()));
-        newFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.NEW_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR, getContext()));
+        todayFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.TODAY_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR, context));
+        oldFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.OLD_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR, context));
+        newFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.NEW_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR, context));
         
         addSeekBarChangeListener(
-                view.findViewById(R.id.textSizeDescripton),
+                view.findViewById(R.id.textSizeDescription),
                 view.findViewById(R.id.fontSizeBar),
                 Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE, R.string.settings_font_size, this);
         
@@ -128,7 +134,7 @@ public class SettingsFragment extends Fragment {
         addSwitchChangeListener(view.findViewById(R.id.adaptive_background_switch), Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED, null);
         
         view.findViewById(R.id.resetSettingsButton).setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Сбросить настройки?");
             
             builder.setPositiveButton("Да", (dialog, which) -> {
@@ -140,5 +146,41 @@ public class SettingsFragment extends Fragment {
             builder.show();
         });
         
+        LinearLayout calendar_settings_container = view.findViewById(R.id.calendar_settings_container);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        
+        ArrayList<SystemCalendar> calendars = getAllCalendars(context.getContentResolver());
+        
+        ArrayList<ArrayList<SystemCalendar>> calendars_sorted = new ArrayList<>();
+        ArrayList<String> calendars_sorted_names = new ArrayList<>();
+        
+        ArrayList<View> calendar_views = new ArrayList<>();
+        
+        for(int i = 0; i < calendars.size(); i++){
+            SystemCalendar calendar = calendars.get(i);
+            if(calendars_sorted_names.contains(calendar.account_name)){
+                calendars_sorted.get(calendars_sorted_names.indexOf(calendar.account_name)).add(calendar);
+            }else{
+                ArrayList<SystemCalendar> calendar_group = new ArrayList<>();
+                calendar_group.add(calendar);
+                calendars_sorted.add(calendar_group);
+                calendars_sorted_names.add(calendar.account_name);
+            }
+        }
+        
+        new Thread(() -> {
+            for(int g = 0; g < calendars_sorted.size(); g++){
+                calendar_views.add(inflater.inflate(R.layout.account_entry, calendar_settings_container, false));
+                for(int c = 0; c < calendars_sorted.get(g).size(); c++){
+                    calendar_views.add(inflater.inflate(R.layout.calendar_entry, calendar_settings_container, false));
+                }
+            }
+            requireActivity().runOnUiThread(() -> {
+                for(View c_view : calendar_views){
+                    calendar_settings_container.addView(c_view);
+                }
+                calendar_views.clear();
+            });
+        }).start();
     }
 }

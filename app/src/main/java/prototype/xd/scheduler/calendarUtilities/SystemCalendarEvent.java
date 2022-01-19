@@ -9,13 +9,13 @@ import android.database.Cursor;
 
 public class SystemCalendarEvent {
     
-    long id;
-    String title;
-    String description;
-    String location;
-    String color;
-    long start;
-    long end;
+    final long id;
+    final String title;
+    final String description;
+    final String location;
+    final String color;
+    final long start;
+    final long end;
     
     SystemCalendarEvent(Cursor cursor){
         id = getLong(cursor, calendarEventsColumns, Events._ID);

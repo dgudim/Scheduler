@@ -253,15 +253,15 @@ public class BitmapUtilities {
         return bitmap;
     }
     
-    public static boolean hasFingerPrint(Bitmap bitmap) {
+    public static boolean noFingerPrint(Bitmap bitmap) {
         for (int i = 0; i < 3; i++) {
             for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
                 if (!(bitmap.getPixel(i2, i) == -16777216)) {
-                    return false;
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
     
 }

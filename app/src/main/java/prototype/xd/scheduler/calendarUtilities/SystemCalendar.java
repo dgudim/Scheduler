@@ -11,20 +11,22 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.CalendarContract;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
 public class SystemCalendar {
     
-    String account_type;
-    String account_name;
+    public final String account_type;
+    public final String account_name;
     
-    String name;
+    public final String name;
     
-    long id;
+    public final long id;
     
-    int accessLevel;
+    public final int accessLevel;
     
-    ArrayList<SystemCalendarEvent> systemCalendarEvents;
+    public ArrayList<SystemCalendarEvent> systemCalendarEvents;
     
     SystemCalendar(Cursor cursor) {
         account_type = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_TYPE);
@@ -39,6 +41,7 @@ public class SystemCalendar {
         Cursor cursor = query(contentResolver, CalendarContract.Events.CONTENT_URI, (String[]) calendarEventsColumns.toArray(),
                 CalendarContract.Events.CALENDAR_ID + " = " + id);
         int events = cursor.getCount();
+        cursor.moveToFirst();
         for(int i = 0; i < events; i++){
             systemCalendarEvents.add(new SystemCalendarEvent(cursor));
             cursor.moveToNext();
@@ -46,4 +49,9 @@ public class SystemCalendar {
         cursor.close();
     }
     
+    @NonNull
+    @Override
+    public String toString() {
+        return account_name + ": " + name;
+    }
 }

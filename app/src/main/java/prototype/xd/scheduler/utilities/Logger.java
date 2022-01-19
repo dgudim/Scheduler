@@ -12,7 +12,7 @@ public class Logger {
 
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("y.M.d  h:m");
     
-    public enum ContentType {INFO, WARNING, ERROR};
+    public enum ContentType {INFO, WARNING, ERROR}
    
     public static void log(ContentType contentType, String message) {
         PrintStream stream = System.out;

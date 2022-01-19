@@ -46,7 +46,6 @@ import prototype.xd.scheduler.entities.TodoListEntry;
 
 public class EntrySettings {
     
-    HomeFragment fragment;
     TodoListEntry entry;
     TextView fontColor_view_state;
     TextView bgColor_view_state;
@@ -75,7 +74,6 @@ public class EntrySettings {
     }
     
     private void initialise(final TodoListEntry entry, final Context context, final HomeFragment fragment, final View settingsView, final ArrayList<TodoListEntry> allEntries) {
-        this.fragment = fragment;
         this.entry = entry;
         
         ImageView fontColor_view = settingsView.findViewById(R.id.textColor);
