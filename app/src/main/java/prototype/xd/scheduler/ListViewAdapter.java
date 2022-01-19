@@ -138,7 +138,11 @@ public class ListViewAdapter extends BaseAdapter {
         } else {
             todoText.setTextColor(currentEntry.fontColor);
         }
-        todoText.setText(currentEntry.textValue + currentEntry.getDayOffset());
+        
+        todoText.setText(currentEntry.textValue);
+        if (currentlySelectedDate.equals(currentDate)) {
+            todoText.setText(todoText.getText() + currentEntry.getDayOffset());
+        }
         
         todoText.setOnLongClickListener(v -> {
             AlertDialog.Builder alert = new AlertDialog.Builder(context);
@@ -168,7 +172,9 @@ public class ListViewAdapter extends BaseAdapter {
             alert.show();
             return false;
         });
-        settings.setOnClickListener(v -> new EntrySettings(inflater, currentEntry, context, home, home.todoListEntries));
+        settings.setOnClickListener(v -> {
+            new EntrySettings(inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, context, home, home.todoListEntries);
+        });
         
         return view;
     }

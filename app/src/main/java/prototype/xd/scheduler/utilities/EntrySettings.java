@@ -25,7 +25,6 @@ import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.text.InputType;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -46,7 +45,7 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 public class EntrySettings {
-
+    
     HomeFragment fragment;
     TodoListEntry entry;
     TextView fontColor_view_state;
@@ -59,29 +58,26 @@ public class EntrySettings {
     TextView adaptiveColor_bar_state;
     TextView showDaysBeforehand_bar_state;
     TextView showDaysAfter_bar_state;
-
-    public EntrySettings(final LayoutInflater inflater, final TodoListEntry entry, final Context context, final HomeFragment fragment, ArrayList<TodoListEntry> allEntries) {
-
-        View settingsView = inflater.inflate(R.layout.entry_settings, null);
-
+    
+    public EntrySettings(View settingsView, final TodoListEntry entry, final Context context, final HomeFragment fragment, ArrayList<TodoListEntry> allEntries) {
+        
         initialise(entry, context, fragment, settingsView, allEntries);
-
+        
         final AlertDialog.Builder alert = new AlertDialog.Builder(context);
-
+        
         alert.setOnDismissListener(dialog -> {
             saveEntries(fragment.todoListEntries);
             fragment.listViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
         });
-        
         alert.setView(settingsView);
         alert.show();
     }
-
+    
     private void initialise(final TodoListEntry entry, final Context context, final HomeFragment fragment, final View settingsView, final ArrayList<TodoListEntry> allEntries) {
         this.fragment = fragment;
         this.entry = entry;
-
+        
         ImageView fontColor_view = settingsView.findViewById(R.id.textColor);
         ImageView bgColor_view = settingsView.findViewById(R.id.backgroundColor);
         ImageView padColor_view = settingsView.findViewById(R.id.padColor);
@@ -100,16 +96,16 @@ public class EntrySettings {
         adaptiveColor_bar_state = settingsView.findViewById(R.id.adaptive_color_balance_state);
         showDaysBeforehand_bar_state = settingsView.findViewById(R.id.days_beforehand_state);
         showDaysAfter_bar_state = settingsView.findViewById(R.id.days_after_state);
-
+        
         updateAllIndicators();
-
+        
         final ArrayList<Group> groupList = readGroupFile();
         final ArrayList<String> groupNames = new ArrayList<>();
         for (Group group : groupList) {
             groupNames.add(group.name);
         }
         final Spinner groupSpinner = settingsView.findViewById(R.id.groupSpinner);
-
+        
         final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, groupNames) {
             @NonNull
             @Override
@@ -124,14 +120,14 @@ public class EntrySettings {
                             builder.setMessage("Ты сломаешь сброс настроек");
                         } else {
                             builder.setTitle("Изменить");
-
+                            
                             final EditText input = new EditText(context);
                             input.setInputType(InputType.TYPE_CLASS_TEXT);
                             input.setText(groupNames.get(position));
                             input.setHint("Название");
-
+                            
                             builder.setView(input);
-
+                            
                             builder.setPositiveButton("Сохранить", (dialog, which) -> {
                                 if (!input.getText().toString().equals(BLANK_NAME)) {
                                     groupNames.set(position, input.getText().toString());
@@ -153,12 +149,12 @@ public class EntrySettings {
                                     builder1.show();
                                 }
                             });
-
+                            
                             builder.setNeutralButton("Удалить группу", (dialog, which) -> {
                                 AlertDialog.Builder builder12 = new AlertDialog.Builder(context);
                                 builder12.setTitle("Удалить");
                                 builder12.setMessage("Вы уверены?");
-
+                                
                                 builder12.setPositiveButton("Да", (dialog1, which1) -> {
                                     String origName = groupNames.get(groupSpinner.getSelectedItemPosition());
                                     groupList.remove(groupSpinner.getSelectedItemPosition());
@@ -174,15 +170,15 @@ public class EntrySettings {
                                     updateAllIndicators();
                                     notifyDataSetChanged();
                                 });
-
+                                
                                 builder12.setNegativeButton("Нет", (dialog12, which12) -> dialog12.dismiss());
-
+                                
                                 builder12.show();
                             });
-
+                            
                             builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
-
-
+                            
+                            
                         }
                         builder.show();
                         return true;
@@ -194,7 +190,7 @@ public class EntrySettings {
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         groupSpinner.setAdapter(arrayAdapter);
         groupSpinner.setSelection(groupNames.indexOf(entry.group.name));
-
+        
         groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -205,36 +201,36 @@ public class EntrySettings {
                     initialise(entry, context, fragment, settingsView, allEntries);
                 }
             }
-
+            
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+            
             }
         });
-
+        
         add_group.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Добавить текущую конфигурацию как группу?");
             builder.setMessage("\n (Будут добавлены только те параметры, которые были изменены вручную)(Зеленые ромбики)");
-
+            
             final EditText input = new EditText(context);
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             input.setHint("Название");
             builder.setView(input);
-
+            
             builder.setPositiveButton("Добавить", (dialog, which) -> {
                 if (input.getText().toString().equals(BLANK_NAME)) {
                     AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
                     builder13.setTitle("Нельзя создать группу с таким названием");
                     builder13.setMessage("Ты сломаешь сброс настроек");
-
+                    
                     builder13.show();
-
+                    
                 } else if (groupNames.contains(input.getText().toString())) {
                     AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
                     builder13.setTitle("Группа с таким именем уже существует");
                     builder13.setMessage("Перезаписать?");
-
+                    
                     builder13.setPositiveButton("Да", (dialog14, which14) -> {
                         Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                         groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
@@ -248,9 +244,9 @@ public class EntrySettings {
                         updateAllIndicators();
                         preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     });
-
+                    
                     builder13.setNegativeButton("Нет", (dialog13, which13) -> dialog13.dismiss());
-
+                    
                     builder13.show();
                 } else {
                     Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
@@ -265,17 +261,17 @@ public class EntrySettings {
                     updateAllIndicators();
                 }
             });
-
+            
             builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
-
-
+            
+            
             builder.show();
         });
-
+        
         settingsView.findViewById(R.id.settingsResetButton).setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Сбросить настройки?");
-
+            
             builder.setPositiveButton("Да", (dialog, which) -> {
                 entry.removeDisplayParams();
                 entry.resetGroup();
@@ -284,41 +280,41 @@ public class EntrySettings {
                 initialise(entry, context, fragment, settingsView, allEntries);
             });
             builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
-
+            
             builder.show();
         });
-
+        
         fontColor_view.setOnClickListener(v -> invokeColorDialogue(entry.fontColor, (ImageView) v, context, entry, FONT_COLOR, true, fontColor_view_state));
         
         bgColor_view.setOnClickListener(v -> invokeColorDialogue(entry.bgColor, (ImageView) v, context, entry, BACKGROUND_COLOR, true, bgColor_view_state));
         
         padColor_view.setOnClickListener(v -> invokeColorDialogue(entry.bevelColor, (ImageView) v, context, entry, BEVEL_COLOR, true, padColor_view_state));
-
+        
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.bevelThicknessDescription),
                 settingsView.findViewById(R.id.bevelThicknessBar),
                 entry.bevelThickness, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE, padSize_state);
-
+        
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.priorityDescription),
                 settingsView.findViewById(R.id.priorityBar),
                 entry.priority, R.string.settings_priority, fragment, entry, PRIORITY, priority_state);
-
+        
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.adaptive_color_balance_description),
                 settingsView.findViewById(R.id.adaptive_color_balance_bar),
                 entry.adaptiveColorBalance, R.string.settings_adaptive_color_balance, fragment, entry, ADAPTIVE_COLOR_BALANCE, adaptiveColor_bar_state);
-    
+        
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.show_days_beforehand_description),
                 settingsView.findViewById(R.id.show_days_beforehand_bar),
                 entry.dayOffset_right, R.string.settings_show_days_beforehand, fragment, entry, SHOW_DAYS_BEFOREHAND, showDaysBeforehand_bar_state);
-    
+        
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.show_days_after_description),
                 settingsView.findViewById(R.id.show_days_after_bar),
                 entry.dayOffset_left, R.string.settings_show_days_after, fragment, entry, SHOW_DAYS_AFTER, showDaysAfter_bar_state);
-
+        
         addSwitchChangeListener(settingsView.findViewById(R.id.showOnLockSwitch),
                 entry.showOnLock, entry, SHOW_ON_LOCK,
                 fragment, show_on_lock_state);
@@ -327,7 +323,7 @@ public class EntrySettings {
                 entry.adaptiveColorEnabled, entry, ADAPTIVE_COLOR,
                 fragment, adaptiveColor_state);
     }
-
+    
     void updateAllIndicators() {
         entry.setStateIconColor(fontColor_view_state, FONT_COLOR);
         entry.setStateIconColor(bgColor_view_state, BACKGROUND_COLOR);
@@ -337,6 +333,8 @@ public class EntrySettings {
         entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
         entry.setStateIconColor(adaptiveColor_state, ADAPTIVE_COLOR);
         entry.setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE);
+        entry.setStateIconColor(showDaysBeforehand_bar_state, SHOW_DAYS_BEFOREHAND);
+        entry.setStateIconColor(showDaysAfter_bar_state, SHOW_DAYS_AFTER);
     }
-
+    
 }

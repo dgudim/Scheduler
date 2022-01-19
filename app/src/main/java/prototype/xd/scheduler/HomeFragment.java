@@ -63,12 +63,15 @@ public class HomeFragment extends Fragment {
     
     Context context;
     
+    ViewGroup container;
+    
     public HomeFragment() {
         super();
     }
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.container = container;
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
     
@@ -108,7 +111,7 @@ public class HomeFragment extends Fragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Добавить пункт");
             
-            View addView = LayoutInflater.from(context).inflate(R.layout.add_entry_dialogue, null);
+            View addView = LayoutInflater.from(context).inflate(R.layout.add_entry_dialogue, container, false);
             final EditText input = addView.findViewById(R.id.entryNameEditText);
             
             final String[] currentGroup = {BLANK_NAME};

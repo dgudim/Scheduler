@@ -29,10 +29,12 @@ import prototype.xd.scheduler.utilities.Keys;
 
 public class TodoListEntry {
     
+    enum EntryType {GLOBAL, TODAY, OLD, NEW, NEUTRAL}
+    
     public String associatedDate;
     public int dayOffset_left = 0;
     public int dayOffset_right = 0;
-    public boolean completed;
+    public boolean completed = false;
     public Group group;
     
     public int bgColor;
@@ -54,9 +56,9 @@ public class TodoListEntry {
     
     public int priority = 0;
     
-    public boolean showOnLock;
-    public boolean showInList;
-    public boolean showInList_ifCompleted;
+    public boolean showOnLock = false;
+    public boolean showInList = true;
+    public boolean showInList_ifCompleted = true;
     
     public static final String blankTextValue = "_BLANK_";
     public String textValue = blankTextValue;
@@ -156,14 +158,20 @@ public class TodoListEntry {
     }
     
     public void reloadParams() {
-        for (int i = 0; i < params.length; i++) {
+        for (int i = 0; i < params.length; i += 2) {
             if (params[i].equals(ASSOCIATED_DATE)) {
                 
                 dayOffset_left = preferences.getInt(Keys.OLD_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_OLD_ITEMS_OFFSET);
                 dayOffset_right = preferences.getInt(Keys.NEW_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_NEW_ITEMS_OFFSET);
                 
-                long days_associated = daysFromDate(params[i + 1]);
+                setParams((String[]) addAll(group.params, params));
+                
                 long days_current = daysFromDate(currentDate);
+                long days_associated = days_current;
+                if (!params[i + 1].equals(DATE_FLAG_GLOBAL)) {
+                    days_associated = daysFromDate(params[i + 1]);
+                }
+                
                 if (params[i + 1].equals(currentDate) || params[i + 1].equals(DATE_FLAG_GLOBAL)) {
                     
                     bgColor = preferences.getInt(Keys.TODAY_BG_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
@@ -178,9 +186,9 @@ public class TodoListEntry {
                     
                     if (params[i + 1].equals(DATE_FLAG_GLOBAL)) {
                         showOnLock = preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
-                        isGlobalEntry = true;
+                        setEntryType(EntryType.GLOBAL);
                     } else {
-                        isTodayEntry = true;
+                        setEntryType(EntryType.TODAY);
                     }
                     
                 } else if (days_associated < days_current && days_current - days_associated <= dayOffset_left) {
@@ -195,7 +203,7 @@ public class TodoListEntry {
                     showInList = true;
                     showOnLock = true;
                     
-                    isOldEntry = true;
+                    setEntryType(EntryType.OLD);
                 } else if (days_associated > days_current && days_associated - days_current <= dayOffset_right) {
                     
                     bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
@@ -208,7 +216,7 @@ public class TodoListEntry {
                     showInList = true;
                     showOnLock = true;
                     
-                    isNewEntry = true;
+                    setEntryType(EntryType.NEW);
                 } else {
                     fontColor = Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR;
                     fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
@@ -219,7 +227,10 @@ public class TodoListEntry {
                     showInList = true;
                     showInList_ifCompleted = true;
                     showOnLock = false;
+                    
+                    setEntryType(EntryType.NEUTRAL);
                 }
+                break;
             }
         }
         
@@ -229,6 +240,13 @@ public class TodoListEntry {
         adaptiveColor = 0xff_FFFFFF;
         priority = 0;
         setParams((String[]) addAll(group.params, params));
+    }
+    
+    private void setEntryType(EntryType entryType) {
+        isTodayEntry = entryType == EntryType.TODAY;
+        isGlobalEntry = entryType == EntryType.GLOBAL;
+        isOldEntry = entryType == EntryType.OLD;
+        isNewEntry = entryType == EntryType.NEW;
     }
     
     private void setFontColor(String key, int defaultColor) {
@@ -261,7 +279,7 @@ public class TodoListEntry {
     public String getDayOffset() {
         if (!associatedDate.equals("GLOBAL")) {
             dayOffset = "";
-
+            
             String[] dateParts = associatedDate.split("_");
             int year = Integer.parseInt(dateParts[0]);
             int month = Integer.parseInt(dateParts[1]);
