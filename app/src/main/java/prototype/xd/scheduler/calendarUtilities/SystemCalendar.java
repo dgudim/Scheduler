@@ -26,6 +26,8 @@ public class SystemCalendar {
     
     public final int accessLevel;
     
+    public final int color;
+    
     public ArrayList<SystemCalendarEvent> systemCalendarEvents;
     
     SystemCalendar(Cursor cursor) {
@@ -34,6 +36,7 @@ public class SystemCalendar {
         name = getString(cursor, calendarColumns, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
         id = getLong(cursor, calendarColumns, CalendarContract.Calendars._ID);
         accessLevel = getInt(cursor, calendarColumns, CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL);
+        color = getInt(cursor, calendarColumns, CalendarContract.Calendars.CALENDAR_COLOR);
     }
     
     void loadCalendarEvents(ContentResolver contentResolver) {

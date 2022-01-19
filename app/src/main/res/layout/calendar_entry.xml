@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -15,19 +15,21 @@
 
         <ImageView
             android:id="@+id/calendar_icon"
-            android:layout_width="60dp"
-            android:layout_height="60dp" />
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="5"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/color_name"
+                android:id="@+id/calendar_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="3dp"
                 android:gravity="center|start"
                 android:text="calendar_name"
                 android:textColor="#000000" />
@@ -38,8 +40,7 @@
             android:id="@+id/edit_button"
             style="@style/Widget.AppCompat.ImageButton"
             android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:background="#00FFFFFF"
             app:srcCompat="@android:drawable/ic_menu_edit"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -48,7 +49,6 @@
             android:id="@+id/hide_check_box"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:text="@string/hide" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

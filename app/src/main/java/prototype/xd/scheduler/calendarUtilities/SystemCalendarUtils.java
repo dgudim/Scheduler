@@ -16,7 +16,8 @@ public class SystemCalendarUtils {
             CalendarContract.Calendars.ACCOUNT_NAME,
             CalendarContract.Calendars.ACCOUNT_TYPE,
             CalendarContract.Calendars._ID,
-            CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL));
+            CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
+            CalendarContract.Calendars.CALENDAR_COLOR));
     
     public static final ArrayList<String> calendarEventsColumns = new ArrayList<>(Arrays.asList(
             CalendarContract.Events.MUTATORS,

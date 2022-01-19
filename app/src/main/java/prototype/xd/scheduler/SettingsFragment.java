@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -170,9 +171,16 @@ public class SettingsFragment extends Fragment {
         
         new Thread(() -> {
             for(int g = 0; g < calendars_sorted.size(); g++){
-                calendar_views.add(inflater.inflate(R.layout.account_entry, calendar_settings_container, false));
+                View acc_view = inflater.inflate(R.layout.account_entry, calendar_settings_container, false);
+                ((TextView)acc_view.findViewById(R.id.calendar_name)).setText(calendars_sorted_names.get(g));
+                ((TextView)acc_view.findViewById(R.id.account_type)).setText(calendars_sorted.get(g).get(0).account_type);
+                ((ImageView)acc_view.findViewById(R.id.calendar_color)).setImageBitmap(createSolidColorCircle(calendars_sorted.get(g).get(0).color));
+                calendar_views.add(acc_view);
                 for(int c = 0; c < calendars_sorted.get(g).size(); c++){
-                    calendar_views.add(inflater.inflate(R.layout.calendar_entry, calendar_settings_container, false));
+                    View c_view = inflater.inflate(R.layout.calendar_entry, calendar_settings_container, false);
+                    ((TextView)c_view.findViewById(R.id.calendar_name)).setText(calendars_sorted.get(g).get(c).name);
+                    ((ImageView)c_view.findViewById(R.id.calendar_icon)).setImageBitmap(createSolidColorCircle(calendars_sorted.get(g).get(c).color));
+                    calendar_views.add(c_view);
                 }
             }
             requireActivity().runOnUiThread(() -> {
