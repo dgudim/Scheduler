@@ -3,6 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/add_entry_dialogue.xml" value="0.4" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/entry_settings.xml" value="0.4" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/fragment_home.xml" value="0.20572916666666666" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/fragment_settings.xml" value="0.2" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/fragment_settings_old.xml" value="0.264" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/list_selection.xml" value="0.20572916666666666" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/recycler_view_item.xml" value="0.20572916666666666" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/settings_color_select_entry.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/settings_discrete_seekbar_entry.xml" value="0.4" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/settings_reset_buttons_entry.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/settings_seekbar_entry.xml" value="0.4" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/settings_switch_entry.xml" value="0.4" />
+        <entry key="..\:/Users/kloud/Documents/Android_projects/Scheduler/app/src/main/res/layout/settings_title_entry.xml" value="0.4" />
         <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/account_entry.xml" value="0.5" />
         <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/activity_main.xml" value="0.2512820512820513" />
         <entry key="..\:/Users/kloud/Documents/Projects/Scheduler/app/src/main/res/layout/add_entry_dialogue.xml" value="0.2512820512820513" />
@@ -67,7 +80,7 @@
       </value>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

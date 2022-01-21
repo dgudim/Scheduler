@@ -9,16 +9,15 @@ import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.content.Context;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import org.apache.commons.lang.WordUtils;
 
@@ -186,17 +185,12 @@ public class Utilities {
         });
     }
     
-    public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defValue, final CompoundButton.OnCheckedChangeListener listener) {
+    public static void addSwitchChangeListener(final SwitchMaterial tSwitch, final String key, boolean defValue) {
         tSwitch.setChecked(preferences.getBoolean(key, defValue));
-        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            preferences.edit().putBoolean(key, isChecked).apply();
-            if (!(listener == null)) {
-                listener.onCheckedChanged(buttonView, isChecked);
-            }
-        });
+        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> preferences.edit().putBoolean(key, isChecked).apply());
     }
     
-    public static void addSwitchChangeListener(final Switch tSwitch, boolean value, final TodoListEntry entry, final String parameter, final HomeFragment fragment, final TextView stateIcon) {
+    public static void addSwitchChangeListener(final SwitchMaterial tSwitch, boolean value, final TodoListEntry entry, final String parameter, final HomeFragment fragment, final TextView stateIcon) {
         tSwitch.setChecked(value);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
