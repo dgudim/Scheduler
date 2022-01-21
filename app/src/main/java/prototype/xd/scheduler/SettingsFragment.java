@@ -75,7 +75,7 @@ public class SettingsFragment extends Fragment {
         todayBevelColor.setImageBitmap(createSolidColorCircle(preferences.getInt(Keys.TODAY_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR)));
         oldBevelColor.setImageBitmap(createSolidColorCircle(preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR)));
         newBevelColor.setImageBitmap(createSolidColorCircle(preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR)));
-    
+        
         todayFontColor.setImageBitmap(createSolidColorCircle(preferences.getInt(Keys.TODAY_FONT_COLOR, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR)));
         oldFontColor.setImageBitmap(createSolidColorCircle(preferences.getInt(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR)));
         newFontColor.setImageBitmap(createSolidColorCircle(preferences.getInt(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR)));
@@ -87,7 +87,7 @@ public class SettingsFragment extends Fragment {
         todayBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.TODAY_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR, context));
         oldBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.OLD_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR, context));
         newBevelColor.setOnClickListener(v -> invokeColorDialogue(Keys.NEW_BEVEL_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR, context));
-    
+        
         todayFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.TODAY_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR, context));
         oldFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.OLD_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR, context));
         newFontColor.setOnClickListener(v -> invokeColorDialogue(Keys.NEW_FONT_COLOR, (ImageView) v, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR, context));
@@ -157,11 +157,11 @@ public class SettingsFragment extends Fragment {
         
         ArrayList<View> calendar_views = new ArrayList<>();
         
-        for(int i = 0; i < calendars.size(); i++){
+        for (int i = 0; i < calendars.size(); i++) {
             SystemCalendar calendar = calendars.get(i);
-            if(calendars_sorted_names.contains(calendar.account_name)){
+            if (calendars_sorted_names.contains(calendar.account_name)) {
                 calendars_sorted.get(calendars_sorted_names.indexOf(calendar.account_name)).add(calendar);
-            }else{
+            } else {
                 ArrayList<SystemCalendar> calendar_group = new ArrayList<>();
                 calendar_group.add(calendar);
                 calendars_sorted.add(calendar_group);
@@ -170,21 +170,33 @@ public class SettingsFragment extends Fragment {
         }
         
         new Thread(() -> {
-            for(int g = 0; g < calendars_sorted.size(); g++){
+            for (int g = 0; g < calendars_sorted.size(); g++) {
+                ArrayList<SystemCalendar> calendar_group = calendars_sorted.get(g);
+                SystemCalendar calendar0 = calendar_group.get(0);
+                
                 View acc_view = inflater.inflate(R.layout.account_entry, calendar_settings_container, false);
-                ((TextView)acc_view.findViewById(R.id.calendar_name)).setText(calendars_sorted_names.get(g));
-                ((TextView)acc_view.findViewById(R.id.account_type)).setText(calendars_sorted.get(g).get(0).account_type);
-                ((ImageView)acc_view.findViewById(R.id.calendar_color)).setImageBitmap(createSolidColorCircle(calendars_sorted.get(g).get(0).color));
+                ((TextView) acc_view.findViewById(R.id.calendar_name)).setText(calendars_sorted_names.get(g));
+                ((TextView) acc_view.findViewById(R.id.account_type)).setText(calendar0.account_type);
+                ((ImageView) acc_view.findViewById(R.id.calendar_color)).setImageBitmap(createSolidColorCircle(calendar0.color));
                 calendar_views.add(acc_view);
-                for(int c = 0; c < calendars_sorted.get(g).size(); c++){
+                
+                for (int c = 0; c < calendar_group.size(); c++) {
+                    SystemCalendar current_calendar = calendar_group.get(c);
+                    
                     View c_view = inflater.inflate(R.layout.calendar_entry, calendar_settings_container, false);
-                    ((TextView)c_view.findViewById(R.id.calendar_name)).setText(calendars_sorted.get(g).get(c).name);
-                    ((ImageView)c_view.findViewById(R.id.calendar_icon)).setImageBitmap(createSolidColorCircle(calendars_sorted.get(g).get(c).color));
+                    ((TextView) c_view.findViewById(R.id.calendar_name)).setText(current_calendar.name);
+                    ((ImageView) c_view.findViewById(R.id.calendar_icon)).setImageBitmap(createSolidColorCircle(current_calendar.color));
                     calendar_views.add(c_view);
+                    
+                    for(int c_col = 0; c_col < current_calendar.availableEventColors.size(); c_col++){
+                        View c_col_view = inflater.inflate(R.layout.calendar_entry, calendar_settings_container, false);
+                        ((ImageView) c_col_view.findViewById(R.id.calendar_icon)).setImageBitmap(createSolidColorCircle(current_calendar.availableEventColors.get(c_col)));
+                        calendar_views.add(c_col_view);
+                    }
                 }
             }
             requireActivity().runOnUiThread(() -> {
-                for(View c_view : calendar_views){
+                for (View c_view : calendar_views) {
                     calendar_settings_container.addView(c_view);
                 }
                 calendar_views.clear();

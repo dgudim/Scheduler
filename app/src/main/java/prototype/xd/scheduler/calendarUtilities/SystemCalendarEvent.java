@@ -25,5 +25,6 @@ public class SystemCalendarEvent {
         color = getString(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
         start = getLong(cursor, calendarEventsColumns, Events.DTSTART);
         end = getLong(cursor, calendarEventsColumns, Events.DTEND);
+        System.out.println(title + "   " + color);
     }
 }

@@ -727,7 +727,8 @@
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
                     android:text="@string/settings_show_old_done_items_list"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    tools:ignore="TouchTargetSizeCheck" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -742,7 +743,8 @@
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
                     android:text="@string/settings_show_new_done_items_list"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    tools:ignore="TouchTargetSizeCheck" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView

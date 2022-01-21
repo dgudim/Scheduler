@@ -20,8 +20,12 @@ public class QueryUtilities {
         return cursor.getInt(columns.indexOf(column));
     }
     
+    public static Cursor query(ContentResolver contentResolver, Uri queryUri, String[] columns, String selection, String[] selectionArgs) {
+        return contentResolver.query(queryUri, columns, selection, selectionArgs, null);
+    }
+    
     public static Cursor query(ContentResolver contentResolver, Uri queryUri, String[] columns, String selection) {
-        return contentResolver.query(queryUri, columns, selection, null, null);
+        return query(contentResolver, queryUri, columns, selection, null);
     }
     
 }
