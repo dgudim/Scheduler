@@ -27,8 +27,11 @@ import prototype.xd.scheduler.utilities.Keys;
 
 public class SettingsFragment extends Fragment {
     
+    private ViewGroup rootViewGroup;
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        rootViewGroup = container;
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
     
@@ -37,9 +40,6 @@ public class SettingsFragment extends Fragment {
         Context context = requireContext();
         
         ArrayList<SettingsEntry> settingsEntries = new ArrayList<>();
-        ListView settingsListView = view.findViewById(R.id.settingsList);
-        SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries, context);
-        settingsListView.setAdapter(settingsListViewAdapter);
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_backgrounds)));
         settingsEntries.add(new SwitchSettingsEntry(
@@ -79,7 +79,7 @@ public class SettingsFragment extends Fragment {
                 context.getString(R.string.settings_today_font_color), context));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR,
                 context.getString(R.string.settings_today_font_color), context));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_FONT_SIZE, true,
+        settingsEntries.add(new SeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE, true,
                 Keys.FONT_SIZE, R.string.settings_font_size, this));
         
         
@@ -124,12 +124,15 @@ public class SettingsFragment extends Fragment {
             ArrayList<SystemCalendar> calendar_group = calendars_sorted.get(g);
             SystemCalendar calendar0 = calendar_group.get(0);
             
-            settingsEntries.add(new CalendarAccountSettingsEntry(calendars_sorted_names.get(g), calendar0.account_type, calendar0.color));
+            settingsEntries.add(new CalendarAccountSettingsEntry(context, rootViewGroup, this, calendars_sorted_names.get(g), calendar0.account_type, calendar0.color));
             
             for (int c = 0; c < calendar_group.size(); c++) {
                 SystemCalendar current_calendar = calendar_group.get(c);
                 settingsEntries.add(new CalendarSettingsEntry(current_calendar.name, current_calendar.color));
             }
         }
+        
+        ((ListView) view.findViewById(R.id.settingsList)).setAdapter(new SettingsListViewAdapter(settingsEntries, context));
+        
     }
 }

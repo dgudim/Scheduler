@@ -172,7 +172,7 @@ public class ListViewAdapter extends BaseAdapter {
             alert.show();
             return false;
         });
-        settings.setOnClickListener(v -> new EntrySettings(inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, context, home, home.todoListEntries));
+        settings.setOnClickListener(v -> new EntrySettings(context, home, inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, home.todoListEntries));
         
         return view;
     }

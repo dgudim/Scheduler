@@ -58,7 +58,7 @@ public class EntrySettings {
     TextView showDaysBeforehand_bar_state;
     TextView showDaysAfter_bar_state;
     
-    public EntrySettings(View settingsView, final TodoListEntry entry, final Context context, final HomeFragment fragment, ArrayList<TodoListEntry> allEntries) {
+    public EntrySettings(final Context context, final HomeFragment fragment, View settingsView, final TodoListEntry entry, ArrayList<TodoListEntry> allEntries) {
         
         initialise(entry, context, fragment, settingsView, allEntries);
         
@@ -282,44 +282,59 @@ public class EntrySettings {
             builder.show();
         });
         
-        fontColor_view.setOnClickListener(v -> invokeColorDialogue(entry.fontColor, (ImageView) v, context, entry, FONT_COLOR, true, fontColor_view_state));
+        fontColor_view.setOnClickListener(v -> invokeColorDialogue(
+                context, (ImageView) v, fontColor_view_state, fragment,
+                entry, FONT_COLOR, entry.fontColor, true));
         
-        bgColor_view.setOnClickListener(v -> invokeColorDialogue(entry.bgColor, (ImageView) v, context, entry, BACKGROUND_COLOR, true, bgColor_view_state));
+        bgColor_view.setOnClickListener(v -> invokeColorDialogue(
+                context, (ImageView) v, bgColor_view_state, fragment,
+                entry, BACKGROUND_COLOR, entry.bgColor, true));
         
-        padColor_view.setOnClickListener(v -> invokeColorDialogue(entry.bevelColor, (ImageView) v, context, entry, BEVEL_COLOR, true, padColor_view_state));
+        padColor_view.setOnClickListener(v -> invokeColorDialogue(
+                context, (ImageView) v, padColor_view_state, fragment,
+                entry, BEVEL_COLOR, entry.bevelColor, true));
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.bevelThicknessDescription),
                 settingsView.findViewById(R.id.bevelThicknessBar),
-                entry.bevelThickness, R.string.settings_bevel_thickness, fragment, entry, BEVEL_SIZE, padSize_state);
+                padSize_state, fragment, R.string.settings_bevel_thickness, entry,
+                BEVEL_SIZE, entry.bevelThickness);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.priorityDescription),
                 settingsView.findViewById(R.id.priorityBar),
-                entry.priority, R.string.settings_priority, fragment, entry, PRIORITY, priority_state);
+                priority_state, fragment, R.string.settings_priority, entry,
+                PRIORITY, entry.priority);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.adaptive_color_balance_description),
                 settingsView.findViewById(R.id.adaptive_color_balance_bar),
-                entry.adaptiveColorBalance, R.string.settings_adaptive_color_balance, fragment, entry, ADAPTIVE_COLOR_BALANCE, adaptiveColor_bar_state);
+                adaptiveColor_bar_state, fragment, R.string.settings_adaptive_color_balance, entry,
+                ADAPTIVE_COLOR_BALANCE, entry.adaptiveColorBalance);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.show_days_beforehand_description),
                 settingsView.findViewById(R.id.show_days_beforehand_bar),
-                entry.dayOffset_right, R.string.settings_show_days_beforehand, fragment, entry, SHOW_DAYS_BEFOREHAND, showDaysBeforehand_bar_state);
+                showDaysBeforehand_bar_state, fragment, R.string.settings_show_days_beforehand, entry,
+                SHOW_DAYS_BEFOREHAND, entry.dayOffset_right);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.show_days_after_description),
                 settingsView.findViewById(R.id.show_days_after_bar),
-                entry.dayOffset_left, R.string.settings_show_days_after, fragment, entry, SHOW_DAYS_AFTER, showDaysAfter_bar_state);
+                showDaysAfter_bar_state, fragment, R.string.settings_show_days_after, entry,
+                SHOW_DAYS_AFTER, entry.dayOffset_left);
         
-        addSwitchChangeListener(settingsView.findViewById(R.id.showOnLockSwitch),
-                entry.showOnLock, entry, SHOW_ON_LOCK,
-                fragment, show_on_lock_state);
+        addSwitchChangeListener(
+                settingsView.findViewById(R.id.showOnLockSwitch),
+                show_on_lock_state,
+                fragment, entry,
+                SHOW_ON_LOCK, entry.showOnLock);
         
-        addSwitchChangeListener(settingsView.findViewById(R.id.adaptive_color_switch),
-                entry.adaptiveColorEnabled, entry, ADAPTIVE_COLOR,
-                fragment, adaptiveColor_state);
+        addSwitchChangeListener(
+                settingsView.findViewById(R.id.adaptive_color_switch),
+                adaptiveColor_state,
+                fragment, entry,
+                ADAPTIVE_COLOR, entry.adaptiveColorEnabled);
     }
     
     void updateAllIndicators() {

@@ -44,7 +44,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <Switch
+                    <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/showOnLockSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -129,7 +129,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <Switch
+                    <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/adaptive_color_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -491,6 +491,7 @@
             </androidx.cardview.widget.CardView>
 
             <LinearLayout
+                android:id="@+id/group_selector"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">

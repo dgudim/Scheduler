@@ -20,7 +20,6 @@ public class SettingsEntry {
     public View get(ViewGroup viewGroup, LayoutInflater inflater) {
         if (view == null) {
             view = InitInnerViews(inflate(inflater, viewGroup));
-            
         }
         return view;
     }

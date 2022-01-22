@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import prototype.xd.scheduler.R;
 
-public class ColorSelectSettingsEntry extends SettingsEntry{
+public class ColorSelectSettingsEntry extends SettingsEntry {
     
     private final String colorKey;
     private final int defaultColor;
@@ -28,10 +28,13 @@ public class ColorSelectSettingsEntry extends SettingsEntry{
     
     @Override
     protected View InitInnerViews(View rootView) {
-        ((TextView)rootView.findViewById(R.id.textView)).setText(text);
+        ((TextView) rootView.findViewById(R.id.textView)).setText(text);
         ImageView imageView = rootView.findViewById(R.id.imageView);
         imageView.setImageBitmap(createSolidColorCircle(preferences.getInt(colorKey, defaultColor)));
-        imageView.setOnClickListener(view -> invokeColorDialogue(colorKey, (ImageView) view, defaultColor, context));
+        imageView.setOnClickListener(view -> {
+            System.out.println("------------------------------------------------lolka");
+            invokeColorDialogue(context, (ImageView) view, colorKey, defaultColor);
+        });
         return super.InitInnerViews(rootView);
     }
 }
