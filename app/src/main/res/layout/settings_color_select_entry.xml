@@ -14,7 +14,7 @@
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="150"
             android:background="#FFFFFF"
@@ -22,13 +22,21 @@
             android:textColor="#000000"
             android:textSize="18sp" />
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:background="#FFFFFF"
-            android:contentDescription="@string/description_color" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#BFBFBF"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/color"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="7dp"
+                android:background="#FFFFFF"
+                android:orientation="horizontal" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

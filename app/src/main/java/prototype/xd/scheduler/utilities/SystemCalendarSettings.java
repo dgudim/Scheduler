@@ -11,7 +11,6 @@ import static prototype.xd.scheduler.entities.TodoListEntry.PRIORITY;
 import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_AFTER;
 import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_BEFOREHAND;
 import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_ON_LOCK;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
@@ -95,12 +94,12 @@ public class SystemCalendarSettings {
         int dayOffset_right = preferences.getInt(getFirstValidKey(Keys.NEW_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_NEW_ITEMS_OFFSET);
         int dayOffset_left = preferences.getInt(getFirstValidKey(Keys.OLD_BEVEL_COLOR), Keys.SETTINGS_DEFAULT_OLD_ITEMS_OFFSET);
         
-        ImageView fontColor_view = settingsView.findViewById(R.id.textColor);
-        ImageView bgColor_view = settingsView.findViewById(R.id.backgroundColor);
-        ImageView padColor_view = settingsView.findViewById(R.id.padColor);
-        fontColor_view.setImageBitmap(createSolidColorCircle(fontColor));
-        bgColor_view.setImageBitmap(createSolidColorCircle(bgColor));
-        padColor_view.setImageBitmap(createSolidColorCircle(bevelColor));
+        View fontColor_view = settingsView.findViewById(R.id.textColor);
+        View bgColor_view = settingsView.findViewById(R.id.backgroundColor);
+        View padColor_view = settingsView.findViewById(R.id.bevelColor);
+        fontColor_view.setBackgroundColor(fontColor);
+        bgColor_view.setBackgroundColor(bgColor);
+        padColor_view.setBackgroundColor(bevelColor);
         
         fontColor_view_state = settingsView.findViewById(R.id.font_color_state);
         bgColor_view_state = settingsView.findViewById(R.id.background_color_state);

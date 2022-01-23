@@ -1,13 +1,13 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
-import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.*;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.CALENDAR_ACCOUNT;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import prototype.xd.scheduler.R;
@@ -38,7 +38,7 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
     protected View InitInnerViews(View rootView) {
         ((TextView) rootView.findViewById(R.id.calendar_name)).setText(accountName);
         ((TextView) rootView.findViewById(R.id.account_type)).setText(accountType);
-        ((ImageView) rootView.findViewById(R.id.calendar_color)).setImageBitmap(createSolidColorCircle(calendarColor));
+        ((CheckBox) rootView.findViewById(R.id.check_box)).setButtonTintList(ColorStateList.valueOf(calendarColor));
         rootView.findViewById(R.id.edit_button).setOnClickListener(v -> new SystemCalendarSettings(context, fragment, LayoutInflater.from(context).inflate(R.layout.entry_settings, root, false), accountName));
         return super.InitInnerViews(rootView);
     }

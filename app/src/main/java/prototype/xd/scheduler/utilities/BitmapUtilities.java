@@ -182,18 +182,6 @@ public class BitmapUtilities {
         return paint;
     }
     
-    public static Bitmap createSolidColorCircle(int color) {
-        Bitmap solidColor = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(solidColor);
-        Paint paint = new Paint();
-        paint.setColor(color);
-        Paint paint_dark = new Paint();
-        paint_dark.setColor(Color.DKGRAY);
-        canvas.drawCircle(500, 500, 497, paint_dark);
-        canvas.drawCircle(500, 500, 461, paint);
-        return solidColor;
-    }
-    
     public static int mixTwoColors(int color1, int color2, double balance) {
         Color c1 = Color.valueOf(color1);
         Color c2 = Color.valueOf(color2);

@@ -15,7 +15,6 @@ import static prototype.xd.scheduler.entities.TodoListEntry.PRIORITY;
 import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_AFTER;
 import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_BEFOREHAND;
 import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_ON_LOCK;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
@@ -76,13 +75,13 @@ public class EntrySettings {
     private void initialise(final TodoListEntry entry, final Context context, final HomeFragment fragment, final View settingsView, final ArrayList<TodoListEntry> allEntries) {
         this.entry = entry;
         
-        ImageView fontColor_view = settingsView.findViewById(R.id.textColor);
-        ImageView bgColor_view = settingsView.findViewById(R.id.backgroundColor);
-        ImageView padColor_view = settingsView.findViewById(R.id.padColor);
-        ImageView add_group = settingsView.findViewById(R.id.addGroup);
-        fontColor_view.setImageBitmap(createSolidColorCircle(entry.fontColor));
-        bgColor_view.setImageBitmap(createSolidColorCircle(entry.bgColor));
-        padColor_view.setImageBitmap(createSolidColorCircle(entry.bevelColor));
+        View fontColor_view = settingsView.findViewById(R.id.textColor);
+        View bgColor_view = settingsView.findViewById(R.id.backgroundColor);
+        View padColor_view = settingsView.findViewById(R.id.bevelColor);
+        View add_group = settingsView.findViewById(R.id.addGroup);
+        fontColor_view.setBackgroundColor(entry.fontColor);
+        bgColor_view.setBackgroundColor(entry.bgColor);
+        padColor_view.setBackgroundColor(entry.bevelColor);
         
         fontColor_view_state = settingsView.findViewById(R.id.font_color_state);
         bgColor_view_state = settingsView.findViewById(R.id.background_color_state);

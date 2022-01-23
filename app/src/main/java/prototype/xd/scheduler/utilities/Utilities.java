@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
@@ -242,7 +241,7 @@ public class Utilities {
                 .density(12)
                 .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
                     preferences.edit().putInt(key, selectedColor).apply();
-                    target.setImageBitmap(createSolidColorCircle(preferences.getInt(key, defValue)));
+                    target.setBackgroundColor(preferences.getInt(key, defValue));
                 }).setNegativeButton("Отмена", (dialog, which) -> {
             
         }).build().show();
@@ -259,7 +258,7 @@ public class Utilities {
                 .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
                     todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
                     saveEntries(fragment.todoListEntries);
-                    target.setImageBitmap(createSolidColorCircle(selectedColor));
+                    target.setBackgroundColor(selectedColor);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
                     todoListEntry.setStateIconColor(stateIcon, parameter);
                 }).setNegativeButton("Отмена", (dialog, which) -> {
@@ -277,7 +276,7 @@ public class Utilities {
                 .density(12)
                 .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
                     preferences.edit().putInt(calendarKey + "_" + parameter, selectedColor).apply();
-                    target.setImageBitmap(createSolidColorCircle(selectedColor));
+                    target.setBackgroundColor(selectedColor);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
                     systemCalendarSettings.setStateIconColor(stateIcon, parameter);
                 }).setNegativeButton("Отмена", (dialog, which) -> {

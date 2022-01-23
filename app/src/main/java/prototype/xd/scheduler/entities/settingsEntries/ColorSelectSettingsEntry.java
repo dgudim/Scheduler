@@ -2,7 +2,6 @@ package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.COLOR_SELECT;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 import android.content.Context;
@@ -31,9 +30,9 @@ public class ColorSelectSettingsEntry extends SettingsEntry {
     @Override
     protected View InitInnerViews(View rootView) {
         ((TextView) rootView.findViewById(R.id.textView)).setText(text);
-        ImageView imageView = rootView.findViewById(R.id.imageView);
-        imageView.setImageBitmap(createSolidColorCircle(preferences.getInt(colorKey, defaultColor)));
-        imageView.setOnClickListener(view -> invokeColorDialogue(context, (ImageView) view, colorKey, defaultColor));
+        View colorSelect = rootView.findViewById(R.id.color);
+        colorSelect.setBackgroundColor(preferences.getInt(colorKey, defaultColor));
+        colorSelect.setOnClickListener(view -> invokeColorDialogue(context, (ImageView) view, colorKey, defaultColor));
         return super.InitInnerViews(rootView);
     }
 }

@@ -1,65 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="60dp"
+    android:orientation="horizontal">
+
+    <CheckBox
+        android:id="@+id/check_box"
+        style="@android:style/Widget.DeviceDefault.CompoundButton.CheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/calendar_icon"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/calendar" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/calendar_color"
-            android:layout_width="20dp"
-            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/calendar_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|start"
+            android:text="account_name"
+            android:textColor="#000000" />
 
-        <ImageView
-            android:id="@+id/calendar_icon"
-            android:layout_width="60dp"
-            android:layout_height="match_parent"
-            app:srcCompat="@drawable/calendar" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/calendar_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center|start"
-                android:text="account_name"
-                android:textColor="#000000" />
-
-            <TextView
-                android:id="@+id/account_type"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="account_type" />
-        </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/edit_button"
-            style="@style/Widget.AppCompat.ImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="#00FFFFFF"
-            app:srcCompat="@android:drawable/ic_menu_edit"
-            tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck" />
-
-        <CheckBox
-            android:id="@+id/hide_check_box"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/hide" />
+        <TextView
+            android:id="@+id/account_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="account_type" />
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageButton
+        android:id="@+id/edit_button"
+        style="@style/Widget.AppCompat.ImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="#00FFFFFF"
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck" />
+
+</LinearLayout>
