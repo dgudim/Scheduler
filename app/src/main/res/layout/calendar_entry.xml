@@ -30,10 +30,17 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/color_selector"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:padding="1.5dp"
+        app:srcCompat="@drawable/color_wheel" />
+
     <ImageButton
         android:id="@+id/edit_button"
         style="@style/Widget.AppCompat.ImageButton"
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="match_parent"
         android:background="#00FFFFFF"
         app:srcCompat="@android:drawable/ic_menu_edit"
