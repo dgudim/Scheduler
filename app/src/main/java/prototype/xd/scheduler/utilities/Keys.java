@@ -29,21 +29,38 @@ public class Keys {
     public static final boolean SETTINGS_DEFAULT_SHOW_OLD_COMPLETED_ITEMS_IN_LIST = false;
     public static final boolean SETTINGS_DEFAULT_SHOW_NEW_COMPLETED_ITEMS_IN_LIST = false;
     
-    public static final int SETTINGS_DEFAULT_NEW_ITEMS_OFFSET = 0;
-    public static final int SETTINGS_DEFAULT_OLD_ITEMS_OFFSET = 0;
+    public static final int SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET = 0;
+    public static final int SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET = 0;
     
+    public static final String DATE_FLAG_GLOBAL = "GLOBAL";
+    
+    public static final boolean CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK = true;
+    public static final boolean CALENDAR_SETTINGS_DEFAULT_VISIBLE = true;
+    public static final String VISIBLE = "visible";
+    
+    public static final String TEXT_VALUE = "value";
+    public static final String IS_COMPLETED = "completed";
+    public static final String SHOW_ON_LOCK = "lock";
+    public static final String ASSOCIATED_DATE = "associatedDate";
+    public static final int ENTITY_SETTINGS_DEFAULT_PRIORITY = 0;
+    public static final String PRIORITY = "priority";
+    
+    public static final String BG_COLOR = "bgColor";
     public static final String TODAY_BG_COLOR = "todayBgColor";
     public static final String NEW_BG_COLOR = "newBgColor";
     public static final String OLD_BG_COLOR = "oldBgColor";
     
+    public static final String BEVEL_COLOR = "bevelColor";
     public static final String TODAY_BEVEL_COLOR = "todayBevelColor";
     public static final String NEW_BEVEL_COLOR = "newBevelColor";
     public static final String OLD_BEVEL_COLOR = "oldBevelColor";
     
+    public static final String BEVEL_THICKNESS = "bevelThickness";
     public static final String TODAY_BEVEL_THICKNESS = "todayBevelThickness";
     public static final String NEW_BEVEL_THICKNESS = "newBevelThickness";
     public static final String OLD_BEVEL_THICKNESS = "oldBevelThickness";
     
+    public static final String FONT_COLOR = "fontColor";
     public static final String TODAY_FONT_COLOR = "todayFontColor";
     public static final String NEW_FONT_COLOR = "newFontColor";
     public static final String OLD_FONT_COLOR = "oldFontColor";
@@ -53,8 +70,8 @@ public class Keys {
     public static final String ADAPTIVE_COLOR_ENABLED = "adaptive_color_enabled";
     public static final String ADAPTIVE_COLOR_BALANCE = "adaptive_color_balance";
     
-    public static final String NEW_ITEMS_OFFSET = "dayOffset_right";
-    public static final String OLD_ITEMS_OFFSET = "dayOffset_left";
+    public static final String BEFOREHAND_ITEMS_OFFSET = "dayOffset_right";
+    public static final String AFTER_ITEMS_OFFSET = "dayOffset_left";
     
     public static final String SHOW_OLD_COMPLETED_ITEMS_IN_LIST = "show_old_done_tasks_list";
     public static final String SHOW_NEW_COMPLETED_ITEMS_IN_LIST = "show_new_done_tasks_list";

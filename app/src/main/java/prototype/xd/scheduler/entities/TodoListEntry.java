@@ -8,6 +8,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromDate;
+import static prototype.xd.scheduler.utilities.Keys.*;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.currentBitmapLongestText;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayWidth;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
@@ -32,8 +33,8 @@ public class TodoListEntry {
     enum EntryType {GLOBAL, TODAY, OLD, NEW, NEUTRAL}
     
     public String associatedDate;
-    public int dayOffset_left = 0;
-    public int dayOffset_right = 0;
+    public int dayOffset_after = 0;
+    public int dayOffset_beforehand = 0;
     public boolean completed = false;
     public Group group;
     
@@ -75,22 +76,6 @@ public class TodoListEntry {
     public boolean isNewEntry = false;
     
     public String[] params;
-    
-    public static final String DATE_FLAG_GLOBAL = "GLOBAL";
-    
-    public static final String TEXT_VALUE = "value";
-    public static final String IS_COMPLETED = "completed";
-    public static final String SHOW_ON_LOCK = "lock";
-    public static final String SHOW_DAYS_BEFOREHAND = "show_beforehand";
-    public static final String SHOW_DAYS_AFTER = "show_after";
-    public static final String BEVEL_SIZE = "padSize";
-    public static final String FONT_COLOR = "fontColor";
-    public static final String BACKGROUND_COLOR = "bgColor";
-    public static final String ADAPTIVE_COLOR = "adaptiveColor";
-    public static final String ADAPTIVE_COLOR_BALANCE = "adaptiveColorBalance";
-    public static final String BEVEL_COLOR = "padColor";
-    public static final String ASSOCIATED_DATE = "associatedDate";
-    public static final String PRIORITY = "priority";
     
     public TodoListEntry() {
     
@@ -161,8 +146,8 @@ public class TodoListEntry {
         for (int i = 0; i < params.length; i += 2) {
             if (params[i].equals(ASSOCIATED_DATE)) {
                 
-                dayOffset_left = preferences.getInt(Keys.OLD_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_OLD_ITEMS_OFFSET);
-                dayOffset_right = preferences.getInt(Keys.NEW_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_NEW_ITEMS_OFFSET);
+                dayOffset_after = preferences.getInt(Keys.AFTER_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
+                dayOffset_beforehand = preferences.getInt(Keys.BEFOREHAND_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
                 
                 setParams((String[]) addAll(group.params, params));
                 
@@ -191,7 +176,7 @@ public class TodoListEntry {
                         setEntryType(EntryType.TODAY);
                     }
                     
-                } else if (days_associated < days_current && days_current - days_associated <= dayOffset_left) {
+                } else if (days_associated < days_current && days_current - days_associated <= dayOffset_after) {
                     
                     bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
                     bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
@@ -204,7 +189,7 @@ public class TodoListEntry {
                     showOnLock = true;
                     
                     setEntryType(EntryType.OLD);
-                } else if (days_associated > days_current && days_associated - days_current <= dayOffset_right) {
+                } else if (days_associated > days_current && days_associated - days_current <= dayOffset_beforehand) {
                     
                     bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
                     bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
@@ -238,7 +223,7 @@ public class TodoListEntry {
         adaptiveColorEnabled = preferences.getBoolean(Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
         adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
         adaptiveColor = 0xff_FFFFFF;
-        priority = 0;
+        priority = ENTITY_SETTINGS_DEFAULT_PRIORITY;
         setParams((String[]) addAll(group.params, params));
     }
     
@@ -376,19 +361,19 @@ public class TodoListEntry {
                 case (SHOW_ON_LOCK):
                     showOnLock = Boolean.parseBoolean(params[i + 1]);
                     break;
-                case (SHOW_DAYS_BEFOREHAND):
-                    dayOffset_right = Integer.parseInt(params[i + 1]);
+                case (BEFOREHAND_ITEMS_OFFSET):
+                    dayOffset_beforehand = Integer.parseInt(params[i + 1]);
                     break;
-                case (SHOW_DAYS_AFTER):
-                    dayOffset_left = Integer.parseInt(params[i + 1]);
+                case (AFTER_ITEMS_OFFSET):
+                    dayOffset_after = Integer.parseInt(params[i + 1]);
                     break;
-                case (BEVEL_SIZE):
+                case (BEVEL_THICKNESS):
                     bevelThickness = Integer.parseInt(params[i + 1]);
                     break;
                 case (FONT_COLOR):
                     fontColor = Integer.parseInt(params[i + 1]);
                     break;
-                case (BACKGROUND_COLOR):
+                case (BG_COLOR):
                     bgColor = Integer.parseInt(params[i + 1]);
                     break;
                 case (BEVEL_COLOR):
@@ -400,7 +385,7 @@ public class TodoListEntry {
                 case (ASSOCIATED_DATE):
                     associatedDate = params[i + 1];
                     break;
-                case (ADAPTIVE_COLOR):
+                case (ADAPTIVE_COLOR_ENABLED):
                     adaptiveColorEnabled = Boolean.parseBoolean(params[i + 1]);
                     break;
                 case (ADAPTIVE_COLOR_BALANCE):

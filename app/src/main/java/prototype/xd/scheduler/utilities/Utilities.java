@@ -8,7 +8,7 @@ import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.content.Context;
-import android.widget.ImageView;
+import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -31,6 +31,7 @@ import java.util.Comparator;
 import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.Views.Switch;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
 public class Utilities {
@@ -159,9 +160,9 @@ public class Utilities {
         });
     }
     
-    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final TextView stateIcon, final HomeFragment fragment, final int stringResource, final TodoListEntry todoListEntry, final String parameter, int defaultValue) {
-        displayTo.setText(fragment.getString(stringResource, defaultValue));
-        seekBar.setProgress(defaultValue);
+    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final TextView stateIcon, final HomeFragment fragment, final int stringResource, final TodoListEntry todoListEntry, final String parameter, int initialValue) {
+        displayTo.setText(fragment.getString(stringResource, initialValue));
+        seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
@@ -184,9 +185,9 @@ public class Utilities {
         });
     }
     
-    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final SettingsFragment fragment, final int stringResource, String calendarKey, final String parameter, int defaultValue) {
-        displayTo.setText(fragment.getString(stringResource, defaultValue));
-        seekBar.setProgress(defaultValue);
+    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final SettingsFragment fragment, final int stringResource, String calendarKey, final String parameter, int initialValue) {
+        displayTo.setText(fragment.getString(stringResource, initialValue));
+        seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
@@ -212,8 +213,8 @@ public class Utilities {
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> preferences.edit().putBoolean(key, isChecked).apply());
     }
     
-    public static void addSwitchChangeListener(final Switch tSwitch, final TextView stateIcon, final HomeFragment fragment, final TodoListEntry entry, final String parameter, boolean defaultValue) {
-        tSwitch.setChecked(defaultValue, false);
+    public static void addSwitchChangeListener(final Switch tSwitch, final TextView stateIcon, final HomeFragment fragment, final TodoListEntry entry, final String parameter, boolean initialValue) {
+        tSwitch.setChecked(initialValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             saveEntries(fragment.todoListEntries);
@@ -222,8 +223,8 @@ public class Utilities {
         });
     }
     
-    public static void addSwitchChangeListener(final Switch tSwitch, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final String calendarKey, final String parameter, boolean defaultValue) {
-        tSwitch.setChecked(defaultValue, false);
+    public static void addSwitchChangeListener(final Switch tSwitch, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final String calendarKey, final String parameter, boolean initialValue) {
+        tSwitch.setChecked(initialValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
@@ -231,27 +232,27 @@ public class Utilities {
         });
     }
     
-    public static void invokeColorDialogue(final Context context, final ImageView target, final String key, final int defValue) {
+    public static void invokeColorDialogue(final Context context, final View target, final String key, final int defaultValue) {
         ColorPickerDialogBuilder
                 .with(context)
                 .setTitle("Выберите цвет")
-                .initialColor(preferences.getInt(key, defValue))
+                .initialColor(preferences.getInt(key, defaultValue))
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
                 .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
                     preferences.edit().putInt(key, selectedColor).apply();
-                    target.setBackgroundColor(preferences.getInt(key, defValue));
+                    target.setBackgroundColor(preferences.getInt(key, defaultValue));
                 }).setNegativeButton("Отмена", (dialog, which) -> {
             
         }).build().show();
     }
     
-    public static void invokeColorDialogue(final Context context, final ImageView target, final TextView stateIcon, final HomeFragment fragment, final TodoListEntry todoListEntry, final String parameter, final int defaultValue, final boolean setReconstructFlag) {
+    public static void invokeColorDialogue(final Context context, final View target, final TextView stateIcon, final HomeFragment fragment, final TodoListEntry todoListEntry, final String parameter, final int initialValue, final boolean setReconstructFlag) {
         ColorPickerDialogBuilder
                 .with(context)
                 .setTitle("Выберите цвет")
-                .initialColor(defaultValue)
+                .initialColor(initialValue)
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
@@ -266,11 +267,11 @@ public class Utilities {
         }).build().show();
     }
     
-    public static void invokeColorDialogue(final Context context, final ImageView target, final TextView stateIcon, SystemCalendarSettings systemCalendarSettings, String calendarKey, final String parameter, final int defaultValue, final boolean setReconstructFlag) {
+    public static void invokeColorDialogue(final Context context, final View target, final TextView stateIcon, SystemCalendarSettings systemCalendarSettings, String calendarKey, final String parameter, final int initialValue, final boolean setReconstructFlag) {
         ColorPickerDialogBuilder
                 .with(context)
                 .setTitle("Выберите цвет")
-                .initialColor(defaultValue)
+                .initialColor(initialValue)
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)

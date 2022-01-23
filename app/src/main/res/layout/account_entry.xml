@@ -6,7 +6,7 @@
     android:layout_height="60dp"
     android:orientation="horizontal">
 
-    <CheckBox
+    <prototype.xd.scheduler.entities.Views.CheckBox
         android:id="@+id/check_box"
         style="@android:style/Widget.DeviceDefault.CompoundButton.CheckBox"
         android:layout_width="wrap_content"

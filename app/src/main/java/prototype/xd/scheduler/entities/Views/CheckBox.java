@@ -1,25 +1,24 @@
-package prototype.xd.scheduler.utilities;
+package prototype.xd.scheduler.entities.Views;
 
 import android.content.Context;
 import android.util.AttributeSet;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.checkbox.MaterialCheckBox;
 
-public class Switch extends SwitchMaterial {
+public class CheckBox extends MaterialCheckBox {
     private boolean ignoreCheckedChange = false;
     
-    public Switch(@NonNull Context context) {
+    public CheckBox(Context context) {
         super(context);
     }
     
-    public Switch(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public CheckBox(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
     
-    public Switch(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public CheckBox(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
     

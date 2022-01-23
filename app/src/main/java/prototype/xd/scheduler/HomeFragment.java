@@ -5,6 +5,10 @@ import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
+import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DATE;
+import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.initStorage;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
@@ -147,9 +151,9 @@ public class HomeFragment extends Fragment {
             
             builder.setPositiveButton("Добавить", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
-                        TodoListEntry.TEXT_VALUE, input.getText().toString(),
-                        TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate,
-                        TodoListEntry.IS_COMPLETED, "false"}, currentGroup[0]);
+                        TEXT_VALUE, input.getText().toString(),
+                        ASSOCIATED_DATE, currentlySelectedDate,
+                        IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
                 listViewAdapter.updateData(newEntry.getLockViewState());
@@ -157,9 +161,9 @@ public class HomeFragment extends Fragment {
             
             builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
-                        TodoListEntry.TEXT_VALUE, input.getText().toString(),
-                        TodoListEntry.ASSOCIATED_DATE, TodoListEntry.DATE_FLAG_GLOBAL,
-                        TodoListEntry.IS_COMPLETED, "false"}, currentGroup[0]);
+                        TEXT_VALUE, input.getText().toString(),
+                        ASSOCIATED_DATE, DATE_FLAG_GLOBAL,
+                        IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
                 listViewAdapter.updateData(newEntry.getLockViewState());

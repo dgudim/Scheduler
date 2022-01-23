@@ -6,7 +6,6 @@ import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import prototype.xd.scheduler.R;
@@ -32,7 +31,7 @@ public class ColorSelectSettingsEntry extends SettingsEntry {
         ((TextView) rootView.findViewById(R.id.textView)).setText(text);
         View colorSelect = rootView.findViewById(R.id.color);
         colorSelect.setBackgroundColor(preferences.getInt(colorKey, defaultColor));
-        colorSelect.setOnClickListener(view -> invokeColorDialogue(context, (ImageView) view, colorKey, defaultColor));
+        colorSelect.setOnClickListener(view -> invokeColorDialogue(context, view, colorKey, defaultColor));
         return super.InitInnerViews(rootView);
     }
 }

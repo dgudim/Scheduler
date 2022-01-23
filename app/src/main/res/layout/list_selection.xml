@@ -23,8 +23,9 @@
             android:background="#FFFFFF"
             android:orientation="horizontal">
 
-            <CheckBox
+            <prototype.xd.scheduler.entities.Views.CheckBox
                 android:id="@+id/isDone"
+                style="@android:style/Widget.DeviceDefault.CompoundButton.CheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"

@@ -5,17 +5,7 @@ import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
-import static prototype.xd.scheduler.entities.TodoListEntry.ADAPTIVE_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.ADAPTIVE_COLOR_BALANCE;
-import static prototype.xd.scheduler.entities.TodoListEntry.BACKGROUND_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.BEVEL_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.BEVEL_SIZE;
-import static prototype.xd.scheduler.entities.TodoListEntry.FONT_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.PRIORITY;
-import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_AFTER;
-import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_BEFOREHAND;
-import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_ON_LOCK;
-import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
+import static prototype.xd.scheduler.utilities.Keys.*;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
@@ -29,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -49,7 +38,7 @@ public class EntrySettings {
     TextView fontColor_view_state;
     TextView bgColor_view_state;
     TextView padColor_view_state;
-    TextView adaptiveColor_state;
+    TextView adaptiveColor_switch_state;
     TextView priority_state;
     TextView padSize_state;
     TextView show_on_lock_state;
@@ -89,7 +78,7 @@ public class EntrySettings {
         priority_state = settingsView.findViewById(R.id.priority_state);
         padSize_state = settingsView.findViewById(R.id.bevel_size_state);
         show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
-        adaptiveColor_state = settingsView.findViewById(R.id.adaptive_color_state);
+        adaptiveColor_switch_state = settingsView.findViewById(R.id.adaptive_color_state);
         adaptiveColor_bar_state = settingsView.findViewById(R.id.adaptive_color_balance_state);
         showDaysBeforehand_bar_state = settingsView.findViewById(R.id.days_beforehand_state);
         showDaysAfter_bar_state = settingsView.findViewById(R.id.days_after_state);
@@ -281,23 +270,23 @@ public class EntrySettings {
             builder.show();
         });
         
-        fontColor_view.setOnClickListener(v -> invokeColorDialogue(
-                context, (ImageView) v, fontColor_view_state, fragment,
+        fontColor_view.setOnClickListener(view -> invokeColorDialogue(
+                context, view, fontColor_view_state, fragment,
                 entry, FONT_COLOR, entry.fontColor, true));
         
-        bgColor_view.setOnClickListener(v -> invokeColorDialogue(
-                context, (ImageView) v, bgColor_view_state, fragment,
-                entry, BACKGROUND_COLOR, entry.bgColor, true));
+        bgColor_view.setOnClickListener(view -> invokeColorDialogue(
+                context, view, bgColor_view_state, fragment,
+                entry, BG_COLOR, entry.bgColor, true));
         
-        padColor_view.setOnClickListener(v -> invokeColorDialogue(
-                context, (ImageView) v, padColor_view_state, fragment,
+        padColor_view.setOnClickListener(view -> invokeColorDialogue(
+                context, view, padColor_view_state, fragment,
                 entry, BEVEL_COLOR, entry.bevelColor, true));
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.bevelThicknessDescription),
                 settingsView.findViewById(R.id.bevelThicknessBar),
                 padSize_state, fragment, R.string.settings_bevel_thickness, entry,
-                BEVEL_SIZE, entry.bevelThickness);
+                BEVEL_THICKNESS, entry.bevelThickness);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.priorityDescription),
@@ -315,13 +304,13 @@ public class EntrySettings {
                 settingsView.findViewById(R.id.show_days_beforehand_description),
                 settingsView.findViewById(R.id.show_days_beforehand_bar),
                 showDaysBeforehand_bar_state, fragment, R.string.settings_show_days_beforehand, entry,
-                SHOW_DAYS_BEFOREHAND, entry.dayOffset_right);
+                BEFOREHAND_ITEMS_OFFSET, entry.dayOffset_beforehand);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.show_days_after_description),
                 settingsView.findViewById(R.id.show_days_after_bar),
                 showDaysAfter_bar_state, fragment, R.string.settings_show_days_after, entry,
-                SHOW_DAYS_AFTER, entry.dayOffset_left);
+                AFTER_ITEMS_OFFSET, entry.dayOffset_after);
         
         addSwitchChangeListener(
                 settingsView.findViewById(R.id.showOnLockSwitch),
@@ -331,22 +320,22 @@ public class EntrySettings {
         
         addSwitchChangeListener(
                 settingsView.findViewById(R.id.adaptive_color_switch),
-                adaptiveColor_state,
+                adaptiveColor_switch_state,
                 fragment, entry,
-                ADAPTIVE_COLOR, entry.adaptiveColorEnabled);
+                ADAPTIVE_COLOR_ENABLED, entry.adaptiveColorEnabled);
     }
     
     void updateAllIndicators() {
         entry.setStateIconColor(fontColor_view_state, FONT_COLOR);
-        entry.setStateIconColor(bgColor_view_state, BACKGROUND_COLOR);
+        entry.setStateIconColor(bgColor_view_state, BG_COLOR);
         entry.setStateIconColor(padColor_view_state, BEVEL_COLOR);
-        entry.setStateIconColor(padSize_state, BEVEL_SIZE);
+        entry.setStateIconColor(padSize_state, BEVEL_THICKNESS);
         entry.setStateIconColor(priority_state, PRIORITY);
         entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
-        entry.setStateIconColor(adaptiveColor_state, ADAPTIVE_COLOR);
+        entry.setStateIconColor(adaptiveColor_switch_state, ADAPTIVE_COLOR_ENABLED);
         entry.setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE);
-        entry.setStateIconColor(showDaysBeforehand_bar_state, SHOW_DAYS_BEFOREHAND);
-        entry.setStateIconColor(showDaysAfter_bar_state, SHOW_DAYS_AFTER);
+        entry.setStateIconColor(showDaysBeforehand_bar_state, BEFOREHAND_ITEMS_OFFSET);
+        entry.setStateIconColor(showDaysAfter_bar_state, AFTER_ITEMS_OFFSET);
     }
     
 }

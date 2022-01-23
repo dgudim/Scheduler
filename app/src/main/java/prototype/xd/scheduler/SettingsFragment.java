@@ -84,10 +84,10 @@ public class SettingsFragment extends Fragment {
         
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_visibility)));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_NEW_ITEMS_OFFSET, true,
-                Keys.NEW_ITEMS_OFFSET, R.string.settings_show_days_beforehand, this));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_OLD_ITEMS_OFFSET, true,
-                Keys.OLD_ITEMS_OFFSET, R.string.settings_show_days_after, this));
+        settingsEntries.add(new SeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET, true,
+                Keys.BEFOREHAND_ITEMS_OFFSET, R.string.settings_show_days_beforehand, this));
+        settingsEntries.add(new SeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET, true,
+                Keys.AFTER_ITEMS_OFFSET, R.string.settings_show_days_after, this));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.SHOW_OLD_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_OLD_COMPLETED_ITEMS_IN_LIST,
                 context.getString(R.string.settings_show_old_done_items_list)));
@@ -124,11 +124,11 @@ public class SettingsFragment extends Fragment {
             ArrayList<SystemCalendar> calendar_group = calendars_sorted.get(g);
             SystemCalendar calendar0 = calendar_group.get(0);
             
-            settingsEntries.add(new CalendarAccountSettingsEntry(context, rootViewGroup, this, calendars_sorted_names.get(g), calendar0.account_type, calendar0.color));
+            settingsEntries.add(new CalendarAccountSettingsEntry(context, rootViewGroup, this, calendar0));
             
             for (int c = 0; c < calendar_group.size(); c++) {
                 SystemCalendar current_calendar = calendar_group.get(c);
-                settingsEntries.add(new CalendarSettingsEntry(current_calendar.name, current_calendar.color));
+                settingsEntries.add(new CalendarSettingsEntry(context, rootViewGroup, this, current_calendar));
             }
         }
         

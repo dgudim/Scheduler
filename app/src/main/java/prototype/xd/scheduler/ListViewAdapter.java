@@ -2,6 +2,10 @@ package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
+import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DATE;
+import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
@@ -13,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.Views.CheckBox;
 import prototype.xd.scheduler.utilities.EntrySettings;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
@@ -123,9 +127,9 @@ public class ListViewAdapter extends BaseAdapter {
         isDone.setChecked(currentEntry.completed);
         isDone.setOnClickListener(view12 -> {
             if (!currentEntry.isGlobalEntry) {
-                currentEntry.changeParameter(TodoListEntry.IS_COMPLETED, String.valueOf(isDone.isChecked()));
+                currentEntry.changeParameter(IS_COMPLETED, String.valueOf(isDone.isChecked()));
             } else {
-                currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, currentlySelectedDate);
+                currentEntry.changeParameter(ASSOCIATED_DATE, currentlySelectedDate);
             }
             saveEntries(home.todoListEntries);
             updateData(true);
@@ -154,14 +158,14 @@ public class ListViewAdapter extends BaseAdapter {
             
             alert.setTitle("Изменить");
             alert.setPositiveButton("Сохранить", (dialog, which) -> {
-                currentEntry.changeParameter(TodoListEntry.TEXT_VALUE, input.getText().toString());
+                currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
                 saveEntries(home.todoListEntries);
                 updateData(currentEntry.getLockViewState());
             });
             
             if (!currentEntry.isGlobalEntry) {
                 alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
-                    currentEntry.changeParameter(TodoListEntry.ASSOCIATED_DATE, "GLOBAL");
+                    currentEntry.changeParameter(ASSOCIATED_DATE, DATE_FLAG_GLOBAL);
                     saveEntries(home.todoListEntries);
                     updateData(currentEntry.getLockViewState());
                 });

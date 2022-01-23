@@ -9,6 +9,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintBitmap
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
+import static prototype.xd.scheduler.utilities.Keys.*;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
@@ -93,7 +94,7 @@ public class LockScreenBitmapDrawer {
                 throw new RuntimeException("Bitmap drawer not initialised");
             }
             currentlyProcessingBitmap = true;
-            forceMaxRWidth = preferences.getBoolean(Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK);
+            forceMaxRWidth = preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK);
             
             final File bg = getBackgroundAccordingToDayAndTime();
             final String[] currentName = {bg.getName()};
@@ -200,7 +201,7 @@ public class LockScreenBitmapDrawer {
                     }
                     TodoListEntry splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
                     copyDisplayData(toAdd.get(i), splitEntry);
-                    splitEntry.changeParameter(TodoListEntry.TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
+                    splitEntry.changeParameter(TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
                     toAddSplit.add(splitEntry);
                     splits.add(splitEntry);
                 }

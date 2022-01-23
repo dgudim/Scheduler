@@ -1,17 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.TodoListEntry.ADAPTIVE_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.ADAPTIVE_COLOR_BALANCE;
-import static prototype.xd.scheduler.entities.TodoListEntry.BACKGROUND_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.BEVEL_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.BEVEL_SIZE;
-import static prototype.xd.scheduler.entities.TodoListEntry.FONT_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.PRIORITY;
-import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_AFTER;
-import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_DAYS_BEFOREHAND;
-import static prototype.xd.scheduler.entities.TodoListEntry.SHOW_ON_LOCK;
-import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
@@ -20,7 +9,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -35,7 +23,7 @@ public class SystemCalendarSettings {
     TextView fontColor_view_state;
     TextView bgColor_view_state;
     TextView padColor_view_state;
-    TextView adaptiveColor_state;
+    TextView adaptiveColor_switch_state;
     TextView priority_state;
     TextView padSize_state;
     TextView show_on_lock_state;
@@ -78,21 +66,24 @@ public class SystemCalendarSettings {
     
     private String getFirstValidKey(String parameter) {
         int index = getFirstValidKeyIndex(parameter);
-        return index == -1 ? parameter : calendarSubKeys.get(index);
+        return index == -1 ? parameter : calendarSubKeys.get(index) + "_" + parameter;
     }
     
     private void initialise(String calendarKey, final Context context, final SettingsFragment fragment, final View settingsView) {
         
-        int fontColor = preferences.getInt(getFirstValidKey(Keys.TODAY_FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
-        int bgColor = preferences.getInt(getFirstValidKey(Keys.TODAY_BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
-        int bevelColor = preferences.getInt(getFirstValidKey(Keys.TODAY_BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
-        int bevelThickness = preferences.getInt(getFirstValidKey(Keys.TODAY_BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
+        int fontColor = preferences.getInt(getFirstValidKey(Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
+        int bgColor = preferences.getInt(getFirstValidKey(Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
+        int bevelColor = preferences.getInt(getFirstValidKey(Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
+        int bevelThickness = preferences.getInt(getFirstValidKey(Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
         
         int adaptiveColorBalance = preferences.getInt(getFirstValidKey(Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
         boolean adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
         
-        int dayOffset_right = preferences.getInt(getFirstValidKey(Keys.NEW_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_NEW_ITEMS_OFFSET);
-        int dayOffset_left = preferences.getInt(getFirstValidKey(Keys.OLD_BEVEL_COLOR), Keys.SETTINGS_DEFAULT_OLD_ITEMS_OFFSET);
+        boolean showOnLock = preferences.getBoolean(getFirstValidKey(Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+        int priority = preferences.getInt(getFirstValidKey(Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
+        
+        int dayOffset_right = preferences.getInt(getFirstValidKey(Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
+        int dayOffset_left = preferences.getInt(getFirstValidKey(Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
         
         View fontColor_view = settingsView.findViewById(R.id.textColor);
         View bgColor_view = settingsView.findViewById(R.id.backgroundColor);
@@ -107,7 +98,7 @@ public class SystemCalendarSettings {
         priority_state = settingsView.findViewById(R.id.priority_state);
         padSize_state = settingsView.findViewById(R.id.bevel_size_state);
         show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
-        adaptiveColor_state = settingsView.findViewById(R.id.adaptive_color_state);
+        adaptiveColor_switch_state = settingsView.findViewById(R.id.adaptive_color_state);
         adaptiveColor_bar_state = settingsView.findViewById(R.id.adaptive_color_balance_state);
         showDaysBeforehand_bar_state = settingsView.findViewById(R.id.days_beforehand_state);
         showDaysAfter_bar_state = settingsView.findViewById(R.id.days_after_state);
@@ -120,7 +111,7 @@ public class SystemCalendarSettings {
             
             builder.setPositiveButton("Да", (dialog, which) -> {
                 // TODO: 22/1/2022 reset settings
-                preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+                preferences.edit().putBoolean(Keys.NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                 initialise(calendarKey, context, fragment, settingsView);
             });
             builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
@@ -128,81 +119,81 @@ public class SystemCalendarSettings {
             builder.show();
         });
         
-        fontColor_view.setOnClickListener(v -> invokeColorDialogue(context,
-                (ImageView) v, fontColor_view_state,
+        fontColor_view.setOnClickListener(view -> invokeColorDialogue(context,
+                view, fontColor_view_state,
                 this,
-                calendarKey, FONT_COLOR, fontColor, true));
+                calendarKey, Keys.FONT_COLOR, fontColor, true));
         
-        bgColor_view.setOnClickListener(v -> invokeColorDialogue(context,
-                (ImageView) v, bgColor_view_state,
+        bgColor_view.setOnClickListener(view -> invokeColorDialogue(context,
+                view, bgColor_view_state,
                 this,
-                calendarKey, BACKGROUND_COLOR, bgColor, true));
+                calendarKey, Keys.BG_COLOR, bgColor, true));
         
-        padColor_view.setOnClickListener(v -> invokeColorDialogue(context,
-                (ImageView) v, padColor_view_state,
+        padColor_view.setOnClickListener(view -> invokeColorDialogue(context,
+                view, padColor_view_state,
                 this,
-                calendarKey, BEVEL_COLOR, bevelColor, true));
+                calendarKey, Keys.BEVEL_COLOR, bevelColor, true));
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.bevelThicknessDescription),
                 settingsView.findViewById(R.id.bevelThicknessBar),
                 padSize_state, this, fragment, R.string.settings_bevel_thickness,
-                calendarKey, BEVEL_SIZE, bevelThickness);
+                calendarKey, Keys.BEVEL_THICKNESS, bevelThickness);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.priorityDescription),
                 settingsView.findViewById(R.id.priorityBar),
                 priority_state, this, fragment, R.string.settings_priority,
-                calendarKey, PRIORITY, 0);
+                calendarKey, Keys.PRIORITY, priority);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.adaptive_color_balance_description),
                 settingsView.findViewById(R.id.adaptive_color_balance_bar),
                 adaptiveColor_bar_state, this, fragment, R.string.settings_adaptive_color_balance,
-                calendarKey, ADAPTIVE_COLOR_BALANCE, adaptiveColorBalance);
+                calendarKey, Keys.ADAPTIVE_COLOR_BALANCE, adaptiveColorBalance);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.show_days_beforehand_description),
                 settingsView.findViewById(R.id.show_days_beforehand_bar),
                 showDaysBeforehand_bar_state, this, fragment, R.string.settings_show_days_beforehand,
-                calendarKey, SHOW_DAYS_BEFOREHAND, dayOffset_right);
+                calendarKey, Keys.BEFOREHAND_ITEMS_OFFSET, dayOffset_right);
         
         addSeekBarChangeListener(
                 settingsView.findViewById(R.id.show_days_after_description),
                 settingsView.findViewById(R.id.show_days_after_bar),
                 showDaysAfter_bar_state, this, fragment, R.string.settings_show_days_after,
-                calendarKey, SHOW_DAYS_AFTER, dayOffset_left);
+                calendarKey, Keys.AFTER_ITEMS_OFFSET, dayOffset_left);
         
         addSwitchChangeListener(
                 settingsView.findViewById(R.id.showOnLockSwitch),
                 show_on_lock_state, this,
-                calendarKey, SHOW_ON_LOCK, true);
+                calendarKey, Keys.SHOW_ON_LOCK, showOnLock);
         
         addSwitchChangeListener(
                 settingsView.findViewById(R.id.adaptive_color_switch),
-                adaptiveColor_state, this,
-                calendarKey, ADAPTIVE_COLOR, adaptiveColorEnabled);
+                adaptiveColor_switch_state, this,
+                calendarKey, Keys.ADAPTIVE_COLOR_ENABLED, adaptiveColorEnabled);
     }
     
     void setStateIconColor(TextView display, String parameter) {
         int keyIndex = getFirstValidKeyIndex(parameter);
         if (keyIndex == calendarSubKeys.size() - 1) {
             display.setTextColor(Color.GREEN);
-        } else if (keyIndex > 0) {
+        } else if (keyIndex >= 0) {
             display.setTextColor(Color.YELLOW);
         }
     }
     
     void updateAllIndicators() {
-        setStateIconColor(fontColor_view_state, FONT_COLOR);
-        setStateIconColor(bgColor_view_state, BACKGROUND_COLOR);
-        setStateIconColor(padColor_view_state, BEVEL_COLOR);
-        setStateIconColor(padSize_state, BEVEL_SIZE);
-        setStateIconColor(priority_state, PRIORITY);
-        setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
-        setStateIconColor(adaptiveColor_state, ADAPTIVE_COLOR);
-        setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE);
-        setStateIconColor(showDaysBeforehand_bar_state, SHOW_DAYS_BEFOREHAND);
-        setStateIconColor(showDaysAfter_bar_state, SHOW_DAYS_AFTER);
+        setStateIconColor(fontColor_view_state, Keys.FONT_COLOR);
+        setStateIconColor(bgColor_view_state, Keys.BG_COLOR);
+        setStateIconColor(padColor_view_state, Keys.BEVEL_COLOR);
+        setStateIconColor(padSize_state, Keys.BEVEL_THICKNESS);
+        setStateIconColor(priority_state, Keys.PRIORITY);
+        setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK);
+        setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED);
+        setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE);
+        setStateIconColor(showDaysBeforehand_bar_state, Keys.BEFOREHAND_ITEMS_OFFSET);
+        setStateIconColor(showDaysAfter_bar_state, Keys.AFTER_ITEMS_OFFSET);
     }
 }
