@@ -18,6 +18,7 @@ import prototype.xd.scheduler.calendarUtilities.SystemCalendar;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarAccountSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.ColorSelectSettingsEntry;
+import prototype.xd.scheduler.entities.settingsEntries.DiscreteSeekBarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.ResetButtonsSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.SeekBarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.SettingsEntry;
@@ -48,7 +49,7 @@ public class SettingsFragment extends Fragment {
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED,
                 context.getString(R.string.settings_adaptive_color)));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 1000, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE, false,
+        settingsEntries.add(new SeekBarSettingsEntry(0, 1000, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE,
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance, this));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_BG_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR,
                 context.getString(R.string.settings_today_bg_color), context));
@@ -60,15 +61,15 @@ public class SettingsFragment extends Fragment {
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_bevels)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR,
                 context.getString(R.string.settings_today_bevel_color), context));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS, true,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS,
                 Keys.TODAY_BEVEL_THICKNESS, R.string.settings_today_bevel_thickness, this));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR,
                 context.getString(R.string.settings_old_bevel_color), context));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_OLD_BEVEL_THICKNESS, true,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_OLD_BEVEL_THICKNESS,
                 Keys.OLD_BEVEL_THICKNESS, R.string.settings_old_bevel_thickness, this));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR,
                 context.getString(R.string.settings_new_bevel_color), context));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_NEW_BEVEL_THICKNESS, true,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_NEW_BEVEL_THICKNESS,
                 Keys.NEW_BEVEL_THICKNESS, R.string.settings_new_bevel_thickness, this));
         
         
@@ -79,14 +80,14 @@ public class SettingsFragment extends Fragment {
                 context.getString(R.string.settings_today_font_color), context));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR,
                 context.getString(R.string.settings_today_font_color), context));
-        settingsEntries.add(new SeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE, true,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE,
                 Keys.FONT_SIZE, R.string.settings_font_size, this));
         
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_visibility)));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET, true,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET,
                 Keys.BEFOREHAND_ITEMS_OFFSET, R.string.settings_show_days_beforehand, this));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET, true,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET,
                 Keys.AFTER_ITEMS_OFFSET, R.string.settings_show_days_after, this));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.SHOW_OLD_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_OLD_COMPLETED_ITEMS_IN_LIST,

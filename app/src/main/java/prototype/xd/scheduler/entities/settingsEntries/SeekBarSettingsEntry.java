@@ -19,8 +19,8 @@ public class SeekBarSettingsEntry extends SettingsEntry{
     private final int stringResource;
     private final Fragment fragment;
     
-    public SeekBarSettingsEntry(int seek_min, int seek_max, int defaultValue, boolean discrete, String key, int stringResource, Fragment fragment) {
-        super(discrete ? R.layout.settings_discrete_seekbar_entry : R.layout.settings_seekbar_entry);
+    public SeekBarSettingsEntry(int seek_min, int seek_max, int defaultValue, String key, int stringResource, Fragment fragment) {
+        super(R.layout.settings_seekbar_entry);
         this.seek_min = seek_min;
         this.seek_max = seek_max;
         this.defaultValue = defaultValue;

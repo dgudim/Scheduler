@@ -145,7 +145,6 @@ public class Utilities {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 displayTo.setText(fragment.getString(stringResource, progress));
-                preferences.edit().putInt(key, progress).apply();
             }
             
             @Override
@@ -155,7 +154,7 @@ public class Utilities {
             
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-            
+                preferences.edit().putInt(key, seekBar.getProgress()).apply();
             }
         });
     }
