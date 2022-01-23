@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.COLOR_SELECT;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
@@ -24,6 +25,7 @@ public class ColorSelectSettingsEntry extends SettingsEntry {
         this.defaultColor = defaultColor;
         this.text = text;
         this.context = context;
+        entryType = COLOR_SELECT;
     }
     
     @Override
@@ -31,10 +33,7 @@ public class ColorSelectSettingsEntry extends SettingsEntry {
         ((TextView) rootView.findViewById(R.id.textView)).setText(text);
         ImageView imageView = rootView.findViewById(R.id.imageView);
         imageView.setImageBitmap(createSolidColorCircle(preferences.getInt(colorKey, defaultColor)));
-        imageView.setOnClickListener(view -> {
-            System.out.println("------------------------------------------------lolka");
-            invokeColorDialogue(context, (ImageView) view, colorKey, defaultColor);
-        });
+        imageView.setOnClickListener(view -> invokeColorDialogue(context, (ImageView) view, colorKey, defaultColor));
         return super.InitInnerViews(rootView);
     }
 }

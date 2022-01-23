@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="5dp">
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <prototype.xd.scheduler.utilities.Switch
             android:id="@+id/Switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

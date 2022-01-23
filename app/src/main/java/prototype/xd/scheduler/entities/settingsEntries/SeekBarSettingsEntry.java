@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.SEEK_BAR;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 
 import android.view.View;
@@ -26,6 +27,7 @@ public class SeekBarSettingsEntry extends SettingsEntry{
         this.key = key;
         this.stringResource = stringResource;
         this.fragment = fragment;
+        entryType = SEEK_BAR;
     }
     
     @Override

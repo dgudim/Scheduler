@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.*;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 
 import android.content.Context;
@@ -30,6 +31,7 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
         this.accountName = accountName;
         this.accountType = accountType;
         this.calendarColor = calendarColor;
+        entryType = CALENDAR_ACCOUNT;
     }
     
     @Override

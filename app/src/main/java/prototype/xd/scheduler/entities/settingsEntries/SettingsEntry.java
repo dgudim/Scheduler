@@ -4,24 +4,34 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+enum SettingsEntryType {CALENDAR_ACCOUNT, CALENDAR, COLOR_SELECT, RESET_BUTTONS, SEEK_BAR, SWITCH, TITLE_BAR, UNDEFINED}
+
 public class SettingsEntry {
     
     protected final int layoutId;
-    protected View view;
+    protected SettingsEntryType entryType;
     
     SettingsEntry(int layoutId) {
         this.layoutId = layoutId;
+    }
+    
+    public int getType(){
+        return entryType.ordinal();
+    }
+    
+    public static int getTypesCount(){
+        return SettingsEntryType.values().length;
     }
     
     protected View inflate(LayoutInflater inflater, ViewGroup viewGroup) {
         return inflater.inflate(layoutId, viewGroup, false);
     }
     
-    public View get(ViewGroup viewGroup, LayoutInflater inflater) {
-        if (view == null) {
-            view = InitInnerViews(inflate(inflater, viewGroup));
+    public View get(View convertView, ViewGroup viewGroup, LayoutInflater inflater) {
+        if (convertView == null) {
+            convertView = inflate(inflater, viewGroup);
         }
-        return view;
+        return InitInnerViews(convertView);
     }
     
     protected View InitInnerViews(View rootView) {

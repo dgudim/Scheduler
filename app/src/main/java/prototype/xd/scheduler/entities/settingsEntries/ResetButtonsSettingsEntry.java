@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.RESET_BUTTONS;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
@@ -27,6 +28,7 @@ public class ResetButtonsSettingsEntry extends SettingsEntry {
         this.fragment = fragment;
         this.view = view;
         this.savedInstanceState = savedInstanceState;
+        entryType = RESET_BUTTONS;
     }
     
     @SuppressWarnings({"ResultOfMethodCallIgnored", "ApplySharedPref"})

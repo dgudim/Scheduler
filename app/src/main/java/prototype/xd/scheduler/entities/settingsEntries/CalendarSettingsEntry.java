@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.CALENDAR;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createSolidColorCircle;
 
 import android.view.View;
@@ -17,6 +18,7 @@ public class CalendarSettingsEntry extends SettingsEntry{
         super(R.layout.calendar_entry);
         this.calendarName = calendarName;
         this.calendarColor = calendarColor;
+        entryType = CALENDAR;
     }
     
     @Override

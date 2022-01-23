@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.TITLE_BAR;
+
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,6 +14,7 @@ public class TitleBarSettingsEntry extends SettingsEntry{
     public TitleBarSettingsEntry(String text) {
         super(R.layout.settings_title_entry);
         this.text = text;
+        entryType = TITLE_BAR;
     }
     
     @Override

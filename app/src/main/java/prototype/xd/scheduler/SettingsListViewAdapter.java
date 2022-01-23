@@ -21,6 +21,16 @@ public class SettingsListViewAdapter extends BaseAdapter {
     }
     
     @Override
+    public int getItemViewType(int i) {
+        return settingsEntries.get(i).getType();
+    }
+    
+    @Override
+    public int getViewTypeCount() {
+        return SettingsEntry.getTypesCount();
+    }
+    
+    @Override
     public int getCount() {
         return settingsEntries.size();
     }
@@ -37,6 +47,6 @@ public class SettingsListViewAdapter extends BaseAdapter {
     
     @Override
     public View getView(int i, View view, ViewGroup parent) {
-        return settingsEntries.get(i).get(parent, inflater);
+        return settingsEntries.get(i).get(view, parent, inflater);
     }
 }

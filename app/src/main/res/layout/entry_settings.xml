@@ -44,7 +44,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <prototype.xd.scheduler.utilities.Switch
                         android:id="@+id/showOnLockSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -129,7 +129,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <prototype.xd.scheduler.utilities.Switch
                         android:id="@+id/adaptive_color_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

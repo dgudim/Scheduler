@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
-import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import org.apache.commons.lang.WordUtils;
 
@@ -209,13 +208,13 @@ public class Utilities {
         });
     }
     
-    public static void addSwitchChangeListener(final SwitchMaterial tSwitch, final String key, boolean defaultValue) {
-        tSwitch.setChecked(preferences.getBoolean(key, defaultValue));
+    public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue) {
+        tSwitch.setChecked(preferences.getBoolean(key, defaultValue), false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> preferences.edit().putBoolean(key, isChecked).apply());
     }
     
-    public static void addSwitchChangeListener(final SwitchMaterial tSwitch, final TextView stateIcon, final HomeFragment fragment, final TodoListEntry entry, final String parameter, boolean defaultValue) {
-        tSwitch.setChecked(defaultValue);
+    public static void addSwitchChangeListener(final Switch tSwitch, final TextView stateIcon, final HomeFragment fragment, final TodoListEntry entry, final String parameter, boolean defaultValue) {
+        tSwitch.setChecked(defaultValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             saveEntries(fragment.todoListEntries);
@@ -224,13 +223,12 @@ public class Utilities {
         });
     }
     
-    public static void addSwitchChangeListener(final SwitchMaterial tSwitch, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final String calendarKey, final String parameter, boolean defaultValue) {
-        tSwitch.setChecked(defaultValue);
+    public static void addSwitchChangeListener(final Switch tSwitch, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final String calendarKey, final String parameter, boolean defaultValue) {
+        tSwitch.setChecked(defaultValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-            //entry.setStateIconColor(stateIcon, parameter);
         });
     }
     

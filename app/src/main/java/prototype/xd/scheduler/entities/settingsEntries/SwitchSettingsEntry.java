@@ -1,12 +1,12 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.SWITCH;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 
 import android.view.View;
 
-import com.google.android.material.switchmaterial.SwitchMaterial;
-
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.Switch;
 
 public class SwitchSettingsEntry extends SettingsEntry{
     
@@ -19,11 +19,12 @@ public class SwitchSettingsEntry extends SettingsEntry{
         this.key = key;
         this.text = text;
         this.defaultValue = defaultValue;
+        entryType = SWITCH;
     }
     
     @Override
     protected View InitInnerViews(View rootView) {
-        SwitchMaterial switchView = rootView.findViewById(R.id.Switch);
+        Switch switchView = rootView.findViewById(R.id.Switch);
         switchView.setText(text);
         addSwitchChangeListener(switchView, key, defaultValue);
         return super.InitInnerViews(rootView);
