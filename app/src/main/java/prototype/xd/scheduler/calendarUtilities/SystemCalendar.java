@@ -1,16 +1,16 @@
 package prototype.xd.scheduler.calendarUtilities;
 
-import static prototype.xd.scheduler.QueryUtilities.getInt;
-import static prototype.xd.scheduler.QueryUtilities.getLong;
-import static prototype.xd.scheduler.QueryUtilities.getString;
-import static prototype.xd.scheduler.QueryUtilities.query;
 import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.calendarColumns;
 import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.calendarEventsColumns;
-import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.colorColumns;
+import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
+import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
+import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
+import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.CalendarContract;
+import android.provider.CalendarContract.Events;
 
 import androidx.annotation.NonNull;
 
@@ -31,6 +31,7 @@ public class SystemCalendar {
     
     public ArrayList<SystemCalendarEvent> systemCalendarEvents;
     public ArrayList<Integer> availableEventColors;
+    public ArrayList<Integer> eventCountsForColors;
     
     SystemCalendar(Cursor cursor, ContentResolver contentResolver) {
         account_type = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_TYPE);
@@ -42,34 +43,41 @@ public class SystemCalendar {
         
         systemCalendarEvents = new ArrayList<>();
         availableEventColors = new ArrayList<>();
-        
+        eventCountsForColors = new ArrayList<>();
+    
+        loadCalendarEvents(contentResolver);
         if (accessLevel >= CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR) {
-            loadAvailableEventColors(contentResolver);
+            loadAvailableEventColors();
         }
     }
     
-    void loadAvailableEventColors(ContentResolver contentResolver) {
+    void loadAvailableEventColors() {
         availableEventColors.clear();
-        Cursor cursor = query(contentResolver, CalendarContract.Colors.CONTENT_URI, colorColumns.toArray(new String[0]),
-                CalendarContract.Colors.ACCOUNT_NAME + "=?", new String[]{account_name});
+        eventCountsForColors.clear();
         
-        int colors = cursor.getCount();
-        
-        cursor.moveToFirst();
-        for (int i = 0; i < colors; i++) {
-            int color = getInt(cursor, colorColumns, CalendarContract.Colors.COLOR);
+        for (int i = 0; i < systemCalendarEvents.size(); i++) {
+            int color = systemCalendarEvents.get(i).color;
             if (!availableEventColors.contains(color)) {
                 availableEventColors.add(color);
+                eventCountsForColors.add(getEventCountWithColor(color));
             }
-            cursor.moveToNext();
         }
-        cursor.close();
+    }
+    
+    private int getEventCountWithColor(int color){
+        int count = 0;
+        for(int i = 0; i < systemCalendarEvents.size(); i++){
+            if(systemCalendarEvents.get(i).color == color){
+                count++;
+            }
+        }
+        return count;
     }
     
     void loadCalendarEvents(ContentResolver contentResolver) {
         systemCalendarEvents.clear();
-        Cursor cursor = query(contentResolver, CalendarContract.Events.CONTENT_URI, calendarEventsColumns.toArray(new String[0]),
-                CalendarContract.Events.CALENDAR_ID + " = " + id);
+        Cursor cursor = query(contentResolver, Events.CONTENT_URI, calendarEventsColumns.toArray(new String[0]),
+                Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0");
         int events = cursor.getCount();
         cursor.moveToFirst();
         for (int i = 0; i < events; i++) {

@@ -6,12 +6,6 @@
     android:layout_height="60dp"
     android:orientation="horizontal">
 
-    <prototype.xd.scheduler.entities.Views.CheckBox
-        android:id="@+id/check_box"
-        style="@android:style/Widget.DeviceDefault.CompoundButton.CheckBox"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent" />
-
     <ImageView
         android:id="@+id/calendar_icon"
         android:layout_width="60dp"
@@ -43,7 +37,7 @@
     <ImageButton
         android:id="@+id/edit_button"
         style="@style/Widget.AppCompat.ImageButton"
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="match_parent"
         android:background="#00FFFFFF"
         app:srcCompat="@android:drawable/ic_menu_edit"

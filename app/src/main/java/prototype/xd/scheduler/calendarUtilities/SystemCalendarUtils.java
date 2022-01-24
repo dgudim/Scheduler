@@ -1,6 +1,6 @@
 package prototype.xd.scheduler.calendarUtilities;
 
-import static prototype.xd.scheduler.QueryUtilities.query;
+import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -26,11 +26,8 @@ public class SystemCalendarUtils {
             CalendarContract.Events.EVENT_LOCATION,
             CalendarContract.Events.DISPLAY_COLOR,
             CalendarContract.Events.DTSTART,
-            CalendarContract.Events.DTEND));
-    
-    public static final ArrayList<String> colorColumns = new ArrayList<>(Arrays.asList(
-            CalendarContract.Colors.ACCOUNT_NAME,
-            CalendarContract.Colors.COLOR));
+            CalendarContract.Events.DTEND,
+            CalendarContract.Events.DELETED));
     
     public static ArrayList<SystemCalendar> getAllCalendars(ContentResolver contentResolver) {
         ArrayList<SystemCalendar> systemCalendars = new ArrayList<>();

@@ -58,6 +58,10 @@
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
 
     <string name="description_fab">add item</string>
+    <string name="title_color_default">обычный</string>
+
+    <string name="calendar_events_full">%d событий</string>
+    <string name="calendar_events">%d соб.</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>

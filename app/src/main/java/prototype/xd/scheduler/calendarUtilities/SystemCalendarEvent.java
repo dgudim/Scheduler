@@ -1,8 +1,9 @@
 package prototype.xd.scheduler.calendarUtilities;
 
 import static android.provider.CalendarContract.Events;
-import static prototype.xd.scheduler.QueryUtilities.getLong;
-import static prototype.xd.scheduler.QueryUtilities.getString;
+import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
+import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
+import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.calendarEventsColumns;
 
 import android.database.Cursor;
@@ -13,7 +14,7 @@ public class SystemCalendarEvent {
     final String title;
     final String description;
     final String location;
-    final String color;
+    final int color;
     final long start;
     final long end;
     
@@ -22,7 +23,7 @@ public class SystemCalendarEvent {
         title = getString(cursor, calendarEventsColumns, Events.TITLE);
         description = getString(cursor, calendarEventsColumns, Events.DESCRIPTION);
         location = getString(cursor, calendarEventsColumns, Events.EVENT_LOCATION);
-        color = getString(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
+        color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
         start = getLong(cursor, calendarEventsColumns, Events.DTSTART);
         end = getLong(cursor, calendarEventsColumns, Events.DTEND);
         System.out.println(title + "   " + color);

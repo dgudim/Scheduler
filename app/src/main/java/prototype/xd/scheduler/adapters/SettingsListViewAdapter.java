@@ -1,4 +1,4 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

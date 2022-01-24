@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.calendarUtilities.SystemCalendar;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarAccountSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarSettingsEntry;
@@ -28,7 +29,8 @@ import prototype.xd.scheduler.utilities.Keys;
 
 public class SettingsFragment extends Fragment {
     
-    private ViewGroup rootViewGroup;
+    public Context context;
+    public ViewGroup rootViewGroup;
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,7 +40,7 @@ public class SettingsFragment extends Fragment {
     
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Context context = requireContext();
+        context = requireContext();
         
         ArrayList<SettingsEntry> settingsEntries = new ArrayList<>();
         
@@ -125,11 +127,11 @@ public class SettingsFragment extends Fragment {
             ArrayList<SystemCalendar> calendar_group = calendars_sorted.get(g);
             SystemCalendar calendar0 = calendar_group.get(0);
             
-            settingsEntries.add(new CalendarAccountSettingsEntry(context, rootViewGroup, this, calendar0));
+            settingsEntries.add(new CalendarAccountSettingsEntry(this, calendar0));
             
             for (int c = 0; c < calendar_group.size(); c++) {
                 SystemCalendar current_calendar = calendar_group.get(c);
-                settingsEntries.add(new CalendarSettingsEntry(context, rootViewGroup, this, current_calendar));
+                settingsEntries.add(new CalendarSettingsEntry(this, current_calendar));
             }
         }
         

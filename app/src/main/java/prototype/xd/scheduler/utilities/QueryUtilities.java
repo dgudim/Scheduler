@@ -1,4 +1,4 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.utilities;
 
 import android.content.ContentResolver;
 import android.database.Cursor;

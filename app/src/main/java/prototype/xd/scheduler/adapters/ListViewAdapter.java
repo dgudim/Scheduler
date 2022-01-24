@@ -1,4 +1,4 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.adapters;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
@@ -23,6 +23,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.HomeFragment;
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.Views.CheckBox;
 import prototype.xd.scheduler.utilities.EntrySettings;
@@ -124,7 +126,7 @@ public class ListViewAdapter extends BaseAdapter {
             alert.show();
         });
         
-        isDone.setChecked(currentEntry.completed);
+        isDone.setChecked(currentEntry.completed, false);
         isDone.setOnClickListener(view12 -> {
             if (!currentEntry.isGlobalEntry) {
                 currentEntry.changeParameter(IS_COMPLETED, String.valueOf(isDone.isChecked()));

@@ -4,7 +4,6 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.CALENDAR_ACCOUNT;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,16 +23,14 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
     private final SettingsFragment fragment;
     private final String accountName;
     private final String accountType;
-    private final int calendarColor;
     
-    public CalendarAccountSettingsEntry(final Context context, final ViewGroup root, final SettingsFragment fragment, SystemCalendar calendar) {
+    public CalendarAccountSettingsEntry(final SettingsFragment fragment, SystemCalendar calendar) {
         super(R.layout.account_entry);
-        this.context = context;
-        this.root = root;
+        this.context = fragment.context;
+        this.root = fragment.rootViewGroup;
         this.fragment = fragment;
         this.accountName = calendar.account_name;
         this.accountType = calendar.account_type;
-        this.calendarColor = calendar.color;
         entryType = CALENDAR_ACCOUNT;
     }
     
@@ -42,7 +39,6 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
         ((TextView) rootView.findViewById(R.id.calendar_name)).setText(accountName);
         ((TextView) rootView.findViewById(R.id.account_type)).setText(accountType);
         CheckBox checkBox = rootView.findViewById(R.id.check_box);
-        checkBox.setButtonTintList(ColorStateList.valueOf(calendarColor));
         checkBox.setChecked(preferences.getBoolean(accountName + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE), false);
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(accountName + "_" + Keys.VISIBLE, isChecked).apply();

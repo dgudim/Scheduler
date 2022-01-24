@@ -43,6 +43,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import pl.droidsonroids.gif.GifImageView;
+import prototype.xd.scheduler.adapters.ListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
@@ -56,21 +57,20 @@ public class HomeFragment extends Fragment {
             Manifest.permission.WRITE_CALENDAR
     };
     
-    ListView listView;
     public ListViewAdapter listViewAdapter;
     
     public ArrayList<TodoListEntry> todoListEntries;
     public ArrayList<TodoListEntry> calendarEntries;
     
-    LockScreenBitmapDrawer lockScreenBitmapDrawer;
+    private LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
-    Timer queueTimer;
+    private Timer queueTimer;
     
-    Activity rootActivity;
+    public Activity rootActivity;
     
-    Context context;
+    public Context context;
     
-    ViewGroup container;
+    private ViewGroup rootViewGroup;
     
     public HomeFragment() {
         super();
@@ -78,7 +78,7 @@ public class HomeFragment extends Fragment {
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.container = container;
+        this.rootViewGroup = container;
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
     
@@ -103,7 +103,7 @@ public class HomeFragment extends Fragment {
         
         todoListEntries = loadTodoEntries();
         
-        listView = view.findViewById(R.id.list);
+        ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
         listViewAdapter = new ListViewAdapter(HomeFragment.this, lockScreenBitmapDrawer);
         listView.setAdapter(listViewAdapter);
@@ -119,7 +119,7 @@ public class HomeFragment extends Fragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Добавить пункт");
             
-            View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
+            View addView = inflater.inflate(R.layout.add_entry_dialogue, rootViewGroup, false);
             final EditText input = addView.findViewById(R.id.entryNameEditText);
             
             final String[] currentGroup = {BLANK_NAME};
