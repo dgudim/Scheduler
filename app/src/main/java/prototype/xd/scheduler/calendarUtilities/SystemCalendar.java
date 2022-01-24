@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.calendarUtilities;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.calendarColumns;
 import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.calendarEventsColumns;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
@@ -15,6 +16,9 @@ import android.provider.CalendarContract.Events;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+
+import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.Keys;
 
 public class SystemCalendar {
     
@@ -44,7 +48,7 @@ public class SystemCalendar {
         systemCalendarEvents = new ArrayList<>();
         availableEventColors = new ArrayList<>();
         eventCountsForColors = new ArrayList<>();
-    
+        
         loadCalendarEvents(contentResolver);
         if (accessLevel >= CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR) {
             loadAvailableEventColors();
@@ -64,10 +68,10 @@ public class SystemCalendar {
         }
     }
     
-    private int getEventCountWithColor(int color){
+    private int getEventCountWithColor(int color) {
         int count = 0;
-        for(int i = 0; i < systemCalendarEvents.size(); i++){
-            if(systemCalendarEvents.get(i).color == color){
+        for (int i = 0; i < systemCalendarEvents.size(); i++) {
+            if (systemCalendarEvents.get(i).color == color) {
                 count++;
             }
         }
@@ -81,10 +85,20 @@ public class SystemCalendar {
         int events = cursor.getCount();
         cursor.moveToFirst();
         for (int i = 0; i < events; i++) {
-            systemCalendarEvents.add(new SystemCalendarEvent(cursor));
+            systemCalendarEvents.add(new SystemCalendarEvent(cursor, this));
             cursor.moveToNext();
         }
         cursor.close();
+    }
+    
+    ArrayList<TodoListEntry> getVisibleTodoListEntries() {
+        ArrayList <TodoListEntry> todoListEntries = new ArrayList<>();
+        if (preferences.getBoolean(account_name + "_" + name + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
+            for (int i = 0; i < systemCalendarEvents.size(); i++) {
+                todoListEntries.add(new TodoListEntry(systemCalendarEvents.get(i)));
+            }
+        }
+        return todoListEntries;
     }
     
     @NonNull

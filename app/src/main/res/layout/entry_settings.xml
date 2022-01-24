@@ -43,7 +43,7 @@
                         android:textStyle="bold" />
 
                     <prototype.xd.scheduler.entities.Views.Switch
-                        android:id="@+id/showOnLockSwitch"
+                        android:id="@+id/show_on_lock_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="#FFFFFF"
@@ -81,7 +81,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/priorityDescription"
+                            android:id="@+id/priority_description"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
@@ -91,7 +91,7 @@
                             android:textSize="18sp" />
 
                         <SeekBar
-                            android:id="@+id/priorityBar"
+                            android:id="@+id/priority_bar"
                             style="@style/Widget.AppCompat.SeekBar.Discrete"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -369,7 +369,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/bevelThicknessDescription"
+                            android:id="@+id/bevel_thickness_description"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
@@ -379,7 +379,7 @@
                             android:textSize="18sp" />
 
                         <SeekBar
-                            android:id="@+id/bevelThicknessBar"
+                            android:id="@+id/bevel_thickness_bar"
                             style="@style/Widget.AppCompat.SeekBar.Discrete"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -542,7 +542,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/settingsResetButton"
+                android:id="@+id/settings_reset_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_reset_to_defaults" />

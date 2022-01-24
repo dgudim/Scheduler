@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.calendarUtilities;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;
@@ -40,6 +41,38 @@ public class SystemCalendarUtils {
         }
         cursor.close();
         return systemCalendars;
+    }
+    
+    public static ArrayList<String> generateSubKeysFromKey(String calendar_key){
+        ArrayList<String> calendarSubKeys = new ArrayList<>();
+        String[] key_split = calendar_key.split("_");
+        StringBuilder buffer = new StringBuilder();
+        for (int i = 0; i < key_split.length; i++) {
+            if (i != 0) {
+                buffer.append('_');
+            }
+            buffer.append(key_split[i]);
+            calendarSubKeys.add(buffer.toString());
+        }
+        return calendarSubKeys;
+    }
+    
+    public static int getFirstValidKeyIndex(ArrayList<String> calendarSubKeys, String parameter) {
+        for (int i = calendarSubKeys.size() - 1; i >= 0; i--) {
+            try {
+                if (preferences.getString(calendarSubKeys.get(i) + "_" + parameter, null) != null) {
+                    return i;
+                }
+            } catch (ClassCastException e) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    public static String getFirstValidKey(ArrayList<String> calendarSubKeys, String parameter) {
+        int index = getFirstValidKeyIndex(calendarSubKeys, parameter);
+        return index == -1 ? parameter : calendarSubKeys.get(index) + "_" + parameter;
     }
     
 }

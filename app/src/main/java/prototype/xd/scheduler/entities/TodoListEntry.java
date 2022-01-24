@@ -8,7 +8,21 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromDate;
-import static prototype.xd.scheduler.utilities.Keys.*;
+import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
+import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
+import static prototype.xd.scheduler.utilities.Keys.AFTER_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DATE;
+import static prototype.xd.scheduler.utilities.Keys.BEFOREHAND_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
+import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY;
+import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
+import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
+import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.currentBitmapLongestText;
 import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayWidth;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
@@ -26,11 +40,14 @@ import androidx.core.math.MathUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import prototype.xd.scheduler.calendarUtilities.SystemCalendarEvent;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class TodoListEntry {
     
     enum EntryType {GLOBAL, TODAY, OLD, NEW, NEUTRAL}
+    
+    public boolean fromSystemCalendar = false;
     
     public String associatedDate;
     public int dayOffset_after = 0;
@@ -77,7 +94,11 @@ public class TodoListEntry {
     public String[] params;
     
     public TodoListEntry() {
+    }
     
+    public TodoListEntry(SystemCalendarEvent event) {
+        fromSystemCalendar = true;
+        
     }
     
     public TodoListEntry(String[] params, String groupName) {
@@ -198,8 +219,8 @@ public class TodoListEntry {
                     
                     setEntryType(EntryType.NEW);
                 } else {
-                    fontColor = Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR;
-                    fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
+                    setFontColor(Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
+                    
                     bgColor = Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR;
                     bevelColor = Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR;
                     bevelThickness = Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS;
@@ -228,9 +249,13 @@ public class TodoListEntry {
         isNewEntry = entryType == EntryType.NEW;
     }
     
-    private void setFontColor(String key, int defaultColor) {
-        fontColor = preferences.getInt(key, defaultColor);
+    private void setFontColor(int color) {
+        fontColor = color;
         fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
+    }
+    
+    private void setFontColor(String key, int defaultColor) {
+        setFontColor(preferences.getInt(key, defaultColor));
     }
     
     public void initialiseDisplayData() {
@@ -365,7 +390,7 @@ public class TodoListEntry {
                     bevelThickness = Integer.parseInt(params[i + 1]);
                     break;
                 case (FONT_COLOR):
-                    fontColor = Integer.parseInt(params[i + 1]);
+                    setFontColor(Integer.parseInt(params[i + 1]));
                     break;
                 case (BG_COLOR):
                     bgColor = Integer.parseInt(params[i + 1]);

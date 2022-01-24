@@ -18,7 +18,7 @@ import prototype.xd.scheduler.calendarUtilities.SystemCalendar;
 import prototype.xd.scheduler.entities.Views.CheckBox;
 import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.SystemCalendarSettings;
+import prototype.xd.scheduler.entities.Views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntry extends SettingsEntry {
     

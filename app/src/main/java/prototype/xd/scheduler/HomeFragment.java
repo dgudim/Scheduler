@@ -60,7 +60,6 @@ public class HomeFragment extends Fragment {
     public ListViewAdapter listViewAdapter;
     
     public ArrayList<TodoListEntry> todoListEntries;
-    public ArrayList<TodoListEntry> calendarEntries;
     
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
     

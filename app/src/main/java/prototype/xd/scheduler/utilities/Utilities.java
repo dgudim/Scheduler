@@ -32,6 +32,7 @@ import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.Views.Switch;
+import prototype.xd.scheduler.entities.Views.settings.SystemCalendarSettings;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
 public class Utilities {
@@ -76,8 +77,11 @@ public class Utilities {
             ArrayList<String> entryGroupNames = new ArrayList<>();
             
             for (int i = 0; i < entries.size(); i++) {
-                entryParams.add(entries.get(i).params);
-                entryGroupNames.add(entries.get(i).group.name);
+                TodoListEntry entry = entries.get(i);
+                if (!entry.fromSystemCalendar) {
+                    entryParams.add(entry.params);
+                    entryGroupNames.add(entry.group.name);
+                }
             }
             
             saveObject("list", entryParams);
@@ -106,6 +110,7 @@ public class Utilities {
     }
     
     public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {
+        ArrayList<TodoListEntry> newEntries = new ArrayList<>();
         ArrayList<TodoListEntry> oldEntries = new ArrayList<>();
         ArrayList<TodoListEntry> todayEntries = new ArrayList<>();
         ArrayList<TodoListEntry> globalEntries = new ArrayList<>();
@@ -115,6 +120,8 @@ public class Utilities {
                 todayEntries.add(entries.get(i));
             } else if (entries.get(i).isOldEntry) {
                 oldEntries.add(entries.get(i));
+            } else if (entries.get(i).isNewEntry) {
+                newEntries.add(entries.get(i));
             } else if (entries.get(i).isGlobalEntry) {
                 globalEntries.add(entries.get(i));
             } else {
@@ -125,6 +132,7 @@ public class Utilities {
         ArrayList<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
+        merged.addAll(newEntries);
         merged.addAll(oldEntries);
         merged.addAll(otherEntries);
         merged.sort(new TodoListEntryGroupComparator());
@@ -184,7 +192,7 @@ public class Utilities {
         });
     }
     
-    public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final SettingsFragment fragment, final int stringResource, String calendarKey, final String parameter, int initialValue) {
+    public static void addSeekBarChangeListener(final TextView displayTo, final SeekBar seekBar, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final SettingsFragment fragment, final int stringResource, final String calendarKey, final String parameter, final int initialValue) {
         displayTo.setText(fragment.getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

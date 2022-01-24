@@ -14,7 +14,7 @@ import java.util.Locale;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.calendarUtilities.SystemCalendar;
-import prototype.xd.scheduler.utilities.SystemCalendarSettings;
+import prototype.xd.scheduler.entities.Views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntry extends SettingsEntry {
     

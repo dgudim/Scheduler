@@ -27,7 +27,7 @@ import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.Views.CheckBox;
-import prototype.xd.scheduler.utilities.EntrySettings;
+import prototype.xd.scheduler.entities.Views.settings.EntrySettings;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class ListViewAdapter extends BaseAdapter {
