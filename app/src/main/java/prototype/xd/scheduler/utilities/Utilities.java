@@ -6,6 +6,8 @@ import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllTodoListEntriesFromCalendars;
 
 import android.content.Context;
 import android.view.View;
@@ -49,7 +51,7 @@ public class Utilities {
         }
     }
     
-    public static ArrayList<TodoListEntry> loadTodoEntries() {
+    public static ArrayList<TodoListEntry> loadTodoEntries(Context context) {
         try {
             
             ArrayList<String[]> entryParams = loadObject("list");
@@ -63,10 +65,11 @@ public class Utilities {
             for (int i = 0; i < entryParams.size(); i++) {
                 readEntries.add(new TodoListEntry(entryParams.get(i), entryGroupNames.get(i)));
             }
-            
+            readEntries.addAll(getAllTodoListEntriesFromCalendars(context));
             return sortEntries(readEntries);
         } catch (Exception e) {
             log(INFO, "no todo list");
+            logException(e);
             return new ArrayList<>();
         }
     }

@@ -2,6 +2,7 @@ package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.CALENDAR;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,7 +15,7 @@ import android.widget.TextView;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
-import prototype.xd.scheduler.calendarUtilities.SystemCalendar;
+import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.entities.Views.CheckBox;
 import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.utilities.Keys;
@@ -23,6 +24,7 @@ import prototype.xd.scheduler.entities.Views.settings.SystemCalendarSettings;
 public class CalendarSettingsEntry extends SettingsEntry {
     
     private final Context context;
+    private final LayoutInflater inflater;
     private final ViewGroup root;
     private final SettingsFragment fragment;
     private final String calendarName;
@@ -35,10 +37,11 @@ public class CalendarSettingsEntry extends SettingsEntry {
     public CalendarSettingsEntry(final SettingsFragment fragment, final SystemCalendar calendar) {
         super(R.layout.calendar_entry);
         this.context = fragment.context;
+        inflater = LayoutInflater.from(context);
         this.root = fragment.rootViewGroup;
         this.fragment = fragment;
         this.calendarName = calendar.name;
-        calendarKey = calendar.account_name + "_" + calendarName;
+        calendarKey = makeKey(calendar);
         this.calendarColor = calendar.color;
         calendarEventsCount = calendar.systemCalendarEvents.size();
         entryType = CALENDAR;
@@ -60,7 +63,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
         
         rootView.findViewById(R.id.edit_button).setOnClickListener(view ->
                 new SystemCalendarSettings(context, fragment,
-                        LayoutInflater.from(context).inflate(R.layout.entry_settings, root, false),
+                        inflater.inflate(R.layout.entry_settings, root, false),
                         calendarKey));
         
         View colorSelector = rootView.findViewById(R.id.color_select_button);
@@ -69,7 +72,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
             colorSelector.setOnClickListener(v -> {
                 final AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 
-                View view = LayoutInflater.from(context).inflate(R.layout.grid_color_select, root, false);
+                View view = inflater.inflate(R.layout.grid_color_select, root, false);
                 GridView gridView = view.findViewById(R.id.grid_view);
                 gridView.setNumColumns(5);
                 gridView.setHorizontalSpacing(5);

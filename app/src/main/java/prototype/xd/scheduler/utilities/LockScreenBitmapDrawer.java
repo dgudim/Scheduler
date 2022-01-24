@@ -179,7 +179,7 @@ public class LockScreenBitmapDrawer {
         
         Canvas canvas = new Canvas(src);
         
-        ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries());
+        ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries(context));
         if (!toAdd.isEmpty()) {
             
             for (int i = 0; i < toAdd.size(); i++) {

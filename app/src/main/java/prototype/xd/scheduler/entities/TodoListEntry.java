@@ -8,6 +8,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromDate;
+import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.AFTER_ITEMS_OFFSET;
@@ -28,6 +29,9 @@ import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayWid
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
 
 import android.graphics.Color;
@@ -40,7 +44,7 @@ import androidx.core.math.MathUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import prototype.xd.scheduler.calendarUtilities.SystemCalendarEvent;
+import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class TodoListEntry {
@@ -49,7 +53,9 @@ public class TodoListEntry {
     
     public boolean fromSystemCalendar = false;
     
-    public String associatedDate;
+    private String associatedDate;
+    public long DT_start;
+    public long DT_end;
     public int dayOffset_after = 0;
     public int dayOffset_beforehand = 0;
     public boolean completed = false;
@@ -96,9 +102,41 @@ public class TodoListEntry {
     public TodoListEntry() {
     }
     
+    public boolean isVisible(String date) {
+        if (fromSystemCalendar) {
+            long days_current = daysFromDate(date);
+            long days_start = daysFromEpoch(DT_start);
+            long days_end = daysFromEpoch(DT_end);
+            return days_current >= days_start && days_current <= days_end;
+        } else {
+            return associatedDate.equals(date);
+        }
+    }
+    
     public TodoListEntry(SystemCalendarEvent event) {
         fromSystemCalendar = true;
+        DT_start = event.start;
+        DT_end = event.end;
         
+        textValue = event.title;
+        
+        ArrayList<String> calendarSubKeys = generateSubKeysFromKey(makeKey(event));
+        
+        fontColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
+        bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
+        bevelColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
+        bevelThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
+        
+        adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
+        adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
+        
+        showOnLock = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+        priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
+        
+        dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
+        dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
+    
+        group = new Group(BLANK_NAME);
     }
     
     public TodoListEntry(String[] params, String groupName) {
@@ -281,7 +319,7 @@ public class TodoListEntry {
     }
     
     public String getDayOffset() {
-        if (!associatedDate.equals("GLOBAL")) {
+        if (!fromSystemCalendar && !associatedDate.equals("GLOBAL")) {
             dayOffset = "";
             
             String[] dateParts = associatedDate.split("_");

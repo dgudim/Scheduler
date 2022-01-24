@@ -1,24 +1,30 @@
-package prototype.xd.scheduler.calendarUtilities;
+package prototype.xd.scheduler.entities.calendars;
 
 import static android.provider.CalendarContract.Events;
-import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.calendarEventsColumns;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 
 import android.database.Cursor;
 
+import java.util.ArrayList;
+
 public class SystemCalendarEvent {
     
-    final SystemCalendar associatedCalendar;
+    public final SystemCalendar associatedCalendar;
     
-    final long id;
-    final String title;
-    final String description;
-    final String location;
-    final int color;
-    final long start;
-    final long end;
+    public final long id;
+    public final String title;
+    public final String description;
+    public final String location;
+    public final int color;
+    public final long start;
+    public final long end;
+    
+    public final ArrayList<String> subKeys;
     
     SystemCalendarEvent(Cursor cursor, SystemCalendar associatedCalendar){
         this.associatedCalendar = associatedCalendar;
@@ -30,5 +36,7 @@ public class SystemCalendarEvent {
         color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
         start = getLong(cursor, calendarEventsColumns, Events.DTSTART);
         end = getLong(cursor, calendarEventsColumns, Events.DTEND);
+        
+        subKeys = generateSubKeysFromKey(makeKey(this));
     }
 }

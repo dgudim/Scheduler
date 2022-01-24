@@ -100,7 +100,7 @@ public class HomeFragment extends Fragment {
         
         final CalendarView datePicker = view.findViewById(R.id.calendar);
         
-        todoListEntries = loadTodoEntries();
+        todoListEntries = loadTodoEntries(context);
         
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);

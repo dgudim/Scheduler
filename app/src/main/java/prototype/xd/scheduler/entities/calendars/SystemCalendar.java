@@ -1,12 +1,13 @@
-package prototype.xd.scheduler.calendarUtilities;
+package prototype.xd.scheduler.entities.calendars;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.calendarColumns;
-import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.calendarEventsColumns;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarColumns;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -37,7 +38,7 @@ public class SystemCalendar {
     public ArrayList<Integer> availableEventColors;
     public ArrayList<Integer> eventCountsForColors;
     
-    SystemCalendar(Cursor cursor, ContentResolver contentResolver) {
+    public SystemCalendar(Cursor cursor, ContentResolver contentResolver) {
         account_type = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_TYPE);
         account_name = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_NAME);
         name = getString(cursor, calendarColumns, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
@@ -91,9 +92,9 @@ public class SystemCalendar {
         cursor.close();
     }
     
-    ArrayList<TodoListEntry> getVisibleTodoListEntries() {
+    public ArrayList<TodoListEntry> getVisibleTodoListEntries() {
         ArrayList <TodoListEntry> todoListEntries = new ArrayList<>();
-        if (preferences.getBoolean(account_name + "_" + name + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
+        if (preferences.getBoolean(makeKey(this) + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
             for (int i = 0; i < systemCalendarEvents.size(); i++) {
                 todoListEntries.add(new TodoListEntry(systemCalendarEvents.get(i)));
             }

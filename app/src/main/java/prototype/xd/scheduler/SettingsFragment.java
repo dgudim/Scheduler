@@ -1,6 +1,6 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.getAllCalendars;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
-import prototype.xd.scheduler.calendarUtilities.SystemCalendar;
+import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarAccountSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.ColorSelectSettingsEntry;
@@ -107,7 +107,7 @@ public class SettingsFragment extends Fragment {
         settingsEntries.add(new ResetButtonsSettingsEntry(this, view, savedInstanceState));
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_system_calendars)));
-        ArrayList<SystemCalendar> calendars = getAllCalendars(context.getContentResolver());
+        ArrayList<SystemCalendar> calendars = getAllCalendars(context);
         ArrayList<ArrayList<SystemCalendar>> calendars_sorted = new ArrayList<>();
         ArrayList<String> calendars_sorted_names = new ArrayList<>();
         

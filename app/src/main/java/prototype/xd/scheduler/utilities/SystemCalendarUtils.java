@@ -1,14 +1,19 @@
-package prototype.xd.scheduler.calendarUtilities;
+package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.provider.CalendarContract;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 
 public class SystemCalendarUtils {
     
@@ -30,7 +35,9 @@ public class SystemCalendarUtils {
             CalendarContract.Events.DTEND,
             CalendarContract.Events.DELETED));
     
-    public static ArrayList<SystemCalendar> getAllCalendars(ContentResolver contentResolver) {
+    public static ArrayList<SystemCalendar> getAllCalendars(Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        
         ArrayList<SystemCalendar> systemCalendars = new ArrayList<>();
         Cursor cursor = query(contentResolver, CalendarContract.Calendars.CONTENT_URI, calendarColumns.toArray(new String[0]), null);
         int calendars = cursor.getCount();
@@ -43,7 +50,16 @@ public class SystemCalendarUtils {
         return systemCalendars;
     }
     
-    public static ArrayList<String> generateSubKeysFromKey(String calendar_key){
+    public static ArrayList<TodoListEntry> getAllTodoListEntriesFromCalendars(Context context) {
+        ArrayList<TodoListEntry> todoListEntries = new ArrayList<>();
+        ArrayList<SystemCalendar> calendars = getAllCalendars(context);
+        for (int i = 0; i < calendars.size(); i++) {
+            todoListEntries.addAll(calendars.get(i).getVisibleTodoListEntries());
+        }
+        return todoListEntries;
+    }
+    
+    public static ArrayList<String> generateSubKeysFromKey(String calendar_key) {
         ArrayList<String> calendarSubKeys = new ArrayList<>();
         String[] key_split = calendar_key.split("_");
         StringBuilder buffer = new StringBuilder();
@@ -73,6 +89,18 @@ public class SystemCalendarUtils {
     public static String getFirstValidKey(ArrayList<String> calendarSubKeys, String parameter) {
         int index = getFirstValidKeyIndex(calendarSubKeys, parameter);
         return index == -1 ? parameter : calendarSubKeys.get(index) + "_" + parameter;
+    }
+    
+    public static String makeKey(SystemCalendar calendar) {
+        return calendar.account_name + "_" + calendar.name;
+    }
+    
+    public static String makeKey(SystemCalendar calendar, int possibleEventColor) {
+        return makeKey(calendar) + "_" + possibleEventColor;
+    }
+    
+    public static String makeKey(SystemCalendarEvent event) {
+        return makeKey(event.associatedCalendar, event.color);
     }
     
 }

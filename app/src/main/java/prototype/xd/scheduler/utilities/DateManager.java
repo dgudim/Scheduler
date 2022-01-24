@@ -27,6 +27,10 @@ public class DateManager {
         }
     }
     
+    public static long daysFromEpoch(long epoch) {
+        return epoch / 86_400_000;
+    }
+    
     public static long daysFromDate(String date) {
         String[] dateParts_current = date.split("_");
         int year = Integer.parseInt(dateParts_current[0]);

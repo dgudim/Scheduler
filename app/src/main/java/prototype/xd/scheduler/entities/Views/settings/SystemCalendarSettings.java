@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.entities.Views.settings;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.generateSubKeysFromKey;
-import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.getFirstValidKey;
-import static prototype.xd.scheduler.calendarUtilities.SystemCalendarUtils.getFirstValidKeyIndex;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
@@ -51,8 +51,8 @@ public class SystemCalendarSettings extends PopupSettingsView{
         boolean showOnLock = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
         int priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
         
-        int dayOffset_right = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
-        int dayOffset_left = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
+        int dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
+        int dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
         
         fontColor_view.setBackgroundColor(fontColor);
         bgColor_view.setBackgroundColor(bgColor);
@@ -117,13 +117,13 @@ public class SystemCalendarSettings extends PopupSettingsView{
                 show_days_beforehand_description,
                 show_days_beforehand_bar,
                 showDaysBeforehand_bar_state, this, fragment, R.string.settings_show_days_beforehand,
-                calendarKey, Keys.BEFOREHAND_ITEMS_OFFSET, dayOffset_right);
+                calendarKey, Keys.BEFOREHAND_ITEMS_OFFSET, dayOffset_beforehand);
         
         addSeekBarChangeListener(
                 show_days_after_description,
                 show_days_after_bar,
                 showDaysAfter_bar_state, this, fragment, R.string.settings_show_days_after,
-                calendarKey, Keys.AFTER_ITEMS_OFFSET, dayOffset_left);
+                calendarKey, Keys.AFTER_ITEMS_OFFSET, dayOffset_after);
         
         addSwitchChangeListener(
                 show_on_lock_switch,

@@ -75,10 +75,10 @@ public class ListViewAdapter extends BaseAdapter {
             boolean visibilityFlag = !currentEntry.completed || currentEntry.showInList_ifCompleted;
             boolean show;
             if (currentlySelectedDate.equals(currentDate)) {
-                show = currentEntry.isNewEntry || currentEntry.isOldEntry || currentEntry.associatedDate.equals(currentlySelectedDate);
+                show = currentEntry.isNewEntry || currentEntry.isOldEntry || currentEntry.isVisible(currentlySelectedDate);
                 show = show && visibilityFlag;
             } else {
-                show = currentEntry.associatedDate.equals(currentlySelectedDate);
+                show = currentEntry.isVisible(currentlySelectedDate);
             }
             
             if (show) {
