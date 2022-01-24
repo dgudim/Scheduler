@@ -5,7 +5,6 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/background"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#B8B8B8"
@@ -49,11 +48,11 @@
 
             <ImageView
                 android:id="@+id/settings"
-                android:layout_width="27dp"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0"
                 android:contentDescription="@string/action_settings"
-                app:srcCompat="@drawable/gears_icon" />
+                app:srcCompat="@drawable/ic_settings" />
 
             <ImageView
                 android:id="@+id/deletionButton"
@@ -61,7 +60,7 @@
                 android:layout_height="54dp"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/delete_item"
-                app:srcCompat="@drawable/trash_can" />
+                app:srcCompat="@drawable/ic_delete" />
         </LinearLayout>
 
     </LinearLayout>

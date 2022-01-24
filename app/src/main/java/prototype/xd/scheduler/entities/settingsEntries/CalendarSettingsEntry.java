@@ -63,7 +63,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
                         LayoutInflater.from(context).inflate(R.layout.entry_settings, root, false),
                         calendarKey));
         
-        View colorSelector = rootView.findViewById(R.id.color_selector);
+        View colorSelector = rootView.findViewById(R.id.color_select_button);
         if (gridViewAdapter != null) {
             colorSelector.setVisibility(View.VISIBLE);
             colorSelector.setOnClickListener(v -> {

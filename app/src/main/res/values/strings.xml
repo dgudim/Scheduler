@@ -6,8 +6,6 @@
     <string name="settings_fragment_label">Settings Fragment</string>
     <string name="delete_item">Delete item</string>
 
-    <string name="hide">Скрыть</string>
-
     <string name="category_backgrounds">Фоны</string>
     <string name="category_bevels">Контуры</string>
     <string name="category_fonts">Шрифты</string>
@@ -39,8 +37,6 @@
     <string name="settings_new_bevel_thickness">Толщина контура для будущих дел:%d</string>
 
     <string name="settings_today_font_color">Цвет шрифта для сегодняшних дел</string>
-    <string name="settings_old_font_color">Цвет шрифта для пропущенных дел</string>
-    <string name="settings_new_font_color">Цвет шрифта для будущих дел</string>
 
     <string name="settings_reset_to_defaults">Сбросить настройки</string>
     <string name="settings_update_bg">Сбросить фон</string>
@@ -62,13 +58,5 @@
 
     <string name="calendar_events_full">%d событий</string>
     <string name="calendar_events">%d соб.</string>
-
-    <string name="monday">Понедельник</string>
-    <string name="tuesday">Вторник</string>
-    <string name="wednesday">Среда</string>
-    <string name="thursday">Четверг</string>
-    <string name="friday">Пятница</string>
-    <string name="saturday">Суббота</string>
-    <string name="sunday">Воскресенье</string>
 
 </resources>

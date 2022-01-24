@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HomeFragment">
@@ -23,7 +22,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
         android:contentDescription="@string/description_fab"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -41,9 +40,9 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:contentDescription="@string/action_settings"
-        android:src="@drawable/gears_icon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_settings" />
 
     <ListView
         android:id="@+id/list"

@@ -37,12 +37,14 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/color_selector"
+    <ImageButton
+        android:id="@+id/color_select_button"
+        style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:padding="1.5dp"
-        app:srcCompat="@drawable/color_wheel" />
+        android:background="#00FFFFFF"
+        app:srcCompat="@drawable/ic_palette"
+        tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck" />
 
     <ImageButton
         android:id="@+id/edit_button"
@@ -50,7 +52,7 @@
         android:layout_width="50dp"
         android:layout_height="match_parent"
         android:background="#00FFFFFF"
-        app:srcCompat="@android:drawable/ic_menu_edit"
+        app:srcCompat="@drawable/ic_settings"
         tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck" />
 
 </LinearLayout>

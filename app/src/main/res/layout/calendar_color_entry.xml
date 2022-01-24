@@ -46,7 +46,7 @@
             android:layout_height="25dp"
             android:layout_marginTop="3dp"
             android:layout_marginBottom="3dp"
-            app:srcCompat="@drawable/gears_icon" />
+            app:srcCompat="@drawable/ic_settings" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
