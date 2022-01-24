@@ -58,8 +58,7 @@ public class TodoListEntry {
     public int priority = 0;
     
     public boolean showOnLock = false;
-    public boolean showInList = true;
-    public boolean showInList_ifCompleted = true;
+    public boolean showInList_ifCompleted = false;
     
     public static final String blankTextValue = "_BLANK_";
     public String textValue = blankTextValue;
@@ -165,8 +164,6 @@ public class TodoListEntry {
                     
                     setFontColor(Keys.TODAY_FONT_COLOR, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
                     
-                    showInList = true;
-                    showInList_ifCompleted = true;
                     showOnLock = true;
                     
                     if (params[i + 1].equals(DATE_FLAG_GLOBAL)) {
@@ -185,7 +182,6 @@ public class TodoListEntry {
                     setFontColor(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR);
                     
                     showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_OLD_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_OLD_COMPLETED_ITEMS_IN_LIST);
-                    showInList = true;
                     showOnLock = true;
                     
                     setEntryType(EntryType.OLD);
@@ -198,7 +194,6 @@ public class TodoListEntry {
                     setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
                     
                     showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_NEW_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_NEW_COMPLETED_ITEMS_IN_LIST);
-                    showInList = true;
                     showOnLock = true;
                     
                     setEntryType(EntryType.NEW);
@@ -209,7 +204,6 @@ public class TodoListEntry {
                     bevelColor = Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR;
                     bevelThickness = Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS;
                     
-                    showInList = true;
                     showInList_ifCompleted = true;
                     showOnLock = false;
                     

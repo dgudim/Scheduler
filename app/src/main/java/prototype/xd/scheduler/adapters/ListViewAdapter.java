@@ -71,12 +71,16 @@ public class ListViewAdapter extends BaseAdapter {
         currentTodoListEntries_indexMap.clear();
         for (int i = 0; i < home.todoListEntries.size(); i++) {
             TodoListEntry currentEntry = home.todoListEntries.get(i);
-            boolean visibilityFlag = (currentEntry.completed && currentEntry.showInList_ifCompleted) || (!currentEntry.completed && currentEntry.showInList);
-            boolean show = visibilityFlag;
-            if (!currentEntry.isGlobalEntry) {
-                show = show && (currentEntry.associatedDate.equals(currentlySelectedDate));
+            
+            boolean visibilityFlag = !currentEntry.completed || currentEntry.showInList_ifCompleted;
+            boolean show;
+            if (currentlySelectedDate.equals(currentDate)) {
+                show = currentEntry.isNewEntry || currentEntry.isOldEntry || currentEntry.associatedDate.equals(currentlySelectedDate);
+                show = show && visibilityFlag;
+            } else {
+                show = currentEntry.associatedDate.equals(currentlySelectedDate);
             }
-            show = show || (currentEntry.isNewEntry || currentEntry.isOldEntry) && currentlySelectedDate.equals(currentDate) && visibilityFlag;
+            
             if (show) {
                 currentTodoListEntries.add(currentEntry);
                 currentTodoListEntries_indexMap.add(i);
