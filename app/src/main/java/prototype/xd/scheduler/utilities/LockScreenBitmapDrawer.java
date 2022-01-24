@@ -27,6 +27,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.ParcelFileDescriptor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,9 +64,11 @@ public class LockScreenBitmapDrawer {
     @SuppressLint("MissingPermission")
     public void initialiseBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
-        cachedBitmapFromLockScreen = BitmapFactory.decodeFileDescriptor(
-                wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK).getFileDescriptor())
-                .copy(Bitmap.Config.ARGB_8888, true);
+        ParcelFileDescriptor wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK);
+        if(wallpaperFile == null){
+            wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM);
+        }
+        cachedBitmapFromLockScreen = BitmapFactory.decodeFileDescriptor(wallpaperFile.getFileDescriptor()).copy(Bitmap.Config.ARGB_8888, true);
         if (!initialised) {
             displayWidth = displayMetrics.widthPixels;
             displayHeight = displayMetrics.heightPixels;
