@@ -39,24 +39,10 @@ public class SystemCalendarSettings extends PopupSettingsView{
     }
     
     private void initialise(String calendarKey, final Context context, final SettingsFragment fragment) {
-        
-        int fontColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
-        int bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
-        int bevelColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
-        int bevelThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
-        
-        int adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-        boolean adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
-        
-        boolean showOnLock = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
-        int priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
-        
-        int dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
-        int dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
-        
-        fontColor_view.setBackgroundColor(fontColor);
-        bgColor_view.setBackgroundColor(bgColor);
-        padColor_view.setBackgroundColor(bevelColor);
+    
+        fontColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR));
+        bgColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR));
+        padColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR));
         
         updateAllIndicators();
         
@@ -83,57 +69,67 @@ public class SystemCalendarSettings extends PopupSettingsView{
         fontColor_view.setOnClickListener(view -> invokeColorDialogue(context,
                 view, fontColor_view_state,
                 this,
-                calendarKey, Keys.FONT_COLOR, fontColor, true));
+                calendarKey, Keys.FONT_COLOR,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR), true));
         
         bgColor_view.setOnClickListener(view -> invokeColorDialogue(context,
                 view, bgColor_view_state,
                 this,
-                calendarKey, Keys.BG_COLOR, bgColor, true));
+                calendarKey, Keys.BG_COLOR,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR), true));
         
         padColor_view.setOnClickListener(view -> invokeColorDialogue(context,
                 view, padColor_view_state,
                 this,
-                calendarKey, Keys.BEVEL_COLOR, bevelColor, true));
+                calendarKey, Keys.BEVEL_COLOR,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR), true));
         
         addSeekBarChangeListener(
                 bevel_thickness_description,
                 bevel_thickness_bar,
                 padSize_state, this, fragment, R.string.settings_bevel_thickness,
-                calendarKey, Keys.BEVEL_THICKNESS, bevelThickness);
+                calendarKey, Keys.BEVEL_THICKNESS,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS));
         
         addSeekBarChangeListener(
                 priority_description,
                 priority_bar,
                 priority_state, this, fragment, R.string.settings_priority,
-                calendarKey, Keys.PRIORITY, priority);
+                calendarKey, Keys.PRIORITY,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY));
         
         addSeekBarChangeListener(
                 adaptive_color_balance_description,
                 adaptive_color_balance_bar,
                 adaptiveColor_bar_state, this, fragment, R.string.settings_adaptive_color_balance,
-                calendarKey, Keys.ADAPTIVE_COLOR_BALANCE, adaptiveColorBalance);
+                calendarKey, Keys.ADAPTIVE_COLOR_BALANCE,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE));
         
         addSeekBarChangeListener(
                 show_days_beforehand_description,
                 show_days_beforehand_bar,
                 showDaysBeforehand_bar_state, this, fragment, R.string.settings_show_days_beforehand,
-                calendarKey, Keys.BEFOREHAND_ITEMS_OFFSET, dayOffset_beforehand);
+                calendarKey, Keys.BEFOREHAND_ITEMS_OFFSET,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET));
         
         addSeekBarChangeListener(
                 show_days_after_description,
                 show_days_after_bar,
                 showDaysAfter_bar_state, this, fragment, R.string.settings_show_days_after,
-                calendarKey, Keys.AFTER_ITEMS_OFFSET, dayOffset_after);
+                calendarKey, Keys.AFTER_ITEMS_OFFSET,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET));
         
         addSwitchChangeListener(
                 show_on_lock_switch,
                 show_on_lock_state, this,
-                calendarKey, Keys.SHOW_ON_LOCK, showOnLock);
+                calendarKey, Keys.SHOW_ON_LOCK,
+                preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK));
         
         addSwitchChangeListener(
                 adaptive_color_switch,
                 adaptiveColor_switch_state, this,
-                calendarKey, Keys.ADAPTIVE_COLOR_ENABLED, adaptiveColorEnabled);
+                calendarKey, Keys.ADAPTIVE_COLOR_ENABLED,
+                preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED));
     }
     
     public void setStateIconColor(TextView display, String parameter) {
