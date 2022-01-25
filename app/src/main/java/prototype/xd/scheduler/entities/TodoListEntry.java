@@ -42,6 +42,10 @@ import android.widget.TextView;
 
 import androidx.core.math.MathUtils;
 
+import org.dmfs.rfc5545.DateTime;
+import org.dmfs.rfc5545.recur.RecurrenceRule;
+import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
+
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.R;
@@ -59,6 +63,8 @@ public class TodoListEntry {
     public long timestamp_start = 0;
     public long timestamp_end = 0;
     public boolean allDay = false;
+    public RecurrenceRule recurrentRule;
+    
     public long day_start = DATE_FLAG_GLOBAL;
     public long day_end = DATE_FLAG_GLOBAL;
     public int dayOffset_after = 0;
@@ -108,10 +114,24 @@ public class TodoListEntry {
     }
     
     public boolean isVisible(long day) {
+        if(recurrentRule != null){
+            RecurrenceRuleIterator it = recurrentRule.iterator(new DateTime(timestamp_start));
+            long instance = 0;
+            while (it.hasNext() && !recurrentRule.isInfinite() && daysFromEpoch(instance) <= day)
+            {
+                instance = it.nextMillis();
+                if(daysFromEpoch(instance) == day){
+                    return true;
+                }
+            }
+        }
         return day >= day_start && day <= day_end;
     }
     
     public String getTimeSpan(Context context) {
+        if(recurrentRule != null){
+            return DateManager.getTimeSpan(dateFromEpoch(timestamp_start), dateFromEpoch(timestamp_start + event.duration));
+        }
         if (allDay) {
             return context.getString(R.string.calendar_event_all_day);
         }
@@ -129,6 +149,7 @@ public class TodoListEntry {
         timestamp_start = event.start;
         timestamp_end = event.end;
         allDay = event.allDay;
+        recurrentRule = event.rRule;
         if (allDay) {
             timestamp_end = timestamp_start;
         }

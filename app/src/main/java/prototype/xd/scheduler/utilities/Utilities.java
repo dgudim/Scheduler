@@ -294,6 +294,73 @@ public class Utilities {
             
         }).build().show();
     }
+    
+    public static long RFC2445ToMilliseconds(String str) {
+        if (str == null || str.isEmpty())
+            throw new IllegalArgumentException("Null or empty RFC string");
+        
+        int sign = 1;
+        int weeks = 0;
+        int days = 0;
+        int hours = 0;
+        int minutes = 0;
+        int seconds = 0;
+        
+        int len = str.length();
+        int index = 0;
+        char c;
+        
+        c = str.charAt(0);
+        
+        if (c == '-') {
+            sign = -1;
+            index++;
+        } else if (c == '+')
+            index++;
+        
+        c = str.charAt(index);
+        
+        if (c != 'P')
+            throw new IllegalArgumentException("Duration.parse(str='" + str + "') expected 'P' at index=" + index);
+        
+        index++;
+        c = str.charAt(index);
+        if (c == 'T')
+            index++;
+        
+        int n = 0;
+        for (; index < len; index++) {
+            c = str.charAt(index);
+            
+            if (c >= '0' && c <= '9') {
+                n *= 10;
+                n += c - '0';
+            } else if (c == 'W') {
+                weeks = n;
+                n = 0;
+            } else if (c == 'H') {
+                hours = n;
+                n = 0;
+            } else if (c == 'M') {
+                minutes = n;
+                n = 0;
+            } else if (c == 'S') {
+                seconds = n;
+                n = 0;
+            } else if (c == 'D') {
+                days = n;
+                n = 0;
+            } else if (c != 'T') {
+                throw new IllegalArgumentException("Duration.parse(str='" + str + "') unexpected char '" + c + "' at index=" + index);
+            }
+        }
+        
+        return 1000 * sign * ((7L * 24 * 60 * 60 * weeks)
+                + (24L * 60 * 60 * days)
+                + (60L * 60 * hours)
+                + (60L * minutes)
+                + seconds);
+    }
 }
 
 class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
