@@ -13,11 +13,8 @@ import static prototype.xd.scheduler.utilities.Utilities.initStorage;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -32,7 +29,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -50,13 +46,6 @@ import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class HomeFragment extends Fragment {
     
-    private static final String[] PERMISSIONS = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.SET_WALLPAPER,
-            Manifest.permission.READ_CALENDAR,
-            Manifest.permission.WRITE_CALENDAR
-    };
-    
     public ListViewAdapter listViewAdapter;
     
     public ArrayList<TodoListEntry> todoListEntries;
@@ -65,7 +54,7 @@ public class HomeFragment extends Fragment {
     
     private Timer queueTimer;
     
-    public Activity rootActivity;
+    public MainActivity rootActivity;
     
     public Context context;
     
@@ -85,10 +74,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        rootActivity = requireActivity();
-        
-        verifyStoragePermissions(rootActivity);
-        
+        rootActivity = (MainActivity) requireActivity();
         context = requireContext();
         
         initStorage(context);
@@ -202,16 +188,5 @@ public class HomeFragment extends Fragment {
         });
         
         lockScreenBitmapDrawer.constructBitmap();
-    }
-    
-    void verifyStoragePermissions(Activity activity) {
-        boolean granted = false;
-        ActivityCompat.requestPermissions(activity, PERMISSIONS, 1);
-        while (!granted) {
-            granted = true;
-            for (String permission : PERMISSIONS) {
-                granted = granted && ActivityCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED;
-            }
-        }
     }
 }
