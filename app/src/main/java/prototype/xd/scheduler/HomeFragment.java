@@ -84,6 +84,8 @@ public class HomeFragment extends Fragment {
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(context);
         }
         
+        BackgroundSetterService.start(context);
+        
         final CalendarView datePicker = view.findViewById(R.id.calendar);
         
         todoListEntries = loadTodoEntries(context);

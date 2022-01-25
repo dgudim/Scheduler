@@ -71,8 +71,8 @@
     <string name="permissions_granted">предоставлено</string>
     <string name="permissions_not_granted">не предоставлено</string>
     <string name="permissions_grant">Предоставить</string>
-    <string name="title_activity_permissions">PermissionsActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="service_name">background updater service</string>
+    <string name="service_description">service to update your lock screen background</string>
 
 </resources>
