@@ -16,6 +16,10 @@ public class QueryUtilities {
         return cursor.getLong(columns.indexOf(column));
     }
     
+    public static boolean getBoolean(Cursor cursor, ArrayList<String> columns, String column){
+        return cursor.getInt(columns.indexOf(column)) > 0;
+    }
+    
     public static int getInt(Cursor cursor, ArrayList<String> columns, String column){
         return cursor.getInt(columns.indexOf(column));
     }

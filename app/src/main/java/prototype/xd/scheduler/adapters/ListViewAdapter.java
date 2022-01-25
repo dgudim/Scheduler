@@ -189,7 +189,7 @@ public class ListViewAdapter extends BaseAdapter {
             settings.setOnClickListener(v -> new EntrySettings(context, home, inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, home.todoListEntries));
         } else {
             view.findViewById(R.id.event_color).setBackgroundColor(currentEntry.event.color);
-            ((TextView)view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan());
+            ((TextView)view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(context));
             settings.setOnClickListener(v -> NavHostFragment.findNavController(home).navigate(R.id.action_HomeFragment_to_SettingsFragment));
         }
         

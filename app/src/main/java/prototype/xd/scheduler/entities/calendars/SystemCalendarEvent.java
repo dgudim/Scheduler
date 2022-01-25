@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities.calendars;
 
 import static android.provider.CalendarContract.Events;
+import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
@@ -23,6 +24,7 @@ public class SystemCalendarEvent {
     public final int color;
     public final long start;
     public final long end;
+    public final boolean allDay;
     
     public final ArrayList<String> subKeys;
     
@@ -36,6 +38,7 @@ public class SystemCalendarEvent {
         color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
         start = getLong(cursor, calendarEventsColumns, Events.DTSTART);
         end = getLong(cursor, calendarEventsColumns, Events.DTEND);
+        allDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
         
         subKeys = generateSubKeysFromKey(makeKey(this));
     }

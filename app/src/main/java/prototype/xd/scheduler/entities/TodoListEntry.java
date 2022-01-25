@@ -34,6 +34,7 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValid
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.TypedValue;
@@ -43,6 +44,7 @@ import androidx.core.math.MathUtils;
 
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
@@ -56,6 +58,7 @@ public class TodoListEntry {
     
     public long timestamp_start = 0;
     public long timestamp_end = 0;
+    public boolean allDay = false;
     public long day_start = DATE_FLAG_GLOBAL;
     public long day_end = DATE_FLAG_GLOBAL;
     public int dayOffset_after = 0;
@@ -108,7 +111,10 @@ public class TodoListEntry {
         return day >= day_start && day <= day_end;
     }
     
-    public String getTimeSpan() {
+    public String getTimeSpan(Context context) {
+        if (allDay) {
+            return context.getString(R.string.calendar_event_all_day);
+        }
         if (timestamp_start == timestamp_end) {
             return dateFromEpoch(timestamp_start);
         } else {
@@ -122,9 +128,13 @@ public class TodoListEntry {
         
         timestamp_start = event.start;
         timestamp_end = event.end;
+        allDay = event.allDay;
+        if (allDay) {
+            timestamp_end = timestamp_start;
+        }
         
-        day_start = daysFromEpoch(event.start);
-        day_end = daysFromEpoch(event.end);
+        day_start = daysFromEpoch(timestamp_start);
+        day_end = daysFromEpoch(timestamp_end);
         
         textValue = event.title;
         
@@ -138,7 +148,6 @@ public class TodoListEntry {
         adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
         adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
         
-        showOnLock = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
         priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
         
         dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
@@ -156,6 +165,10 @@ public class TodoListEntry {
             bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
             setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
         }
+        
+        showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+        showOnLock = showOnLock || isOldEntry || isNewEntry;
+        
         params = new String[]{};
         reloadParams();
     }

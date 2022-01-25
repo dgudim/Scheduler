@@ -33,6 +33,7 @@ public class SystemCalendarUtils {
             CalendarContract.Events.DISPLAY_COLOR,
             CalendarContract.Events.DTSTART,
             CalendarContract.Events.DTEND,
+            CalendarContract.Events.ALL_DAY,
             CalendarContract.Events.DELETED));
     
     public static ArrayList<SystemCalendar> getAllCalendars(Context context) {

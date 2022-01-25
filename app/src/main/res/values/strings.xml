@@ -60,5 +60,6 @@
 
     <string name="calendar_events_full">%d событий</string>
     <string name="calendar_events">%d соб.</string>
+    <string name="calendar_event_all_day">весь день</string>
 
 </resources>
