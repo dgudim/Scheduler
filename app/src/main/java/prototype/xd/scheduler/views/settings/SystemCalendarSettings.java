@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.entities.Views.settings;
+package prototype.xd.scheduler.views.settings;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;

@@ -33,8 +33,8 @@ import java.util.Comparator;
 import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.Views.Switch;
-import prototype.xd.scheduler.entities.Views.settings.SystemCalendarSettings;
+import prototype.xd.scheduler.views.Switch;
+import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
 public class Utilities {

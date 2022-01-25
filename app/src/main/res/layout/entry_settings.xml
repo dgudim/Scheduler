@@ -42,7 +42,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <prototype.xd.scheduler.entities.Views.Switch
+                    <prototype.xd.scheduler.views.Switch
                         android:id="@+id/show_on_lock_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <prototype.xd.scheduler.entities.Views.Switch
+                    <prototype.xd.scheduler.views.Switch
                         android:id="@+id/adaptive_color_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

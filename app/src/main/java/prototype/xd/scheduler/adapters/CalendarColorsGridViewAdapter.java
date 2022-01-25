@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
-import prototype.xd.scheduler.entities.Views.settings.SystemCalendarSettings;
+import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarColorsGridViewAdapter extends BaseAdapter {
     

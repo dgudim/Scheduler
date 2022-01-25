@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.entities.Views.settings;
+package prototype.xd.scheduler.views.settings;
 
 import android.view.View;
 import android.widget.SeekBar;
@@ -6,7 +6,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.entities.Views.Switch;
+import prototype.xd.scheduler.views.Switch;
 
 public class PopupSettingsView {
     

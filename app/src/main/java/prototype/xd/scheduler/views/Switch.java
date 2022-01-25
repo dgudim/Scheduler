@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.entities.Views;
+package prototype.xd.scheduler.views;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -6,7 +6,7 @@ import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener
 import android.view.View;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.entities.Views.Switch;
+import prototype.xd.scheduler.views.Switch;
 
 public class SwitchSettingsEntry extends SettingsEntry{
     

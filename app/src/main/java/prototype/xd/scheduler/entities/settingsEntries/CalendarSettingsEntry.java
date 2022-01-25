@@ -16,10 +16,10 @@ import android.widget.TextView;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
-import prototype.xd.scheduler.entities.Views.CheckBox;
+import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.entities.Views.settings.SystemCalendarSettings;
+import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntry extends SettingsEntry {
     
