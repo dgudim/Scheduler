@@ -14,8 +14,8 @@ import java.util.ArrayList;
 
 public class Group {
 
-    public static final String BLANK_NAME = "Ничего";
-    public String name = BLANK_NAME;
+    public static final String BLANK_GROUP_NAME = "Ничего";
+    public String name = BLANK_GROUP_NAME;
 
     String[] params = new String[]{};
 
@@ -92,7 +92,7 @@ public class Group {
 
     private static ArrayList<Group> createDefaultGroupFile() {
         ArrayList<Group> groups = new ArrayList<>();
-        groups.add(new Group(BLANK_NAME, new String[]{}));
+        groups.add(new Group(BLANK_GROUP_NAME, new String[]{}));
         saveGroupsFile(groups);
         return groups;
     }

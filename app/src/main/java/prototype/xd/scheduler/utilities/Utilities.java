@@ -306,6 +306,9 @@ class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
 class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
+        if (o1.fromSystemCalendar || o2.fromSystemCalendar) {
+            return Long.compare(o1.timestamp_start, o2.timestamp_start);
+        }
         return Integer.compare(o1.group.name.hashCode(), o2.group.name.hashCode());
     }
 }

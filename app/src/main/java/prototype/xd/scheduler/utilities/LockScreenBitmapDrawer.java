@@ -65,7 +65,7 @@ public class LockScreenBitmapDrawer {
     public void initialiseBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
         ParcelFileDescriptor wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK);
-        if(wallpaperFile == null){
+        if (wallpaperFile == null) {
             wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM);
         }
         cachedBitmapFromLockScreen = BitmapFactory.decodeFileDescriptor(wallpaperFile.getFileDescriptor()).copy(Bitmap.Config.ARGB_8888, true);
@@ -183,7 +183,7 @@ public class LockScreenBitmapDrawer {
         if (!toAdd.isEmpty()) {
             
             for (int i = 0; i < toAdd.size(); i++) {
-                toAdd.get(i).initialiseDisplayData();
+                toAdd.get(i).loadDisplayData();
                 toAdd.get(i).splitText();
             }
             
@@ -202,7 +202,12 @@ public class LockScreenBitmapDrawer {
                     if (forceMaxRWidth) {
                         toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelThickness;
                     }
-                    TodoListEntry splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
+                    TodoListEntry splitEntry;
+                    if (toAdd.get(i).fromSystemCalendar) {
+                        splitEntry = new TodoListEntry(toAdd.get(i).event);
+                    } else {
+                        splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
+                    }
                     copyDisplayData(toAdd.get(i), splitEntry);
                     splitEntry.changeParameter(TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
                     toAddSplit.add(splitEntry);

@@ -1,12 +1,12 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
+import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
-import static prototype.xd.scheduler.utilities.DateManager.currentDate;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DATE;
-import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
+import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.initStorage;
@@ -92,7 +92,7 @@ public class HomeFragment extends Fragment {
         context = requireContext();
         
         initStorage(context);
-        updateDate("none", true);
+        updateDate(DATE_FLAG_GLOBAL_STR, true);
         
         if (lockScreenBitmapDrawer == null) {
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(context);
@@ -109,7 +109,7 @@ public class HomeFragment extends Fragment {
         
         datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
             updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-            listViewAdapter.updateData(currentlySelectedDate.equals(currentDate));
+            listViewAdapter.updateData(currentlySelectedDay == currentDay);
         });
         
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -121,7 +121,7 @@ public class HomeFragment extends Fragment {
             View addView = inflater.inflate(R.layout.add_entry_dialogue, rootViewGroup, false);
             final EditText input = addView.findViewById(R.id.entryNameEditText);
             
-            final String[] currentGroup = {BLANK_NAME};
+            final String[] currentGroup = {BLANK_GROUP_NAME};
             
             final ArrayList<Group> groupList = readGroupFile();
             final ArrayList<String> groupNames = new ArrayList<>();
@@ -132,7 +132,7 @@ public class HomeFragment extends Fragment {
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, groupNames);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
             groupSpinner.setAdapter(arrayAdapter);
-            groupSpinner.setSelection(groupNames.indexOf(BLANK_NAME));
+            groupSpinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
             groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
@@ -151,7 +151,7 @@ public class HomeFragment extends Fragment {
             builder.setPositiveButton("Добавить", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString(),
-                        ASSOCIATED_DATE, currentlySelectedDate,
+                        ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
@@ -161,7 +161,7 @@ public class HomeFragment extends Fragment {
             builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString(),
-                        ASSOCIATED_DATE, DATE_FLAG_GLOBAL,
+                        ASSOCIATED_DAY, DATE_FLAG_GLOBAL_STR,
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);

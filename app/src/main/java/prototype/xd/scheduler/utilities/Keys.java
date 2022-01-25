@@ -32,7 +32,8 @@ public class Keys {
     public static final int SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET = 0;
     public static final int SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET = 0;
     
-    public static final String DATE_FLAG_GLOBAL = "GLOBAL";
+    public static final int DATE_FLAG_GLOBAL = -1;
+    public static final String DATE_FLAG_GLOBAL_STR = "-1";
     
     public static final boolean CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK = true;
     public static final boolean CALENDAR_SETTINGS_DEFAULT_VISIBLE = true;
@@ -41,7 +42,7 @@ public class Keys {
     public static final String TEXT_VALUE = "value";
     public static final String IS_COMPLETED = "completed";
     public static final String SHOW_ON_LOCK = "lock";
-    public static final String ASSOCIATED_DATE = "associatedDate";
+    public static final String ASSOCIATED_DAY = "associatedDay";
     public static final int ENTITY_SETTINGS_DEFAULT_PRIORITY = 0;
     public static final String PRIORITY = "priority";
     

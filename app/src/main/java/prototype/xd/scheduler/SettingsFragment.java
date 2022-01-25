@@ -79,9 +79,9 @@ public class SettingsFragment extends Fragment {
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_FONT_COLOR, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR,
                 context.getString(R.string.settings_today_font_color), context));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR,
-                context.getString(R.string.settings_today_font_color), context));
+                context.getString(R.string.settings_old_font_color), context));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR,
-                context.getString(R.string.settings_today_font_color), context));
+                context.getString(R.string.settings_new_font_color), context));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE,
                 Keys.FONT_SIZE, R.string.settings_font_size, this));
         

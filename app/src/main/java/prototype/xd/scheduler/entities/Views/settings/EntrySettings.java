@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.entities.Views.settings;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.Group.BLANK_NAME;
+import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
@@ -84,7 +84,7 @@ public class EntrySettings extends PopupSettingsView{
                 if (convertView == null) {
                     view.setOnLongClickListener(view1 -> {
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        if (groupNames.get(position).equals(BLANK_NAME)) {
+                        if (groupNames.get(position).equals(BLANK_GROUP_NAME)) {
                             builder.setTitle("Нельзя переименовать эту группу");
                             builder.setMessage("Ты сломаешь сброс настроек");
                         } else {
@@ -98,7 +98,7 @@ public class EntrySettings extends PopupSettingsView{
                             builder.setView(input);
                             
                             builder.setPositiveButton("Сохранить", (dialog, which) -> {
-                                if (!input.getText().toString().equals(BLANK_NAME)) {
+                                if (!input.getText().toString().equals(BLANK_GROUP_NAME)) {
                                     groupNames.set(position, input.getText().toString());
                                     String origName = groupList.get(position).name;
                                     groupList.get(position).name = input.getText().toString();
@@ -135,7 +135,7 @@ public class EntrySettings extends PopupSettingsView{
                                         }
                                     }
                                     saveEntries(fragment.todoListEntries);
-                                    group_spinner.setSelection(groupNames.indexOf(BLANK_NAME));
+                                    group_spinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
                                     updateAllIndicators();
                                     notifyDataSetChanged();
                                 });
@@ -188,7 +188,7 @@ public class EntrySettings extends PopupSettingsView{
             builder.setView(input);
             
             builder.setPositiveButton("Добавить", (dialog, which) -> {
-                if (input.getText().toString().equals(BLANK_NAME)) {
+                if (input.getText().toString().equals(BLANK_GROUP_NAME)) {
                     AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
                     builder13.setTitle("Нельзя создать группу с таким названием");
                     builder13.setMessage("Ты сломаешь сброс настроек");

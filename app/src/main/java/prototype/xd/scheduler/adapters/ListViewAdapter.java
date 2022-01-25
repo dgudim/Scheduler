@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.adapters;
 
-import static prototype.xd.scheduler.utilities.DateManager.currentDate;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDate;
-import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DATE;
-import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
+import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
+import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
@@ -20,6 +20,8 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.ArrayList;
 
@@ -74,11 +76,11 @@ public class ListViewAdapter extends BaseAdapter {
             
             boolean visibilityFlag = !currentEntry.completed || currentEntry.showInList_ifCompleted;
             boolean show;
-            if (currentlySelectedDate.equals(currentDate)) {
-                show = currentEntry.isNewEntry || currentEntry.isOldEntry || currentEntry.isVisible(currentlySelectedDate);
+            if (currentlySelectedDay == currentDay) {
+                show = currentEntry.isNewEntry || currentEntry.isOldEntry || currentEntry.isVisible(currentlySelectedDay);
                 show = show && visibilityFlag;
             } else {
-                show = currentEntry.isVisible(currentlySelectedDate);
+                show = currentEntry.isVisible(currentlySelectedDay);
             }
             
             if (show) {
@@ -97,49 +99,99 @@ public class ListViewAdapter extends BaseAdapter {
         home.rootActivity.runOnUiThread(this::notifyDataSetChanged);
     }
     
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+    
+    @Override
+    public int getItemViewType(int i) {
+        return currentTodoListEntries.get(i).fromSystemCalendar ? 1 : 0;
+    }
+    
     @SuppressLint("SetTextI18n")
     @Override
     public View getView(final int i, View view, ViewGroup parent) {
         
         final TodoListEntry currentEntry = currentTodoListEntries.get(i);
-        TextView todoText;
-        CheckBox isDone;
         
         if (view == null) {
-            view = inflater.inflate(R.layout.list_selection, parent, false);
+            if (currentEntry.fromSystemCalendar) {
+                view = inflater.inflate(R.layout.list_selection_calendar, parent, false);
+            } else {
+                view = inflater.inflate(R.layout.list_selection, parent, false);
+            }
         }
-        todoText = view.findViewById(R.id.todoText);
-        isDone = view.findViewById(R.id.isDone);
         
-        ImageView delete = view.findViewById(R.id.deletionButton);
+        TextView todoText = view.findViewById(R.id.todoText);
+        
         ImageView settings = view.findViewById(R.id.settings);
         
-        delete.setOnClickListener(view1 -> {
+        if (!currentEntry.fromSystemCalendar) {
             
-            AlertDialog.Builder alert = new AlertDialog.Builder(context);
-            alert.setTitle("Удалить");
-            alert.setMessage("Вы уверены?");
-            alert.setPositiveButton("Да", (dialog, which) -> {
-                home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
-                saveEntries(home.todoListEntries);
-                updateData(currentEntry.getLockViewState());
+            view.findViewById(R.id.deletionButton).setOnClickListener(view1 -> {
+                
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                alert.setTitle("Удалить");
+                alert.setMessage("Вы уверены?");
+                alert.setPositiveButton("Да", (dialog, which) -> {
+                    home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
+                    saveEntries(home.todoListEntries);
+                    updateData(currentEntry.getLockViewState());
+                });
+                
+                alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+                
+                alert.show();
             });
             
-            alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+            CheckBox isDone = view.findViewById(R.id.isDone);
             
-            alert.show();
-        });
-        
-        isDone.setChecked(currentEntry.completed, false);
-        isDone.setOnClickListener(view12 -> {
-            if (!currentEntry.isGlobalEntry) {
-                currentEntry.changeParameter(IS_COMPLETED, String.valueOf(isDone.isChecked()));
-            } else {
-                currentEntry.changeParameter(ASSOCIATED_DATE, currentlySelectedDate);
-            }
-            saveEntries(home.todoListEntries);
-            updateData(true);
-        });
+            isDone.setChecked(currentEntry.completed, false);
+            isDone.setOnClickListener(view12 -> {
+                if (!currentEntry.isGlobalEntry) {
+                    currentEntry.changeParameter(IS_COMPLETED, String.valueOf(isDone.isChecked()));
+                } else {
+                    currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
+                }
+                saveEntries(home.todoListEntries);
+                updateData(true);
+            });
+            
+            todoText.setOnLongClickListener(v -> {
+                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                
+                final EditText input = new EditText(context);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setText(currentEntry.textValue);
+                alert.setView(input);
+                
+                alert.setTitle("Изменить");
+                alert.setPositiveButton("Сохранить", (dialog, which) -> {
+                    currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
+                    saveEntries(home.todoListEntries);
+                    updateData(currentEntry.getLockViewState());
+                });
+                
+                if (!currentEntry.isGlobalEntry) {
+                    alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
+                        currentEntry.changeParameter(ASSOCIATED_DAY, DATE_FLAG_GLOBAL_STR);
+                        saveEntries(home.todoListEntries);
+                        updateData(currentEntry.getLockViewState());
+                    });
+                }
+                
+                alert.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+                
+                alert.show();
+                return false;
+            });
+            settings.setOnClickListener(v -> new EntrySettings(context, home, inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, home.todoListEntries));
+        } else {
+            view.findViewById(R.id.event_color).setBackgroundColor(currentEntry.event.color);
+            ((TextView)view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan());
+            settings.setOnClickListener(v -> NavHostFragment.findNavController(home).navigate(R.id.action_HomeFragment_to_SettingsFragment));
+        }
         
         view.findViewById(R.id.backgroundSecondLayer).setBackgroundColor(currentEntry.bgColor);
         
@@ -150,39 +202,9 @@ public class ListViewAdapter extends BaseAdapter {
         }
         
         todoText.setText(currentEntry.textValue);
-        if (currentlySelectedDate.equals(currentDate)) {
+        if (currentlySelectedDay == currentDay) {
             todoText.setText(todoText.getText() + currentEntry.getDayOffset());
         }
-        
-        todoText.setOnLongClickListener(v -> {
-            AlertDialog.Builder alert = new AlertDialog.Builder(context);
-            
-            final EditText input = new EditText(context);
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            input.setText(currentEntry.textValue);
-            alert.setView(input);
-            
-            alert.setTitle("Изменить");
-            alert.setPositiveButton("Сохранить", (dialog, which) -> {
-                currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
-                saveEntries(home.todoListEntries);
-                updateData(currentEntry.getLockViewState());
-            });
-            
-            if (!currentEntry.isGlobalEntry) {
-                alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
-                    currentEntry.changeParameter(ASSOCIATED_DATE, DATE_FLAG_GLOBAL);
-                    saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
-                });
-            }
-            
-            alert.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
-            
-            alert.show();
-            return false;
-        });
-        settings.setOnClickListener(v -> new EntrySettings(context, home, inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, home.todoListEntries));
         
         return view;
     }
