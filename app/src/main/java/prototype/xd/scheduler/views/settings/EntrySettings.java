@@ -54,8 +54,7 @@ public class EntrySettings extends PopupSettingsView{
         
         alert.setOnDismissListener(dialog -> {
             saveEntries(fragment.todoListEntries);
-            fragment.listViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
+            fragment.listViewAdapter.updateData();
         });
         alert.setView(settingsView);
         alert.show();

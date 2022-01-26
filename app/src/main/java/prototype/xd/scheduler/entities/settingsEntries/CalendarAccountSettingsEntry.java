@@ -51,7 +51,7 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
         ((TextView) rootView.findViewById(R.id.calendar_name)).setText(accountName);
         ((TextView) rootView.findViewById(R.id.account_type)).setText(accountType);
         rootView.findViewById(R.id.edit_button).setOnClickListener(v ->
-                new SystemCalendarSettings(context, fragment,
+                new SystemCalendarSettings(fragment,
                         inflater.inflate(R.layout.entry_settings, root, false),
                         accountName));
         return super.InitInnerViews(rootView);

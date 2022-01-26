@@ -9,7 +9,9 @@ import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllTodoListEntriesFromCalendars;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -36,11 +38,11 @@ import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-@SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked", "UseSwitchCompatOrMaterialCode"})
+@SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})
 public class Utilities {
     
     public static File rootDir;
-    
+   
     public static void initStorage(Context context) {
         rootDir = context.getExternalFilesDir("");
         if (rootDir == null) {
@@ -110,6 +112,16 @@ public class Utilities {
         ObjectOutputStream s = new ObjectOutputStream(f);
         s.writeObject(object);
         s.close();
+    }
+    
+    public static void callImageFileChooser(Activity activity, int requestCode){
+        Intent chooseFile;
+        Intent intent;
+        chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
+        chooseFile.setType("image/*");
+        intent = Intent.createChooser(chooseFile, "Choose an image");
+        activity.startActivityForResult(intent, requestCode);
     }
     
     public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {

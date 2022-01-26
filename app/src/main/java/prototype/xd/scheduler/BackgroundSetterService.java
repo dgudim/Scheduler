@@ -12,14 +12,24 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
+
 public class BackgroundSetterService extends Service {
     
-    public static void start(Context context) {
+    public LockScreenBitmapDrawer lockScreenBitmapDrawer;
+    
+    public static void restart(Context context) {
+        context.stopService(new Intent(context, BackgroundSetterService.class));
         ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
     }
     
-    public static void stop(Context context) {
-        context.stopService(new Intent(context, BackgroundSetterService.class));
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
     
     // Foreground service notification =========
@@ -96,12 +106,16 @@ public class BackgroundSetterService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         startForeground(foregroundNotificationId, getForegroundNotification());
-        return START_STICKY;
-    }
+        lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
+        
+        Timer queueTimer = new Timer();
+        queueTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+            }
+        }, 3000, 1000 * 60); //every minute
     
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+        return START_STICKY;
     }
 }

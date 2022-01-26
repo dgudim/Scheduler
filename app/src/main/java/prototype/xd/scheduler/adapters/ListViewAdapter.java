@@ -30,7 +30,6 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.EntrySettings;
-import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class ListViewAdapter extends BaseAdapter {
     
@@ -38,15 +37,13 @@ public class ListViewAdapter extends BaseAdapter {
     
     private final LayoutInflater inflater;
     private final HomeFragment home;
-    private final LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
     public final ArrayList<TodoListEntry> currentTodoListEntries;
     public final ArrayList<Integer> currentTodoListEntries_indexMap;
     
-    public ListViewAdapter(HomeFragment fragment, LockScreenBitmapDrawer lockScreenBitmapDrawer) {
+    public ListViewAdapter(HomeFragment fragment) {
         this.home = fragment;
-        this.context = fragment.context;
-        this.lockScreenBitmapDrawer = lockScreenBitmapDrawer;
+        this.context = fragment.rootActivity;
         inflater = LayoutInflater.from(context);
         currentTodoListEntries = new ArrayList<>();
         currentTodoListEntries_indexMap = new ArrayList<>();
@@ -90,10 +87,7 @@ public class ListViewAdapter extends BaseAdapter {
         }
     }
     
-    public void updateData(boolean reconstructBitmap) {
-        if (reconstructBitmap) {
-            lockScreenBitmapDrawer.constructBitmap();
-        }
+    public void updateData() {
         home.todoListEntries = sortEntries(home.todoListEntries);
         updateCurrentEntries();
         home.rootActivity.runOnUiThread(this::notifyDataSetChanged);
@@ -137,7 +131,7 @@ public class ListViewAdapter extends BaseAdapter {
                 alert.setPositiveButton("Да", (dialog, which) -> {
                     home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
                     saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
+                    updateData();
                 });
                 
                 alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
@@ -155,7 +149,7 @@ public class ListViewAdapter extends BaseAdapter {
                     currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                 }
                 saveEntries(home.todoListEntries);
-                updateData(true);
+                updateData();
             });
             
             todoText.setOnLongClickListener(v -> {
@@ -170,14 +164,14 @@ public class ListViewAdapter extends BaseAdapter {
                 alert.setPositiveButton("Сохранить", (dialog, which) -> {
                     currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
                     saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
+                    updateData();
                 });
                 
                 if (!currentEntry.isGlobalEntry) {
                     alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
                         currentEntry.changeParameter(ASSOCIATED_DAY, DATE_FLAG_GLOBAL_STR);
                         saveEntries(home.todoListEntries);
-                        updateData(currentEntry.getLockViewState());
+                        updateData();
                     });
                 }
                 

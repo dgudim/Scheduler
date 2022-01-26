@@ -9,14 +9,12 @@ import java.util.Calendar;
 
 public class BackgroundChooser {
 
-    public static final String defaultBackgroundName = "bg.png";
+    public static final String defaultBackgroundName = availableDays[7] + ".png";
 
     static File getBackgroundAccordingToDayAndTime() {
-
-        File defaultName = new File(rootDir, defaultBackgroundName);
-
-        if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, true)) {
-            return defaultName;
+        
+        if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED)) {
+            return new File(rootDir, defaultBackgroundName);
         }
 
         final Calendar cal = Calendar.getInstance();
@@ -27,14 +25,8 @@ public class BackgroundChooser {
         }else{
             day_string = availableDays[day - 2];
         }
-
-        File dayName = new File(rootDir, day_string + ".png");
-
-        if (!defaultName.exists()) {
-            return defaultName;
-        } else {
-            return dayName;
-        }
+    
+        return new File(rootDir, day_string + ".png");
     }
 
 }

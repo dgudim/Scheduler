@@ -9,10 +9,29 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.DisplayMetrics;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 public class BitmapUtilities {
+    
+    
+    public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output, DisplayMetrics displayMetrics) throws FileNotFoundException {
+        Bitmap cut_bitmap = Bitmap.createBitmap(bitmap,
+                (int) (bitmap.getWidth() / 2f - displayMetrics.widthPixels / 2f),
+                (int) (bitmap.getHeight() / 2f - displayMetrics.heightPixels / 2f),
+                displayMetrics.widthPixels, displayMetrics.heightPixels);
+        fingerPrintBitmap(cut_bitmap);
+        cut_bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(output));
+        
+        Bitmap resizedBitmap = createScaledBitmap(cut_bitmap, (int) (cut_bitmap.getWidth() / 4f), (int) (cut_bitmap.getHeight() / 4f), BitmapUtilities.ScalingLogic.FIT);
+        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, new FileOutputStream(output.getAbsolutePath() + "_min.png"));
+        resizedBitmap.recycle();
+        bitmap.recycle();
+        return cut_bitmap;
+    }
     
     /**
      * Utility function for decoding an image resource. The decoded bitmap will
@@ -232,19 +251,19 @@ public class BitmapUtilities {
                 blueBucket / pixelCount);
     }
     
-    public static Bitmap fingerPrintBitmap(Bitmap bitmap) {
+    public static void fingerPrintBitmap(Bitmap bitmap) {
         for (int i = 0; i < 3; i++) {
             for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
-                bitmap.setPixel(i2, i, 0);
-            }
-        }
-        return bitmap;
-    }
+                bitmap.setPixel(i2, i, 0);//<<<-------------------------------------------------------------------------------------
+            }                                                                                                                           //|
+        }                                                                                                                               //|
+    }                                                                                                                                   //|
     
-    public static boolean noFingerPrint(Bitmap bitmap) {
-        for (int i = 0; i < 3; i++) {
-            for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
-                if (!(bitmap.getPixel(i2, i) == -16777216)) {
+    public static boolean noFingerPrint(Bitmap bitmap) {                                                                                //|
+        for (int i = 0; i < 3; i++) {                                                                                                   //|
+            for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {                                                                            //|
+                int pixel = bitmap.getPixel(i2, i);                                                                                     //|
+                if (!(pixel == -16777216 || pixel == 0)) { // -16777216 is the decoded value 0 is just after setting the fingerprint here |
                     return true;
                 }
             }

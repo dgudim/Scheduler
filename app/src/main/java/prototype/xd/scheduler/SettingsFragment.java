@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.entities.settingsEntries.AdaptiveBackgroundSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarAccountSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.ColorSelectSettingsEntry;
@@ -31,11 +32,16 @@ public class SettingsFragment extends Fragment {
     
     public Context context;
     public ViewGroup rootViewGroup;
+    private AdaptiveBackgroundSettingsEntry adaptiveBackgroundSettingsEntry;
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootViewGroup = container;
         return inflater.inflate(R.layout.fragment_settings, container, false);
+    }
+    
+    public void notifyBgSelected() {
+        adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated();
     }
     
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
@@ -44,10 +50,10 @@ public class SettingsFragment extends Fragment {
         
         ArrayList<SettingsEntry> settingsEntries = new ArrayList<>();
         
+        adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntry(this);
+        
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_backgrounds)));
-        settingsEntries.add(new SwitchSettingsEntry(
-                Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED,
-                context.getString(R.string.settings_adaptive_background)));
+        settingsEntries.add(adaptiveBackgroundSettingsEntry);
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED,
                 context.getString(R.string.settings_adaptive_color)));
@@ -105,37 +111,40 @@ public class SettingsFragment extends Fragment {
                 context.getString(R.string.settings_max_rWidth_lock)));
         
         settingsEntries.add(new ResetButtonsSettingsEntry(this, view, savedInstanceState));
+    
+        SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries, context);
+        ((ListView) view.findViewById(R.id.settingsList)).setAdapter(settingsListViewAdapter);
         
-        settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_system_calendars)));
-        ArrayList<SystemCalendar> calendars = getAllCalendars(context);
-        ArrayList<ArrayList<SystemCalendar>> calendars_sorted = new ArrayList<>();
-        ArrayList<String> calendars_sorted_names = new ArrayList<>();
-        
-        for (int i = 0; i < calendars.size(); i++) {
-            SystemCalendar calendar = calendars.get(i);
-            if (calendars_sorted_names.contains(calendar.account_name)) {
-                calendars_sorted.get(calendars_sorted_names.indexOf(calendar.account_name)).add(calendar);
-            } else {
-                ArrayList<SystemCalendar> calendar_group = new ArrayList<>();
-                calendar_group.add(calendar);
-                calendars_sorted.add(calendar_group);
-                calendars_sorted_names.add(calendar.account_name);
+        new Thread(() -> {
+            settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_system_calendars)));
+            ArrayList<SystemCalendar> calendars = getAllCalendars(context);
+            ArrayList<ArrayList<SystemCalendar>> calendars_sorted = new ArrayList<>();
+            ArrayList<String> calendars_sorted_names = new ArrayList<>();
+
+            for (int i = 0; i < calendars.size(); i++) {
+                SystemCalendar calendar = calendars.get(i);
+                if (calendars_sorted_names.contains(calendar.account_name)) {
+                    calendars_sorted.get(calendars_sorted_names.indexOf(calendar.account_name)).add(calendar);
+                } else {
+                    ArrayList<SystemCalendar> calendar_group = new ArrayList<>();
+                    calendar_group.add(calendar);
+                    calendars_sorted.add(calendar_group);
+                    calendars_sorted_names.add(calendar.account_name);
+                }
             }
-        }
-        
-        for (int g = 0; g < calendars_sorted.size(); g++) {
-            ArrayList<SystemCalendar> calendar_group = calendars_sorted.get(g);
-            SystemCalendar calendar0 = calendar_group.get(0);
-            
-            settingsEntries.add(new CalendarAccountSettingsEntry(this, calendar0));
-            
-            for (int c = 0; c < calendar_group.size(); c++) {
-                SystemCalendar current_calendar = calendar_group.get(c);
-                settingsEntries.add(new CalendarSettingsEntry(this, current_calendar));
+
+            for (int g = 0; g < calendars_sorted.size(); g++) {
+                ArrayList<SystemCalendar> calendar_group = calendars_sorted.get(g);
+                SystemCalendar calendar0 = calendar_group.get(0);
+    
+                settingsEntries.add(new CalendarAccountSettingsEntry(SettingsFragment.this, calendar0));
+    
+                for (int c = 0; c < calendar_group.size(); c++) {
+                    SystemCalendar current_calendar = calendar_group.get(c);
+                    settingsEntries.add(new CalendarSettingsEntry(SettingsFragment.this, current_calendar));
+                }
             }
-        }
-        
-        ((ListView) view.findViewById(R.id.settingsList)).setAdapter(new SettingsListViewAdapter(settingsEntries, context));
-        
+            requireActivity().runOnUiThread(settingsListViewAdapter::notifyDataSetChanged);
+        }).start();
     }
 }

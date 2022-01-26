@@ -4,7 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-enum SettingsEntryType {CALENDAR_ACCOUNT, CALENDAR, COLOR_SELECT, RESET_BUTTONS, SEEK_BAR, SEEK_BAR_DISCRETE, SWITCH, TITLE_BAR, UNDEFINED}
+enum SettingsEntryType {CALENDAR_ACCOUNT, CALENDAR, COLOR_SELECT, RESET_BUTTONS, SEEK_BAR, SEEK_BAR_DISCRETE, SWITCH, TITLE_BAR, ADAPTIVE_BACKGROUND_SETTINGS}
 
 public class SettingsEntry {
     

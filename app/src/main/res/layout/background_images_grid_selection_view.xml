@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <prototype.xd.scheduler.views.Switch
+        android:id="@+id/adaptive_bg_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
+        android:text="@string/enable"
+        android:textSize="18sp"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <include layout="@layout/grid_selection_view" />
+
+</LinearLayout>

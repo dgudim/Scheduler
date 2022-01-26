@@ -15,10 +15,10 @@ import android.widget.TextView;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
-import prototype.xd.scheduler.entities.calendars.SystemCalendar;
-import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
+import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntry extends SettingsEntry {
@@ -62,7 +62,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
                 preferences.edit().putBoolean(calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
         
         rootView.findViewById(R.id.edit_button).setOnClickListener(view ->
-                new SystemCalendarSettings(context, fragment,
+                new SystemCalendarSettings(fragment,
                         inflater.inflate(R.layout.entry_settings, root, false),
                         calendarKey));
         
@@ -72,7 +72,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
             colorSelector.setOnClickListener(v -> {
                 final AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 
-                View view = inflater.inflate(R.layout.grid_color_select, root, false);
+                View view = inflater.inflate(R.layout.grid_selection_view, root, false);
                 GridView gridView = view.findViewById(R.id.grid_view);
                 gridView.setNumColumns(5);
                 gridView.setHorizontalSpacing(5);

@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.entities;
 
 import static org.apache.commons.lang.ArrayUtils.addAll;
-import static prototype.xd.scheduler.MainActivity.displayMetrics;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
@@ -25,8 +24,6 @@ import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.currentBitmapLongestText;
-import static prototype.xd.scheduler.utilities.LockScreenBitmapDrawer.displayWidth;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
@@ -52,6 +49,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class TodoListEntry {
     
@@ -362,14 +360,14 @@ public class TodoListEntry {
         setFontColor(preferences.getInt(key, defaultColor));
     }
     
-    public void loadDisplayData() {
-        h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, displayMetrics);
+    public void loadDisplayData(LockScreenBitmapDrawer lockScreenBitmapDrawer) {
+        h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, lockScreenBitmapDrawer.displayMetrics);
         kM = h * 1.1f;
         textPaint = createNewPaint(fontColor);
         textPaint.setTextSize(h);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        rWidth = MathUtils.clamp(textPaint.measureText(currentBitmapLongestText), 1, displayWidth / 2f - bevelThickness);
-        maxChars = (int) ((displayWidth - bevelThickness * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
+        rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1, lockScreenBitmapDrawer.displayWidth / 2f - bevelThickness);
+        maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - bevelThickness * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         
         log(INFO, "loaded display data for " + textValue);
     }

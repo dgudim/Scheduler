@@ -21,7 +21,7 @@ public class DateManager {
     
     static final DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.ROOT);
     
-    public static final CharSequence[] availableDays = new CharSequence[]{"понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "общий"};
+    public static final String[] availableDays = new String[]{"понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "общий"};
     
     public static void updateDate(String selectedDate_string, boolean updateCurrentlySelected) {
         long selectedDay = daysFromDate(selectedDate_string);

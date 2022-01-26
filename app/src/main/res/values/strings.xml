@@ -75,4 +75,7 @@
     <string name="service_name">background updater service</string>
     <string name="service_description">service to update your lock screen background</string>
 
+    <string name="group">Группа:</string>
+    <string name="enable">Включить</string>
+
 </resources>

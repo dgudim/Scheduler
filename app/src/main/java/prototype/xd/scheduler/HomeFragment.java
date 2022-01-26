@@ -2,19 +2,17 @@ package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.Utilities.initStorage;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -26,7 +24,6 @@ import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -35,14 +32,10 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import pl.droidsonroids.gif.GifImageView;
 import prototype.xd.scheduler.adapters.ListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class HomeFragment extends Fragment {
     
@@ -50,13 +43,7 @@ public class HomeFragment extends Fragment {
     
     public ArrayList<TodoListEntry> todoListEntries;
     
-    private LockScreenBitmapDrawer lockScreenBitmapDrawer;
-    
-    private Timer queueTimer;
-    
-    public MainActivity rootActivity;
-    
-    public Context context;
+    public Activity rootActivity;
     
     private ViewGroup rootViewGroup;
     
@@ -74,36 +61,33 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        rootActivity = (MainActivity) requireActivity();
-        context = requireContext();
+        rootActivity = requireActivity();
         
-        initStorage(context);
         updateDate(DATE_FLAG_GLOBAL_STR, true);
-        
-        if (lockScreenBitmapDrawer == null) {
-            lockScreenBitmapDrawer = new LockScreenBitmapDrawer(context);
-        }
-        
-        BackgroundSetterService.start(context);
         
         final CalendarView datePicker = view.findViewById(R.id.calendar);
         
-        todoListEntries = loadTodoEntries(context);
+        todoListEntries = new ArrayList<>();
         
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        listViewAdapter = new ListViewAdapter(HomeFragment.this, lockScreenBitmapDrawer);
+        listViewAdapter = new ListViewAdapter(HomeFragment.this);
         listView.setAdapter(listViewAdapter);
         
         datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
             updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-            listViewAdapter.updateData(currentlySelectedDay == currentDay);
+            listViewAdapter.updateData();
         });
         
-        LayoutInflater inflater = LayoutInflater.from(context);
+        new Thread(() -> {
+            todoListEntries.addAll(loadTodoEntries(rootActivity));
+            rootActivity.runOnUiThread(() -> listViewAdapter.updateData());
+        }).start();
+        
+        LayoutInflater inflater = LayoutInflater.from(rootActivity);
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(view1 -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(rootActivity);
             builder.setTitle("Добавить пункт");
             
             View addView = inflater.inflate(R.layout.add_entry_dialogue, rootViewGroup, false);
@@ -117,7 +101,7 @@ public class HomeFragment extends Fragment {
                 groupNames.add(group.name);
             }
             final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, groupNames);
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(rootActivity, android.R.layout.simple_spinner_item, groupNames);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
             groupSpinner.setAdapter(arrayAdapter);
             groupSpinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
@@ -143,7 +127,7 @@ public class HomeFragment extends Fragment {
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
-                listViewAdapter.updateData(newEntry.getLockViewState());
+                listViewAdapter.updateData();
             });
             
             builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
@@ -153,7 +137,7 @@ public class HomeFragment extends Fragment {
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
-                listViewAdapter.updateData(newEntry.getLockViewState());
+                listViewAdapter.updateData();
             });
             
             builder.setNeutralButton("Отмена", (dialog, which) -> dialog.dismiss());
@@ -161,34 +145,7 @@ public class HomeFragment extends Fragment {
             builder.show();
         });
         
-        final GifImageView loadingGif = view.findViewById(R.id.loadingIcon);
-        final TextView loadingText = view.findViewById(R.id.queueText);
-        
-        queueTimer = new Timer();
-        queueTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                lockScreenBitmapDrawer.checkQueue();
-                rootActivity.runOnUiThread(() -> {
-                    if (lockScreenBitmapDrawer.currentlyProcessingBitmap) {
-                        loadingGif.setVisibility(View.VISIBLE);
-                    } else {
-                        loadingGif.setVisibility(View.GONE);
-                    }
-                    if (lockScreenBitmapDrawer.needBitmapProcessing) {
-                        loadingText.setVisibility(View.VISIBLE);
-                    } else {
-                        loadingText.setVisibility(View.GONE);
-                    }
-                });
-            }
-        }, 0, 100);
-        
-        view.findViewById(R.id.openSettingsButton).setOnClickListener(v -> {
-            queueTimer.cancel();
-            NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_HomeFragment_to_SettingsFragment);
-        });
-        
-        lockScreenBitmapDrawer.constructBitmap();
+        view.findViewById(R.id.openSettingsButton).setOnClickListener(v ->
+                NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_HomeFragment_to_SettingsFragment));
     }
 }

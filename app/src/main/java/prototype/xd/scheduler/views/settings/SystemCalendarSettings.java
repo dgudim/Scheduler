@@ -25,17 +25,16 @@ import prototype.xd.scheduler.utilities.Keys;
 public class SystemCalendarSettings extends PopupSettingsView{
     
     private final ArrayList<String> calendarSubKeys;
-    
-    public SystemCalendarSettings(final Context context, final SettingsFragment fragment, View settingsView, final String calendar_key) {
+    public SystemCalendarSettings(final SettingsFragment fragment, View settingsView, final String calendar_key) {
         super(settingsView);
-    
+        
         settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
         
         calendarSubKeys = generateSubKeysFromKey(calendar_key);
         
-        initialise(calendar_key, context, fragment);
+        initialise(calendar_key, fragment.context, fragment);
         
-        new AlertDialog.Builder(context).setView(settingsView).show();
+        new AlertDialog.Builder(fragment.context).setView(settingsView).show();
     }
     
     private void initialise(String calendarKey, final Context context, final SettingsFragment fragment) {
