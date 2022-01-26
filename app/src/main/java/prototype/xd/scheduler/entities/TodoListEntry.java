@@ -36,12 +36,15 @@ import android.graphics.Paint;
 import android.util.TypedValue;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.core.math.MathUtils;
 
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
@@ -111,16 +114,15 @@ public class TodoListEntry {
     }
     
     public boolean isVisible(long day) {
-        if(recurrenceSet != null){
-            if(day > day_end){
+        if (recurrenceSet != null) {
+            if (day > day_end) {
                 return false;
             }
             RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             long instance = 0;
-            while (it.hasNext() && !recurrenceSet.isInfinite() && daysFromEpoch(instance) <= day)
-            {
+            while (it.hasNext() && !recurrenceSet.isInfinite() && daysFromEpoch(instance) <= day) {
                 instance = it.next();
-                if(daysFromEpoch(instance) == day){
+                if (daysFromEpoch(instance) == day) {
                     return true;
                 }
             }
@@ -133,7 +135,7 @@ public class TodoListEntry {
         if (allDay) {
             return context.getString(R.string.calendar_event_all_day);
         }
-        if(recurrenceSet != null){
+        if (recurrenceSet != null) {
             return DateManager.getTimeSpan(timestamp_start, timestamp_start + timestamp_duration);
         }
         if (timestamp_start == timestamp_end) {
@@ -299,30 +301,30 @@ public class TodoListEntry {
             timestamp_duration = event.duration;
             allDay = event.allDay;
             recurrenceSet = event.rSet;
-    
+            
             day_start = daysFromEpoch(timestamp_start);
             day_end = daysFromEpoch(timestamp_end);
-    
+            
             textValue = event.title;
-    
+            
             ArrayList<String> calendarSubKeys = event.subKeys;
-    
+            
             fontColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
             bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
             bevelColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
             bevelThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
-    
+            
             adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
             adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
-    
+            
             priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
-    
+            
             dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
             dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
-    
+            
             isNewEntry = currentDay + dayOffset_beforehand >= day_start && currentDay < day_start;
             isOldEntry = currentDay - dayOffset_after <= day_end && currentDay > day_end;
-    
+            
             if (isOldEntry) {
                 bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
                 bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
@@ -332,7 +334,7 @@ public class TodoListEntry {
                 bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
                 setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
             }
-    
+            
             showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
             showOnLock = showOnLock || isOldEntry || isNewEntry;
             
@@ -536,5 +538,21 @@ public class TodoListEntry {
         } else {
             icon.setTextColor(Color.GRAY);
         }
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(event, params);
+    }
+    
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null) {
+            return false;
+        } else if (obj instanceof TodoListEntry) {
+            return Objects.equals(event, ((TodoListEntry) obj).event) &&
+                    Arrays.equals(((TodoListEntry) obj).params, params);
+        }
+        return super.equals(obj);
     }
 }

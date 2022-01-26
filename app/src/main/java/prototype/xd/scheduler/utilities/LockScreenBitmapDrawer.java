@@ -54,6 +54,8 @@ public class LockScreenBitmapDrawer {
     
     private WallpaperManager wallpaperManager;
     
+    private ArrayList<TodoListEntry> toAdd_previous;
+    
     public LockScreenBitmapDrawer(Context context) {
         initialiseBitmapDrawer(context);
     }
@@ -67,6 +69,8 @@ public class LockScreenBitmapDrawer {
         
         displayMetrics = new DisplayMetrics();
         display.getRealMetrics(displayMetrics);
+        
+        toAdd_previous = new ArrayList<>();
         
         if (!initialised) {
             displayWidth = displayMetrics.widthPixels;
@@ -128,17 +132,24 @@ public class LockScreenBitmapDrawer {
                 log(INFO, "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
                 
                 bitmap.recycle();
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
+                log(INFO, e.getMessage());
+            } catch (Exception e){
                 logException(e);
             }
         }).start();
     }
     
-    private void drawStringsOnBitmap(BackgroundSetterService backgroundSetterService, Bitmap src) {
+    private void drawStringsOnBitmap(BackgroundSetterService backgroundSetterService, Bitmap src) throws InterruptedException {
         
         Canvas canvas = new Canvas(src);
         
         ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries(backgroundSetterService));
+        if(toAdd_previous.equals(toAdd)){
+            throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
+        }
+        toAdd_previous = toAdd;
+        
         if (!toAdd.isEmpty()) {
             
             for (int i = 0; i < toAdd.size(); i++) {
