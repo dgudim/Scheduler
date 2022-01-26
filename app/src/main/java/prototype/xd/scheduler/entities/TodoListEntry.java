@@ -116,6 +116,9 @@ public class TodoListEntry {
     
     public boolean isVisible(long day) {
         if(recurrenceSet != null){
+            if(day > day_end){
+                return false;
+            }
             RecurrenceSetIterator it = recurrenceSet.iterator(TimeZone.getTimeZone("UTC"), timestamp_start);
             long instance = 0;
             while (it.hasNext() && !recurrenceSet.isInfinite() && daysFromEpoch(instance) <= day)
