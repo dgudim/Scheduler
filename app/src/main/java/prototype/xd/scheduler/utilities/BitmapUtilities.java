@@ -57,17 +57,6 @@ public class BitmapUtilities {
         return BitmapFactory.decodeResource(res, resId, options);
     }
     
-    public static Bitmap decodeFile(File src, int dstWidth, int dstHeight, ScalingLogic scalingLogic) {
-        
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(src.getPath(), options);
-        options.inJustDecodeBounds = false;
-        options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, dstWidth, dstHeight, scalingLogic);
-        
-        return BitmapFactory.decodeFile(src.getPath(), options);
-    }
-    
     /**
      * Utility function for creating a scaled version of an existing bitmap
      *
@@ -161,7 +150,7 @@ public class BitmapUtilities {
                 return new Rect(srcRectLeft, 0, srcRectLeft + srcRectWidth, srcHeight);
             } else {
                 final int srcRectHeight = (int) (srcWidth / dstAspect);
-                final int scrRectTop = (int) (srcHeight - srcRectHeight) / 2;
+                final int scrRectTop = (srcHeight - srcRectHeight) / 2;
                 return new Rect(0, scrRectTop, srcWidth, scrRectTop + srcRectHeight);
             }
         } else {

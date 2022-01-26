@@ -5,10 +5,10 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
-import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
+import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.AFTER_ITEMS_OFFSET;
@@ -27,9 +27,7 @@ import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
 
 import android.content.Context;
@@ -307,7 +305,7 @@ public class TodoListEntry {
     
             textValue = event.title;
     
-            ArrayList<String> calendarSubKeys = generateSubKeysFromKey(makeKey(event));
+            ArrayList<String> calendarSubKeys = event.subKeys;
     
             fontColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
             bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);

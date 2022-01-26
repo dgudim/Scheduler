@@ -26,7 +26,6 @@ public class SystemCalendarUtils {
             CalendarContract.Calendars.CALENDAR_COLOR));
     
     public static final ArrayList<String> calendarEventsColumns = new ArrayList<>(Arrays.asList(
-            CalendarContract.Events._ID,
             CalendarContract.Events.TITLE,
             CalendarContract.Events.DISPLAY_COLOR,
             CalendarContract.Events.DTSTART,

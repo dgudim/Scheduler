@@ -34,9 +34,9 @@ public class SystemCalendar {
     
     public final int color;
     
-    public ArrayList<SystemCalendarEvent> systemCalendarEvents;
-    public ArrayList<Integer> availableEventColors;
-    public ArrayList<Integer> eventCountsForColors;
+    public final ArrayList<SystemCalendarEvent> systemCalendarEvents;
+    public final ArrayList<Integer> availableEventColors;
+    public final ArrayList<Integer> eventCountsForColors;
     
     public SystemCalendar(Cursor cursor, ContentResolver contentResolver) {
         account_type = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_TYPE);

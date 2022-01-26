@@ -26,7 +26,6 @@ public class SystemCalendarEvent {
     
     public final SystemCalendar associatedCalendar;
     
-    public final long id;
     public final String title;
     public final int color;
     public final long start;
@@ -41,7 +40,6 @@ public class SystemCalendarEvent {
     SystemCalendarEvent(Cursor cursor, SystemCalendar associatedCalendar) {
         this.associatedCalendar = associatedCalendar;
         
-        id = getLong(cursor, calendarEventsColumns, Events._ID);
         title = getString(cursor, calendarEventsColumns, Events.TITLE);
         color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
         start = getLong(cursor, calendarEventsColumns, Events.DTSTART);
@@ -80,7 +78,6 @@ public class SystemCalendarEvent {
                 logException(e);
             }
         }
-        
         
         subKeys = generateSubKeysFromKey(makeKey(this));
     }

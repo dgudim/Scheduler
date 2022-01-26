@@ -2,7 +2,6 @@ package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.CALENDAR_ACCOUNT;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntry extends SettingsEntry {
     
-    private final Context context;
     private final LayoutInflater inflater;
     private final ViewGroup root;
     private final SettingsFragment fragment;
@@ -27,8 +25,7 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
     
     public CalendarAccountSettingsEntry(final SettingsFragment fragment, SystemCalendar calendar) {
         super(R.layout.account_entry);
-        this.context = fragment.context;
-        inflater = LayoutInflater.from(context);
+        inflater = LayoutInflater.from(fragment.context);
         this.root = fragment.rootViewGroup;
         this.fragment = fragment;
         this.accountName = calendar.account_name;
