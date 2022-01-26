@@ -42,11 +42,11 @@ import android.widget.TextView;
 
 import androidx.core.math.MathUtils;
 
-import org.dmfs.rfc5545.DateTime;
-import org.dmfs.rfc5545.recur.RecurrenceRule;
-import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
+import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
+import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
@@ -62,8 +62,9 @@ public class TodoListEntry {
     
     public long timestamp_start = 0;
     public long timestamp_end = 0;
+    public long timestamp_duration = 0;
     public boolean allDay = false;
-    public RecurrenceRule recurrentRule;
+    public RecurrenceSet recurrenceSet;
     
     public long day_start = DATE_FLAG_GLOBAL;
     public long day_end = DATE_FLAG_GLOBAL;
@@ -114,12 +115,12 @@ public class TodoListEntry {
     }
     
     public boolean isVisible(long day) {
-        if(recurrentRule != null){
-            RecurrenceRuleIterator it = recurrentRule.iterator(new DateTime(timestamp_start));
+        if(recurrenceSet != null){
+            RecurrenceSetIterator it = recurrenceSet.iterator(TimeZone.getTimeZone("UTC"), timestamp_start);
             long instance = 0;
-            while (it.hasNext() && !recurrentRule.isInfinite() && daysFromEpoch(instance) <= day)
+            while (it.hasNext() && !recurrenceSet.isInfinite() && daysFromEpoch(instance) <= day)
             {
-                instance = it.nextMillis();
+                instance = it.next();
                 if(daysFromEpoch(instance) == day){
                     return true;
                 }
@@ -129,67 +130,22 @@ public class TodoListEntry {
     }
     
     public String getTimeSpan(Context context) {
-        if(recurrentRule != null){
-            return DateManager.getTimeSpan(dateFromEpoch(timestamp_start), dateFromEpoch(timestamp_start + event.duration));
-        }
         if (allDay) {
             return context.getString(R.string.calendar_event_all_day);
+        }
+        if(recurrenceSet != null){
+            return DateManager.getTimeSpan(timestamp_start, timestamp_start + timestamp_duration);
         }
         if (timestamp_start == timestamp_end) {
             return dateFromEpoch(timestamp_start);
         } else {
-            return DateManager.getTimeSpan(dateFromEpoch(timestamp_start), dateFromEpoch(timestamp_end));
+            return DateManager.getTimeSpan(timestamp_start, timestamp_end);
         }
     }
     
     public TodoListEntry(SystemCalendarEvent event) {
         fromSystemCalendar = true;
         this.event = event;
-        
-        timestamp_start = event.start;
-        timestamp_end = event.end;
-        allDay = event.allDay;
-        recurrentRule = event.rRule;
-        if (allDay) {
-            timestamp_end = timestamp_start;
-        }
-        
-        day_start = daysFromEpoch(timestamp_start);
-        day_end = daysFromEpoch(timestamp_end);
-        
-        textValue = event.title;
-        
-        ArrayList<String> calendarSubKeys = generateSubKeysFromKey(makeKey(event));
-        
-        fontColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
-        bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
-        bevelColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
-        bevelThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
-        
-        adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-        adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
-        
-        priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
-        
-        dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
-        dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
-        
-        isNewEntry = currentDay + dayOffset_beforehand >= day_start && currentDay < day_start;
-        isOldEntry = currentDay - dayOffset_after <= day_end && currentDay > day_end;
-        
-        if (isOldEntry) {
-            bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
-            bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
-            setFontColor(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR);
-        } else if (isNewEntry) {
-            bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
-            bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
-            setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
-        }
-        
-        showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
-        showOnLock = showOnLock || isOldEntry || isNewEntry;
-        
         params = new String[]{};
         reloadParams();
     }
@@ -289,7 +245,7 @@ public class TodoListEntry {
                             setEntryType(EntryType.TODAY);
                         }
                         
-                    } else if (days_associated < currentDay && currentDay - days_associated <= dayOffset_after) {
+                    } else if (days_associated < currentDay && currentDay - days_associated < dayOffset_after) {
                         
                         bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
                         bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
@@ -301,7 +257,7 @@ public class TodoListEntry {
                         showOnLock = true;
                         
                         setEntryType(EntryType.OLD);
-                    } else if (days_associated > currentDay && days_associated - currentDay <= dayOffset_beforehand) {
+                    } else if (days_associated > currentDay && days_associated - currentDay < dayOffset_beforehand) {
                         
                         bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
                         bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
@@ -335,7 +291,51 @@ public class TodoListEntry {
             adaptiveColor = 0xff_FFFFFF;
             priority = ENTITY_SETTINGS_DEFAULT_PRIORITY;
             setParams((String[]) addAll(group.params, params));
+            
         } else {
+            
+            timestamp_start = event.start;
+            timestamp_end = event.end;
+            timestamp_duration = event.duration;
+            allDay = event.allDay;
+            recurrenceSet = event.rSet;
+    
+            day_start = daysFromEpoch(timestamp_start);
+            day_end = daysFromEpoch(timestamp_end);
+    
+            textValue = event.title;
+    
+            ArrayList<String> calendarSubKeys = generateSubKeysFromKey(makeKey(event));
+    
+            fontColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
+            bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
+            bevelColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
+            bevelThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
+    
+            adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
+            adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
+    
+            priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
+    
+            dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
+            dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
+    
+            isNewEntry = currentDay + dayOffset_beforehand >= day_start && currentDay < day_start;
+            isOldEntry = currentDay - dayOffset_after <= day_end && currentDay > day_end;
+    
+            if (isOldEntry) {
+                bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
+                bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
+                setFontColor(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR);
+            } else if (isNewEntry) {
+                bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
+                bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
+                setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
+            }
+    
+            showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+            showOnLock = showOnLock || isOldEntry || isNewEntry;
+            
             fontSize = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
             adaptiveColor = 0xff_FFFFFF;
             setParams(params);

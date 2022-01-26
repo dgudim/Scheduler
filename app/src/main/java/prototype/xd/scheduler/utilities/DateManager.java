@@ -37,7 +37,9 @@ public class DateManager {
         return epoch / 86_400_000;
     }
     
-    public static String getTimeSpan(String date1, String date2) {
+    public static String getTimeSpan(long time1, long time2) {
+        String date1 = dateFromEpoch(time1);
+        String date2 = dateFromEpoch(time2);
         String[] date1_split = date1.split(" ");
         String[] date2_split = date2.split(" ");
         if (date1.equals(date2) || date1_split[0].equals(date2_split[0])) {

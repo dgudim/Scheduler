@@ -13,11 +13,14 @@ import static prototype.xd.scheduler.utilities.Utilities.RFC2445ToMilliseconds;
 
 import android.database.Cursor;
 
-import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRule;
+import org.dmfs.rfc5545.recurrenceset.RecurrenceList;
+import org.dmfs.rfc5545.recurrenceset.RecurrenceRuleAdapter;
+import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 public class SystemCalendarEvent {
     
@@ -30,7 +33,7 @@ public class SystemCalendarEvent {
     public long end;
     public final boolean allDay;
     
-    public RecurrenceRule rRule;
+    public RecurrenceSet rSet;
     public long duration;
     
     public final ArrayList<String> subKeys;
@@ -45,13 +48,34 @@ public class SystemCalendarEvent {
         end = getLong(cursor, calendarEventsColumns, Events.DTEND);
         allDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
         
+        if(allDay){
+            end = start;
+        }
+        
         String rRule_str = getString(cursor, calendarEventsColumns, Events.RRULE);
-        if (rRule_str != null) {
+        String rDate_str = getString(cursor, calendarEventsColumns, Events.RDATE);
+        if (rRule_str != null || rDate_str != null) {
             try {
-                rRule = new RecurrenceRule(rRule_str);
+                rSet = new RecurrenceSet();
+                
+                if(rRule_str != null)
+                    rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
+                
+                if(rDate_str != null)
+                    rSet.addInstances(new RecurrenceList(rDate_str, TimeZone.getTimeZone("UTC")));
+                
+                String exRule = getString(cursor, calendarEventsColumns, Events.EXRULE);
+                String exDate = getString(cursor, calendarEventsColumns, Events.EXDATE);
+    
+                if(exRule != null)
+                    rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule)));
+    
+                if(exDate != null)
+                    rSet.addExceptions(new RecurrenceList(exDate, TimeZone.getTimeZone("UTC")));
+                
                 duration = RFC2445ToMilliseconds(getString(cursor, calendarEventsColumns, Events.DURATION));
-                DateTime until = rRule.getUntil();
-                end = until == null ? Long.MAX_VALUE : until.getTimestamp();
+                
+                end = rSet.isInfinite() ? Long.MAX_VALUE : rSet.getLastInstance(TimeZone.getTimeZone("UTC"), start);
             } catch (InvalidRecurrenceRuleException e) {
                 logException(e);
             }

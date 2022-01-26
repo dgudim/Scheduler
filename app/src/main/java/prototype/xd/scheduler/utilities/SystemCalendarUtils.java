@@ -34,6 +34,9 @@ public class SystemCalendarUtils {
             CalendarContract.Events.DURATION,
             CalendarContract.Events.ALL_DAY,
             CalendarContract.Events.RRULE,
+            CalendarContract.Events.RDATE,
+            CalendarContract.Events.EXRULE,
+            CalendarContract.Events.EXDATE,
             CalendarContract.Events.DELETED));
     
     public static ArrayList<SystemCalendar> getAllCalendars(Context context) {
