@@ -9,10 +9,12 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class DateManager {
     
     private static final Calendar calendar = Calendar.getInstance();
+    public static TimeZone timeZone_UTC = TimeZone.getTimeZone("UTC");
     
     public static long currentDay = DATE_FLAG_GLOBAL;
     public static long currentlySelectedDay = DATE_FLAG_GLOBAL;

@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
@@ -46,7 +47,6 @@ import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.ArrayList;
-import java.util.TimeZone;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
@@ -119,7 +119,7 @@ public class TodoListEntry {
             if(day > day_end){
                 return false;
             }
-            RecurrenceSetIterator it = recurrenceSet.iterator(TimeZone.getTimeZone("UTC"), timestamp_start);
+            RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             long instance = 0;
             while (it.hasNext() && !recurrenceSet.isInfinite() && daysFromEpoch(instance) <= day)
             {
@@ -128,6 +128,7 @@ public class TodoListEntry {
                     return true;
                 }
             }
+            return false;
         }
         return day >= day_start && day <= day_end;
     }

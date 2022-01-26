@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities.calendars;
 
 import static android.provider.CalendarContract.Events;
+import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
@@ -20,7 +21,6 @@ import org.dmfs.rfc5545.recurrenceset.RecurrenceRuleAdapter;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 
 import java.util.ArrayList;
-import java.util.TimeZone;
 
 public class SystemCalendarEvent {
     
@@ -62,7 +62,7 @@ public class SystemCalendarEvent {
                     rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
                 
                 if(rDate_str != null)
-                    rSet.addInstances(new RecurrenceList(rDate_str, TimeZone.getTimeZone("UTC")));
+                    rSet.addInstances(new RecurrenceList(rDate_str, timeZone_UTC));
                 
                 String exRule = getString(cursor, calendarEventsColumns, Events.EXRULE);
                 String exDate = getString(cursor, calendarEventsColumns, Events.EXDATE);
@@ -71,11 +71,11 @@ public class SystemCalendarEvent {
                     rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule)));
     
                 if(exDate != null)
-                    rSet.addExceptions(new RecurrenceList(exDate, TimeZone.getTimeZone("UTC")));
+                    rSet.addExceptions(new RecurrenceList(exDate, timeZone_UTC));
                 
                 duration = RFC2445ToMilliseconds(getString(cursor, calendarEventsColumns, Events.DURATION));
                 
-                end = rSet.isInfinite() ? Long.MAX_VALUE : rSet.getLastInstance(TimeZone.getTimeZone("UTC"), start);
+                end = rSet.isInfinite() ? Long.MAX_VALUE : rSet.getLastInstance(timeZone_UTC, start);
             } catch (InvalidRecurrenceRuleException e) {
                 logException(e);
             }
