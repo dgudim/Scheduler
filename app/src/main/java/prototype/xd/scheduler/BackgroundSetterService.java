@@ -117,7 +117,7 @@ public class BackgroundSetterService extends Service {
         startForeground(foregroundNotificationId, getForegroundNotification());
         lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
         preferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
-    
+        
         refreshTimer = new Timer();
         refreshTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -126,7 +126,7 @@ public class BackgroundSetterService extends Service {
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                 }
             }
-        }, 1000 * 60, 1000 * 60 * 60); // every hour if day
+        }, 5000, 1000 * 60 * 30); //approximately every 30 minutes if day
         
         refreshTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -137,7 +137,7 @@ public class BackgroundSetterService extends Service {
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
                 }
             }
-        }, 3000, 1000 * 60 * 5); //every 5 minutes
+        }, 3000, 1000 * 60 * 5); //approximately every 5 minutes
         
         return START_STICKY;
     }
