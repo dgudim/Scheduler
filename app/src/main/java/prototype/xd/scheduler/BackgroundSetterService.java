@@ -1,11 +1,17 @@
 package prototype.xd.scheduler;
 
+import static prototype.xd.scheduler.utilities.DateManager.isDayTime;
+import static prototype.xd.scheduler.utilities.DateManager.updateDate;
+import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
@@ -20,6 +26,9 @@ import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 public class BackgroundSetterService extends Service {
     
     public LockScreenBitmapDrawer lockScreenBitmapDrawer;
+    private SharedPreferences preferences;
+    
+    private Timer refreshTimer;
     
     public static void restart(Context context) {
         context.stopService(new Intent(context, BackgroundSetterService.class));
@@ -78,7 +87,7 @@ public class BackgroundSetterService extends Service {
     public String getForegroundNotificationChannelId() {
         if (foregroundNotificationChannelId == null) {
             foregroundNotificationChannelId = "BackgroundSetterService.NotificationChannel";
-           
+            
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             // Not exists so we create it at first time
             if (manager.getNotificationChannel(foregroundNotificationChannelId) == null) {
@@ -107,15 +116,34 @@ public class BackgroundSetterService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         startForeground(foregroundNotificationId, getForegroundNotification());
         lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
-        
-        Timer queueTimer = new Timer();
-        queueTimer.scheduleAtFixedRate(new TimerTask() {
+        preferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+    
+        refreshTimer = new Timer();
+        refreshTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                if(isDayTime()){
+                    preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+                }
             }
-        }, 3000, 1000 * 60); //every minute
-    
+        }, 1000 * 60, 1000 * 60 * 60); // every hour if day
+        
+        refreshTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                updateDate(DATE_FLAG_GLOBAL_STR, false);
+                if (preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false)) {
+                    lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                    preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
+                }
+            }
+        }, 3000, 1000 * 60 * 5); //every 5 minutes
+        
         return START_STICKY;
+    }
+    
+    @Override
+    public void onDestroy() {
+        refreshTimer.cancel();
     }
 }

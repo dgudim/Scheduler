@@ -38,7 +38,7 @@ public class SystemCalendarUtils {
             CalendarContract.Events.EXDATE,
             CalendarContract.Events.DELETED));
     
-    public static ArrayList<SystemCalendar> getAllCalendars(Context context) {
+    public static ArrayList<SystemCalendar> getAllCalendars(Context context, boolean loadMinimal) {
         ContentResolver contentResolver = context.getContentResolver();
         
         ArrayList<SystemCalendar> systemCalendars = new ArrayList<>();
@@ -46,7 +46,7 @@ public class SystemCalendarUtils {
         int calendars = cursor.getCount();
         cursor.moveToFirst();
         for (int i = 0; i < calendars; i++) {
-            systemCalendars.add(new SystemCalendar(cursor, contentResolver));
+            systemCalendars.add(new SystemCalendar(cursor, contentResolver, loadMinimal));
             cursor.moveToNext();
         }
         cursor.close();
@@ -55,7 +55,7 @@ public class SystemCalendarUtils {
     
     public static ArrayList<TodoListEntry> getAllTodoListEntriesFromCalendars(Context context) {
         ArrayList<TodoListEntry> todoListEntries = new ArrayList<>();
-        ArrayList<SystemCalendar> calendars = getAllCalendars(context);
+        ArrayList<SystemCalendar> calendars = getAllCalendars(context, false);
         for (int i = 0; i < calendars.size(); i++) {
             todoListEntries.addAll(calendars.get(i).getVisibleTodoListEntries());
         }

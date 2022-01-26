@@ -24,20 +24,26 @@ import java.util.ArrayList;
 
 public class SystemCalendarEvent {
     
-    public final SystemCalendar associatedCalendar;
+    public SystemCalendar associatedCalendar;
     
-    public final String title;
+    public String title;
     public final int color;
-    public final long start;
+    public long start;
     public long end;
-    public final boolean allDay;
+    public boolean allDay;
     
     public RecurrenceSet rSet;
     public long duration;
     
-    public final ArrayList<String> subKeys;
+    public ArrayList<String> subKeys;
     
-    SystemCalendarEvent(Cursor cursor, SystemCalendar associatedCalendar) {
+    SystemCalendarEvent(Cursor cursor, SystemCalendar associatedCalendar, boolean loadMinimal) {
+        
+        if(loadMinimal){
+            color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
+            return;
+        }
+        
         this.associatedCalendar = associatedCalendar;
         
         title = getString(cursor, calendarEventsColumns, Events.TITLE);

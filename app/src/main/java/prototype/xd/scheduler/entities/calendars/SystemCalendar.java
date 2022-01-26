@@ -38,7 +38,7 @@ public class SystemCalendar {
     public final ArrayList<Integer> availableEventColors;
     public final ArrayList<Integer> eventCountsForColors;
     
-    public SystemCalendar(Cursor cursor, ContentResolver contentResolver) {
+    public SystemCalendar(Cursor cursor, ContentResolver contentResolver, boolean loadMinimal) {
         account_type = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_TYPE);
         account_name = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_NAME);
         name = getString(cursor, calendarColumns, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
@@ -50,7 +50,7 @@ public class SystemCalendar {
         availableEventColors = new ArrayList<>();
         eventCountsForColors = new ArrayList<>();
         
-        loadCalendarEvents(contentResolver);
+        loadCalendarEvents(contentResolver, loadMinimal);
         if (accessLevel >= CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR) {
             loadAvailableEventColors();
         }
@@ -79,14 +79,14 @@ public class SystemCalendar {
         return count;
     }
     
-    void loadCalendarEvents(ContentResolver contentResolver) {
+    void loadCalendarEvents(ContentResolver contentResolver, boolean loadMinimal) {
         systemCalendarEvents.clear();
         Cursor cursor = query(contentResolver, Events.CONTENT_URI, calendarEventsColumns.toArray(new String[0]),
                 Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0");
         int events = cursor.getCount();
         cursor.moveToFirst();
         for (int i = 0; i < events; i++) {
-            systemCalendarEvents.add(new SystemCalendarEvent(cursor, this));
+            systemCalendarEvents.add(new SystemCalendarEvent(cursor, this, loadMinimal));
             cursor.moveToNext();
         }
         cursor.close();

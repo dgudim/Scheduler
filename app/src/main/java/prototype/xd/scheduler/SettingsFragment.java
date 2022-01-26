@@ -117,7 +117,7 @@ public class SettingsFragment extends Fragment {
         
         new Thread(() -> {
             settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_system_calendars)));
-            ArrayList<SystemCalendar> calendars = getAllCalendars(context);
+            ArrayList<SystemCalendar> calendars = getAllCalendars(context, true);
             ArrayList<ArrayList<SystemCalendar>> calendars_sorted = new ArrayList<>();
             ArrayList<String> calendars_sorted_names = new ArrayList<>();
 
