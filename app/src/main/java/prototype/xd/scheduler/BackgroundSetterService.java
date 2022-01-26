@@ -3,7 +3,6 @@ package prototype.xd.scheduler;
 import static prototype.xd.scheduler.utilities.DateManager.isDayTime;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
-import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -11,7 +10,6 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
@@ -26,13 +24,25 @@ import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 public class BackgroundSetterService extends Service {
     
     public LockScreenBitmapDrawer lockScreenBitmapDrawer;
-    private SharedPreferences preferences;
     
     private Timer refreshTimer;
+    private Timer queueTimer;
     
     public static void restart(Context context) {
         context.stopService(new Intent(context, BackgroundSetterService.class));
         ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
+    }
+    
+    public static void ping(Context context) {
+        Intent intent = new Intent(context, BackgroundSetterService.class);
+        intent.putExtra("update", 1);
+        ContextCompat.startForegroundService(context, intent);
+    }
+    
+    public static void stop_queue(Context context) {
+        Intent intent = new Intent(context, BackgroundSetterService.class);
+        intent.putExtra("on_exit", 1);
+        ContextCompat.startForegroundService(context, intent);
     }
     
     @Nullable
@@ -114,31 +124,33 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(foregroundNotificationId, getForegroundNotification());
-        lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
-        preferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        
-        refreshTimer = new Timer();
-        refreshTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if(isDayTime()){
-                    preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+        if (intent.hasExtra("update")) {
+            lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+        } else if (intent.hasExtra("on_exit")) {
+            queueTimer.cancel();
+            queueTimer = null;
+        } else {
+            startForeground(foregroundNotificationId, getForegroundNotification());
+            lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
+            
+            refreshTimer = new Timer();
+            refreshTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    if (isDayTime()) {
+                        updateDate(DATE_FLAG_GLOBAL_STR, false);
+                        lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                    }
                 }
-            }
-        }, 5000, 1000 * 60 * 30); //approximately every 30 minutes if day
-        
-        refreshTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                updateDate(DATE_FLAG_GLOBAL_STR, false);
-                if (preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false)) {
-                    lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
-                    preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
+            }, 5000, 1000 * 60 * 30); //approximately every 30 minutes if day
+            queueTimer = new Timer();
+            queueTimer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    lockScreenBitmapDrawer.checkQueue(BackgroundSetterService.this);
                 }
-            }
-        }, 3000, 1000 * 60 * 5); //approximately every 5 minutes
-        
+            }, 0, 100);
+        }
         return START_STICKY;
     }
     

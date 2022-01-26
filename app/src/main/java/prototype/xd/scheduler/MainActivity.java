@@ -62,6 +62,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     
+    public void notifyService(){
+        BackgroundSetterService.ping(this);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        BackgroundSetterService.stop_queue(this);
+        super.onDestroy();
+    }
+    
     private boolean refreshPermissionStates() {
         boolean storage_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         boolean calendar_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED;

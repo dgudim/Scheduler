@@ -52,6 +52,9 @@ public class LockScreenBitmapDrawer {
     private boolean initialised = false;
     private boolean forceMaxRWidth = false;
     
+    private volatile boolean busy = false;
+    private volatile boolean queued = false;
+    
     private WallpaperManager wallpaperManager;
     
     private ArrayList<TodoListEntry> toAdd_previous;
@@ -99,7 +102,20 @@ public class LockScreenBitmapDrawer {
         
         forceMaxRWidth = preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK);
         
-        startBitmapThread(backgroundSetterService);
+        if (!busy) {
+            busy = true;
+            queued = false;
+            startBitmapThread(backgroundSetterService);
+        } else {
+            queued = true;
+        }
+    }
+    
+    public void checkQueue(BackgroundSetterService backgroundSetterService){
+        if(queued && !busy){
+            startBitmapThread(backgroundSetterService);
+            queued = false;
+        }
     }
     
     private void startBitmapThread(BackgroundSetterService backgroundSetterService) {
@@ -134,9 +150,10 @@ public class LockScreenBitmapDrawer {
                 bitmap.recycle();
             } catch (InterruptedException e) {
                 log(INFO, e.getMessage());
-            } catch (Exception e){
+            } catch (Exception e) {
                 logException(e);
             }
+            busy = false;
         }).start();
     }
     
@@ -145,7 +162,7 @@ public class LockScreenBitmapDrawer {
         Canvas canvas = new Canvas(src);
         
         ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries(backgroundSetterService));
-        if(toAdd_previous.equals(toAdd)){
+        if (toAdd_previous.equals(toAdd)) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
         }
         toAdd_previous = toAdd;

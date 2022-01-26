@@ -26,6 +26,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.HomeFragment;
+import prototype.xd.scheduler.MainActivity;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.CheckBox;
@@ -41,7 +42,10 @@ public class ListViewAdapter extends BaseAdapter {
     public final ArrayList<TodoListEntry> currentTodoListEntries;
     public final ArrayList<Integer> currentTodoListEntries_indexMap;
     
-    public ListViewAdapter(HomeFragment fragment) {
+    private final MainActivity mainActivity;
+    
+    public ListViewAdapter(HomeFragment fragment, MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
         this.home = fragment;
         this.context = fragment.rootActivity;
         inflater = LayoutInflater.from(context);
@@ -87,7 +91,10 @@ public class ListViewAdapter extends BaseAdapter {
         }
     }
     
-    public void updateData() {
+    public void updateData(boolean updateBitmap) {
+        if(updateBitmap){
+            mainActivity.notifyService();
+        }
         home.todoListEntries = sortEntries(home.todoListEntries);
         updateCurrentEntries();
         home.rootActivity.runOnUiThread(this::notifyDataSetChanged);
@@ -131,7 +138,7 @@ public class ListViewAdapter extends BaseAdapter {
                 alert.setPositiveButton("Да", (dialog, which) -> {
                     home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
                     saveEntries(home.todoListEntries);
-                    updateData();
+                    updateData(currentEntry.getLockViewState());
                 });
                 
                 alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
@@ -149,7 +156,7 @@ public class ListViewAdapter extends BaseAdapter {
                     currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                 }
                 saveEntries(home.todoListEntries);
-                updateData();
+                updateData(true);
             });
             
             todoText.setOnLongClickListener(v -> {
@@ -164,14 +171,14 @@ public class ListViewAdapter extends BaseAdapter {
                 alert.setPositiveButton("Сохранить", (dialog, which) -> {
                     currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
                     saveEntries(home.todoListEntries);
-                    updateData();
+                    updateData(currentEntry.getLockViewState());
                 });
                 
                 if (!currentEntry.isGlobalEntry) {
                     alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
                         currentEntry.changeParameter(ASSOCIATED_DAY, DATE_FLAG_GLOBAL_STR);
                         saveEntries(home.todoListEntries);
-                        updateData();
+                        updateData(currentEntry.getLockViewState());
                     });
                 }
                 

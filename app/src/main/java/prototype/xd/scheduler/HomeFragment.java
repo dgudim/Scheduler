@@ -11,7 +11,6 @@ import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.InputType;
@@ -43,7 +42,7 @@ public class HomeFragment extends Fragment {
     
     public ArrayList<TodoListEntry> todoListEntries;
     
-    public Activity rootActivity;
+    public MainActivity rootActivity;
     
     private ViewGroup rootViewGroup;
     
@@ -61,7 +60,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        rootActivity = requireActivity();
+        rootActivity = (MainActivity) requireActivity();
         
         updateDate(DATE_FLAG_GLOBAL_STR, true);
         
@@ -71,17 +70,17 @@ public class HomeFragment extends Fragment {
         
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        listViewAdapter = new ListViewAdapter(HomeFragment.this);
+        listViewAdapter = new ListViewAdapter(HomeFragment.this, rootActivity);
         listView.setAdapter(listViewAdapter);
         
         datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
             updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-            listViewAdapter.updateData();
+            listViewAdapter.updateData(false);
         });
         
         new Thread(() -> {
             todoListEntries.addAll(loadTodoEntries(rootActivity));
-            rootActivity.runOnUiThread(() -> listViewAdapter.updateData());
+            rootActivity.runOnUiThread(() -> listViewAdapter.updateData(false));
         }).start();
         
         LayoutInflater inflater = LayoutInflater.from(rootActivity);
@@ -127,7 +126,7 @@ public class HomeFragment extends Fragment {
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
-                listViewAdapter.updateData();
+                listViewAdapter.updateData(newEntry.getLockViewState());
             });
             
             builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
@@ -137,7 +136,7 @@ public class HomeFragment extends Fragment {
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
-                listViewAdapter.updateData();
+                listViewAdapter.updateData(newEntry.getLockViewState());
             });
             
             builder.setNeutralButton("Отмена", (dialog, which) -> dialog.dismiss());
