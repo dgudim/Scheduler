@@ -26,7 +26,6 @@ public class BackgroundSetterService extends Service {
     public LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
     private Timer refreshTimer;
-    private Timer queueTimer;
     
     public static void restart(Context context) {
         context.stopService(new Intent(context, BackgroundSetterService.class));
@@ -126,9 +125,6 @@ public class BackgroundSetterService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.hasExtra("update")) {
             lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
-        } else if (intent.hasExtra("on_exit")) {
-            queueTimer.cancel();
-            queueTimer = null;
         } else {
             startForeground(foregroundNotificationId, getForegroundNotification());
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
@@ -143,13 +139,6 @@ public class BackgroundSetterService extends Service {
                     }
                 }
             }, 5000, 1000 * 60 * 30); //approximately every 30 minutes if day
-            queueTimer = new Timer();
-            queueTimer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    lockScreenBitmapDrawer.checkQueue(BackgroundSetterService.this);
-                }
-            }, 0, 100);
         }
         return START_STICKY;
     }

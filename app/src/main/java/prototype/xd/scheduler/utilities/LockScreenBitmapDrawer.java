@@ -36,6 +36,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import prototype.xd.scheduler.BackgroundSetterService;
 import prototype.xd.scheduler.entities.TodoListEntry;
@@ -46,24 +48,20 @@ public class LockScreenBitmapDrawer {
     
     public int displayWidth;
     public DisplayMetrics displayMetrics;
-    private Point displayCenter;
-    private SharedPreferences preferences;
+    private final Point displayCenter;
+    private final SharedPreferences preferences;
     
-    private boolean initialised = false;
     private boolean forceMaxRWidth = false;
     
     private volatile boolean busy = false;
-    private volatile boolean queued = false;
     
-    private WallpaperManager wallpaperManager;
+    private final WallpaperManager wallpaperManager;
     
     private int toAdd_previous_hash;
     
-    public LockScreenBitmapDrawer(Context context) {
-        initialiseBitmapDrawer(context);
-    }
+    private final Timer queueTimer;
     
-    public void initialiseBitmapDrawer(Context context) {
+    public LockScreenBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
         preferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
         
@@ -72,14 +70,12 @@ public class LockScreenBitmapDrawer {
         
         displayMetrics = new DisplayMetrics();
         display.getRealMetrics(displayMetrics);
-    
+        
+        queueTimer = new Timer();
         toAdd_previous_hash = 0;
         
-        if (!initialised) {
-            displayWidth = displayMetrics.widthPixels;
-            displayCenter = new Point(displayWidth / 2, displayMetrics.heightPixels / 2);
-            initialised = true;
-        }
+        displayWidth = displayMetrics.widthPixels;
+        displayCenter = new Point(displayWidth / 2, displayMetrics.heightPixels / 2);
     }
     
     @SuppressLint("MissingPermission")
@@ -96,25 +92,19 @@ public class LockScreenBitmapDrawer {
     }
     
     public void constructBitmap(BackgroundSetterService backgroundSetterService) {
-        if (!initialised) {
-            throw new RuntimeException("Bitmap drawer not initialised");
-        }
-        
         forceMaxRWidth = preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK);
         
         if (!busy) {
             busy = true;
-            queued = false;
             startBitmapThread(backgroundSetterService);
         } else {
-            queued = true;
-        }
-    }
-    
-    public void checkQueue(BackgroundSetterService backgroundSetterService){
-        if(queued && !busy){
-            startBitmapThread(backgroundSetterService);
-            queued = false;
+            queueTimer.cancel();
+            queueTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    constructBitmap(backgroundSetterService);
+                }
+            }, 1000 * 60 * 2); // in 2 minutes
         }
     }
     
