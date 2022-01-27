@@ -34,13 +34,15 @@ public class DateManager {
         }
     }
     
-    public static boolean isDayTime() {
+    public static boolean isDayTime(){
         int timeOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         return timeOfDay >= 6 && timeOfDay <= 22;
     }
     
     public static long daysFromEpoch(long epoch) {
-        return (long) Math.ceil(epoch / (double) 86_400_000);
+        final Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(epoch);
+        return cal.getTime().toInstant().getEpochSecond() / 86400;
     }
     
     public static String getTimeSpan(long time1, long time2) {
