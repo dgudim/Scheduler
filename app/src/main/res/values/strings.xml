@@ -78,4 +78,6 @@
     <string name="group">Группа:</string>
     <string name="enable">Включить</string>
 
+    <string name="global">(общее)</string>
+
 </resources>

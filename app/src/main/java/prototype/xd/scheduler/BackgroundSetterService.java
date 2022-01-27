@@ -2,7 +2,7 @@ package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.isDayTime;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -138,7 +138,7 @@ public class BackgroundSetterService extends Service {
                 @Override
                 public void run() {
                     if (isDayTime()) {
-                        updateDate(DATE_FLAG_GLOBAL_STR, false);
+                        updateDate(DAY_FLAG_GLOBAL_STR, false);
                         lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
                     }
                 }

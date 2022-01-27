@@ -5,7 +5,7 @@ import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
@@ -31,20 +31,19 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-import prototype.xd.scheduler.adapters.ListViewAdapter;
+import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 public class HomeFragment extends Fragment {
     
-    public ListViewAdapter listViewAdapter;
+    public TodoListViewAdapter todoListViewAdapter;
     
     public ArrayList<TodoListEntry> todoListEntries;
     
     public MainActivity rootActivity;
-    
-    private ViewGroup rootViewGroup;
     
     public HomeFragment() {
         super();
@@ -52,48 +51,31 @@ public class HomeFragment extends Fragment {
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.rootViewGroup = container;
-        return inflater.inflate(R.layout.fragment_home, container, false);
-    }
     
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        
         rootActivity = (MainActivity) requireActivity();
         
-        updateDate(DATE_FLAG_GLOBAL_STR, true);
-        
-        final CalendarView datePicker = view.findViewById(R.id.calendar);
-        
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+    
         todoListEntries = new ArrayList<>();
-        
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        listViewAdapter = new ListViewAdapter(HomeFragment.this, rootActivity);
-        listView.setAdapter(listViewAdapter);
-        
-        datePicker.setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
+        todoListViewAdapter = new TodoListViewAdapter(HomeFragment.this, rootActivity);
+        listView.setAdapter(todoListViewAdapter);
+    
+        view.<CalendarView>findViewById(R.id.calendar).setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
             updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-            listViewAdapter.updateData(false);
+            todoListViewAdapter.updateData(false);
         });
         
-        new Thread(() -> {
-            todoListEntries.addAll(loadTodoEntries(rootActivity));
-            rootActivity.runOnUiThread(() -> listViewAdapter.updateData(false));
-        }).start();
-        
-        LayoutInflater inflater = LayoutInflater.from(rootActivity);
-        FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(view1 -> {
+        view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(rootActivity);
             builder.setTitle("Добавить пункт");
-            
-            View addView = inflater.inflate(R.layout.add_entry_dialogue, rootViewGroup, false);
+        
+            View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
             final EditText input = addView.findViewById(R.id.entryNameEditText);
-            
+        
             final String[] currentGroup = {BLANK_GROUP_NAME};
-            
+        
             final ArrayList<Group> groupList = readGroupFile();
             final ArrayList<String> groupNames = new ArrayList<>();
             for (Group group : groupList) {
@@ -109,16 +91,16 @@ public class HomeFragment extends Fragment {
                 public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
                     currentGroup[0] = groupNames.get(position);
                 }
-                
+            
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
                 
                 }
             });
-            
+        
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(addView);
-            
+        
             builder.setPositiveButton("Добавить", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString(),
@@ -126,25 +108,50 @@ public class HomeFragment extends Fragment {
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
-                listViewAdapter.updateData(newEntry.getLockViewState());
+                todoListViewAdapter.updateData(newEntry.getLockViewState());
             });
-            
+        
             builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString(),
-                        ASSOCIATED_DAY, DATE_FLAG_GLOBAL_STR,
+                        ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
-                listViewAdapter.updateData(newEntry.getLockViewState());
+                todoListViewAdapter.updateData(newEntry.getLockViewState());
             });
-            
+        
             builder.setNeutralButton("Отмена", (dialog, which) -> dialog.dismiss());
-            
+        
             builder.show();
         });
         
+        
         view.findViewById(R.id.openSettingsButton).setOnClickListener(v ->
-                NavHostFragment.findNavController(HomeFragment.this).navigate(R.id.action_HomeFragment_to_SettingsFragment));
+                ((NavHostFragment) Objects.requireNonNull(rootActivity.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)))
+                        .getNavController().navigate(R.id.action_HomeFragment_to_SettingsFragment));
+        
+        return view;
+    }
+    
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+        updateDate(DAY_FLAG_GLOBAL_STR, true);
+        
+        new Thread(() -> {
+            todoListEntries.clear();
+            todoListEntries.addAll(loadTodoEntries(rootActivity));
+            todoListViewAdapter.updateData(false);
+        }).start();
+    }
+    
+    @Override
+    public void onDestroy() {
+        rootActivity = null;
+        todoListViewAdapter = null;
+        todoListEntries = null;
+        super.onDestroy();
     }
 }

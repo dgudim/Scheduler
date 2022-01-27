@@ -32,8 +32,8 @@ public class Keys {
     public static final int SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET = 0;
     public static final int SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET = 0;
     
-    public static final int DATE_FLAG_GLOBAL = -1;
-    public static final String DATE_FLAG_GLOBAL_STR = "-1";
+    public static final int DAY_FLAG_GLOBAL = -1;
+    public static final String DAY_FLAG_GLOBAL_STR = "-1";
     
     public static final boolean CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK = true;
     public static final boolean CALENDAR_SETTINGS_DEFAULT_VISIBLE = true;

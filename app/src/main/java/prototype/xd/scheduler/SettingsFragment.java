@@ -40,6 +40,20 @@ public class SettingsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
     
+    @Override
+    public void onDestroyView() {
+        ((MainActivity)requireActivity()).notifyService();
+        super.onDestroyView();
+    }
+    
+    @Override
+    public void onDestroy() {
+        context = null;
+        rootViewGroup = null;
+        adaptiveBackgroundSettingsEntry = null;
+        super.onDestroy();
+    }
+    
     public void notifyBgSelected() {
         adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated();
     }

@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL;
-import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,11 +13,10 @@ import java.util.TimeZone;
 
 public class DateManager {
     
-    private static final Calendar calendar = Calendar.getInstance();
     public static final TimeZone timeZone_UTC = TimeZone.getTimeZone("UTC");
     
-    public static long currentDay = DATE_FLAG_GLOBAL;
-    public static long currentlySelectedDay = DATE_FLAG_GLOBAL;
+    public static long currentDay = DAY_FLAG_GLOBAL;
+    public static long currentlySelectedDay = DAY_FLAG_GLOBAL;
     
     static final DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.ROOT);
     
@@ -27,7 +26,7 @@ public class DateManager {
         long selectedDay = daysFromDate(selectedDate_string);
         currentDay = getCurrentDay();
         if (updateCurrentlySelected) {
-            if (selectedDay == DATE_FLAG_GLOBAL) {
+            if (selectedDay == DAY_FLAG_GLOBAL) {
                 currentlySelectedDay = currentDay;
             } else {
                 currentlySelectedDay = selectedDay;
@@ -36,8 +35,8 @@ public class DateManager {
     }
     
     public static boolean isDayTime(){
-        int timeOfDay = calendar.get(Calendar.HOUR_OF_DAY);
-        return timeOfDay >= 7 && timeOfDay <= 22;
+        int timeOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        return timeOfDay >= 6 && timeOfDay <= 22;
     }
     
     public static long daysFromEpoch(long epoch) {
@@ -70,8 +69,8 @@ public class DateManager {
     }
     
     public static long daysFromDate(String date) {
-        if (date.equals(DATE_FLAG_GLOBAL_STR)) {
-            return DATE_FLAG_GLOBAL;
+        if (date.equals(DAY_FLAG_GLOBAL_STR)) {
+            return DAY_FLAG_GLOBAL;
         }
         String[] dateParts_current = date.split("_");
         int year = Integer.parseInt(dateParts_current[0]);
@@ -82,7 +81,7 @@ public class DateManager {
     }
     
     private static long getCurrentDay() {
-        return daysFromEpoch(calendar.getTime().getTime());
+        return daysFromEpoch(Calendar.getInstance().getTime().getTime());
     }
     
 }

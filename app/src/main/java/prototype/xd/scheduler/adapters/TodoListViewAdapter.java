@@ -3,7 +3,7 @@ package prototype.xd.scheduler.adapters;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
@@ -32,7 +32,7 @@ import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 
-public class ListViewAdapter extends BaseAdapter {
+public class TodoListViewAdapter extends BaseAdapter {
     
     private final Context context;
     
@@ -44,14 +44,13 @@ public class ListViewAdapter extends BaseAdapter {
     
     private final MainActivity mainActivity;
     
-    public ListViewAdapter(HomeFragment fragment, MainActivity mainActivity) {
+    public TodoListViewAdapter(HomeFragment fragment, MainActivity mainActivity) {
         this.mainActivity = mainActivity;
         this.home = fragment;
         this.context = fragment.rootActivity;
         inflater = LayoutInflater.from(context);
         currentTodoListEntries = new ArrayList<>();
         currentTodoListEntries_indexMap = new ArrayList<>();
-        updateCurrentEntries();
     }
     
     @Override
@@ -92,7 +91,7 @@ public class ListViewAdapter extends BaseAdapter {
     }
     
     public void updateData(boolean updateBitmap) {
-        if(updateBitmap){
+        if (updateBitmap) {
             mainActivity.notifyService();
         }
         home.todoListEntries = sortEntries(home.todoListEntries);
@@ -176,7 +175,7 @@ public class ListViewAdapter extends BaseAdapter {
                 
                 if (!currentEntry.isGlobalEntry) {
                     alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
-                        currentEntry.changeParameter(ASSOCIATED_DAY, DATE_FLAG_GLOBAL_STR);
+                        currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                         saveEntries(home.todoListEntries);
                         updateData(currentEntry.getLockViewState());
                     });
@@ -190,7 +189,7 @@ public class ListViewAdapter extends BaseAdapter {
             settings.setOnClickListener(v -> new EntrySettings(context, home, inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, home.todoListEntries));
         } else {
             view.findViewById(R.id.event_color).setBackgroundColor(currentEntry.event.color);
-            ((TextView)view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(context));
+            ((TextView) view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(context));
             settings.setOnClickListener(v -> NavHostFragment.findNavController(home).navigate(R.id.action_HomeFragment_to_SettingsFragment));
         }
         
@@ -203,10 +202,9 @@ public class ListViewAdapter extends BaseAdapter {
         }
         
         todoText.setText(currentEntry.textValue);
-        if (currentlySelectedDay == currentDay) {
+        if (currentlySelectedDay == currentDay || currentEntry.isGlobalEntry) {
             todoText.setText(todoText.getText() + currentEntry.getDayOffset());
         }
-        
         return view;
     }
 }

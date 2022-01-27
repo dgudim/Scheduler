@@ -63,8 +63,10 @@ public class MainActivity extends AppCompatActivity {
     }
     
     public void notifyService(){
-        BackgroundSetterService.ping(this);
+        new Thread(() -> BackgroundSetterService.ping(MainActivity.this)).start();
     }
+    
+    
     
     @Override
     protected void onDestroy() {

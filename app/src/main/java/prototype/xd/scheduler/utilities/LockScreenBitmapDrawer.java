@@ -57,7 +57,7 @@ public class LockScreenBitmapDrawer {
     
     private WallpaperManager wallpaperManager;
     
-    private ArrayList<TodoListEntry> toAdd_previous;
+    private int toAdd_previous_hash;
     
     public LockScreenBitmapDrawer(Context context) {
         initialiseBitmapDrawer(context);
@@ -72,8 +72,8 @@ public class LockScreenBitmapDrawer {
         
         displayMetrics = new DisplayMetrics();
         display.getRealMetrics(displayMetrics);
-        
-        toAdd_previous = new ArrayList<>();
+    
+        toAdd_previous_hash = 0;
         
         if (!initialised) {
             displayWidth = displayMetrics.widthPixels;
@@ -162,10 +162,10 @@ public class LockScreenBitmapDrawer {
         Canvas canvas = new Canvas(src);
         
         ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries(backgroundSetterService));
-        if (toAdd_previous.equals(toAdd)) {
+        if (toAdd_previous_hash == toAdd.hashCode()) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
         }
-        toAdd_previous = toAdd;
+        toAdd_previous_hash = toAdd.hashCode();
         
         if (!toAdd.isEmpty()) {
             

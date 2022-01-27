@@ -17,7 +17,7 @@ import static prototype.xd.scheduler.utilities.Keys.BEFOREHAND_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.DATE_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
@@ -65,8 +65,8 @@ public class TodoListEntry {
     public boolean allDay = false;
     public RecurrenceSet recurrenceSet;
     
-    public long day_start = DATE_FLAG_GLOBAL;
-    public long day_end = DATE_FLAG_GLOBAL;
+    public long day_start = DAY_FLAG_GLOBAL;
+    public long day_end = DAY_FLAG_GLOBAL;
     public int dayOffset_after = 0;
     public int dayOffset_beforehand = 0;
     public boolean completed = false;
@@ -128,7 +128,7 @@ public class TodoListEntry {
             }
             return false;
         }
-        return day >= day_start && day <= day_end;
+        return (day >= day_start && day <= day_end) || day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL;
     }
     
     public String getTimeSpan(Context context) {
@@ -225,11 +225,11 @@ public class TodoListEntry {
                     
                     long days_associated = currentDay;
                     long days_from_param = Long.parseLong(params[i + 1]);
-                    if (days_from_param != DATE_FLAG_GLOBAL) {
+                    if (days_from_param != DAY_FLAG_GLOBAL) {
                         days_associated = days_from_param;
                     }
                     
-                    if (days_from_param == currentDay || days_from_param == DATE_FLAG_GLOBAL) {
+                    if (days_from_param == currentDay || days_from_param == DAY_FLAG_GLOBAL) {
                         
                         bgColor = preferences.getInt(Keys.TODAY_BG_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
                         bevelColor = preferences.getInt(Keys.TODAY_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
@@ -240,14 +240,14 @@ public class TodoListEntry {
                         showOnLock = true;
                         showInList_ifCompleted = true;
                         
-                        if (days_from_param == DATE_FLAG_GLOBAL) {
+                        if (days_from_param == DAY_FLAG_GLOBAL) {
                             showOnLock = preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
                             setEntryType(EntryType.GLOBAL);
                         } else {
                             setEntryType(EntryType.TODAY);
                         }
                         
-                    } else if (days_associated < currentDay && currentDay - days_associated < dayOffset_after) {
+                    } else if (days_associated < currentDay && currentDay - days_associated <= dayOffset_after) {
                         
                         bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
                         bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
@@ -259,7 +259,7 @@ public class TodoListEntry {
                         showOnLock = true;
                         
                         setEntryType(EntryType.OLD);
-                    } else if (days_associated > currentDay && days_associated - currentDay < dayOffset_beforehand) {
+                    } else if (days_associated > currentDay && days_associated - currentDay <= dayOffset_beforehand) {
                         
                         bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
                         bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
@@ -383,7 +383,7 @@ public class TodoListEntry {
     }
     
     public String getDayOffset() {
-        if (day_start != DATE_FLAG_GLOBAL && day_end != DATE_FLAG_GLOBAL) {
+        if (day_start != DAY_FLAG_GLOBAL && day_end != DAY_FLAG_GLOBAL) {
             dayOffset = "";
             
             int dayShift = 0;
@@ -437,6 +437,8 @@ public class TodoListEntry {
                     dayOffset += " (> чем через месяц)";
                 }
             }
+        } else {
+            dayOffset = " (общее)";
         }
         return dayOffset;
     }
@@ -542,7 +544,7 @@ public class TodoListEntry {
     
     @Override
     public int hashCode() {
-        return Objects.hash(event, params);
+        return Objects.hash(event, Arrays.hashCode(params));
     }
     
     @Override
