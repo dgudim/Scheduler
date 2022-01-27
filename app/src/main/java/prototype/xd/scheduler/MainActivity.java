@@ -66,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> BackgroundSetterService.ping(MainActivity.this)).start();
     }
     
-    
-    
     @Override
     protected void onDestroy() {
         BackgroundSetterService.stop_queue(this);
