@@ -91,14 +91,12 @@ public class TodoListViewAdapter extends BaseAdapter {
     }
     
     public void updateData(boolean updateBitmap) {
-        new Thread(() -> {
-            if (updateBitmap) {
-                mainActivity.notifyService();
-            }
-            home.todoListEntries = sortEntries(home.todoListEntries);
-            updateCurrentEntries();
-            home.rootActivity.runOnUiThread(TodoListViewAdapter.this::notifyDataSetChanged);
-        }).start();
+        if (updateBitmap) {
+            mainActivity.notifyService();
+        }
+        home.todoListEntries = sortEntries(home.todoListEntries);
+        updateCurrentEntries();
+        home.rootActivity.runOnUiThread(TodoListViewAdapter.this::notifyDataSetChanged);
     }
     
     @Override
