@@ -134,18 +134,19 @@ public class BackgroundSetterService extends Service {
                 @Override
                 public void run() {
                     if (isDayTime()) {
-                        if(lockScreenBitmapDrawer == null){
+                        if (lockScreenBitmapDrawer == null) {
                             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(BackgroundSetterService.this);
                         }
                         updateDate(DAY_FLAG_GLOBAL_STR, false);
                         lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
                     } else {
-                        if(lockScreenBitmapDrawer != null){
+                        if (lockScreenBitmapDrawer != null) {
                             lockScreenBitmapDrawer = null;
+                            System.gc();
                         }
                     }
                 }
-            }, 5000, 1000 * 60 * 30); //approximately every 30 minutes if day
+            }, 5000, 1000 * 60); //approximately every 30 minutes if day
         }
         return START_STICKY;
     }
