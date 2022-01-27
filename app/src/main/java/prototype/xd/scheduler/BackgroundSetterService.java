@@ -134,8 +134,15 @@ public class BackgroundSetterService extends Service {
                 @Override
                 public void run() {
                     if (isDayTime()) {
+                        if(lockScreenBitmapDrawer == null){
+                            lockScreenBitmapDrawer = new LockScreenBitmapDrawer(BackgroundSetterService.this);
+                        }
                         updateDate(DAY_FLAG_GLOBAL_STR, false);
                         lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                    } else {
+                        if(lockScreenBitmapDrawer != null){
+                            lockScreenBitmapDrawer = null;
+                        }
                     }
                 }
             }, 5000, 1000 * 60 * 30); //approximately every 30 minutes if day

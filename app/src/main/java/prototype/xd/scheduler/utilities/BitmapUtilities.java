@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.util.DisplayMetrics;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
@@ -31,6 +32,13 @@ public class BitmapUtilities {
         resizedBitmap.recycle();
         bitmap.recycle();
         return cut_bitmap;
+    }
+    
+    public static Bitmap readStream(FileInputStream inputStream){
+        Bitmap orig = BitmapFactory.decodeStream(inputStream);
+        Bitmap copy = orig.copy(Bitmap.Config.ARGB_8888, true);
+        orig.recycle();
+        return copy;
     }
     
     /**

@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAc
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
@@ -96,13 +97,13 @@ public class LockScreenBitmapDrawer {
                         bitmap = fingerPrintAndSaveBitmap(bitmap, bg, displayMetrics);
                     } else {
                         if (bg.exists()) {
-                            bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
-                                    .copy(Bitmap.Config.ARGB_8888, true);
+                            bitmap.recycle();
+                            bitmap = readStream(new FileInputStream(bg));
                         } else {
                             File defFile = new File(rootDir, defaultBackgroundName);
                             if (defFile.exists()) {
-                                bitmap = BitmapFactory.decodeStream(new FileInputStream(defFile))
-                                        .copy(Bitmap.Config.ARGB_8888, true);
+                                bitmap.recycle();
+                                bitmap = readStream(new FileInputStream(defFile));
                             } else {
                                 throw new FileNotFoundException("No available background to load");
                             }
