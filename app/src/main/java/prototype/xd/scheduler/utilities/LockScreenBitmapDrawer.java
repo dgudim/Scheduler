@@ -36,8 +36,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import prototype.xd.scheduler.BackgroundSetterService;
 import prototype.xd.scheduler.entities.TodoListEntry;
@@ -51,15 +49,11 @@ public class LockScreenBitmapDrawer {
     private final Point displayCenter;
     private final SharedPreferences preferences;
     
-    private boolean forceMaxRWidth = false;
-    
     private volatile boolean busy = false;
     
     private final WallpaperManager wallpaperManager;
     
     private int toAdd_previous_hash;
-    
-    private final Timer queueTimer;
     
     public LockScreenBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
@@ -70,8 +64,7 @@ public class LockScreenBitmapDrawer {
         
         displayMetrics = new DisplayMetrics();
         display.getRealMetrics(displayMetrics);
-        
-        queueTimer = new Timer();
+       
         toAdd_previous_hash = 0;
         
         displayWidth = displayMetrics.widthPixels;
@@ -92,59 +85,45 @@ public class LockScreenBitmapDrawer {
     }
     
     public void constructBitmap(BackgroundSetterService backgroundSetterService) {
-        forceMaxRWidth = preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK);
-        
         if (!busy) {
             busy = true;
-            startBitmapThread(backgroundSetterService);
-        } else {
-            queueTimer.cancel();
-            queueTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    constructBitmap(backgroundSetterService);
-                }
-            }, 1000 * 60 * 2); // in 2 minutes
-        }
-    }
-    
-    private void startBitmapThread(BackgroundSetterService backgroundSetterService) {
-        new Thread(() -> {
-            try {
-                Bitmap bitmap = getBitmapFromLockScreen();
-                File bg = getBackgroundAccordingToDayAndTime();
-                
-                if (noFingerPrint(bitmap)) {
-                    bitmap = fingerPrintAndSaveBitmap(bitmap, bg, displayMetrics);
-                } else {
-                    if (bg.exists()) {
-                        bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
-                                .copy(Bitmap.Config.ARGB_8888, true);
+            new Thread(() -> {
+                try {
+                    Bitmap bitmap = getBitmapFromLockScreen();
+                    File bg = getBackgroundAccordingToDayAndTime();
+                    
+                    if (noFingerPrint(bitmap)) {
+                        bitmap = fingerPrintAndSaveBitmap(bitmap, bg, displayMetrics);
                     } else {
-                        File defFile = new File(rootDir, defaultBackgroundName);
-                        if (defFile.exists()) {
-                            bitmap = BitmapFactory.decodeStream(new FileInputStream(defFile))
+                        if (bg.exists()) {
+                            bitmap = BitmapFactory.decodeStream(new FileInputStream(bg))
                                     .copy(Bitmap.Config.ARGB_8888, true);
                         } else {
-                            throw new FileNotFoundException("No available background to load");
+                            File defFile = new File(rootDir, defaultBackgroundName);
+                            if (defFile.exists()) {
+                                bitmap = BitmapFactory.decodeStream(new FileInputStream(defFile))
+                                        .copy(Bitmap.Config.ARGB_8888, true);
+                            } else {
+                                throw new FileNotFoundException("No available background to load");
+                            }
                         }
                     }
+                    
+                    float time = System.nanoTime();
+                    log(INFO, "setting wallpaper");
+                    drawStringsOnBitmap(backgroundSetterService, bitmap);
+                    setLockScreenBitmap(bitmap);
+                    log(INFO, "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
+                    
+                    bitmap.recycle();
+                } catch (InterruptedException e) {
+                    log(INFO, e.getMessage());
+                } catch (Exception e) {
+                    logException(e);
                 }
-                
-                float time = System.nanoTime();
-                log(INFO, "setting wallpaper");
-                drawStringsOnBitmap(backgroundSetterService, bitmap);
-                setLockScreenBitmap(bitmap);
-                log(INFO, "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
-                
-                bitmap.recycle();
-            } catch (InterruptedException e) {
-                log(INFO, e.getMessage());
-            } catch (Exception e) {
-                logException(e);
-            }
-            busy = false;
-        }).start();
+                busy = false;
+            }).start();
+        }
     }
     
     private void drawStringsOnBitmap(BackgroundSetterService backgroundSetterService, Bitmap src) throws InterruptedException {
@@ -176,7 +155,7 @@ public class LockScreenBitmapDrawer {
             for (int i = toAdd.size() - 1; i >= 0; i--) {
                 ArrayList<TodoListEntry> splits = new ArrayList<>();
                 for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
-                    if (forceMaxRWidth) {
+                    if (preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK)) {
                         toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelThickness;
                     }
                     TodoListEntry splitEntry;
