@@ -82,4 +82,6 @@ public class Keys {
     public static final String ITEM_FULL_WIDTH_LOCK = "force_max_RWidth_lock";
     
     public static final String NEED_TO_RECONSTRUCT_BITMAP = "need_to_reconstruct_bitmap";
+    
+    public static final String PREVIOUSLY_SELECTED_DATE = "previously_selected_date";
 }

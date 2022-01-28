@@ -1,7 +1,10 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
+import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
+import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -10,11 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import java.io.File;
+
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.adapters.BackgroundImagesGridViewAdapter;
 import prototype.xd.scheduler.utilities.Keys;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class AdaptiveBackgroundSettingsEntry extends SettingsEntry{
     
     private final Context context;
@@ -43,6 +49,23 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry{
     
             View view = inflater.inflate(R.layout.background_images_grid_selection_view, root, false);
             addSwitchChangeListener(view.findViewById(R.id.adaptive_bg_switch), Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED);
+    
+            view.findViewById(R.id.resetBgButton).setOnClickListener(view1 -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Удалить все сохраненные фоны?");
+        
+                builder.setPositiveButton("Да", (dialog, which) -> {
+                    new File(rootDir, defaultBackgroundName).delete();
+                    for (int i = 0; i < 7; i++) {
+                        new File(rootDir, availableDays[i] + ".png").delete();
+                        new File(rootDir, availableDays[i] + ".png_min.png").delete();
+                    }
+                });
+                builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+                
+                builder.show();
+            });
+            
             GridView gridView = view.findViewById(R.id.grid_view);
             gridView.setNumColumns(2);
             gridView.setHorizontalSpacing(5);

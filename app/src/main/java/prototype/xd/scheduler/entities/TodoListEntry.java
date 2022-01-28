@@ -1,11 +1,13 @@
 package prototype.xd.scheduler.entities;
 
 import static org.apache.commons.lang.ArrayUtils.addAll;
+import static java.lang.Math.max;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
@@ -115,15 +117,18 @@ public class TodoListEntry {
     
     public boolean isVisible(long day) {
         if (recurrenceSet != null) {
-            if (day > day_end) {
+            if (day > day_end && !allDay) {
                 return false;
             }
             RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             long instance = 0;
-            while (it.hasNext() && !recurrenceSet.isInfinite() && daysFromEpoch(instance) <= day) {
+            while (it.hasNext() && daysFromEpoch(instance) <= day) {
                 instance = it.next();
-                if (daysFromEpoch(instance) == day) {
-                    return true;
+                long startEventDayFromEpoch = daysFromEpoch(instance);
+                long endEventDayFromEpoch = daysFromEpoch(instance) + max(daysFromEpoch(timestamp_duration) - 1, 0);
+                if ((startEventDayFromEpoch >= day - dayOffset_beforehand && startEventDayFromEpoch <= day + dayOffset_after)
+                        || (endEventDayFromEpoch >= day - dayOffset_beforehand && endEventDayFromEpoch <= day + dayOffset_after)) {
+                    return (day >= currentDay - dayOffset_after && day <= currentDay + dayOffset_beforehand) || daysFromEpoch(instance) == currentlySelectedDay;
                 }
             }
             return false;
@@ -131,7 +136,26 @@ public class TodoListEntry {
         return (day >= day_start && day <= day_end) || day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL;
     }
     
+    public long genNearestEventDay() {
+        if (recurrenceSet != null) {
+            if (currentDay > day_end && !allDay) {
+                return day_start;
+            }
+            RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
+            while (it.hasNext()) {
+                long epoch = it.next();
+                if(daysFromEpoch(epoch) >= currentDay){
+                    return daysFromEpoch(epoch);
+                }
+            }
+        }
+        return day_start;
+    }
+    
     public String getTimeSpan(Context context) {
+        if (event == null) {
+            return "";
+        }
         if (allDay) {
             return context.getString(R.string.calendar_event_all_day);
         }
@@ -322,7 +346,8 @@ public class TodoListEntry {
             dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
             dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
             
-            isNewEntry = currentDay + dayOffset_beforehand >= day_start && currentDay < day_start;
+            long nearestDay = genNearestEventDay();
+            isNewEntry = currentDay + dayOffset_beforehand >= nearestDay && currentDay < nearestDay;
             isOldEntry = currentDay - dayOffset_after <= day_end && currentDay > day_end;
             
             if (isOldEntry) {
@@ -388,8 +413,9 @@ public class TodoListEntry {
             
             int dayShift = 0;
             
-            if (currentDay < day_start) {
-                dayShift = (int) (day_start - currentDay);
+            long nearestDay = genNearestEventDay();
+            if (currentDay < nearestDay) {
+                dayShift = (int) (nearestDay - currentDay);
             } else if (currentDay > day_end) {
                 dayShift = (int) (day_end - currentDay);
             }
@@ -443,8 +469,8 @@ public class TodoListEntry {
         return dayOffset;
     }
     
-    public void splitText() {
-        textValueSplit = makeNewLines(textValue + getDayOffset(), maxChars);
+    public void splitText(Context context) {
+        textValueSplit = makeNewLines(textValue + getDayOffset() + "\n" + getTimeSpan(context), maxChars);
     }
     
     private void setParams(String[] params) {

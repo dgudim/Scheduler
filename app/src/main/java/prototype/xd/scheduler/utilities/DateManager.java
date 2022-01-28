@@ -64,6 +64,12 @@ public class DateManager {
         }
     }
     
+    public static long dateToEpoch(int year, int month, int dayOfMonth){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, dayOfMonth);
+        return calendar.getTimeInMillis();
+    }
+    
     public static String dateFromEpoch(long epoch) {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(epoch);
@@ -82,8 +88,12 @@ public class DateManager {
                 .toInstant().getEpochSecond() / 86400;
     }
     
+    public static long addTimeZoneOffset(long epoch){
+        return epoch + TimeZone.getDefault().getOffset(epoch);
+    }
+    
     private static long getCurrentDay() {
-        return daysFromEpoch(Calendar.getInstance().getTime().getTime());
+        return daysFromEpoch(addTimeZoneOffset(Calendar.getInstance().getTime().getTime()));
     }
     
 }

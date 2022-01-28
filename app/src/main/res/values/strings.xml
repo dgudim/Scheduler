@@ -41,7 +41,7 @@
     <string name="settings_new_font_color">Цвет шрифта для будущих дел</string>
 
     <string name="settings_reset_to_defaults">Сбросить настройки</string>
-    <string name="settings_update_bg">Сбросить фон</string>
+    <string name="settings_reset_bg">Сбросить фоны</string>
     <string name="settings_add_group">Добавить группу</string>
 
     <string name="settings_text_color">Цвет шрифта</string>

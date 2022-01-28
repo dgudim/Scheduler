@@ -2,17 +2,12 @@ package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.RESET_BUTTONS;
-import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
-import static prototype.xd.scheduler.utilities.DateManager.availableDays;
-import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.fragment.app.Fragment;
-
-import java.io.File;
 
 import prototype.xd.scheduler.R;
 
@@ -31,24 +26,9 @@ public class ResetButtonsSettingsEntry extends SettingsEntry {
         entryType = RESET_BUTTONS;
     }
     
-    @SuppressWarnings({"ResultOfMethodCallIgnored", "ApplySharedPref"})
+    @SuppressWarnings({"ApplySharedPref"})
     @Override
     protected View InitInnerViews(View rootView) {
-    
-        rootView.findViewById(R.id.resetBgButton).setOnClickListener(view1 -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
-            builder.setTitle("Удалить все сохраненные фоны?");
-        
-            builder.setPositiveButton("Да", (dialog, which) -> {
-                new File(rootDir, defaultBackgroundName).delete();
-                for (int i = 0; i < 7; i++) {
-                    new File(rootDir, availableDays[i] + ".png").delete();
-                }
-            });
-            builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
-        
-            builder.show();
-        });
         
         rootView.findViewById(R.id.resetSettingsButton).setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());

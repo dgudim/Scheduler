@@ -1,12 +1,12 @@
 package prototype.xd.scheduler.entities.calendars;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarColumns;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarColumns;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 
 import android.content.ContentResolver;

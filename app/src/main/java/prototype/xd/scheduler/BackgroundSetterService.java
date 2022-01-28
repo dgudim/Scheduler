@@ -38,12 +38,6 @@ public class BackgroundSetterService extends Service {
         ContextCompat.startForegroundService(context, intent);
     }
     
-    public static void stop_queue(Context context) {
-        Intent intent = new Intent(context, BackgroundSetterService.class);
-        intent.putExtra("on_exit", 1);
-        ContextCompat.startForegroundService(context, intent);
-    }
-    
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -124,7 +118,9 @@ public class BackgroundSetterService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.hasExtra("update")) {
-            lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+            if (lockScreenBitmapDrawer != null) {
+                lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+            }
         } else {
             startForeground(foregroundNotificationId, getForegroundNotification());
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
@@ -146,7 +142,7 @@ public class BackgroundSetterService extends Service {
                         }
                     }
                 }
-            }, 5000, 1000 * 60); //approximately every 30 minutes if day
+            }, 5000, 1000 * 60 * 30); //approximately every 30 minutes if day
         }
         return START_STICKY;
     }

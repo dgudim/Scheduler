@@ -5,6 +5,7 @@ import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgrou
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
@@ -45,8 +46,9 @@ public class LockScreenBitmapDrawer {
     
     public String currentBitmapLongestText = "";
     
-    public int displayWidth;
-    public DisplayMetrics displayMetrics;
+    public final int displayWidth;
+    public final int displayHeight;
+    public final DisplayMetrics displayMetrics;
     private final Point displayCenter;
     private final SharedPreferences preferences;
     
@@ -54,7 +56,7 @@ public class LockScreenBitmapDrawer {
     
     private final WallpaperManager wallpaperManager;
     
-    private int toAdd_previous_hash;
+    private int previous_hash;
     
     public LockScreenBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
@@ -65,20 +67,29 @@ public class LockScreenBitmapDrawer {
         
         displayMetrics = new DisplayMetrics();
         display.getRealMetrics(displayMetrics);
-       
-        toAdd_previous_hash = 0;
+        
+        previous_hash = 0;
         
         displayWidth = displayMetrics.widthPixels;
-        displayCenter = new Point(displayWidth / 2, displayMetrics.heightPixels / 2);
+        displayHeight = displayMetrics.heightPixels;
+        displayCenter = new Point(displayWidth / 2, displayHeight / 2);
     }
     
     @SuppressLint("MissingPermission")
-    private Bitmap getBitmapFromLockScreen() {
+    private Bitmap getBitmapFromLockScreen() throws IOException {
         ParcelFileDescriptor wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK);
         if (wallpaperFile == null) {
             wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM);
         }
-        return BitmapFactory.decodeFileDescriptor(wallpaperFile.getFileDescriptor()).copy(Bitmap.Config.ARGB_8888, true);
+        if (wallpaperFile != null) {
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(wallpaperFile.getFileDescriptor()).copy(Bitmap.Config.ARGB_8888, true);
+            wallpaperFile.close();
+            return bitmap;
+        } else {
+            Bitmap blankBitmap = Bitmap.createBitmap(displayWidth, displayHeight, Bitmap.Config.ARGB_8888);
+            blankBitmap.eraseColor(13);
+            return blankBitmap;
+        }
     }
     
     private void setLockScreenBitmap(Bitmap bitmap) throws IOException {
@@ -132,16 +143,17 @@ public class LockScreenBitmapDrawer {
         Canvas canvas = new Canvas(src);
         
         ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries(backgroundSetterService));
-        if (toAdd_previous_hash == toAdd.hashCode()) {
+        int currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(src);
+        if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
         }
-        toAdd_previous_hash = toAdd.hashCode();
+        previous_hash = currentHash;
         
         if (!toAdd.isEmpty()) {
             
             for (int i = 0; i < toAdd.size(); i++) {
                 toAdd.get(i).loadDisplayData(backgroundSetterService.lockScreenBitmapDrawer);
-                toAdd.get(i).splitText();
+                toAdd.get(i).splitText(backgroundSetterService);
             }
             
             float totalHeight = 0;

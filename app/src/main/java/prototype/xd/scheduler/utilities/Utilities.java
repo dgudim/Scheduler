@@ -42,7 +42,7 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 public class Utilities {
     
     public static File rootDir;
-   
+    
     public static void initStorage(Context context) {
         rootDir = context.getExternalFilesDir("");
         if (rootDir == null) {
@@ -54,8 +54,9 @@ public class Utilities {
     }
     
     public static ArrayList<TodoListEntry> loadTodoEntries(Context context) {
+        
+        ArrayList<TodoListEntry> readEntries = new ArrayList<>();
         try {
-            
             ArrayList<String[]> entryParams = loadObject("list");
             ArrayList<String> entryGroupNames = loadObject("list_groupData");
             
@@ -63,17 +64,17 @@ public class Utilities {
                 log(WARNING, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
             }
             
-            ArrayList<TodoListEntry> readEntries = new ArrayList<>();
             for (int i = 0; i < entryParams.size(); i++) {
                 readEntries.add(new TodoListEntry(entryParams.get(i), entryGroupNames.get(i)));
             }
-            readEntries.addAll(getAllTodoListEntriesFromCalendars(context));
-            return sortEntries(readEntries);
         } catch (Exception e) {
             log(INFO, "no todo list");
             logException(e);
-            return new ArrayList<>();
         }
+        
+        readEntries.addAll(getAllTodoListEntriesFromCalendars(context));
+        return sortEntries(readEntries);
+        
     }
     
     public static void saveEntries(ArrayList<TodoListEntry> entries) {
@@ -114,7 +115,7 @@ public class Utilities {
         s.close();
     }
     
-    public static void callImageFileChooser(Activity activity, int requestCode){
+    public static void callImageFileChooser(Activity activity, int requestCode) {
         Intent chooseFile;
         Intent intent;
         chooseFile = new Intent(Intent.ACTION_GET_CONTENT);

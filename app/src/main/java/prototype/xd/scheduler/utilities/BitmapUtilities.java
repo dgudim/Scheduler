@@ -13,31 +13,37 @@ import android.util.DisplayMetrics;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class BitmapUtilities {
     
     
-    public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output, DisplayMetrics displayMetrics) throws FileNotFoundException {
-        Bitmap cut_bitmap = Bitmap.createBitmap(bitmap,
-                (int) (bitmap.getWidth() / 2f - displayMetrics.widthPixels / 2f),
-                (int) (bitmap.getHeight() / 2f - displayMetrics.heightPixels / 2f),
-                displayMetrics.widthPixels, displayMetrics.heightPixels);
+    public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output, DisplayMetrics displayMetrics) throws IOException {
+        Bitmap cut_bitmap = createScaledBitmap(bitmap, displayMetrics.widthPixels, displayMetrics.heightPixels, ScalingLogic.CROP);
         fingerPrintBitmap(cut_bitmap);
-        cut_bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(output));
+        
+        FileOutputStream outputStream = new FileOutputStream(output);
+        cut_bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        outputStream.close();
         
         Bitmap resizedBitmap = createScaledBitmap(cut_bitmap, (int) (cut_bitmap.getWidth() / 4f), (int) (cut_bitmap.getHeight() / 4f), BitmapUtilities.ScalingLogic.FIT);
-        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, new FileOutputStream(output.getAbsolutePath() + "_min.png"));
+        
+        FileOutputStream outputStream_min = new FileOutputStream(output.getAbsolutePath() + "_min.png");
+        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStream_min);
+        outputStream_min.close();
+        
         resizedBitmap.recycle();
         bitmap.recycle();
         return cut_bitmap;
     }
     
-    public static Bitmap readStream(FileInputStream inputStream){
+    public static Bitmap readStream(FileInputStream inputStream) throws IOException {
         Bitmap orig = BitmapFactory.decodeStream(inputStream);
         Bitmap copy = orig.copy(Bitmap.Config.ARGB_8888, true);
         orig.recycle();
+        inputStream.close();
         return copy;
     }
     
@@ -249,23 +255,25 @@ public class BitmapUtilities {
     }
     
     public static void fingerPrintBitmap(Bitmap bitmap) {
-        for (int i = 0; i < 3; i++) {
-            for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {
-                bitmap.setPixel(i2, i, 0);//<<<-------------------------------------------------------------------------------------
-            }                                                                                                                           //|
-        }                                                                                                                               //|
-    }                                                                                                                                   //|
+        bitmap.setPixel(0, 0, Color.DKGRAY);
+        bitmap.setPixel(1, 0, Color.GREEN);
+        bitmap.setPixel(0, 1, Color.YELLOW);
+    }
     
-    public static boolean noFingerPrint(Bitmap bitmap) {                                                                                //|
-        for (int i = 0; i < 3; i++) {                                                                                                   //|
-            for (int i2 = 0; i2 < bitmap.getWidth(); i2++) {                                                                            //|
-                int pixel = bitmap.getPixel(i2, i);                                                                                     //|
-                if (!(pixel == -16777216 || pixel == 0)) { // -16777216 is the decoded value 0 is just after setting the fingerprint here |
-                    return true;
-                }
-            }
-        }
-        return false;
+    public static boolean noFingerPrint(Bitmap bitmap) {
+        int pixel1 = bitmap.getPixel(0, 0);
+        int pixel2 = bitmap.getPixel(1, 0);
+        int pixel3 = bitmap.getPixel(0, 1);
+        
+        return !((pixel1 == Color.DKGRAY)
+                && (pixel2 == Color.GREEN)
+                && (pixel3 == Color.YELLOW));
+    }
+    
+    public static int hashBitmap(Bitmap bitmap) {
+        int[] buffer = new int[bitmap.getWidth() * bitmap.getHeight() / 16];
+        bitmap.getPixels(buffer, 0, bitmap.getWidth() / 4, 0, 0, bitmap.getWidth() / 4, bitmap.getHeight() / 4);
+        return Arrays.hashCode(buffer);
     }
     
 }

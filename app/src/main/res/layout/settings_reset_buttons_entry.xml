@@ -14,23 +14,10 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/resetBgButton"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="1dp"
-            android:layout_weight="1"
-            android:background="#FFFFFF"
-            android:text="@string/settings_update_bg"
-            android:textColor="#000000" />
-
-        <Button
             android:id="@+id/resetSettingsButton"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="1dp"
-            android:layout_weight="1"
             android:background="#FFFFFF"
             android:text="@string/settings_reset_to_defaults"
             android:textColor="#000000" />

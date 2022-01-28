@@ -47,7 +47,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         
         preferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
-        BackgroundSetterService.restart(this);
+       /* try {
+            Class.forName("dalvik.system.CloseGuard")
+                    .getMethod("setEnabled", boolean.class)
+                    .invoke(null, true);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }*/
         
         if (!refreshPermissionStates()) {
             setContentView(R.layout.permissions_request_screen);
@@ -58,18 +64,13 @@ public class MainActivity extends AppCompatActivity {
             grant_button.setOnClickListener(v -> requestPermissions(PERMISSIONS, REQUEST_CODE_PERMISSIONS));
         } else {
             initStorage(this);
+            BackgroundSetterService.restart(this);
             setContentView(R.layout.activity_main);
         }
     }
     
     public void notifyService(){
         new Thread(() -> BackgroundSetterService.ping(MainActivity.this)).start();
-    }
-    
-    @Override
-    protected void onDestroy() {
-        BackgroundSetterService.stop_queue(this);
-        super.onDestroy();
     }
     
     private boolean refreshPermissionStates() {
