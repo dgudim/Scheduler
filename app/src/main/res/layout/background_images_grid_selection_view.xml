@@ -14,11 +14,11 @@
         android:layout_marginStart="3dp"
         android:layout_marginTop="3dp"
         android:layout_marginEnd="3dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:text="@string/enable"
         android:textSize="18sp"
         tools:ignore="TouchTargetSizeCheck" />
-
-    <include layout="@layout/grid_selection_view" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -35,5 +35,7 @@
             android:backgroundTint="#00FFFFFF"
             android:text="@string/settings_reset_bg" />
     </androidx.cardview.widget.CardView>
+
+    <include layout="@layout/grid_selection_view" />
 
 </LinearLayout>

@@ -56,10 +56,11 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry{
         
                 builder.setPositiveButton("Да", (dialog, which) -> {
                     new File(rootDir, defaultBackgroundName).delete();
-                    for (int i = 0; i < 7; i++) {
-                        new File(rootDir, availableDays[i] + ".png").delete();
-                        new File(rootDir, availableDays[i] + ".png_min.png").delete();
+                    for (String availableDay : availableDays) {
+                        new File(rootDir, availableDay + ".png").delete();
+                        new File(rootDir, availableDay + ".png_min.png").delete();
                     }
+                    gridViewAdapter.notifyDataSetChanged();
                 });
                 builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
                 
