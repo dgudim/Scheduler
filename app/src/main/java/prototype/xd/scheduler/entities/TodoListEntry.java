@@ -126,8 +126,13 @@ public class TodoListEntry {
                 instance = it.next();
                 long startEventDayFromEpoch = daysFromEpoch(instance);
                 long endEventDayFromEpoch = daysFromEpoch(instance) + max(daysFromEpoch(timestamp_duration) - 1, 0);
-                if ((startEventDayFromEpoch >= day - dayOffset_beforehand && startEventDayFromEpoch <= day + dayOffset_after)
-                        || (endEventDayFromEpoch >= day - dayOffset_beforehand && endEventDayFromEpoch <= day + dayOffset_after)) {
+                
+                if ((startEventDayFromEpoch >= day - dayOffset_beforehand
+                        && startEventDayFromEpoch <= day + dayOffset_after)
+                        
+                        || (endEventDayFromEpoch >= day - dayOffset_beforehand
+                        && endEventDayFromEpoch <= day + dayOffset_after))
+                {
                     return (day >= currentDay - dayOffset_after && day <= currentDay + dayOffset_beforehand) || daysFromEpoch(instance) == currentlySelectedDay;
                 }
             }

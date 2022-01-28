@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
-import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
@@ -55,7 +54,6 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry{
                 builder.setTitle("Удалить все сохраненные фоны?");
         
                 builder.setPositiveButton("Да", (dialog, which) -> {
-                    new File(rootDir, defaultBackgroundName).delete();
                     for (String availableDay : availableDays) {
                         new File(rootDir, availableDay + ".png").delete();
                         new File(rootDir, availableDay + ".png_min.png").delete();
