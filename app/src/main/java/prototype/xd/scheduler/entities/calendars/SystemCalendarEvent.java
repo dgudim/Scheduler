@@ -61,8 +61,8 @@ public class SystemCalendarEvent {
         allDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
         
         if (allDay) {
+            end -= 60 * 1000;
             start += 60 * 1000;
-            end -= 60 * 1000; // offset time window by 1 minute because all-day event's time window is day 00:00 - next day 00:00, new time window is day 00:01 - day 23:59
         }
         
         duration = end - start;
@@ -94,6 +94,10 @@ public class SystemCalendarEvent {
             } catch (InvalidRecurrenceRuleException e) {
                 logException(e);
             }
+        }
+    
+        if (allDay) {
+            duration -= 60 * 1000;
         }
         
         subKeys = generateSubKeysFromKey(makeKey(this));

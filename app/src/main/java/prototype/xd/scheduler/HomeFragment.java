@@ -158,7 +158,7 @@ public class HomeFragment extends Fragment {
             if((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0){
                 currentlySelectedDay = daysFromEpoch(addTimeZoneOffset(epoch)); // timezone corrections because calendar returns in local timezone
             }
-            todoListViewAdapter.updateData(false);
+            if(todoListViewAdapter != null) todoListViewAdapter.updateData(false);
         }).start();
     }
     
