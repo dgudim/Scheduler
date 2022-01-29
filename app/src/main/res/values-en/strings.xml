@@ -102,4 +102,6 @@
     <string name="day_sunday">sunday</string>
     <string name="day_default">default</string>
     <string name="day_thursday">thursday</string>
+    <string name="battery_optimization">Background activity</string>
+    <string name="battery_optimization_description">To allow the app to set the background even when you are not in the app</string>
 </resources>

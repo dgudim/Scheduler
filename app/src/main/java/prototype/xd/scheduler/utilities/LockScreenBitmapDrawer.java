@@ -30,6 +30,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -57,6 +58,9 @@ public class LockScreenBitmapDrawer {
     private final WallpaperManager wallpaperManager;
     
     private int previous_hash;
+    
+    public float fontSize_h = 0;
+    private float fontSize_kM = 0;
     
     public LockScreenBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
@@ -97,6 +101,12 @@ public class LockScreenBitmapDrawer {
     }
     
     public void constructBitmap(BackgroundSetterService backgroundSetterService) {
+        
+        fontSize_h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+                preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE),
+                displayMetrics);
+        fontSize_kM = fontSize_h * 1.1f;
+        
         if (!busy) {
             busy = true;
             new Thread(() -> {
@@ -158,9 +168,9 @@ public class LockScreenBitmapDrawer {
             
             float totalHeight = 0;
             for (int i = 0; i < toAdd.size(); i++) {
-                totalHeight += toAdd.get(i).h * toAdd.get(i).textValueSplit.length + toAdd.get(i).kM;
+                totalHeight += fontSize_h * toAdd.get(i).textValueSplit.length + fontSize_kM;
             }
-            totalHeight -= toAdd.get(0).kM;
+            totalHeight -= fontSize_kM;
             totalHeight /= 2f;
             
             ArrayList<ArrayList<TodoListEntry>> splitEntries = new ArrayList<>();
@@ -189,8 +199,8 @@ public class LockScreenBitmapDrawer {
             for (int i = 0; i < toAddSplit.size(); i++) {
                 if (toAddSplit.get(i).adaptiveColorEnabled && !toAddSplit.get(i).textValue.equals(BLANK_TEXT)) {
                     int width = (int) (toAddSplit.get(i).rWidth * 2);
-                    int height = (int) (toAddSplit.get(i).h / 2f + toAddSplit.get(i).kM);
-                    int VOffset = (int) (displayCenter.y + totalHeight - toAddSplit.get(i).kM * (i + 1));
+                    int height = (int) (fontSize_h / 2f + fontSize_kM);
+                    int VOffset = (int) (displayCenter.y + totalHeight - fontSize_kM * (i + 1));
                     int HOffset = (src.getWidth() - width) / 2;
                     
                     Rect destRect = new Rect(HOffset, VOffset, width + HOffset, height + VOffset);
@@ -242,8 +252,6 @@ public class LockScreenBitmapDrawer {
         to.padPaint = from.padPaint;
         to.bgPaint = from.bgPaint;
         to.textPaint = from.textPaint;
-        to.h = from.h;
-        to.kM = from.kM;
         to.maxChars = from.maxChars;
         to.rWidth = from.rWidth;
     }
@@ -251,7 +259,7 @@ public class LockScreenBitmapDrawer {
     private void drawTextListOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
             if (!toAdd.get(i).textValue.equals(BLANK_TEXT)) {
-                canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i, toAdd.get(i).textPaint);
+                canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - fontSize_kM * i, toAdd.get(i).textPaint);
             }
         }
     }
@@ -262,15 +270,15 @@ public class LockScreenBitmapDrawer {
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
                         -toAdd.get(i).rWidth - toAdd.get(i).bevelThickness,
-                        toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
+                        fontSize_h / 2f - fontSize_kM * i,
                         toAdd.get(i).rWidth + toAdd.get(i).bevelThickness,
-                        -toAdd.get(i).kM * (i + 1) - toAdd.get(i).bevelThickness);
+                        -fontSize_kM * (i + 1) - toAdd.get(i).bevelThickness);
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
                         -toAdd.get(i).rWidth,
-                        toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
+                        fontSize_h / 2f - fontSize_kM * i,
                         toAdd.get(i).rWidth,
-                        -toAdd.get(i).kM * (i + 1));
+                        -fontSize_kM * (i + 1));
             }
         }
     }

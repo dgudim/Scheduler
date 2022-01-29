@@ -102,4 +102,6 @@
     <string name="day_saturday">суббота</string>
     <string name="day_sunday">воскресенье</string>
     <string name="day_default">дефолтный</string>
+    <string name="battery_optimization_description">Чтобы приложение могло обновлять фон даже когда вы не в приложении</string>
+    <string name="battery_optimization">Работа в фоне</string>
 </resources>

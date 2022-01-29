@@ -149,6 +149,6 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public void onDestroy() {
-        refreshTimer.cancel();
+        if(refreshTimer != null) refreshTimer.cancel();
     }
 }

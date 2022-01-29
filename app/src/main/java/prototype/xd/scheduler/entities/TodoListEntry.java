@@ -33,7 +33,6 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValid
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.TypedValue;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -83,9 +82,6 @@ public class TodoListEntry {
     public int adaptiveColorBalance;
     public int adaptiveColor;
     
-    public int fontSize = 0;
-    public float h = 0;
-    public float kM = 0;
     public int maxChars = 0;
     public float rWidth = 0;
     
@@ -319,7 +315,6 @@ public class TodoListEntry {
                 }
             }
             
-            fontSize = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
             adaptiveColorEnabled = preferences.getBoolean(Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
             adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
             adaptiveColor = 0xff_FFFFFF;
@@ -372,7 +367,6 @@ public class TodoListEntry {
             showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.SETTINGS_DEFAULT_SHOW_ON_LOCK);
             showOnLock = showOnLock || isOldEntry || isNewEntry;
             
-            fontSize = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
             adaptiveColor = 0xff_FFFFFF;
             setParams(params);
         }
@@ -395,10 +389,8 @@ public class TodoListEntry {
     }
     
     public void loadDisplayData(LockScreenBitmapDrawer lockScreenBitmapDrawer) {
-        h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, lockScreenBitmapDrawer.displayMetrics);
-        kM = h * 1.1f;
         textPaint = createNewPaint(fontColor);
-        textPaint.setTextSize(h);
+        textPaint.setTextSize(lockScreenBitmapDrawer.fontSize_h);
         textPaint.setTextAlign(Paint.Align.CENTER);
         rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1, lockScreenBitmapDrawer.displayWidth / 2f - bevelThickness);
         maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - bevelThickness * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
