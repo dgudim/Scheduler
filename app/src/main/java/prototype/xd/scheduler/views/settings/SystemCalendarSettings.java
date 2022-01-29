@@ -47,9 +47,9 @@ public class SystemCalendarSettings extends PopupSettingsView{
         
         settings_reset_button.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Сбросить настройки?");
+            builder.setTitle(R.string.reset_settings_prompt);
             
-            builder.setPositiveButton("Да", (dialog, which) -> {
+            builder.setPositiveButton(R.string.yes, (dialog, which) -> {
                 Map<String, ?> allEntries = preferences.getAll();
                 SharedPreferences.Editor editor = preferences.edit();
                 for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
@@ -60,7 +60,7 @@ public class SystemCalendarSettings extends PopupSettingsView{
                 editor.apply();
                 initialise(calendarKey, context, fragment);
             });
-            builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+            builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
             
             builder.show();
         });

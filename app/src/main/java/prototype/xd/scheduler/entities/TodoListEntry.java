@@ -2,7 +2,6 @@ package prototype.xd.scheduler.entities;
 
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
@@ -15,6 +14,8 @@ import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
+import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
@@ -95,9 +96,7 @@ public class TodoListEntry {
     public boolean showOnLock = false;
     public boolean showInList_ifCompleted = false;
     
-    public static final String blankTextValue = "_BLANK_";
-    public String textValue = blankTextValue;
-    public String dayOffset = "";
+    public String textValue = BLANK_TEXT;
     public String[] textValueSplit;
     
     public Paint textPaint;
@@ -417,9 +416,9 @@ public class TodoListEntry {
         }
     }
     
-    public String getDayOffset(long day) {
+    public String getDayOffset(long day, Context context) {
+        String dayOffset = "";
         if (day_start != DAY_FLAG_GLOBAL && day_end != DAY_FLAG_GLOBAL) {
-            dayOffset = "";
             
             int dayShift = 0;
             
@@ -434,7 +433,7 @@ public class TodoListEntry {
                 if (dayShift > 0) {
                     switch (dayShift) {
                         case (1):
-                            dayOffset += " (Завтра)";
+                            dayOffset = context.getString(R.string.item_tomorrow);
                             break;
                         case (2):
                         case (3):
@@ -442,16 +441,16 @@ public class TodoListEntry {
                         case (22):
                         case (23):
                         case (24):
-                            dayOffset += " (Через " + dayShift + " дня)";
+                            dayOffset = context.getString(R.string.item_in_N_days_single, dayShift);
                             break;
                         default:
-                            dayOffset += " (Через " + dayShift + " дней)";
+                            dayOffset = context.getString(R.string.item_in_N_days_double, dayShift);
                             break;
                     }
                 } else if (dayShift < 0) {
                     switch (dayShift) {
                         case (-1):
-                            dayOffset += " (Вчера)";
+                            dayOffset = context.getString(R.string.item_yesterday);
                             break;
                         case (-2):
                         case (-3):
@@ -459,22 +458,25 @@ public class TodoListEntry {
                         case (-22):
                         case (-23):
                         case (-24):
-                            dayOffset += " (" + -dayShift + " дня назад)";
+                            dayOffset = context.getString(R.string.item_N_days_ago_single, -dayShift);
                             break;
                         default:
-                            dayOffset += " (" + -dayShift + " дней назад)";
+                            dayOffset = context.getString(R.string.item_N_days_ago_double, -dayShift);
                             break;
                     }
                 }
             } else {
                 if (dayShift < 0) {
-                    dayOffset += " (> месяца назад)";
+                    dayOffset = context.getString(R.string.item_more_than_a_month_ago);
                 } else {
-                    dayOffset += " (> чем через месяц)";
+                    dayOffset = context.getString(R.string.item_in_more_than_in_a_month);
                 }
             }
         } else {
-            dayOffset = " (общее)";
+            dayOffset = context.getString(R.string.item_global);
+        }
+        if (!dayOffset.equals("")) {
+            return " " + dayOffset;
         }
         return dayOffset;
     }

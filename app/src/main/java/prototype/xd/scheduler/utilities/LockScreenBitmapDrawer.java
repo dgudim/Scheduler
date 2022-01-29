@@ -1,6 +1,5 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
@@ -8,6 +7,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
+import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
@@ -187,7 +187,7 @@ public class LockScreenBitmapDrawer {
             }
             
             for (int i = 0; i < toAddSplit.size(); i++) {
-                if (toAddSplit.get(i).adaptiveColorEnabled && !toAddSplit.get(i).textValue.equals(blankTextValue)) {
+                if (toAddSplit.get(i).adaptiveColorEnabled && !toAddSplit.get(i).textValue.equals(BLANK_TEXT)) {
                     int width = (int) (toAddSplit.get(i).rWidth * 2);
                     int height = (int) (toAddSplit.get(i).h / 2f + toAddSplit.get(i).kM);
                     int VOffset = (int) (displayCenter.y + totalHeight - toAddSplit.get(i).kM * (i + 1));
@@ -228,7 +228,7 @@ public class LockScreenBitmapDrawer {
             }
             
             for (int i = 0; i < toAddSplit.size(); i++) {
-                if (!toAddSplit.get(i).textValue.equals(blankTextValue)) {
+                if (!toAddSplit.get(i).textValue.equals(BLANK_TEXT)) {
                     toAddSplit.get(i).initializeBgAndPadPaints();
                 }
             }
@@ -250,7 +250,7 @@ public class LockScreenBitmapDrawer {
     
     private void drawTextListOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
-            if (!toAdd.get(i).textValue.equals(blankTextValue)) {
+            if (!toAdd.get(i).textValue.equals(BLANK_TEXT)) {
                 canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i, toAdd.get(i).textPaint);
             }
         }
@@ -258,7 +258,7 @@ public class LockScreenBitmapDrawer {
     
     private void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
-            if (!toAdd.get(i).textValue.equals(blankTextValue)) {
+            if (!toAdd.get(i).textValue.equals(BLANK_TEXT)) {
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
                         -toAdd.get(i).rWidth - toAdd.get(i).bevelThickness,

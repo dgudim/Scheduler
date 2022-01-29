@@ -51,16 +51,16 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry{
     
             view.findViewById(R.id.resetBgButton).setOnClickListener(view1 -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Удалить все сохраненные фоны?");
+                builder.setTitle(R.string.remove_all_saved_backgrounds_prompt);
         
-                builder.setPositiveButton("Да", (dialog, which) -> {
+                builder.setPositiveButton(R.string.yes, (dialog, which) -> {
                     for (String availableDay : availableDays) {
                         new File(rootDir, availableDay + ".png").delete();
                         new File(rootDir, availableDay + ".png_min.png").delete();
                     }
                     gridViewAdapter.notifyDataSetChanged();
                 });
-                builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+                builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
                 
                 builder.show();
             });

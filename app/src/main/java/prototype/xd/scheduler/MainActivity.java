@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     
-    public void notifyService(){
+    public void notifyService() {
         new Thread(() -> BackgroundSetterService.ping(MainActivity.this)).start();
     }
     
@@ -106,10 +106,10 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(() -> {
                     try {
                         Bitmap originalBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
-    
+                        
                         WindowManager wm = (WindowManager) MainActivity.this.getSystemService(Context.WINDOW_SERVICE);
                         Display display = wm.getDefaultDisplay();
-    
+                        
                         DisplayMetrics displayMetrics = new DisplayMetrics();
                         display.getRealMetrics(displayMetrics);
                         

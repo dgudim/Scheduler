@@ -1,7 +1,6 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.addTimeZoneOffset;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
@@ -9,6 +8,7 @@ import static prototype.xd.scheduler.utilities.DateManager.dateToEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
+import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
@@ -79,7 +79,7 @@ public class HomeFragment extends Fragment {
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(rootActivity);
-            builder.setTitle("Добавить пункт");
+            builder.setTitle(R.string.add_item);
             
             View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
             final EditText input = addView.findViewById(R.id.entryNameEditText);
@@ -116,7 +116,7 @@ public class HomeFragment extends Fragment {
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(addView);
             
-            builder.setPositiveButton("Добавить", (dialog, which) -> {
+            builder.setPositiveButton(R.string.add, (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString(),
                         ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
@@ -126,7 +126,7 @@ public class HomeFragment extends Fragment {
                 todoListViewAdapter.updateData(newEntry.getLockViewState());
             });
             
-            builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
+            builder.setNegativeButton(R.string.add_to_global_list, (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString(),
                         ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
@@ -136,7 +136,7 @@ public class HomeFragment extends Fragment {
                 todoListViewAdapter.updateData(newEntry.getLockViewState());
             });
             
-            builder.setNeutralButton("Отмена", (dialog, which) -> dialog.dismiss());
+            builder.setNeutralButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
             
             builder.show();
         });

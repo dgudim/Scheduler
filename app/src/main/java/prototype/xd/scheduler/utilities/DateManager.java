@@ -14,13 +14,14 @@ import java.util.TimeZone;
 public class DateManager {
     
     public static final TimeZone timeZone_UTC = TimeZone.getTimeZone("UTC");
+    public static final TimeZone timeZone_SYSTEM = TimeZone.getDefault();
     
     public static long currentDay = DAY_FLAG_GLOBAL;
     public static long currentlySelectedDay = DAY_FLAG_GLOBAL;
     
     static final DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.ROOT);
     
-    public static final String[] availableDays = new String[]{"понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "общий"};
+    public static final String[] availableDays = new String[]{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"};
     
     public static void updateDate(String selectedDate_string, boolean updateCurrentlySelected) {
         long selectedDay = daysFromDate(selectedDate_string);
@@ -89,7 +90,7 @@ public class DateManager {
     }
     
     public static long addTimeZoneOffset(long epoch){
-        return epoch + TimeZone.getDefault().getOffset(epoch);
+        return epoch + timeZone_SYSTEM.getOffset(epoch);
     }
     
     private static long getCurrentDay() {

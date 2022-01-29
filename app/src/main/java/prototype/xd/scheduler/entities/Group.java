@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.entities;
 
+import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
@@ -13,8 +14,7 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 
 public class Group {
-
-    public static final String BLANK_GROUP_NAME = "Ничего";
+    
     public String name = BLANK_GROUP_NAME;
 
     String[] params = new String[]{};

@@ -1,33 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Scheduler</string>
     <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home Fragment</string>
     <string name="settings_fragment_label">Settings Fragment</string>
     <string name="delete_item">Delete item</string>
-
-    <string name="settings_state_symbol">⬧</string>
-
-    <string name="settings_today_bevel_color">Current events border color</string>s
-
-    <string name="settings_today_bevel_thickness">Current events border thickness: %d</string>
-
-    <string name="calendar_event_all_day">all day</string>
-
-    <string name="permissions_granted">granted</string>
-
-    <string name="service_name">background updater service</string>
     <string name="service_description">service to update your lock screen background</string>
+    <string name="service_name">background updater service</string>
     <string name="permissions_grant">Grant</string>
     <string name="permissions_not_granted">not granted</string>
-    <string name="file_access">Access to files</string>
+    <string name="permissions_granted">granted</string>
     <string name="file_access_description">For reading and saving backgrounds from lock screen</string>
+    <string name="file_access">Access to files</string>
     <string name="calendar_access">Access to calendar</string>
     <string name="calendar_access_description">For sync with system calendars</string>
     <string name="permission_request_description">Please grant permissions for the app to properly function</string>
     <string name="permission_request">Permission request</string>
-    <string name="calendar_events">%d evs.</string>
+    <string name="calendar_event_all_day">all day</string>
     <string name="calendar_events_full">%d events</string>
+    <string name="calendar_events">%d evs.</string>
     <string name="title_color_default">default</string>
     <string name="description_fab">add item</string>
     <string name="settings_adaptive_background">Different lock screen backgroung according to day</string>
@@ -37,18 +28,21 @@
     <string name="settings_show_days_upcoming">Show in %d day/days</string>
     <string name="settings_bevel_thickness">Border thickness: %d</string>
     <string name="settings_bg_color">Background color</string>
-    <string name="settings_bevel_color">Border color</string>
     <string name="settings_text_color">Font color</string>
+    <string name="settings_bevel_color">Border color</string>
     <string name="settings_add_group">Add group</string>
     <string name="settings_reset_bg">Reset backgrounds</string>
     <string name="settings_reset_to_defaults">Reset settings</string>
-    <string name="settings_upcoming_font_color">Upcoming events font color</string>
     <string name="settings_expired_font_color">Expired events font color</string>
+    <string name="settings_upcoming_font_color">Upcoming events font color</string>
     <string name="title">Name</string>
     <string name="yes">Yes</string>
     <string name="settings_upcoming_bg_color">Upcoming events background color</string>
     <string name="settings_upcoming_bevel_thickness">Upcoming events border thickness: %d</string>
     <string name="settings_upcoming_bevel_color">Upcoming events border color</string>
+    <string name="settings_today_bevel_color">Current events border color</string>
+    <string name="settings_state_symbol">⬧</string>
+    <string name="settings_today_bevel_thickness">Current events border thickness: %d</string>
     <string name="settings_today_bg_color">Current events background color</string>
     <string name="settings_today_font_color">Current events font color</string>
     <string name="settings_show_upcoming_done_items_list">Show upcoming completed events in list</string>
@@ -67,11 +61,11 @@
     <string name="move_to_global_list">Move to global list</string>
     <string name="item_yesterday">(Yesterday)</string>
     <string name="item_tomorrow">(Tomorrow)</string>
-    <string name="item_N_days_ago_double">(% days ago)</string>
     <string name="item_N_days_ago_single">(% days ago)</string>
+    <string name="item_N_days_ago_double">(% days ago)</string>
     <string name="item_more_than_a_month_ago">(> than a month ago)</string>
-    <string name="item_in_N_days_double">(in %d days)</string>
     <string name="item_in_N_days_single">(in %d days)</string>
+    <string name="item_in_N_days_double">(in %d days)</string>
     <string name="item_in_more_than_in_a_month">(> than in a month)</string>
     <string name="item_global">(Global)</string>
     <string name="group_with_same_name_exists">A group with the same name already exists</string>
@@ -91,8 +85,8 @@
     <string name="apply">Apply</string>
     <string name="add_to_global_list">Add to global list</string>
     <string name="add_item">Add event</string>
-    <string name="add">Add</string>
     <string name="add_current_config_as_group_prompt">Add current configuration as a group?</string>
+    <string name="add">Add</string>
     <string name="break_settings_reset_message">You will break settings reset</string>
     <string name="cant_create_group_with_this_name">Can\'t create a group with this name</string>
     <string name="cant_rename_this_group">Can\'t rename this group</string>
@@ -108,5 +102,4 @@
     <string name="day_sunday">sunday</string>
     <string name="day_default">default</string>
     <string name="day_thursday">thursday</string>
-
 </resources>

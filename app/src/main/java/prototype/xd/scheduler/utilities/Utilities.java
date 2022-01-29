@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import prototype.xd.scheduler.HomeFragment;
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.Switch;
@@ -252,15 +253,15 @@ public class Utilities {
     public static void invokeColorDialogue(final Context context, final View target, final String key, final int defaultValue) {
         ColorPickerDialogBuilder
                 .with(context)
-                .setTitle("Выберите цвет")
+                .setTitle(context.getString(R.string.choose_color))
                 .initialColor(preferences.getInt(key, defaultValue))
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
-                .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
+                .setPositiveButton(context.getString(R.string.apply), (dialog, selectedColor, allColors) -> {
                     preferences.edit().putInt(key, selectedColor).apply();
                     target.setBackgroundColor(preferences.getInt(key, defaultValue));
-                }).setNegativeButton("Отмена", (dialog, which) -> {
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
             
         }).build().show();
     }
@@ -268,18 +269,18 @@ public class Utilities {
     public static void invokeColorDialogue(final Context context, final View target, final TextView stateIcon, final HomeFragment fragment, final TodoListEntry todoListEntry, final String parameter, final int initialValue, final boolean setReconstructFlag) {
         ColorPickerDialogBuilder
                 .with(context)
-                .setTitle("Выберите цвет")
+                .setTitle(context.getString(R.string.choose_color))
                 .initialColor(initialValue)
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
-                .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
+                .setPositiveButton(context.getString(R.string.apply), (dialog, selectedColor, allColors) -> {
                     todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
                     saveEntries(fragment.todoListEntries);
                     target.setBackgroundColor(selectedColor);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
                     todoListEntry.setStateIconColor(stateIcon, parameter);
-                }).setNegativeButton("Отмена", (dialog, which) -> {
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
             
         }).build().show();
     }
@@ -287,17 +288,17 @@ public class Utilities {
     public static void invokeColorDialogue(final Context context, final View target, final TextView stateIcon, SystemCalendarSettings systemCalendarSettings, String calendarKey, final String parameter, final int initialValue, final boolean setReconstructFlag) {
         ColorPickerDialogBuilder
                 .with(context)
-                .setTitle("Выберите цвет")
+                .setTitle(context.getString(R.string.choose_color))
                 .initialColor(initialValue)
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
-                .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
+                .setPositiveButton(context.getString(R.string.apply), (dialog, selectedColor, allColors) -> {
                     preferences.edit().putInt(calendarKey + "_" + parameter, selectedColor).apply();
                     target.setBackgroundColor(selectedColor);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
                     systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-                }).setNegativeButton("Отмена", (dialog, which) -> {
+                }).setNegativeButton(R.string.cancel, (dialog, which) -> {
             
         }).build().show();
     }

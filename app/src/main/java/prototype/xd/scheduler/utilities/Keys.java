@@ -86,4 +86,5 @@ public class Keys {
     public static final String PREVIOUSLY_SELECTED_DATE = "previously_selected_date";
     
     public static final String BLANK_TEXT = "_BLANK_";
+    public static String BLANK_GROUP_NAME = "none";
 }

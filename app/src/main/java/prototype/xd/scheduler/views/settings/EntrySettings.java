@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.views.settings;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
@@ -10,6 +9,7 @@ import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
@@ -40,7 +40,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
-public class EntrySettings extends PopupSettingsView{
+public class EntrySettings extends PopupSettingsView {
     
     private final TodoListEntry entry;
     
@@ -85,19 +85,19 @@ public class EntrySettings extends PopupSettingsView{
                     view.setOnLongClickListener(view1 -> {
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         if (groupNames.get(position).equals(BLANK_GROUP_NAME)) {
-                            builder.setTitle("Нельзя переименовать эту группу");
-                            builder.setMessage("Ты сломаешь сброс настроек");
+                            builder.setTitle(R.string.cant_rename_this_group);
+                            builder.setMessage(R.string.break_settings_reset_message);
                         } else {
-                            builder.setTitle("Изменить");
+                            builder.setTitle(R.string.edit);
                             
                             final EditText input = new EditText(context);
                             input.setInputType(InputType.TYPE_CLASS_TEXT);
                             input.setText(groupNames.get(position));
-                            input.setHint("Название");
+                            input.setHint(R.string.title);
                             
                             builder.setView(input);
                             
-                            builder.setPositiveButton("Сохранить", (dialog, which) -> {
+                            builder.setPositiveButton(R.string.save, (dialog, which) -> {
                                 if (!input.getText().toString().equals(BLANK_GROUP_NAME)) {
                                     groupNames.set(position, input.getText().toString());
                                     String origName = groupList.get(position).name;
@@ -113,18 +113,18 @@ public class EntrySettings extends PopupSettingsView{
                                 } else {
                                     dialog.dismiss();
                                     final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
-                                    builder1.setTitle("Нельзя так называть группу");
-                                    builder1.setMessage("Ты сломаешь сброс настроек");
+                                    builder1.setTitle(R.string.cant_use_this_group_name);
+                                    builder1.setMessage(R.string.break_settings_reset_message);
                                     builder1.show();
                                 }
                             });
                             
-                            builder.setNeutralButton("Удалить группу", (dialog, which) -> {
+                            builder.setNeutralButton(R.string.delete_group, (dialog, which) -> {
                                 AlertDialog.Builder builder12 = new AlertDialog.Builder(context);
-                                builder12.setTitle("Удалить");
-                                builder12.setMessage("Вы уверены?");
+                                builder12.setTitle(R.string.delete);
+                                builder12.setMessage(R.string.are_you_sure);
                                 
-                                builder12.setPositiveButton("Да", (dialog1, which1) -> {
+                                builder12.setPositiveButton(R.string.yes, (dialog1, which1) -> {
                                     String origName = groupNames.get(group_spinner.getSelectedItemPosition());
                                     groupList.remove(group_spinner.getSelectedItemPosition());
                                     groupNames.remove(group_spinner.getSelectedItemPosition());
@@ -140,12 +140,12 @@ public class EntrySettings extends PopupSettingsView{
                                     notifyDataSetChanged();
                                 });
                                 
-                                builder12.setNegativeButton("Нет", (dialog12, which12) -> dialog12.dismiss());
+                                builder12.setNegativeButton(R.string.no, (dialog12, which12) -> dialog12.dismiss());
                                 
                                 builder12.show();
                             });
                             
-                            builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+                            builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                             
                             
                         }
@@ -179,28 +179,28 @@ public class EntrySettings extends PopupSettingsView{
         
         add_group.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Добавить текущую конфигурацию как группу?");
-            builder.setMessage("\n (Будут добавлены только те параметры, которые были изменены вручную)(Зеленые ромбики)");
+            builder.setTitle(R.string.add_current_config_as_group_prompt);
+            builder.setMessage(R.string.add_current_config_as_group_message);
             
             final EditText input = new EditText(context);
             input.setInputType(InputType.TYPE_CLASS_TEXT);
-            input.setHint("Название");
+            input.setHint(R.string.title);
             builder.setView(input);
             
-            builder.setPositiveButton("Добавить", (dialog, which) -> {
+            builder.setPositiveButton(R.string.add, (dialog, which) -> {
                 if (input.getText().toString().equals(BLANK_GROUP_NAME)) {
                     AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
-                    builder13.setTitle("Нельзя создать группу с таким названием");
-                    builder13.setMessage("Ты сломаешь сброс настроек");
+                    builder13.setTitle(R.string.cant_create_group_with_this_name);
+                    builder13.setMessage(R.string.break_settings_reset_message);
                     
                     builder13.show();
                     
                 } else if (groupNames.contains(input.getText().toString())) {
                     AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
-                    builder13.setTitle("Группа с таким именем уже существует");
-                    builder13.setMessage("Перезаписать?");
+                    builder13.setTitle(R.string.group_with_same_name_exists);
+                    builder13.setMessage(R.string.overwrite_prompt);
                     
-                    builder13.setPositiveButton("Да", (dialog14, which14) -> {
+                    builder13.setPositiveButton(R.string.yes, (dialog14, which14) -> {
                         Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                         groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
                         saveGroupsFile(groupList);
@@ -214,7 +214,7 @@ public class EntrySettings extends PopupSettingsView{
                         preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     });
                     
-                    builder13.setNegativeButton("Нет", (dialog13, which13) -> dialog13.dismiss());
+                    builder13.setNegativeButton(R.string.no, (dialog13, which13) -> dialog13.dismiss());
                     
                     builder13.show();
                 } else {
@@ -231,22 +231,22 @@ public class EntrySettings extends PopupSettingsView{
                 }
             });
             
-            builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
             builder.show();
         });
         
         settings_reset_button.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Сбросить настройки?");
+            builder.setTitle(R.string.reset_settings_prompt);
             
-            builder.setPositiveButton("Да", (dialog, which) -> {
+            builder.setPositiveButton(R.string.yes, (dialog, which) -> {
                 entry.removeDisplayParams();
                 entry.resetGroup();
                 saveEntries(fragment.todoListEntries);
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                 initialise(context, fragment, allEntries);
             });
-            builder.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+            builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
             
             builder.show();
         });

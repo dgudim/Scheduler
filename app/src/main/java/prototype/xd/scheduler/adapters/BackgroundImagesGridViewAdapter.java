@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.utilities.Utilities.callImageFileChooser;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,10 +27,22 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
     
     private final LayoutInflater inflater;
     private final Activity rootActivity;
+    private final String[] availableDays_localized;
     
     public BackgroundImagesGridViewAdapter(SettingsFragment fragment) {
         inflater = LayoutInflater.from(fragment.context);
         rootActivity = fragment.requireActivity();
+        Context context = fragment.context;
+        availableDays_localized = new String[]{
+                context.getString(R.string.day_monday),
+                context.getString(R.string.day_tuesday),
+                context.getString(R.string.day_wednesday),
+                context.getString(R.string.day_thursday),
+                context.getString(R.string.day_friday),
+                context.getString(R.string.day_saturday),
+                context.getString(R.string.day_sunday),
+                context.getString(R.string.day_default)
+        };
     }
     
     @Override
@@ -54,7 +67,7 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.background_image_entry, parent, false);
         }
         
-        ((TextView) convertView.findViewById(R.id.bg_title)).setText(availableDays[i]);
+        ((TextView) convertView.findViewById(R.id.bg_title)).setText(availableDays_localized[i]);
         ImageView imageView = convertView.findViewById(R.id.bg_image);
         
         try {
@@ -66,7 +79,7 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
         } catch (IOException e) {
             logException(e);
         }
-    
+        
         imageView.setOnClickListener(v -> {
             callImageFileChooser(rootActivity, i);
         });

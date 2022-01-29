@@ -166,22 +166,22 @@ public class TodoListViewAdapter extends BaseAdapter {
                 input.setText(currentEntry.textValue);
                 alert.setView(input);
                 
-                alert.setTitle("Изменить");
-                alert.setPositiveButton("Сохранить", (dialog, which) -> {
+                alert.setTitle(R.string.edit);
+                alert.setPositiveButton(R.string.save, (dialog, which) -> {
                     currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
                     saveEntries(home.todoListEntries);
                     updateData(currentEntry.getLockViewState());
                 });
                 
                 if (!currentEntry.isGlobalEntry) {
-                    alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
+                    alert.setNeutralButton(R.string.move_to_global_list, (dialog, which) -> {
                         currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                         saveEntries(home.todoListEntries);
                         updateData(currentEntry.getLockViewState());
                     });
                 }
                 
-                alert.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+                alert.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
                 
                 alert.show();
                 return false;
@@ -201,7 +201,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             todoText.setTextColor(currentEntry.fontColor);
         }
         
-        todoText.setText(currentEntry.textValue + currentEntry.getDayOffset(currentlySelectedDay));
+        todoText.setText(currentEntry.textValue + currentEntry.getDayOffset(currentlySelectedDay, context));
         
         return view;
     }
