@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
@@ -31,6 +32,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.SettingsFragment;
@@ -57,7 +59,8 @@ public class Utilities {
         
         ArrayList<TodoListEntry> readEntries = new ArrayList<>();
         try {
-            ArrayList<String[]> entryParams = loadObject("list");
+            ArrayList<HashMap<String, Integer>> entryParams = loadObject("list");
+            ArrayList<String> entryNames = loadObject("list_textValues");
             ArrayList<String> entryGroupNames = loadObject("list_groupData");
             
             if (!(entryParams.size() == entryGroupNames.size())) {
@@ -65,7 +68,7 @@ public class Utilities {
             }
             
             for (int i = 0; i < entryParams.size(); i++) {
-                readEntries.add(new TodoListEntry(entryParams.get(i), entryGroupNames.get(i)));
+                readEntries.add(new TodoListEntry(entryNames.get(i), entryParams.get(i), entryGroupNames.get(i)));
             }
         } catch (Exception e) {
             log(INFO, "no todo list");
@@ -73,24 +76,27 @@ public class Utilities {
         }
         
         readEntries.addAll(getAllTodoListEntriesFromCalendars(context));
-        return sortEntries(readEntries);
+        return sortEntries(readEntries, currentDay);
         
     }
     
     public static void saveEntries(ArrayList<TodoListEntry> entries) {
         try {
-            ArrayList<String[]> entryParams = new ArrayList<>();
+            ArrayList<HashMap<String, Integer>> entryParams = new ArrayList<>();
+            ArrayList<String> entryNames = new ArrayList<>();
             ArrayList<String> entryGroupNames = new ArrayList<>();
             
             for (int i = 0; i < entries.size(); i++) {
                 TodoListEntry entry = entries.get(i);
                 if (!entry.fromSystemCalendar) {
                     entryParams.add(entry.params);
+                    entryNames.add(entry.getTextValue());
                     entryGroupNames.add(entry.group.name);
                 }
             }
             
             saveObject("list", entryParams);
+            saveObject("list_textValues", entryNames);
             saveObject("list_groupData", entryGroupNames);
             log(INFO, "saving todo list");
         } catch (Exception e) {
@@ -125,20 +131,20 @@ public class Utilities {
         activity.startActivityForResult(intent, requestCode);
     }
     
-    public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {
+    public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries, long day) {
         ArrayList<TodoListEntry> newEntries = new ArrayList<>();
         ArrayList<TodoListEntry> oldEntries = new ArrayList<>();
         ArrayList<TodoListEntry> todayEntries = new ArrayList<>();
         ArrayList<TodoListEntry> globalEntries = new ArrayList<>();
         ArrayList<TodoListEntry> otherEntries = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
-            if (entries.get(i).isTodayEntry) {
+            if (entries.get(i).isToday(day)) {
                 todayEntries.add(entries.get(i));
-            } else if (entries.get(i).isOldEntry) {
+            } else if (entries.get(i).isExpired(day)) {
                 oldEntries.add(entries.get(i));
-            } else if (entries.get(i).isNewEntry) {
+            } else if (entries.get(i).isUpcoming(day)) {
                 newEntries.add(entries.get(i));
-            } else if (entries.get(i).isGlobalEntry) {
+            } else if (entries.get(i).isGlobal()) {
                 globalEntries.add(entries.get(i));
             } else {
                 otherEntries.add(entries.get(i));
@@ -200,7 +206,7 @@ public class Utilities {
             
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
+                todoListEntry.changeParameter(parameter, seekBar.getProgress());
                 saveEntries(fragment.todoListEntries);
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                 todoListEntry.setStateIconColor(stateIcon, parameter);
@@ -239,7 +245,7 @@ public class Utilities {
     public static void addSwitchChangeListener(final Switch tSwitch, final TextView stateIcon, final HomeFragment fragment, final TodoListEntry entry, final String parameter, boolean initialValue) {
         tSwitch.setChecked(initialValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            entry.changeParameter(parameter, String.valueOf(isChecked));
+            entry.changeParameter(parameter, isChecked ? 1 : 0);
             saveEntries(fragment.todoListEntries);
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
             entry.setStateIconColor(stateIcon, parameter);
@@ -280,7 +286,7 @@ public class Utilities {
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
                 .setPositiveButton("Применить", (dialog, selectedColor, allColors) -> {
-                    todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
+                    todoListEntry.changeParameter(parameter, selectedColor);
                     saveEntries(fragment.todoListEntries);
                     target.setBackgroundColor(selectedColor);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
@@ -379,7 +385,7 @@ public class Utilities {
 class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
-        return Integer.compare(o2.priority, o1.priority);
+        return Integer.compare(o2.getPriority(), o1.getPriority());
     }
 }
 

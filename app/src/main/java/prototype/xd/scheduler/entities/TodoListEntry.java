@@ -1,33 +1,25 @@
 package prototype.xd.scheduler.entities;
 
-import static org.apache.commons.lang.ArrayUtils.addAll;
-import static java.lang.Math.max;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
-import static prototype.xd.scheduler.utilities.Keys.AFTER_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.BEFOREHAND_ITEMS_OFFSET;
-import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
-import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY;
-import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
-import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
+import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE;
+import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
@@ -35,17 +27,16 @@ import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.TypedValue;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.math.MathUtils;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 
 import prototype.xd.scheduler.R;
@@ -56,100 +47,170 @@ import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class TodoListEntry {
     
-    enum EntryType {GLOBAL, TODAY, OLD, NEW, NEUTRAL}
-    
     public boolean fromSystemCalendar = false;
     public SystemCalendarEvent event;
     
     public long timestamp_start = 0;
     public long timestamp_end = 0;
     public long timestamp_duration = 0;
-    public boolean allDay = false;
-    public RecurrenceSet recurrenceSet;
     
     public long day_start = DAY_FLAG_GLOBAL;
     public long day_end = DAY_FLAG_GLOBAL;
-    public int dayOffset_after = 0;
-    public int dayOffset_beforehand = 0;
-    public boolean completed = false;
+    public long duration_in_days = 0;
+    
+    public boolean allDay = false;
+    public RecurrenceSet recurrenceSet;
+    
+    private String textValue;
+    public HashMap<String, Integer> params;
     public Group group;
     
-    public int bgColor;
-    public int fontColor;
-    public int fontColor_completed;
-    public int bevelColor;
-    
-    public boolean adaptiveColorEnabled;
-    public int adaptiveColorBalance;
-    public int adaptiveColor;
-    
-    public int fontSize = 0;
-    public float h = 0;
-    public float kM = 0;
-    public int maxChars = 0;
-    public float rWidth = 0;
-    
-    public int bevelThickness = 0;
-    
-    public int priority = 0;
-    
-    public boolean showOnLock = false;
-    public boolean showInList_ifCompleted = false;
-    
-    public static final String blankTextValue = "_BLANK_";
-    public String textValue = blankTextValue;
-    public String dayOffset = "";
-    public String[] textValueSplit;
-    
     public Paint textPaint;
-    public Paint bgPaint;
     public Paint padPaint;
+    public Paint bgPaint;
+    public int adaptiveColor = 0xff_FFFFFF;
     
-    public boolean isTodayEntry = false;
-    public boolean isGlobalEntry = false;
-    public boolean isOldEntry = false;
-    public boolean isNewEntry = false;
-    
-    public String[] params;
+    public float rWidth;
+    public String[] textValue_split;
     
     public TodoListEntry() {
+        params = new HashMap<>(0);
+        textValue = BLANK_TEXT;
+    }
+    
+    public TodoListEntry(SystemCalendarEvent event) {
+        fromSystemCalendar = true;
+        this.event = event;
+        
+        textValue = event.title;
+        timestamp_start = event.start;
+        timestamp_end = event.end;
+        timestamp_duration = event.duration;
+        allDay = event.allDay;
+        recurrenceSet = event.rSet;
+        
+        day_start = daysFromEpoch(timestamp_start);
+        day_end = daysFromEpoch(timestamp_end);
+        duration_in_days = daysFromEpoch(timestamp_duration);
+        
+        params = new HashMap<>(0);
+        resetGroup();
+    }
+    
+    public TodoListEntry(String textValue, HashMap<String, Integer> params, String groupName) {
+        group = new Group(groupName);
+        this.params = params;
+        
+        this.textValue = textValue;
+        day_start = Objects.requireNonNull(params.get(ASSOCIATED_DAY));
+        day_end = day_start;
+    }
+    
+    public void changeGroup(String groupName) {
+        group = new Group(groupName);
+    }
+    
+    public void resetGroup() {
+        changeGroup(BLANK_GROUP_NAME);
+    }
+    
+    public void changeGroup(Group group) {
+        this.group = group;
+    }
+    
+    private boolean inRange(long day, long event_start_day) {
+        return isGlobal() || (day >= event_start_day - getDayOffset_upcoming() && day <= event_start_day + duration_in_days + getDayOffset_expired());
+        // | days after the event ended ------ event start |event| event end ------ days before the event starts |
+        // | ++++++++++++++++++++++++++       -------------|-----|----------        +++++++++++++++++++++++++++++|
+    }
+    
+    public boolean isGlobal() {
+        return day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL;
+    }
+    
+    private boolean isToday(long day, long event_start_day) {
+        return day >= event_start_day && day <= event_start_day + timestamp_duration;
+    }
+    
+    public boolean isExpired(long day, long event_start_day) {
+        long event_end_day = event_start_day + duration_in_days;
+        return day <= event_end_day + getDayOffset_expired() && day > event_end_day;
+    }
+    
+    public boolean isUpcoming(long day, long event_start_day) {
+        return day >= event_start_day - getDayOffset_upcoming() && day < event_start_day;
+    }
+    
+    public boolean isToday(long day) {
+        return isToday(day, getNearestEventDay(day));
+    }
+    
+    public boolean isExpired(long day) {
+        return isExpired(day, getNearestEventDay(day));
+    }
+    
+    public boolean isUpcoming(long day) {
+        return isUpcoming(day, getNearestEventDay(day));
     }
     
     public boolean isVisible(long day) {
         if (recurrenceSet != null) {
-            if (day > day_end && !allDay) {
+            if (day > day_end) {
                 return false;
             }
             RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             long instance = 0;
             while (it.hasNext() && daysFromEpoch(instance) <= day) {
                 instance = it.next();
-                long startEventDayFromEpoch = daysFromEpoch(instance);
-                long endEventDayFromEpoch = daysFromEpoch(instance) + max(daysFromEpoch(timestamp_duration) - 1, 0);
-                
-                if ((startEventDayFromEpoch >= day - dayOffset_beforehand
-                        && startEventDayFromEpoch <= day + dayOffset_after)
-                        
-                        || (endEventDayFromEpoch >= day - dayOffset_beforehand
-                        && endEventDayFromEpoch <= day + dayOffset_after))
-                {
-                    return (day >= currentDay - dayOffset_after && day <= currentDay + dayOffset_beforehand) || daysFromEpoch(instance) == currentlySelectedDay;
+                if (inRange(day, daysFromEpoch(instance))) {
+                    return true;
                 }
             }
             return false;
         }
-        return (day >= day_start && day <= day_end) || day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL;
+        return inRange(day, day_start);
     }
     
-    public long genNearestEventDay() {
+    public boolean isVisibleOnLock() {
+        long day = currentDay;
         if (recurrenceSet != null) {
-            if (currentDay > day_end && !allDay) {
-                return day_start;
+            if (day > day_end) {
+                return false;
+            }
+            RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
+            long instance = 0;
+            while (it.hasNext() && daysFromEpoch(instance) <= day) {
+                instance = it.next();
+                boolean visible = inRange(day, daysFromEpoch(instance));
+                if (!visible) continue;
+                return showOnLock();
+            }
+            return false;
+        }
+        boolean visible = inRange(day, day_start);
+        if (isGlobal()) {
+            visible = visible && preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
+        } else if (isCompleted() && isExpired(day)) {
+            visible = visible && preferences.getBoolean(Keys.SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST);
+        } else if (isCompleted() && isUpcoming(day)) {
+            visible = visible && preferences.getBoolean(Keys.SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST);
+        }
+        return visible && !isCompleted() && showOnLock();
+    }
+    
+    public boolean showOnLock() {
+        return getParameter_generic(Keys.SHOW_ON_LOCK, Keys.SETTINGS_DEFAULT_SHOW_ON_LOCK ? 1 : 0) > 0;
+    }
+    
+    private long getNearestEventDay(long relative_to) {
+        if (recurrenceSet != null) {
+            if (relative_to > day_end) {
+                return day_end;
             }
             RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             while (it.hasNext()) {
                 long epoch = it.next();
-                if(daysFromEpoch(epoch) >= currentDay){
+                if (daysFromEpoch(epoch) >= relative_to) {
                     return daysFromEpoch(epoch);
                 }
             }
@@ -174,262 +235,201 @@ public class TodoListEntry {
         }
     }
     
-    public TodoListEntry(SystemCalendarEvent event) {
-        fromSystemCalendar = true;
-        this.event = event;
-        params = new String[]{};
-        reloadParams();
-    }
-    
-    public TodoListEntry(String[] params, String groupName) {
-        group = new Group(groupName);
-        this.params = params;
-        reloadParams();
-    }
-    
-    public void changeGroup(String groupName) {
-        group = new Group(groupName);
-        reloadParams();
-    }
-    
-    public void resetGroup() {
-        changeGroup(BLANK_GROUP_NAME);
-    }
-    
-    public void changeGroup(Group group) {
-        this.group = group;
-        reloadParams();
-    }
-    
-    public boolean getLockViewState() {
-        return (showOnLock && !completed);
-    }
-    
-    public String[] getDisplayParams() {
-        ArrayList<String> displayParams = new ArrayList<>();
-        for (int i = 0; i < params.length; i += 2) {
-            
-            if (!(params[i].equals(TEXT_VALUE)
-                    || params[i].equals(ASSOCIATED_DAY)
-                    || params[i].equals(IS_COMPLETED))) {
-                displayParams.add(params[i]);
-                displayParams.add(params[i + 1]);
+    public int getParameter(String parameterKey, int fallbackValue) {
+        Integer param = params.get(parameterKey);
+        if (param == null) {
+            if(group == null){
+                return fallbackValue;
+            }
+            param = group.params.get(parameterKey);
+            if (param == null) {
+                return fallbackValue;
             }
         }
-        String[] displayParams_new = new String[displayParams.size()];
-        for (int i = 0; i < displayParams.size(); i++) {
-            displayParams_new[i] = displayParams.get(i);
+        return param;
+    }
+    
+    private int tryRead(String parameterKey, int defaultValue) {
+        int toReturn;
+        try {
+            toReturn = preferences.getInt(parameterKey, defaultValue);
+        } catch (ClassCastException e) {
+            toReturn = preferences.getBoolean(parameterKey, defaultValue > 0) ? 1 : 0;
         }
-        return displayParams_new;
+        return toReturn;
+    }
+    
+    public int getParameter_generic(String parameterKey, int defaultValue) {
+        if (fromSystemCalendar) {
+            return getParameter(parameterKey, tryRead(getFirstValidKey(event.subKeys, parameterKey), defaultValue));
+        } else {
+            return getParameter(parameterKey, tryRead(parameterKey, defaultValue));
+        }
+    }
+    
+    public void setTextValue(String textValue) {
+        if (fromSystemCalendar) {
+            event.title = textValue;
+        } else {
+            this.textValue = textValue;
+        }
+    }
+    
+    public String getTextValue() {
+        if (fromSystemCalendar) {
+            return event.title;
+        } else {
+            return textValue;
+        }
+    }
+    
+    public int getFontColor(long day) {
+        int defaultValue;
+        if (isExpired(day)) {
+            defaultValue = preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
+        } else if (isUpcoming(day)) {
+            defaultValue = preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
+        } else {
+            defaultValue = preferences.getInt(Keys.TODAY_FONT_COLOR, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
+        }
+        if (isCompleted()) {
+            return mixTwoColors(getParameter_generic(Keys.FONT_COLOR, defaultValue), 0xff_FFFFFF, 0.5);
+        } else {
+            return getParameter_generic(Keys.FONT_COLOR, defaultValue);
+        }
+    }
+    
+    public int getBgColor(long day) {
+        int defaultValue;
+        if (isExpired(day)) {
+            defaultValue = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
+        } else if (isUpcoming(day)) {
+            defaultValue = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
+        } else {
+            defaultValue = preferences.getInt(Keys.TODAY_BG_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
+        }
+        return getParameter_generic(Keys.BG_COLOR, defaultValue);
+    }
+    
+    public int getBgColor_lock() {
+        if (isAdaptiveColorEnabled()) {
+            return mixTwoColors(getBgColor(currentDay), adaptiveColor, getAdaptiveColorBalance() / 1000d);
+        } else {
+            return getBgColor(currentDay);
+        }
+    }
+    
+    public int getBevelColor(long day) {
+        int defaultValue;
+        if (isExpired(day)) {
+            defaultValue = preferences.getInt(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR);
+        } else if (isUpcoming(day)) {
+            defaultValue = preferences.getInt(Keys.UPCOMING_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR);
+        } else {
+            defaultValue = preferences.getInt(Keys.TODAY_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
+        }
+        return getParameter_generic(Keys.BEVEL_COLOR, defaultValue);
+    }
+    
+    public int getBevelColor_lock() {
+        if (isAdaptiveColorEnabled()) {
+            return mixTwoColors(getBevelColor(currentDay), adaptiveColor, getAdaptiveColorBalance() / 1000d);
+        } else {
+            return getBevelColor(currentDay);
+        }
+    }
+    
+    public int getBevelThickness(long day) {
+        int defaultValue;
+        if (isExpired(day)) {
+            defaultValue = preferences.getInt(Keys.EXPIRED_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS);
+        } else if (isUpcoming(day)) {
+            defaultValue = preferences.getInt(Keys.UPCOMING_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS);
+        } else {
+            defaultValue = preferences.getInt(Keys.TODAY_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
+        }
+        return getParameter_generic(Keys.BEVEL_THICKNESS, defaultValue);
+    }
+    
+    public boolean isAdaptiveColorEnabled() {
+        return getParameter_generic(ADAPTIVE_COLOR_ENABLED, SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED ? 1 : 0) > 0;
+    }
+    
+    public int getAdaptiveColorBalance() {
+        return getParameter_generic(ADAPTIVE_COLOR_BALANCE, SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
+    }
+    
+    public int getPriority() {
+        return getParameter_generic(PRIORITY, ENTITY_SETTINGS_DEFAULT_PRIORITY);
+    }
+    
+    public boolean isCompleted() {
+        return getParameter(IS_COMPLETED, 0) > 0;
+    }
+    
+    public int getDayOffset_expired() {
+        return getParameter_generic(Keys.EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
+    }
+    
+    public int getDayOffset_upcoming() {
+        return getParameter_generic(Keys.UPCOMING_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public HashMap<String, Integer> getDisplayParams() {
+        HashMap<String, Integer> displayParams = (HashMap<String, Integer>) SerializationUtils.clone(params);
+        displayParams.remove(TEXT_VALUE);
+        displayParams.remove(ASSOCIATED_DAY);
+        displayParams.remove(IS_COMPLETED);
+        return displayParams;
     }
     
     public void removeDisplayParams() {
-        ArrayList<String> displayParams = new ArrayList<>();
-        for (int i = 0; i < params.length; i += 2) {
-            
-            if (params[i].equals(TEXT_VALUE)
-                    || params[i].equals(ASSOCIATED_DAY)
-                    || params[i].equals(IS_COMPLETED)) {
-                displayParams.add(params[i]);
-                displayParams.add(params[i + 1]);
-            }
-        }
-        String[] params_new = new String[displayParams.size()];
-        for (int i = 0; i < displayParams.size(); i++) {
-            params_new[i] = displayParams.get(i);
-        }
-        params = params_new;
-        reloadParams();
-    }
-    
-    public void reloadParams() {
-        if (!fromSystemCalendar) {
-            for (int i = 0; i < params.length; i += 2) {
-                if (params[i].equals(ASSOCIATED_DAY)) {
-                    
-                    dayOffset_after = preferences.getInt(Keys.AFTER_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
-                    dayOffset_beforehand = preferences.getInt(Keys.BEFOREHAND_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
-                    
-                    setParams((String[]) addAll(group.params, params));
-                    
-                    long days_associated = currentDay;
-                    long days_from_param = Long.parseLong(params[i + 1]);
-                    if (days_from_param != DAY_FLAG_GLOBAL) {
-                        days_associated = days_from_param;
-                    }
-                    
-                    if (days_from_param == currentDay || days_from_param == DAY_FLAG_GLOBAL) {
-                        
-                        bgColor = preferences.getInt(Keys.TODAY_BG_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
-                        bevelColor = preferences.getInt(Keys.TODAY_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
-                        bevelThickness = preferences.getInt(Keys.TODAY_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
-                        
-                        setFontColor(Keys.TODAY_FONT_COLOR, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
-                        
-                        showOnLock = true;
-                        showInList_ifCompleted = true;
-                        
-                        if (days_from_param == DAY_FLAG_GLOBAL) {
-                            showOnLock = preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
-                            setEntryType(EntryType.GLOBAL);
-                        } else {
-                            setEntryType(EntryType.TODAY);
-                        }
-                        
-                    } else if (days_associated < currentDay && currentDay - days_associated <= dayOffset_after) {
-                        
-                        bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
-                        bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
-                        bevelThickness = preferences.getInt(Keys.OLD_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_OLD_BEVEL_THICKNESS);
-                        
-                        setFontColor(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR);
-                        
-                        showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_OLD_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_OLD_COMPLETED_ITEMS_IN_LIST);
-                        showOnLock = true;
-                        
-                        setEntryType(EntryType.OLD);
-                    } else if (days_associated > currentDay && days_associated - currentDay <= dayOffset_beforehand) {
-                        
-                        bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
-                        bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
-                        bevelThickness = preferences.getInt(Keys.NEW_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_NEW_BEVEL_THICKNESS);
-                        
-                        setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
-                        
-                        showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_NEW_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_NEW_COMPLETED_ITEMS_IN_LIST);
-                        showOnLock = true;
-                        
-                        setEntryType(EntryType.NEW);
-                    } else {
-                        setFontColor(Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
-                        
-                        bgColor = Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR;
-                        bevelColor = Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR;
-                        bevelThickness = Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS;
-                        
-                        showInList_ifCompleted = true;
-                        showOnLock = false;
-                        
-                        setEntryType(EntryType.NEUTRAL);
-                    }
-                    break;
-                }
-            }
-            
-            fontSize = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
-            adaptiveColorEnabled = preferences.getBoolean(Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
-            adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-            adaptiveColor = 0xff_FFFFFF;
-            priority = ENTITY_SETTINGS_DEFAULT_PRIORITY;
-            setParams((String[]) addAll(group.params, params));
-            
-        } else {
-            
-            timestamp_start = event.start;
-            timestamp_end = event.end;
-            timestamp_duration = event.duration;
-            allDay = event.allDay;
-            recurrenceSet = event.rSet;
-            
-            day_start = daysFromEpoch(timestamp_start);
-            day_end = daysFromEpoch(timestamp_end);
-            
-            textValue = event.title;
-            
-            ArrayList<String> calendarSubKeys = event.subKeys;
-            
-            fontColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
-            bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR);
-            bevelColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR);
-            bevelThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS);
-            
-            adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-            adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
-            
-            priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
-            
-            dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
-            dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
-            
-            long nearestDay = genNearestEventDay();
-            isNewEntry = currentDay + dayOffset_beforehand >= nearestDay && currentDay < nearestDay;
-            isOldEntry = currentDay - dayOffset_after <= day_end && currentDay > day_end;
-            
-            if (isOldEntry) {
-                bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
-                bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
-                setFontColor(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR);
-            } else if (isNewEntry) {
-                bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
-                bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
-                setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
-            }
-            
-            showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
-            showOnLock = showOnLock || isOldEntry || isNewEntry;
-            
-            fontSize = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
-            adaptiveColor = 0xff_FFFFFF;
-            setParams(params);
-        }
-    }
-    
-    private void setEntryType(EntryType entryType) {
-        isTodayEntry = entryType == EntryType.TODAY;
-        isGlobalEntry = entryType == EntryType.GLOBAL;
-        isOldEntry = entryType == EntryType.OLD;
-        isNewEntry = entryType == EntryType.NEW;
-    }
-    
-    private void setFontColor(int color) {
-        fontColor = color;
-        fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
-    }
-    
-    private void setFontColor(String key, int defaultColor) {
-        setFontColor(preferences.getInt(key, defaultColor));
+        HashMap<String, Integer> newParams = new HashMap<>(3);
+        newParams.put(TEXT_VALUE, params.get(TEXT_VALUE));
+        newParams.put(ASSOCIATED_DAY, params.get(ASSOCIATED_DAY));
+        newParams.put(IS_COMPLETED, params.get(IS_COMPLETED));
+        params = newParams;
     }
     
     public void loadDisplayData(LockScreenBitmapDrawer lockScreenBitmapDrawer) {
-        h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, fontSize, lockScreenBitmapDrawer.displayMetrics);
-        kM = h * 1.1f;
-        textPaint = createNewPaint(fontColor);
-        textPaint.setTextSize(h);
+        
+        textPaint = createNewPaint(getFontColor(currentDay));
+        textPaint.setTextSize(lockScreenBitmapDrawer.fontSize_scaled);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1, lockScreenBitmapDrawer.displayWidth / 2f - bevelThickness);
-        maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - bevelThickness * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
+        rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1,
+                lockScreenBitmapDrawer.displayWidth / 2f - getBevelThickness(currentDay));
         
         log(INFO, "loaded display data for " + textValue);
     }
     
     public void initializeBgAndPadPaints() {
-        if (adaptiveColorEnabled) {
-            bgPaint = createNewPaint(mixTwoColors(bgColor, adaptiveColor, adaptiveColorBalance / 1000d));
-            padPaint = createNewPaint(mixTwoColors(bevelColor, adaptiveColor, adaptiveColorBalance / 1000d));
-        } else {
-            bgPaint = createNewPaint(bgColor);
-            padPaint = createNewPaint(bevelColor);
-        }
+        bgPaint = createNewPaint(getBgColor_lock());
+        padPaint = createNewPaint(getBevelColor_lock());
     }
     
-    public String getDayOffset() {
-        if (day_start != DAY_FLAG_GLOBAL && day_end != DAY_FLAG_GLOBAL) {
-            dayOffset = "";
+    public void splitText(Context context, int maxChars) {
+        textValue_split = makeNewLines(getTextValue() + getDayOffset(currentDay) + "\n" + getTimeSpan(context), maxChars);
+    }
+    
+    public String getDayOffset(long day) {
+        String dayOffset = "";
+        if (!isGlobal()) {
             
             int dayShift = 0;
             
-            long nearestDay = genNearestEventDay();
-            if (currentDay < nearestDay) {
-                dayShift = (int) (nearestDay - currentDay);
-            } else if (currentDay > day_end) {
-                dayShift = (int) (day_end - currentDay);
+            long nearestDay = getNearestEventDay(day);
+            if (day < nearestDay) {
+                dayShift = (int) (nearestDay - day);
+            } else if (day > day_end) {
+                dayShift = (int) (day_end - day);
             }
             
             if (dayShift < 31 && dayShift > -31) {
                 if (dayShift > 0) {
                     switch (dayShift) {
                         case (1):
-                            dayOffset += " (Завтра)";
+                            dayOffset = " (Завтра)";
                             break;
                         case (2):
                         case (3):
@@ -437,16 +437,16 @@ public class TodoListEntry {
                         case (22):
                         case (23):
                         case (24):
-                            dayOffset += " (Через " + dayShift + " дня)";
+                            dayOffset = " (Через " + dayShift + " дня)";
                             break;
                         default:
-                            dayOffset += " (Через " + dayShift + " дней)";
+                            dayOffset = " (Через " + dayShift + " дней)";
                             break;
                     }
                 } else if (dayShift < 0) {
                     switch (dayShift) {
                         case (-1):
-                            dayOffset += " (Вчера)";
+                            dayOffset = " (Вчера)";
                             break;
                         case (-2):
                         case (-3):
@@ -454,18 +454,18 @@ public class TodoListEntry {
                         case (-22):
                         case (-23):
                         case (-24):
-                            dayOffset += " (" + -dayShift + " дня назад)";
+                            dayOffset = " (" + -dayShift + " дня назад)";
                             break;
                         default:
-                            dayOffset += " (" + -dayShift + " дней назад)";
+                            dayOffset = " (" + -dayShift + " дней назад)";
                             break;
                     }
                 }
             } else {
                 if (dayShift < 0) {
-                    dayOffset += " (> месяца назад)";
+                    dayOffset = " (> месяца назад)";
                 } else {
-                    dayOffset += " (> чем через месяц)";
+                    dayOffset = " (> чем через месяц)";
                 }
             }
         } else {
@@ -474,94 +474,13 @@ public class TodoListEntry {
         return dayOffset;
     }
     
-    public void splitText(Context context) {
-        textValueSplit = makeNewLines(textValue + getDayOffset() + "\n" + getTimeSpan(context), maxChars);
+    public void changeParameter(String name, Integer value) {
+        params.put(name, value);
     }
     
-    private void setParams(String[] params) {
-        for (int i = 0; i < params.length; i += 2) {
-            switch (params[i]) {
-                case (TEXT_VALUE):
-                    textValue = params[i + 1];
-                    break;
-                case (IS_COMPLETED):
-                    completed = Boolean.parseBoolean(params[i + 1]);
-                    break;
-                case (SHOW_ON_LOCK):
-                    showOnLock = Boolean.parseBoolean(params[i + 1]);
-                    break;
-                case (BEFOREHAND_ITEMS_OFFSET):
-                    dayOffset_beforehand = Integer.parseInt(params[i + 1]);
-                    break;
-                case (AFTER_ITEMS_OFFSET):
-                    dayOffset_after = Integer.parseInt(params[i + 1]);
-                    break;
-                case (BEVEL_THICKNESS):
-                    bevelThickness = Integer.parseInt(params[i + 1]);
-                    break;
-                case (FONT_COLOR):
-                    setFontColor(Integer.parseInt(params[i + 1]));
-                    break;
-                case (BG_COLOR):
-                    bgColor = Integer.parseInt(params[i + 1]);
-                    break;
-                case (BEVEL_COLOR):
-                    bevelColor = Integer.parseInt(params[i + 1]);
-                    break;
-                case (PRIORITY):
-                    priority = Integer.parseInt(params[i + 1]);
-                    break;
-                case (ASSOCIATED_DAY):
-                    day_start = Long.parseLong(params[i + 1]);
-                    day_end = day_start;
-                    break;
-                case (ADAPTIVE_COLOR_ENABLED):
-                    adaptiveColorEnabled = Boolean.parseBoolean(params[i + 1]);
-                    break;
-                case (ADAPTIVE_COLOR_BALANCE):
-                    adaptiveColorBalance = Integer.parseInt(params[i + 1]);
-                    break;
-                default:
-                    log(WARNING, "unknown parameter: " + params[i] + " entry textValue: " + textValue);
-                    break;
-            }
-        }
-    }
-    
-    public void changeParameter(String name, String value) {
-        boolean changed = false;
-        for (int i = 0; i < params.length; i++) {
-            if (params[i].equals(name)) {
-                params[i + 1] = value;
-                changed = true;
-                break;
-            }
-        }
-        if (!changed) {
-            String[] newParams = new String[params.length + 2];
-            System.arraycopy(params, 0, newParams, 0, params.length);
-            newParams[newParams.length - 1] = value;
-            newParams[newParams.length - 2] = name;
-            params = newParams;
-        }
-        reloadParams();
-    }
-    
-    public void setStateIconColor(TextView icon, String parameter) {
-        boolean containedInGroupParams = false;
-        boolean containedInPersonalParams = false;
-        for (int i = 0; i < group.params.length; i += 2) {
-            if (group.params[i].equals(parameter)) {
-                containedInGroupParams = true;
-                break;
-            }
-        }
-        for (int i = 0; i < params.length; i += 2) {
-            if (params[i].equals(parameter)) {
-                containedInPersonalParams = true;
-                break;
-            }
-        }
+    public void setStateIconColor(TextView icon, String parameterKey) {
+        boolean containedInGroupParams = group.params.containsKey(parameterKey);
+        boolean containedInPersonalParams = params.containsKey(parameterKey);
         if (containedInGroupParams && containedInPersonalParams) {
             icon.setTextColor(Color.BLUE);
         } else if (containedInGroupParams) {
@@ -575,7 +494,7 @@ public class TodoListEntry {
     
     @Override
     public int hashCode() {
-        return Objects.hash(event, Arrays.hashCode(params));
+        return Objects.hash(event, params.hashCode());
     }
     
     @Override
@@ -584,7 +503,7 @@ public class TodoListEntry {
             return false;
         } else if (obj instanceof TodoListEntry) {
             return Objects.equals(event, ((TodoListEntry) obj).event) &&
-                    Arrays.equals(((TodoListEntry) obj).params, params);
+                    Objects.equals(((TodoListEntry) obj).params, params);
         }
         return super.equals(obj);
     }

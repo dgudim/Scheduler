@@ -426,7 +426,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:background="#FFFFFF"
-                            android:text="@string/settings_show_days_beforehand"
+                            android:text="@string/settings_show_days_upcoming"
                             android:textColor="#000000"
                             android:textSize="18sp" />
 
@@ -478,7 +478,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:background="#FFFFFF"
-                            android:text="@string/settings_show_days_after"
+                            android:text="@string/settings_show_days_expired"
                             android:textColor="#000000"
                             android:textSize="18sp" />
 

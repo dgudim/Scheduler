@@ -1,16 +1,17 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.entities.TodoListEntry.blankTextValue;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
-import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
@@ -30,6 +31,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -57,6 +59,10 @@ public class LockScreenBitmapDrawer {
     private final WallpaperManager wallpaperManager;
     
     private int previous_hash;
+    
+    public float fontSize_scaled;
+    private float fontSize_scaled_kM;
+    private int maxChars;
     
     public LockScreenBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
@@ -97,6 +103,14 @@ public class LockScreenBitmapDrawer {
     }
     
     public void constructBitmap(BackgroundSetterService backgroundSetterService) {
+        
+        fontSize_scaled = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE), displayMetrics);
+        fontSize_scaled_kM = fontSize_scaled * 1.1f;
+        Paint measurementPaint = createNewPaint(Color.WHITE);
+        measurementPaint.setTextSize(fontSize_scaled);
+        measurementPaint.setTextAlign(Paint.Align.CENTER);
+        maxChars = (int) ((displayWidth) / (measurementPaint.measureText("qwerty_") / 5f)) - 2;
+        
         if (!busy) {
             busy = true;
             new Thread(() -> {
@@ -153,32 +167,32 @@ public class LockScreenBitmapDrawer {
             
             for (int i = 0; i < toAdd.size(); i++) {
                 toAdd.get(i).loadDisplayData(backgroundSetterService.lockScreenBitmapDrawer);
-                toAdd.get(i).splitText(backgroundSetterService);
+                toAdd.get(i).splitText(backgroundSetterService, maxChars);
             }
             
             float totalHeight = 0;
             for (int i = 0; i < toAdd.size(); i++) {
-                totalHeight += toAdd.get(i).h * toAdd.get(i).textValueSplit.length + toAdd.get(i).kM;
+                totalHeight += fontSize_scaled * toAdd.get(i).textValue_split.length + fontSize_scaled_kM;
             }
-            totalHeight -= toAdd.get(0).kM;
+            totalHeight -= fontSize_scaled_kM;
             totalHeight /= 2f;
             
             ArrayList<ArrayList<TodoListEntry>> splitEntries = new ArrayList<>();
             ArrayList<TodoListEntry> toAddSplit = new ArrayList<>();
             for (int i = toAdd.size() - 1; i >= 0; i--) {
                 ArrayList<TodoListEntry> splits = new ArrayList<>();
-                for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
+                for (int i2 = toAdd.get(i).textValue_split.length - 1; i2 >= 0; i2--) {
                     if (preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK)) {
-                        toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelThickness;
+                        toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).getBevelThickness(currentDay);
                     }
                     TodoListEntry splitEntry;
                     if (toAdd.get(i).fromSystemCalendar) {
                         splitEntry = new TodoListEntry(toAdd.get(i).event);
+                        splitEntry.event.title = toAdd.get(i).textValue_split[i2];
                     } else {
-                        splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
+                        splitEntry = new TodoListEntry(toAdd.get(i).textValue_split[i2], toAdd.get(i).params, toAdd.get(i).group.name);
                     }
                     copyDisplayData(toAdd.get(i), splitEntry);
-                    splitEntry.changeParameter(TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
                     toAddSplit.add(splitEntry);
                     splits.add(splitEntry);
                 }
@@ -187,10 +201,10 @@ public class LockScreenBitmapDrawer {
             }
             
             for (int i = 0; i < toAddSplit.size(); i++) {
-                if (toAddSplit.get(i).adaptiveColorEnabled && !toAddSplit.get(i).textValue.equals(blankTextValue)) {
+                if (toAddSplit.get(i).isAdaptiveColorEnabled() && !toAddSplit.get(i).getTextValue().equals(BLANK_TEXT)) {
                     int width = (int) (toAddSplit.get(i).rWidth * 2);
-                    int height = (int) (toAddSplit.get(i).h / 2f + toAddSplit.get(i).kM);
-                    int VOffset = (int) (displayCenter.y + totalHeight - toAddSplit.get(i).kM * (i + 1));
+                    int height = (int) (fontSize_scaled / 2f + fontSize_scaled_kM);
+                    int VOffset = (int) (displayCenter.y + totalHeight - fontSize_scaled_kM * (i + 1));
                     int HOffset = (src.getWidth() - width) / 2;
                     
                     Rect destRect = new Rect(HOffset, VOffset, width + HOffset, height + VOffset);
@@ -208,7 +222,7 @@ public class LockScreenBitmapDrawer {
             }
             
             for (ArrayList<TodoListEntry> splits : splitEntries) {
-                if (splits.get(0).adaptiveColorEnabled) {
+                if (splits.get(0).isAdaptiveColorEnabled()) {
                     int red = 0;
                     int green = 0;
                     int blue = 0;
@@ -228,7 +242,7 @@ public class LockScreenBitmapDrawer {
             }
             
             for (int i = 0; i < toAddSplit.size(); i++) {
-                if (!toAddSplit.get(i).textValue.equals(blankTextValue)) {
+                if (!toAddSplit.get(i).getTextValue().equals(BLANK_TEXT)) {
                     toAddSplit.get(i).initializeBgAndPadPaints();
                 }
             }
@@ -242,35 +256,34 @@ public class LockScreenBitmapDrawer {
         to.padPaint = from.padPaint;
         to.bgPaint = from.bgPaint;
         to.textPaint = from.textPaint;
-        to.h = from.h;
-        to.kM = from.kM;
-        to.maxChars = from.maxChars;
         to.rWidth = from.rWidth;
     }
     
     private void drawTextListOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
-            if (!toAdd.get(i).textValue.equals(blankTextValue)) {
-                canvas.drawText(toAdd.get(i).textValue, displayCenter.x, displayCenter.y + maxHeight - toAdd.get(i).kM * i, toAdd.get(i).textPaint);
+            if (!toAdd.get(i).getTextValue().equals(BLANK_TEXT)) {
+                canvas.drawText(toAdd.get(i).getTextValue(), displayCenter.x, displayCenter.y + maxHeight - fontSize_scaled_kM * i, toAdd.get(i).textPaint);
             }
         }
     }
     
     private void drawBgOnCanvas(ArrayList<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
         for (int i = 0; i < toAdd.size(); i++) {
-            if (!toAdd.get(i).textValue.equals(blankTextValue)) {
+            if (!toAdd.get(i).getTextValue().equals(BLANK_TEXT)) {
+                
+                int bevelThickness = toAdd.get(i).getBevelThickness(currentDay);
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
-                        -toAdd.get(i).rWidth - toAdd.get(i).bevelThickness,
-                        toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
-                        toAdd.get(i).rWidth + toAdd.get(i).bevelThickness,
-                        -toAdd.get(i).kM * (i + 1) - toAdd.get(i).bevelThickness);
+                        -toAdd.get(i).rWidth - bevelThickness,
+                        fontSize_scaled / 2f - fontSize_scaled_kM * i,
+                        toAdd.get(i).rWidth + bevelThickness,
+                        -fontSize_scaled_kM * (i + 1) - bevelThickness);
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
                         -toAdd.get(i).rWidth,
-                        toAdd.get(i).h / 2f - toAdd.get(i).kM * i,
+                        fontSize_scaled / 2f - fontSize_scaled_kM * i,
                         toAdd.get(i).rWidth,
-                        -toAdd.get(i).kM * (i + 1));
+                        -fontSize_scaled_kM * (i + 1));
             }
         }
     }
@@ -286,10 +299,10 @@ public class LockScreenBitmapDrawer {
     private ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input) {
         ArrayList<TodoListEntry> toAdd = new ArrayList<>();
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).getLockViewState()) {
+            if (input.get(i).isVisibleOnLock()) {
                 toAdd.add(input.get(i));
-                if (input.get(i).textValue.length() > currentBitmapLongestText.length()) {
-                    currentBitmapLongestText = input.get(i).textValue;
+                if (input.get(i).getTextValue().length() > currentBitmapLongestText.length()) {
+                    currentBitmapLongestText = input.get(i).getTextValue();
                 }
             }
         }

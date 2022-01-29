@@ -12,8 +12,8 @@
     <string name="category_visibility">Видимость</string>
     <string name="category_system_calendars">Интеграция с системным календарём</string>
 
-    <string name="settings_show_old_done_items_list">Показывать пропущенные выполненные дела в списке</string>
-    <string name="settings_show_new_done_items_list">Показывать будущие выполненные дела в списке</string>
+    <string name="settings_show_expired_done_items_list">Показывать пропущенные выполненные дела в списке</string>
+    <string name="settings_show_upcoming_done_items_list">Показывать будущие выполненные дела в списке</string>
     <string name="settings_show_global_items_lock">Показывать общие дела на экране блокировки</string>
     <string name="settings_max_rWidth_lock">Ширина дела на весь экран на экране блокировки</string>
 
@@ -26,19 +26,19 @@
     <string name="settings_priority">Приоритет:%d</string>
 
     <string name="settings_today_bg_color">Цвет фона для сегодняшних дел</string>
-    <string name="settings_old_bg_color">Цвет фона для пропущенных дел</string>
+    <string name="settings_expired_bg_color">Цвет фона для пропущенных дел</string>
     <string name="settings_today_bevel_color">Цвет контура для сегодняшних дел</string>s
-    <string name="settings_old_bevel_color">Цвет контура для пропущенных дел</string>
-    <string name="settings_new_bg_color">Цвет фона для будущих дел</string>
-    <string name="settings_new_bevel_color">Цвет контура для будущих дел</string>
+    <string name="settings_expired_bevel_color">Цвет контура для пропущенных дел</string>
+    <string name="settings_upcoming_bg_color">Цвет фона для будущих дел</string>
+    <string name="settings_upcoming_bevel_color">Цвет контура для будущих дел</string>
 
     <string name="settings_today_bevel_thickness">Толщина контура для сегодняшних дел:%d</string>
-    <string name="settings_old_bevel_thickness">Толщина контура для пропущенных дел:%d</string>
-    <string name="settings_new_bevel_thickness">Толщина контура для будущих дел:%d</string>
+    <string name="settings_expired_bevel_thickness">Толщина контура для пропущенных дел:%d</string>
+    <string name="settings_upcoming_bevel_thickness">Толщина контура для будущих дел:%d</string>
 
     <string name="settings_today_font_color">Цвет шрифта для сегодняшних дел</string>
-    <string name="settings_old_font_color">Цвет шрифта для пропущенных дел</string>
-    <string name="settings_new_font_color">Цвет шрифта для будущих дел</string>
+    <string name="settings_expired_font_color">Цвет шрифта для пропущенных дел</string>
+    <string name="settings_upcoming_font_color">Цвет шрифта для будущих дел</string>
 
     <string name="settings_reset_to_defaults">Сбросить настройки</string>
     <string name="settings_reset_bg">Сбросить фоны</string>
@@ -49,8 +49,8 @@
     <string name="settings_bg_color">Цвет фона</string>
     <string name="settings_bevel_thickness">Толщина контура:%d</string>
 
-    <string name="settings_show_days_beforehand">Показывать за %d дня/дней</string>
-    <string name="settings_show_days_after">Показывать после %d дня/дней</string>
+    <string name="settings_show_days_upcoming">Показывать за %d дня/дней</string>
+    <string name="settings_show_days_expired">Показывать после %d дня/дней</string>
     <string name="settings_adaptive_color">Подстраивать цвет дела под цвет фона</string>
     <string name="settings_adaptive_color_balance">Баланс подстраиваемого цвета: %d</string>
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>

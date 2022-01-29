@@ -75,55 +75,55 @@ public class SettingsFragment extends Fragment {
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance, this));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_BG_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR,
                 context.getString(R.string.settings_today_bg_color), context));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR,
-                context.getString(R.string.settings_old_bg_color), context));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR,
-                context.getString(R.string.settings_new_bg_color), context));
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR,
+                context.getString(R.string.settings_expired_bg_color), context));
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR,
+                context.getString(R.string.settings_upcoming_bg_color), context));
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_bevels)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR,
                 context.getString(R.string.settings_today_bevel_color), context));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS,
                 Keys.TODAY_BEVEL_THICKNESS, R.string.settings_today_bevel_thickness, this));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR,
-                context.getString(R.string.settings_old_bevel_color), context));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_OLD_BEVEL_THICKNESS,
-                Keys.OLD_BEVEL_THICKNESS, R.string.settings_old_bevel_thickness, this));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR,
-                context.getString(R.string.settings_new_bevel_color), context));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_NEW_BEVEL_THICKNESS,
-                Keys.NEW_BEVEL_THICKNESS, R.string.settings_new_bevel_thickness, this));
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR,
+                context.getString(R.string.settings_expired_bevel_color), context));
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS,
+                Keys.EXPIRED_BEVEL_THICKNESS, R.string.settings_expired_bevel_thickness, this));
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR,
+                context.getString(R.string.settings_upcoming_bevel_color), context));
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS,
+                Keys.UPCOMING_BEVEL_THICKNESS, R.string.settings_upcoming_bevel_thickness, this));
         
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_fonts)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_FONT_COLOR, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR,
                 context.getString(R.string.settings_today_font_color), context));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR,
-                context.getString(R.string.settings_old_font_color), context));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR,
-                context.getString(R.string.settings_new_font_color), context));
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR,
+                context.getString(R.string.settings_expired_font_color), context));
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR,
+                context.getString(R.string.settings_upcoming_font_color), context));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE,
                 Keys.FONT_SIZE, R.string.settings_font_size, this));
         
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_visibility)));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET,
-                Keys.BEFOREHAND_ITEMS_OFFSET, R.string.settings_show_days_beforehand, this));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET,
-                Keys.AFTER_ITEMS_OFFSET, R.string.settings_show_days_after, this));
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET,
+                Keys.UPCOMING_ITEMS_OFFSET, R.string.settings_show_days_upcoming, this));
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET,
+                Keys.EXPIRED_ITEMS_OFFSET, R.string.settings_show_days_expired, this));
         settingsEntries.add(new SwitchSettingsEntry(
-                Keys.SHOW_OLD_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_OLD_COMPLETED_ITEMS_IN_LIST,
-                context.getString(R.string.settings_show_old_done_items_list)));
+                Keys.SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST,
+                context.getString(R.string.settings_show_expired_done_items_list)));
         settingsEntries.add(new SwitchSettingsEntry(
-                Keys.SHOW_NEW_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_NEW_COMPLETED_ITEMS_IN_LIST,
-                context.getString(R.string.settings_show_new_done_items_list)));
+                Keys.SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST,
+                context.getString(R.string.settings_show_upcoming_done_items_list)));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK,
                 context.getString(R.string.settings_show_global_items_lock)));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK,
                 context.getString(R.string.settings_max_rWidth_lock)));
-        
+        // TODO: 28/1/2022 apply settings instantly
         settingsEntries.add(new ResetButtonsSettingsEntry(this, view, savedInstanceState));
     
         SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries, context);

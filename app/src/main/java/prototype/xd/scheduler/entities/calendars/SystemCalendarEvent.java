@@ -61,8 +61,11 @@ public class SystemCalendarEvent {
         allDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
         
         if (allDay) {
-            end = start;
+            start += 60 * 1000;
+            end -= 60 * 1000; // offset time window by 1 minute because all-day event's time window is day 00:00 - next day 00:00, new time window is day 00:01 - day 23:59
         }
+        
+        duration = end - start;
         
         rRule_str = getString(cursor, calendarEventsColumns, Events.RRULE);
         rDate_str = getString(cursor, calendarEventsColumns, Events.RDATE);

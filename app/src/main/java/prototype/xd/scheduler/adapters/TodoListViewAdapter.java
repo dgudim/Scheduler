@@ -1,11 +1,9 @@
 package prototype.xd.scheduler.adapters;
 
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
@@ -73,17 +71,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         currentTodoListEntries_indexMap.clear();
         for (int i = 0; i < home.todoListEntries.size(); i++) {
             TodoListEntry currentEntry = home.todoListEntries.get(i);
-            
-            boolean visibilityFlag = !currentEntry.completed || currentEntry.showInList_ifCompleted;
-            boolean show;
-            if (currentlySelectedDay == currentDay) {
-                show = currentEntry.isNewEntry || currentEntry.isOldEntry || currentEntry.isVisible(currentlySelectedDay);
-                show = show && visibilityFlag;
-            } else {
-                show = currentEntry.isVisible(currentlySelectedDay);
-            }
-            
-            if (show) {
+            if (currentEntry.isVisible(currentlySelectedDay)) {
                 currentTodoListEntries.add(currentEntry);
                 currentTodoListEntries_indexMap.add(i);
             }
@@ -94,7 +82,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         if (updateBitmap) {
             mainActivity.notifyService();
         }
-        home.todoListEntries = sortEntries(home.todoListEntries);
+        home.todoListEntries = sortEntries(home.todoListEntries, currentlySelectedDay);
         updateCurrentEntries();
         home.rootActivity.runOnUiThread(TodoListViewAdapter.this::notifyDataSetChanged);
     }
@@ -137,7 +125,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                 alert.setPositiveButton("Да", (dialog, which) -> {
                     home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
                     saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
+                    updateData(currentEntry.isVisibleOnLock());
                 });
                 
                 alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
@@ -147,12 +135,12 @@ public class TodoListViewAdapter extends BaseAdapter {
             
             CheckBox isDone = view.findViewById(R.id.isDone);
             
-            isDone.setChecked(currentEntry.completed, false);
+            isDone.setChecked(currentEntry.isCompleted(), false);
             isDone.setOnClickListener(view12 -> {
-                if (!currentEntry.isGlobalEntry) {
-                    currentEntry.changeParameter(IS_COMPLETED, String.valueOf(isDone.isChecked()));
+                if (!currentEntry.isGlobal()) {
+                    currentEntry.changeParameter(IS_COMPLETED, isDone.isChecked() ? 1 : 0);
                 } else {
-                    currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
+                    currentEntry.changeParameter(ASSOCIATED_DAY, (int) currentlySelectedDay);
                 }
                 saveEntries(home.todoListEntries);
                 updateData(true);
@@ -163,21 +151,21 @@ public class TodoListViewAdapter extends BaseAdapter {
                 
                 final EditText input = new EditText(context);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                input.setText(currentEntry.textValue);
+                input.setText(currentEntry.getTextValue());
                 alert.setView(input);
                 
                 alert.setTitle("Изменить");
                 alert.setPositiveButton("Сохранить", (dialog, which) -> {
-                    currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
+                    currentEntry.setTextValue(input.getText().toString());
                     saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
+                    updateData(currentEntry.isVisibleOnLock());
                 });
                 
-                if (!currentEntry.isGlobalEntry) {
+                if (!currentEntry.isGlobal()) {
                     alert.setNeutralButton("Переместить в общий список", (dialog, which) -> {
-                        currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
+                        currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL);
                         saveEntries(home.todoListEntries);
-                        updateData(currentEntry.getLockViewState());
+                        updateData(currentEntry.isVisibleOnLock());
                     });
                 }
                 
@@ -193,18 +181,12 @@ public class TodoListViewAdapter extends BaseAdapter {
             settings.setOnClickListener(v -> NavHostFragment.findNavController(home).navigate(R.id.action_HomeFragment_to_SettingsFragment));
         }
         
-        view.findViewById(R.id.backgroundSecondLayer).setBackgroundColor(currentEntry.bgColor);
+        view.findViewById(R.id.backgroundSecondLayer).setBackgroundColor(currentEntry.getBgColor(currentlySelectedDay));
         
-        if (currentEntry.completed) {
-            todoText.setTextColor(currentEntry.fontColor_completed);
-        } else {
-            todoText.setTextColor(currentEntry.fontColor);
-        }
+        todoText.setTextColor(currentEntry.getFontColor(currentlySelectedDay));
         
-        todoText.setText(currentEntry.textValue);
-        if (currentlySelectedDay == currentDay || currentEntry.isGlobalEntry) {
-            todoText.setText(todoText.getText() + currentEntry.getDayOffset());
-        }
+        todoText.setText(currentEntry.getTextValue() + currentEntry.getDayOffset(currentlySelectedDay));
+        
         return view;
     }
 }

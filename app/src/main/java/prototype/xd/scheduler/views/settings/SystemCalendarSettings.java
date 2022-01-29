@@ -107,22 +107,22 @@ public class SystemCalendarSettings extends PopupSettingsView{
         addSeekBarChangeListener(
                 show_days_beforehand_description,
                 show_days_beforehand_bar,
-                showDaysBeforehand_bar_state, this, fragment, R.string.settings_show_days_beforehand,
-                calendarKey, Keys.BEFOREHAND_ITEMS_OFFSET,
-                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET));
+                showDaysBeforehand_bar_state, this, fragment, R.string.settings_show_days_upcoming,
+                calendarKey, Keys.UPCOMING_ITEMS_OFFSET,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET));
         
         addSeekBarChangeListener(
                 show_days_after_description,
                 show_days_after_bar,
-                showDaysAfter_bar_state, this, fragment, R.string.settings_show_days_after,
-                calendarKey, Keys.AFTER_ITEMS_OFFSET,
-                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET));
+                showDaysAfter_bar_state, this, fragment, R.string.settings_show_days_expired,
+                calendarKey, Keys.EXPIRED_ITEMS_OFFSET,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET));
         
         addSwitchChangeListener(
                 show_on_lock_switch,
                 show_on_lock_state, this,
                 calendarKey, Keys.SHOW_ON_LOCK,
-                preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK));
+                preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.SETTINGS_DEFAULT_SHOW_ON_LOCK));
         
         addSwitchChangeListener(
                 adaptive_color_switch,
@@ -151,7 +151,7 @@ public class SystemCalendarSettings extends PopupSettingsView{
         setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK);
         setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED);
         setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE);
-        setStateIconColor(showDaysBeforehand_bar_state, Keys.BEFOREHAND_ITEMS_OFFSET);
-        setStateIconColor(showDaysAfter_bar_state, Keys.AFTER_ITEMS_OFFSET);
+        setStateIconColor(showDaysBeforehand_bar_state, Keys.UPCOMING_ITEMS_OFFSET);
+        setStateIconColor(showDaysAfter_bar_state, Keys.EXPIRED_ITEMS_OFFSET);
     }
 }
