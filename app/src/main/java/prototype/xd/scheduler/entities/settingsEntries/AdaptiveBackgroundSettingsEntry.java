@@ -44,7 +44,7 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry{
     @Override
     protected View InitInnerViews(View rootView) {
         rootView.findViewById(R.id.adaptive_bg_settings).setOnClickListener(v -> {
-            final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+            final AlertDialog.Builder alert = new AlertDialog.Builder(context, R.style.FullScreenDialog);
     
             View view = inflater.inflate(R.layout.background_images_grid_selection_view, root, false);
             addSwitchChangeListener(view.findViewById(R.id.adaptive_bg_switch), Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED);

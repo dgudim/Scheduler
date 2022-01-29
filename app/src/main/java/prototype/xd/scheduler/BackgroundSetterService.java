@@ -57,7 +57,7 @@ public class BackgroundSetterService extends Service {
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSound(null)
                     .setOngoing(true)
-                    .setContentText("Background service running")
+                    .setContentText(getString(R.string.background_service_persistent_message))
                     .build();
         }
         return foregroundNotification;
