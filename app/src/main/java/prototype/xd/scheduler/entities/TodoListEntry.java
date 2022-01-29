@@ -28,7 +28,6 @@ import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
-import static prototype.xd.scheduler.utilities.Utilities.makeNewLines;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -39,6 +38,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.math.MathUtils;
 
+import org.apache.commons.lang.WordUtils;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
@@ -139,7 +139,7 @@ public class TodoListEntry {
             }
             return false;
         }
-        return (day >= day_start && day <= day_end) || day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL;
+        return inRange(day, day_start);
     }
     
     public long genNearestEventDay(long day) {
@@ -150,7 +150,7 @@ public class TodoListEntry {
             RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             while (it.hasNext()) {
                 long epoch = it.next();
-                if(inRange(day, daysFromEpoch(epoch))){
+                if (inRange(day, daysFromEpoch(epoch))) {
                     return daysFromEpoch(epoch);
                 }
                 if (daysFromEpoch(epoch) >= day) {
@@ -480,7 +480,8 @@ public class TodoListEntry {
     }
     
     public void splitText(Context context) {
-        textValueSplit = makeNewLines(textValue + getDayOffset(currentDay) + "\n" + getTimeSpan(context), maxChars);
+        textValueSplit = (WordUtils.wrap(textValue, maxChars, "\n", true) + "\n" + getTimeSpan(context)).split("\n");
+        
     }
     
     private void setParams(String[] params) {

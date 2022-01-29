@@ -21,8 +21,6 @@ import androidx.fragment.app.Fragment;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
-import org.apache.commons.lang.WordUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -155,10 +153,6 @@ public class Utilities {
         merged.sort(new TodoListEntryPriorityComparator());
         
         return merged;
-    }
-    
-    public static String[] makeNewLines(String input, int maxChars) {
-        return WordUtils.wrap(input, maxChars, "\n", true).split("\n");
     }
     
     public static void addSeekBarChangeListener(final TextView displayTo, SeekBar seekBar, final Fragment fragment, final int stringResource, final String key, int defaultValue) {

@@ -16,11 +16,13 @@ import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CalendarView;
@@ -56,11 +58,11 @@ public class HomeFragment extends Fragment {
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    
+        
         rootActivity = (MainActivity) requireActivity();
         
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-    
+        
         todoListEntries = new ArrayList<>();
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
@@ -78,12 +80,17 @@ public class HomeFragment extends Fragment {
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(rootActivity);
             builder.setTitle("Добавить пункт");
-        
+            
             View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
             final EditText input = addView.findViewById(R.id.entryNameEditText);
-        
+            input.setOnFocusChangeListener((v, hasFocus) -> input.postDelayed(() -> {
+                InputMethodManager inputMethodManager= (InputMethodManager) rootActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+            }, 200));
+            input.requestFocus();
+            
             final String[] currentGroup = {BLANK_GROUP_NAME};
-        
+            
             final ArrayList<Group> groupList = readGroupFile();
             final ArrayList<String> groupNames = new ArrayList<>();
             for (Group group : groupList) {
@@ -99,16 +106,16 @@ public class HomeFragment extends Fragment {
                 public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
                     currentGroup[0] = groupNames.get(position);
                 }
-            
+                
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
                 
                 }
             });
-        
+            
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(addView);
-        
+            
             builder.setPositiveButton("Добавить", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString(),
@@ -118,7 +125,7 @@ public class HomeFragment extends Fragment {
                 saveEntries(todoListEntries);
                 todoListViewAdapter.updateData(newEntry.getLockViewState());
             });
-        
+            
             builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString(),
@@ -128,9 +135,9 @@ public class HomeFragment extends Fragment {
                 saveEntries(todoListEntries);
                 todoListViewAdapter.updateData(newEntry.getLockViewState());
             });
-        
+            
             builder.setNeutralButton("Отмена", (dialog, which) -> dialog.dismiss());
-        
+            
             builder.show();
         });
         
@@ -152,10 +159,10 @@ public class HomeFragment extends Fragment {
             todoListEntries.clear();
             todoListEntries.addAll(loadTodoEntries(rootActivity));
             long epoch;
-            if((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0){
+            if ((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
                 currentlySelectedDay = daysFromEpoch(addTimeZoneOffset(epoch)); // timezone corrections because calendar returns in local timezone
             }
-            if(todoListViewAdapter != null) todoListViewAdapter.updateData(false);
+            if (todoListViewAdapter != null) todoListViewAdapter.updateData(false);
         }).start();
     }
     

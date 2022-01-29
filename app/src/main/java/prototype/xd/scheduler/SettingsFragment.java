@@ -123,7 +123,7 @@ public class SettingsFragment extends Fragment {
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK,
                 context.getString(R.string.settings_max_rWidth_lock)));
-        // TODO: 28/1/2022 apply settings instantly
+        
         settingsEntries.add(new ResetButtonsSettingsEntry(this, view, savedInstanceState));
     
         SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries, context);
