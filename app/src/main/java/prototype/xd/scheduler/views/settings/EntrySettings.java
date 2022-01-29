@@ -5,18 +5,17 @@ import static prototype.xd.scheduler.entities.Group.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
-import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
-import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
+import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
@@ -64,9 +63,9 @@ public class EntrySettings extends PopupSettingsView{
     
     private void initialise(final Context context, final HomeFragment fragment, final ArrayList<TodoListEntry> allEntries) {
         
-        fontColor_view.setBackgroundColor(entry.getFontColor(currentlySelectedDay));
-        bgColor_view.setBackgroundColor(entry.getBgColor(currentlySelectedDay));
-        padColor_view.setBackgroundColor(entry.getBevelColor(currentlySelectedDay));
+        fontColor_view.setBackgroundColor(entry.fontColor);
+        bgColor_view.setBackgroundColor(entry.bgColor);
+        padColor_view.setBackgroundColor(entry.bevelColor);
         
         updateAllIndicators();
         
@@ -190,18 +189,18 @@ public class EntrySettings extends PopupSettingsView{
             
             builder.setPositiveButton("Добавить", (dialog, which) -> {
                 if (input.getText().toString().equals(BLANK_GROUP_NAME)) {
-                    AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
-                    builder2.setTitle("Нельзя создать группу с таким названием");
-                    builder2.setMessage("Ты сломаешь сброс настроек");
+                    AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
+                    builder13.setTitle("Нельзя создать группу с таким названием");
+                    builder13.setMessage("Ты сломаешь сброс настроек");
                     
-                    builder2.show();
+                    builder13.show();
                     
                 } else if (groupNames.contains(input.getText().toString())) {
-                    AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
-                    builder2.setTitle("Группа с таким именем уже существует");
-                    builder2.setMessage("Перезаписать?");
+                    AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
+                    builder13.setTitle("Группа с таким именем уже существует");
+                    builder13.setMessage("Перезаписать?");
                     
-                    builder2.setPositiveButton("Да", (dialog14, which14) -> {
+                    builder13.setPositiveButton("Да", (dialog14, which14) -> {
                         Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                         groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
                         saveGroupsFile(groupList);
@@ -215,9 +214,9 @@ public class EntrySettings extends PopupSettingsView{
                         preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     });
                     
-                    builder2.setNegativeButton("Нет", (dialog13, which13) -> dialog13.dismiss());
+                    builder13.setNegativeButton("Нет", (dialog13, which13) -> dialog13.dismiss());
                     
-                    builder2.show();
+                    builder13.show();
                 } else {
                     Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                     groupNames.add(createdGroup.name);
@@ -254,57 +253,57 @@ public class EntrySettings extends PopupSettingsView{
         
         fontColor_view.setOnClickListener(view -> invokeColorDialogue(
                 context, view, fontColor_view_state, fragment,
-                entry, FONT_COLOR, entry.getFontColor(currentlySelectedDay), true));
+                entry, FONT_COLOR, entry.fontColor, true));
         
         bgColor_view.setOnClickListener(view -> invokeColorDialogue(
                 context, view, bgColor_view_state, fragment,
-                entry, BG_COLOR, entry.getBgColor(currentlySelectedDay), true));
+                entry, BG_COLOR, entry.bgColor, true));
         
         padColor_view.setOnClickListener(view -> invokeColorDialogue(
                 context, view, padColor_view_state, fragment,
-                entry, BEVEL_COLOR, entry.getBevelColor(currentlySelectedDay), true));
+                entry, BEVEL_COLOR, entry.bevelColor, true));
         
         addSeekBarChangeListener(
                 bevel_thickness_description,
                 bevel_thickness_bar,
                 padSize_state, fragment, R.string.settings_bevel_thickness, entry,
-                BEVEL_THICKNESS, entry.getBevelThickness(currentlySelectedDay));
+                BEVEL_THICKNESS, entry.bevelThickness);
         
         addSeekBarChangeListener(
                 priority_description,
                 priority_bar,
                 priority_state, fragment, R.string.settings_priority, entry,
-                PRIORITY, entry.getPriority());
+                PRIORITY, entry.priority);
         
         addSeekBarChangeListener(
                 adaptive_color_balance_description,
                 adaptive_color_balance_bar,
                 adaptiveColor_bar_state, fragment, R.string.settings_adaptive_color_balance, entry,
-                ADAPTIVE_COLOR_BALANCE, entry.getAdaptiveColorBalance());
+                ADAPTIVE_COLOR_BALANCE, entry.adaptiveColorBalance);
         
         addSeekBarChangeListener(
                 show_days_beforehand_description,
                 show_days_beforehand_bar,
-                showDaysBeforehand_bar_state, fragment, R.string.settings_show_days_upcoming, entry,
-                UPCOMING_ITEMS_OFFSET, entry.getDayOffset_upcoming());
+                showDaysUpcoming_bar_state, fragment, R.string.settings_show_days_upcoming, entry,
+                UPCOMING_ITEMS_OFFSET, entry.dayOffset_upcoming);
         
         addSeekBarChangeListener(
                 show_days_after_description,
                 show_days_after_bar,
-                showDaysAfter_bar_state, fragment, R.string.settings_show_days_expired, entry,
-                EXPIRED_ITEMS_OFFSET, entry.getDayOffset_expired());
+                showDaysExpired_bar_state, fragment, R.string.settings_show_days_expired, entry,
+                EXPIRED_ITEMS_OFFSET, entry.dayOffset_expired);
         
         addSwitchChangeListener(
                 show_on_lock_switch,
                 show_on_lock_state,
                 fragment, entry,
-                SHOW_ON_LOCK, entry.showOnLock());
+                SHOW_ON_LOCK, entry.showOnLock);
         
         addSwitchChangeListener(
                 adaptive_color_switch,
                 adaptiveColor_switch_state,
                 fragment, entry,
-                ADAPTIVE_COLOR_ENABLED, entry.isAdaptiveColorEnabled());
+                ADAPTIVE_COLOR_ENABLED, entry.adaptiveColorEnabled);
     }
     
     void updateAllIndicators() {
@@ -316,8 +315,8 @@ public class EntrySettings extends PopupSettingsView{
         entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
         entry.setStateIconColor(adaptiveColor_switch_state, ADAPTIVE_COLOR_ENABLED);
         entry.setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE);
-        entry.setStateIconColor(showDaysBeforehand_bar_state, UPCOMING_ITEMS_OFFSET);
-        entry.setStateIconColor(showDaysAfter_bar_state, EXPIRED_ITEMS_OFFSET);
+        entry.setStateIconColor(showDaysUpcoming_bar_state, UPCOMING_ITEMS_OFFSET);
+        entry.setStateIconColor(showDaysExpired_bar_state, EXPIRED_ITEMS_OFFSET);
     }
     
 }

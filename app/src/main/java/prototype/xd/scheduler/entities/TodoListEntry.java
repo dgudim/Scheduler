@@ -11,19 +11,19 @@ import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
-import static prototype.xd.scheduler.utilities.Keys.AFTER_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.BEFOREHAND_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY;
+import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
+import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
@@ -54,7 +54,7 @@ import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class TodoListEntry {
     
-    enum EntryType {GLOBAL, TODAY, OLD, NEW, NEUTRAL}
+    enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING, NEUTRAL}
     
     public boolean fromSystemCalendar = false;
     public SystemCalendarEvent event;
@@ -68,8 +68,8 @@ public class TodoListEntry {
     public long day_start = DAY_FLAG_GLOBAL;
     public long day_end = DAY_FLAG_GLOBAL;
     public long duration_in_days = 0;
-    public int dayOffset_after = 0;
-    public int dayOffset_beforehand = 0;
+    public int dayOffset_expired = 0;
+    public int dayOffset_upcoming = 0;
     public boolean completed = false;
     public Group group;
     
@@ -115,7 +115,7 @@ public class TodoListEntry {
     }
     
     private boolean inRange(long day, long event_start_day) {
-        return isGlobal() || (day >= event_start_day - dayOffset_beforehand && day <= event_start_day + duration_in_days + dayOffset_after);
+        return isGlobal() || (day >= event_start_day - dayOffset_upcoming && day <= event_start_day + duration_in_days + dayOffset_expired);
         // | days after the event ended ------ event start |event| event end ------ days before the event starts |
         // | ++++++++++++++++++++++++++       -------------|-----|----------        +++++++++++++++++++++++++++++|
     }
@@ -251,8 +251,8 @@ public class TodoListEntry {
             for (int i = 0; i < params.length; i += 2) {
                 if (params[i].equals(ASSOCIATED_DAY)) {
                     
-                    dayOffset_after = preferences.getInt(Keys.AFTER_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
-                    dayOffset_beforehand = preferences.getInt(Keys.BEFOREHAND_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
+                    dayOffset_expired = preferences.getInt(EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
+                    dayOffset_upcoming = preferences.getInt(UPCOMING_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
                     
                     setParams((String[]) addAll(group.params, params));
                     
@@ -280,30 +280,30 @@ public class TodoListEntry {
                             setEntryType(EntryType.TODAY);
                         }
                         
-                    } else if (days_associated < currentDay && currentDay - days_associated <= dayOffset_after) {
+                    } else if (days_associated < currentDay && currentDay - days_associated <= dayOffset_expired) {
                         
-                        bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
-                        bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
-                        bevelThickness = preferences.getInt(Keys.OLD_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_OLD_BEVEL_THICKNESS);
+                        bgColor = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
+                        bevelColor = preferences.getInt(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR);
+                        bevelThickness = preferences.getInt(Keys.EXPIRED_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS);
                         
-                        setFontColor(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR);
+                        setFontColor(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
                         
-                        showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_OLD_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_OLD_COMPLETED_ITEMS_IN_LIST);
+                        showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST);
                         showOnLock = true;
                         
-                        setEntryType(EntryType.OLD);
-                    } else if (days_associated > currentDay && days_associated - currentDay <= dayOffset_beforehand) {
+                        setEntryType(EntryType.EXPIRED);
+                    } else if (days_associated > currentDay && days_associated - currentDay <= dayOffset_upcoming) {
                         
-                        bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
-                        bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
-                        bevelThickness = preferences.getInt(Keys.NEW_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_NEW_BEVEL_THICKNESS);
+                        bgColor = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
+                        bevelColor = preferences.getInt(Keys.UPCOMING_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR);
+                        bevelThickness = preferences.getInt(Keys.UPCOMING_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS);
                         
-                        setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
+                        setFontColor(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
                         
-                        showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_NEW_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_NEW_COMPLETED_ITEMS_IN_LIST);
+                        showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST);
                         showOnLock = true;
                         
-                        setEntryType(EntryType.NEW);
+                        setEntryType(EntryType.UPCOMING);
                     } else {
                         setFontColor(Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR);
                         
@@ -353,24 +353,24 @@ public class TodoListEntry {
             
             priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
             
-            dayOffset_beforehand = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEFOREHAND_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_BEFOREHAND_ITEMS_OFFSET);
-            dayOffset_after = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.AFTER_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_AFTER_ITEMS_OFFSET);
+            dayOffset_upcoming = preferences.getInt(getFirstValidKey(calendarSubKeys, UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
+            dayOffset_expired = preferences.getInt(getFirstValidKey(calendarSubKeys, EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
             
             long nearestDay = genNearestEventDay(currentDay);
-            isNewEntry = currentDay + dayOffset_beforehand >= nearestDay && currentDay < nearestDay;
-            isOldEntry = !isNewEntry && (currentDay - dayOffset_after <= day_end && currentDay > day_end);
+            isNewEntry = currentDay + dayOffset_upcoming >= nearestDay && currentDay < nearestDay;
+            isOldEntry = !isNewEntry && (currentDay - dayOffset_expired <= day_end && currentDay > day_end);
             
             if (isOldEntry) {
-                bgColor = preferences.getInt(Keys.OLD_BG_COLOR, Keys.SETTINGS_DEFAULT_OLD_BG_COLOR);
-                bevelColor = preferences.getInt(Keys.OLD_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_OLD_BEVEL_COLOR);
-                setFontColor(Keys.OLD_FONT_COLOR, Keys.SETTINGS_DEFAULT_OLD_FONT_COLOR);
+                bgColor = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
+                bevelColor = preferences.getInt(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR);
+                setFontColor(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
             } else if (isNewEntry) {
-                bgColor = preferences.getInt(Keys.NEW_BG_COLOR, Keys.SETTINGS_DEFAULT_NEW_BG_COLOR);
-                bevelColor = preferences.getInt(Keys.NEW_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_NEW_BEVEL_COLOR);
-                setFontColor(Keys.NEW_FONT_COLOR, Keys.SETTINGS_DEFAULT_NEW_FONT_COLOR);
+                bgColor = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
+                bevelColor = preferences.getInt(Keys.UPCOMING_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR);
+                setFontColor(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
             }
             
-            showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+            showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.SETTINGS_DEFAULT_SHOW_ON_LOCK);
             showOnLock = showOnLock || isOldEntry || isNewEntry;
             
             fontSize = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
@@ -382,8 +382,8 @@ public class TodoListEntry {
     private void setEntryType(EntryType entryType) {
         isTodayEntry = entryType == EntryType.TODAY;
         isGlobalEntry = entryType == EntryType.GLOBAL;
-        isOldEntry = entryType == EntryType.OLD;
-        isNewEntry = entryType == EntryType.NEW;
+        isOldEntry = entryType == EntryType.EXPIRED;
+        isNewEntry = entryType == EntryType.UPCOMING;
     }
     
     private void setFontColor(int color) {
@@ -495,11 +495,11 @@ public class TodoListEntry {
                 case (SHOW_ON_LOCK):
                     showOnLock = Boolean.parseBoolean(params[i + 1]);
                     break;
-                case (BEFOREHAND_ITEMS_OFFSET):
-                    dayOffset_beforehand = Integer.parseInt(params[i + 1]);
+                case (UPCOMING_ITEMS_OFFSET):
+                    dayOffset_upcoming = Integer.parseInt(params[i + 1]);
                     break;
-                case (AFTER_ITEMS_OFFSET):
-                    dayOffset_after = Integer.parseInt(params[i + 1]);
+                case (EXPIRED_ITEMS_OFFSET):
+                    dayOffset_expired = Integer.parseInt(params[i + 1]);
                     break;
                 case (BEVEL_THICKNESS):
                     bevelThickness = Integer.parseInt(params[i + 1]);

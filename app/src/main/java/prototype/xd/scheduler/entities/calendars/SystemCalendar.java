@@ -90,15 +90,6 @@ public class SystemCalendar {
             cursor.moveToNext();
         }
         cursor.close();
-    
-        Cursor cursor2 = CalendarContract.Instances.query(contentResolver, new String[]{CalendarContract.Instances.DISPLAY_COLOR}, 0, Long.MAX_VALUE);
-        cursor2.moveToFirst();
-        for(int i = 0; i < cursor2.getCount(); i++){
-            System.out.println(cursor2.getLong(0));
-            cursor2.moveToNext();
-        }
-        cursor2.close();
-        
     }
     
     public ArrayList<TodoListEntry> getVisibleTodoListEntries() {

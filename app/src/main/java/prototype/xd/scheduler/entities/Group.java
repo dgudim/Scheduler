@@ -11,46 +11,49 @@ import static prototype.xd.scheduler.utilities.Utilities.saveObject;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Group {
-    
+
     public static final String BLANK_GROUP_NAME = "Ничего";
     public String name = BLANK_GROUP_NAME;
-    
-    HashMap<String, Integer> params = new HashMap<>(0);
-    
+
+    String[] params = new String[]{};
+
     public Group(String groupName) {
         ArrayList<Group> groups = readGroupFile();
+        boolean foundGroup = false;
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).name.equals(groupName)) {
                 params = groups.get(i).params;
-                name = groupName;
+                foundGroup = true;
                 break;
             }
         }
+        if (foundGroup) {
+            name = groupName;
+        }
     }
-    
-    private Group(String groupName, HashMap<String, Integer> params) {
+
+    private Group(String groupName, String[] params) {
         name = groupName;
         this.params = params;
     }
-    
+
     public static ArrayList<Group> readGroupFile() {
         try {
-            
-            ArrayList<HashMap<String, Integer>> groupParams = loadObject("groups");
+
+            ArrayList<String[]> groupParams = loadObject("groups");
             ArrayList<String> groupNames = loadObject("groupNames");
-            
+
             if (!(groupParams.size() == groupNames.size())) {
                 log(WARNING, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
             }
-            
+
             ArrayList<Group> groups = new ArrayList<>();
             for (int i = 0; i < groupParams.size(); i++) {
                 groups.add(new Group(groupNames.get(i), groupParams.get(i)));
             }
-            
+
             return groups;
         } catch (Exception e) {
             logException(e);
@@ -58,42 +61,42 @@ public class Group {
             return createDefaultGroupFile();
         }
     }
-    
+
     public static void saveGroupsFile(ArrayList<Group> groups) {
         try {
-            
-            ArrayList<HashMap<String, Integer>> groupParams = new ArrayList<>();
+
+            ArrayList<String[]> groupParams = new ArrayList<>();
             ArrayList<String> groupNames = new ArrayList<>();
             for (int i = 0; i < groups.size(); i++) {
                 groupParams.add(groups.get(i).params);
                 groupNames.add(groups.get(i).name);
             }
-            
+
             saveObject("groups", groupParams);
             saveObject("groupNames", groupNames);
-            
+
             log(INFO, "saving groups file");
-            
+
         } catch (Exception e) {
             log(ERROR, "failed to save groups file: " + e.getMessage());
         }
     }
-    
-    public static Group createGroup(String name, HashMap<String, Integer> params) {
+
+    public static Group createGroup(String name, String[] params) {
         ArrayList<Group> groups = readGroupFile();
         Group createdGroup = new Group(name, params);
         groups.add(createdGroup);
         saveGroupsFile(groups);
         return createdGroup;
     }
-    
+
     private static ArrayList<Group> createDefaultGroupFile() {
         ArrayList<Group> groups = new ArrayList<>();
-        groups.add(new Group(BLANK_GROUP_NAME, new HashMap<>(0)));
+        groups.add(new Group(BLANK_GROUP_NAME, new String[]{}));
         saveGroupsFile(groups);
         return groups;
     }
-    
+
     @NonNull
     @Override
     public String toString() {

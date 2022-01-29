@@ -24,8 +24,8 @@ public class PopupSettingsView {
     protected final TextView padSize_state;
     protected final TextView show_on_lock_state;
     protected final TextView adaptiveColor_bar_state;
-    protected final TextView showDaysBeforehand_bar_state;
-    protected final TextView showDaysAfter_bar_state;
+    protected final TextView showDaysUpcoming_bar_state;
+    protected final TextView showDaysExpired_bar_state;
     
     protected final TextView bevel_thickness_description;
     protected final SeekBar bevel_thickness_bar;
@@ -58,8 +58,8 @@ public class PopupSettingsView {
         show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
         adaptiveColor_switch_state = settingsView.findViewById(R.id.adaptive_color_state);
         adaptiveColor_bar_state = settingsView.findViewById(R.id.adaptive_color_balance_state);
-        showDaysBeforehand_bar_state = settingsView.findViewById(R.id.days_beforehand_state);
-        showDaysAfter_bar_state = settingsView.findViewById(R.id.days_after_state);
+        showDaysUpcoming_bar_state = settingsView.findViewById(R.id.days_beforehand_state);
+        showDaysExpired_bar_state = settingsView.findViewById(R.id.days_after_state);
     
         bevel_thickness_description = settingsView.findViewById(R.id.bevel_thickness_description);
         bevel_thickness_bar = settingsView.findViewById(R.id.bevel_thickness_bar);

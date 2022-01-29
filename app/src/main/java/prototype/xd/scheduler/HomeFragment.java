@@ -9,9 +9,9 @@ import static prototype.xd.scheduler.utilities.DateManager.dateToEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
@@ -35,7 +35,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
@@ -111,25 +110,23 @@ public class HomeFragment extends Fragment {
             builder.setView(addView);
         
             builder.setPositiveButton("Добавить", (dialog, which) -> {
-                HashMap<String, Integer> params = new HashMap<>();
-                params.put(ASSOCIATED_DAY, (int) currentlySelectedDay);
-                params.put(IS_COMPLETED, 0);
-                TodoListEntry newEntry = new TodoListEntry(input.getText().toString(),
-                        params, currentGroup[0]);
+                TodoListEntry newEntry = new TodoListEntry(new String[]{
+                        TEXT_VALUE, input.getText().toString(),
+                        ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
+                        IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
-                todoListViewAdapter.updateData(newEntry.isVisibleOnLock());
+                todoListViewAdapter.updateData(newEntry.getLockViewState());
             });
         
             builder.setNegativeButton("Добавить в общий список", (dialog, which) -> {
-                HashMap<String, Integer> params = new HashMap<>();
-                params.put(ASSOCIATED_DAY, DAY_FLAG_GLOBAL);
-                params.put(IS_COMPLETED, 0);
-                TodoListEntry newEntry = new TodoListEntry(input.getText().toString(),
-                        params, currentGroup[0]);
+                TodoListEntry newEntry = new TodoListEntry(new String[]{
+                        TEXT_VALUE, input.getText().toString(),
+                        ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
+                        IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
-                todoListViewAdapter.updateData(newEntry.isVisibleOnLock());
+                todoListViewAdapter.updateData(newEntry.getLockViewState());
             });
         
             builder.setNeutralButton("Отмена", (dialog, which) -> dialog.dismiss());
