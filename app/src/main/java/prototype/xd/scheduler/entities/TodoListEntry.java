@@ -333,7 +333,7 @@ public class TodoListEntry {
             day_end = daysFromEpoch(timestamp_end);
             duration_in_days = daysFromEpoch(timestamp_duration);
             
-            textValue = event.title;
+            textValue = event.title.trim();
             
             ArrayList<String> calendarSubKeys = event.subKeys;
             
@@ -474,7 +474,7 @@ public class TodoListEntry {
     }
     
     public void splitText(Context context) {
-        textValueSplit = (WordUtils.wrap(textValue, maxChars, "\n", true) + "\n" + getTimeSpan(context)).split("\n");
+        textValueSplit = (WordUtils.wrap(textValue + getDayOffset(currentDay, context), maxChars, "\n", true) + "\n" + getTimeSpan(context)).split("\n");
         
     }
     

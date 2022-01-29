@@ -118,7 +118,7 @@ public class HomeFragment extends Fragment {
             
             builder.setPositiveButton(R.string.add, (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
-                        TEXT_VALUE, input.getText().toString(),
+                        TEXT_VALUE, input.getText().toString().trim(),
                         ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
@@ -128,7 +128,7 @@ public class HomeFragment extends Fragment {
             
             builder.setNegativeButton(R.string.add_to_global_list, (dialog, which) -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
-                        TEXT_VALUE, input.getText().toString(),
+                        TEXT_VALUE, input.getText().toString().trim(),
                         ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
                         IS_COMPLETED, "false"}, currentGroup[0]);
                 todoListEntries.add(newEntry);
