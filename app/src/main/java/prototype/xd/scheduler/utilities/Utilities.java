@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
@@ -72,7 +73,7 @@ public class Utilities {
         }
         
         readEntries.addAll(getAllTodoListEntriesFromCalendars(context));
-        return sortEntries(readEntries);
+        return sortEntries(readEntries, currentDay);
         
     }
     
@@ -124,7 +125,7 @@ public class Utilities {
         activity.startActivityForResult(intent, requestCode);
     }
     
-    public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries) {
+    public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries, long day) {
         ArrayList<TodoListEntry> newEntries = new ArrayList<>();
         ArrayList<TodoListEntry> oldEntries = new ArrayList<>();
         ArrayList<TodoListEntry> todayEntries = new ArrayList<>();
@@ -150,7 +151,7 @@ public class Utilities {
         merged.addAll(newEntries);
         merged.addAll(oldEntries);
         merged.addAll(otherEntries);
-        merged.sort(new TodoListEntryGroupComparator());
+        merged.sort(new TodoListEntryGroupComparator(day));
         merged.sort(new TodoListEntryPriorityComparator());
         
         return merged;
@@ -379,10 +380,17 @@ class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
 }
 
 class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
+    
+    long day;
+    
+    public TodoListEntryGroupComparator(long day) {
+        this.day = day;
+    }
+    
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
         if (o1.fromSystemCalendar || o2.fromSystemCalendar) {
-            return Long.compare(o1.timestamp_start, o2.timestamp_start);
+            return Long.compare(o1.getNearestEventTimestamp(day), o2.getNearestEventTimestamp(day));
         }
         return Integer.compare(o1.group.name.hashCode(), o2.group.name.hashCode());
     }

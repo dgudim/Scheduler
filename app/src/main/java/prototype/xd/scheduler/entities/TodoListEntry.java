@@ -142,21 +142,28 @@ public class TodoListEntry {
         return inRange(day, day_start);
     }
     
-    public long genNearestEventDay(long day) {
+    public long getNearestEventTimestamp(long day){
         if (recurrenceSet != null) {
             if (day > day_end) {
-                return day_end;
+                return timestamp_end;
             }
             RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             while (it.hasNext()) {
                 long epoch = it.next();
                 if (inRange(day, daysFromEpoch(epoch))) {
-                    return daysFromEpoch(epoch);
+                    return epoch;
                 }
                 if (daysFromEpoch(epoch) >= day) {
-                    return daysFromEpoch(epoch);
+                    return epoch;
                 }
             }
+        }
+        return timestamp_start;
+    }
+    
+    public long getNearestEventDay(long day) {
+        if(fromSystemCalendar) {
+            return daysFromEpoch(getNearestEventTimestamp(day));
         }
         return day_start;
     }
@@ -350,7 +357,7 @@ public class TodoListEntry {
             dayOffset_upcoming = preferences.getInt(getFirstValidKey(calendarSubKeys, UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
             dayOffset_expired = preferences.getInt(getFirstValidKey(calendarSubKeys, EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
             
-            long nearestDay = genNearestEventDay(currentDay);
+            long nearestDay = getNearestEventDay(currentDay);
             isUpcomingEntry = currentDay + dayOffset_upcoming >= nearestDay && currentDay < nearestDay;
             isExpiredEntry = !isUpcomingEntry && (currentDay - dayOffset_expired <= day_end && currentDay > day_end);
             
@@ -433,7 +440,7 @@ public class TodoListEntry {
             
             int dayShift = 0;
             
-            long nearestDay = genNearestEventDay(day);
+            long nearestDay = getNearestEventDay(day);
             if (day < nearestDay) {
                 dayShift = (int) (nearestDay - day);
             } else if (day > nearestDay + duration_in_days) {

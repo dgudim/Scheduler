@@ -95,7 +95,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         if (updateBitmap) {
             mainActivity.notifyService();
         }
-        home.todoListEntries = sortEntries(home.todoListEntries);
+        home.todoListEntries = sortEntries(home.todoListEntries, currentlySelectedDay);
         updateCurrentEntries();
         home.rootActivity.runOnUiThread(TodoListViewAdapter.this::notifyDataSetChanged);
     }
