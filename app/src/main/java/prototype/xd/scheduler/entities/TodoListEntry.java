@@ -280,7 +280,7 @@ public class TodoListEntry {
                         bgColor = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
                         bevelColor = preferences.getInt(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR);
                         bevelThickness = preferences.getInt(Keys.EXPIRED_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS);
-                        
+                        // TODO: 30/1/2022 bevel color and thickness wrong override
                         setFontColor(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
                         
                         showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST);
@@ -357,10 +357,12 @@ public class TodoListEntry {
             if (isOldEntry) {
                 bgColor = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
                 bevelColor = preferences.getInt(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR);
+                bevelThickness = preferences.getInt(Keys.EXPIRED_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS);
                 setFontColor(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
             } else if (isNewEntry) {
                 bgColor = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
                 bevelColor = preferences.getInt(Keys.UPCOMING_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR);
+                bevelThickness = preferences.getInt(Keys.UPCOMING_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS);
                 setFontColor(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
             }
             

@@ -230,13 +230,20 @@ public class BitmapUtilities {
         for (int y = 0, h = bitmap.getHeight(); y < h; y++) {
             for (int x = 0, w = bitmap.getWidth(); x < w; x++) {
                 int color = pixels[x + y * w]; // x + y * width
-                if (((color >> 16) & 0xFF + (color >> 8) & 0xFF + color & 0xFF) != 0) {
-                    redBucket += (color >> 16) & 0xFF; // Color.red
-                    greenBucket += (color >> 8) & 0xFF; // Color.greed
-                    blueBucket += (color & 0xFF); // Color.blue
+                int red = (color >> 16) & 0xFF;
+                int green = (color >> 8) & 0xFF;
+                int blue = color & 0xFF;
+                if (red + green + blue != 0) {
+                    redBucket += red;
+                    greenBucket += green;
+                    blueBucket += blue;
                     actualPixelCount++;
                 }
             }
+        }
+        
+        if(actualPixelCount == 0){
+            return 0;
         }
         
         pixelCount = actualPixelCount;

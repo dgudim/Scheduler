@@ -268,11 +268,13 @@ public class LockScreenBitmapDrawer {
         for (int i = 0; i < toAdd.size(); i++) {
             if (!toAdd.get(i).textValue.equals(BLANK_TEXT)) {
                 
-                drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
-                        -toAdd.get(i).rWidth - toAdd.get(i).bevelThickness,
-                        fontSize_h / 2f - fontSize_kM * i,
-                        toAdd.get(i).rWidth + toAdd.get(i).bevelThickness,
-                        -fontSize_kM * (i + 1) - toAdd.get(i).bevelThickness);
+                if(toAdd.get(i).bevelThickness > 0){
+                    drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
+                            -toAdd.get(i).rWidth - toAdd.get(i).bevelThickness,
+                            fontSize_h / 2f - fontSize_kM * i,
+                            toAdd.get(i).rWidth + toAdd.get(i).bevelThickness,
+                            -fontSize_kM * (i + 1) - toAdd.get(i).bevelThickness);
+                }
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
                         -toAdd.get(i).rWidth,
