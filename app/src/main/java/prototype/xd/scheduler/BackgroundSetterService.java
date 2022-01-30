@@ -38,6 +38,10 @@ public class BackgroundSetterService extends Service {
         ContextCompat.startForegroundService(context, intent);
     }
     
+    public static void notifyScreenLocked(){
+    
+    }
+    
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
