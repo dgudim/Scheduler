@@ -11,7 +11,6 @@ import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
 
@@ -22,9 +21,10 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.utilities.Keys;
 
-public class SystemCalendarSettings extends PopupSettingsView{
+public class SystemCalendarSettings extends PopupSettingsView {
     
     private final ArrayList<String> calendarSubKeys;
+    
     public SystemCalendarSettings(final SettingsFragment fragment, View settingsView, final String calendar_key) {
         super(settingsView);
         
@@ -32,18 +32,20 @@ public class SystemCalendarSettings extends PopupSettingsView{
         
         calendarSubKeys = generateSubKeysFromKey(calendar_key);
         
-        initialise(calendar_key, fragment.context, fragment);
+        initialise(calendar_key, fragment);
         
         new AlertDialog.Builder(fragment.context).setView(settingsView).show();
     }
     
-    private void initialise(String calendarKey, final Context context, final SettingsFragment fragment) {
+    private void initialise(String calendarKey, final SettingsFragment fragment) {
     
+        final Context context = fragment.context;
+        
         fontColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR));
         bgColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR));
         padColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_BEVEL_COLOR));
         
-        updateAllIndicators();
+        updateAllIndicators(context);
         
         settings_reset_button.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -58,7 +60,7 @@ public class SystemCalendarSettings extends PopupSettingsView{
                     }
                 }
                 editor.apply();
-                initialise(calendarKey, context, fragment);
+                initialise(calendarKey, fragment);
             });
             builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
             
@@ -118,40 +120,40 @@ public class SystemCalendarSettings extends PopupSettingsView{
                 calendarKey, Keys.EXPIRED_ITEMS_OFFSET,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET));
         
-        addSwitchChangeListener(
+        addSwitchChangeListener(context,
                 show_on_lock_switch,
                 show_on_lock_state, this,
                 calendarKey, Keys.SHOW_ON_LOCK,
                 preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK));
         
-        addSwitchChangeListener(
+        addSwitchChangeListener(context,
                 adaptive_color_switch,
                 adaptiveColor_switch_state, this,
                 calendarKey, Keys.ADAPTIVE_COLOR_ENABLED,
                 preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED));
     }
     
-    public void setStateIconColor(TextView display, String parameter) {
+    public void setStateIconColor(TextView display, String parameter, Context context) {
         int keyIndex = getFirstValidKeyIndex(calendarSubKeys, parameter);
         if (keyIndex == calendarSubKeys.size() - 1) {
-            display.setTextColor(Color.GREEN);
+            display.setTextColor(context.getColor(R.color.entry_settings_parameter_personal));
         } else if (keyIndex >= 0) {
-            display.setTextColor(Color.YELLOW);
+            display.setTextColor(context.getColor(R.color.entry_settings_parameter_group));
         } else {
-            display.setTextColor(Color.GRAY);
+            display.setTextColor(context.getColor(R.color.entry_settings_parameter_default));
         }
     }
     
-    void updateAllIndicators() {
-        setStateIconColor(fontColor_view_state, Keys.FONT_COLOR);
-        setStateIconColor(bgColor_view_state, Keys.BG_COLOR);
-        setStateIconColor(padColor_view_state, Keys.BEVEL_COLOR);
-        setStateIconColor(padSize_state, Keys.BEVEL_THICKNESS);
-        setStateIconColor(priority_state, Keys.PRIORITY);
-        setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK);
-        setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED);
-        setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE);
-        setStateIconColor(showDaysUpcoming_bar_state, Keys.UPCOMING_ITEMS_OFFSET);
-        setStateIconColor(showDaysExpired_bar_state, Keys.EXPIRED_ITEMS_OFFSET);
+    void updateAllIndicators(Context context) {
+        setStateIconColor(fontColor_view_state, Keys.FONT_COLOR, context);
+        setStateIconColor(bgColor_view_state, Keys.BG_COLOR, context);
+        setStateIconColor(padColor_view_state, Keys.BEVEL_COLOR, context);
+        setStateIconColor(padSize_state, Keys.BEVEL_THICKNESS, context);
+        setStateIconColor(priority_state, Keys.PRIORITY, context);
+        setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK, context);
+        setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED, context);
+        setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE, context);
+        setStateIconColor(showDaysUpcoming_bar_state, Keys.UPCOMING_ITEMS_OFFSET, context);
+        setStateIconColor(showDaysExpired_bar_state, Keys.EXPIRED_ITEMS_OFFSET, context);
     }
 }

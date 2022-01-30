@@ -67,8 +67,8 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry{
             
             GridView gridView = view.findViewById(R.id.grid_view);
             gridView.setNumColumns(2);
-            gridView.setHorizontalSpacing(5);
-            gridView.setVerticalSpacing(5);
+            gridView.setHorizontalSpacing(30);
+            gridView.setVerticalSpacing(30);
             gridView.setAdapter(gridViewAdapter);
     
             alert.setView(view);

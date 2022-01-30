@@ -67,7 +67,7 @@ public class EntrySettings extends PopupSettingsView {
         bgColor_view.setBackgroundColor(entry.bgColor_original);
         padColor_view.setBackgroundColor(entry.bevelColor_original);
         
-        updateAllIndicators();
+        updateAllIndicators(context);
         
         final ArrayList<Group> groupList = readGroupFile();
         final ArrayList<String> groupNames = new ArrayList<>();
@@ -136,7 +136,7 @@ public class EntrySettings extends PopupSettingsView {
                                     }
                                     saveEntries(fragment.todoListEntries);
                                     group_spinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
-                                    updateAllIndicators();
+                                    updateAllIndicators(context);
                                     notifyDataSetChanged();
                                 });
                                 
@@ -210,7 +210,7 @@ public class EntrySettings extends PopupSettingsView {
                                 entry12.changeGroup(createdGroup);
                             }
                         }
-                        updateAllIndicators();
+                        updateAllIndicators(context);
                         preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     });
                     
@@ -227,7 +227,7 @@ public class EntrySettings extends PopupSettingsView {
                     entry.removeDisplayParams();
                     entry.changeGroup(createdGroup);
                     saveEntries(fragment.todoListEntries);
-                    updateAllIndicators();
+                    updateAllIndicators(context);
                 }
             });
             
@@ -306,17 +306,17 @@ public class EntrySettings extends PopupSettingsView {
                 ADAPTIVE_COLOR_ENABLED, entry.adaptiveColorEnabled);
     }
     
-    void updateAllIndicators() {
-        entry.setStateIconColor(fontColor_view_state, FONT_COLOR);
-        entry.setStateIconColor(bgColor_view_state, BG_COLOR);
-        entry.setStateIconColor(padColor_view_state, BEVEL_COLOR);
-        entry.setStateIconColor(padSize_state, BEVEL_THICKNESS);
-        entry.setStateIconColor(priority_state, PRIORITY);
-        entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK);
-        entry.setStateIconColor(adaptiveColor_switch_state, ADAPTIVE_COLOR_ENABLED);
-        entry.setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE);
-        entry.setStateIconColor(showDaysUpcoming_bar_state, UPCOMING_ITEMS_OFFSET);
-        entry.setStateIconColor(showDaysExpired_bar_state, EXPIRED_ITEMS_OFFSET);
+    void updateAllIndicators(Context context) {
+        entry.setStateIconColor(fontColor_view_state, FONT_COLOR, context);
+        entry.setStateIconColor(bgColor_view_state, BG_COLOR, context);
+        entry.setStateIconColor(padColor_view_state, BEVEL_COLOR, context);
+        entry.setStateIconColor(padSize_state, BEVEL_THICKNESS, context);
+        entry.setStateIconColor(priority_state, PRIORITY, context);
+        entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK, context);
+        entry.setStateIconColor(adaptiveColor_switch_state, ADAPTIVE_COLOR_ENABLED, context);
+        entry.setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE, context);
+        entry.setStateIconColor(showDaysUpcoming_bar_state, UPCOMING_ITEMS_OFFSET, context);
+        entry.setStateIconColor(showDaysExpired_bar_state, EXPIRED_ITEMS_OFFSET, context);
     }
     
 }

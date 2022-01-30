@@ -31,7 +31,6 @@ import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.widget.TextView;
 
@@ -573,7 +572,7 @@ public class TodoListEntry {
         reloadParams();
     }
     
-    public void setStateIconColor(TextView icon, String parameter) {
+    public void setStateIconColor(TextView icon, String parameter, Context context) {
         boolean containedInGroupParams = false;
         boolean containedInPersonalParams = false;
         for (int i = 0; i < group.params.length; i += 2) {
@@ -589,13 +588,13 @@ public class TodoListEntry {
             }
         }
         if (containedInGroupParams && containedInPersonalParams) {
-            icon.setTextColor(Color.BLUE);
+            icon.setTextColor(context.getColor(R.color.entry_settings_parameter_group_and_personal));
         } else if (containedInGroupParams) {
-            icon.setTextColor(Color.YELLOW);
+            icon.setTextColor(context.getColor(R.color.entry_settings_parameter_group));
         } else if (containedInPersonalParams) {
-            icon.setTextColor(Color.GREEN);
+            icon.setTextColor(context.getColor(R.color.entry_settings_parameter_personal));
         } else {
-            icon.setTextColor(Color.GRAY);
+            icon.setTextColor(context.getColor(R.color.entry_settings_parameter_default));
         }
     }
     

@@ -199,7 +199,7 @@ public class Utilities {
                 todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
                 saveEntries(fragment.todoListEntries);
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-                todoListEntry.setStateIconColor(stateIcon, parameter);
+                todoListEntry.setStateIconColor(stateIcon, parameter, fragment.rootActivity);
             }
         });
     }
@@ -222,7 +222,7 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 preferences.edit().putInt(calendarKey + "_" + parameter, seekBar.getProgress()).apply();
-                systemCalendarSettings.setStateIconColor(stateIcon, parameter);
+                systemCalendarSettings.setStateIconColor(stateIcon, parameter, fragment.context);
             }
         });
     }
@@ -238,16 +238,16 @@ public class Utilities {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             saveEntries(fragment.todoListEntries);
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-            entry.setStateIconColor(stateIcon, parameter);
+            entry.setStateIconColor(stateIcon, parameter, fragment.rootActivity);
         });
     }
     
-    public static void addSwitchChangeListener(final Switch tSwitch, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final String calendarKey, final String parameter, boolean initialValue) {
+    public static void addSwitchChangeListener(final Context context, final Switch tSwitch, final TextView stateIcon, final SystemCalendarSettings systemCalendarSettings, final String calendarKey, final String parameter, boolean initialValue) {
         tSwitch.setChecked(initialValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-            systemCalendarSettings.setStateIconColor(stateIcon, parameter);
+            systemCalendarSettings.setStateIconColor(stateIcon, parameter, context);
         });
     }
     
@@ -280,7 +280,7 @@ public class Utilities {
                     saveEntries(fragment.todoListEntries);
                     target.setBackgroundColor(selectedColor);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
-                    todoListEntry.setStateIconColor(stateIcon, parameter);
+                    todoListEntry.setStateIconColor(stateIcon, parameter, context);
                 }).setNegativeButton(R.string.cancel, (dialog, which) -> {
             
         }).build().show();
@@ -298,7 +298,7 @@ public class Utilities {
                     preferences.edit().putInt(calendarKey + "_" + parameter, selectedColor).apply();
                     target.setBackgroundColor(selectedColor);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
-                    systemCalendarSettings.setStateIconColor(stateIcon, parameter);
+                    systemCalendarSettings.setStateIconColor(stateIcon, parameter, context);
                 }).setNegativeButton(R.string.cancel, (dialog, which) -> {
             
         }).build().show();

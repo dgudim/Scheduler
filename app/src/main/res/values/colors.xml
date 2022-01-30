@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF6200EE</color>
-    <color name="colorPrimaryDark">#FF3700B3</color>
-    <color name="colorAccent">#FF03DAC5</color>
-    <color name="light_gray_bg">#FFDFDFDF</color>
-    <color name="gray_bg">#FFBFBFBF</color>
-    <color name="white_bg">#FFFFFFFF</color>
+    <color name="colorPrimary">#f5b042</color>
+    <color name="colorPrimaryDark">#f59042</color>
+    <color name="colorAccent">#f5bf42</color>
+    <color name="colorAccent_title">#ff9f63</color>
+    <color name="light_gray_bg">#DFDFDF</color>
+    <color name="gray_bg">#BFBFBF</color>
+    <color name="white_bg">#FFFFFF</color>
+
+    <color name="entry_settings_parameter_default">#888888</color>
+    <color name="entry_settings_parameter_personal">#6FFF6F</color>
+    <color name="entry_settings_parameter_group">#FFFF86</color>
+    <color name="entry_settings_parameter_group_and_personal">#3D6EFF</color>
+
     <color name="ic_launcher_background">#000000</color>
     <color name="color_permission_granted">#008107</color>
     <color name="color_permission_not_granted">#DD2C00</color>
