@@ -7,8 +7,10 @@ import static prototype.xd.scheduler.utilities.Utilities.initStorage;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -42,6 +44,15 @@ public class MainActivity extends AppCompatActivity {
     
     public static final int REQUEST_CODE_PERMISSIONS = 13;
     
+    BroadcastReceiver screenOffReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                BackgroundSetterService.notifyScreenLocked();
+            }
+        }
+    };
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
             grant_button.setOnClickListener(v -> requestPermissions(PERMISSIONS, REQUEST_CODE_PERMISSIONS));
         } else {
             initStorage(this);
+            registerReceiver(screenOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
             BackgroundSetterService.restart(this);
             setContentView(R.layout.activity_main);
         }

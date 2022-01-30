@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.utilities;
+package prototype.xd.scheduler.utilities.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
