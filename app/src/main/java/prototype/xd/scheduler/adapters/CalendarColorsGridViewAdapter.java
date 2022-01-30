@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
+
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.R;
@@ -62,7 +64,7 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         if (view == null) {
             view = inflater.inflate(R.layout.calendar_color_entry, parent, false);
         }
-        view.findViewById(R.id.color).setBackgroundColor(colors.get(i));
+        ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(colors.get(i));
         view.findViewById(R.id.title_default).setVisibility(calendarColor == colors.get(i) ? View.VISIBLE : View.GONE);
         ((TextView) view.findViewById(R.id.event_count)).setText(context.getString(R.string.calendar_events, color_eventCounts.get(i)));
         view.findViewById(R.id.settings).setOnClickListener(v ->

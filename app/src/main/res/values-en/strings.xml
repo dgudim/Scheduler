@@ -105,4 +105,5 @@
     <string name="battery_optimization">Background activity</string>
     <string name="battery_optimization_description">To allow the app to set the background even when you are not in the app</string>
     <string name="background_service_persistent_message">Background service running</string>
+    <string name="last_update_time">last update: %s</string>
 </resources>

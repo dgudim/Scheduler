@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             boolean visibilityFlag = !currentEntry.completed || currentEntry.showInList_ifCompleted;
             boolean show;
             if (currentlySelectedDay == currentDay) {
-                show = currentEntry.isNewEntry || currentEntry.isOldEntry || currentEntry.isVisible(currentlySelectedDay);
+                show = currentEntry.isUpcomingEntry || currentEntry.isExpiredEntry || currentEntry.isVisible(currentlySelectedDay);
                 show = show && visibilityFlag;
             } else {
                 show = currentEntry.isVisible(currentlySelectedDay);
@@ -188,7 +189,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             });
             settings.setOnClickListener(v -> new EntrySettings(context, home, inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, home.todoListEntries));
         } else {
-            view.findViewById(R.id.event_color).setBackgroundColor(currentEntry.event.color);
+            ((CardView)view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
             ((TextView) view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(context));
             settings.setOnClickListener(v -> NavHostFragment.findNavController(home).navigate(R.id.action_HomeFragment_to_SettingsFragment));
         }

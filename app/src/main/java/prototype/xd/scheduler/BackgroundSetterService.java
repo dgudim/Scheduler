@@ -1,10 +1,12 @@
 package prototype.xd.scheduler;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentTime;
 import static prototype.xd.scheduler.utilities.DateManager.isDayTime;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -32,14 +34,17 @@ public class BackgroundSetterService extends Service {
         ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
     }
     
-    public static void ping(Context context) {
+    private static void ping(Context context) {
         Intent intent = new Intent(context, BackgroundSetterService.class);
-        intent.putExtra("update", 1);
+        intent.putExtra(SERVICE_UPDATE_SIGNAL, 1);
         ContextCompat.startForegroundService(context, intent);
     }
     
-    public static void notifyScreenLocked(){
-    
+    public static void notifyScreenStateChanged(Context context) {
+        if(!lastUpdateSucceeded || preferences.getBoolean(SERVICE_UPDATE_SIGNAL, false)){
+            ping(context);
+            preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
+        }
     }
     
     @Nullable
@@ -49,20 +54,21 @@ public class BackgroundSetterService extends Service {
     }
     
     // Foreground service notification =========
-    private final static int foregroundNotificationId = (int) (System.currentTimeMillis() % 10000);
+    private final int foregroundNotificationId = (int) (System.currentTimeMillis() % 10000);
     
     // Notification
-    private static Notification foregroundNotification = null;
+    private NotificationCompat.Builder foregroundNotification = null;
     
-    public Notification getForegroundNotification() {
+    public NotificationCompat.Builder getForegroundNotification() {
         if (foregroundNotification == null) {
             foregroundNotification = new NotificationCompat.Builder(getApplicationContext(), getForegroundNotificationChannelId())
                     .setSmallIcon(R.drawable.ic_settings)
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSound(null)
                     .setOngoing(true)
-                    .setContentText(getString(R.string.background_service_persistent_message))
-                    .build();
+                    .setSilent(true)
+                    .setShowWhen(false)
+                    .setContentText(getString(R.string.background_service_persistent_message));
         }
         return foregroundNotification;
     }
@@ -90,21 +96,22 @@ public class BackgroundSetterService extends Service {
     
     // Notification channel id
     private String foregroundNotificationChannelId = null;
+    private NotificationManager notificationManager;
     
     public String getForegroundNotificationChannelId() {
         if (foregroundNotificationChannelId == null) {
             foregroundNotificationChannelId = "BackgroundSetterService.NotificationChannel";
             
-            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             // Not exists so we create it at first time
-            if (manager.getNotificationChannel(foregroundNotificationChannelId) == null) {
+            if (notificationManager.getNotificationChannel(foregroundNotificationChannelId) == null) {
                 NotificationChannel nc = new NotificationChannel(
                         getForegroundNotificationChannelId(),
                         getForegroundNotificationChannelName(),
                         NotificationManager.IMPORTANCE_MIN
                 );
                 // Discrete notification setup
-                manager.createNotificationChannel(nc);
+                notificationManager.createNotificationChannel(nc);
                 nc.setDescription(getForegroundNotificationChannelDescription());
                 nc.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
                 nc.setVibrationPattern(null);
@@ -116,17 +123,24 @@ public class BackgroundSetterService extends Service {
         return foregroundNotificationChannelId;
     }
     
+    private void updateNotification() {
+        getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTime()));
+        notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
+    }
     
     // Lifecycle ===============================
     
+    static boolean lastUpdateSucceeded = false;
+    
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.hasExtra("update")) {
+        if (intent.hasExtra(SERVICE_UPDATE_SIGNAL)) {
             if (lockScreenBitmapDrawer != null) {
-                lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                updateNotification();
             }
         } else {
-            startForeground(foregroundNotificationId, getForegroundNotification());
+            startForeground(foregroundNotificationId, getForegroundNotification().build());
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
             
             refreshTimer = new Timer();
@@ -134,11 +148,14 @@ public class BackgroundSetterService extends Service {
                 @Override
                 public void run() {
                     if (isDayTime()) {
+                        preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
                         if (lockScreenBitmapDrawer == null) {
                             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(BackgroundSetterService.this);
+                            lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                            updateNotification();
+                            preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
                         }
                         updateDate(DAY_FLAG_GLOBAL_STR, false);
-                        lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
                     } else {
                         if (lockScreenBitmapDrawer != null) {
                             lockScreenBitmapDrawer = null;
@@ -153,6 +170,6 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public void onDestroy() {
-        if(refreshTimer != null) refreshTimer.cancel();
+        if (refreshTimer != null) refreshTimer.cancel();
     }
 }

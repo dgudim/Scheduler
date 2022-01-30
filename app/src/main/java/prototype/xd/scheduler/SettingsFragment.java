@@ -60,6 +60,7 @@ public class SettingsFragment extends Fragment {
     
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        
         context = requireContext();
         
         ArrayList<SettingsEntry> settingsEntries = new ArrayList<>();
@@ -73,7 +74,7 @@ public class SettingsFragment extends Fragment {
                 context.getString(R.string.settings_adaptive_color)));
         settingsEntries.add(new SeekBarSettingsEntry(0, 1000, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE,
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance, this));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_BG_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BG_COLOR,
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR,
                 context.getString(R.string.settings_today_bg_color), context));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR,
                 context.getString(R.string.settings_expired_bg_color), context));
@@ -81,10 +82,10 @@ public class SettingsFragment extends Fragment {
                 context.getString(R.string.settings_upcoming_bg_color), context));
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_bevels)));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_COLOR,
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.BEVEL_COLOR, Keys.SETTINGS_DEFAULT_BEVEL_COLOR,
                 context.getString(R.string.settings_today_bevel_color), context));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS,
-                Keys.TODAY_BEVEL_THICKNESS, R.string.settings_today_bevel_thickness, this));
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_BEVEL_THICKNESS,
+                Keys.BEVEL_THICKNESS, R.string.settings_today_bevel_thickness, this));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR,
                 context.getString(R.string.settings_expired_bevel_color), context));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS,
@@ -96,7 +97,7 @@ public class SettingsFragment extends Fragment {
         
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_fonts)));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.TODAY_FONT_COLOR, Keys.SETTINGS_DEFAULT_TODAY_FONT_COLOR,
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR,
                 context.getString(R.string.settings_today_font_color), context));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR,
                 context.getString(R.string.settings_expired_font_color), context));

@@ -2,6 +2,8 @@ package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
+import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.initStorage;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
@@ -32,7 +34,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     
-    public static SharedPreferences preferences;
+    public volatile static SharedPreferences preferences;
     
     private TextView calendar_permission_text;
     private TextView storage_permission_text;
@@ -44,11 +46,11 @@ public class MainActivity extends AppCompatActivity {
     
     public static final int REQUEST_CODE_PERMISSIONS = 13;
     
-    BroadcastReceiver screenOffReceiver = new BroadcastReceiver() {
+    BroadcastReceiver screenOnOffReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                BackgroundSetterService.notifyScreenLocked();
+            if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction()) || Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
+                BackgroundSetterService.notifyScreenStateChanged(context);
             }
         }
     };
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        preferences = getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
        /* try {
             Class.forName("dalvik.system.CloseGuard")
                     .getMethod("setEnabled", boolean.class)
@@ -74,15 +76,20 @@ public class MainActivity extends AppCompatActivity {
             View grant_button = findViewById(R.id.grant_permissions_button);
             grant_button.setOnClickListener(v -> requestPermissions(PERMISSIONS, REQUEST_CODE_PERMISSIONS));
         } else {
-            initStorage(this);
-            registerReceiver(screenOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
-            BackgroundSetterService.restart(this);
-            setContentView(R.layout.activity_main);
+            launchMainActivity();
         }
     }
     
+    private void launchMainActivity() {
+        initStorage(this);
+        registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+        registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
+        BackgroundSetterService.restart(this);
+        setContentView(R.layout.activity_main);
+    }
+    
     public void notifyService() {
-        new Thread(() -> BackgroundSetterService.ping(MainActivity.this)).start();
+        preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
     }
     
     private boolean refreshPermissionStates() {
@@ -104,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (refreshPermissionStates()) {
-            setContentView(R.layout.activity_main);
+            launchMainActivity();
         }
     }
     

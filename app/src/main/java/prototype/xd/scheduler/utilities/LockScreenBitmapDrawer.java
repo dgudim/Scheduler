@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
@@ -7,6 +8,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
@@ -20,7 +22,6 @@ import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -51,20 +52,18 @@ public class LockScreenBitmapDrawer {
     public final int displayHeight;
     public final DisplayMetrics displayMetrics;
     private final Point displayCenter;
-    private final SharedPreferences preferences;
     
     private volatile boolean busy = false;
     
     private final WallpaperManager wallpaperManager;
     
-    private int previous_hash;
+    private long previous_hash;
     
     public float fontSize_h = 0;
     private float fontSize_kM = 0;
     
     public LockScreenBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
-        preferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
         
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
@@ -100,7 +99,7 @@ public class LockScreenBitmapDrawer {
         wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
     }
     
-    public void constructBitmap(BackgroundSetterService backgroundSetterService) {
+    public boolean constructBitmap(BackgroundSetterService backgroundSetterService) {
         
         fontSize_h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
                 preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE),
@@ -145,7 +144,9 @@ public class LockScreenBitmapDrawer {
                 }
                 busy = false;
             }).start();
+            return true;
         }
+        return false;
     }
     
     private void drawStringsOnBitmap(BackgroundSetterService backgroundSetterService, Bitmap src) throws InterruptedException {
@@ -153,7 +154,7 @@ public class LockScreenBitmapDrawer {
         Canvas canvas = new Canvas(src);
         
         ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries(backgroundSetterService));
-        int currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(src);
+        long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(src) + currentDay;
         if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
         }
@@ -268,7 +269,7 @@ public class LockScreenBitmapDrawer {
         for (int i = 0; i < toAdd.size(); i++) {
             if (!toAdd.get(i).textValue.equals(BLANK_TEXT)) {
                 
-                if(toAdd.get(i).bevelThickness > 0){
+                if (toAdd.get(i).bevelThickness > 0) {
                     drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
                             -toAdd.get(i).rWidth - toAdd.get(i).bevelThickness,
                             fontSize_h / 2f - fontSize_kM * i,
@@ -281,6 +282,15 @@ public class LockScreenBitmapDrawer {
                         fontSize_h / 2f - fontSize_kM * i,
                         toAdd.get(i).rWidth,
                         -fontSize_kM * (i + 1));
+                
+                if (toAdd.get(i).fromSystemCalendar) {
+                    drawRectRelativeToTheCenter(canvas, toAdd.get(i).indicatorPaint, maxHeight,
+                            -toAdd.get(i).rWidth + 10,
+                            fontSize_h / 2f - fontSize_kM * i,
+                            -toAdd.get(i).rWidth + 35,
+                            -fontSize_kM * (i + 1));
+                }
+                
             }
         }
     }

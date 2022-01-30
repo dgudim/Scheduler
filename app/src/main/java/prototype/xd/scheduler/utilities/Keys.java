@@ -2,19 +2,19 @@ package prototype.xd.scheduler.utilities;
 
 public class Keys {
     
-    public static final int SETTINGS_DEFAULT_TODAY_BG_COLOR = 0xff_FFFFFF;
+    public static final int SETTINGS_DEFAULT_BG_COLOR = 0xff_FFFFFF;
     public static final int SETTINGS_DEFAULT_UPCOMING_BG_COLOR = 0xff_CCFFCC;
     public static final int SETTINGS_DEFAULT_EXPIRED_BG_COLOR = 0xff_FFCCCC;
     
-    public static final int SETTINGS_DEFAULT_TODAY_BEVEL_COLOR = 0xff_888888;
+    public static final int SETTINGS_DEFAULT_BEVEL_COLOR = 0xff_888888;
     public static final int SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR = 0xff_88FF88;
     public static final int SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR = 0xff_FF8888;
     
-    public static final int SETTINGS_DEFAULT_TODAY_BEVEL_THICKNESS = 5;
+    public static final int SETTINGS_DEFAULT_BEVEL_THICKNESS = 5;
     public static final int SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS = 5;
     public static final int SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS = 5;
     
-    public static final int SETTINGS_DEFAULT_TODAY_FONT_COLOR = 0xff_000000;
+    public static final int SETTINGS_DEFAULT_FONT_COLOR = 0xff_000000;
     public static final int SETTINGS_DEFAULT_UPCOMING_FONT_COLOR = 0xff_005500;
     public static final int SETTINGS_DEFAULT_EXPIRED_FONT_COLOR = 0xff_990000;
     
@@ -35,7 +35,7 @@ public class Keys {
     public static final int DAY_FLAG_GLOBAL = -1;
     public static final String DAY_FLAG_GLOBAL_STR = "-1";
     
-    public static final boolean SETTINGS_DEFAULT_SHOW_ON_LOCK = true;
+    public static final boolean CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK = true;
     public static final boolean CALENDAR_SETTINGS_DEFAULT_VISIBLE = true;
     public static final String VISIBLE = "visible";
     
@@ -47,22 +47,18 @@ public class Keys {
     public static final String PRIORITY = "priority";
     
     public static final String BG_COLOR = "bgColor";
-    public static final String TODAY_BG_COLOR = "todayBgColor";
     public static final String UPCOMING_BG_COLOR = "upcomingBgColor";
     public static final String EXPIRED_BG_COLOR = "expiredBgColor";
     
     public static final String BEVEL_COLOR = "bevelColor";
-    public static final String TODAY_BEVEL_COLOR = "todayBevelColor";
     public static final String UPCOMING_BEVEL_COLOR = "upcomingBevelColor";
     public static final String EXPIRED_BEVEL_COLOR = "expiredBevelColor";
     
     public static final String BEVEL_THICKNESS = "bevelThickness";
-    public static final String TODAY_BEVEL_THICKNESS = "todayBevelThickness";
     public static final String UPCOMING_BEVEL_THICKNESS = "upcomingBevelThickness";
     public static final String EXPIRED_BEVEL_THICKNESS = "expiredBevelThickness";
     
     public static final String FONT_COLOR = "fontColor";
-    public static final String TODAY_FONT_COLOR = "todayFontColor";
     public static final String UPCOMING_FONT_COLOR = "upcomingFontColor";
     public static final String EXPIRED_FONT_COLOR = "expiredFontColor";
     
@@ -87,4 +83,8 @@ public class Keys {
     
     public static final String BLANK_TEXT = "_BLANK_";
     public static String BLANK_GROUP_NAME = "none";
+    
+    public static String PREFERENCES = "prefs";
+    
+    public static String SERVICE_UPDATE_SIGNAL = "update";
 }

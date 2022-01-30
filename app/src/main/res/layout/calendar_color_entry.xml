@@ -28,7 +28,7 @@
             android:layout_marginEnd="3dp"
             android:layout_weight="1"
             app:cardBackgroundColor="@color/white_bg"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="3dp">
 
             <TextView
                 android:id="@+id/event_count"

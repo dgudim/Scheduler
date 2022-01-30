@@ -35,9 +35,9 @@ public class DateManager {
         }
     }
     
-    public static boolean isDayTime(){
+    public static boolean isDayTime() {
         int timeOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        return timeOfDay >= 6 && timeOfDay <= 22;
+        return timeOfDay >= 5 && timeOfDay <= 22;
     }
     
     public static long daysFromEpoch(long epoch) {
@@ -47,8 +47,8 @@ public class DateManager {
     }
     
     public static String getTimeSpan(long time1, long time2) {
-        String date1 = dateFromEpoch(time1);
-        String date2 = dateFromEpoch(time2);
+        String date1 = datetimeFromEpoch(time1);
+        String date2 = datetimeFromEpoch(time2);
         String[] date1_split = date1.split(" ");
         String[] date2_split = date2.split(" ");
         if (date1.equals(date2) || date1_split[0].equals(date2_split[0])) {
@@ -65,16 +65,21 @@ public class DateManager {
         }
     }
     
-    public static long dateToEpoch(int year, int month, int dayOfMonth){
+    public static long dateToEpoch(int year, int month, int dayOfMonth) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, dayOfMonth);
         return calendar.getTimeInMillis();
     }
     
-    public static String dateFromEpoch(long epoch) {
+    public static String datetimeFromEpoch(long epoch) {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(epoch);
         return dateFormat.format(cal.getTime());
+    }
+    
+    public static String getCurrentTime() {
+        final Calendar cal = Calendar.getInstance();
+        return dateFormat.format(cal.getTime()).split(" ")[1];
     }
     
     public static long daysFromDate(String date) {
@@ -89,7 +94,7 @@ public class DateManager {
                 .toInstant().getEpochSecond() / 86400;
     }
     
-    public static long addTimeZoneOffset(long epoch){
+    public static long addTimeZoneOffset(long epoch) {
         return epoch + timeZone_SYSTEM.getOffset(epoch);
     }
     

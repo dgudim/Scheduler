@@ -63,9 +63,9 @@ public class EntrySettings extends PopupSettingsView {
     
     private void initialise(final Context context, final HomeFragment fragment, final ArrayList<TodoListEntry> allEntries) {
         
-        fontColor_view.setBackgroundColor(entry.fontColor);
-        bgColor_view.setBackgroundColor(entry.bgColor);
-        padColor_view.setBackgroundColor(entry.bevelColor);
+        fontColor_view.setBackgroundColor(entry.fontColor_original);
+        bgColor_view.setBackgroundColor(entry.bgColor_original);
+        padColor_view.setBackgroundColor(entry.bevelColor_original);
         
         updateAllIndicators();
         
@@ -253,21 +253,21 @@ public class EntrySettings extends PopupSettingsView {
         
         fontColor_view.setOnClickListener(view -> invokeColorDialogue(
                 context, view, fontColor_view_state, fragment,
-                entry, FONT_COLOR, entry.fontColor, true));
+                entry, FONT_COLOR, entry.fontColor_original, true));
         
         bgColor_view.setOnClickListener(view -> invokeColorDialogue(
                 context, view, bgColor_view_state, fragment,
-                entry, BG_COLOR, entry.bgColor, true));
+                entry, BG_COLOR, entry.bgColor_original, true));
         
         padColor_view.setOnClickListener(view -> invokeColorDialogue(
                 context, view, padColor_view_state, fragment,
-                entry, BEVEL_COLOR, entry.bevelColor, true));
+                entry, BEVEL_COLOR, entry.bevelColor_original, true));
         
         addSeekBarChangeListener(
                 bevel_thickness_description,
                 bevel_thickness_bar,
                 padSize_state, fragment, R.string.settings_bevel_thickness, entry,
-                BEVEL_THICKNESS, entry.bevelThickness);
+                BEVEL_THICKNESS, entry.bevelThickness_original);
         
         addSeekBarChangeListener(
                 priority_description,

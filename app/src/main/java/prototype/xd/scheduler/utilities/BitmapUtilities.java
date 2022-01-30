@@ -121,19 +121,15 @@ public class BitmapUtilities {
      */
     public static int calculateSampleSize(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
                                           ScalingLogic scalingLogic) {
+        final float srcAspect = (float) srcWidth / (float) srcHeight;
+        final float dstAspect = (float) dstWidth / (float) dstHeight;
         if (scalingLogic == ScalingLogic.FIT) {
-            final float srcAspect = (float) srcWidth / (float) srcHeight;
-            final float dstAspect = (float) dstWidth / (float) dstHeight;
-            
             if (srcAspect > dstAspect) {
                 return srcWidth / dstWidth;
             } else {
                 return srcHeight / dstHeight;
             }
         } else {
-            final float srcAspect = (float) srcWidth / (float) srcHeight;
-            final float dstAspect = (float) dstWidth / (float) dstHeight;
-            
             if (srcAspect > dstAspect) {
                 return srcHeight / dstHeight;
             } else {
@@ -215,7 +211,7 @@ public class BitmapUtilities {
     }
     
     public static int getAverageColor(Bitmap bitmap) {
-        if (bitmap == null) return Color.TRANSPARENT;
+        if (bitmap == null) return Color.BLACK;
         
         int redBucket = 0;
         int greenBucket = 0;
@@ -243,7 +239,7 @@ public class BitmapUtilities {
         }
         
         if(actualPixelCount == 0){
-            return 0;
+            return Color.BLACK;
         }
         
         pixelCount = actualPixelCount;

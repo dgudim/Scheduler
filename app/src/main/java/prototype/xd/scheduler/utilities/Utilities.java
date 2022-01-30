@@ -133,9 +133,9 @@ public class Utilities {
         for (int i = 0; i < entries.size(); i++) {
             if (entries.get(i).isTodayEntry) {
                 todayEntries.add(entries.get(i));
-            } else if (entries.get(i).isOldEntry) {
+            } else if (entries.get(i).isExpiredEntry) {
                 oldEntries.add(entries.get(i));
-            } else if (entries.get(i).isNewEntry) {
+            } else if (entries.get(i).isUpcomingEntry) {
                 newEntries.add(entries.get(i));
             } else if (entries.get(i).isGlobalEntry) {
                 globalEntries.add(entries.get(i));
