@@ -142,7 +142,7 @@ public class TodoListEntry {
         return inRange(day, day_start);
     }
     
-    public long getNearestEventTimestamp(long day){
+    public long getNearestEventTimestamp(long day) {
         if (recurrenceSet != null) {
             if (day > day_end) {
                 return timestamp_end;
@@ -162,7 +162,7 @@ public class TodoListEntry {
     }
     
     public long getNearestEventDay(long day) {
-        if(fromSystemCalendar) {
+        if (fromSystemCalendar) {
             return daysFromEpoch(getNearestEventTimestamp(day));
         }
         return day_start;
@@ -374,12 +374,12 @@ public class TodoListEntry {
         }
         
         //colors and thickness post update
-        if(isUpcomingEntry || isExpiredEntry){
-            fontColor_original = fontColor;
-            bgColor_original = bgColor;
-            bevelColor_original = bevelColor;
-            bevelThickness_original = bevelThickness;
-        }
+        
+        fontColor_original = fontColor;
+        bgColor_original = bgColor;
+        bevelColor_original = bevelColor;
+        bevelThickness_original = bevelThickness;
+        
         if (isUpcomingEntry) {
             setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), 0.85f));
             bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), 0.85f);
