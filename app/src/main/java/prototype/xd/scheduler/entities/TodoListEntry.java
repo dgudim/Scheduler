@@ -11,12 +11,13 @@ import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
@@ -75,13 +76,13 @@ public class TodoListEntry {
     public int bgColor;
     public int fontColor;
     public int fontColor_completed;
-    public int bevelColor;
-    public int bevelThickness = 0;
+    public int borderColor;
+    public int borderThickness = 0;
     
     public int bgColor_original;
     public int fontColor_original;
-    public int bevelColor_original;
-    public int bevelThickness_original = 0;
+    public int borderColor_original;
+    public int border_thickness_original = 0;
     
     public int priority = 0;
     
@@ -271,8 +272,8 @@ public class TodoListEntry {
                     if (days_from_param == currentDay || days_from_param == DAY_FLAG_GLOBAL) {
                         
                         bgColor = preferences.getInt(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR);
-                        bevelColor = preferences.getInt(Keys.BEVEL_COLOR, Keys.SETTINGS_DEFAULT_BEVEL_COLOR);
-                        bevelThickness = preferences.getInt(Keys.BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_BEVEL_THICKNESS);
+                        borderColor = preferences.getInt(Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR);
+                        borderThickness = preferences.getInt(Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
                         
                         setFontColor(Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR);
                         
@@ -289,8 +290,8 @@ public class TodoListEntry {
                     } else if (days_associated < currentDay && currentDay - days_associated <= dayOffset_expired) {
                         
                         bgColor = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
-                        bevelColor = preferences.getInt(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR);
-                        bevelThickness = preferences.getInt(Keys.EXPIRED_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS);
+                        borderColor = preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR);
+                        borderThickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
                         
                         setFontColor(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
                         
@@ -301,8 +302,8 @@ public class TodoListEntry {
                     } else if (days_associated > currentDay && days_associated - currentDay <= dayOffset_upcoming) {
                         
                         bgColor = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
-                        bevelColor = preferences.getInt(Keys.UPCOMING_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR);
-                        bevelThickness = preferences.getInt(Keys.UPCOMING_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS);
+                        borderColor = preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR);
+                        borderThickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
                         
                         setFontColor(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
                         
@@ -314,8 +315,8 @@ public class TodoListEntry {
                         setFontColor(Keys.SETTINGS_DEFAULT_FONT_COLOR);
                         
                         bgColor = Keys.SETTINGS_DEFAULT_BG_COLOR;
-                        bevelColor = Keys.SETTINGS_DEFAULT_BEVEL_COLOR;
-                        bevelThickness = Keys.SETTINGS_DEFAULT_BEVEL_THICKNESS;
+                        borderColor = Keys.SETTINGS_DEFAULT_BORDER_COLOR;
+                        borderThickness = Keys.SETTINGS_DEFAULT_BORDER_THICKNESS;
                         
                         showInList_ifCompleted = true;
                         showOnLock = false;
@@ -362,8 +363,8 @@ public class TodoListEntry {
             
             setFontColor(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR);
             bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR);
-            bevelColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_BEVEL_COLOR);
-            bevelThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_BEVEL_THICKNESS);
+            borderColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
+            borderThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
             
             showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
             showOnLock = showOnLock || isExpiredEntry || isUpcomingEntry;
@@ -376,19 +377,19 @@ public class TodoListEntry {
         
         fontColor_original = fontColor;
         bgColor_original = bgColor;
-        bevelColor_original = bevelColor;
-        bevelThickness_original = bevelThickness;
+        borderColor_original = borderColor;
+        border_thickness_original = borderThickness;
         
         if (isUpcomingEntry) {
-            setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), 0.85f));
-            bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), 0.85f);
-            bevelColor = mixTwoColors(bevelColor, preferences.getInt(Keys.UPCOMING_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR), 0.85f);
-            bevelThickness = preferences.getInt(Keys.UPCOMING_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS);
+            setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+            bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR);
+            borderColor = mixTwoColors(borderColor, preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR);
+            borderThickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
         } else if (isExpiredEntry) {
-            setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), 0.85f));
-            bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), 0.85f);
-            bevelColor = mixTwoColors(bevelColor, preferences.getInt(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR), 0.85f);
-            bevelThickness = preferences.getInt(Keys.EXPIRED_BEVEL_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS);
+            setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+            bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR);
+            borderColor = mixTwoColors(borderColor, preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR);
+            borderThickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
         }
     }
     
@@ -412,8 +413,8 @@ public class TodoListEntry {
         textPaint = createNewPaint(fontColor);
         textPaint.setTextSize(lockScreenBitmapDrawer.fontSize_h);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1, lockScreenBitmapDrawer.displayWidth / 2f - bevelThickness);
-        maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - bevelThickness * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
+        rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1, lockScreenBitmapDrawer.displayWidth / 2f - borderThickness);
+        maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - borderThickness * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         
         log(INFO, "loaded display data for " + textValue);
     }
@@ -427,7 +428,7 @@ public class TodoListEntry {
     
     public void initializeBgAndPadPaints() {
         bgPaint = createNewPaint(getAdaptiveColor(bgColor));
-        padPaint = createNewPaint(getAdaptiveColor(bevelColor));
+        padPaint = createNewPaint(getAdaptiveColor(borderColor));
         if (fromSystemCalendar) {
             indicatorPaint = createNewPaint(event.color);
         }
@@ -521,8 +522,8 @@ public class TodoListEntry {
                 case (EXPIRED_ITEMS_OFFSET):
                     dayOffset_expired = Integer.parseInt(params[i + 1]);
                     break;
-                case (BEVEL_THICKNESS):
-                    bevelThickness = Integer.parseInt(params[i + 1]);
+                case (BORDER_THICKNESS):
+                    borderThickness = Integer.parseInt(params[i + 1]);
                     break;
                 case (FONT_COLOR):
                     setFontColor(Integer.parseInt(params[i + 1]));
@@ -530,8 +531,8 @@ public class TodoListEntry {
                 case (BG_COLOR):
                     bgColor = Integer.parseInt(params[i + 1]);
                     break;
-                case (BEVEL_COLOR):
-                    bevelColor = Integer.parseInt(params[i + 1]);
+                case (BORDER_COLOR):
+                    borderColor = Integer.parseInt(params[i + 1]);
                     break;
                 case (PRIORITY):
                     priority = Integer.parseInt(params[i + 1]);

@@ -82,18 +82,18 @@ public class SettingsFragment extends Fragment {
                 context.getString(R.string.settings_upcoming_bg_color), context));
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_bevels)));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.BEVEL_COLOR, Keys.SETTINGS_DEFAULT_BEVEL_COLOR,
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR,
                 context.getString(R.string.settings_today_bevel_color), context));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_BEVEL_THICKNESS,
-                Keys.BEVEL_THICKNESS, R.string.settings_today_bevel_thickness, this));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS,
+                Keys.BORDER_THICKNESS, R.string.settings_today_bevel_thickness, this));
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR,
                 context.getString(R.string.settings_expired_bevel_color), context));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS,
-                Keys.EXPIRED_BEVEL_THICKNESS, R.string.settings_expired_bevel_thickness, this));
-        settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_BEVEL_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS,
+                Keys.EXPIRED_BORDER_THICKNESS, R.string.settings_expired_bevel_thickness, this));
+        settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR,
                 context.getString(R.string.settings_upcoming_bevel_color), context));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS,
-                Keys.UPCOMING_BEVEL_THICKNESS, R.string.settings_upcoming_bevel_thickness, this));
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS,
+                Keys.UPCOMING_BORDER_THICKNESS, R.string.settings_upcoming_bevel_thickness, this));
         
         
         settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_fonts)));
@@ -129,9 +129,10 @@ public class SettingsFragment extends Fragment {
     
         SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries, context);
         ((ListView) view.findViewById(R.id.settingsList)).setAdapter(settingsListViewAdapter);
-        
+    
+        ArrayList<SettingsEntry> settingsEntries_additional = new ArrayList<>();
         new Thread(() -> {
-            settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_system_calendars)));
+            settingsEntries_additional.add(new TitleBarSettingsEntry(context.getString(R.string.category_system_calendars)));
             ArrayList<SystemCalendar> calendars = getAllCalendars(context, true);
             ArrayList<ArrayList<SystemCalendar>> calendars_sorted = new ArrayList<>();
             ArrayList<String> calendars_sorted_names = new ArrayList<>();
@@ -152,14 +153,17 @@ public class SettingsFragment extends Fragment {
                 ArrayList<SystemCalendar> calendar_group = calendars_sorted.get(g);
                 SystemCalendar calendar0 = calendar_group.get(0);
     
-                settingsEntries.add(new CalendarAccountSettingsEntry(SettingsFragment.this, calendar0));
+                settingsEntries_additional.add(new CalendarAccountSettingsEntry(SettingsFragment.this, calendar0));
     
                 for (int c = 0; c < calendar_group.size(); c++) {
                     SystemCalendar current_calendar = calendar_group.get(c);
-                    settingsEntries.add(new CalendarSettingsEntry(SettingsFragment.this, current_calendar));
+                    settingsEntries_additional.add(new CalendarSettingsEntry(SettingsFragment.this, current_calendar));
                 }
             }
-            requireActivity().runOnUiThread(settingsListViewAdapter::notifyDataSetChanged);
+            requireActivity().runOnUiThread(() -> {
+                settingsEntries.addAll(settingsEntries_additional);
+                settingsListViewAdapter.notifyDataSetChanged();
+            });
         }).start();
     }
 }

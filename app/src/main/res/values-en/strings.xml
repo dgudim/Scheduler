@@ -5,8 +5,8 @@
     <string name="home_fragment_label">Home Fragment</string>
     <string name="settings_fragment_label">Settings Fragment</string>
     <string name="delete_item">Delete item</string>
-    <string name="service_description">service to update your lock screen background</string>
-    <string name="service_name">background updater service</string>
+    <string name="service_description">Service to update your lock screen background</string>
+    <string name="service_name">Background updater service</string>
     <string name="permissions_grant">Grant</string>
     <string name="permissions_not_granted">not granted</string>
     <string name="permissions_granted">granted</string>
@@ -26,10 +26,10 @@
     <string name="settings_adaptive_color">Tune event color to background</string>
     <string name="settings_show_days_expired">Show after %d day/days</string>
     <string name="settings_show_days_upcoming">Show in %d day/days</string>
-    <string name="settings_bevel_thickness">Border thickness: %d</string>
-    <string name="settings_bg_color">Background color</string>
-    <string name="settings_text_color">Font color</string>
-    <string name="settings_bevel_color">Border color</string>
+    <string name="settings_border_thickness">Border thickness: %d</string>
+    <string name="settings_bg_color">Background</string>
+    <string name="settings_text_color">Font</string>
+    <string name="settings_bevel_color">Border</string>
     <string name="settings_add_group">Add group</string>
     <string name="settings_reset_bg">Reset backgrounds</string>
     <string name="settings_reset_to_defaults">Reset settings</string>
@@ -91,8 +91,8 @@
     <string name="cant_create_group_with_this_name">Can\'t create a group with this name</string>
     <string name="cant_rename_this_group">Can\'t rename this group</string>
     <string name="cant_use_this_group_name">Can\'t use this name</string>
-    <string name="add_current_config_as_group_message">(Parameters marked with green or blue rhombs(manualy edited) will be added to the group)</string>
-    <string name="settings_max_rWidth_lock">Strech event background to fill lock screen width</string>
+    <string name="add_current_config_as_group_message">(Parameters marked with green or blue rhombs(manually edited) will be added to the group)</string>
+    <string name="settings_max_rWidth_lock">Stretch event background to fill lock screen width</string>
     <string name="remove_all_saved_backgrounds_prompt">Delete all saved backgrounds?</string>
     <string name="day_monday">monday</string>
     <string name="day_tuesday">tuesday</string>
@@ -106,4 +106,9 @@
     <string name="battery_optimization_description">To allow the app to set the background even when you are not in the app</string>
     <string name="background_service_persistent_message">Background service running</string>
     <string name="last_update_time">last update: %s</string>
+    <string name="service_sleep_mode">service is in sleep mode</string>
+    <string name="settings_colors">Colors</string>
+    <string name="settings_preview">Preview</string>
+    <string name="settings_preview_expired">Expired</string>
+    <string name="settings_preview_upcoming">Upcoming</string>
 </resources>

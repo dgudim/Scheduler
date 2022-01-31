@@ -180,7 +180,7 @@ public class LockScreenBitmapDrawer {
                 ArrayList<TodoListEntry> splits = new ArrayList<>();
                 for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
                     if (preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK)) {
-                        toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).bevelThickness;
+                        toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).borderThickness;
                     }
                     TodoListEntry splitEntry;
                     if (toAdd.get(i).fromSystemCalendar) {
@@ -269,12 +269,12 @@ public class LockScreenBitmapDrawer {
         for (int i = 0; i < toAdd.size(); i++) {
             if (!toAdd.get(i).textValue.equals(BLANK_TEXT)) {
                 
-                if (toAdd.get(i).bevelThickness > 0) {
+                if (toAdd.get(i).borderThickness > 0) {
                     drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
-                            -toAdd.get(i).rWidth - toAdd.get(i).bevelThickness,
+                            -toAdd.get(i).rWidth - toAdd.get(i).borderThickness,
                             fontSize_h / 2f - fontSize_kM * i,
-                            toAdd.get(i).rWidth + toAdd.get(i).bevelThickness,
-                            -fontSize_kM * (i + 1) - toAdd.get(i).bevelThickness);
+                            toAdd.get(i).rWidth + toAdd.get(i).borderThickness,
+                            -fontSize_kM * (i + 1) - toAdd.get(i).borderThickness);
                 }
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,

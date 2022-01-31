@@ -6,19 +6,19 @@ public class Keys {
     public static final int SETTINGS_DEFAULT_UPCOMING_BG_COLOR = 0xff_CCFFCC;
     public static final int SETTINGS_DEFAULT_EXPIRED_BG_COLOR = 0xff_FFCCCC;
     
-    public static final int SETTINGS_DEFAULT_BEVEL_COLOR = 0xff_888888;
-    public static final int SETTINGS_DEFAULT_UPCOMING_BEVEL_COLOR = 0xff_88FF88;
-    public static final int SETTINGS_DEFAULT_EXPIRED_BEVEL_COLOR = 0xff_FF8888;
+    public static final int SETTINGS_DEFAULT_BORDER_COLOR = 0xff_888888;
+    public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR = 0xff_88FF88;
+    public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR = 0xff_FF8888;
     
-    public static final int SETTINGS_DEFAULT_BEVEL_THICKNESS = 5;
-    public static final int SETTINGS_DEFAULT_UPCOMING_BEVEL_THICKNESS = 5;
-    public static final int SETTINGS_DEFAULT_EXPIRED_BEVEL_THICKNESS = 5;
+    public static final int SETTINGS_DEFAULT_BORDER_THICKNESS = 5;
+    public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS = 5;
+    public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS = 5;
     
     public static final int SETTINGS_DEFAULT_FONT_COLOR = 0xff_000000;
     public static final int SETTINGS_DEFAULT_UPCOMING_FONT_COLOR = 0xff_005500;
     public static final int SETTINGS_DEFAULT_EXPIRED_FONT_COLOR = 0xff_990000;
     
-    public static final int SETTINGS_DEFAULT_FONT_SIZE = 21;
+    public static final int SETTINGS_DEFAULT_FONT_SIZE = 19;
     public static final boolean SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED = false;
     public static final boolean SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED = false;
     public static final int SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE = 500;
@@ -31,6 +31,8 @@ public class Keys {
     
     public static final int SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET = 0;
     public static final int SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET = 0;
+    
+    public static final float DEFAULT_COLOR_MIX_FACTOR = 0.85f;
     
     public static final int DAY_FLAG_GLOBAL = -1;
     public static final String DAY_FLAG_GLOBAL_STR = "-1";
@@ -50,13 +52,13 @@ public class Keys {
     public static final String UPCOMING_BG_COLOR = "upcomingBgColor";
     public static final String EXPIRED_BG_COLOR = "expiredBgColor";
     
-    public static final String BEVEL_COLOR = "bevelColor";
-    public static final String UPCOMING_BEVEL_COLOR = "upcomingBevelColor";
-    public static final String EXPIRED_BEVEL_COLOR = "expiredBevelColor";
+    public static final String BORDER_COLOR = "bevelColor";
+    public static final String UPCOMING_BORDER_COLOR = "upcomingBevelColor";
+    public static final String EXPIRED_BORDER_COLOR = "expiredBevelColor";
     
-    public static final String BEVEL_THICKNESS = "bevelThickness";
-    public static final String UPCOMING_BEVEL_THICKNESS = "upcomingBevelThickness";
-    public static final String EXPIRED_BEVEL_THICKNESS = "expiredBevelThickness";
+    public static final String BORDER_THICKNESS = "bevelThickness";
+    public static final String UPCOMING_BORDER_THICKNESS = "upcomingBevelThickness";
+    public static final String EXPIRED_BORDER_THICKNESS = "expiredBevelThickness";
     
     public static final String FONT_COLOR = "fontColor";
     public static final String UPCOMING_FONT_COLOR = "upcomingFontColor";

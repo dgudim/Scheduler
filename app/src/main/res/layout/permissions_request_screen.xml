@@ -41,7 +41,7 @@
                 app:srcCompat="@drawable/ic_calendar" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
@@ -57,13 +57,27 @@
                     android:layout_height="wrap_content"
                     android:text="@string/calendar_access_description" />
 
-                <TextView
-                    android:id="@+id/calendar_permission_granted"
-                    android:layout_width="match_parent"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/calendar_permission_granted_bg"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/permissions_not_granted"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textColor="@color/color_permission_not_granted" />
+                    app:cardBackgroundColor="@color/color_permission_not_granted_bg"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="0dp">
+
+                    <TextView
+                        android:id="@+id/calendar_permission_granted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginRight="3dp"
+                        android:layout_marginBottom="3dp"
+                        android:text="@string/permissions_not_granted"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/color_permission_not_granted" />
+                </androidx.cardview.widget.CardView>
+
             </LinearLayout>
         </LinearLayout>
 
@@ -97,12 +111,26 @@
                     android:layout_height="wrap_content"
                     android:text="@string/file_access_description" />
 
-                <TextView
-                    android:id="@+id/storage_permission_granted"
-                    android:layout_width="match_parent"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/storage_permission_granted_bg"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/permissions_not_granted"
-                    android:textColor="@color/color_permission_not_granted" />
+                    app:cardBackgroundColor="@color/color_permission_not_granted_bg"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="0dp">
+
+                    <TextView
+                        android:id="@+id/storage_permission_granted"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="3dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginRight="3dp"
+                        android:layout_marginBottom="3dp"
+                        android:text="@string/permissions_not_granted"
+                        android:textColor="@color/color_permission_not_granted" />
+                </androidx.cardview.widget.CardView>
+
             </LinearLayout>
         </LinearLayout>
 
@@ -113,6 +141,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/permissions_grant"
-            android:textColor="#352B4A" />
+            android:textColor="@color/button_text_color" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

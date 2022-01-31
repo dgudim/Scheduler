@@ -12,7 +12,6 @@ import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,13 +44,16 @@ public class TodoListViewAdapter extends BaseAdapter {
     
     private final MainActivity mainActivity;
     
-    public TodoListViewAdapter(HomeFragment fragment, MainActivity mainActivity) {
+    private EntrySettings entrySettings;
+    
+    public TodoListViewAdapter(final HomeFragment fragment, final MainActivity mainActivity, final ViewGroup parent) {
         this.mainActivity = mainActivity;
         this.home = fragment;
         this.context = fragment.rootActivity;
         inflater = LayoutInflater.from(context);
         currentTodoListEntries = new ArrayList<>();
         currentTodoListEntries_indexMap = new ArrayList<>();
+        entrySettings = new EntrySettings(home, inflater.inflate(R.layout.entry_settings, parent, false));
     }
     
     @Override
@@ -160,36 +162,41 @@ public class TodoListViewAdapter extends BaseAdapter {
             });
             
             todoText.setOnLongClickListener(v -> {
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
+                alertBuilder.setTitle(R.string.edit);
+                View addView = inflater.inflate(R.layout.edit_entry_dialogue, parent, false);
+                alertBuilder.setView(addView);
+                AlertDialog dialog = alertBuilder.create();
                 
-                final EditText input = new EditText(context);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                final EditText input = addView.findViewById(R.id.entryNameEditText);
                 input.setText(currentEntry.textValue);
-                alert.setView(input);
                 
-                alert.setTitle(R.string.edit);
-                alert.setPositiveButton(R.string.save, (dialog, which) -> {
+                addView.findViewById(R.id.save_button).setOnClickListener(v1 -> {
                     currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
                     saveEntries(home.todoListEntries);
                     updateData(currentEntry.getLockViewState());
                 });
                 
+                View move_to_global_button = addView.findViewById(R.id.move_to_global_button);
+                
                 if (!currentEntry.isGlobalEntry) {
-                    alert.setNeutralButton(R.string.move_to_global_list, (dialog, which) -> {
+                    move_to_global_button.setOnClickListener(v1 -> {
                         currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                         saveEntries(home.todoListEntries);
                         updateData(currentEntry.getLockViewState());
                     });
+                }else{
+                    move_to_global_button.setVisibility(View.GONE);
                 }
+    
+                addView.findViewById(R.id.cancel_button).setOnClickListener(v1 -> dialog.dismiss());
                 
-                alert.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
-                
-                alert.show();
+                dialog.show();
                 return false;
             });
-            settings.setOnClickListener(v -> new EntrySettings(context, home, inflater.inflate(R.layout.entry_settings, parent, false), currentEntry, home.todoListEntries));
+            settings.setOnClickListener(v -> entrySettings.show(home, currentEntry));
         } else {
-            ((CardView)view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
+            ((CardView) view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
             ((TextView) view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(context));
             settings.setOnClickListener(v -> NavHostFragment.findNavController(home).navigate(R.id.action_HomeFragment_to_SettingsFragment));
         }

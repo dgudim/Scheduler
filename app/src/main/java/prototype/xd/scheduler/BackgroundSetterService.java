@@ -41,7 +41,7 @@ public class BackgroundSetterService extends Service {
     }
     
     public static void notifyScreenStateChanged(Context context) {
-        if(!lastUpdateSucceeded || preferences.getBoolean(SERVICE_UPDATE_SIGNAL, false)){
+        if (!lastUpdateSucceeded || preferences.getBoolean(SERVICE_UPDATE_SIGNAL, false)) {
             ping(context);
             preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
         }
@@ -124,7 +124,11 @@ public class BackgroundSetterService extends Service {
     }
     
     private void updateNotification() {
-        getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTime()));
+        if (lockScreenBitmapDrawer == null) {
+            getForegroundNotification().setContentText(getString(R.string.service_sleep_mode));
+        } else {
+            getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTime()));
+        }
         notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
     }
     
@@ -134,7 +138,7 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.hasExtra(SERVICE_UPDATE_SIGNAL)) {
+        if (intent == null || intent.hasExtra(SERVICE_UPDATE_SIGNAL)) {
             if (lockScreenBitmapDrawer != null) {
                 lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
                 updateNotification();
@@ -149,16 +153,16 @@ public class BackgroundSetterService extends Service {
                 public void run() {
                     if (isDayTime()) {
                         preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                        updateDate(DAY_FLAG_GLOBAL_STR, false);
                         if (lockScreenBitmapDrawer == null) {
                             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(BackgroundSetterService.this);
                             lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
                             updateNotification();
-                            preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
                         }
-                        updateDate(DAY_FLAG_GLOBAL_STR, false);
                     } else {
                         if (lockScreenBitmapDrawer != null) {
                             lockScreenBitmapDrawer = null;
+                            updateNotification();
                             System.gc();
                         }
                     }

@@ -18,7 +18,6 @@ import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +65,7 @@ public class HomeFragment extends Fragment {
         todoListEntries = new ArrayList<>();
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        todoListViewAdapter = new TodoListViewAdapter(HomeFragment.this, rootActivity);
+        todoListViewAdapter = new TodoListViewAdapter(HomeFragment.this, rootActivity, container);
         listView.setAdapter(todoListViewAdapter);
         
         CalendarView calendarView = view.findViewById(R.id.calendar);
@@ -80,8 +79,10 @@ public class HomeFragment extends Fragment {
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(rootActivity);
             builder.setTitle(R.string.add_item);
-            
             View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
+            builder.setView(addView);
+            AlertDialog dialog = builder.create();
+            
             final EditText input = addView.findViewById(R.id.entryNameEditText);
             input.setOnFocusChangeListener((v, hasFocus) -> input.postDelayed(() -> {
                 InputMethodManager inputMethodManager= (InputMethodManager) rootActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -113,10 +114,7 @@ public class HomeFragment extends Fragment {
                 }
             });
             
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(addView);
-            
-            builder.setPositiveButton(R.string.add, (dialog, which) -> {
+            addView.findViewById(R.id.save_button).setOnClickListener(v -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString().trim(),
                         ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
@@ -124,9 +122,10 @@ public class HomeFragment extends Fragment {
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
                 todoListViewAdapter.updateData(newEntry.getLockViewState());
+                dialog.dismiss();
             });
-            
-            builder.setNegativeButton(R.string.add_to_global_list, (dialog, which) -> {
+    
+            addView.findViewById(R.id.add_to_global_button).setOnClickListener(v -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString().trim(),
                         ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
@@ -134,13 +133,13 @@ public class HomeFragment extends Fragment {
                 todoListEntries.add(newEntry);
                 saveEntries(todoListEntries);
                 todoListViewAdapter.updateData(newEntry.getLockViewState());
+                dialog.dismiss();
             });
+    
+            addView.findViewById(R.id.cancel_button).setOnClickListener(v -> dialog.dismiss());
             
-            builder.setNeutralButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
-            
-            builder.show();
+            dialog.show();
         });
-        
         
         view.findViewById(R.id.openSettingsButton).setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(rootActivity.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)))

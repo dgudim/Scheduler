@@ -8,6 +8,8 @@ import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
+
 import prototype.xd.scheduler.R;
 
 public class ColorSelectSettingsEntry extends SettingsEntry {
@@ -29,9 +31,9 @@ public class ColorSelectSettingsEntry extends SettingsEntry {
     @Override
     protected View InitInnerViews(View rootView) {
         ((TextView) rootView.findViewById(R.id.textView)).setText(text);
-        View colorSelect = rootView.findViewById(R.id.color);
-        colorSelect.setBackgroundColor(preferences.getInt(colorKey, defaultColor));
-        colorSelect.setOnClickListener(view -> invokeColorDialogue(context, view, colorKey, defaultColor));
+        CardView colorSelect = rootView.findViewById(R.id.color);
+        colorSelect.setCardBackgroundColor(preferences.getInt(colorKey, defaultColor));
+        colorSelect.setOnClickListener(view -> invokeColorDialogue(context, (CardView) view, colorKey, defaultColor));
         return super.InitInnerViews(rootView);
     }
 }

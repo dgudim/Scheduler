@@ -36,8 +36,7 @@ public class DateManager {
     }
     
     public static boolean isDayTime() {
-        int timeOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        return timeOfDay >= 5 && timeOfDay <= 22;
+        return Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 5;
     }
     
     public static long daysFromEpoch(long epoch) {

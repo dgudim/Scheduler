@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#f5b042</color>
-    <color name="colorPrimaryDark">#f59042</color>
-    <color name="colorAccent">#f5bf42</color>
-    <color name="colorAccent_title">#ff9f63</color>
+    <color name="colorPrimary">#0098FF</color>
+    <color name="colorPrimaryDark">#0079CA</color>
+    <color name="colorAccent">#31ACFF</color>
+    <color name="colorAccent_title">#62A1FF</color>
     <color name="light_gray_bg">#DFDFDF</color>
     <color name="gray_bg">#BFBFBF</color>
     <color name="white_bg">#FFFFFF</color>
+
+    <color name="button_text_color">#140139</color>
 
     <color name="entry_settings_parameter_default">#888888</color>
     <color name="entry_settings_parameter_personal">#6FFF6F</color>
@@ -16,4 +18,6 @@
     <color name="ic_launcher_background">#000000</color>
     <color name="color_permission_granted">#008107</color>
     <color name="color_permission_not_granted">#DD2C00</color>
+    <color name="color_permission_granted_bg">#30008107</color>
+    <color name="color_permission_not_granted_bg">#30DD2C00</color>
 </resources>

@@ -14,6 +14,8 @@ import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -41,9 +43,9 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
         final Context context = fragment.context;
         
-        fontColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR));
-        bgColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR));
-        padColor_view.setBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_BEVEL_COLOR));
+        fontColor_view.setCardBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR));
+        bgColor_view.setCardBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR));
+        borderColor_view.setCardBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR));
         
         updateAllIndicators(context);
         
@@ -68,29 +70,29 @@ public class SystemCalendarSettings extends PopupSettingsView {
         });
         
         fontColor_view.setOnClickListener(view -> invokeColorDialogue(context,
-                view, fontColor_view_state,
+                (CardView) view, fontColor_view_state,
                 this,
                 calendarKey, Keys.FONT_COLOR,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR), true));
         
         bgColor_view.setOnClickListener(view -> invokeColorDialogue(context,
-                view, bgColor_view_state,
+                (CardView) view, bgColor_view_state,
                 this,
                 calendarKey, Keys.BG_COLOR,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR), true));
         
-        padColor_view.setOnClickListener(view -> invokeColorDialogue(context,
-                view, padColor_view_state,
+        borderColor_view.setOnClickListener(view -> invokeColorDialogue(context,
+                (CardView) view, padColor_view_state,
                 this,
-                calendarKey, Keys.BEVEL_COLOR,
-                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_COLOR), Keys.SETTINGS_DEFAULT_BEVEL_COLOR), true));
+                calendarKey, Keys.BORDER_COLOR,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR), true));
         
         addSeekBarChangeListener(
-                bevel_thickness_description,
-                bevel_thickness_bar,
-                padSize_state, this, fragment, R.string.settings_bevel_thickness,
-                calendarKey, Keys.BEVEL_THICKNESS,
-                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BEVEL_THICKNESS), Keys.SETTINGS_DEFAULT_BEVEL_THICKNESS));
+                border_thickness_description,
+                border_thickness_bar,
+                border_size_state, this, fragment, R.string.settings_border_thickness,
+                calendarKey, Keys.BORDER_THICKNESS,
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS));
         
         addSeekBarChangeListener(
                 priority_description,
@@ -147,8 +149,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
     void updateAllIndicators(Context context) {
         setStateIconColor(fontColor_view_state, Keys.FONT_COLOR, context);
         setStateIconColor(bgColor_view_state, Keys.BG_COLOR, context);
-        setStateIconColor(padColor_view_state, Keys.BEVEL_COLOR, context);
-        setStateIconColor(padSize_state, Keys.BEVEL_THICKNESS, context);
+        setStateIconColor(padColor_view_state, Keys.BORDER_COLOR, context);
+        setStateIconColor(border_size_state, Keys.BORDER_THICKNESS, context);
         setStateIconColor(priority_state, Keys.PRIORITY, context);
         setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK, context);
         setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED, context);

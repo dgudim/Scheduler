@@ -4,12 +4,14 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
-import static prototype.xd.scheduler.utilities.Keys.BEVEL_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BEVEL_THICKNESS;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
+import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
@@ -32,6 +34,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 
 import java.util.ArrayList;
 
@@ -39,18 +42,16 @@ import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.Keys;
 
 public class EntrySettings extends PopupSettingsView {
     
-    private final TodoListEntry entry;
+    private final AlertDialog dialog;
     
-    public EntrySettings(final Context context, final HomeFragment fragment, View settingsView, final TodoListEntry entry, ArrayList<TodoListEntry> allEntries) {
+    public EntrySettings(final HomeFragment fragment, final View settingsView) {
         super(settingsView);
-        this.entry = entry;
         
-        initialise(context, fragment, allEntries);
-        
-        final AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        final AlertDialog.Builder alert = new AlertDialog.Builder(fragment.rootActivity);
         
         alert.setOnDismissListener(dialog -> {
             saveEntries(fragment.todoListEntries);
@@ -58,16 +59,51 @@ public class EntrySettings extends PopupSettingsView {
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
         });
         alert.setView(settingsView);
-        alert.show();
+        dialog = alert.create();
     }
     
-    private void initialise(final Context context, final HomeFragment fragment, final ArrayList<TodoListEntry> allEntries) {
+    public void show(final HomeFragment fragment, final TodoListEntry entry) {
+        initialise(fragment, entry);
+        dialog.show();
+    }
+    
+    private void initialise(final HomeFragment fragment, TodoListEntry entry) {
+    
+        final Context context = fragment.rootActivity;
+        final ArrayList<TodoListEntry> allEntries = fragment.todoListEntries;
         
-        fontColor_view.setBackgroundColor(entry.fontColor_original);
-        bgColor_view.setBackgroundColor(entry.bgColor_original);
-        padColor_view.setBackgroundColor(entry.bevelColor_original);
+        fontColor_view.setCardBackgroundColor(entry.fontColor_original);
+        bgColor_view.setCardBackgroundColor(entry.bgColor_original);
+        borderColor_view.setCardBackgroundColor(entry.borderColor_original);
         
-        updateAllIndicators(context);
+        preview_text.setTextColor(entry.fontColor_original);
+        preview_text.setBackgroundColor(entry.bgColor_original);
+        preview_border.setBackgroundColor(entry.borderColor_original);
+        preview_border.setPadding(entry.border_thickness_original,
+                entry.border_thickness_original, entry.border_thickness_original, 0);
+        
+        int expired_border_thickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
+        int upcoming_border_thickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
+        
+        preview_text_upcoming.setTextColor(mixTwoColors(entry.fontColor_original,
+                preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_text_upcoming.setBackgroundColor(mixTwoColors(entry.bgColor_original,
+                preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_border_upcoming.setBackgroundColor(mixTwoColors(entry.borderColor_original,
+                preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_border_upcoming.setPadding(upcoming_border_thickness,
+                upcoming_border_thickness, upcoming_border_thickness, 0);
+        
+        preview_text_expired.setTextColor(mixTwoColors(entry.fontColor_original,
+                preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_text_expired.setBackgroundColor(mixTwoColors(entry.bgColor_original,
+                preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_border_expired.setBackgroundColor(mixTwoColors(entry.borderColor_original,
+                preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_border_expired.setPadding(expired_border_thickness,
+                expired_border_thickness, expired_border_thickness, 0);
+        
+        updateAllIndicators(context, entry);
         
         final ArrayList<Group> groupList = readGroupFile();
         final ArrayList<String> groupNames = new ArrayList<>();
@@ -120,11 +156,11 @@ public class EntrySettings extends PopupSettingsView {
                             });
                             
                             builder.setNeutralButton(R.string.delete_group, (dialog, which) -> {
-                                AlertDialog.Builder builder12 = new AlertDialog.Builder(context);
-                                builder12.setTitle(R.string.delete);
-                                builder12.setMessage(R.string.are_you_sure);
+                                AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                                builder2.setTitle(R.string.delete);
+                                builder2.setMessage(R.string.are_you_sure);
                                 
-                                builder12.setPositiveButton(R.string.yes, (dialog1, which1) -> {
+                                builder2.setPositiveButton(R.string.yes, (dialog1, which1) -> {
                                     String origName = groupNames.get(group_spinner.getSelectedItemPosition());
                                     groupList.remove(group_spinner.getSelectedItemPosition());
                                     groupNames.remove(group_spinner.getSelectedItemPosition());
@@ -136,13 +172,13 @@ public class EntrySettings extends PopupSettingsView {
                                     }
                                     saveEntries(fragment.todoListEntries);
                                     group_spinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
-                                    updateAllIndicators(context);
+                                    updateAllIndicators(context, entry);
                                     notifyDataSetChanged();
                                 });
                                 
-                                builder12.setNegativeButton(R.string.no, (dialog12, which12) -> dialog12.dismiss());
+                                builder2.setNegativeButton(R.string.no, (dialog12, which12) -> dialog12.dismiss());
                                 
-                                builder12.show();
+                                builder2.show();
                             });
                             
                             builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
@@ -167,7 +203,7 @@ public class EntrySettings extends PopupSettingsView {
                     entry.changeGroup(groupNames.get(position));
                     saveEntries(fragment.todoListEntries);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-                    initialise(context, fragment, allEntries);
+                    initialise(fragment, entry);
                 }
             }
             
@@ -189,34 +225,34 @@ public class EntrySettings extends PopupSettingsView {
             
             builder.setPositiveButton(R.string.add, (dialog, which) -> {
                 if (input.getText().toString().equals(BLANK_GROUP_NAME)) {
-                    AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
-                    builder13.setTitle(R.string.cant_create_group_with_this_name);
-                    builder13.setMessage(R.string.break_settings_reset_message);
+                    AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                    builder2.setTitle(R.string.cant_create_group_with_this_name);
+                    builder2.setMessage(R.string.break_settings_reset_message);
                     
-                    builder13.show();
+                    builder2.show();
                     
                 } else if (groupNames.contains(input.getText().toString())) {
-                    AlertDialog.Builder builder13 = new AlertDialog.Builder(context);
-                    builder13.setTitle(R.string.group_with_same_name_exists);
-                    builder13.setMessage(R.string.overwrite_prompt);
+                    AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                    builder2.setTitle(R.string.group_with_same_name_exists);
+                    builder2.setMessage(R.string.overwrite_prompt);
                     
-                    builder13.setPositiveButton(R.string.yes, (dialog14, which14) -> {
+                    builder2.setPositiveButton(R.string.yes, (dialog14, which14) -> {
                         Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                         groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
                         saveGroupsFile(groupList);
-                        for (TodoListEntry entry12 : allEntries) {
-                            if (entry12.group.name.equals(input.getText().toString())) {
-                                entry12.removeDisplayParams();
-                                entry12.changeGroup(createdGroup);
+                        for (TodoListEntry entry2 : allEntries) {
+                            if (entry2.group.name.equals(input.getText().toString())) {
+                                entry2.removeDisplayParams();
+                                entry2.changeGroup(createdGroup);
                             }
                         }
-                        updateAllIndicators(context);
+                        updateAllIndicators(context, entry);
                         preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     });
                     
-                    builder13.setNegativeButton(R.string.no, (dialog13, which13) -> dialog13.dismiss());
+                    builder2.setNegativeButton(R.string.no, (dialog13, which13) -> dialog13.dismiss());
                     
-                    builder13.show();
+                    builder2.show();
                 } else {
                     Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                     groupNames.add(createdGroup.name);
@@ -227,7 +263,7 @@ public class EntrySettings extends PopupSettingsView {
                     entry.removeDisplayParams();
                     entry.changeGroup(createdGroup);
                     saveEntries(fragment.todoListEntries);
-                    updateAllIndicators(context);
+                    updateAllIndicators(context, entry);
                 }
             });
             
@@ -244,7 +280,7 @@ public class EntrySettings extends PopupSettingsView {
                 entry.resetGroup();
                 saveEntries(fragment.todoListEntries);
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-                initialise(context, fragment, allEntries);
+                initialise(fragment, entry);
             });
             builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
             
@@ -252,22 +288,22 @@ public class EntrySettings extends PopupSettingsView {
         });
         
         fontColor_view.setOnClickListener(view -> invokeColorDialogue(
-                context, view, fontColor_view_state, fragment,
+                context, (CardView) view, fontColor_view_state, preview_text, true, fragment,
                 entry, FONT_COLOR, entry.fontColor_original, true));
         
         bgColor_view.setOnClickListener(view -> invokeColorDialogue(
-                context, view, bgColor_view_state, fragment,
+                context, (CardView) view, bgColor_view_state, preview_text, false, fragment,
                 entry, BG_COLOR, entry.bgColor_original, true));
         
-        padColor_view.setOnClickListener(view -> invokeColorDialogue(
-                context, view, padColor_view_state, fragment,
-                entry, BEVEL_COLOR, entry.bevelColor_original, true));
+        borderColor_view.setOnClickListener(view -> invokeColorDialogue(
+                context, (CardView) view, padColor_view_state, preview_border, false, fragment,
+                entry, BORDER_COLOR, entry.borderColor_original, true));
         
         addSeekBarChangeListener(
-                bevel_thickness_description,
-                bevel_thickness_bar,
-                padSize_state, fragment, R.string.settings_bevel_thickness, entry,
-                BEVEL_THICKNESS, entry.bevelThickness_original);
+                border_thickness_description,
+                border_thickness_bar, border_size_state,
+                this, fragment, R.string.settings_border_thickness, entry,
+                BORDER_THICKNESS, entry.border_thickness_original);
         
         addSeekBarChangeListener(
                 priority_description,
@@ -306,11 +342,11 @@ public class EntrySettings extends PopupSettingsView {
                 ADAPTIVE_COLOR_ENABLED, entry.adaptiveColorEnabled);
     }
     
-    void updateAllIndicators(Context context) {
+    private void updateAllIndicators(Context context, TodoListEntry entry) {
         entry.setStateIconColor(fontColor_view_state, FONT_COLOR, context);
         entry.setStateIconColor(bgColor_view_state, BG_COLOR, context);
-        entry.setStateIconColor(padColor_view_state, BEVEL_COLOR, context);
-        entry.setStateIconColor(padSize_state, BEVEL_THICKNESS, context);
+        entry.setStateIconColor(padColor_view_state, BORDER_COLOR, context);
+        entry.setStateIconColor(border_size_state, BORDER_THICKNESS, context);
         entry.setStateIconColor(priority_state, PRIORITY, context);
         entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK, context);
         entry.setStateIconColor(adaptiveColor_switch_state, ADAPTIVE_COLOR_ENABLED, context);
