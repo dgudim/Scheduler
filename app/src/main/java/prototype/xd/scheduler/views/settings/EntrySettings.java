@@ -4,14 +4,12 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
@@ -31,10 +29,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 
 import java.util.ArrayList;
 
@@ -42,68 +40,39 @@ import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.Keys;
 
 public class EntrySettings extends PopupSettingsView {
     
     private final AlertDialog dialog;
+    public final HomeFragment fragment;
+    private TodoListEntry todoListEntry;
     
     public EntrySettings(final HomeFragment fragment, final View settingsView) {
         super(settingsView);
+        this.fragment = fragment;
         
-        final AlertDialog.Builder alert = new AlertDialog.Builder(fragment.rootActivity);
-        
-        alert.setOnDismissListener(dialog -> {
+        dialog = new AlertDialog.Builder(fragment.rootActivity).setOnDismissListener(dialog -> {
             saveEntries(fragment.todoListEntries);
             fragment.todoListViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
-        });
-        alert.setView(settingsView);
-        dialog = alert.create();
+        }).setView(settingsView).create();
     }
     
-    public void show(final HomeFragment fragment, final TodoListEntry entry) {
-        initialise(fragment, entry);
+    public void show(final TodoListEntry entry) {
+        initialise(entry);
         dialog.show();
     }
     
-    private void initialise(final HomeFragment fragment, TodoListEntry entry) {
-    
+    private void initialise(TodoListEntry entry) {
+        
+        todoListEntry = entry;
+        
         final Context context = fragment.rootActivity;
         final ArrayList<TodoListEntry> allEntries = fragment.todoListEntries;
         
-        fontColor_view.setCardBackgroundColor(entry.fontColor_original);
-        bgColor_view.setCardBackgroundColor(entry.bgColor_original);
-        borderColor_view.setCardBackgroundColor(entry.borderColor_original);
+        updatePreviews(entry.fontColor_original, entry.bgColor_original, entry.borderColor_original, entry.border_thickness_original);
         
-        preview_text.setTextColor(entry.fontColor_original);
-        preview_text.setBackgroundColor(entry.bgColor_original);
-        preview_border.setBackgroundColor(entry.borderColor_original);
-        preview_border.setPadding(entry.border_thickness_original,
-                entry.border_thickness_original, entry.border_thickness_original, 0);
-        
-        int expired_border_thickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
-        int upcoming_border_thickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
-        
-        preview_text_upcoming.setTextColor(mixTwoColors(entry.fontColor_original,
-                preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
-        preview_text_upcoming.setBackgroundColor(mixTwoColors(entry.bgColor_original,
-                preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR));
-        preview_border_upcoming.setBackgroundColor(mixTwoColors(entry.borderColor_original,
-                preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR));
-        preview_border_upcoming.setPadding(upcoming_border_thickness,
-                upcoming_border_thickness, upcoming_border_thickness, 0);
-        
-        preview_text_expired.setTextColor(mixTwoColors(entry.fontColor_original,
-                preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
-        preview_text_expired.setBackgroundColor(mixTwoColors(entry.bgColor_original,
-                preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR));
-        preview_border_expired.setBackgroundColor(mixTwoColors(entry.borderColor_original,
-                preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR));
-        preview_border_expired.setPadding(expired_border_thickness,
-                expired_border_thickness, expired_border_thickness, 0);
-        
-        updateAllIndicators(context, entry);
+        updateAllIndicators(context);
         
         final ArrayList<Group> groupList = readGroupFile();
         final ArrayList<String> groupNames = new ArrayList<>();
@@ -172,7 +141,7 @@ public class EntrySettings extends PopupSettingsView {
                                     }
                                     saveEntries(fragment.todoListEntries);
                                     group_spinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
-                                    updateAllIndicators(context, entry);
+                                    updateAllIndicators(context);
                                     notifyDataSetChanged();
                                 });
                                 
@@ -203,7 +172,7 @@ public class EntrySettings extends PopupSettingsView {
                     entry.changeGroup(groupNames.get(position));
                     saveEntries(fragment.todoListEntries);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-                    initialise(fragment, entry);
+                    initialise(entry);
                 }
             }
             
@@ -246,7 +215,7 @@ public class EntrySettings extends PopupSettingsView {
                                 entry2.changeGroup(createdGroup);
                             }
                         }
-                        updateAllIndicators(context, entry);
+                        updateAllIndicators(context);
                         preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     });
                     
@@ -263,7 +232,7 @@ public class EntrySettings extends PopupSettingsView {
                     entry.removeDisplayParams();
                     entry.changeGroup(createdGroup);
                     saveEntries(fragment.todoListEntries);
-                    updateAllIndicators(context, entry);
+                    updateAllIndicators(context);
                 }
             });
             
@@ -280,53 +249,53 @@ public class EntrySettings extends PopupSettingsView {
                 entry.resetGroup();
                 saveEntries(fragment.todoListEntries);
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-                initialise(fragment, entry);
+                initialise(entry);
             });
             builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
             
             builder.show();
         });
         
-        fontColor_view.setOnClickListener(view -> invokeColorDialogue(
-                context, (CardView) view, fontColor_view_state, preview_text, true, fragment,
+        fontColor_select.setOnClickListener(view -> invokeColorDialogue(
+                context, fontColor_view_state, this, fragment,
                 entry, FONT_COLOR, entry.fontColor_original, true));
         
-        bgColor_view.setOnClickListener(view -> invokeColorDialogue(
-                context, (CardView) view, bgColor_view_state, preview_text, false, fragment,
+        bgColor_select.setOnClickListener(view -> invokeColorDialogue(
+                context, bgColor_view_state, this, fragment,
                 entry, BG_COLOR, entry.bgColor_original, true));
         
-        borderColor_view.setOnClickListener(view -> invokeColorDialogue(
-                context, (CardView) view, padColor_view_state, preview_border, false, fragment,
+        borderColor_select.setOnClickListener(view -> invokeColorDialogue(
+                context, padColor_view_state, this, fragment,
                 entry, BORDER_COLOR, entry.borderColor_original, true));
         
         addSeekBarChangeListener(
                 border_thickness_description,
                 border_thickness_bar, border_size_state,
-                this, fragment, R.string.settings_border_thickness, entry,
+                this, true, R.string.settings_border_thickness,
                 BORDER_THICKNESS, entry.border_thickness_original);
         
         addSeekBarChangeListener(
                 priority_description,
-                priority_bar,
-                priority_state, fragment, R.string.settings_priority, entry,
+                priority_bar, priority_state,
+                this, false, R.string.settings_priority,
                 PRIORITY, entry.priority);
         
         addSeekBarChangeListener(
                 adaptive_color_balance_description,
-                adaptive_color_balance_bar,
-                adaptiveColor_bar_state, fragment, R.string.settings_adaptive_color_balance, entry,
+                adaptive_color_balance_bar, adaptiveColor_bar_state,
+                this, false, R.string.settings_adaptive_color_balance,
                 ADAPTIVE_COLOR_BALANCE, entry.adaptiveColorBalance);
         
         addSeekBarChangeListener(
                 show_days_beforehand_description,
-                show_days_beforehand_bar,
-                showDaysUpcoming_bar_state, fragment, R.string.settings_show_days_upcoming, entry,
+                show_days_beforehand_bar, showDaysUpcoming_bar_state,
+                this, false, R.string.settings_show_days_upcoming,
                 UPCOMING_ITEMS_OFFSET, entry.dayOffset_upcoming);
         
         addSeekBarChangeListener(
                 show_days_after_description,
-                show_days_after_bar,
-                showDaysExpired_bar_state, fragment, R.string.settings_show_days_expired, entry,
+                show_days_after_bar, showDaysExpired_bar_state,
+                this, false, R.string.settings_show_days_expired,
                 EXPIRED_ITEMS_OFFSET, entry.dayOffset_expired);
         
         addSwitchChangeListener(
@@ -342,17 +311,13 @@ public class EntrySettings extends PopupSettingsView {
                 ADAPTIVE_COLOR_ENABLED, entry.adaptiveColorEnabled);
     }
     
-    private void updateAllIndicators(Context context, TodoListEntry entry) {
-        entry.setStateIconColor(fontColor_view_state, FONT_COLOR, context);
-        entry.setStateIconColor(bgColor_view_state, BG_COLOR, context);
-        entry.setStateIconColor(padColor_view_state, BORDER_COLOR, context);
-        entry.setStateIconColor(border_size_state, BORDER_THICKNESS, context);
-        entry.setStateIconColor(priority_state, PRIORITY, context);
-        entry.setStateIconColor(show_on_lock_state, SHOW_ON_LOCK, context);
-        entry.setStateIconColor(adaptiveColor_switch_state, ADAPTIVE_COLOR_ENABLED, context);
-        entry.setStateIconColor(adaptiveColor_bar_state, ADAPTIVE_COLOR_BALANCE, context);
-        entry.setStateIconColor(showDaysUpcoming_bar_state, UPCOMING_ITEMS_OFFSET, context);
-        entry.setStateIconColor(showDaysExpired_bar_state, EXPIRED_ITEMS_OFFSET, context);
+    public void changeEntryParameter(TextView icon, String parameter, String value) {
+        todoListEntry.changeParameter(parameter, value);
+        setStateIconColor(icon, parameter, fragment.rootActivity);
     }
     
+    @Override
+    protected void setStateIconColor(TextView icon, String parameter, Context context) {
+        todoListEntry.setStateIconColor(icon, parameter, context);
+    }
 }

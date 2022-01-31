@@ -2,6 +2,9 @@ package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
@@ -13,7 +16,6 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllTodoLis
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -35,7 +37,6 @@ import java.util.Comparator;
 
 import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.EntrySettings;
@@ -188,37 +189,23 @@ public class Utilities {
         });
     }
     
-    //listener for entry settings
-    public static void addSeekBarChangeListener(final TextView displayTo,
-                                                final SeekBar seekBar,
-                                                final TextView stateIcon,
-                                                final HomeFragment fragment,
-                                                final int stringResource,
-                                                final TodoListEntry todoListEntry,
-                                                final String parameter,
-                                                final int initialValue) {
-        addSeekBarChangeListener(displayTo, seekBar, stateIcon, null,
-                fragment, stringResource, todoListEntry, parameter, initialValue);
-    }
-    
     //listener for border thickness preview in entry settings
     public static void addSeekBarChangeListener(final TextView displayTo,
                                                 final SeekBar seekBar,
                                                 final TextView stateIcon,
                                                 final EntrySettings entrySettings,
-                                                final HomeFragment fragment,
+                                                final boolean mapToBorderPreview,
                                                 final int stringResource,
-                                                final TodoListEntry todoListEntry,
                                                 final String parameter,
                                                 final int initialValue) {
-        displayTo.setText(fragment.getString(stringResource, initialValue));
+        displayTo.setText(entrySettings.fragment.getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(fragment.getString(stringResource, progress));
-                if (entrySettings != null) {
+                displayTo.setText(entrySettings.fragment.getString(stringResource, progress));
+                if (mapToBorderPreview) {
                     entrySettings.preview_border.setPadding(progress, progress, progress, 0);
                 }
             }
@@ -230,9 +217,8 @@ public class Utilities {
             
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                todoListEntry.changeParameter(parameter, String.valueOf(seekBar.getProgress()));
-                todoListEntry.setStateIconColor(stateIcon, parameter, fragment.rootActivity);
-                saveEntries(fragment.todoListEntries);
+                entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf(seekBar.getProgress()));
+                saveEntries(entrySettings.fragment.todoListEntries);
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
             }
         });
@@ -243,18 +229,21 @@ public class Utilities {
                                                 final SeekBar seekBar,
                                                 final TextView stateIcon,
                                                 final SystemCalendarSettings systemCalendarSettings,
-                                                final SettingsFragment fragment,
+                                                final boolean mapToBorderPreview,
                                                 final int stringResource,
                                                 final String calendarKey,
                                                 final String parameter,
                                                 final int initialValue) {
-        displayTo.setText(fragment.getString(stringResource, initialValue));
+        displayTo.setText(systemCalendarSettings.fragment.getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(fragment.getString(stringResource, progress));
+                displayTo.setText(systemCalendarSettings.fragment.getString(stringResource, progress));
+                if (mapToBorderPreview) {
+                    systemCalendarSettings.preview_border.setPadding(progress, progress, progress, 0);
+                }
             }
             
             @Override
@@ -265,7 +254,7 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 preferences.edit().putInt(calendarKey + "_" + parameter, seekBar.getProgress()).apply();
-                systemCalendarSettings.setStateIconColor(stateIcon, parameter, fragment.context);
+                systemCalendarSettings.setStateIconColor(stateIcon, parameter, systemCalendarSettings.fragment.context);
             }
         });
     }
@@ -280,7 +269,7 @@ public class Utilities {
                                                final HomeFragment fragment,
                                                final TodoListEntry entry,
                                                final String parameter,
-                                               boolean initialValue) {
+                                               final boolean initialValue) {
         tSwitch.setChecked(initialValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
@@ -296,7 +285,7 @@ public class Utilities {
                                                final SystemCalendarSettings systemCalendarSettings,
                                                final String calendarKey,
                                                final String parameter,
-                                               boolean initialValue) {
+                                               final boolean initialValue) {
         tSwitch.setChecked(initialValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
@@ -315,10 +304,8 @@ public class Utilities {
     
     //color dialogue with border and background color preview in entry settings
     public static void invokeColorDialogue(final Context context,
-                                           final CardView target,
                                            final TextView stateIcon,
-                                           final View preview_view,
-                                           final boolean setTextColor,
+                                           final EntrySettings settings,
                                            final HomeFragment fragment,
                                            final TodoListEntry todoListEntry,
                                            final String parameter,
@@ -327,12 +314,17 @@ public class Utilities {
         invokeColorDialogue(context, initialValue, (dialog, selectedColor, allColors) -> {
             todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
             saveEntries(fragment.todoListEntries);
-            if (setTextColor) {
-                ((TextView) preview_view).setTextColor(selectedColor);
-            } else {
-                preview_view.setBackgroundColor(selectedColor);
+            switch (parameter) {
+                case FONT_COLOR:
+                    settings.updatePreviewFont(selectedColor);
+                    break;
+                case BG_COLOR:
+                    settings.updatePreviewBg(selectedColor);
+                    break;
+                case BORDER_COLOR:
+                    settings.updatePreviewBorder(selectedColor);
+                    break;
             }
-            target.setCardBackgroundColor(selectedColor);
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
             todoListEntry.setStateIconColor(stateIcon, parameter, context);
         });
@@ -340,7 +332,6 @@ public class Utilities {
     
     //color dialogue for calendar settings
     public static void invokeColorDialogue(final Context context,
-                                           final CardView target,
                                            final TextView stateIcon,
                                            final SystemCalendarSettings systemCalendarSettings,
                                            final String calendarKey,
@@ -349,7 +340,17 @@ public class Utilities {
                                            final boolean setReconstructFlag) {
         invokeColorDialogue(context, initialValue, (dialog, selectedColor, allColors) -> {
             preferences.edit().putInt(calendarKey + "_" + parameter, selectedColor).apply();
-            target.setCardBackgroundColor(selectedColor);
+            switch (parameter) {
+                case FONT_COLOR:
+                    systemCalendarSettings.updatePreviewFont(selectedColor);
+                    break;
+                case BG_COLOR:
+                    systemCalendarSettings.updatePreviewBg(selectedColor);
+                    break;
+                case BORDER_COLOR:
+                    systemCalendarSettings.updatePreviewBorder(selectedColor);
+                    break;
+            }
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
             systemCalendarSettings.setStateIconColor(stateIcon, parameter, context);
         });

@@ -44,7 +44,7 @@ public class TodoListViewAdapter extends BaseAdapter {
     
     private final MainActivity mainActivity;
     
-    private EntrySettings entrySettings;
+    private final EntrySettings entrySettings;
     
     public TodoListViewAdapter(final HomeFragment fragment, final MainActivity mainActivity, final ViewGroup parent) {
         this.mainActivity = mainActivity;
@@ -53,7 +53,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         inflater = LayoutInflater.from(context);
         currentTodoListEntries = new ArrayList<>();
         currentTodoListEntries_indexMap = new ArrayList<>();
-        entrySettings = new EntrySettings(home, inflater.inflate(R.layout.entry_settings, parent, false));
+        entrySettings = new EntrySettings(fragment, inflater.inflate(R.layout.entry_settings, parent, false));
     }
     
     @Override
@@ -194,7 +194,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                 dialog.show();
                 return false;
             });
-            settings.setOnClickListener(v -> entrySettings.show(home, currentEntry));
+            settings.setOnClickListener(v -> entrySettings.show(currentEntry));
         } else {
             ((CardView) view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
             ((TextView) view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(context));

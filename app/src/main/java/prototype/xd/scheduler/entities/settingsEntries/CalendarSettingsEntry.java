@@ -19,7 +19,6 @@ import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.CheckBox;
-import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntry extends SettingsEntry {
     
@@ -47,7 +46,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
         entryType = CALENDAR;
         
         if (calendar.availableEventColors.size() > 0 && calendar.systemCalendarEvents.size() > 0) {
-            gridViewAdapter = new CalendarColorsGridViewAdapter(context, fragment, root, calendar);
+            gridViewAdapter = new CalendarColorsGridViewAdapter(context, fragment, calendar);
         }
     }
     
@@ -61,10 +60,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 preferences.edit().putBoolean(calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
         
-        rootView.findViewById(R.id.edit_button).setOnClickListener(view ->
-                new SystemCalendarSettings(fragment,
-                        inflater.inflate(R.layout.entry_settings, root, false),
-                        calendarKey));
+        rootView.findViewById(R.id.edit_button).setOnClickListener(view -> fragment.calendarSettingsDialogue.show(calendarKey));
         
         View colorSelector = rootView.findViewById(R.id.color_select_button);
         if (gridViewAdapter != null) {

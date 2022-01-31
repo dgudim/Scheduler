@@ -27,16 +27,20 @@ import prototype.xd.scheduler.entities.settingsEntries.SettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.SwitchSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.TitleBarSettingsEntry;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class SettingsFragment extends Fragment {
     
     public Context context;
     public ViewGroup rootViewGroup;
     private AdaptiveBackgroundSettingsEntry adaptiveBackgroundSettingsEntry;
+    public SystemCalendarSettings calendarSettingsDialogue;
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootViewGroup = container;
+        context = requireContext();
+        calendarSettingsDialogue = new SystemCalendarSettings(this, inflater.inflate(R.layout.entry_settings, container, false));
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
     
@@ -51,6 +55,7 @@ public class SettingsFragment extends Fragment {
         context = null;
         rootViewGroup = null;
         adaptiveBackgroundSettingsEntry = null;
+        calendarSettingsDialogue = null;
         super.onDestroy();
     }
     
@@ -60,8 +65,6 @@ public class SettingsFragment extends Fragment {
     
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
-        context = requireContext();
         
         ArrayList<SettingsEntry> settingsEntries = new ArrayList<>();
         

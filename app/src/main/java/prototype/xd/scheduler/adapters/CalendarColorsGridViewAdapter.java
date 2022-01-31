@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
-import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarColorsGridViewAdapter extends BaseAdapter {
     
@@ -28,13 +27,11 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
     private final Context context;
     private final LayoutInflater inflater;
     private final SettingsFragment fragment;
-    private final ViewGroup root;
     
     private final SystemCalendar calendar;
     
-    public CalendarColorsGridViewAdapter(final Context context, final SettingsFragment fragment, final ViewGroup root, final SystemCalendar calendar) {
+    public CalendarColorsGridViewAdapter(final Context context, final SettingsFragment fragment, final SystemCalendar calendar) {
         this.fragment = fragment;
-        this.root = root;
         colors = calendar.availableEventColors;
         calendarColor = calendar.color;
         color_eventCounts = calendar.eventCountsForColors;
@@ -67,10 +64,7 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(colors.get(i));
         view.findViewById(R.id.title_default).setVisibility(calendarColor == colors.get(i) ? View.VISIBLE : View.GONE);
         ((TextView) view.findViewById(R.id.event_count)).setText(context.getString(R.string.calendar_events, color_eventCounts.get(i)));
-        view.findViewById(R.id.settings).setOnClickListener(v ->
-                new SystemCalendarSettings(fragment,
-                        inflater.inflate(R.layout.entry_settings, root, false),
-                        makeKey(calendar, colors.get(i))));
+        view.findViewById(R.id.settings).setOnClickListener(v -> fragment.calendarSettingsDialogue.show(makeKey(calendar, colors.get(i))));
         
         return view;
     }

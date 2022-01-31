@@ -14,8 +14,6 @@ import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.cardview.widget.CardView;
-
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -25,27 +23,32 @@ import prototype.xd.scheduler.utilities.Keys;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
-    private final ArrayList<String> calendarSubKeys;
+    private final AlertDialog dialog;
+    private ArrayList<String> calendarSubKeys;
+    public final SettingsFragment fragment;
     
-    public SystemCalendarSettings(final SettingsFragment fragment, View settingsView, final String calendar_key) {
+    public SystemCalendarSettings(final SettingsFragment fragment, final View settingsView) {
         super(settingsView);
+        this.fragment = fragment;
         
         settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
         
-        calendarSubKeys = generateSubKeysFromKey(calendar_key);
-        
-        initialise(calendar_key, fragment);
-        
-        new AlertDialog.Builder(fragment.context).setView(settingsView).show();
+        dialog = new AlertDialog.Builder(fragment.context).setView(settingsView).create();
     }
     
-    private void initialise(String calendarKey, final SettingsFragment fragment) {
+    public void show(final String calendar_key) {
+        initialise(calendar_key);
+        dialog.show();
+    }
     
-        final Context context = fragment.context;
+    private void initialise(final String calendarKey) {
         
-        fontColor_view.setCardBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR));
-        bgColor_view.setCardBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR));
-        borderColor_view.setCardBackgroundColor(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR));
+        calendarSubKeys = generateSubKeysFromKey(calendarKey);
+        final Context context = fragment.context;
+        updatePreviews(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR),
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR),
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR),
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS));
         
         updateAllIndicators(context);
         
@@ -62,63 +65,60 @@ public class SystemCalendarSettings extends PopupSettingsView {
                     }
                 }
                 editor.apply();
-                initialise(calendarKey, fragment);
+                initialise(calendarKey);
             });
             builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
             
             builder.show();
         });
         
-        fontColor_view.setOnClickListener(view -> invokeColorDialogue(context,
-                (CardView) view, fontColor_view_state,
-                this,
+        fontColor_select.setOnClickListener(view -> invokeColorDialogue(context,
+                fontColor_view_state, this,
                 calendarKey, Keys.FONT_COLOR,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR), true));
         
-        bgColor_view.setOnClickListener(view -> invokeColorDialogue(context,
-                (CardView) view, bgColor_view_state,
-                this,
+        bgColor_select.setOnClickListener(view -> invokeColorDialogue(context,
+                bgColor_view_state, this,
                 calendarKey, Keys.BG_COLOR,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR), true));
         
-        borderColor_view.setOnClickListener(view -> invokeColorDialogue(context,
-                (CardView) view, padColor_view_state,
-                this,
+        borderColor_select.setOnClickListener(view -> invokeColorDialogue(context,
+                padColor_view_state, this,
                 calendarKey, Keys.BORDER_COLOR,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR), true));
         
         addSeekBarChangeListener(
                 border_thickness_description,
-                border_thickness_bar,
-                border_size_state, this, fragment, R.string.settings_border_thickness,
+                border_thickness_bar, border_size_state,
+                this, true, R.string.settings_border_thickness,
                 calendarKey, Keys.BORDER_THICKNESS,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS));
         
         addSeekBarChangeListener(
                 priority_description,
-                priority_bar,
-                priority_state, this, fragment, R.string.settings_priority,
+                priority_bar, priority_state,
+                this, false, R.string.settings_priority,
                 calendarKey, Keys.PRIORITY,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY));
         
         addSeekBarChangeListener(
                 adaptive_color_balance_description,
-                adaptive_color_balance_bar,
-                adaptiveColor_bar_state, this, fragment, R.string.settings_adaptive_color_balance,
+                adaptive_color_balance_bar, adaptiveColor_bar_state,
+                this, false, R.string.settings_adaptive_color_balance,
                 calendarKey, Keys.ADAPTIVE_COLOR_BALANCE,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE));
         
         addSeekBarChangeListener(
                 show_days_beforehand_description,
-                show_days_beforehand_bar,
-                showDaysUpcoming_bar_state, this, fragment, R.string.settings_show_days_upcoming,
+                show_days_beforehand_bar, showDaysUpcoming_bar_state,
+                this, false, R.string.settings_show_days_upcoming,
                 calendarKey, Keys.UPCOMING_ITEMS_OFFSET,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET));
         
         addSeekBarChangeListener(
                 show_days_after_description,
-                show_days_after_bar,
-                showDaysExpired_bar_state, this, fragment, R.string.settings_show_days_expired,
+                show_days_after_bar, showDaysExpired_bar_state,
+                this, false, R.string.settings_show_days_expired,
                 calendarKey, Keys.EXPIRED_ITEMS_OFFSET,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET));
         
@@ -135,6 +135,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED));
     }
     
+    @Override
     public void setStateIconColor(TextView display, String parameter, Context context) {
         int keyIndex = getFirstValidKeyIndex(calendarSubKeys, parameter);
         if (keyIndex == calendarSubKeys.size() - 1) {
@@ -144,18 +145,5 @@ public class SystemCalendarSettings extends PopupSettingsView {
         } else {
             display.setTextColor(context.getColor(R.color.entry_settings_parameter_default));
         }
-    }
-    
-    void updateAllIndicators(Context context) {
-        setStateIconColor(fontColor_view_state, Keys.FONT_COLOR, context);
-        setStateIconColor(bgColor_view_state, Keys.BG_COLOR, context);
-        setStateIconColor(padColor_view_state, Keys.BORDER_COLOR, context);
-        setStateIconColor(border_size_state, Keys.BORDER_THICKNESS, context);
-        setStateIconColor(priority_state, Keys.PRIORITY, context);
-        setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK, context);
-        setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED, context);
-        setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE, context);
-        setStateIconColor(showDaysUpcoming_bar_state, Keys.UPCOMING_ITEMS_OFFSET, context);
-        setStateIconColor(showDaysExpired_bar_state, Keys.EXPIRED_ITEMS_OFFSET, context);
     }
 }

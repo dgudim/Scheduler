@@ -1,5 +1,10 @@
 package prototype.xd.scheduler.views.settings;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
+
+import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -9,13 +14,14 @@ import android.widget.TextView;
 import androidx.cardview.widget.CardView;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.Switch;
 
 public class PopupSettingsView {
     
-    protected final CardView fontColor_view;
-    protected final CardView bgColor_view;
-    protected final CardView borderColor_view;
+    protected final CardView fontColor_select;
+    protected final CardView bgColor_select;
+    protected final CardView borderColor_select;
     
     protected final View add_group;
     protected final Spinner group_spinner;
@@ -31,13 +37,13 @@ public class PopupSettingsView {
     protected final TextView showDaysUpcoming_bar_state;
     protected final TextView showDaysExpired_bar_state;
     
-    protected final TextView preview_text_upcoming;
+    public final TextView preview_text_upcoming;
     public final LinearLayout preview_border_upcoming;
     
-    protected final TextView preview_text;
+    public final TextView preview_text;
     public final LinearLayout preview_border;
     
-    protected final TextView preview_text_expired;
+    public final TextView preview_text_expired;
     public final LinearLayout preview_border_expired;
     
     protected final TextView border_thickness_description;
@@ -55,14 +61,14 @@ public class PopupSettingsView {
     
     protected final View settings_reset_button;
     
-    PopupSettingsView(View settingsView){
-    
-        fontColor_view = settingsView.findViewById(R.id.textColor);
-        bgColor_view = settingsView.findViewById(R.id.backgroundColor);
-        borderColor_view = settingsView.findViewById(R.id.bevelColor);
+    PopupSettingsView(View settingsView) {
+        
+        fontColor_select = settingsView.findViewById(R.id.textColor);
+        bgColor_select = settingsView.findViewById(R.id.backgroundColor);
+        borderColor_select = settingsView.findViewById(R.id.bevelColor);
         add_group = settingsView.findViewById(R.id.addGroup);
         group_spinner = settingsView.findViewById(R.id.groupSpinner);
-    
+        
         fontColor_view_state = settingsView.findViewById(R.id.font_color_state);
         bgColor_view_state = settingsView.findViewById(R.id.background_color_state);
         padColor_view_state = settingsView.findViewById(R.id.border_color_state);
@@ -73,7 +79,7 @@ public class PopupSettingsView {
         adaptiveColor_bar_state = settingsView.findViewById(R.id.adaptive_color_balance_state);
         showDaysUpcoming_bar_state = settingsView.findViewById(R.id.days_beforehand_state);
         showDaysExpired_bar_state = settingsView.findViewById(R.id.days_after_state);
-    
+        
         preview_text_upcoming = settingsView.findViewById(R.id.preview_text_upcoming);
         preview_border_upcoming = settingsView.findViewById(R.id.preview_border_upcoming);
         
@@ -97,6 +103,65 @@ public class PopupSettingsView {
         adaptive_color_switch = settingsView.findViewById(R.id.adaptive_color_switch);
         
         settings_reset_button = settingsView.findViewById(R.id.settings_reset_button);
+    }
+    
+    protected void setStateIconColor(TextView icon, String parameter, Context context) {
+    }
+    
+    void updateAllIndicators(Context context) {
+        setStateIconColor(fontColor_view_state, Keys.FONT_COLOR, context);
+        setStateIconColor(bgColor_view_state, Keys.BG_COLOR, context);
+        setStateIconColor(padColor_view_state, Keys.BORDER_COLOR, context);
+        setStateIconColor(border_size_state, Keys.BORDER_THICKNESS, context);
+        setStateIconColor(priority_state, Keys.PRIORITY, context);
+        setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK, context);
+        setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED, context);
+        setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE, context);
+        setStateIconColor(showDaysUpcoming_bar_state, Keys.UPCOMING_ITEMS_OFFSET, context);
+        setStateIconColor(showDaysExpired_bar_state, Keys.EXPIRED_ITEMS_OFFSET, context);
+    }
+    
+    protected void updatePreviews(int fontColor, int bgColor, int borderColor, int borderThickness) {
+        updatePreviewFont(fontColor);
+        updatePreviewBg(bgColor);
+        updatePreviewBorder(borderColor);
+        preview_border.setPadding(borderThickness,
+                borderThickness, borderThickness, 0);
+        
+        int upcoming_border_thickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
+        int expired_border_thickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
+        
+        preview_border_upcoming.setPadding(upcoming_border_thickness,
+                upcoming_border_thickness, upcoming_border_thickness, 0);
+        preview_border_expired.setPadding(expired_border_thickness,
+                expired_border_thickness, expired_border_thickness, 0);
+    }
+    
+    public void updatePreviewFont(int fontColor) {
+        fontColor_select.setCardBackgroundColor(fontColor);
+        preview_text.setTextColor(fontColor);
+        preview_text_upcoming.setTextColor(mixTwoColors(fontColor,
+                preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_text_expired.setTextColor(mixTwoColors(fontColor,
+                preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+    }
+    
+    public void updatePreviewBg(int bgColor) {
+        bgColor_select.setCardBackgroundColor(bgColor);
+        preview_text.setBackgroundColor(bgColor);
+        preview_text_upcoming.setBackgroundColor(mixTwoColors(bgColor,
+                preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_text_expired.setBackgroundColor(mixTwoColors(bgColor,
+                preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+    }
+    
+    public void updatePreviewBorder(int borderColor) {
+        borderColor_select.setCardBackgroundColor(borderColor);
+        preview_border.setBackgroundColor(borderColor);
+        preview_border_upcoming.setBackgroundColor(mixTwoColors(borderColor,
+                preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+        preview_border_expired.setBackgroundColor(mixTwoColors(borderColor,
+                preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR));
     }
     
 }
