@@ -29,4 +29,5 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.4.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation group: 'org.dmfs', name: 'lib-recur', version: '0.12.2'
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 }

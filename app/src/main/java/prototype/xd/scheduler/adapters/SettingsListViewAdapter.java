@@ -1,7 +1,5 @@
 package prototype.xd.scheduler.adapters;
 
-import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -12,12 +10,10 @@ import prototype.xd.scheduler.entities.settingsEntries.SettingsEntry;
 
 public class SettingsListViewAdapter extends BaseAdapter {
     
-    private final LayoutInflater inflater;
     private final ArrayList<SettingsEntry> settingsEntries;
     
-    public SettingsListViewAdapter(ArrayList<SettingsEntry> settingsEntries, Context context) {
+    public SettingsListViewAdapter(ArrayList<SettingsEntry> settingsEntries) {
         this.settingsEntries = settingsEntries;
-        inflater = LayoutInflater.from(context);
     }
     
     @Override
@@ -47,6 +43,6 @@ public class SettingsListViewAdapter extends BaseAdapter {
     
     @Override
     public View getView(int i, View view, ViewGroup parent) {
-        return settingsEntries.get(i).get(view, parent, inflater);
+        return settingsEntries.get(i).get(view, parent);
     }
 }

@@ -163,7 +163,7 @@ public class LockScreenBitmapDrawer {
         if (!toAdd.isEmpty()) {
             
             for (int i = 0; i < toAdd.size(); i++) {
-                toAdd.get(i).loadDisplayData(backgroundSetterService.lockScreenBitmapDrawer);
+                toAdd.get(i).loadDisplayData(this);
                 toAdd.get(i).splitText(backgroundSetterService);
             }
             

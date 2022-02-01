@@ -3,16 +3,13 @@ package prototype.xd.scheduler;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.initStorage;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -37,26 +34,12 @@ public class MainActivity extends AppCompatActivity {
     
     public volatile static SharedPreferences preferences;
     
-    private TextView calendar_permission_text;
-    private TextView storage_permission_text;
-    private CardView calendar_permission_text_bg;
-    private CardView storage_permission_text_bg;
-    
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_CALENDAR
     };
     
     public static final int REQUEST_CODE_PERMISSIONS = 13;
-    
-    BroadcastReceiver screenOnOffReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction()) || Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
-                BackgroundSetterService.notifyScreenStateChanged(context);
-            }
-        }
-    };
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +54,9 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }*/
         
-        if (!refreshPermissionStates()) {
+        if (!refreshPermissionStates(false)) {
             setContentView(R.layout.permissions_request_screen);
-            calendar_permission_text = findViewById(R.id.calendar_permission_granted);
-            storage_permission_text = findViewById(R.id.storage_permission_granted);
-            calendar_permission_text_bg = findViewById(R.id.calendar_permission_granted_bg);
-            storage_permission_text_bg = findViewById(R.id.storage_permission_granted_bg);
-            refreshPermissionStates();
+            refreshPermissionStates(true);
             View grant_button = findViewById(R.id.grant_permissions_button);
             grant_button.setOnClickListener(v -> requestPermissions(PERMISSIONS, REQUEST_CODE_PERMISSIONS));
         } else {
@@ -87,25 +66,24 @@ public class MainActivity extends AppCompatActivity {
     
     private void launchMainActivity() {
         initStorage(this);
-        registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
-        registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
-        BackgroundSetterService.restart(this);
+        BackgroundSetterService.restart(getApplicationContext());
         setContentView(R.layout.activity_main);
     }
     
-    public void notifyService() {
-        preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-    }
-    
-    private boolean refreshPermissionStates() {
+    private boolean refreshPermissionStates(boolean display) {
         boolean storage_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         boolean calendar_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED;
         
-        if (calendar_permission_text != null) {
+        if(display){
+            TextView calendar_permission_text = findViewById(R.id.calendar_permission_granted);
+            TextView storage_permission_text = findViewById(R.id.storage_permission_granted);
+            CardView calendar_permission_text_bg = findViewById(R.id.calendar_permission_granted_bg);
+            CardView storage_permission_text_bg = findViewById(R.id.storage_permission_granted_bg);
+    
             calendar_permission_text.setText(calendar_granted ? R.string.permissions_granted : R.string.permissions_not_granted);
             calendar_permission_text.setTextColor(getColor(calendar_granted ? R.color.color_permission_granted : R.color.color_permission_not_granted));
             calendar_permission_text_bg.setCardBackgroundColor(getColor(calendar_granted ? R.color.color_permission_granted_bg : R.color.color_permission_not_granted_bg));
-            
+    
             storage_permission_text.setText(storage_granted ? R.string.permissions_granted : R.string.permissions_not_granted);
             storage_permission_text.setTextColor(getColor(storage_granted ? R.color.color_permission_granted : R.color.color_permission_not_granted));
             storage_permission_text_bg.setCardBackgroundColor(getColor(storage_granted ? R.color.color_permission_granted_bg : R.color.color_permission_not_granted_bg));
@@ -117,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (refreshPermissionStates()) {
+        if (refreshPermissionStates(true)) {
             launchMainActivity();
         }
     }

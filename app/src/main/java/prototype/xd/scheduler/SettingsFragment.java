@@ -1,8 +1,9 @@
 package prototype.xd.scheduler;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,29 +32,23 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class SettingsFragment extends Fragment {
     
-    public Context context;
-    public ViewGroup rootViewGroup;
     private AdaptiveBackgroundSettingsEntry adaptiveBackgroundSettingsEntry;
     public SystemCalendarSettings calendarSettingsDialogue;
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootViewGroup = container;
-        context = requireContext();
-        calendarSettingsDialogue = new SystemCalendarSettings(this, inflater.inflate(R.layout.entry_settings, container, false));
+        calendarSettingsDialogue = new SystemCalendarSettings(inflater.inflate(R.layout.entry_settings, container, false));
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
     
     @Override
     public void onDestroyView() {
-        ((MainActivity)requireActivity()).notifyService();
+        preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         super.onDestroyView();
     }
     
     @Override
     public void onDestroy() {
-        context = null;
-        rootViewGroup = null;
         adaptiveBackgroundSettingsEntry = null;
         calendarSettingsDialogue = null;
         super.onDestroy();
@@ -70,73 +65,73 @@ public class SettingsFragment extends Fragment {
         
         adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntry(this);
         
-        settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_backgrounds)));
+        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_backgrounds)));
         settingsEntries.add(adaptiveBackgroundSettingsEntry);
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED,
-                context.getString(R.string.settings_adaptive_color)));
+                getString(R.string.settings_adaptive_color)));
         settingsEntries.add(new SeekBarSettingsEntry(0, 1000, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE,
-                Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance, this));
+                Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR,
-                context.getString(R.string.settings_today_bg_color), context));
+                getString(R.string.settings_today_bg_color)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR,
-                context.getString(R.string.settings_expired_bg_color), context));
+                getString(R.string.settings_expired_bg_color)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR,
-                context.getString(R.string.settings_upcoming_bg_color), context));
+                getString(R.string.settings_upcoming_bg_color)));
         
-        settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_bevels)));
+        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_bevels)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR,
-                context.getString(R.string.settings_today_bevel_color), context));
+                getString(R.string.settings_today_bevel_color)));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS,
-                Keys.BORDER_THICKNESS, R.string.settings_today_bevel_thickness, this));
+                Keys.BORDER_THICKNESS, R.string.settings_today_bevel_thickness));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR,
-                context.getString(R.string.settings_expired_bevel_color), context));
+                getString(R.string.settings_expired_bevel_color)));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS,
-                Keys.EXPIRED_BORDER_THICKNESS, R.string.settings_expired_bevel_thickness, this));
+                Keys.EXPIRED_BORDER_THICKNESS, R.string.settings_expired_bevel_thickness));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR,
-                context.getString(R.string.settings_upcoming_bevel_color), context));
+                getString(R.string.settings_upcoming_bevel_color)));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS,
-                Keys.UPCOMING_BORDER_THICKNESS, R.string.settings_upcoming_bevel_thickness, this));
+                Keys.UPCOMING_BORDER_THICKNESS, R.string.settings_upcoming_bevel_thickness));
         
         
-        settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_fonts)));
+        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_fonts)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR,
-                context.getString(R.string.settings_today_font_color), context));
+                getString(R.string.settings_today_font_color)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR,
-                context.getString(R.string.settings_expired_font_color), context));
+                getString(R.string.settings_expired_font_color)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR,
-                context.getString(R.string.settings_upcoming_font_color), context));
+                getString(R.string.settings_upcoming_font_color)));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE,
-                Keys.FONT_SIZE, R.string.settings_font_size, this));
+                Keys.FONT_SIZE, R.string.settings_font_size));
         
         
-        settingsEntries.add(new TitleBarSettingsEntry(context.getString(R.string.category_visibility)));
+        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_visibility)));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET,
-                Keys.UPCOMING_ITEMS_OFFSET, R.string.settings_show_days_upcoming, this));
+                Keys.UPCOMING_ITEMS_OFFSET, R.string.settings_show_days_upcoming));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET,
-                Keys.EXPIRED_ITEMS_OFFSET, R.string.settings_show_days_expired, this));
+                Keys.EXPIRED_ITEMS_OFFSET, R.string.settings_show_days_expired));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST,
-                context.getString(R.string.settings_show_expired_done_items_list)));
+                getString(R.string.settings_show_expired_done_items_list)));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST,
-                context.getString(R.string.settings_show_upcoming_done_items_list)));
+                getString(R.string.settings_show_upcoming_done_items_list)));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK,
-                context.getString(R.string.settings_show_global_items_lock)));
+                getString(R.string.settings_show_global_items_lock)));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK,
-                context.getString(R.string.settings_max_rWidth_lock)));
+                getString(R.string.settings_max_rWidth_lock)));
         
         settingsEntries.add(new ResetButtonsSettingsEntry(this, view, savedInstanceState));
     
-        SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries, context);
+        SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries);
         ((ListView) view.findViewById(R.id.settingsList)).setAdapter(settingsListViewAdapter);
     
         ArrayList<SettingsEntry> settingsEntries_additional = new ArrayList<>();
         new Thread(() -> {
-            settingsEntries_additional.add(new TitleBarSettingsEntry(context.getString(R.string.category_system_calendars)));
-            ArrayList<SystemCalendar> calendars = getAllCalendars(context, true);
+            settingsEntries_additional.add(new TitleBarSettingsEntry(getString(R.string.category_system_calendars)));
+            ArrayList<SystemCalendar> calendars = getAllCalendars(view.getContext(), true);
             ArrayList<ArrayList<SystemCalendar>> calendars_sorted = new ArrayList<>();
             ArrayList<String> calendars_sorted_names = new ArrayList<>();
 

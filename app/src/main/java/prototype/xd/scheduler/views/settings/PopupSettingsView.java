@@ -4,7 +4,6 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 
-import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -105,20 +104,20 @@ public class PopupSettingsView {
         settings_reset_button = settingsView.findViewById(R.id.settings_reset_button);
     }
     
-    protected void setStateIconColor(TextView icon, String parameter, Context context) {
+    protected void setStateIconColor(TextView icon, String parameter) {
     }
     
-    void updateAllIndicators(Context context) {
-        setStateIconColor(fontColor_view_state, Keys.FONT_COLOR, context);
-        setStateIconColor(bgColor_view_state, Keys.BG_COLOR, context);
-        setStateIconColor(padColor_view_state, Keys.BORDER_COLOR, context);
-        setStateIconColor(border_size_state, Keys.BORDER_THICKNESS, context);
-        setStateIconColor(priority_state, Keys.PRIORITY, context);
-        setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK, context);
-        setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED, context);
-        setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE, context);
-        setStateIconColor(showDaysUpcoming_bar_state, Keys.UPCOMING_ITEMS_OFFSET, context);
-        setStateIconColor(showDaysExpired_bar_state, Keys.EXPIRED_ITEMS_OFFSET, context);
+    void updateAllIndicators() {
+        setStateIconColor(fontColor_view_state, Keys.FONT_COLOR);
+        setStateIconColor(bgColor_view_state, Keys.BG_COLOR);
+        setStateIconColor(padColor_view_state, Keys.BORDER_COLOR);
+        setStateIconColor(border_size_state, Keys.BORDER_THICKNESS);
+        setStateIconColor(priority_state, Keys.PRIORITY);
+        setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK);
+        setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED);
+        setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE);
+        setStateIconColor(showDaysUpcoming_bar_state, Keys.UPCOMING_ITEMS_OFFSET);
+        setStateIconColor(showDaysExpired_bar_state, Keys.EXPIRED_ITEMS_OFFSET);
     }
     
     protected void updatePreviews(int fontColor, int bgColor, int borderColor, int borderThickness) {

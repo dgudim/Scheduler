@@ -1,17 +1,18 @@
 package prototype.xd.scheduler.adapters;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.HomeFragment;
-import prototype.xd.scheduler.MainActivity;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.CheckBox;
@@ -34,26 +34,18 @@ import prototype.xd.scheduler.views.settings.EntrySettings;
 
 public class TodoListViewAdapter extends BaseAdapter {
     
-    private final Context context;
-    
-    private final LayoutInflater inflater;
     private final HomeFragment home;
     
     public final ArrayList<TodoListEntry> currentTodoListEntries;
     public final ArrayList<Integer> currentTodoListEntries_indexMap;
     
-    private final MainActivity mainActivity;
-    
     private final EntrySettings entrySettings;
     
-    public TodoListViewAdapter(final HomeFragment fragment, final MainActivity mainActivity, final ViewGroup parent) {
-        this.mainActivity = mainActivity;
+    public TodoListViewAdapter(final HomeFragment fragment, final ViewGroup parent) {
         this.home = fragment;
-        this.context = fragment.rootActivity;
-        inflater = LayoutInflater.from(context);
         currentTodoListEntries = new ArrayList<>();
         currentTodoListEntries_indexMap = new ArrayList<>();
-        entrySettings = new EntrySettings(fragment, inflater.inflate(R.layout.entry_settings, parent, false));
+        entrySettings = new EntrySettings(fragment, LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
     }
     
     @Override
@@ -95,11 +87,11 @@ public class TodoListViewAdapter extends BaseAdapter {
     
     public void updateData(boolean updateBitmap) {
         if (updateBitmap) {
-            mainActivity.notifyService();
+            preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
         home.todoListEntries = sortEntries(home.todoListEntries, currentlySelectedDay);
         updateCurrentEntries();
-        home.rootActivity.runOnUiThread(TodoListViewAdapter.this::notifyDataSetChanged);
+        home.requireActivity().runOnUiThread(TodoListViewAdapter.this::notifyDataSetChanged);
     }
     
     @Override
@@ -120,9 +112,9 @@ public class TodoListViewAdapter extends BaseAdapter {
         
         if (view == null) {
             if (currentEntry.fromSystemCalendar) {
-                view = inflater.inflate(R.layout.list_selection_calendar, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_selection_calendar, parent, false);
             } else {
-                view = inflater.inflate(R.layout.list_selection, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_selection, parent, false);
             }
         }
         
@@ -134,7 +126,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             
             view.findViewById(R.id.deletionButton).setOnClickListener(view1 -> {
                 
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                AlertDialog.Builder alert = new AlertDialog.Builder(view1.getContext());
                 alert.setTitle("Удалить");
                 alert.setMessage("Вы уверены?");
                 alert.setPositiveButton("Да", (dialog, which) -> {
@@ -161,10 +153,10 @@ public class TodoListViewAdapter extends BaseAdapter {
                 updateData(true);
             });
             
-            todoText.setOnLongClickListener(v -> {
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
+            todoText.setOnLongClickListener(view1 -> {
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(view1.getContext());
                 alertBuilder.setTitle(R.string.edit);
-                View addView = inflater.inflate(R.layout.edit_entry_dialogue, parent, false);
+                View addView = LayoutInflater.from(view1.getContext()).inflate(R.layout.edit_entry_dialogue, parent, false);
                 alertBuilder.setView(addView);
                 AlertDialog dialog = alertBuilder.create();
                 
@@ -194,10 +186,10 @@ public class TodoListViewAdapter extends BaseAdapter {
                 dialog.show();
                 return false;
             });
-            settings.setOnClickListener(v -> entrySettings.show(currentEntry));
+            settings.setOnClickListener(v -> entrySettings.show(currentEntry, v.getContext()));
         } else {
             ((CardView) view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
-            ((TextView) view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(context));
+            ((TextView) view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(view.getContext()));
             settings.setOnClickListener(v -> NavHostFragment.findNavController(home).navigate(R.id.action_HomeFragment_to_SettingsFragment));
         }
         
@@ -209,7 +201,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             todoText.setTextColor(currentEntry.fontColor);
         }
         
-        todoText.setText(currentEntry.textValue + currentEntry.getDayOffset(currentlySelectedDay, context));
+        todoText.setText(currentEntry.textValue + currentEntry.getDayOffset(currentlySelectedDay, view.getContext()));
         
         return view;
     }

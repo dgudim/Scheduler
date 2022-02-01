@@ -46,11 +46,8 @@ import prototype.xd.scheduler.utilities.Keys;
 public class HomeFragment extends Fragment {
     
     public TodoListViewAdapter todoListViewAdapter;
-    
     public ArrayList<TodoListEntry> todoListEntries;
-    
-    public MainActivity rootActivity;
-    
+
     public HomeFragment() {
         super();
     }
@@ -58,14 +55,12 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         
-        rootActivity = (MainActivity) requireActivity();
-        
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         
         todoListEntries = new ArrayList<>();
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        todoListViewAdapter = new TodoListViewAdapter(HomeFragment.this, rootActivity, container);
+        todoListViewAdapter = new TodoListViewAdapter(HomeFragment.this, container);
         listView.setAdapter(todoListViewAdapter);
         
         CalendarView calendarView = view.findViewById(R.id.calendar);
@@ -77,7 +72,7 @@ public class HomeFragment extends Fragment {
         });
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(rootActivity);
+            AlertDialog.Builder builder = new AlertDialog.Builder(view1.getContext());
             builder.setTitle(R.string.add_item);
             View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
             builder.setView(addView);
@@ -85,7 +80,7 @@ public class HomeFragment extends Fragment {
             
             final EditText input = addView.findViewById(R.id.entryNameEditText);
             input.setOnFocusChangeListener((v, hasFocus) -> input.postDelayed(() -> {
-                InputMethodManager inputMethodManager= (InputMethodManager) rootActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager inputMethodManager= (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
             }, 200));
             input.requestFocus();
@@ -98,7 +93,7 @@ public class HomeFragment extends Fragment {
                 groupNames.add(group.name);
             }
             final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(rootActivity, android.R.layout.simple_spinner_item, groupNames);
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, groupNames);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
             groupSpinner.setAdapter(arrayAdapter);
             groupSpinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
@@ -142,7 +137,7 @@ public class HomeFragment extends Fragment {
         });
         
         view.findViewById(R.id.openSettingsButton).setOnClickListener(v ->
-                ((NavHostFragment) Objects.requireNonNull(rootActivity.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)))
+                ((NavHostFragment) Objects.requireNonNull(requireActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)))
                         .getNavController().navigate(R.id.action_HomeFragment_to_SettingsFragment));
         
         return view;
@@ -156,7 +151,7 @@ public class HomeFragment extends Fragment {
         
         new Thread(() -> {
             todoListEntries.clear();
-            todoListEntries.addAll(loadTodoEntries(rootActivity));
+            todoListEntries.addAll(loadTodoEntries(requireContext()));
             long epoch;
             if ((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
                 currentlySelectedDay = daysFromEpoch(addTimeZoneOffset(epoch)); // timezone corrections because calendar returns in local timezone
@@ -167,9 +162,6 @@ public class HomeFragment extends Fragment {
     
     @Override
     public void onDestroy() {
-        rootActivity = null;
-        todoListViewAdapter = null;
-        todoListEntries = null;
         preferences.edit().remove(Keys.PREVIOUSLY_SELECTED_DATE).apply();
         super.onDestroy();
     }

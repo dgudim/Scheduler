@@ -20,7 +20,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
@@ -164,17 +163,16 @@ public class Utilities {
     //listener for general settings
     public static void addSeekBarChangeListener(final TextView displayTo,
                                                 final SeekBar seekBar,
-                                                final Fragment fragment,
                                                 final int stringResource,
                                                 final String key,
                                                 final int defaultValue) {
-        displayTo.setText(fragment.getString(stringResource, preferences.getInt(key, defaultValue)));
+        displayTo.setText(displayTo.getContext().getString(stringResource, preferences.getInt(key, defaultValue)));
         seekBar.setProgress(preferences.getInt(key, defaultValue));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(fragment.getString(stringResource, progress));
+                displayTo.setText(displayTo.getContext().getString(stringResource, progress));
             }
             
             @Override
@@ -198,13 +196,13 @@ public class Utilities {
                                                 final int stringResource,
                                                 final String parameter,
                                                 final int initialValue) {
-        displayTo.setText(entrySettings.fragment.getString(stringResource, initialValue));
+        displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(entrySettings.fragment.getString(stringResource, progress));
+                displayTo.setText(displayTo.getContext().getString(stringResource, progress));
                 if (mapToBorderPreview) {
                     entrySettings.preview_border.setPadding(progress, progress, progress, 0);
                 }
@@ -234,13 +232,13 @@ public class Utilities {
                                                 final String calendarKey,
                                                 final String parameter,
                                                 final int initialValue) {
-        displayTo.setText(systemCalendarSettings.fragment.getString(stringResource, initialValue));
+        displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(systemCalendarSettings.fragment.getString(stringResource, progress));
+                displayTo.setText(displayTo.getContext().getString(stringResource, progress));
                 if (mapToBorderPreview) {
                     systemCalendarSettings.preview_border.setPadding(progress, progress, progress, 0);
                 }
@@ -254,7 +252,7 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 preferences.edit().putInt(calendarKey + "_" + parameter, seekBar.getProgress()).apply();
-                systemCalendarSettings.setStateIconColor(stateIcon, parameter, systemCalendarSettings.fragment.context);
+                systemCalendarSettings.setStateIconColor(stateIcon, parameter);
             }
         });
     }
@@ -273,14 +271,13 @@ public class Utilities {
         tSwitch.setChecked(initialValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
-            entry.setStateIconColor(stateIcon, parameter, fragment.rootActivity);
+            entry.setStateIconColor(stateIcon, parameter);
             saveEntries(fragment.todoListEntries);
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
         });
     }
     
-    public static void addSwitchChangeListener(final Context context,
-                                               final Switch tSwitch,
+    public static void addSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
                                                final SystemCalendarSettings systemCalendarSettings,
                                                final String calendarKey,
@@ -290,28 +287,27 @@ public class Utilities {
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-            systemCalendarSettings.setStateIconColor(stateIcon, parameter, context);
+            systemCalendarSettings.setStateIconColor(stateIcon, parameter);
         });
     }
     
     //color dialogue for general settings
-    public static void invokeColorDialogue(final Context context, final CardView target, final String key, final int defaultValue) {
-        invokeColorDialogue(context, preferences.getInt(key, defaultValue), (dialog, selectedColor, allColors) -> {
+    public static void invokeColorDialogue(final CardView target, final String key, final int defaultValue) {
+        invokeColorDialogue(target.getContext(), preferences.getInt(key, defaultValue), (dialog, selectedColor, allColors) -> {
             preferences.edit().putInt(key, selectedColor).apply();
             target.setCardBackgroundColor(preferences.getInt(key, defaultValue));
         });
     }
     
     //color dialogue with border and background color preview in entry settings
-    public static void invokeColorDialogue(final Context context,
-                                           final TextView stateIcon,
+    public static void invokeColorDialogue(final TextView stateIcon,
                                            final EntrySettings settings,
                                            final HomeFragment fragment,
                                            final TodoListEntry todoListEntry,
                                            final String parameter,
                                            final int initialValue,
                                            final boolean setReconstructFlag) {
-        invokeColorDialogue(context, initialValue, (dialog, selectedColor, allColors) -> {
+        invokeColorDialogue(stateIcon.getContext(), initialValue, (dialog, selectedColor, allColors) -> {
             todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
             saveEntries(fragment.todoListEntries);
             switch (parameter) {
@@ -326,19 +322,18 @@ public class Utilities {
                     break;
             }
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
-            todoListEntry.setStateIconColor(stateIcon, parameter, context);
+            todoListEntry.setStateIconColor(stateIcon, parameter);
         });
     }
     
     //color dialogue for calendar settings
-    public static void invokeColorDialogue(final Context context,
-                                           final TextView stateIcon,
+    public static void invokeColorDialogue(final TextView stateIcon,
                                            final SystemCalendarSettings systemCalendarSettings,
                                            final String calendarKey,
                                            final String parameter,
                                            final int initialValue,
                                            final boolean setReconstructFlag) {
-        invokeColorDialogue(context, initialValue, (dialog, selectedColor, allColors) -> {
+        invokeColorDialogue(stateIcon.getContext(), initialValue, (dialog, selectedColor, allColors) -> {
             preferences.edit().putInt(calendarKey + "_" + parameter, selectedColor).apply();
             switch (parameter) {
                 case FONT_COLOR:
@@ -352,7 +347,7 @@ public class Utilities {
                     break;
             }
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
-            systemCalendarSettings.setStateIconColor(stateIcon, parameter, context);
+            systemCalendarSettings.setStateIconColor(stateIcon, parameter);
         });
     }
     

@@ -23,18 +23,14 @@ public class SettingsEntry {
         return SettingsEntryType.values().length;
     }
     
-    protected View inflate(LayoutInflater inflater, ViewGroup viewGroup) {
-        return inflater.inflate(layoutId, viewGroup, false);
-    }
-    
-    public View get(View convertView, ViewGroup viewGroup, LayoutInflater inflater) {
+    public View get(View convertView, ViewGroup viewGroup) {
         if (convertView == null) {
-            convertView = inflate(inflater, viewGroup);
+            convertView = LayoutInflater.from(viewGroup.getContext()).inflate(layoutId, viewGroup, false);
         }
-        return InitInnerViews(convertView);
+        return InitInnerViews(convertView, viewGroup);
     }
     
-    protected View InitInnerViews(View rootView) {
-        return rootView;
+    protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
+        return convertView;
     }
 }

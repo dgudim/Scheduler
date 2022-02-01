@@ -9,7 +9,6 @@ import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.TextView;
@@ -18,22 +17,19 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
     private final AlertDialog dialog;
     private ArrayList<String> calendarSubKeys;
-    public final SettingsFragment fragment;
     
-    public SystemCalendarSettings(final SettingsFragment fragment, final View settingsView) {
+    public SystemCalendarSettings(final View settingsView) {
         super(settingsView);
-        this.fragment = fragment;
         
         settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
         
-        dialog = new AlertDialog.Builder(fragment.context).setView(settingsView).create();
+        dialog = new AlertDialog.Builder(settingsView.getContext()).setView(settingsView).create();
     }
     
     public void show(final String calendar_key) {
@@ -44,16 +40,16 @@ public class SystemCalendarSettings extends PopupSettingsView {
     private void initialise(final String calendarKey) {
         
         calendarSubKeys = generateSubKeysFromKey(calendarKey);
-        final Context context = fragment.context;
+        
         updatePreviews(preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR),
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR),
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR),
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS));
         
-        updateAllIndicators(context);
+        updateAllIndicators();
         
         settings_reset_button.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
             builder.setTitle(R.string.reset_settings_prompt);
             
             builder.setPositiveButton(R.string.yes, (dialog, which) -> {
@@ -72,17 +68,17 @@ public class SystemCalendarSettings extends PopupSettingsView {
             builder.show();
         });
         
-        fontColor_select.setOnClickListener(view -> invokeColorDialogue(context,
+        fontColor_select.setOnClickListener(view -> invokeColorDialogue(
                 fontColor_view_state, this,
                 calendarKey, Keys.FONT_COLOR,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR), true));
         
-        bgColor_select.setOnClickListener(view -> invokeColorDialogue(context,
+        bgColor_select.setOnClickListener(view -> invokeColorDialogue(
                 bgColor_view_state, this,
                 calendarKey, Keys.BG_COLOR,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR), true));
         
-        borderColor_select.setOnClickListener(view -> invokeColorDialogue(context,
+        borderColor_select.setOnClickListener(view -> invokeColorDialogue(
                 padColor_view_state, this,
                 calendarKey, Keys.BORDER_COLOR,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR), true));
@@ -122,13 +118,13 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 calendarKey, Keys.EXPIRED_ITEMS_OFFSET,
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET));
         
-        addSwitchChangeListener(context,
+        addSwitchChangeListener(
                 show_on_lock_switch,
                 show_on_lock_state, this,
                 calendarKey, Keys.SHOW_ON_LOCK,
                 preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK));
         
-        addSwitchChangeListener(context,
+        addSwitchChangeListener(
                 adaptive_color_switch,
                 adaptiveColor_switch_state, this,
                 calendarKey, Keys.ADAPTIVE_COLOR_ENABLED,
@@ -136,14 +132,14 @@ public class SystemCalendarSettings extends PopupSettingsView {
     }
     
     @Override
-    public void setStateIconColor(TextView display, String parameter, Context context) {
+    public void setStateIconColor(TextView display, String parameter) {
         int keyIndex = getFirstValidKeyIndex(calendarSubKeys, parameter);
         if (keyIndex == calendarSubKeys.size() - 1) {
-            display.setTextColor(context.getColor(R.color.entry_settings_parameter_personal));
+            display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_personal));
         } else if (keyIndex >= 0) {
-            display.setTextColor(context.getColor(R.color.entry_settings_parameter_group));
+            display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_group));
         } else {
-            display.setTextColor(context.getColor(R.color.entry_settings_parameter_default));
+            display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_default));
         }
     }
 }

@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
@@ -17,7 +18,6 @@ public class ResetButtonsSettingsEntry extends SettingsEntry {
     private final View view;
     private final Bundle savedInstanceState;
     
-    
     public ResetButtonsSettingsEntry(Fragment fragment, View view, Bundle savedInstanceState) {
         super(R.layout.settings_reset_buttons_entry);
         this.fragment = fragment;
@@ -28,10 +28,10 @@ public class ResetButtonsSettingsEntry extends SettingsEntry {
     
     @SuppressWarnings({"ApplySharedPref"})
     @Override
-    protected View InitInnerViews(View rootView) {
+    protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
         
-        rootView.findViewById(R.id.resetSettingsButton).setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getContext());
+        convertView.findViewById(R.id.resetSettingsButton).setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(convertView.getContext());
             builder.setTitle("Сбросить настройки?");
         
             builder.setPositiveButton("Да", (dialog, which) -> {
@@ -43,6 +43,6 @@ public class ResetButtonsSettingsEntry extends SettingsEntry {
             builder.show();
         });
         
-        return super.InitInnerViews(rootView);
+        return super.InitInnerViews(convertView, viewGroup);
     }
 }

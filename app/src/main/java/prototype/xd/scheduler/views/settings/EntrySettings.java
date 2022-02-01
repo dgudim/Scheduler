@@ -51,28 +51,27 @@ public class EntrySettings extends PopupSettingsView {
         super(settingsView);
         this.fragment = fragment;
         
-        dialog = new AlertDialog.Builder(fragment.rootActivity).setOnDismissListener(dialog -> {
+        dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
             saveEntries(fragment.todoListEntries);
             fragment.todoListViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
         }).setView(settingsView).create();
     }
     
-    public void show(final TodoListEntry entry) {
-        initialise(entry);
+    public void show(final TodoListEntry entry, final Context context) {
+        initialise(entry, context);
         dialog.show();
     }
     
-    private void initialise(TodoListEntry entry) {
+    private void initialise(TodoListEntry entry, Context context) {
         
         todoListEntry = entry;
         
-        final Context context = fragment.rootActivity;
         final ArrayList<TodoListEntry> allEntries = fragment.todoListEntries;
         
         updatePreviews(entry.fontColor_original, entry.bgColor_original, entry.borderColor_original, entry.border_thickness_original);
         
-        updateAllIndicators(context);
+        updateAllIndicators();
         
         final ArrayList<Group> groupList = readGroupFile();
         final ArrayList<String> groupNames = new ArrayList<>();
@@ -88,14 +87,14 @@ public class EntrySettings extends PopupSettingsView {
                 view.setLongClickable(true);
                 if (convertView == null) {
                     view.setOnLongClickListener(view1 -> {
-                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(view1.getContext());
                         if (groupNames.get(position).equals(BLANK_GROUP_NAME)) {
                             builder.setTitle(R.string.cant_rename_this_group);
                             builder.setMessage(R.string.break_settings_reset_message);
                         } else {
                             builder.setTitle(R.string.edit);
                             
-                            final EditText input = new EditText(context);
+                            final EditText input = new EditText(view.getContext());
                             input.setInputType(InputType.TYPE_CLASS_TEXT);
                             input.setText(groupNames.get(position));
                             input.setHint(R.string.title);
@@ -117,7 +116,7 @@ public class EntrySettings extends PopupSettingsView {
                                     notifyDataSetChanged();
                                 } else {
                                     dialog.dismiss();
-                                    final AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+                                    final AlertDialog.Builder builder1 = new AlertDialog.Builder(view1.getContext());
                                     builder1.setTitle(R.string.cant_use_this_group_name);
                                     builder1.setMessage(R.string.break_settings_reset_message);
                                     builder1.show();
@@ -125,7 +124,7 @@ public class EntrySettings extends PopupSettingsView {
                             });
                             
                             builder.setNeutralButton(R.string.delete_group, (dialog, which) -> {
-                                AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                                AlertDialog.Builder builder2 = new AlertDialog.Builder(view1.getContext());
                                 builder2.setTitle(R.string.delete);
                                 builder2.setMessage(R.string.are_you_sure);
                                 
@@ -141,7 +140,7 @@ public class EntrySettings extends PopupSettingsView {
                                     }
                                     saveEntries(fragment.todoListEntries);
                                     group_spinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
-                                    updateAllIndicators(context);
+                                    updateAllIndicators();
                                     notifyDataSetChanged();
                                 });
                                 
@@ -172,7 +171,7 @@ public class EntrySettings extends PopupSettingsView {
                     entry.changeGroup(groupNames.get(position));
                     saveEntries(fragment.todoListEntries);
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-                    initialise(entry);
+                    initialise(entry, context);
                 }
             }
             
@@ -183,25 +182,25 @@ public class EntrySettings extends PopupSettingsView {
         });
         
         add_group.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
             builder.setTitle(R.string.add_current_config_as_group_prompt);
             builder.setMessage(R.string.add_current_config_as_group_message);
             
-            final EditText input = new EditText(context);
+            final EditText input = new EditText(v.getContext());
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             input.setHint(R.string.title);
             builder.setView(input);
             
             builder.setPositiveButton(R.string.add, (dialog, which) -> {
                 if (input.getText().toString().equals(BLANK_GROUP_NAME)) {
-                    AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                    AlertDialog.Builder builder2 = new AlertDialog.Builder(v.getContext());
                     builder2.setTitle(R.string.cant_create_group_with_this_name);
                     builder2.setMessage(R.string.break_settings_reset_message);
                     
                     builder2.show();
                     
                 } else if (groupNames.contains(input.getText().toString())) {
-                    AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                    AlertDialog.Builder builder2 = new AlertDialog.Builder(v.getContext());
                     builder2.setTitle(R.string.group_with_same_name_exists);
                     builder2.setMessage(R.string.overwrite_prompt);
                     
@@ -215,7 +214,7 @@ public class EntrySettings extends PopupSettingsView {
                                 entry2.changeGroup(createdGroup);
                             }
                         }
-                        updateAllIndicators(context);
+                        updateAllIndicators();
                         preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     });
                     
@@ -232,7 +231,7 @@ public class EntrySettings extends PopupSettingsView {
                     entry.removeDisplayParams();
                     entry.changeGroup(createdGroup);
                     saveEntries(fragment.todoListEntries);
-                    updateAllIndicators(context);
+                    updateAllIndicators();
                 }
             });
             
@@ -241,7 +240,7 @@ public class EntrySettings extends PopupSettingsView {
         });
         
         settings_reset_button.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
             builder.setTitle(R.string.reset_settings_prompt);
             
             builder.setPositiveButton(R.string.yes, (dialog, which) -> {
@@ -249,7 +248,7 @@ public class EntrySettings extends PopupSettingsView {
                 entry.resetGroup();
                 saveEntries(fragment.todoListEntries);
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
-                initialise(entry);
+                initialise(entry, context);
             });
             builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
             
@@ -257,15 +256,15 @@ public class EntrySettings extends PopupSettingsView {
         });
         
         fontColor_select.setOnClickListener(view -> invokeColorDialogue(
-                context, fontColor_view_state, this, fragment,
+                fontColor_view_state, this, fragment,
                 entry, FONT_COLOR, entry.fontColor_original, true));
         
         bgColor_select.setOnClickListener(view -> invokeColorDialogue(
-                context, bgColor_view_state, this, fragment,
+                bgColor_view_state, this, fragment,
                 entry, BG_COLOR, entry.bgColor_original, true));
         
         borderColor_select.setOnClickListener(view -> invokeColorDialogue(
-                context, padColor_view_state, this, fragment,
+                padColor_view_state, this, fragment,
                 entry, BORDER_COLOR, entry.borderColor_original, true));
         
         addSeekBarChangeListener(
@@ -313,11 +312,11 @@ public class EntrySettings extends PopupSettingsView {
     
     public void changeEntryParameter(TextView icon, String parameter, String value) {
         todoListEntry.changeParameter(parameter, value);
-        setStateIconColor(icon, parameter, fragment.rootActivity);
+        setStateIconColor(icon, parameter);
     }
     
     @Override
-    protected void setStateIconColor(TextView icon, String parameter, Context context) {
-        todoListEntry.setStateIconColor(icon, parameter, context);
+    protected void setStateIconColor(TextView icon, String parameter) {
+        todoListEntry.setStateIconColor(icon, parameter);
     }
 }

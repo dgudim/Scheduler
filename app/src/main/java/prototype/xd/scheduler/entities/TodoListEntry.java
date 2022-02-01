@@ -501,7 +501,6 @@ public class TodoListEntry {
     
     public void splitText(Context context) {
         textValueSplit = (WordUtils.wrap(textValue + getDayOffset(currentDay, context), maxChars, "\n", true) + "\n" + getTimeSpan(context)).split("\n");
-        
     }
     
     private void setParams(String[] params) {
@@ -573,7 +572,7 @@ public class TodoListEntry {
         reloadParams();
     }
     
-    public void setStateIconColor(TextView icon, String parameter, Context context) {
+    public void setStateIconColor(TextView icon, String parameter) {
         boolean containedInGroupParams = false;
         boolean containedInPersonalParams = false;
         for (int i = 0; i < group.params.length; i += 2) {
@@ -589,13 +588,13 @@ public class TodoListEntry {
             }
         }
         if (containedInGroupParams && containedInPersonalParams) {
-            icon.setTextColor(context.getColor(R.color.entry_settings_parameter_group_and_personal));
+            icon.setTextColor(icon.getContext().getColor(R.color.entry_settings_parameter_group_and_personal));
         } else if (containedInGroupParams) {
-            icon.setTextColor(context.getColor(R.color.entry_settings_parameter_group));
+            icon.setTextColor(icon.getContext().getColor(R.color.entry_settings_parameter_group));
         } else if (containedInPersonalParams) {
-            icon.setTextColor(context.getColor(R.color.entry_settings_parameter_personal));
+            icon.setTextColor(icon.getContext().getColor(R.color.entry_settings_parameter_personal));
         } else {
-            icon.setTextColor(context.getColor(R.color.entry_settings_parameter_default));
+            icon.setTextColor(icon.getContext().getColor(R.color.entry_settings_parameter_default));
         }
     }
     
