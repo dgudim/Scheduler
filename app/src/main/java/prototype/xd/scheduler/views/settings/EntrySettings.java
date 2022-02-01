@@ -257,15 +257,15 @@ public class EntrySettings extends PopupSettingsView {
         
         fontColor_select.setOnClickListener(view -> invokeColorDialogue(
                 fontColor_view_state, this, fragment,
-                entry, FONT_COLOR, entry.fontColor_original, true));
+                entry, FONT_COLOR, entry.fontColor_original));
         
         bgColor_select.setOnClickListener(view -> invokeColorDialogue(
                 bgColor_view_state, this, fragment,
-                entry, BG_COLOR, entry.bgColor_original, true));
+                entry, BG_COLOR, entry.bgColor_original));
         
         borderColor_select.setOnClickListener(view -> invokeColorDialogue(
                 padColor_view_state, this, fragment,
-                entry, BORDER_COLOR, entry.borderColor_original, true));
+                entry, BORDER_COLOR, entry.borderColor_original));
         
         addSeekBarChangeListener(
                 border_thickness_description,

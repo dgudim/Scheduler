@@ -187,7 +187,7 @@ public class Utilities {
         });
     }
     
-    //listener for border thickness preview in entry settings
+    //listener for entry settings
     public static void addSeekBarChangeListener(final TextView displayTo,
                                                 final SeekBar seekBar,
                                                 final TextView stateIcon,
@@ -253,15 +253,18 @@ public class Utilities {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 preferences.edit().putInt(calendarKey + "_" + parameter, seekBar.getProgress()).apply();
                 systemCalendarSettings.setStateIconColor(stateIcon, parameter);
+                preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
             }
         });
     }
     
+    //switch listener for regular settings
     public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue) {
         tSwitch.setChecked(preferences.getBoolean(key, defaultValue), false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> preferences.edit().putBoolean(key, isChecked).apply());
     }
     
+    //switch listener for entry settings
     public static void addSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
                                                final HomeFragment fragment,
@@ -277,6 +280,7 @@ public class Utilities {
         });
     }
     
+    //switch listener for calendar settings
     public static void addSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
                                                final SystemCalendarSettings systemCalendarSettings,
@@ -286,8 +290,8 @@ public class Utilities {
         tSwitch.setChecked(initialValue, false);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);
+            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
         });
     }
     
@@ -299,14 +303,13 @@ public class Utilities {
         });
     }
     
-    //color dialogue with border and background color preview in entry settings
+    //color dialogue for entry settings
     public static void invokeColorDialogue(final TextView stateIcon,
                                            final EntrySettings settings,
                                            final HomeFragment fragment,
                                            final TodoListEntry todoListEntry,
                                            final String parameter,
-                                           final int initialValue,
-                                           final boolean setReconstructFlag) {
+                                           final int initialValue) {
         invokeColorDialogue(stateIcon.getContext(), initialValue, (dialog, selectedColor, allColors) -> {
             todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
             saveEntries(fragment.todoListEntries);
@@ -321,8 +324,8 @@ public class Utilities {
                     settings.updatePreviewBorder(selectedColor);
                     break;
             }
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
             todoListEntry.setStateIconColor(stateIcon, parameter);
+            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
         });
     }
     
@@ -331,8 +334,7 @@ public class Utilities {
                                            final SystemCalendarSettings systemCalendarSettings,
                                            final String calendarKey,
                                            final String parameter,
-                                           final int initialValue,
-                                           final boolean setReconstructFlag) {
+                                           final int initialValue) {
         invokeColorDialogue(stateIcon.getContext(), initialValue, (dialog, selectedColor, allColors) -> {
             preferences.edit().putInt(calendarKey + "_" + parameter, selectedColor).apply();
             switch (parameter) {
@@ -346,8 +348,8 @@ public class Utilities {
                     systemCalendarSettings.updatePreviewBorder(selectedColor);
                     break;
             }
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, setReconstructFlag).apply();
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);
+            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
         });
     }
     

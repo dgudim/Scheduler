@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
-import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.ArrayList;
 
@@ -31,6 +30,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.EntrySettings;
+import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class TodoListViewAdapter extends BaseAdapter {
     
@@ -40,12 +40,15 @@ public class TodoListViewAdapter extends BaseAdapter {
     public final ArrayList<Integer> currentTodoListEntries_indexMap;
     
     private final EntrySettings entrySettings;
+    private final SystemCalendarSettings systemCalendarSettings;
     
     public TodoListViewAdapter(final HomeFragment fragment, final ViewGroup parent) {
         this.home = fragment;
         currentTodoListEntries = new ArrayList<>();
         currentTodoListEntries_indexMap = new ArrayList<>();
         entrySettings = new EntrySettings(fragment, LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
+        systemCalendarSettings = new SystemCalendarSettings(
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false), this);
     }
     
     @Override
@@ -190,7 +193,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         } else {
             ((CardView) view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
             ((TextView) view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(view.getContext()));
-            settings.setOnClickListener(v -> NavHostFragment.findNavController(home).navigate(R.id.action_HomeFragment_to_SettingsFragment));
+            settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
         }
         
         view.findViewById(R.id.backgroundSecondLayer).setBackgroundColor(currentEntry.bgColor);

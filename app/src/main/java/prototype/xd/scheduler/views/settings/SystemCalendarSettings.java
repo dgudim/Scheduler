@@ -1,9 +1,11 @@
 package prototype.xd.scheduler.views.settings;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
@@ -17,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.adapters.TodoListViewAdapter;
+import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class SystemCalendarSettings extends PopupSettingsView {
@@ -24,16 +28,26 @@ public class SystemCalendarSettings extends PopupSettingsView {
     private final AlertDialog dialog;
     private ArrayList<String> calendarSubKeys;
     
-    public SystemCalendarSettings(final View settingsView) {
+    public SystemCalendarSettings(final View settingsView, final TodoListViewAdapter todoListViewAdapter) {
         super(settingsView);
         
         settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
         
-        dialog = new AlertDialog.Builder(settingsView.getContext()).setView(settingsView).create();
+        dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
+            if (todoListViewAdapter != null) {
+                todoListViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
+            }
+            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
+        }).setView(settingsView).create();
     }
     
     public void show(final String calendar_key) {
         initialise(calendar_key);
+        dialog.show();
+    }
+    
+    public void show(final TodoListEntry entry) {
+        initialise(makeKey(entry.event));
         dialog.show();
     }
     
@@ -71,17 +85,17 @@ public class SystemCalendarSettings extends PopupSettingsView {
         fontColor_select.setOnClickListener(view -> invokeColorDialogue(
                 fontColor_view_state, this,
                 calendarKey, Keys.FONT_COLOR,
-                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR), true));
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR)));
         
         bgColor_select.setOnClickListener(view -> invokeColorDialogue(
                 bgColor_view_state, this,
                 calendarKey, Keys.BG_COLOR,
-                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR), true));
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR)));
         
         borderColor_select.setOnClickListener(view -> invokeColorDialogue(
                 padColor_view_state, this,
                 calendarKey, Keys.BORDER_COLOR,
-                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR), true));
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR)));
         
         addSeekBarChangeListener(
                 border_thickness_description,

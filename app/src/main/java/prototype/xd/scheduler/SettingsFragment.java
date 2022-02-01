@@ -37,7 +37,7 @@ public class SettingsFragment extends Fragment {
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        calendarSettingsDialogue = new SystemCalendarSettings(inflater.inflate(R.layout.entry_settings, container, false));
+        calendarSettingsDialogue = new SystemCalendarSettings(inflater.inflate(R.layout.entry_settings, container, false), null);
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
     
