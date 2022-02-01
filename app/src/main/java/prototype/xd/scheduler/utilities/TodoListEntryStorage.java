@@ -54,18 +54,18 @@ public class TodoListEntryStorage {
             loadedDay_end = currentlySelectedDay + 14;
             todoListEntries.addAll(loadTodoEntries(context, loadedDay_start, loadedDay_end));
         } else {
-            long old_loadedDay_start = loadedDay_start;
-            long old_loadedDay_end = loadedDay_end;
-            loadedDay_start = currentlySelectedDay - 14;
-            loadedDay_end = currentlySelectedDay + 14;
+            long new_loadedDay_start = currentlySelectedDay - 14;
+            long new_loadedDay_end = currentlySelectedDay + 14;
             long day_start = 0;
             long day_end = 0;
-            if (loadedDay_end > old_loadedDay_end) {
-                day_start = old_loadedDay_end + 1;
-                day_end = loadedDay_end;
-            } else if (loadedDay_start < old_loadedDay_start) {
-                day_start = loadedDay_start;
-                day_end = old_loadedDay_start - 1;
+            if (new_loadedDay_end > loadedDay_end) {
+                day_start = loadedDay_end + 1;
+                day_end = new_loadedDay_end;
+                loadedDay_end = new_loadedDay_end;
+            } else if (new_loadedDay_start < loadedDay_start) {
+                day_start = new_loadedDay_start;
+                day_end = loadedDay_start - 1;
+                loadedDay_start = new_loadedDay_start;
             }
             if (day_start != 0) {
                 for (int i = 0; i < calendars.size(); i++) {
