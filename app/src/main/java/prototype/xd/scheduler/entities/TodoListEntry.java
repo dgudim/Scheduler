@@ -8,15 +8,14 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.datetimeFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
-import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY;
@@ -130,7 +129,7 @@ public class TodoListEntry {
             if (day > day_end) {
                 return false;
             }
-            RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
+            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
             long instance = 0;
             while (it.hasNext() && instance <= day) {
                 instance = daysFromEpoch(it.next());
@@ -148,7 +147,7 @@ public class TodoListEntry {
             if (timestamp > timestamp_end) {
                 return false;
             }
-            RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
+            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
             long instance = 0;
             long day = daysFromEpoch(timestamp);
             while (it.hasNext() && instance <= timestamp) {
@@ -167,7 +166,7 @@ public class TodoListEntry {
             if (day > day_end) {
                 return timestamp_end;
             }
-            RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
+            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
             while (it.hasNext()) {
                 long epoch = it.next();
                 if (inRange(day, daysFromEpoch(epoch)) || daysFromEpoch(epoch) >= day) {
@@ -383,7 +382,12 @@ public class TodoListEntry {
             borderColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
             borderThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
             
-            showOnLock = isVisible_exact(currentTimestamp) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+            if (preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
+                showOnLock = isVisible_exact(currentTimestamp);
+            } else {
+                showOnLock = isVisible(currentDay);
+            }
+            showOnLock = showOnLock && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
             showOnLock = showOnLock || isExpiredEntry || isUpcomingEntry;
             
             adaptiveColor = 0xff_FFFFFF;
@@ -617,7 +621,7 @@ public class TodoListEntry {
     
     @Override
     public int hashCode() {
-        return Objects.hash(event, Arrays.hashCode(params));
+        return Objects.hash(event, Arrays.hashCode(params), showOnLock);
     }
     
     @Override
@@ -628,7 +632,7 @@ public class TodoListEntry {
             return true;
         } else if (obj instanceof TodoListEntry) {
             return Objects.equals(event, ((TodoListEntry) obj).event) &&
-                    Arrays.equals(((TodoListEntry) obj).params, params);
+                    Arrays.equals(((TodoListEntry) obj).params, params) && showOnLock == ((TodoListEntry) obj).showOnLock;
         }
         return super.equals(obj);
     }

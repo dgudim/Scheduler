@@ -111,6 +111,9 @@ public class SettingsFragment extends Fragment {
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET,
                 Keys.EXPIRED_ITEMS_OFFSET, R.string.settings_show_days_expired));
         settingsEntries.add(new SwitchSettingsEntry(
+                Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME,
+                getString(R.string.settings_hide_expired_entries_by_time)));
+        settingsEntries.add(new SwitchSettingsEntry(
                 Keys.SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST,
                 getString(R.string.settings_show_expired_done_items_list)));
         settingsEntries.add(new SwitchSettingsEntry(

@@ -13,7 +13,6 @@ import java.util.TimeZone;
 
 public class DateManager {
     
-    public static final TimeZone timeZone_UTC = TimeZone.getTimeZone("UTC");
     public static final TimeZone timeZone_SYSTEM = TimeZone.getDefault();
     
     public static long currentDay = DAY_FLAG_GLOBAL;
@@ -44,7 +43,7 @@ public class DateManager {
     public static long daysFromEpoch(long epoch) {
         final Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(epoch);
-        return cal.getTime().toInstant().getEpochSecond() / 86400;
+        return addTimeZoneOffset_seconds(cal.getTime().toInstant().getEpochSecond()) / 86400;
     }
     
     public static String getTimeSpan(long time1, long time2) {
@@ -93,6 +92,10 @@ public class DateManager {
         int day = Integer.parseInt(dateParts_current[2]);
         return OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.UTC)
                 .toInstant().getEpochSecond() / 86400;
+    }
+    
+    public static long addTimeZoneOffset_seconds(long epoch_seconds) {
+        return epoch_seconds + timeZone_SYSTEM.getOffset(epoch_seconds * 1000) / 1000L;
     }
     
     public static long addTimeZoneOffset(long epoch) {

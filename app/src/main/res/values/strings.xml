@@ -117,5 +117,6 @@
     <string name="settings_preview">Preview</string>
     <string name="settings_preview_expired">Expired</string>
     <string name="settings_preview_upcoming">Upcoming</string>
+    <string name="settings_hide_expired_entries_by_time">Hide passed entries on lockscreen(by time)</string>
 
 </resources>

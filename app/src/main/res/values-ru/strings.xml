@@ -111,4 +111,5 @@
     <string name="settings_preview">Превью</string>
     <string name="settings_preview_expired">Прошедшие</string>
     <string name="settings_preview_upcoming">Будущие</string>
+    <string name="settings_hide_expired_entries_by_time">Скрывать пройденные дела на экране блокировки(по времени)</string>
 </resources>

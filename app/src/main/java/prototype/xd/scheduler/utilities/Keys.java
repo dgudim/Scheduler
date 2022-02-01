@@ -24,6 +24,7 @@ public class Keys {
     public static final int SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE = 500;
     
     public static final boolean SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK = false;
+    public static final boolean SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME = false;
     
     public static final boolean SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK = true;
     public static final boolean SETTINGS_DEFAULT_SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST = false;
@@ -78,6 +79,8 @@ public class Keys {
     public static final String SHOW_GLOBAL_ITEMS_LOCK = "show_global_tasks_lock";
     
     public static final String ITEM_FULL_WIDTH_LOCK = "force_max_RWidth_lock";
+    
+    public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
     
     public static final String NEED_TO_RECONSTRUCT_BITMAP = "need_to_reconstruct_bitmap";
     

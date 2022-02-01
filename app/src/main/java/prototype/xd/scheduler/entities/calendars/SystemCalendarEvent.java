@@ -2,7 +2,7 @@ package prototype.xd.scheduler.entities.calendars;
 
 import static android.provider.CalendarContract.Events;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
-import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
+import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
@@ -26,6 +26,7 @@ import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.TimeZone;
 
 public class SystemCalendarEvent {
     
@@ -45,6 +46,8 @@ public class SystemCalendarEvent {
     public RecurrenceSet rSet;
     public long duration;
     
+    public TimeZone timeZone;
+    
     public ArrayList<String> subKeys;
     
     SystemCalendarEvent(Cursor cursor, SystemCalendar associatedCalendar, boolean loadMinimal) {
@@ -61,6 +64,11 @@ public class SystemCalendarEvent {
         start = getLong(cursor, calendarEventsColumns, Events.DTSTART);
         end = getLong(cursor, calendarEventsColumns, Events.DTEND);
         allDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
+        
+        timeZone = TimeZone.getTimeZone(getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE));
+        if (timeZone == null) {
+            timeZone = timeZone_SYSTEM;
+        }
         
         if (allDay) {
             end -= 60 * 1000;
@@ -79,7 +87,7 @@ public class SystemCalendarEvent {
                     rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
                 
                 if (rDate_str != null)
-                    rSet.addInstances(new RecurrenceList(rDate_str, timeZone_UTC));
+                    rSet.addInstances(new RecurrenceList(rDate_str, timeZone));
                 
                 exRule_str = getString(cursor, calendarEventsColumns, Events.EXRULE);
                 exDate_str = getString(cursor, calendarEventsColumns, Events.EXDATE);
@@ -88,11 +96,11 @@ public class SystemCalendarEvent {
                     rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule_str)));
                 
                 if (exDate_str != null)
-                    rSet.addExceptions(new RecurrenceList(exDate_str, timeZone_UTC));
+                    rSet.addExceptions(new RecurrenceList(exDate_str, timeZone));
                 
                 duration = RFC2445ToMilliseconds(getString(cursor, calendarEventsColumns, Events.DURATION));
                 
-                end = rSet.isInfinite() ? Long.MAX_VALUE : rSet.getLastInstance(timeZone_UTC, start);
+                end = rSet.isInfinite() ? Long.MAX_VALUE : rSet.getLastInstance(timeZone, start);
             } catch (InvalidRecurrenceRuleException e) {
                 logException(e);
             }
@@ -107,7 +115,7 @@ public class SystemCalendarEvent {
     
     public boolean fallsInRange(long dayStart, long dayEnd) {
         if (rSet != null) {
-            RecurrenceSetIterator it = rSet.iterator(timeZone_UTC, start);
+            RecurrenceSetIterator it = rSet.iterator(timeZone, start);
             long instance = 0;
             while (it.hasNext() && daysFromEpoch(instance) <= dayEnd) {
                 instance = daysFromEpoch(it.next());
@@ -120,7 +128,7 @@ public class SystemCalendarEvent {
         return startOrEndInRange(start, end, dayStart, dayEnd);
     }
     
-    private boolean startOrEndInRange(long start, long end, long dayStart, long dayEnd){
+    private boolean startOrEndInRange(long start, long end, long dayStart, long dayEnd) {
         start = daysFromEpoch(start);
         end = daysFromEpoch(end);
         return (start >= dayStart && start <= dayEnd) || (end >= dayStart && end <= dayEnd);

@@ -36,7 +36,8 @@ public class SystemCalendarUtils {
             CalendarContract.Events.RDATE,
             CalendarContract.Events.EXRULE,
             CalendarContract.Events.EXDATE,
-            CalendarContract.Events.DELETED));
+            CalendarContract.Events.DELETED,
+            CalendarContract.Events.EVENT_TIMEZONE));
     
     public static ArrayList<SystemCalendar> getAllCalendars(Context context, boolean loadMinimal) {
         ContentResolver contentResolver = context.getContentResolver();

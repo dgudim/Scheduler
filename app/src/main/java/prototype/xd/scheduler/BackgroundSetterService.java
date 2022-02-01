@@ -116,7 +116,7 @@ public class BackgroundSetterService extends Service {
     
     private void updateNotification() {
         if (lockScreenBitmapDrawer == null) {
-            getForegroundNotification().setContentText(getString(R.string.service_sleep_mode));
+            getForegroundNotification().setContentTitle(getString(R.string.service_sleep_mode));
         } else {
             getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTime()));
         }
@@ -175,7 +175,7 @@ public class BackgroundSetterService extends Service {
                         }
                     }
                 }
-            }, 5000, 1000 * 60 * 30); //approximately every 30 minutes if day
+            }, 5000, 1000 * 60 * 10); //approximately every 10 minutes if day
         }
         return START_STICKY;
     }
