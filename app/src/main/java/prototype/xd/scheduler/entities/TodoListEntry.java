@@ -5,6 +5,7 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.datetimeFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
@@ -140,6 +141,25 @@ public class TodoListEntry {
             return false;
         }
         return inRange(day, day_start);
+    }
+    
+    public boolean isVisible_exact(long timestamp) {
+        if (recurrenceSet != null) {
+            if (timestamp > timestamp_end) {
+                return false;
+            }
+            RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
+            long instance = 0;
+            long day = daysFromEpoch(timestamp);
+            while (it.hasNext() && instance <= timestamp) {
+                instance = it.next();
+                if (inRange(day, instance)) {
+                    return instance + timestamp_duration >= timestamp;
+                }
+            }
+            return false;
+        }
+        return inRange(daysFromEpoch(timestamp), day_start) && timestamp_start + timestamp_duration >= timestamp;
     }
     
     public long getNearestEventTimestamp(long day) {
@@ -363,7 +383,7 @@ public class TodoListEntry {
             borderColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
             borderThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
             
-            showOnLock = isVisible(currentDay) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+            showOnLock = isVisible_exact(currentTimestamp) && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
             showOnLock = showOnLock || isExpiredEntry || isUpcomingEntry;
             
             adaptiveColor = 0xff_FFFFFF;

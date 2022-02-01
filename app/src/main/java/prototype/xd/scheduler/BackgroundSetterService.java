@@ -125,7 +125,7 @@ public class BackgroundSetterService extends Service {
     
     // Lifecycle ===============================
     
-    private boolean lastUpdateSucceeded = false;
+    private volatile boolean lastUpdateSucceeded = false;
     private boolean initialized = false;
     private BroadcastReceiver screenOnOffReceiver;
     

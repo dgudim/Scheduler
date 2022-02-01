@@ -17,6 +17,7 @@ public class DateManager {
     public static final TimeZone timeZone_SYSTEM = TimeZone.getDefault();
     
     public static long currentDay = DAY_FLAG_GLOBAL;
+    public static long currentTimestamp = DAY_FLAG_GLOBAL;
     public static long currentlySelectedDay = DAY_FLAG_GLOBAL;
     
     static final DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.ROOT);
@@ -25,7 +26,8 @@ public class DateManager {
     
     public static void updateDate(String selectedDate_string, boolean updateCurrentlySelected) {
         long selectedDay = daysFromDate(selectedDate_string);
-        currentDay = getCurrentDay();
+        currentTimestamp = getCurrentTimestamp();
+        currentDay = daysFromEpoch(currentTimestamp);
         if (updateCurrentlySelected) {
             if (selectedDay == DAY_FLAG_GLOBAL) {
                 currentlySelectedDay = currentDay;
@@ -97,8 +99,8 @@ public class DateManager {
         return epoch + timeZone_SYSTEM.getOffset(epoch);
     }
     
-    private static long getCurrentDay() {
-        return daysFromEpoch(addTimeZoneOffset(Calendar.getInstance().getTime().getTime()));
+    private static long getCurrentTimestamp() {
+        return addTimeZoneOffset(Calendar.getInstance().getTime().getTime());
     }
     
 }
