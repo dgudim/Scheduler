@@ -15,8 +15,10 @@ import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
@@ -93,7 +95,7 @@ public class SystemCalendar {
     }
     
     public ArrayList<TodoListEntry> getVisibleTodoListEntries() {
-        ArrayList <TodoListEntry> todoListEntries = new ArrayList<>();
+        ArrayList<TodoListEntry> todoListEntries = new ArrayList<>();
         if (preferences.getBoolean(makeKey(this) + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
             for (int i = 0; i < systemCalendarEvents.size(); i++) {
                 todoListEntries.add(new TodoListEntry(systemCalendarEvents.get(i)));
@@ -106,5 +108,28 @@ public class SystemCalendar {
     @Override
     public String toString() {
         return account_name + ": " + name;
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(account_type, account_name, name, id, accessLevel, color);
+    }
+    
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null) {
+            return false;
+        } else if (obj == this) {
+            return true;
+        } else if (obj instanceof SystemCalendar) {
+            SystemCalendar s_calendar = (SystemCalendar) obj;
+            return Objects.equals(account_type, s_calendar.account_type) &&
+                    Objects.equals(account_name, s_calendar.account_name) &&
+                    Objects.equals(name, s_calendar.name) &&
+                    Objects.equals(id, s_calendar.id) &&
+                    Objects.equals(accessLevel, s_calendar.accessLevel) &&
+                    Objects.equals(color, s_calendar.color);
+        }
+        return super.equals(obj);
     }
 }

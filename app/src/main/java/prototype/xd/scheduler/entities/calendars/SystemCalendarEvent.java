@@ -95,7 +95,7 @@ public class SystemCalendarEvent {
                 logException(e);
             }
         }
-    
+        
         if (allDay) {
             duration -= 60 * 1000;
         }
@@ -105,13 +105,15 @@ public class SystemCalendarEvent {
     
     @Override
     public int hashCode() {
-        return Objects.hash(title, color, start, end, allDay, rRule_str, rDate_str, exRule_str, exDate_str);
+        return Objects.hash(title, color, start, end, allDay, rRule_str, rDate_str, exRule_str, exDate_str, associatedCalendar);
     }
     
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj == null) {
             return false;
+        } else if (obj == this) {
+            return true;
         } else if (obj instanceof SystemCalendarEvent) {
             SystemCalendarEvent s_event = (SystemCalendarEvent) obj;
             return Objects.equals(title, s_event.title) &&
@@ -122,7 +124,8 @@ public class SystemCalendarEvent {
                     Objects.equals(rRule_str, s_event.rRule_str) &&
                     Objects.equals(rDate_str, s_event.rDate_str) &&
                     Objects.equals(exRule_str, s_event.exRule_str) &&
-                    Objects.equals(exDate_str, s_event.exDate_str);
+                    Objects.equals(exDate_str, s_event.exDate_str) &&
+                    Objects.equals(associatedCalendar, s_event.associatedCalendar);
         }
         return super.equals(obj);
     }

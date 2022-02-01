@@ -48,7 +48,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         currentTodoListEntries_indexMap = new ArrayList<>();
         entrySettings = new EntrySettings(fragment, LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
         systemCalendarSettings = new SystemCalendarSettings(
-                LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false), this);
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false), fragment);
     }
     
     @Override

@@ -18,8 +18,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Map;
 
+import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
 
@@ -27,15 +27,19 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     private final AlertDialog dialog;
     private ArrayList<String> calendarSubKeys;
+    private TodoListEntry entry;
+    private final HomeFragment homeFragment;
     
-    public SystemCalendarSettings(final View settingsView, final TodoListViewAdapter todoListViewAdapter) {
+    public SystemCalendarSettings(final View settingsView, final HomeFragment homeFragment) {
         super(settingsView);
         
         settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
         
+        this.homeFragment = homeFragment;
+        
         dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
-            if (todoListViewAdapter != null) {
-                todoListViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
+            if (homeFragment != null) {
+                homeFragment.todoListViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
             }
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
         }).setView(settingsView).create();
@@ -47,6 +51,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     }
     
     public void show(final TodoListEntry entry) {
+        this.entry = entry;
         initialise(makeKey(entry.event));
         dialog.show();
     }
@@ -154,6 +159,16 @@ public class SystemCalendarSettings extends PopupSettingsView {
             display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_group));
         } else {
             display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_default));
+        }
+        if (homeFragment != null) {
+            for (int i = 0; i < homeFragment.todoListEntries.size(); i++) {
+                TodoListEntry current_entry = homeFragment.todoListEntries.get(i);
+                if(current_entry.fromSystemCalendar){
+                    if(current_entry.event.subKeys.equals(entry.event.subKeys)){
+                        current_entry.reloadParams();
+                    }
+                }
+            }
         }
     }
 }

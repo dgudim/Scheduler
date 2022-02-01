@@ -607,6 +607,8 @@ public class TodoListEntry {
     public boolean equals(@Nullable Object obj) {
         if (obj == null) {
             return false;
+        } else if (obj == this) {
+            return true;
         } else if (obj instanceof TodoListEntry) {
             return Objects.equals(event, ((TodoListEntry) obj).event) &&
                     Arrays.equals(((TodoListEntry) obj).params, params);

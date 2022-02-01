@@ -67,8 +67,6 @@ public class EntrySettings extends PopupSettingsView {
         
         todoListEntry = entry;
         
-        final ArrayList<TodoListEntry> allEntries = fragment.todoListEntries;
-        
         updatePreviews(entry.fontColor_original, entry.bgColor_original, entry.borderColor_original, entry.border_thickness_original);
         
         updateAllIndicators();
@@ -107,7 +105,7 @@ public class EntrySettings extends PopupSettingsView {
                                     String origName = groupList.get(position).name;
                                     groupList.get(position).name = input.getText().toString();
                                     saveGroupsFile(groupList);
-                                    for (TodoListEntry entry1 : allEntries) {
+                                    for (TodoListEntry entry1 : fragment.todoListEntries) {
                                         if (entry1.group.name.equals(origName)) {
                                             entry1.group.name = input.getText().toString();
                                         }
@@ -133,7 +131,7 @@ public class EntrySettings extends PopupSettingsView {
                                     groupList.remove(group_spinner.getSelectedItemPosition());
                                     groupNames.remove(group_spinner.getSelectedItemPosition());
                                     saveGroupsFile(groupList);
-                                    for (TodoListEntry entry1 : allEntries) {
+                                    for (TodoListEntry entry1 : fragment.todoListEntries) {
                                         if (entry1.group.name.equals(origName)) {
                                             entry1.resetGroup();
                                         }
@@ -208,7 +206,7 @@ public class EntrySettings extends PopupSettingsView {
                         Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                         groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
                         saveGroupsFile(groupList);
-                        for (TodoListEntry entry2 : allEntries) {
+                        for (TodoListEntry entry2 : fragment.todoListEntries) {
                             if (entry2.group.name.equals(input.getText().toString())) {
                                 entry2.removeDisplayParams();
                                 entry2.changeGroup(createdGroup);
