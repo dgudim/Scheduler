@@ -118,8 +118,8 @@ public class SystemCalendarEvent {
             RecurrenceSetIterator it = rSet.iterator(timeZone, start);
             long instance = 0;
             while (it.hasNext() && daysFromEpoch(instance) <= dayEnd) {
-                instance = daysFromEpoch(it.next());
-                if (startOrEndInRange(start, start + duration, dayStart, dayEnd)) {
+                instance = it.next();
+                if (startOrEndInRange(start, instance + duration, dayStart, dayEnd)) {
                     return true;
                 }
             }
