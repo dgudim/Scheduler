@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities.calendars;
 
 import static android.provider.CalendarContract.Events;
+import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.timeZone_UTC;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
@@ -21,6 +22,7 @@ import org.dmfs.rfc5545.recur.RecurrenceRule;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceList;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceRuleAdapter;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
+import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -101,6 +103,27 @@ public class SystemCalendarEvent {
         }
         
         subKeys = generateSubKeysFromKey(makeKey(this));
+    }
+    
+    public boolean fallsInRange(long dayStart, long dayEnd) {
+        if (rSet != null) {
+            RecurrenceSetIterator it = rSet.iterator(timeZone_UTC, start);
+            long instance = 0;
+            while (it.hasNext() && daysFromEpoch(instance) <= dayEnd) {
+                instance = daysFromEpoch(it.next());
+                if (startOrEndInRange(start, start + duration, dayStart, dayEnd)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return startOrEndInRange(start, end, dayStart, dayEnd);
+    }
+    
+    private boolean startOrEndInRange(long start, long end, long dayStart, long dayEnd){
+        start = daysFromEpoch(start);
+        end = daysFromEpoch(end);
+        return (start >= dayStart && start <= dayEnd) || (end >= dayStart && end <= dayEnd);
     }
     
     @Override

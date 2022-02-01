@@ -12,8 +12,6 @@ import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
-import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -38,16 +36,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
 public class HomeFragment extends Fragment {
     
-    public TodoListViewAdapter todoListViewAdapter;
-    public ArrayList<TodoListEntry> todoListEntries;
-
+    private volatile TodoListEntryStorage todoListEntryStorage;
+    
     public HomeFragment() {
         super();
     }
@@ -57,18 +54,18 @@ public class HomeFragment extends Fragment {
         
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         
-        todoListEntries = new ArrayList<>();
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
-        todoListViewAdapter = new TodoListViewAdapter(HomeFragment.this, container);
-        listView.setAdapter(todoListViewAdapter);
+        
+        todoListEntryStorage = new TodoListEntryStorage(container);
+        listView.setAdapter(todoListEntryStorage.getTodoListViewAdapter());
         
         CalendarView calendarView = view.findViewById(R.id.calendar);
         calendarView.setDate(preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, calendarView.getDate()));
-        calendarView.setOnDateChangeListener((view12, year, month, dayOfMonth) -> {
+        calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             preferences.edit().putLong(Keys.PREVIOUSLY_SELECTED_DATE, dateToEpoch(year, month, dayOfMonth)).apply();
             updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-            todoListViewAdapter.updateData(false);
+            todoListEntryStorage.lazyLoadEntries(view1.getContext());
         });
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
@@ -80,7 +77,7 @@ public class HomeFragment extends Fragment {
             
             final EditText input = addView.findViewById(R.id.entryNameEditText);
             input.setOnFocusChangeListener((v, hasFocus) -> input.postDelayed(() -> {
-                InputMethodManager inputMethodManager= (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager inputMethodManager = (InputMethodManager) view1.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
             }, 200));
             input.requestFocus();
@@ -93,7 +90,7 @@ public class HomeFragment extends Fragment {
                 groupNames.add(group.name);
             }
             final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, groupNames);
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(view1.getContext(), android.R.layout.simple_spinner_item, groupNames);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
             groupSpinner.setAdapter(arrayAdapter);
             groupSpinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
@@ -114,23 +111,23 @@ public class HomeFragment extends Fragment {
                         TEXT_VALUE, input.getText().toString().trim(),
                         ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
                         IS_COMPLETED, "false"}, currentGroup[0]);
-                todoListEntries.add(newEntry);
-                saveEntries(todoListEntries);
-                todoListViewAdapter.updateData(newEntry.getLockViewState());
+                todoListEntryStorage.addEntry(newEntry);
+                todoListEntryStorage.saveEntries();
+                todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
                 dialog.dismiss();
             });
-    
+            
             addView.findViewById(R.id.add_to_global_button).setOnClickListener(v -> {
                 TodoListEntry newEntry = new TodoListEntry(new String[]{
                         TEXT_VALUE, input.getText().toString().trim(),
                         ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
                         IS_COMPLETED, "false"}, currentGroup[0]);
-                todoListEntries.add(newEntry);
-                saveEntries(todoListEntries);
-                todoListViewAdapter.updateData(newEntry.getLockViewState());
+                todoListEntryStorage.addEntry(newEntry);
+                todoListEntryStorage.saveEntries();
+                todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
                 dialog.dismiss();
             });
-    
+            
             addView.findViewById(R.id.cancel_button).setOnClickListener(v -> dialog.dismiss());
             
             dialog.show();
@@ -149,19 +146,16 @@ public class HomeFragment extends Fragment {
         
         updateDate(DAY_FLAG_GLOBAL_STR, true);
         
-        new Thread(() -> {
-            todoListEntries.clear();
-            todoListEntries.addAll(loadTodoEntries(requireContext()));
-            long epoch;
-            if ((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
-                currentlySelectedDay = daysFromEpoch(addTimeZoneOffset(epoch)); // timezone corrections because calendar returns in local timezone
-            }
-            if (todoListViewAdapter != null) todoListViewAdapter.updateData(false);
-        }).start();
+        long epoch;
+        if ((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
+            currentlySelectedDay = daysFromEpoch(addTimeZoneOffset(epoch)); // timezone corrections because calendar returns in local timezone
+        }
+        todoListEntryStorage.lazyLoadEntries(view.getContext());
     }
     
     @Override
     public void onDestroy() {
+        todoListEntryStorage = null;
         preferences.edit().remove(Keys.PREVIOUSLY_SELECTED_DATE).apply();
         super.onDestroy();
     }

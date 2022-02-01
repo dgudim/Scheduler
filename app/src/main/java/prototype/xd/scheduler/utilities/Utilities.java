@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
@@ -11,7 +10,7 @@ import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllTodoListEntriesFromCalendars;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 
 import android.app.Activity;
 import android.content.Context;
@@ -34,7 +33,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.views.Switch;
@@ -56,7 +54,7 @@ public class Utilities {
         }
     }
     
-    public static ArrayList<TodoListEntry> loadTodoEntries(Context context) {
+    public static ArrayList<TodoListEntry> loadTodoEntries(Context context, long day_start, long day_end) {
         
         ArrayList<TodoListEntry> readEntries = new ArrayList<>();
         try {
@@ -75,9 +73,8 @@ public class Utilities {
             logException(e);
         }
         
-        readEntries.addAll(getAllTodoListEntriesFromCalendars(context));
-        return sortEntries(readEntries, currentDay);
-        
+        readEntries.addAll(getTodoListEntriesFromCalendars(context, day_start, day_end));
+        return readEntries;
     }
     
     public static void saveEntries(ArrayList<TodoListEntry> entries) {
@@ -216,7 +213,7 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf(seekBar.getProgress()));
-                saveEntries(entrySettings.fragment.todoListEntries);
+                entrySettings.todoListEntryStorage.saveEntries();
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
             }
         });
@@ -267,7 +264,7 @@ public class Utilities {
     //switch listener for entry settings
     public static void addSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
-                                               final HomeFragment fragment,
+                                               final TodoListEntryStorage todoListEntryStorage,
                                                final TodoListEntry entry,
                                                final String parameter,
                                                final boolean initialValue) {
@@ -275,7 +272,7 @@ public class Utilities {
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             entry.setStateIconColor(stateIcon, parameter);
-            saveEntries(fragment.todoListEntries);
+            todoListEntryStorage.saveEntries();
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
         });
     }
@@ -306,13 +303,13 @@ public class Utilities {
     //color dialogue for entry settings
     public static void invokeColorDialogue(final TextView stateIcon,
                                            final EntrySettings settings,
-                                           final HomeFragment fragment,
+                                           final TodoListEntryStorage todoListEntryStorage,
                                            final TodoListEntry todoListEntry,
                                            final String parameter,
                                            final int initialValue) {
         invokeColorDialogue(stateIcon.getContext(), initialValue, (dialog, selectedColor, allColors) -> {
             todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
-            saveEntries(fragment.todoListEntries);
+            todoListEntryStorage.saveEntries();
             switch (parameter) {
                 case FONT_COLOR:
                     settings.updatePreviewFont(selectedColor);

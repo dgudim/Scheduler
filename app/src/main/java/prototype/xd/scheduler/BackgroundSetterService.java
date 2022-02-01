@@ -1,10 +1,10 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTime;
 import static prototype.xd.scheduler.utilities.DateManager.isDayTime;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 
 import android.app.NotificationChannel;
@@ -14,6 +14,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
@@ -27,6 +28,7 @@ import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class BackgroundSetterService extends Service {
     
+    private SharedPreferences preferences;
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
     private Timer refreshTimer;
@@ -136,7 +138,7 @@ public class BackgroundSetterService extends Service {
             }
         } else {
             initialized = true;
-            
+            preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
             //register receivers
             screenOnOffReceiver = new BroadcastReceiver(){
                 @Override

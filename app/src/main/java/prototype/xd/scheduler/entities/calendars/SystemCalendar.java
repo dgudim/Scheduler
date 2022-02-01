@@ -94,11 +94,14 @@ public class SystemCalendar {
         cursor.close();
     }
     
-    public ArrayList<TodoListEntry> getVisibleTodoListEntries() {
+    public ArrayList<TodoListEntry> getVisibleTodoListEntries(long day_start, long day_end) {
         ArrayList<TodoListEntry> todoListEntries = new ArrayList<>();
         if (preferences.getBoolean(makeKey(this) + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
             for (int i = 0; i < systemCalendarEvents.size(); i++) {
-                todoListEntries.add(new TodoListEntry(systemCalendarEvents.get(i)));
+                SystemCalendarEvent event = systemCalendarEvents.get(i);
+                if (event.fallsInRange(day_start, day_end)) {
+                    todoListEntries.add(new TodoListEntry(event));
+                }
             }
         }
         return todoListEntries;

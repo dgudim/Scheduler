@@ -18,28 +18,28 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Map;
 
-import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
     private final AlertDialog dialog;
     private ArrayList<String> calendarSubKeys;
     private TodoListEntry entry;
-    private final HomeFragment homeFragment;
+    private final TodoListEntryStorage todoListEntryStorage;
     
-    public SystemCalendarSettings(final View settingsView, final HomeFragment homeFragment) {
+    public SystemCalendarSettings(final TodoListEntryStorage todoListEntryStorage, final View settingsView) {
         super(settingsView);
         
         settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
         
-        this.homeFragment = homeFragment;
+        this.todoListEntryStorage = todoListEntryStorage;
         
         dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
-            if (homeFragment != null) {
-                homeFragment.todoListViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
+            if (todoListEntryStorage != null) {
+                todoListEntryStorage.updateTodoListAdapter(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
             }
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
         }).setView(settingsView).create();
@@ -160,11 +160,10 @@ public class SystemCalendarSettings extends PopupSettingsView {
         } else {
             display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_default));
         }
-        if (homeFragment != null) {
-            for (int i = 0; i < homeFragment.todoListEntries.size(); i++) {
-                TodoListEntry current_entry = homeFragment.todoListEntries.get(i);
-                if(current_entry.fromSystemCalendar){
-                    if(current_entry.event.subKeys.equals(entry.event.subKeys)){
+        if (todoListEntryStorage != null) {
+            for (TodoListEntry current_entry : todoListEntryStorage.getTodoListEntries()) {
+                if (current_entry.fromSystemCalendar) {
+                    if (current_entry.event.subKeys.equals(entry.event.subKeys)) {
                         current_entry.reloadParams();
                     }
                 }

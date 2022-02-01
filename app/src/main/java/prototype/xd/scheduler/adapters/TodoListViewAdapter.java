@@ -1,15 +1,11 @@
 package prototype.xd.scheduler.adapters;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
-import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -25,16 +21,16 @@ import androidx.cardview.widget.CardView;
 
 import java.util.ArrayList;
 
-import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class TodoListViewAdapter extends BaseAdapter {
     
-    private final HomeFragment home;
+    private final TodoListEntryStorage todoListEntryStorage;
     
     public final ArrayList<TodoListEntry> currentTodoListEntries;
     public final ArrayList<Integer> currentTodoListEntries_indexMap;
@@ -42,13 +38,13 @@ public class TodoListViewAdapter extends BaseAdapter {
     private final EntrySettings entrySettings;
     private final SystemCalendarSettings systemCalendarSettings;
     
-    public TodoListViewAdapter(final HomeFragment fragment, final ViewGroup parent) {
-        this.home = fragment;
+    public TodoListViewAdapter(final TodoListEntryStorage todoListEntryStorage, final ViewGroup parent) {
+        this.todoListEntryStorage = todoListEntryStorage;
         currentTodoListEntries = new ArrayList<>();
         currentTodoListEntries_indexMap = new ArrayList<>();
-        entrySettings = new EntrySettings(fragment, LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
-        systemCalendarSettings = new SystemCalendarSettings(
-                LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false), fragment);
+        entrySettings = new EntrySettings(todoListEntryStorage, LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
+        systemCalendarSettings = new SystemCalendarSettings(todoListEntryStorage,
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
     }
     
     @Override
@@ -69,8 +65,9 @@ public class TodoListViewAdapter extends BaseAdapter {
     public void updateCurrentEntries() {
         currentTodoListEntries.clear();
         currentTodoListEntries_indexMap.clear();
-        for (int i = 0; i < home.todoListEntries.size(); i++) {
-            TodoListEntry currentEntry = home.todoListEntries.get(i);
+        ArrayList<TodoListEntry> entries = todoListEntryStorage.getTodoListEntries();
+        for (int i = 0; i < entries.size(); i++) {
+            TodoListEntry currentEntry = entries.get(i);
             
             boolean visibilityFlag = !currentEntry.completed || currentEntry.showInList_ifCompleted;
             boolean show;
@@ -86,15 +83,6 @@ public class TodoListViewAdapter extends BaseAdapter {
                 currentTodoListEntries_indexMap.add(i);
             }
         }
-    }
-    
-    public void updateData(boolean updateBitmap) {
-        if (updateBitmap) {
-            preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-        }
-        home.todoListEntries = sortEntries(home.todoListEntries, currentlySelectedDay);
-        updateCurrentEntries();
-        home.requireActivity().runOnUiThread(TodoListViewAdapter.this::notifyDataSetChanged);
     }
     
     @Override
@@ -133,9 +121,9 @@ public class TodoListViewAdapter extends BaseAdapter {
                 alert.setTitle("Удалить");
                 alert.setMessage("Вы уверены?");
                 alert.setPositiveButton("Да", (dialog, which) -> {
-                    home.todoListEntries.remove(currentTodoListEntries_indexMap.get(i).intValue());
-                    saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
+                    todoListEntryStorage.removeEntry(currentTodoListEntries_indexMap.get(i));
+                    todoListEntryStorage.saveEntries();
+                    todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
                 });
                 
                 alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
@@ -152,8 +140,8 @@ public class TodoListViewAdapter extends BaseAdapter {
                 } else {
                     currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                 }
-                saveEntries(home.todoListEntries);
-                updateData(true);
+                todoListEntryStorage.saveEntries();
+                todoListEntryStorage.updateTodoListAdapter(true);
             });
             
             todoText.setOnLongClickListener(view1 -> {
@@ -168,8 +156,8 @@ public class TodoListViewAdapter extends BaseAdapter {
                 
                 addView.findViewById(R.id.save_button).setOnClickListener(v1 -> {
                     currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
-                    saveEntries(home.todoListEntries);
-                    updateData(currentEntry.getLockViewState());
+                    todoListEntryStorage.saveEntries();
+                    todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
                 });
                 
                 View move_to_global_button = addView.findViewById(R.id.move_to_global_button);
@@ -177,8 +165,8 @@ public class TodoListViewAdapter extends BaseAdapter {
                 if (!currentEntry.isGlobalEntry) {
                     move_to_global_button.setOnClickListener(v1 -> {
                         currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
-                        saveEntries(home.todoListEntries);
-                        updateData(currentEntry.getLockViewState());
+                        todoListEntryStorage.saveEntries();
+                        todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
                     });
                 }else{
                     move_to_global_button.setVisibility(View.GONE);

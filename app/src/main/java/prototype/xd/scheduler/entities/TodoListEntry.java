@@ -131,9 +131,9 @@ public class TodoListEntry {
             }
             RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             long instance = 0;
-            while (it.hasNext() && daysFromEpoch(instance) <= day) {
-                instance = it.next();
-                if (inRange(day, daysFromEpoch(instance))) {
+            while (it.hasNext() && instance <= day) {
+                instance = daysFromEpoch(it.next());
+                if (inRange(day, instance)) {
                     return true;
                 }
             }
@@ -150,10 +150,7 @@ public class TodoListEntry {
             RecurrenceSetIterator it = recurrenceSet.iterator(timeZone_UTC, timestamp_start);
             while (it.hasNext()) {
                 long epoch = it.next();
-                if (inRange(day, daysFromEpoch(epoch))) {
-                    return epoch;
-                }
-                if (daysFromEpoch(epoch) >= day) {
+                if (inRange(day, daysFromEpoch(epoch)) || daysFromEpoch(epoch) >= day) {
                     return epoch;
                 }
             }

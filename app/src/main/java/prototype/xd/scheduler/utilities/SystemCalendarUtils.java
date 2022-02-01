@@ -53,11 +53,11 @@ public class SystemCalendarUtils {
         return systemCalendars;
     }
     
-    public static ArrayList<TodoListEntry> getAllTodoListEntriesFromCalendars(Context context) {
+    public static ArrayList<TodoListEntry> getTodoListEntriesFromCalendars(Context context, long day_start, long day_end) {
         ArrayList<TodoListEntry> todoListEntries = new ArrayList<>();
         ArrayList<SystemCalendar> calendars = getAllCalendars(context, false);
         for (int i = 0; i < calendars.size(); i++) {
-            todoListEntries.addAll(calendars.get(i).getVisibleTodoListEntries());
+            todoListEntries.addAll(calendars.get(i).getVisibleTodoListEntries(day_start, day_end));
         }
         return todoListEntries;
     }

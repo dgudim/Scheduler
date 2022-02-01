@@ -18,6 +18,7 @@ import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
@@ -153,7 +154,8 @@ public class LockScreenBitmapDrawer {
         
         Canvas canvas = new Canvas(src);
         
-        ArrayList<TodoListEntry> toAdd = filterItems(loadTodoEntries(backgroundSetterService));
+        ArrayList<TodoListEntry> toAdd = filterItems(sortEntries(
+                loadTodoEntries(backgroundSetterService, currentDay - 14, currentDay + 14), currentDay));
         long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(src) + currentDay;
         if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");

@@ -19,7 +19,6 @@ import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
-import static prototype.xd.scheduler.utilities.Utilities.saveEntries;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -36,24 +35,24 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
-import prototype.xd.scheduler.HomeFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
 public class EntrySettings extends PopupSettingsView {
     
     private final AlertDialog dialog;
-    public final HomeFragment fragment;
+    public final TodoListEntryStorage todoListEntryStorage;
     private TodoListEntry todoListEntry;
     
-    public EntrySettings(final HomeFragment fragment, final View settingsView) {
+    public EntrySettings(final TodoListEntryStorage todoListEntryStorage, final View settingsView) {
         super(settingsView);
-        this.fragment = fragment;
+        this.todoListEntryStorage = todoListEntryStorage;
         
         dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
-            saveEntries(fragment.todoListEntries);
-            fragment.todoListViewAdapter.updateData(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
+            todoListEntryStorage.saveEntries();
+            todoListEntryStorage.updateTodoListAdapter(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
             preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
         }).setView(settingsView).create();
     }
@@ -105,12 +104,12 @@ public class EntrySettings extends PopupSettingsView {
                                     String origName = groupList.get(position).name;
                                     groupList.get(position).name = input.getText().toString();
                                     saveGroupsFile(groupList);
-                                    for (TodoListEntry entry1 : fragment.todoListEntries) {
+                                    for (TodoListEntry entry1 : todoListEntryStorage.getTodoListEntries()) {
                                         if (entry1.group.name.equals(origName)) {
                                             entry1.group.name = input.getText().toString();
                                         }
                                     }
-                                    saveEntries(fragment.todoListEntries);
+                                    todoListEntryStorage.saveEntries();
                                     notifyDataSetChanged();
                                 } else {
                                     dialog.dismiss();
@@ -131,12 +130,12 @@ public class EntrySettings extends PopupSettingsView {
                                     groupList.remove(group_spinner.getSelectedItemPosition());
                                     groupNames.remove(group_spinner.getSelectedItemPosition());
                                     saveGroupsFile(groupList);
-                                    for (TodoListEntry entry1 : fragment.todoListEntries) {
+                                    for (TodoListEntry entry1 : todoListEntryStorage.getTodoListEntries()) {
                                         if (entry1.group.name.equals(origName)) {
                                             entry1.resetGroup();
                                         }
                                     }
-                                    saveEntries(fragment.todoListEntries);
+                                    todoListEntryStorage.saveEntries();
                                     group_spinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
                                     updateAllIndicators();
                                     notifyDataSetChanged();
@@ -167,7 +166,7 @@ public class EntrySettings extends PopupSettingsView {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!groupNames.get(position).equals(entry.group.name)) {
                     entry.changeGroup(groupNames.get(position));
-                    saveEntries(fragment.todoListEntries);
+                    todoListEntryStorage.saveEntries();
                     preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                     initialise(entry, context);
                 }
@@ -206,7 +205,7 @@ public class EntrySettings extends PopupSettingsView {
                         Group createdGroup = createGroup(input.getText().toString(), entry.getDisplayParams());
                         groupList.set(groupNames.indexOf(input.getText().toString()), createdGroup);
                         saveGroupsFile(groupList);
-                        for (TodoListEntry entry2 : fragment.todoListEntries) {
+                        for (TodoListEntry entry2 : todoListEntryStorage.getTodoListEntries()) {
                             if (entry2.group.name.equals(input.getText().toString())) {
                                 entry2.removeDisplayParams();
                                 entry2.changeGroup(createdGroup);
@@ -228,7 +227,7 @@ public class EntrySettings extends PopupSettingsView {
                     saveGroupsFile(groupList);
                     entry.removeDisplayParams();
                     entry.changeGroup(createdGroup);
-                    saveEntries(fragment.todoListEntries);
+                    todoListEntryStorage.saveEntries();
                     updateAllIndicators();
                 }
             });
@@ -244,7 +243,7 @@ public class EntrySettings extends PopupSettingsView {
             builder.setPositiveButton(R.string.yes, (dialog, which) -> {
                 entry.removeDisplayParams();
                 entry.resetGroup();
-                saveEntries(fragment.todoListEntries);
+                todoListEntryStorage.saveEntries();
                 preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
                 initialise(entry, context);
             });
@@ -254,15 +253,15 @@ public class EntrySettings extends PopupSettingsView {
         });
         
         fontColor_select.setOnClickListener(view -> invokeColorDialogue(
-                fontColor_view_state, this, fragment,
+                fontColor_view_state, this, todoListEntryStorage,
                 entry, FONT_COLOR, entry.fontColor_original));
         
         bgColor_select.setOnClickListener(view -> invokeColorDialogue(
-                bgColor_view_state, this, fragment,
+                bgColor_view_state, this, todoListEntryStorage,
                 entry, BG_COLOR, entry.bgColor_original));
         
         borderColor_select.setOnClickListener(view -> invokeColorDialogue(
-                padColor_view_state, this, fragment,
+                padColor_view_state, this, todoListEntryStorage,
                 entry, BORDER_COLOR, entry.borderColor_original));
         
         addSeekBarChangeListener(
@@ -298,13 +297,13 @@ public class EntrySettings extends PopupSettingsView {
         addSwitchChangeListener(
                 show_on_lock_switch,
                 show_on_lock_state,
-                fragment, entry,
+                todoListEntryStorage, entry,
                 SHOW_ON_LOCK, entry.showOnLock);
         
         addSwitchChangeListener(
                 adaptive_color_switch,
                 adaptiveColor_switch_state,
-                fragment, entry,
+                todoListEntryStorage, entry,
                 ADAPTIVE_COLOR_ENABLED, entry.adaptiveColorEnabled);
     }
     
