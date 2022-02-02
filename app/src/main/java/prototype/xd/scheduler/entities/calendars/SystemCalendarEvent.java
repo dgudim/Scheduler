@@ -70,11 +70,6 @@ public class SystemCalendarEvent {
             timeZone = timeZone_SYSTEM;
         }
         
-        if (allDay) {
-            end -= 60 * 1000;
-            start += 60 * 1000;
-        }
-        
         duration = end - start;
         
         rRule_str = getString(cursor, calendarEventsColumns, Events.RRULE);
@@ -107,7 +102,9 @@ public class SystemCalendarEvent {
         }
         
         if (allDay) {
-            duration -= 60 * 1000;
+            end -= 60 * 1000;
+            start += 60 * 1000;
+            duration -= 2 * 60 * 1000;
         }
         
         subKeys = generateSubKeysFromKey(makeKey(this));
@@ -117,7 +114,7 @@ public class SystemCalendarEvent {
         if (rSet != null) {
             RecurrenceSetIterator it = rSet.iterator(timeZone, start);
             long instance = 0;
-            while (it.hasNext() && daysFromEpoch(instance) <= dayEnd) {
+            while (it.hasNext() && daysFromEpoch(instance, timeZone) <= dayEnd) {
                 instance = it.next();
                 if (startOrEndInRange(start, instance + duration, dayStart, dayEnd)) {
                     return true;
@@ -129,8 +126,8 @@ public class SystemCalendarEvent {
     }
     
     private boolean startOrEndInRange(long start, long end, long dayStart, long dayEnd) {
-        start = daysFromEpoch(start);
-        end = daysFromEpoch(end);
+        start = daysFromEpoch(start, timeZone);
+        end = daysFromEpoch(end, timeZone);
         return (start >= dayStart && start <= dayEnd) || (end >= dayStart && end <= dayEnd);
     }
     

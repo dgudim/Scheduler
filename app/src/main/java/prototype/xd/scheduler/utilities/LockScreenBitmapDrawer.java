@@ -111,6 +111,10 @@ public class LockScreenBitmapDrawer {
             busy = true;
             new Thread(() -> {
                 try {
+    
+                    float time = System.nanoTime();
+                    log(INFO, "setting wallpaper");
+                    
                     Bitmap bitmap = getBitmapFromLockScreen();
                     File bg = getBackgroundAccordingToDayAndTime();
                     
@@ -131,8 +135,6 @@ public class LockScreenBitmapDrawer {
                         }
                     }
                     
-                    float time = System.nanoTime();
-                    log(INFO, "setting wallpaper");
                     drawStringsOnBitmap(backgroundSetterService, bitmap);
                     setLockScreenBitmap(bitmap);
                     log(INFO, "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
@@ -155,7 +157,7 @@ public class LockScreenBitmapDrawer {
         Canvas canvas = new Canvas(src);
         
         ArrayList<TodoListEntry> toAdd = filterItems(sortEntries(
-                loadTodoEntries(backgroundSetterService, currentDay - 14, currentDay + 14), currentDay));
+                loadTodoEntries(backgroundSetterService, currentDay - 14, currentDay + 14), currentDay), backgroundSetterService);
         long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(src) + currentDay;
         if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
@@ -305,13 +307,17 @@ public class LockScreenBitmapDrawer {
                 displayCenter.y + maxHeight + bottom, paint);
     }
     
-    private ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input) {
+    private ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input, Context context) {
         ArrayList<TodoListEntry> toAdd = new ArrayList<>();
         for (int i = 0; i < input.size(); i++) {
             if (input.get(i).getLockViewState()) {
                 toAdd.add(input.get(i));
                 if (input.get(i).textValue.length() > currentBitmapLongestText.length()) {
                     currentBitmapLongestText = input.get(i).textValue;
+                }
+                String time_string = input.get(i).getTimeSpan(context);
+                if(time_string.length() > currentBitmapLongestText.length()){
+                    currentBitmapLongestText = time_string;
                 }
             }
         }

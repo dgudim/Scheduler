@@ -5,15 +5,17 @@ import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class DateManager {
     
     public static final TimeZone timeZone_SYSTEM = TimeZone.getDefault();
+    public static final TimeZone timeZone_UTC = TimeZone.getTimeZone("UTC");
     
     public static long currentDay = DAY_FLAG_GLOBAL;
     public static long currentTimestamp = DAY_FLAG_GLOBAL;
@@ -26,7 +28,7 @@ public class DateManager {
     public static void updateDate(String selectedDate_string, boolean updateCurrentlySelected) {
         long selectedDay = daysFromDate(selectedDate_string);
         currentTimestamp = getCurrentTimestamp();
-        currentDay = daysFromEpoch(currentTimestamp);
+        currentDay = daysFromEpoch(currentTimestamp, timeZone_SYSTEM);
         if (updateCurrentlySelected) {
             if (selectedDay == DAY_FLAG_GLOBAL) {
                 currentlySelectedDay = currentDay;
@@ -34,16 +36,6 @@ public class DateManager {
                 currentlySelectedDay = selectedDay;
             }
         }
-    }
-    
-    public static boolean isDayTime() {
-        return Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 5;
-    }
-    
-    public static long daysFromEpoch(long epoch) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(epoch);
-        return addTimeZoneOffset_seconds(cal.getTime().toInstant().getEpochSecond()) / 86400;
     }
     
     public static String getTimeSpan(long time1, long time2) {
@@ -65,20 +57,23 @@ public class DateManager {
         }
     }
     
-    public static long dateToEpoch(int year, int month, int dayOfMonth) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, dayOfMonth);
-        return calendar.getTimeInMillis();
+    public static long daysFromEpoch(long epoch, TimeZone timezone) {
+        return TimeUnit.DAYS.convert(addTimeZoneOffset(epoch, timezone) , TimeUnit.MILLISECONDS);
+    }
+    
+    public static long dateToEpoch(int year, int month, int day) {
+        return LocalDateTime.of(year, month, day, 0, 0, 0, 0).toInstant(ZoneOffset.UTC)
+                .toEpochMilli();
     }
     
     public static String datetimeFromEpoch(long epoch) {
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(timeZone_UTC);
         cal.setTimeInMillis(epoch);
         return dateFormat.format(cal.getTime());
     }
     
     public static String getCurrentTime() {
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(timeZone_UTC);
         return dateFormat.format(cal.getTime()).split(" ")[1];
     }
     
@@ -90,20 +85,15 @@ public class DateManager {
         int year = Integer.parseInt(dateParts_current[0]);
         int month = Integer.parseInt(dateParts_current[1]);
         int day = Integer.parseInt(dateParts_current[2]);
-        return OffsetDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.UTC)
-                .toInstant().getEpochSecond() / 86400;
+        return daysFromEpoch(dateToEpoch(year, month, day), timeZone_SYSTEM);
     }
     
-    public static long addTimeZoneOffset_seconds(long epoch_seconds) {
-        return epoch_seconds + timeZone_SYSTEM.getOffset(epoch_seconds * 1000) / 1000L;
-    }
-    
-    public static long addTimeZoneOffset(long epoch) {
-        return epoch + timeZone_SYSTEM.getOffset(epoch);
+    public static long addTimeZoneOffset(long epoch, TimeZone timeZone) {
+        return epoch + timeZone.getOffset(epoch);
     }
     
     private static long getCurrentTimestamp() {
-        return addTimeZoneOffset(Calendar.getInstance().getTime().getTime());
+        return Calendar.getInstance(timeZone_UTC).getTimeInMillis();
     }
     
 }

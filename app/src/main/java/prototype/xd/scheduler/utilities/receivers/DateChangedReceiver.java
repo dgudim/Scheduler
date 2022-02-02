@@ -6,10 +6,10 @@ import android.content.Intent;
 
 import prototype.xd.scheduler.BackgroundSetterService;
 
-public class BootReceiver extends BroadcastReceiver {
+public class DateChangedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+        if (Intent.ACTION_DATE_CHANGED.equals(intent.getAction())) {
             BackgroundSetterService.ping(context);
         }
     }

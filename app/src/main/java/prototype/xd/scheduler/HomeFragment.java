@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.utilities.DateManager.addTimeZoneOffset;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateToEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
+import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
@@ -61,9 +62,12 @@ public class HomeFragment extends Fragment {
         listView.setAdapter(todoListEntryStorage.getTodoListViewAdapter());
         
         CalendarView calendarView = view.findViewById(R.id.calendar);
-        calendarView.setDate(preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, calendarView.getDate()));
+        long epoch;
+        if((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0){
+            calendarView.setDate(addTimeZoneOffset(epoch, timeZone_SYSTEM));
+        }
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
-            preferences.edit().putLong(Keys.PREVIOUSLY_SELECTED_DATE, dateToEpoch(year, month, dayOfMonth)).apply();
+            preferences.edit().putLong(Keys.PREVIOUSLY_SELECTED_DATE, dateToEpoch(year, month + 1, dayOfMonth)).apply();
             updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
             todoListEntryStorage.lazyLoadEntries(view1.getContext());
         });
@@ -148,7 +152,7 @@ public class HomeFragment extends Fragment {
         
         long epoch;
         if ((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
-            currentlySelectedDay = daysFromEpoch(addTimeZoneOffset(epoch)); // timezone corrections because calendar returns in local timezone
+            currentlySelectedDay = daysFromEpoch(epoch, timeZone_SYSTEM);
         }
         todoListEntryStorage.lazyLoadEntries(view.getContext());
     }

@@ -106,7 +106,6 @@
     <string name="battery_optimization_description">To allow the app to set the background even when you are not in the app</string>
     <string name="background_service_persistent_message">Background service running</string>
     <string name="last_update_time">last update: %s</string>
-    <string name="service_sleep_mode">service is in sleep mode</string>
     <string name="settings_colors">Colors</string>
     <string name="settings_preview">Preview</string>
     <string name="settings_preview_expired">Expired</string>

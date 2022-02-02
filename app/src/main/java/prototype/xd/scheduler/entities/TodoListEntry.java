@@ -132,7 +132,7 @@ public class TodoListEntry {
             RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
             long instance = 0;
             while (it.hasNext() && instance <= day) {
-                instance = daysFromEpoch(it.next());
+                instance = daysFromEpoch(it.next(), event.timeZone);
                 if (inRange(day, instance)) {
                     return true;
                 }
@@ -149,7 +149,7 @@ public class TodoListEntry {
             }
             RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
             long instance = 0;
-            long day = daysFromEpoch(timestamp);
+            long day = daysFromEpoch(timestamp, event.timeZone);
             while (it.hasNext() && instance <= timestamp) {
                 instance = it.next();
                 if (inRange(day, instance)) {
@@ -158,7 +158,7 @@ public class TodoListEntry {
             }
             return false;
         }
-        return inRange(daysFromEpoch(timestamp), day_start) && timestamp_start + timestamp_duration >= timestamp;
+        return inRange(daysFromEpoch(timestamp, event.timeZone), day_start) && timestamp_start + timestamp_duration >= timestamp;
     }
     
     public long getNearestEventTimestamp(long day) {
@@ -169,7 +169,7 @@ public class TodoListEntry {
             RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
             while (it.hasNext()) {
                 long epoch = it.next();
-                if (inRange(day, daysFromEpoch(epoch)) || daysFromEpoch(epoch) >= day) {
+                if (inRange(day, daysFromEpoch(epoch, event.timeZone)) || daysFromEpoch(epoch, event.timeZone) >= day) {
                     return epoch;
                 }
             }
@@ -179,7 +179,7 @@ public class TodoListEntry {
     
     public long getNearestEventDay(long day) {
         if (fromSystemCalendar) {
-            return daysFromEpoch(getNearestEventTimestamp(day));
+            return daysFromEpoch(getNearestEventTimestamp(day), event.timeZone);
         }
         return day_start;
     }
@@ -357,9 +357,9 @@ public class TodoListEntry {
             allDay = event.allDay;
             recurrenceSet = event.rSet;
             
-            day_start = daysFromEpoch(timestamp_start);
-            day_end = daysFromEpoch(timestamp_end);
-            duration_in_days = daysFromEpoch(timestamp_duration);
+            day_start = daysFromEpoch(timestamp_start, event.timeZone);
+            day_end = daysFromEpoch(timestamp_end, event.timeZone);
+            duration_in_days = daysFromEpoch(timestamp_duration, event.timeZone);
             
             textValue = event.title.trim();
             

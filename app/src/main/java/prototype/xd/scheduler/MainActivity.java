@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     
     private void launchMainActivity() {
         initStorage(this);
-        BackgroundSetterService.restart(getApplicationContext());
+        BackgroundSetterService.ping(getApplicationContext());
         setContentView(R.layout.activity_main);
     }
     

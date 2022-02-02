@@ -1,7 +1,6 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTime;
-import static prototype.xd.scheduler.utilities.DateManager.isDayTime;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
@@ -33,8 +32,7 @@ public class BackgroundSetterService extends Service {
     
     private Timer refreshTimer;
     
-    public static void restart(Context context) {
-        context.stopService(new Intent(context, BackgroundSetterService.class));
+    public static void ping(Context context) {
         ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
     }
     
@@ -115,11 +113,7 @@ public class BackgroundSetterService extends Service {
     }
     
     private void updateNotification() {
-        if (lockScreenBitmapDrawer == null) {
-            getForegroundNotification().setContentTitle(getString(R.string.service_sleep_mode));
-        } else {
-            getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTime()));
-        }
+        getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTime()));
         notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
     }
     
@@ -132,19 +126,18 @@ public class BackgroundSetterService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null || initialized) {
-            if (lockScreenBitmapDrawer != null) {
-                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
-                updateNotification();
-            }
+            updateDate(DAY_FLAG_GLOBAL_STR, false);
+            lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+            updateNotification();
         } else {
             initialized = true;
             preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
             //register receivers
-            screenOnOffReceiver = new BroadcastReceiver(){
+            screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     if (!lastUpdateSucceeded || preferences.getBoolean(SERVICE_UPDATE_SIGNAL, false)) {
-                        ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
+                        ping(context);
                         preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
                     }
                 }
@@ -159,21 +152,7 @@ public class BackgroundSetterService extends Service {
             refreshTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    if (isDayTime()) {
-                        preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-                        updateDate(DAY_FLAG_GLOBAL_STR, false);
-                        if (lockScreenBitmapDrawer == null) {
-                            lockScreenBitmapDrawer = new LockScreenBitmapDrawer(BackgroundSetterService.this);
-                            lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
-                            updateNotification();
-                        }
-                    } else {
-                        if (lockScreenBitmapDrawer != null) {
-                            lockScreenBitmapDrawer = null;
-                            updateNotification();
-                            System.gc();
-                        }
-                    }
+                    preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
                 }
             }, 5000, 1000 * 60 * 10); //approximately every 10 minutes if day
         }
