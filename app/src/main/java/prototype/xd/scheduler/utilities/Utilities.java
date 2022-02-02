@@ -440,7 +440,7 @@ class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
 
 class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
     
-    long day;
+    final long day;
     
     public TodoListEntryGroupComparator(long day) {
         this.day = day;

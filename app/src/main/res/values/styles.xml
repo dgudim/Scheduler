@@ -28,4 +28,9 @@
         <item name="android:textColor">@color/button_text_color</item>
     </style>
 
+    <style name="defaultButtonStyleImportant" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:backgroundTint">@color/colorAccent2</item>
+        <item name="android:textColor">@color/button_text_color</item>
+    </style>
+
 </resources>

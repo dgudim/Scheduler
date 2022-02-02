@@ -2,6 +2,7 @@ package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.initStorage;
@@ -29,6 +30,8 @@ import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.util.Objects;
+
+import prototype.xd.scheduler.utilities.Keys;
 
 public class MainActivity extends AppCompatActivity {
     
@@ -60,8 +63,43 @@ public class MainActivity extends AppCompatActivity {
             View grant_button = findViewById(R.id.grant_permissions_button);
             grant_button.setOnClickListener(v -> requestPermissions(PERMISSIONS, REQUEST_CODE_PERMISSIONS));
         } else {
-            launchMainActivity();
+            if (isServiceBeingKilled()) {
+                setContentView(R.layout.service_keep_alive_screen);
+                
+                if (preferences.getInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED, 0) > 1) {
+                    View dontBotherButton = findViewById(R.id.never_ask_again_button);
+                    dontBotherButton.setVisibility(View.VISIBLE);
+                    dontBotherButton.setOnClickListener(v -> {
+                        preferences.edit().putBoolean(Keys.SERVICE_KILLED_DONT_BOTHER, true).apply();
+                        launchMainActivity();
+                    });
+                }
+                
+                findViewById(R.id.learn_howTo_button).setOnClickListener(v ->
+                        startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://dontkillmyapp.com/"))));
+                
+                findViewById(R.id.ignore_button).setOnClickListener(v -> {
+                    preferences.edit().putInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0).apply();
+                    preferences.edit().putInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED,
+                            preferences.getInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED, 0) + 1).apply();
+                    launchMainActivity();
+                });
+            } else {
+                launchMainActivity();
+            }
         }
+    }
+    
+    private boolean isServiceBeingKilled() {
+        if (preferences.getBoolean(Keys.SERVICE_KILLED_DONT_BOTHER, false)) {
+            return false;
+        }
+        long prevTime = preferences.getLong(Keys.LAST_UPDATE_TIME, getCurrentTimestamp());
+        if (getCurrentTimestamp() - prevTime > 12 * 60 * 60 * 1000) {
+            preferences.edit().putInt(Keys.SERVICE_KILL_THRESHOLD_REACHED,
+                    preferences.getInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0) + 1).apply();
+        }
+        return preferences.getInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0) > 15;
     }
     
     private void launchMainActivity() {
@@ -74,16 +112,16 @@ public class MainActivity extends AppCompatActivity {
         boolean storage_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         boolean calendar_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED;
         
-        if(display){
+        if (display) {
             TextView calendar_permission_text = findViewById(R.id.calendar_permission_granted);
             TextView storage_permission_text = findViewById(R.id.storage_permission_granted);
             CardView calendar_permission_text_bg = findViewById(R.id.calendar_permission_granted_bg);
             CardView storage_permission_text_bg = findViewById(R.id.storage_permission_granted_bg);
-    
+            
             calendar_permission_text.setText(calendar_granted ? R.string.permissions_granted : R.string.permissions_not_granted);
             calendar_permission_text.setTextColor(getColor(calendar_granted ? R.color.color_permission_granted : R.color.color_permission_not_granted));
             calendar_permission_text_bg.setCardBackgroundColor(getColor(calendar_granted ? R.color.color_permission_granted_bg : R.color.color_permission_not_granted_bg));
-    
+            
             storage_permission_text.setText(storage_granted ? R.string.permissions_granted : R.string.permissions_not_granted);
             storage_permission_text.setTextColor(getColor(storage_granted ? R.color.color_permission_granted : R.color.color_permission_not_granted));
             storage_permission_text_bg.setCardBackgroundColor(getColor(storage_granted ? R.color.color_permission_granted_bg : R.color.color_permission_not_granted_bg));

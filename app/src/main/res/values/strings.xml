@@ -8,9 +8,9 @@
 
     <string name="settings_state_symbol">⬧</string>
 
-    <string name="settings_today_bevel_color">Current events border color</string>s
+    <string name="settings_current_border_color">Current events border color</string>s
 
-    <string name="settings_today_bevel_thickness">Current events border thickness: %d</string>
+    <string name="settings_current_border_thickness">Current events border thickness: %d</string>
 
     <string name="calendar_event_all_day">all day</string>
 
@@ -37,7 +37,7 @@
     <string name="settings_show_days_upcoming">Show in %d day/days</string>
     <string name="settings_border_thickness">Border thickness: %d</string>
     <string name="settings_bg_color">Background</string>
-    <string name="settings_bevel_color">Border</string>
+    <string name="settings_border_color">Border</string>
     <string name="settings_text_color">Font</string>
     <string name="settings_add_group">Add group</string>
     <string name="settings_reset_bg">Reset backgrounds</string>
@@ -47,19 +47,19 @@
     <string name="title">Name</string>
     <string name="yes">Yes</string>
     <string name="settings_upcoming_bg_color">Upcoming events background color</string>
-    <string name="settings_upcoming_bevel_thickness">Upcoming events border thickness: %d</string>
-    <string name="settings_upcoming_bevel_color">Upcoming events border color</string>
-    <string name="settings_today_bg_color">Current events background color</string>
-    <string name="settings_today_font_color">Current events font color</string>
+    <string name="settings_upcoming_border_thickness">Upcoming events border thickness: %d</string>
+    <string name="settings_upcoming_border_color">Upcoming events border color</string>
+    <string name="settings_current_bg_color">Current events background color</string>
+    <string name="settings_current_font_color">Current events font color</string>
     <string name="settings_show_upcoming_done_items_list">Show upcoming completed events in list</string>
     <string name="settings_show_items_lock">Show on lock screen</string>
     <string name="settings_show_global_items_lock">Show global events on lock screen</string>
     <string name="settings_show_expired_done_items_list">Show expired completed events in list</string>
     <string name="settings_priority">Priority: %d</string>
     <string name="settings_font_size">Font size (Lock screen): %d</string>
-    <string name="settings_expired_bevel_thickness">Expired events border thickness: %d</string>
+    <string name="settings_expired_border_thickness">Expired events border thickness: %d</string>
     <string name="settings_expired_bg_color">Expired events background color</string>
-    <string name="settings_expired_bevel_color">Expired events border color</string>
+    <string name="settings_expired_border_color">Expired events border color</string>
     <string name="save">Save</string>
     <string name="reset_settings_prompt">Reset settings?</string>
     <string name="overwrite_prompt">Overwrite?</string>
@@ -84,7 +84,7 @@
     <string name="category_visibility">Visibility</string>
     <string name="category_system_calendars">System calendar integration</string>
     <string name="category_fonts">Fonts</string>
-    <string name="category_bevels">Borders</string>
+    <string name="category_borders">Borders</string>
     <string name="category_backgrounds">Backgrounds</string>
     <string name="cancel">Cancel</string>
     <string name="are_you_sure">Are you sure?</string>
@@ -108,14 +108,17 @@
     <string name="day_sunday">sunday</string>
     <string name="day_default">default</string>
     <string name="day_thursday">thursday</string>
-    <string name="battery_optimization">Background activity</string>
-    <string name="battery_optimization_description">To allow the app to set the background even when you are not in the app</string>
     <string name="background_service_persistent_message">Background service running</string>
     <string name="last_update_time">last update: %s</string>
     <string name="settings_colors">Colors</string>
-    <string name="settings_preview">Preview</string>
+    <string name="settings_preview_current">Current</string>
     <string name="settings_preview_expired">Expired</string>
     <string name="settings_preview_upcoming">Upcoming</string>
     <string name="settings_hide_expired_entries_by_time">Hide passed entries on lockscreen(by time)</string>
+    <string name="alert">Alert!</string>
+    <string name="ignore">ignore</string>
+    <string name="visit_dont_kill_my_app">learn how to</string>
+    <string name="service_killed_message">It looks like android system is killing app background update service, without the service the app won\'t update your wallpaper in time, please whitelist th app from battery optimizations(click \"learn how to\" if you don\'t know how to do it)</string>
+    <string name="never_ask_again">Never ask again</string>
 
 </resources>

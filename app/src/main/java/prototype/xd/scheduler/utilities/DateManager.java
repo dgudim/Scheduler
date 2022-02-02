@@ -88,7 +88,7 @@ public class DateManager {
         return epoch + timeZone.getOffset(epoch);
     }
     
-    private static long getCurrentTimestamp() {
+    public static long getCurrentTimestamp() {
         return System.currentTimeMillis();
     }
     

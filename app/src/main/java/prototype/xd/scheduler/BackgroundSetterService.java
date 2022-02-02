@@ -1,9 +1,10 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTime;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
-import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
+import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 
 import android.app.NotificationChannel;
@@ -23,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class BackgroundSetterService extends Service {
@@ -113,6 +115,7 @@ public class BackgroundSetterService extends Service {
     }
     
     private void updateNotification() {
+        preferences.edit().putLong(Keys.LAST_UPDATE_TIME, getCurrentTimestamp()).apply();
         getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTime()));
         notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
     }
@@ -122,6 +125,7 @@ public class BackgroundSetterService extends Service {
     private volatile boolean lastUpdateSucceeded = false;
     private boolean initialized = false;
     private BroadcastReceiver screenOnOffReceiver;
+    private BroadcastReceiver pingReceiver;
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -131,7 +135,7 @@ public class BackgroundSetterService extends Service {
             updateNotification();
         } else {
             initialized = true;
-            preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+            preferences = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
             //register receivers
             screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
@@ -142,8 +146,15 @@ public class BackgroundSetterService extends Service {
                     }
                 }
             };
+            pingReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    ping(context);
+                }
+            };
             registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
             registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
+            registerReceiver(pingReceiver, new IntentFilter(Intent.ACTION_DATE_CHANGED));
             
             startForeground(foregroundNotificationId, getForegroundNotification().build());
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
@@ -165,6 +176,7 @@ public class BackgroundSetterService extends Service {
         foregroundNotification = null;
         notificationManager = null;
         unregisterReceiver(screenOnOffReceiver);
+        unregisterReceiver(pingReceiver);
         if (refreshTimer != null) refreshTimer.cancel();
     }
 }

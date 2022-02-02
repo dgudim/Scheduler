@@ -87,9 +87,14 @@ public class Keys {
     public static final String PREVIOUSLY_SELECTED_DATE = "previously_selected_date";
     
     public static final String BLANK_TEXT = "_BLANK_";
-    public static String BLANK_GROUP_NAME = "none";
     
-    public static String PREFERENCES = "prefs";
+    public static final String BLANK_GROUP_NAME = "none";
     
-    public static String SERVICE_UPDATE_SIGNAL = "update";
+    public static final String PREFERENCES = "prefs";
+    public static final String PREFERENCES_SERVICE = "prefs_s";
+    public static final String LAST_UPDATE_TIME = "last_update_time";
+    public static final String SERVICE_KILL_THRESHOLD_REACHED = "service_supposedly_killed";
+    public static final String SERVICE_KILLED_DONT_BOTHER = "service_killed_ignore";
+    public static final String SERVICE_KILLED_IGNORE_BUTTON_CLICKED = "service_killed_ignore_count";
+    public static final String SERVICE_UPDATE_SIGNAL = "update";
 }

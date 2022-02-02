@@ -73,30 +73,30 @@ public class SettingsFragment extends Fragment {
         settingsEntries.add(new SeekBarSettingsEntry(0, 1000, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE,
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR,
-                getString(R.string.settings_today_bg_color)));
+                getString(R.string.settings_current_bg_color)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR,
                 getString(R.string.settings_expired_bg_color)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR,
                 getString(R.string.settings_upcoming_bg_color)));
         
-        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_bevels)));
+        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_borders)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR,
-                getString(R.string.settings_today_bevel_color)));
+                getString(R.string.settings_current_border_color)));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS,
-                Keys.BORDER_THICKNESS, R.string.settings_today_bevel_thickness));
+                Keys.BORDER_THICKNESS, R.string.settings_current_border_thickness));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR,
-                getString(R.string.settings_expired_bevel_color)));
+                getString(R.string.settings_expired_border_color)));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS,
-                Keys.EXPIRED_BORDER_THICKNESS, R.string.settings_expired_bevel_thickness));
+                Keys.EXPIRED_BORDER_THICKNESS, R.string.settings_expired_border_thickness));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR,
-                getString(R.string.settings_upcoming_bevel_color)));
+                getString(R.string.settings_upcoming_border_color)));
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 15, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS,
-                Keys.UPCOMING_BORDER_THICKNESS, R.string.settings_upcoming_bevel_thickness));
+                Keys.UPCOMING_BORDER_THICKNESS, R.string.settings_upcoming_border_thickness));
         
         
         settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_fonts)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR,
-                getString(R.string.settings_today_font_color)));
+                getString(R.string.settings_current_font_color)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR,
                 getString(R.string.settings_expired_font_color)));
         settingsEntries.add(new ColorSelectSettingsEntry(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR,

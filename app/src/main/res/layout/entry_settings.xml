@@ -283,7 +283,7 @@
                             android:layout_weight="1"
                             android:background="#FFFFFF"
                             android:gravity="center_vertical"
-                            android:text="@string/settings_bevel_color"
+                            android:text="@string/settings_border_color"
                             android:textColor="#000000"
                             android:textSize="18sp" />
 
@@ -367,7 +367,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="center"
                                 android:paddingBottom="3dp"
-                                android:text="@string/settings_preview"
+                                android:text="@string/settings_preview_current"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                                 android:textColor="#000000" />
 
