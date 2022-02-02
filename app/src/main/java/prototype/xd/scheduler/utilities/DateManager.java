@@ -7,7 +7,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 public class DateManager {
     
     public static final TimeZone timeZone_SYSTEM = TimeZone.getDefault();
-    public static final TimeZone timeZone_UTC = TimeZone.getTimeZone("UTC");
     
     public static long currentDay = DAY_FLAG_GLOBAL;
     public static long currentTimestamp = DAY_FLAG_GLOBAL;
@@ -67,14 +66,11 @@ public class DateManager {
     }
     
     public static String datetimeFromEpoch(long epoch) {
-        final Calendar cal = Calendar.getInstance(timeZone_UTC);
-        cal.setTimeInMillis(epoch);
-        return dateFormat.format(cal.getTime());
+        return dateFormat.format(new Date(epoch));
     }
     
     public static String getCurrentTime() {
-        final Calendar cal = Calendar.getInstance(timeZone_UTC);
-        return dateFormat.format(cal.getTime()).split(" ")[1];
+        return dateFormat.format(new Date()).split(" ")[1];
     }
     
     public static long daysFromDate(String date) {
@@ -93,7 +89,7 @@ public class DateManager {
     }
     
     private static long getCurrentTimestamp() {
-        return Calendar.getInstance(timeZone_UTC).getTimeInMillis();
+        return System.currentTimeMillis();
     }
     
 }

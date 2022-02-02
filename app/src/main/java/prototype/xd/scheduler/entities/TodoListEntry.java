@@ -359,7 +359,7 @@ public class TodoListEntry {
             
             day_start = daysFromEpoch(timestamp_start, event.timeZone);
             day_end = daysFromEpoch(timestamp_end, event.timeZone);
-            duration_in_days = daysFromEpoch(timestamp_duration, event.timeZone);
+            duration_in_days = day_end - day_start;
             
             textValue = event.title.trim();
             
