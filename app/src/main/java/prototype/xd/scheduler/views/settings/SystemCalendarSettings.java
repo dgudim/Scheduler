@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.views.settings;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
@@ -14,6 +13,8 @@ import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     private TodoListEntry entry;
     private final TodoListEntryStorage todoListEntryStorage;
     
-    public SystemCalendarSettings(final TodoListEntryStorage todoListEntryStorage, final View settingsView) {
+    public SystemCalendarSettings(@Nullable final TodoListEntryStorage todoListEntryStorage, final View settingsView) {
         super(settingsView);
         
         settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
@@ -39,9 +40,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
             if (todoListEntryStorage != null) {
-                todoListEntryStorage.updateTodoListAdapter(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
+                todoListEntryStorage.updateTodoListAdapter(false);
             }
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
         }).setView(settingsView).create();
     }
     

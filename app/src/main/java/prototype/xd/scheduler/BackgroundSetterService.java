@@ -29,7 +29,7 @@ import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class BackgroundSetterService extends Service {
     
-    private SharedPreferences preferences;
+    private SharedPreferences preferences_service;
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
     private Timer refreshTimer;
@@ -115,7 +115,7 @@ public class BackgroundSetterService extends Service {
     }
     
     private void updateNotification() {
-        preferences.edit().putLong(Keys.LAST_UPDATE_TIME, getCurrentTimestamp()).apply();
+        preferences_service.edit().putLong(Keys.LAST_UPDATE_TIME, getCurrentTimestamp()).apply();
         getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTime()));
         notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
     }
@@ -135,14 +135,14 @@ public class BackgroundSetterService extends Service {
             updateNotification();
         } else {
             initialized = true;
-            preferences = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
+            preferences_service = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
             //register receivers
             screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    if (!lastUpdateSucceeded || preferences.getBoolean(SERVICE_UPDATE_SIGNAL, false)) {
+                    if (!lastUpdateSucceeded || preferences_service.getBoolean(SERVICE_UPDATE_SIGNAL, false)) {
                         ping(context);
-                        preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
+                        preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
                     }
                 }
             };
@@ -163,7 +163,7 @@ public class BackgroundSetterService extends Service {
             refreshTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                    preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
                 }
             }, 5000, 1000 * 60 * 10); //approximately every 10 minutes if day
         }

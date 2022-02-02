@@ -36,14 +36,14 @@ public class PopupSettingsView {
     protected final TextView showDaysUpcoming_bar_state;
     protected final TextView showDaysExpired_bar_state;
     
-    public final TextView preview_text_upcoming;
-    public final LinearLayout preview_border_upcoming;
+    private final TextView preview_text_upcoming;
+    private final LinearLayout preview_border_upcoming;
     
-    public final TextView preview_text;
+    protected final TextView preview_text;
     public final LinearLayout preview_border;
     
-    public final TextView preview_text_expired;
-    public final LinearLayout preview_border_expired;
+    private final TextView preview_text_expired;
+    private final LinearLayout preview_border_expired;
     
     protected final TextView border_thickness_description;
     protected final SeekBar border_thickness_bar;
@@ -62,9 +62,9 @@ public class PopupSettingsView {
     
     PopupSettingsView(View settingsView) {
         
-        fontColor_select = settingsView.findViewById(R.id.textColor);
+        fontColor_select = settingsView.findViewById(R.id.fontColor);
         bgColor_select = settingsView.findViewById(R.id.backgroundColor);
-        borderColor_select = settingsView.findViewById(R.id.bevelColor);
+        borderColor_select = settingsView.findViewById(R.id.borderColor);
         add_group = settingsView.findViewById(R.id.addGroup);
         group_spinner = settingsView.findViewById(R.id.groupSpinner);
         

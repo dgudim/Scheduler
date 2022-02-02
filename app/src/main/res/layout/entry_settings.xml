@@ -303,7 +303,7 @@
                             app:cardElevation="5dp" />
 
                         <androidx.cardview.widget.CardView
-                            android:id="@+id/textColor"
+                            android:id="@+id/fontColor"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_margin="5dp"
@@ -311,7 +311,7 @@
                             app:cardElevation="5dp" />
 
                         <androidx.cardview.widget.CardView
-                            android:id="@+id/bevelColor"
+                            android:id="@+id/borderColor"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_margin="5dp"

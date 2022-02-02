@@ -82,8 +82,6 @@ public class Keys {
     
     public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
     
-    public static final String NEED_TO_RECONSTRUCT_BITMAP = "need_to_reconstruct_bitmap";
-    
     public static final String PREVIOUSLY_SELECTED_DATE = "previously_selected_date";
     
     public static final String BLANK_TEXT = "_BLANK_";
@@ -92,6 +90,7 @@ public class Keys {
     
     public static final String PREFERENCES = "prefs";
     public static final String PREFERENCES_SERVICE = "prefs_s";
+    
     public static final String LAST_UPDATE_TIME = "last_update_time";
     public static final String SERVICE_KILL_THRESHOLD_REACHED = "service_supposedly_killed";
     public static final String SERVICE_KILLED_DONT_BOTHER = "service_killed_ignore";

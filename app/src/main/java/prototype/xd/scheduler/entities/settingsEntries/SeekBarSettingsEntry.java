@@ -34,6 +34,7 @@ public class SeekBarSettingsEntry extends SettingsEntry{
         seekBar.setMax(seek_max);
         addSeekBarChangeListener(
                 convertView.findViewById(R.id.seek_bar_description), seekBar,
+                null,
                 stringResource,
                 key, defaultValue);
         return super.InitInnerViews(convertView, viewGroup);

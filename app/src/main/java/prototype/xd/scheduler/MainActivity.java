@@ -4,6 +4,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSav
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
+import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.initStorage;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
@@ -36,6 +37,7 @@ import prototype.xd.scheduler.utilities.Keys;
 public class MainActivity extends AppCompatActivity {
     
     public volatile static SharedPreferences preferences;
+    public volatile static SharedPreferences preferences_service;
     
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         
         preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        preferences_service = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
        /* try {
             Class.forName("dalvik.system.CloseGuard")
                     .getMethod("setEnabled", boolean.class)
@@ -66,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
             if (isServiceBeingKilled()) {
                 setContentView(R.layout.service_keep_alive_screen);
                 
-                if (preferences.getInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED, 0) > 1) {
+                if (preferences_service.getInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED, 0) > 1) {
                     View dontBotherButton = findViewById(R.id.never_ask_again_button);
                     dontBotherButton.setVisibility(View.VISIBLE);
                     dontBotherButton.setOnClickListener(v -> {
-                        preferences.edit().putBoolean(Keys.SERVICE_KILLED_DONT_BOTHER, true).apply();
+                        preferences_service.edit().putBoolean(Keys.SERVICE_KILLED_DONT_BOTHER, true).apply();
                         launchMainActivity();
                     });
                 }
@@ -79,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://dontkillmyapp.com/"))));
                 
                 findViewById(R.id.ignore_button).setOnClickListener(v -> {
-                    preferences.edit().putInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0).apply();
-                    preferences.edit().putInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED,
-                            preferences.getInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED, 0) + 1).apply();
+                    preferences_service.edit().putInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0).apply();
+                    preferences_service.edit().putInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED,
+                            preferences_service.getInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED, 0) + 1).apply();
                     launchMainActivity();
                 });
             } else {
@@ -91,15 +94,15 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private boolean isServiceBeingKilled() {
-        if (preferences.getBoolean(Keys.SERVICE_KILLED_DONT_BOTHER, false)) {
+        if (preferences_service.getBoolean(Keys.SERVICE_KILLED_DONT_BOTHER, false)) {
             return false;
         }
-        long prevTime = preferences.getLong(Keys.LAST_UPDATE_TIME, getCurrentTimestamp());
+        long prevTime = preferences_service.getLong(Keys.LAST_UPDATE_TIME, getCurrentTimestamp());
         if (getCurrentTimestamp() - prevTime > 4 * 60 * 60 * 1000) {
-            preferences.edit().putInt(Keys.SERVICE_KILL_THRESHOLD_REACHED,
-                    preferences.getInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0) + 1).apply();
+            preferences_service.edit().putInt(Keys.SERVICE_KILL_THRESHOLD_REACHED,
+                    preferences_service.getInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0) + 1).apply();
         }
-        return preferences.getInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0) > 15;
+        return preferences_service.getInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0) > 15;
     }
     
     private void launchMainActivity() {

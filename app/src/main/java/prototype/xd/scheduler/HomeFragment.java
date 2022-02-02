@@ -1,6 +1,6 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.addTimeZoneOffset;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
@@ -63,11 +63,11 @@ public class HomeFragment extends Fragment {
         
         CalendarView calendarView = view.findViewById(R.id.calendar);
         long epoch;
-        if((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0){
+        if((epoch = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0){
             calendarView.setDate(addTimeZoneOffset(epoch, timeZone_SYSTEM));
         }
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
-            preferences.edit().putLong(Keys.PREVIOUSLY_SELECTED_DATE, dateToEpoch(year, month + 1, dayOfMonth)).apply();
+            preferences_service.edit().putLong(Keys.PREVIOUSLY_SELECTED_DATE, dateToEpoch(year, month + 1, dayOfMonth)).apply();
             updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
             todoListEntryStorage.lazyLoadEntries(view1.getContext());
         });
@@ -151,7 +151,7 @@ public class HomeFragment extends Fragment {
         updateDate(DAY_FLAG_GLOBAL_STR, true);
         
         long epoch;
-        if ((epoch = preferences.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
+        if ((epoch = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
             currentlySelectedDay = daysFromEpoch(epoch, timeZone_SYSTEM);
         }
         todoListEntryStorage.lazyLoadEntries(view.getContext());
@@ -160,7 +160,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroy() {
         todoListEntryStorage = null;
-        preferences.edit().remove(Keys.PREVIOUSLY_SELECTED_DATE).apply();
+        preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DATE).apply();
         super.onDestroy();
     }
 }

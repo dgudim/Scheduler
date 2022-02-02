@@ -1,6 +1,6 @@
 package prototype.xd.scheduler.views.settings;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.entities.Group.createGroup;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
@@ -12,8 +12,8 @@ import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
@@ -52,8 +52,7 @@ public class EntrySettings extends PopupSettingsView {
         
         dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
             todoListEntryStorage.saveEntries();
-            todoListEntryStorage.updateTodoListAdapter(preferences.getBoolean(NEED_TO_RECONSTRUCT_BITMAP, false));
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, false).apply();
+            todoListEntryStorage.updateTodoListAdapter(false);
         }).setView(settingsView).create();
     }
     
@@ -167,7 +166,7 @@ public class EntrySettings extends PopupSettingsView {
                 if (!groupNames.get(position).equals(entry.group.name)) {
                     entry.changeGroup(groupNames.get(position));
                     todoListEntryStorage.saveEntries();
-                    preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+                    preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
                     initialise(entry, context);
                 }
             }
@@ -212,7 +211,7 @@ public class EntrySettings extends PopupSettingsView {
                             }
                         }
                         updateAllIndicators();
-                        preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+                        preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
                     });
                     
                     builder2.setNegativeButton(R.string.no, (dialog13, which13) -> dialog13.dismiss());
@@ -244,7 +243,7 @@ public class EntrySettings extends PopupSettingsView {
                 entry.removeDisplayParams();
                 entry.resetGroup();
                 todoListEntryStorage.saveEntries();
-                preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
                 initialise(entry, context);
             });
             builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());

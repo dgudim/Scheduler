@@ -1,6 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
@@ -37,7 +37,7 @@ public class TodoListEntryStorage {
     
     public void updateTodoListAdapter(boolean updateBitmap) {
         if (updateBitmap) {
-            preferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
         todoListEntries = Utilities.sortEntries(todoListEntries, currentlySelectedDay);
         todoListViewAdapter.updateCurrentEntries();

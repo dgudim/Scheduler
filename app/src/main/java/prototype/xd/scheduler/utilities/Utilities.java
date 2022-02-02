@@ -1,10 +1,14 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
+import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.NEED_TO_RECONSTRUCT_BITMAP;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
+import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
@@ -18,6 +22,7 @@ import android.content.Intent;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
 import com.flask.colorpicker.ColorPickerView;
@@ -35,6 +40,7 @@ import java.util.Comparator;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.settingsEntries.CompoundCustomizationEntry;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
@@ -160,6 +166,7 @@ public class Utilities {
     //listener for general settings
     public static void addSeekBarChangeListener(final TextView displayTo,
                                                 final SeekBar seekBar,
+                                                @Nullable final CompoundCustomizationEntry customizationEntry,
                                                 final int stringResource,
                                                 final String key,
                                                 final int defaultValue) {
@@ -169,7 +176,22 @@ public class Utilities {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(displayTo.getContext().getString(stringResource, progress));
+                if (fromUser) {
+                    displayTo.setText(displayTo.getContext().getString(stringResource, progress));
+                    if (customizationEntry != null) {
+                        switch (key) {
+                            case UPCOMING_BORDER_THICKNESS:
+                                customizationEntry.updateUpcomingPreviewBorderThickness(progress);
+                                break;
+                            case BORDER_THICKNESS:
+                                customizationEntry.updateCurrentPreviewBorderThickness(progress);
+                                break;
+                            case EXPIRED_BORDER_THICKNESS:
+                                customizationEntry.updateExpiredPreviewBorderThickness(progress);
+                                break;
+                        }
+                    }
+                }
             }
             
             @Override
@@ -180,6 +202,7 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 preferences.edit().putInt(key, seekBar.getProgress()).apply();
+                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
@@ -199,9 +222,11 @@ public class Utilities {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(displayTo.getContext().getString(stringResource, progress));
-                if (mapToBorderPreview) {
-                    entrySettings.preview_border.setPadding(progress, progress, progress, 0);
+                if (fromUser) {
+                    displayTo.setText(displayTo.getContext().getString(stringResource, progress));
+                    if (mapToBorderPreview) {
+                        entrySettings.preview_border.setPadding(progress, progress, progress, 0);
+                    }
                 }
             }
             
@@ -214,7 +239,7 @@ public class Utilities {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf(seekBar.getProgress()));
                 entrySettings.todoListEntryStorage.saveEntries();
-                preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
@@ -235,9 +260,11 @@ public class Utilities {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                displayTo.setText(displayTo.getContext().getString(stringResource, progress));
-                if (mapToBorderPreview) {
-                    systemCalendarSettings.preview_border.setPadding(progress, progress, progress, 0);
+                if (fromUser) {
+                    displayTo.setText(displayTo.getContext().getString(stringResource, progress));
+                    if (mapToBorderPreview) {
+                        systemCalendarSettings.preview_border.setPadding(progress, progress, progress, 0);
+                    }
                 }
             }
             
@@ -250,7 +277,7 @@ public class Utilities {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 preferences.edit().putInt(calendarKey + "_" + parameter, seekBar.getProgress()).apply();
                 systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-                preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
@@ -258,7 +285,10 @@ public class Utilities {
     //switch listener for regular settings
     public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue) {
         tSwitch.setChecked(preferences.getBoolean(key, defaultValue), false);
-        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> preferences.edit().putBoolean(key, isChecked).apply());
+        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            preferences.edit().putBoolean(key, isChecked).apply();
+            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+        });
     }
     
     //switch listener for entry settings
@@ -273,7 +303,7 @@ public class Utilities {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             entry.setStateIconColor(stateIcon, parameter);
             todoListEntryStorage.saveEntries();
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -288,15 +318,35 @@ public class Utilities {
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
     //color dialogue for general settings
-    public static void invokeColorDialogue(final CardView target, final String key, final int defaultValue) {
+    public static void invokeColorDialogue(final CardView target,
+                                           final CompoundCustomizationEntry customizationEntry,
+                                           final String key,
+                                           final int defaultValue) {
         invokeColorDialogue(target.getContext(), preferences.getInt(key, defaultValue), (dialog, selectedColor, allColors) -> {
             preferences.edit().putInt(key, selectedColor).apply();
-            target.setCardBackgroundColor(preferences.getInt(key, defaultValue));
+            switch (key) {
+                case Keys.UPCOMING_BG_COLOR:
+                case Keys.BG_COLOR:
+                case Keys.EXPIRED_BG_COLOR:
+                    customizationEntry.updatePreviewBgs();
+                    break;
+                case Keys.UPCOMING_FONT_COLOR:
+                case Keys.FONT_COLOR:
+                case Keys.EXPIRED_FONT_COLOR:
+                    customizationEntry.updatePreviewFonts();
+                    break;
+                case Keys.UPCOMING_BORDER_COLOR:
+                case Keys.BORDER_COLOR:
+                case Keys.EXPIRED_BORDER_COLOR:
+                    customizationEntry.updatePreviewBorders();
+                    break;
+            }
+            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -322,7 +372,7 @@ public class Utilities {
                     break;
             }
             todoListEntry.setStateIconColor(stateIcon, parameter);
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -346,7 +396,7 @@ public class Utilities {
                     break;
             }
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-            preferences.edit().putBoolean(NEED_TO_RECONSTRUCT_BITMAP, true).apply();
+            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
