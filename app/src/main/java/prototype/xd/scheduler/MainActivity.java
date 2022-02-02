@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         long prevTime = preferences.getLong(Keys.LAST_UPDATE_TIME, getCurrentTimestamp());
-        if (getCurrentTimestamp() - prevTime > 12 * 60 * 60 * 1000) {
+        if (getCurrentTimestamp() - prevTime > 4 * 60 * 60 * 1000) {
             preferences.edit().putInt(Keys.SERVICE_KILL_THRESHOLD_REACHED,
                     preferences.getInt(Keys.SERVICE_KILL_THRESHOLD_REACHED, 0) + 1).apply();
         }
