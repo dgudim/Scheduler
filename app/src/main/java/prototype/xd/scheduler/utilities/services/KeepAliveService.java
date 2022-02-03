@@ -7,14 +7,6 @@ public class KeepAliveService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         BackgroundSetterService.keepAlive(getApplicationContext());
-        System.out.println("---------------------------------------");
-        System.out.println("---------------------------------------");
-        System.out.println("---------------------------------------");
-        System.out.println("---------------------------------------");
-        System.out.println("---------------------------------------");
-        System.out.println("---------------------------------------");
-        System.out.println("---------------------------------------");
-        System.out.println("---------------------------------------");
         return false;
     }
     
