@@ -1,16 +1,16 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.utilities.BackgroundChooser.defaultBackgroundName;
-import static prototype.xd.scheduler.utilities.BackgroundChooser.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.defaultBackgroundName;
+import static prototype.xd.scheduler.utilities.DateManager.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
+import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
@@ -23,6 +23,7 @@ import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -51,12 +52,13 @@ public class LockScreenBitmapDrawer {
     
     public final int displayWidth;
     public final int displayHeight;
-    public final DisplayMetrics displayMetrics;
+    private final DisplayMetrics displayMetrics;
     private final Point displayCenter;
     
     private volatile boolean busy = false;
     
     private final WallpaperManager wallpaperManager;
+    private final SharedPreferences preferences;
     
     private long previous_hash;
     
@@ -65,6 +67,7 @@ public class LockScreenBitmapDrawer {
     
     public LockScreenBitmapDrawer(Context context) {
         wallpaperManager = WallpaperManager.getInstance(context);
+        preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();

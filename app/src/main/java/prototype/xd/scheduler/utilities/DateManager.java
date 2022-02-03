@@ -1,12 +1,16 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -23,6 +27,7 @@ public class DateManager {
     static final DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.ROOT);
     
     public static final String[] availableDays = new String[]{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"};
+    public static final String defaultBackgroundName = "default.png";
     
     public static void updateDate(String selectedDate_string, boolean updateCurrentlySelected) {
         long selectedDay = daysFromDate(selectedDate_string);
@@ -54,6 +59,24 @@ public class DateManager {
                 return date1 + " - " + date2;
             }
         }
+    }
+    
+    static File getBackgroundAccordingToDayAndTime() {
+        
+        if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED)) {
+            return new File(rootDir, defaultBackgroundName);
+        }
+        
+        final Calendar cal = Calendar.getInstance();
+        int day = cal.get(Calendar.DAY_OF_WEEK);
+        CharSequence day_string;
+        if (day == 1) {
+            day_string = availableDays[6];
+        } else {
+            day_string = availableDays[day - 2];
+        }
+        
+        return new File(rootDir, day_string + ".png");
     }
     
     public static long daysFromEpoch(long epoch, TimeZone timezone) {
