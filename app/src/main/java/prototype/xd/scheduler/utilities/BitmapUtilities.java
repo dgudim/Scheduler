@@ -2,7 +2,6 @@ package prototype.xd.scheduler.utilities;
 
 import static java.lang.Math.max;
 
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -45,30 +44,6 @@ public class BitmapUtilities {
         orig.recycle();
         inputStream.close();
         return copy;
-    }
-    
-    /**
-     * Utility function for decoding an image resource. The decoded bitmap will
-     * be optimized for further scaling to the requested destination dimensions
-     * and scaling logic.
-     *
-     * @param res          The resources object containing the image data
-     * @param resId        The resource id of the image data
-     * @param dstWidth     Width of destination area
-     * @param dstHeight    Height of destination area
-     * @param scalingLogic Logic to use to avoid image stretching
-     * @return Decoded bitmap
-     */
-    public static Bitmap decodeResource(Resources res, int resId, int dstWidth, int dstHeight,
-                                        ScalingLogic scalingLogic) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-        options.inJustDecodeBounds = false;
-        options.inSampleSize = calculateSampleSize(options.outWidth, options.outHeight, dstWidth,
-                dstHeight, scalingLogic);
-        
-        return BitmapFactory.decodeResource(res, resId, options);
     }
     
     /**

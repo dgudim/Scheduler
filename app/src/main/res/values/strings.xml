@@ -8,7 +8,7 @@
 
     <string name="settings_state_symbol" translatable="false">⬧</string>
 
-    <string name="settings_current_border_color">Current events border color</string>s
+    s
 
     <string name="settings_current_border_thickness">Current events border thickness: %d</string>
 
@@ -42,15 +42,9 @@
     <string name="settings_add_group">Add group</string>
     <string name="settings_reset_bg">Reset backgrounds</string>
     <string name="settings_reset_to_defaults">Reset settings</string>
-    <string name="settings_upcoming_font_color">Upcoming events font color</string>
-    <string name="settings_expired_font_color">Expired events font color</string>
     <string name="title">Name</string>
     <string name="yes">Yes</string>
-    <string name="settings_upcoming_bg_color">Upcoming events background color</string>
     <string name="settings_upcoming_border_thickness">Upcoming events border thickness: %d</string>
-    <string name="settings_upcoming_border_color">Upcoming events border color</string>
-    <string name="settings_current_bg_color">Current events background color</string>
-    <string name="settings_current_font_color">Current events font color</string>
     <string name="settings_show_upcoming_done_items_list">Show upcoming completed events in list</string>
     <string name="settings_show_items_lock">Show on lock screen</string>
     <string name="settings_show_global_items_lock">Show global events on lock screen</string>
@@ -58,8 +52,6 @@
     <string name="settings_priority">Priority: %d</string>
     <string name="settings_font_size">Font size (Lock screen): %d</string>
     <string name="settings_expired_border_thickness">Expired events border thickness: %d</string>
-    <string name="settings_expired_bg_color">Expired events background color</string>
-    <string name="settings_expired_border_color">Expired events border color</string>
     <string name="save">Save</string>
     <string name="reset_settings_prompt">Reset settings?</string>
     <string name="overwrite_prompt">Overwrite?</string>
@@ -83,14 +75,11 @@
     <string name="choose_color">Choose color</string>
     <string name="category_visibility">Visibility</string>
     <string name="category_system_calendars">System calendar integration</string>
-    <string name="category_fonts">Fonts</string>
-    <string name="category_borders">Borders</string>
     <string name="category_appearance">Appearance</string>
     <string name="cancel">Cancel</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="apply">Apply</string>
     <string name="add_to_global_list">Add to global list</string>
-    <string name="add_event">Add event</string>
     <string name="event_name_input_hint">Event</string>
     <string name="add">Add</string>
     <string name="add_current_config_as_group_prompt">Add current configuration as a group?</string>

@@ -17,7 +17,8 @@
             android:id="@+id/bg_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="bg_title" />
+            android:text="bg_title"
+            tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/bg_image"

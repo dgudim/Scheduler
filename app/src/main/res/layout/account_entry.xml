@@ -25,7 +25,8 @@
             android:layout_height="wrap_content"
             android:gravity="center|start"
             android:text="account_name"
-            android:textAppearance="@style/TextSmall_primary" />
+            android:textAppearance="@style/TextSmall_primary"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/account_type"
@@ -33,7 +34,8 @@
             android:layout_height="wrap_content"
             android:gravity="start"
             android:text="account_type"
-            android:textAppearance="@style/TextSmall_secondary" />
+            android:textAppearance="@style/TextSmall_secondary"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <ImageButton

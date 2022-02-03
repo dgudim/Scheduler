@@ -2,14 +2,11 @@
 <resources>
     <color name="colorPrimary">#0098FF</color>
     <color name="colorPrimaryDark">#0079CA</color>
-    <color name="colorAccent">#31ACFF</color>
+    <color name="colorAccent">#62A1FF</color>
     <color name="colorAccent2">#FF6D34</color>
-    <color name="colorAccent_title">#62A1FF</color>
     <color name="image_button_bg">#00000000</color>
 
     <color name="light_gray_bg_tint">#55555555</color>
-
-    <color name="divider_color">#77555555</color>
 
     <color name="button_text_color">#000000</color>
 

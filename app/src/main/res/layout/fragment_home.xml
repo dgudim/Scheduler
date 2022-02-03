@@ -24,7 +24,8 @@
         app:layout_constraintBottom_toTopOf="@+id/calendar"
         app:layout_constraintEnd_toStartOf="@+id/openSettingsButton"
         app:layout_constraintStart_toEndOf="@+id/to_current_date_button"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
 
     <ImageView
         android:id="@+id/to_current_date_button"

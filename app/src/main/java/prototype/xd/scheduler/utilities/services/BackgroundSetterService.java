@@ -25,8 +25,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import java.util.Timer;
-
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
@@ -35,8 +33,6 @@ public class BackgroundSetterService extends Service {
     
     private SharedPreferences preferences_service;
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
-    
-    private Timer refreshTimer;
     
     public static void ping(Context context) {
         ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
@@ -188,6 +184,5 @@ public class BackgroundSetterService extends Service {
         notificationManager = null;
         unregisterReceiver(screenOnOffReceiver);
         unregisterReceiver(pingReceiver);
-        if (refreshTimer != null) refreshTimer.cancel();
     }
 }

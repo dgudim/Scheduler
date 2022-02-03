@@ -12,6 +12,6 @@
             android:layout_height="wrap_content"
             android:text="parameter"
             android:textAppearance="@style/TextSmallMedium_primary"
-            tools:ignore="TouchTargetSizeCheck" />
+            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
 
 </androidx.cardview.widget.CardView>
