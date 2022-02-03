@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/backgroundFirstLayer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#B8B8B8"
+    android:background="@color/gray_bg"
     android:orientation="horizontal">
 
     <LinearLayout
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
         android:layout_marginBottom="1dp"
-        android:background="#FFFFFF"
+        android:background="@color/light_gray_bg"
         android:orientation="horizontal">
 
         <prototype.xd.scheduler.views.CheckBox

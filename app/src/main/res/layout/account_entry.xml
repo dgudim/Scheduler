@@ -25,14 +25,15 @@
             android:layout_height="wrap_content"
             android:gravity="center|start"
             android:text="account_name"
-            android:textColor="#000000" />
+            android:textAppearance="@style/primary_text_appearance_small" />
 
         <TextView
             android:id="@+id/account_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="start"
-            android:text="account_type" />
+            android:text="account_type"
+            android:textAppearance="@style/secondary_text_appearance_small" />
     </LinearLayout>
 
     <ImageButton
@@ -40,7 +41,7 @@
         style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:background="#00FFFFFF"
+        android:background="@color/image_button_bg"
         app:srcCompat="@drawable/ic_settings"
         tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck" />
 

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="45dp"
-    android:background="@color/white_bg"
     android:orientation="horizontal">
 
     <prototype.xd.scheduler.views.CheckBox
@@ -27,14 +26,14 @@
             android:layout_height="wrap_content"
             android:gravity="center|start"
             android:text="calendar_name"
-            android:textColor="#000000" />
+            android:textAppearance="@style/primary_text_appearance_small" />
 
         <TextView
             android:id="@+id/event_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="event_count"
-            android:textColor="#000000" />
+            android:textAppearance="@style/secondary_text_appearance_small" />
 
     </LinearLayout>
 

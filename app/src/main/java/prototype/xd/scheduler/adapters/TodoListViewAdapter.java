@@ -184,6 +184,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
         }
         
+        view.findViewById(R.id.backgroundFirstLayer).setBackgroundColor(currentEntry.borderColor);
         view.findViewById(R.id.backgroundSecondLayer).setBackgroundColor(currentEntry.bgColor);
         
         if (currentEntry.completed) {

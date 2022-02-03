@@ -7,6 +7,30 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="primary_text_appearance_small" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/main_text_color</item>
+    </style>
+
+    <style name="secondary_text_appearance_small" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/secondary_text_color</item>
+    </style>
+
+    <style name="primary_text_appearance_medium" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/main_text_color</item>
+    </style>
+
+    <style name="secondary_text_appearance_medium" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/secondary_text_color</item>
+    </style>
+
+    <style name="primary_text_appearance_large" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textColor">@color/main_text_color</item>
+    </style>
+
+    <style name="secondary_text_appearance_large" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textColor">@color/secondary_text_color</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

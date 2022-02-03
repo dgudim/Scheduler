@@ -27,7 +27,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#FFFFFF"
                     android:gravity="center_vertical"
                     android:text="@string/settings_bg_color"
                     android:textColor="#000000"
@@ -37,7 +36,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#FFFFFF"
                     android:gravity="center_vertical"
                     android:text="@string/settings_text_color"
                     android:textColor="#000000"
@@ -47,7 +45,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="#FFFFFF"
                     android:gravity="center_vertical"
                     android:text="@string/settings_border_color"
                     android:textColor="#000000"
@@ -255,7 +252,6 @@
                 android:id="@+id/upcoming_border_thickness_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
                 android:text="@string/settings_upcoming_border_thickness"
                 android:textColor="#000000"
                 android:textSize="18sp" />
@@ -265,7 +261,6 @@
                 style="@android:style/Widget.Material.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
                 android:max="15"
                 android:min="0" />
 
@@ -278,7 +273,6 @@
                 android:id="@+id/current_border_thickness_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
                 android:text="@string/settings_current_border_thickness"
                 android:textColor="#000000"
                 android:textSize="18sp" />
@@ -288,7 +282,6 @@
                 style="@android:style/Widget.Material.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
                 android:max="15"
                 android:min="0" />
 
@@ -301,7 +294,6 @@
                 android:id="@+id/expired_border_thickness_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
                 android:text="@string/settings_expired_border_thickness"
                 android:textColor="#000000"
                 android:textSize="18sp" />
@@ -311,7 +303,6 @@
                 style="@android:style/Widget.Material.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
                 android:max="15"
                 android:min="0" />
 
