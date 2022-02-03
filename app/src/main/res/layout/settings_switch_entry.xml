@@ -10,7 +10,8 @@
             android:id="@+id/Switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:text="parameter"
+            android:textAppearance="@style/TextSmallMedium_primary"
             tools:ignore="TouchTargetSizeCheck" />
 
 </androidx.cardview.widget.CardView>

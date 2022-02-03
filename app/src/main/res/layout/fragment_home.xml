@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        android:textAppearance="@style/secondary_text_appearance_medium"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintBottom_toTopOf="@+id/calendar"
         app:layout_constraintEnd_toStartOf="@+id/openSettingsButton"
         app:layout_constraintStart_toEndOf="@+id/to_current_date_button"

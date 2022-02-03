@@ -29,8 +29,7 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="@string/settings_bg_color"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -38,8 +37,7 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="@string/settings_text_color"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -47,8 +45,7 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="@string/settings_border_color"
-                    android:textColor="#000000"
-                    android:textSize="18sp" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
             </LinearLayout>
 
@@ -63,8 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_preview_upcoming"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000000" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/backgroundColor_upcoming"
@@ -104,8 +100,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_preview_current"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000000" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/backgroundColor"
@@ -145,8 +140,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_preview_expired"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000000" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/backgroundColor_expired"
@@ -180,7 +174,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/light_gray_bg"
+            android:background="@color/light_gray_bg_tint"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="5dp">
@@ -198,8 +192,7 @@
                     android:gravity="center"
                     android:paddingBottom="3dp"
                     android:text="@string/settings_preview_upcoming"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000000" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
             </LinearLayout>
 
@@ -218,8 +211,7 @@
                     android:gravity="center"
                     android:paddingBottom="3dp"
                     android:text="@string/settings_preview_current"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000000" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
             </LinearLayout>
 
@@ -236,8 +228,7 @@
                     android:gravity="center"
                     android:paddingBottom="3dp"
                     android:text="@string/settings_preview_expired"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000000" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
 
             </LinearLayout>
 
@@ -253,8 +244,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_upcoming_border_thickness"
-                android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textAppearance="@style/TextSmallMedium_primary" />
 
             <SeekBar
                 android:id="@+id/upcoming_border_thickness_seek_bar"
@@ -274,8 +264,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_current_border_thickness"
-                android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textAppearance="@style/TextSmallMedium_primary" />
 
             <SeekBar
                 android:id="@+id/current_border_thickness_seek_bar"
@@ -295,8 +284,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/settings_expired_border_thickness"
-                android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textAppearance="@style/TextSmallMedium_primary" />
 
             <SeekBar
                 android:id="@+id/expired_border_thickness_seek_bar"

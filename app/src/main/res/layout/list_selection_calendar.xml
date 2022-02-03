@@ -1,35 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/backgroundFirstLayer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/gray_bg"
     android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/backgroundSecondLayer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/event_color"
+        android:layout_width="8dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="11dp"
         android:layout_marginTop="1dp"
+        android:layout_marginRight="11dp"
         android:layout_marginBottom="1dp"
-        android:background="@color/light_gray_bg"
-        android:orientation="horizontal">
+        app:cardCornerRadius="2dp"
+        app:cardElevation="2dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/event_color"
-            android:layout_width="8dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="11dp"
-            android:layout_marginRight="11dp"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="2dp" />
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/backgroundLayer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:layout_weight="1"
+        app:cardCornerRadius="5dp"
+        app:strokeWidth="0.7dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="2dp">
 
             <TextView
                 android:id="@+id/todoText"
@@ -41,23 +43,24 @@
                 android:maxLines="5"
                 android:minLines="1"
                 android:text="@string/app_name"
-                android:textColor="#000000"
+                android:textAppearance="@style/TextMedium_primary"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="time" />
+                android:text="time"
+                android:textAppearance="@style/TextSmall_secondary" />
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/settings"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/action_settings"
-            app:srcCompat="@drawable/ic_settings" />
+    </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/settings"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/action_settings"
+        app:srcCompat="@drawable/ic_settings" />
 
 </LinearLayout>

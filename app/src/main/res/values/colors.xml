@@ -5,13 +5,13 @@
     <color name="colorAccent">#31ACFF</color>
     <color name="colorAccent2">#FF6D34</color>
     <color name="colorAccent_title">#62A1FF</color>
-    <color name="light_gray_bg">#DFDFDF</color>
-    <color name="gray_bg">#BFBFBF</color>
     <color name="image_button_bg">#00000000</color>
 
-    <color name="button_text_color">#140139</color>
-    <color name="main_text_color">#000000</color>
-    <color name="secondary_text_color">#686868</color>
+    <color name="light_gray_bg_tint">#55555555</color>
+
+    <color name="divider_color">#77555555</color>
+
+    <color name="button_text_color">#000000</color>
 
     <color name="entry_settings_parameter_default">#888888</color>
     <color name="entry_settings_parameter_personal">#6FFF6F</color>

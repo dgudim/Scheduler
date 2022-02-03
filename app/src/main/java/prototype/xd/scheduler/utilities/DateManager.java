@@ -69,6 +69,10 @@ public class DateManager {
         return dateFormat.format(new Date(epoch));
     }
     
+    public static String dateFromEpoch(long epoch) {
+        return dateFormat.format(new Date(epoch)).split(" ")[0];
+    }
+    
     public static String getCurrentTime() {
         return dateFormat.format(new Date()).split(" ")[1];
     }

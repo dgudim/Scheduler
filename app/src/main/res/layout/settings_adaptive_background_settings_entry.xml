@@ -13,12 +13,11 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:text="@string/settings_adaptive_background"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="#000000" />
+            android:textAppearance="@style/TextSmallMedium_primary" />
 
         <ImageButton
             android:id="@+id/adaptive_bg_settings"

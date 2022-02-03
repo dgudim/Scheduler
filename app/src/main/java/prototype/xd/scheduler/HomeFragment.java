@@ -3,7 +3,10 @@ package prototype.xd.scheduler;
 import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.addTimeZoneOffset;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
+import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.dateToEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
@@ -24,15 +27,16 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CalendarView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -62,24 +66,33 @@ public class HomeFragment extends Fragment {
         listView.setAdapter(todoListEntryStorage.getTodoListViewAdapter());
         
         CalendarView calendarView = view.findViewById(R.id.calendar);
+        TextView statusText = view.findViewById(R.id.status_text);
         long epoch;
-        if((epoch = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0){
+        if ((epoch = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
             calendarView.setDate(addTimeZoneOffset(epoch, timeZone_SYSTEM));
         }
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             preferences_service.edit().putLong(Keys.PREVIOUSLY_SELECTED_DATE, dateToEpoch(year, month + 1, dayOfMonth)).apply();
             updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
             todoListEntryStorage.lazyLoadEntries(view1.getContext());
+            updateStatusText(statusText);
+        });
+        
+        view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> {
+            calendarView.setDate(addTimeZoneOffset(currentTimestamp, timeZone_SYSTEM));
+            currentlySelectedDay = currentDay;
+            preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DATE).apply();
+            todoListEntryStorage.updateTodoListAdapter(false);
+            updateStatusText(statusText);
         });
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(view1.getContext());
-            builder.setTitle(R.string.add_item);
             View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
             builder.setView(addView);
             AlertDialog dialog = builder.create();
             
-            final EditText input = addView.findViewById(R.id.entryNameEditText);
+            final TextInputEditText input = addView.findViewById(R.id.entryNameEditText);
             input.setOnFocusChangeListener((v, hasFocus) -> input.postDelayed(() -> {
                 InputMethodManager inputMethodManager = (InputMethodManager) view1.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
@@ -111,25 +124,29 @@ public class HomeFragment extends Fragment {
             });
             
             addView.findViewById(R.id.save_button).setOnClickListener(v -> {
-                TodoListEntry newEntry = new TodoListEntry(new String[]{
-                        TEXT_VALUE, input.getText().toString().trim(),
-                        ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
-                        IS_COMPLETED, "false"}, currentGroup[0]);
-                todoListEntryStorage.addEntry(newEntry);
-                todoListEntryStorage.saveEntries();
-                todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
-                dialog.dismiss();
+                if (input.getText() != null) {
+                    TodoListEntry newEntry = new TodoListEntry(new String[]{
+                            TEXT_VALUE, input.getText().toString().trim(),
+                            ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
+                            IS_COMPLETED, "false"}, currentGroup[0]);
+                    todoListEntryStorage.addEntry(newEntry);
+                    todoListEntryStorage.saveEntries();
+                    todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
+                    dialog.dismiss();
+                }
             });
             
             addView.findViewById(R.id.add_to_global_button).setOnClickListener(v -> {
-                TodoListEntry newEntry = new TodoListEntry(new String[]{
-                        TEXT_VALUE, input.getText().toString().trim(),
-                        ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
-                        IS_COMPLETED, "false"}, currentGroup[0]);
-                todoListEntryStorage.addEntry(newEntry);
-                todoListEntryStorage.saveEntries();
-                todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
-                dialog.dismiss();
+                if (input.getText() != null) {
+                    TodoListEntry newEntry = new TodoListEntry(new String[]{
+                            TEXT_VALUE, input.getText().toString().trim(),
+                            ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
+                            IS_COMPLETED, "false"}, currentGroup[0]);
+                    todoListEntryStorage.addEntry(newEntry);
+                    todoListEntryStorage.saveEntries();
+                    todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
+                    dialog.dismiss();
+                }
             });
             
             addView.findViewById(R.id.cancel_button).setOnClickListener(v -> dialog.dismiss());
@@ -155,6 +172,13 @@ public class HomeFragment extends Fragment {
             currentlySelectedDay = daysFromEpoch(epoch, timeZone_SYSTEM);
         }
         todoListEntryStorage.lazyLoadEntries(view.getContext());
+    
+        updateStatusText(view.findViewById(R.id.status_text));
+    }
+    
+    private void updateStatusText(TextView statusText){
+        statusText.setText(getString(R.string.status, dateFromEpoch(currentlySelectedDay * 86400000),
+                todoListEntryStorage.getCurrentlyVisibleEntries()));
     }
     
     @Override

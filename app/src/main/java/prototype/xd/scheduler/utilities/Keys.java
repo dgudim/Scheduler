@@ -1,5 +1,9 @@
 package prototype.xd.scheduler.utilities;
 
+import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
+import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
+
 public class Keys {
     
     public static final int SETTINGS_DEFAULT_BG_COLOR = 0xff_FFFFFF;
@@ -83,6 +87,12 @@ public class Keys {
     public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
     
     public static final String PREVIOUSLY_SELECTED_DATE = "previously_selected_date";
+    
+    public static final byte APP_THEME_LIGHT = MODE_NIGHT_NO;
+    public static final byte APP_THEME_DARK = MODE_NIGHT_YES;
+    public static final byte APP_THEME_SYSTEM = MODE_NIGHT_FOLLOW_SYSTEM;
+    public static final byte DEFAULT_APP_THEME = APP_THEME_SYSTEM;
+    public static final String APP_THEME = "app_theme";
     
     public static final String BLANK_TEXT = "_BLANK_";
     

@@ -5,7 +5,7 @@
     <string name="home_fragment_label">Home Fragment</string>
     <string name="settings_fragment_label">Settings Fragment</string>
     <string name="delete_item">Delete item</string>
-    <string name="category_backgrounds">Фоны</string>
+    <string name="category_appearance">Внешний вид</string>
     <string name="category_borders">Контуры</string>
     <string name="category_fonts">Шрифты</string>
     <string name="category_visibility">Видимость</string>
@@ -44,7 +44,7 @@
     <string name="move_to_global_list">Переместить в общий список</string>
     <string name="add_to_global_list">Добавить в общий список</string>
     <string name="add">Добавить</string>
-    <string name="add_item">Добавить событие</string>
+    <string name="add_event">Добавить событие</string>
     <string name="enable">Включить</string>
     <string name="group">Группа:</string>
     <string name="service_description">Сервис для обновления фона блокировки</string>
@@ -81,7 +81,6 @@
     <string name="settings_upcoming_border_thickness">Толщина контура для будущих событий: %d</string>
     <string name="settings_upcoming_border_color">Цвет контура для будущих событий</string>
     <string name="settings_current_border_color">Цвет контура для текущих собятий</string>
-    <string name="settings_state_symbol">⬧</string>
     <string name="settings_current_border_thickness">Толщина контура для текущих событий: %d</string>
     <string name="settings_current_bg_color">Цвет фона для текущих событий</string>
     <string name="settings_current_font_color">Цвет шрифта для текущих событий</string>
@@ -114,4 +113,10 @@
     <string name="visit_dont_kill_my_app">узнать как</string>
     <string name="service_killed_message">Похоже, что система Android убивает службу фонового обновления приложения, без службы приложение не будет обновлять ваши обои вовремя, пожалуйста, добавьте приложение в белый список оптимизации батареи (нажмите \"узнать как\", если вы не знаете, как это сделать)</string>
     <string name="never_ask_again">Больше не спрашивать</string>
+    <string name="event_name_input_hint">Событие</string>
+    <string name="status">Дата: %s  Событий: %d</string>
+    <string name="app_theme">Тема приложения</string>
+    <string name="app_theme_system">Системная</string>
+    <string name="app_theme_dark">Тёмная</string>
+    <string name="app_theme_light">Светлая</string>
 </resources>

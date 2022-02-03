@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.RESET_BUTTONS;
+import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.RESET_BUTTON;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
@@ -12,18 +12,18 @@ import androidx.fragment.app.Fragment;
 
 import prototype.xd.scheduler.R;
 
-public class ResetButtonsSettingsEntry extends SettingsEntry {
+public class ResetButtonSettingsEntry extends SettingsEntry {
     
     private final Fragment fragment;
     private final View view;
     private final Bundle savedInstanceState;
     
-    public ResetButtonsSettingsEntry(Fragment fragment, View view, Bundle savedInstanceState) {
-        super(R.layout.settings_reset_buttons_entry);
+    public ResetButtonSettingsEntry(Fragment fragment, View view, Bundle savedInstanceState) {
+        super(R.layout.settings_reset_button_entry);
         this.fragment = fragment;
         this.view = view;
         this.savedInstanceState = savedInstanceState;
-        entryType = RESET_BUTTONS;
+        entryType = RESET_BUTTON;
     }
     
     @SuppressWarnings({"ApplySharedPref"})

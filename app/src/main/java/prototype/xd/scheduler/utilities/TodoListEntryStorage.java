@@ -35,6 +35,10 @@ public class TodoListEntryStorage {
         return todoListViewAdapter;
     }
     
+    public int getCurrentlyVisibleEntries(){
+        return todoListViewAdapter.getCount();
+    }
+    
     public void updateTodoListAdapter(boolean updateBitmap) {
         if (updateBitmap) {
             preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();

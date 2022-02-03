@@ -3,39 +3,62 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingStart="3dp"
+    android:paddingEnd="3dp">
 
-    <EditText
-        android:id="@+id/entryNameEditText"
-        android:layout_width="0dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textField"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints="Название"
-        android:inputType="text"
+        android:hint="@string/event_name_input_hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/entryNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:ignore="TextContrastCheck" />
 
-    <Spinner
-        android:id="@+id/groupSpinner"
-        android:layout_width="0dp"
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
-        android:layout_weight="150"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/entryNameEditText"
-        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/group"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entryNameEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/textField"
+        app:strokeColor="@color/material_on_surface_stroke"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/group"
+                android:textAppearance="@style/TextMedium_secondary" />
+
+            <Spinner
+                android:id="@+id/groupSpinner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:dropDownWidth="match_parent"
+                tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -44,7 +67,7 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/groupSpinner">
+        app:layout_constraintTop_toBottomOf="@+id/cardView">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -56,14 +79,16 @@
                 style="@style/defaultButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/cancel" />
+                android:text="@string/cancel"
+                tools:ignore="TextContrastCheck" />
 
             <Button
                 android:id="@+id/save_button"
                 style="@style/defaultButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/add" />
+                android:text="@string/add"
+                tools:ignore="TextContrastCheck" />
 
         </LinearLayout>
 

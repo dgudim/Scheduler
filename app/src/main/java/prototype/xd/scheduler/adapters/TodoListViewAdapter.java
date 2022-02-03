@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 
+import com.google.android.material.card.MaterialCardView;
+
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.R;
@@ -32,8 +34,8 @@ public class TodoListViewAdapter extends BaseAdapter {
     
     private final TodoListEntryStorage todoListEntryStorage;
     
-    public final ArrayList<TodoListEntry> currentTodoListEntries;
-    public final ArrayList<Integer> currentTodoListEntries_indexMap;
+    private final ArrayList<TodoListEntry> currentTodoListEntries;
+    private final ArrayList<Integer> currentTodoListEntries_indexMap;
     
     private final EntrySettings entrySettings;
     private final SystemCalendarSettings systemCalendarSettings;
@@ -118,15 +120,15 @@ public class TodoListViewAdapter extends BaseAdapter {
             view.findViewById(R.id.deletionButton).setOnClickListener(view1 -> {
                 
                 AlertDialog.Builder alert = new AlertDialog.Builder(view1.getContext());
-                alert.setTitle("Удалить");
-                alert.setMessage("Вы уверены?");
-                alert.setPositiveButton("Да", (dialog, which) -> {
+                alert.setTitle(R.string.delete);
+                alert.setMessage(R.string.are_you_sure);
+                alert.setPositiveButton(R.string.yes, (dialog, which) -> {
                     todoListEntryStorage.removeEntry(currentTodoListEntries_indexMap.get(i));
                     todoListEntryStorage.saveEntries();
                     todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
                 });
                 
-                alert.setNegativeButton("Нет", (dialog, which) -> dialog.dismiss());
+                alert.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
                 
                 alert.show();
             });
@@ -146,7 +148,6 @@ public class TodoListViewAdapter extends BaseAdapter {
             
             todoText.setOnLongClickListener(view1 -> {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(view1.getContext());
-                alertBuilder.setTitle(R.string.edit);
                 View addView = LayoutInflater.from(view1.getContext()).inflate(R.layout.edit_entry_dialogue, parent, false);
                 alertBuilder.setView(addView);
                 AlertDialog dialog = alertBuilder.create();
@@ -158,6 +159,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                     currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
                     todoListEntryStorage.saveEntries();
                     todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
+                    dialog.dismiss();
                 });
                 
                 View move_to_global_button = addView.findViewById(R.id.move_to_global_button);
@@ -167,6 +169,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                         currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                         todoListEntryStorage.saveEntries();
                         todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
+                        dialog.dismiss();
                     });
                 }else{
                     move_to_global_button.setVisibility(View.GONE);
@@ -180,12 +183,15 @@ public class TodoListViewAdapter extends BaseAdapter {
             settings.setOnClickListener(v -> entrySettings.show(currentEntry, v.getContext()));
         } else {
             ((CardView) view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
-            ((TextView) view.findViewById(R.id.time_text)).setText(currentEntry.getTimeSpan(view.getContext()));
+            TextView time = view.findViewById(R.id.time_text);
+            time.setText(currentEntry.getTimeSpan(view.getContext()));
+            time.setTextColor(currentEntry.fontColor);
             settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
         }
         
-        view.findViewById(R.id.backgroundFirstLayer).setBackgroundColor(currentEntry.borderColor);
-        view.findViewById(R.id.backgroundSecondLayer).setBackgroundColor(currentEntry.bgColor);
+        MaterialCardView backgroundLayer = view.findViewById(R.id.backgroundLayer);
+        backgroundLayer.setCardBackgroundColor(currentEntry.bgColor);
+        backgroundLayer.setStrokeColor(currentEntry.borderColor);
         
         if (currentEntry.completed) {
             todoText.setTextColor(currentEntry.fontColor_completed);

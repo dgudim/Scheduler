@@ -20,12 +20,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/permission_request"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:textAppearance="@style/TextLarge" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/permission_request_description" />
+            android:text="@string/permission_request_description"
+            android:textAppearance="@style/TextSmall_secondary" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,13 +50,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/calendar_access"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000000" />
+                    android:textAppearance="@style/TextMedium_primary" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/calendar_access_description" />
+                    android:text="@string/calendar_access_description"
+                    android:textAppearance="@style/TextSmall_secondary" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/calendar_permission_granted_bg"
@@ -103,13 +104,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/file_access"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="#000000" />
+                    android:textAppearance="@style/TextMedium_primary" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/file_access_description" />
+                    android:text="@string/file_access_description"
+                    android:textAppearance="@style/TextSmall_secondary" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/storage_permission_granted_bg"

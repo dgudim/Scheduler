@@ -20,21 +20,12 @@
         android:textSize="18sp"
         tools:ignore="TouchTargetSizeCheck" />
 
-    <androidx.cardview.widget.CardView
+    <Button
+        android:id="@+id/resetBgButton"
+        style="@style/defaultButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:cardCornerRadius="5dp"
-        app:cardElevation="3dp">
-
-        <Button
-            android:id="@+id/resetBgButton"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#00FFFFFF"
-            android:text="@string/settings_reset_bg" />
-    </androidx.cardview.widget.CardView>
+        android:text="@string/settings_reset_bg" />
 
     <include layout="@layout/grid_selection_view" />
 

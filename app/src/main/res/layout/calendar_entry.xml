@@ -26,14 +26,14 @@
             android:layout_height="wrap_content"
             android:gravity="center|start"
             android:text="calendar_name"
-            android:textAppearance="@style/primary_text_appearance_small" />
+            android:textAppearance="@style/TextSmall_primary" />
 
         <TextView
             android:id="@+id/event_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="event_count"
-            android:textAppearance="@style/secondary_text_appearance_small" />
+            android:textAppearance="@style/TextSmall_secondary" />
 
     </LinearLayout>
 

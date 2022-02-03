@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }*/
+        
+        AppCompatDelegate.setDefaultNightMode(preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME));
         
         if (!refreshPermissionStates(false)) {
             setContentView(R.layout.permissions_request_screen);

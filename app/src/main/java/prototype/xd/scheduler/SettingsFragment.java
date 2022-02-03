@@ -18,11 +18,12 @@ import java.util.ArrayList;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.entities.settingsEntries.AdaptiveBackgroundSettingsEntry;
+import prototype.xd.scheduler.entities.settingsEntries.AppThemeSelectorEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarAccountSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CalendarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CompoundCustomizationEntry;
 import prototype.xd.scheduler.entities.settingsEntries.DiscreteSeekBarSettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.ResetButtonsSettingsEntry;
+import prototype.xd.scheduler.entities.settingsEntries.ResetButtonSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.SeekBarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.SettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.SwitchSettingsEntry;
@@ -65,7 +66,8 @@ public class SettingsFragment extends Fragment {
         
         adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntry(this);
         
-        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_backgrounds)));
+        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_appearance)));
+        settingsEntries.add(new AppThemeSelectorEntry());
         settingsEntries.add(adaptiveBackgroundSettingsEntry);
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED,
@@ -98,7 +100,7 @@ public class SettingsFragment extends Fragment {
                 Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK,
                 getString(R.string.settings_max_rWidth_lock)));
         
-        settingsEntries.add(new ResetButtonsSettingsEntry(this, view, savedInstanceState));
+        settingsEntries.add(new ResetButtonSettingsEntry(this, view, savedInstanceState));
     
         SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries);
         ((ListView) view.findViewById(R.id.settingsList)).setAdapter(settingsListViewAdapter);
