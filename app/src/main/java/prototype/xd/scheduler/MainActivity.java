@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.Objects;
 
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class MainActivity extends AppCompatActivity {
     

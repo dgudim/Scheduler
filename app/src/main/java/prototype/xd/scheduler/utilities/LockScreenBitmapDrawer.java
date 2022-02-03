@@ -42,7 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import prototype.xd.scheduler.BackgroundSetterService;
+import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 public class LockScreenBitmapDrawer {

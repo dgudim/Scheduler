@@ -1,16 +1,20 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.utilities.services;
 
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTime;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -22,8 +26,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
@@ -36,6 +40,12 @@ public class BackgroundSetterService extends Service {
     
     public static void ping(Context context) {
         ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
+    }
+    
+    public static void keepAlive(Context context) {
+        Intent keepAliveIntent = new Intent(context, BackgroundSetterService.class);
+        keepAliveIntent.putExtra(SERVICE_KEEP_ALIVE_SIGNAL, 1);
+        ContextCompat.startForegroundService(context, keepAliveIntent);
     }
     
     @Nullable
@@ -129,10 +139,14 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent == null || initialized) {
-            updateDate(DAY_FLAG_GLOBAL_STR, false);
-            lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
-            updateNotification();
+        if (intent != null && initialized) {
+            if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
+                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            } else {
+                updateDate(DAY_FLAG_GLOBAL_STR, false);
+                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                updateNotification();
+            }
         } else {
             initialized = true;
             preferences_service = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
@@ -156,16 +170,13 @@ public class BackgroundSetterService extends Service {
             registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
             registerReceiver(pingReceiver, new IntentFilter(Intent.ACTION_DATE_CHANGED));
             
+            //start the service and a keep alive job
+            getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
+                    new ComponentName(getApplicationContext(), KeepAliveService.class))
+                    .setPeriodic(15 * 60 * 1000, 5 * 60 * 1000).build());
+            
             startForeground(foregroundNotificationId, getForegroundNotification().build());
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
-            
-            refreshTimer = new Timer();
-            refreshTimer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-                }
-            }, 5000, 1000 * 60 * 10); //approximately every 10 minutes if day
         }
         return START_STICKY;
     }

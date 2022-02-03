@@ -22,9 +22,16 @@
         tools:ignore="UnusedAttribute">
 
         <service
-            android:name=".BackgroundSetterService"
+            android:name=".utilities.services.BackgroundSetterService"
             android:enabled="true"
             android:exported="false" />
+
+        <service
+            android:name=".utilities.services.KeepAliveService"
+            android:enabled="true"
+            android:exported="false"
+            android:label="Keep alive service"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
             android:name=".MainActivity"

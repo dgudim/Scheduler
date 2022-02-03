@@ -96,4 +96,5 @@ public class Keys {
     public static final String SERVICE_KILLED_DONT_BOTHER = "service_killed_ignore";
     public static final String SERVICE_KILLED_IGNORE_BUTTON_CLICKED = "service_killed_ignore_count";
     public static final String SERVICE_UPDATE_SIGNAL = "update";
+    public static final String SERVICE_KEEP_ALIVE_SIGNAL = "keep_alive";
 }
