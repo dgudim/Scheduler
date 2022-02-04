@@ -88,12 +88,6 @@ public class SettingsFragment extends Fragment {
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME,
                 getString(R.string.settings_hide_expired_entries_by_time)));
         settingsEntries.add(new SwitchSettingsEntry(
-                Keys.SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST,
-                getString(R.string.settings_show_expired_done_items_list)));
-        settingsEntries.add(new SwitchSettingsEntry(
-                Keys.SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST,
-                getString(R.string.settings_show_upcoming_done_items_list)));
-        settingsEntries.add(new SwitchSettingsEntry(
                 Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK,
                 getString(R.string.settings_show_global_items_lock)));
         settingsEntries.add(new SwitchSettingsEntry(

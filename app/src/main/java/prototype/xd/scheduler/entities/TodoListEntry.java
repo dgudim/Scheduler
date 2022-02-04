@@ -311,7 +311,7 @@ public class TodoListEntry {
                         
                         setFontColor(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
                         
-                        showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_EXPIRED_COMPLETED_ITEMS_IN_LIST);
+                        showInList_ifCompleted = false;
                         showOnLock = true;
                         
                         setEntryType(EntryType.EXPIRED);
@@ -323,7 +323,7 @@ public class TodoListEntry {
                         
                         setFontColor(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
                         
-                        showInList_ifCompleted = preferences.getBoolean(Keys.SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_COMPLETED_ITEMS_IN_LIST);
+                        showInList_ifCompleted = false;
                         showOnLock = true;
                         
                         setEntryType(EntryType.UPCOMING);

@@ -8,8 +8,6 @@
     <string name="category_appearance">Внешний вид</string>
     <string name="category_visibility">Видимость</string>
     <string name="category_system_calendars">Интеграция с системным календарём</string>
-    <string name="settings_show_expired_done_items_list">Показывать пропущенные выполненные события в списке</string>
-    <string name="settings_show_upcoming_done_items_list">Показывать будущие выполненные события в списке</string>
     <string name="apply">Применить</string>
     <string name="choose_color">Выберите цвет</string>
     <string name="item_N_days_ago_double">(%d дней назад)</string>
@@ -63,8 +61,8 @@
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
     <string name="settings_adaptive_color_balance">Баланс подстраиваемого цвета: %d</string>
     <string name="settings_adaptive_color">Подстраивать цвет события под цвет фона</string>
-    <string name="settings_show_days_expired">Показывать после %d дня/дней</string>
-    <string name="settings_show_days_upcoming">Показывать за %d дня/дней</string>
+    <string name="settings_show_days_expired">Показывать события после %d дня/дней</string>
+    <string name="settings_show_days_upcoming">Показывать события за %d дня/дней</string>
     <string name="settings_border_thickness">Толщина контура: %d</string>
     <string name="settings_bg_color">Фон</string>
     <string name="settings_border_color">Контур</string>
@@ -77,7 +75,7 @@
     <string name="settings_show_items_lock">Показывать на экране блокировки</string>
     <string name="settings_show_global_items_lock">Показывать общие события на экране блокировки</string>
     <string name="settings_priority">Приоритет: %d</string>
-    <string name="settings_max_rWidth_lock">Растянуть фон события на всю ширину экрана болкировки</string>
+    <string name="settings_max_rWidth_lock">Растянуть фон события на всю ширину экрана блокировки</string>
     <string name="settings_font_size">Размер шрифта(Экран блокировки): %d</string>
     <string name="settings_expired_border_thickness">Толщина контура для пропущенных событий: %d</string>
     <string name="remove_all_saved_backgrounds_prompt">Удалить все сохраненные фоны?</string>
@@ -95,7 +93,7 @@
     <string name="settings_preview_current">Текущие</string>
     <string name="settings_preview_expired">Прошедшие</string>
     <string name="settings_preview_upcoming">Будущие</string>
-    <string name="settings_hide_expired_entries_by_time">Скрывать пройденные дела на экране блокировки(по времени)</string>
+    <string name="settings_hide_expired_entries_by_time">Скрывать прошедшие события на экране блокировки(по времени)</string>
     <string name="alert">Внимание!</string>
     <string name="ignore">игнорировать</string>
     <string name="visit_dont_kill_my_app">узнать как</string>

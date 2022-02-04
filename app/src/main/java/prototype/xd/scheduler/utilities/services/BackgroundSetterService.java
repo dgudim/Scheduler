@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
@@ -139,9 +140,11 @@ public class BackgroundSetterService extends Service {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             } else {
-                updateDate(DAY_FLAG_GLOBAL_STR, false);
-                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
-                updateNotification();
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    updateDate(DAY_FLAG_GLOBAL_STR, false);
+                    lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                    updateNotification();
+                }
             }
         } else {
             initialized = true;
