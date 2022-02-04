@@ -14,7 +14,6 @@
         android:layout_gravity="center_vertical"
         android:backgroundTint="#FFFFFF"
         android:textAllCaps="false"
-        android:textSize="18sp"
         tools:ignore="TouchTargetSizeCheck" />
 
     <com.google.android.material.card.MaterialCardView
@@ -38,8 +37,7 @@
             android:minLines="1"
             android:padding="2dp"
             android:text="@string/app_name"
-            android:textAppearance="@style/TextMedium_primary"
-            android:textSize="18sp" />
+            android:textAppearance="@style/TextMedium_primary" />
     </com.google.android.material.card.MaterialCardView>
 
     <ImageView
