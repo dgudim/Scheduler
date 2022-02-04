@@ -31,6 +31,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
+                    android:textAppearance="@style/TextMedium_primary"
                     android:textStyle="bold" />
 
                 <prototype.xd.scheduler.views.Switch
@@ -63,6 +64,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
+                    android:textAppearance="@style/TextMedium_primary"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -111,6 +113,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
+                    android:textAppearance="@style/TextMedium_primary"
                     android:textStyle="bold" />
 
                 <prototype.xd.scheduler.views.Switch
@@ -144,6 +147,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
+                    android:textAppearance="@style/TextMedium_primary"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -157,7 +161,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:text="@string/settings_adaptive_color_balance"
-                        android:textAppearance="@style/TextMedium_primary" />
+                        android:textAppearance="@style/TextSmallMedium_primary" />
 
                     <SeekBar
                         android:id="@+id/adaptive_color_balance_bar"
@@ -188,7 +192,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/settings_colors"
-                    android:textAppearance="@style/TextSmallMedium_primary" />
+                    android:textAppearance="@style/TextMedium_primary" />
 
                 <View
                     android:layout_width="match_parent"
@@ -214,6 +218,7 @@
                             android:text="@string/settings_state_symbol"
                             android:textAlignment="center"
 
+                            android:textAppearance="@style/TextMedium_primary"
                             android:textStyle="bold" />
 
                         <TextView
@@ -225,6 +230,7 @@
                             android:text="@string/settings_state_symbol"
                             android:textAlignment="center"
 
+                            android:textAppearance="@style/TextMedium_primary"
                             android:textStyle="bold" />
 
                         <TextView
@@ -236,6 +242,7 @@
                             android:text="@string/settings_state_symbol"
                             android:textAlignment="center"
 
+                            android:textAppearance="@style/TextMedium_primary"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -392,6 +399,7 @@
                         android:text="@string/settings_state_symbol"
                         android:textAlignment="center"
 
+                        android:textAppearance="@style/TextMedium_primary"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -442,6 +450,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
+                    android:textAppearance="@style/TextMedium_primary"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -490,7 +499,8 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textAppearance="@style/TextMedium_primary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
