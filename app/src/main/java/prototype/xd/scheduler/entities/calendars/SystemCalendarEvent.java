@@ -59,7 +59,7 @@ public class SystemCalendarEvent {
         
         this.associatedCalendar = associatedCalendar;
         
-        title = getString(cursor, calendarEventsColumns, Events.TITLE);
+        title = getString(cursor, calendarEventsColumns, Events.TITLE).trim();
         color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
         start = getLong(cursor, calendarEventsColumns, Events.DTSTART);
         end = getLong(cursor, calendarEventsColumns, Events.DTEND);
@@ -95,7 +95,7 @@ public class SystemCalendarEvent {
                 
                 duration = RFC2445ToMilliseconds(getString(cursor, calendarEventsColumns, Events.DURATION));
                 
-                end = rSet.isInfinite() ? Long.MAX_VALUE : rSet.getLastInstance(timeZone, start);
+                end = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, start);
             } catch (InvalidRecurrenceRuleException e) {
                 logException(e);
             }
@@ -116,19 +116,17 @@ public class SystemCalendarEvent {
             long instance = 0;
             while (it.hasNext() && daysFromEpoch(instance, timeZone) <= dayEnd) {
                 instance = it.next();
-                if (startOrEndInRange(start, instance + duration, dayStart, dayEnd)) {
+                if (rangesOverlap(instance, instance + duration, dayStart, dayEnd)) {
                     return true;
                 }
             }
             return false;
         }
-        return startOrEndInRange(start, end, dayStart, dayEnd);
+        return rangesOverlap(start, end, dayStart, dayEnd);
     }
     
-    private boolean startOrEndInRange(long start, long end, long dayStart, long dayEnd) {
-        start = daysFromEpoch(start, timeZone);
-        end = daysFromEpoch(end, timeZone);
-        return (start >= dayStart && start <= dayEnd) || (end >= dayStart && end <= dayEnd);
+    private boolean rangesOverlap(long start, long end, long dayStart, long dayEnd) {
+        return daysFromEpoch(start, timeZone) <= dayEnd && daysFromEpoch(end, timeZone) >= dayStart;
     }
     
     @Override

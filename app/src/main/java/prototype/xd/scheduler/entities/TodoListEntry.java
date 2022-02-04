@@ -163,7 +163,7 @@ public class TodoListEntry {
     
     public long getNearestEventTimestamp(long day) {
         if (recurrenceSet != null) {
-            if (day > day_end) {
+            if (day >= day_end) {
                 return timestamp_end;
             }
             RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
@@ -359,9 +359,9 @@ public class TodoListEntry {
             
             day_start = daysFromEpoch(timestamp_start, event.timeZone);
             day_end = daysFromEpoch(timestamp_end, event.timeZone);
-            duration_in_days = day_end - day_start;
+            duration_in_days = daysFromEpoch(timestamp_start + timestamp_duration, event.timeZone) - day_start;
             
-            textValue = event.title.trim();
+            textValue = event.title;
             
             ArrayList<String> calendarSubKeys = event.subKeys;
             
@@ -375,7 +375,8 @@ public class TodoListEntry {
             
             long nearestDay = getNearestEventDay(currentDay);
             isUpcomingEntry = currentDay + dayOffset_upcoming >= nearestDay && currentDay < nearestDay;
-            isExpiredEntry = !isUpcomingEntry && (currentDay - dayOffset_expired <= day_end && currentDay > day_end);
+            isExpiredEntry = !isUpcomingEntry &&
+                    (currentDay - dayOffset_expired <= nearestDay + duration_in_days && currentDay > nearestDay + duration_in_days);
             
             setFontColor(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR);
             bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR);
@@ -457,7 +458,7 @@ public class TodoListEntry {
     
     public String getDayOffset(long day, Context context) {
         String dayOffset = "";
-        if (day_start != DAY_FLAG_GLOBAL && day_end != DAY_FLAG_GLOBAL) {
+        if (!isGlobal()) {
             
             int dayShift = 0;
             
