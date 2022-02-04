@@ -149,7 +149,7 @@ public class LockScreenBitmapDrawer {
                     logException(e);
                 }
                 busy = false;
-            }).start();
+            }, "Bitmap thread").start();
             return true;
         }
         return false;

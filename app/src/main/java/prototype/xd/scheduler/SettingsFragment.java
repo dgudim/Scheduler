@@ -133,6 +133,6 @@ public class SettingsFragment extends Fragment {
                 settingsEntries.addAll(settingsEntries_additional);
                 settingsListViewAdapter.notifyDataSetChanged();
             });
-        }).start();
+        }, "SSCfetch thread").start();
     }
 }

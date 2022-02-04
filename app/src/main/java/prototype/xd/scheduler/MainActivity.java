@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         logException(e);
                     }
-                }).start();
+                }, "LBCP thread").start();
             }
         }
     }

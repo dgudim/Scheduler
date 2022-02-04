@@ -28,7 +28,7 @@ public class TodoListEntryStorage {
     public TodoListEntryStorage(final ViewGroup parent) {
         this.todoListViewAdapter = new TodoListViewAdapter(this, parent);
         this.todoListEntries = new ArrayList<>();
-        new Thread(() -> calendars = getAllCalendars(parent.getContext(), false)).start();
+        new Thread(() -> calendars = getAllCalendars(parent.getContext(), false), "Cfetch thread").start();
     }
     
     public TodoListViewAdapter getTodoListViewAdapter() {
@@ -72,8 +72,10 @@ public class TodoListEntryStorage {
                 loadedDay_start = new_loadedDay_start;
             }
             if (day_start != 0) {
-                for (int i = 0; i < calendars.size(); i++) {
-                    addDistinct(calendars.get(i).getVisibleTodoListEntries(day_start, day_end));
+                if(calendars != null){
+                    for (int i = 0; i < calendars.size(); i++) {
+                        addDistinct(calendars.get(i).getVisibleTodoListEntries(day_start, day_end));
+                    }
                 }
             }
         }
