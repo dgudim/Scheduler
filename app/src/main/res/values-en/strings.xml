@@ -105,4 +105,5 @@
     <string name="app_theme_light">Light</string>
     <string name="app_theme_dark">Dark</string>
     <string name="app_theme_system">System default</string>
+    <string name="xiaomi_message">It looks like you are using a xiaomi phone, miui doesn\'t allow to set lockscreen wallpaper, so the app will most probably not work. Sorry, i can\'t do anything about it.</string>
 </resources>

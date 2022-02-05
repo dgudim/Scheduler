@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -31,6 +32,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Objects;
 
 import prototype.xd.scheduler.utilities.Keys;
@@ -47,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
     };
     
     public static final int REQUEST_CODE_PERMISSIONS = 13;
+    
+    private boolean isCrapPhone() {
+        return !preferences.getBoolean(Keys.XIAOMI_MESSAGE_IGNORE, false) &&
+                (Build.MANUFACTURER.toLowerCase(Locale.ROOT).contains("xiaomi") || Build.MODEL.toLowerCase(Locale.ROOT).contains("xiaomi"));
+    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
                             preferences_service.getInt(Keys.SERVICE_KILLED_IGNORE_BUTTON_CLICKED, 0) + 1).apply();
                     launchMainActivity();
                 });
+            } else if (isCrapPhone()) {
+                setContentView(R.layout.you_have_a_xiaomi_phone_screen);
+                findViewById(R.id.ignore_button).setOnClickListener(v -> {
+                    preferences_service.edit().putBoolean(Keys.XIAOMI_MESSAGE_IGNORE, true).apply();
+                    launchMainActivity();
+                });
+                
             } else {
                 launchMainActivity();
             }

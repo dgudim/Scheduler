@@ -96,6 +96,8 @@ public class Keys {
     public static final String PREFERENCES = "prefs";
     public static final String PREFERENCES_SERVICE = "prefs_s";
     
+    public static final String XIAOMI_MESSAGE_IGNORE = "crap_ignore";
+    
     public static final String LAST_UPDATE_TIME = "last_update_time";
     public static final String SERVICE_KILL_THRESHOLD_REACHED = "service_supposedly_killed";
     public static final String SERVICE_KILLED_DONT_BOTHER = "service_killed_ignore";
