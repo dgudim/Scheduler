@@ -99,10 +99,6 @@ public class LockScreenBitmapDrawer {
         }
     }
     
-    private void setLockScreenBitmap(Bitmap bitmap) throws IOException {
-        wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-    }
-    
     public boolean constructBitmap(BackgroundSetterService backgroundSetterService) {
         
         fontSize_h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
@@ -139,7 +135,7 @@ public class LockScreenBitmapDrawer {
                     }
                     
                     drawStringsOnBitmap(backgroundSetterService, bitmap);
-                    setLockScreenBitmap(bitmap);
+                    wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
                     log(INFO, "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
                     
                     bitmap.recycle();
