@@ -149,7 +149,7 @@ public class BackgroundSetterService extends Service {
         } else {
             initialized = true;
             preferences_service = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
-            //register receivers
+            
             screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
@@ -166,26 +166,29 @@ public class BackgroundSetterService extends Service {
                 }
             };
             registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
-            registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
             registerReceiver(pingReceiver, new IntentFilter(Intent.ACTION_DATE_CHANGED));
-            
-            //start the service and a keep alive job
-            getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
-                    new ComponentName(getApplicationContext(), KeepAliveService.class))
-                    .setPeriodic(15 * 60 * 1000, 5 * 60 * 1000).build());
-            
+            scheduleRestartJob();
             startForeground(foregroundNotificationId, getForegroundNotification().build());
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
         }
         return START_STICKY;
     }
     
+    private void scheduleRestartJob(){
+        getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
+                new ComponentName(getApplicationContext(), KeepAliveService.class))
+                .setPeriodic(15 * 60 * 1000, 5 * 60 * 1000).build());
+    }
+    
     @Override
     public void onDestroy() {
+        scheduleRestartJob();
+        if (screenOnOffReceiver != null) {
+            unregisterReceiver(screenOnOffReceiver);
+        }
+        if (pingReceiver != null) {
+            unregisterReceiver(pingReceiver);
+        }
         lockScreenBitmapDrawer = null;
-        foregroundNotification = null;
-        notificationManager = null;
-        unregisterReceiver(screenOnOffReceiver);
-        unregisterReceiver(pingReceiver);
     }
 }
