@@ -152,7 +152,7 @@ public class TodoListEntry {
             long day = daysFromEpoch(timestamp, event.timeZone);
             while (it.hasNext() && instance <= timestamp) {
                 instance = it.next();
-                if (inRange(day, instance)) {
+                if (inRange(day, daysFromEpoch(instance, event.timeZone))) {
                     return instance + timestamp_duration >= timestamp;
                 }
             }
