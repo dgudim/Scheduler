@@ -165,7 +165,12 @@ public class BackgroundSetterService extends Service {
                     ping(context);
                 }
             };
-            registerReceiver(screenOnOffReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+            
+            IntentFilter onOffFilter = new IntentFilter();
+            onOffFilter.addAction(Intent.ACTION_SCREEN_ON);
+            onOffFilter.addAction(Intent.ACTION_SCREEN_OFF);
+            
+            registerReceiver(screenOnOffReceiver, onOffFilter);
             registerReceiver(pingReceiver, new IntentFilter(Intent.ACTION_DATE_CHANGED));
             scheduleRestartJob();
             startForeground(foregroundNotificationId, getForegroundNotification().build());
