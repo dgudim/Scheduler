@@ -12,7 +12,6 @@ import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
@@ -33,6 +32,7 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValid
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.text.Editable;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -71,7 +71,7 @@ public class TodoListEntry {
     public int dayOffset_expired = 0;
     public int dayOffset_upcoming = 0;
     public boolean completed = false;
-    public Group group;
+    private Group group;
     
     public int bgColor;
     public int fontColor;
@@ -112,6 +112,66 @@ public class TodoListEntry {
     public String[] params;
     
     public TodoListEntry() {
+    }
+    
+    public TodoListEntry(SystemCalendarEvent event) {
+        fromSystemCalendar = true;
+        this.event = event;
+        params = new String[]{};
+        reloadParams();
+    }
+    
+    public TodoListEntry(Context context, String[] params, String groupName) {
+        if (!groupName.isEmpty()) {
+            group = new Group(context, groupName);
+            if(group.isNullGroup()){
+                group = null;
+            }
+        }
+        this.params = params;
+        reloadParams();
+    }
+    
+    public Group getGroup(){
+        return group;
+    }
+    
+    public String getGroupName() {
+        if (group != null) {
+            return group.getName();
+        } else {
+            return "";
+        }
+    }
+    
+    public void setGroupName(String name) {
+        if (group != null) {
+            group.setName(name);
+        }
+    }
+    
+    public void setGroupName(Editable name) {
+        if (group != null) {
+            group.setName(name);
+        }
+    }
+    
+    public void resetGroup() {
+        group = null;
+        reloadParams();
+    }
+    
+    public void changeGroup(Group group) {
+        if (group.isNullGroup()) {
+            resetGroup();
+        } else {
+            this.group = group;
+            reloadParams();
+        }
+    }
+    
+    public boolean getLockViewState() {
+        return (showOnLock && !completed);
     }
     
     private boolean inRange(long day, long event_start_day) {
@@ -201,37 +261,6 @@ public class TodoListEntry {
         }
     }
     
-    public TodoListEntry(SystemCalendarEvent event) {
-        fromSystemCalendar = true;
-        this.event = event;
-        params = new String[]{};
-        reloadParams();
-    }
-    
-    public TodoListEntry(String[] params, String groupName) {
-        group = new Group(groupName);
-        this.params = params;
-        reloadParams();
-    }
-    
-    public void changeGroup(String groupName) {
-        group = new Group(groupName);
-        reloadParams();
-    }
-    
-    public void resetGroup() {
-        changeGroup(BLANK_GROUP_NAME);
-    }
-    
-    public void changeGroup(Group group) {
-        this.group = group;
-        reloadParams();
-    }
-    
-    public boolean getLockViewState() {
-        return (showOnLock && !completed);
-    }
-    
     public String[] getDisplayParams() {
         ArrayList<String> displayParams = new ArrayList<>();
         for (int i = 0; i < params.length; i += 2) {
@@ -277,7 +306,7 @@ public class TodoListEntry {
                     dayOffset_expired = preferences.getInt(EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
                     dayOffset_upcoming = preferences.getInt(UPCOMING_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
                     
-                    setParams((String[]) addAll(group.params, params));
+                    setParamsWithGroup();
                     
                     long days_associated = currentDay;
                     long days_from_param = Long.parseLong(params[i + 1]);
@@ -347,7 +376,7 @@ public class TodoListEntry {
             adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
             adaptiveColor = 0xff_FFFFFF;
             priority = ENTITY_SETTINGS_DEFAULT_PRIORITY;
-            setParams((String[]) addAll(group.params, params));
+            setParamsWithGroup();
             
         } else {
             
@@ -525,6 +554,14 @@ public class TodoListEntry {
         textValueSplit = (WordUtils.wrap(textValue + getDayOffset(currentDay, context), maxChars, "\n", true) + "\n" + getTimeSpan(context)).split("\n");
     }
     
+    private void setParamsWithGroup() {
+        if (group != null) {
+            setParams((String[]) addAll(group.params, params));
+        } else {
+            setParams(params);
+        }
+    }
+    
     private void setParams(String[] params) {
         for (int i = 0; i < params.length; i += 2) {
             switch (params[i]) {
@@ -597,10 +634,12 @@ public class TodoListEntry {
     public void setStateIconColor(TextView icon, String parameter) {
         boolean containedInGroupParams = false;
         boolean containedInPersonalParams = false;
-        for (int i = 0; i < group.params.length; i += 2) {
-            if (group.params[i].equals(parameter)) {
-                containedInGroupParams = true;
-                break;
+        if (group != null) {
+            for (int i = 0; i < group.params.length; i += 2) {
+                if (group.params[i].equals(parameter)) {
+                    containedInGroupParams = true;
+                    break;
+                }
             }
         }
         for (int i = 0; i < params.length; i += 2) {
@@ -622,7 +661,7 @@ public class TodoListEntry {
     
     @Override
     public int hashCode() {
-        return Objects.hash(event, Arrays.hashCode(params), showOnLock);
+        return Objects.hash(event, Arrays.hashCode(params), showOnLock, group);
     }
     
     @Override
@@ -632,8 +671,10 @@ public class TodoListEntry {
         } else if (obj == this) {
             return true;
         } else if (obj instanceof TodoListEntry) {
-            return Objects.equals(event, ((TodoListEntry) obj).event) &&
-                    Arrays.equals(((TodoListEntry) obj).params, params) && showOnLock == ((TodoListEntry) obj).showOnLock;
+            TodoListEntry entry = (TodoListEntry) obj;
+            return Objects.equals(event, entry.event) &&
+                    Arrays.equals(entry.params, params) && showOnLock == entry.showOnLock
+                    && Objects.equals(group, entry.group);
         }
         return super.equals(obj);
     }

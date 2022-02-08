@@ -91,8 +91,6 @@ public class Keys {
     
     public static final String BLANK_TEXT = "_BLANK_";
     
-    public static final String BLANK_GROUP_NAME = "none";
-    
     public static final String PREFERENCES = "prefs";
     public static final String PREFERENCES_SERVICE = "prefs_s";
     

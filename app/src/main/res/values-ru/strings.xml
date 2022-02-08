@@ -106,4 +106,6 @@
     <string name="app_theme_dark">Тёмная</string>
     <string name="app_theme_light">Светлая</string>
     <string name="xiaomi_message">Похоже, вы используете телефон xiaomi, miui не позволяет устанавливать обои экрана блокировки, поэтому приложение, скорее всего, не будет работать. Извините, я ничего не могу с этим поделать.</string>
+    <string name="blank_group_name">Нет</string>
+    <string name="name_cant_be_empty">название не может быть пустым</string>
 </resources>

@@ -148,21 +148,21 @@ public class TodoListViewAdapter extends BaseAdapter {
             
             todoText.setOnLongClickListener(view1 -> {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(view1.getContext());
-                View addView = LayoutInflater.from(view1.getContext()).inflate(R.layout.edit_entry_dialogue, parent, false);
+                View addView = LayoutInflater.from(view1.getContext()).inflate(R.layout.edit_text_spinner_dialogue, parent, false);
                 alertBuilder.setView(addView);
                 AlertDialog dialog = alertBuilder.create();
                 
                 final EditText input = addView.findViewById(R.id.entryNameEditText);
                 input.setText(currentEntry.textValue);
                 
-                addView.findViewById(R.id.save_button).setOnClickListener(v1 -> {
+                addView.findViewById(R.id.confirm_button).setOnClickListener(v1 -> {
                     currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
                     todoListEntryStorage.saveEntries();
                     todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
                     dialog.dismiss();
                 });
                 
-                View move_to_global_button = addView.findViewById(R.id.move_to_global_button);
+                View move_to_global_button = addView.findViewById(R.id.secondary_action_button);
                 
                 if (!currentEntry.isGlobalEntry) {
                     move_to_global_button.setOnClickListener(v1 -> {

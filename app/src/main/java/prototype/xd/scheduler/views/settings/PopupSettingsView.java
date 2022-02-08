@@ -104,8 +104,7 @@ public class PopupSettingsView {
         settings_reset_button = settingsView.findViewById(R.id.settings_reset_button);
     }
     
-    protected void setStateIconColor(TextView icon, String parameter) {
-    }
+    protected void setStateIconColor(TextView icon, String parameter) {}
     
     void updateAllIndicators() {
         setStateIconColor(fontColor_view_state, Keys.FONT_COLOR);

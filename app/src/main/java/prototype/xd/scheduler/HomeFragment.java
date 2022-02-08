@@ -12,7 +12,6 @@ import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.BLANK_GROUP_NAME;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
@@ -88,33 +87,36 @@ public class HomeFragment extends Fragment {
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(view1.getContext());
-            View addView = inflater.inflate(R.layout.add_entry_dialogue, container, false);
+            View addView = inflater.inflate(R.layout.edit_text_spinner_dialogue, container, false);
             builder.setView(addView);
             AlertDialog dialog = builder.create();
             
             final TextInputEditText input = addView.findViewById(R.id.entryNameEditText);
             input.setOnFocusChangeListener((v, hasFocus) -> input.postDelayed(() -> {
-                InputMethodManager inputMethodManager = (InputMethodManager) view1.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager inputMethodManager = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
             }, 200));
             input.requestFocus();
             
-            final String[] currentGroup = {BLANK_GROUP_NAME};
+            final String[] currentGroup = {""};
             
-            final ArrayList<Group> groupList = readGroupFile();
-            final ArrayList<String> groupNames = new ArrayList<>();
-            for (Group group : groupList) {
-                groupNames.add(group.name);
-            }
+            final ArrayList<Group> groupList = new ArrayList<>();
+            groupList.add(new Group(view1.getContext()));
+            groupList.addAll(readGroupFile());
+            
             final Spinner groupSpinner = addView.findViewById(R.id.groupSpinner);
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(view1.getContext(), android.R.layout.simple_spinner_item, groupNames);
+            final ArrayAdapter<Group> arrayAdapter = new ArrayAdapter<>(view1.getContext(), android.R.layout.simple_spinner_item, groupList);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
             groupSpinner.setAdapter(arrayAdapter);
-            groupSpinner.setSelection(groupNames.indexOf(BLANK_GROUP_NAME));
+            groupSpinner.setSelection(0);
             groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view1, int position, long id) {
-                    currentGroup[0] = groupNames.get(position);
+                    if (position >= 0) {
+                        currentGroup[0] = groupList.get(position).getName();
+                    } else {
+                        currentGroup[0] = "";
+                    }
                 }
                 
                 @Override
@@ -123,9 +125,9 @@ public class HomeFragment extends Fragment {
                 }
             });
             
-            addView.findViewById(R.id.save_button).setOnClickListener(v -> {
+            addView.findViewById(R.id.confirm_button).setOnClickListener(v -> {
                 if (input.getText() != null) {
-                    TodoListEntry newEntry = new TodoListEntry(new String[]{
+                    TodoListEntry newEntry = new TodoListEntry(v.getContext(), new String[]{
                             TEXT_VALUE, input.getText().toString().trim(),
                             ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
                             IS_COMPLETED, "false"}, currentGroup[0]);
@@ -136,9 +138,9 @@ public class HomeFragment extends Fragment {
                 }
             });
             
-            addView.findViewById(R.id.add_to_global_button).setOnClickListener(v -> {
+            addView.findViewById(R.id.secondary_action_button).setOnClickListener(v -> {
                 if (input.getText() != null) {
-                    TodoListEntry newEntry = new TodoListEntry(new String[]{
+                    TodoListEntry newEntry = new TodoListEntry(v.getContext(), new String[]{
                             TEXT_VALUE, input.getText().toString().trim(),
                             ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
                             IS_COMPLETED, "false"}, currentGroup[0]);
@@ -172,11 +174,11 @@ public class HomeFragment extends Fragment {
             currentlySelectedDay = daysFromEpoch(epoch, timeZone_SYSTEM);
         }
         todoListEntryStorage.lazyLoadEntries(view.getContext());
-    
+        
         updateStatusText(view.findViewById(R.id.status_text));
     }
     
-    private void updateStatusText(TextView statusText){
+    private void updateStatusText(TextView statusText) {
         statusText.setText(getString(R.string.status, dateFromEpoch(currentlySelectedDay * 86400000),
                 todoListEntryStorage.getCurrentlyVisibleEntries()));
     }

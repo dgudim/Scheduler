@@ -72,7 +72,7 @@ public class Utilities {
             }
             
             for (int i = 0; i < entryParams.size(); i++) {
-                readEntries.add(new TodoListEntry(entryParams.get(i), entryGroupNames.get(i)));
+                readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i)));
             }
         } catch (Exception e) {
             log(INFO, "no todo list");
@@ -92,7 +92,7 @@ public class Utilities {
                 TodoListEntry entry = entries.get(i);
                 if (!entry.fromSystemCalendar) {
                     entryParams.add(entry.params);
-                    entryGroupNames.add(entry.group.name);
+                    entryGroupNames.add(entry.getGroupName());
                 }
             }
             
@@ -501,6 +501,6 @@ class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
         if (o1.fromSystemCalendar || o2.fromSystemCalendar) {
             return Long.compare(o1.getNearestEventTimestamp(day), o2.getNearestEventTimestamp(day));
         }
-        return Integer.compare(o1.group.name.hashCode(), o2.group.name.hashCode());
+        return Integer.compare(o1.getGroupName().hashCode(), o2.getGroupName().hashCode());
     }
 }

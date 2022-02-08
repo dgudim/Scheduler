@@ -189,7 +189,7 @@ public class LockScreenBitmapDrawer {
                     if (toAdd.get(i).fromSystemCalendar) {
                         splitEntry = new TodoListEntry(toAdd.get(i).event);
                     } else {
-                        splitEntry = new TodoListEntry(toAdd.get(i).params, toAdd.get(i).group.name);
+                        splitEntry = new TodoListEntry(backgroundSetterService, toAdd.get(i).params, toAdd.get(i).getGroupName());
                     }
                     copyDisplayData(toAdd.get(i), splitEntry);
                     splitEntry.changeParameter(TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);
