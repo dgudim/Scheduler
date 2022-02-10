@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
-        android:contentDescription="@string/description_fab"
+        android:contentDescription="@string/add_event_fab"
         android:src="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

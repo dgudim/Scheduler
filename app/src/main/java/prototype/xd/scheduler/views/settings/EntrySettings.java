@@ -36,8 +36,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.material.textfield.TextInputEditText;
-
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.R;
@@ -82,7 +80,6 @@ public class EntrySettings extends PopupSettingsView {
             @Override
             public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 final View view = super.getView(position, convertView, parent);
-                view.setLongClickable(true);
                 if (convertView == null) {
                     if (position == 0) {
                         view.setOnLongClickListener(null);
@@ -169,35 +166,32 @@ public class EntrySettings extends PopupSettingsView {
         });
         
         add_group.setOnClickListener(v -> displayEditTextDialogue(v.getContext(), R.string.add_current_config_as_group_prompt,
-                R.string.add_current_config_as_group_message,
-                R.string.title,
+                R.string.add_current_config_as_group_message, R.string.title,
+                R.string.cancel, R.string.add,
                 new DialogueUtilities.OnClickListenerWithEditText() {
                     @Override
-                    public boolean onClick(View view, TextInputEditText editText, int selection) {
-                        if (editText.getText() == null || editText.getText().toString().trim().equals("")) {
-                            editText.setError(view.getContext().getString(R.string.name_cant_be_empty));
-                            return false;
-                        }
-                        int groupIndex = groupIndexInList(groupList, editText.getText().toString());
+                    public boolean onClick(View view, String text, int selection) {
+                        int groupIndex = groupIndexInList(groupList, text);
                         if (groupIndex >= 0) {
                             
-                            displayConfirmationDialogue(v.getContext(), R.string.group_with_same_name_exists, R.string.overwrite_prompt, v1 -> {
-                                Group createdGroup = createGroup(editText.getText().toString(), entry.getDisplayParams());
-                                groupList.set(groupIndex, createdGroup);
-                                saveGroupsFile(groupList);
-                                
-                                entry.removeDisplayParams();
-                                group_spinner.setSelection(groupIndex);
-                                
-                                for (TodoListEntry entry2 : todoListEntryStorage.getTodoListEntries()) {
-                                    if (entry2.getGroupName().equals(editText.getText().toString())) {
-                                        entry2.changeGroup(createdGroup);
-                                    }
-                                }
-                            });
+                            displayConfirmationDialogue(v.getContext(), R.string.group_with_same_name_exists, R.string.overwrite_prompt,
+                                    R.string.cancel, R.string.overwrite, v1 -> {
+                                        Group createdGroup = createGroup(text, entry.getDisplayParams());
+                                        groupList.set(groupIndex, createdGroup);
+                                        saveGroupsFile(groupList);
+                                        
+                                        entry.removeDisplayParams();
+                                        group_spinner.setSelection(groupIndex);
+                                        
+                                        for (TodoListEntry entry2 : todoListEntryStorage.getTodoListEntries()) {
+                                            if (entry2.getGroupName().equals(text)) {
+                                                entry2.changeGroup(createdGroup);
+                                            }
+                                        }
+                                    });
                             
                         } else {
-                            Group createdGroup = createGroup(editText.getText().toString(), entry.getDisplayParams());
+                            Group createdGroup = createGroup(text, entry.getDisplayParams());
                             groupList.add(createdGroup);
                             saveGroupsFile(groupList);
                             arrayAdapter.notifyDataSetChanged();
@@ -209,7 +203,8 @@ public class EntrySettings extends PopupSettingsView {
                 }));
         
         settings_reset_button.setOnClickListener(v ->
-                displayConfirmationDialogue(v.getContext(), R.string.reset_settings_prompt,
+                displayConfirmationDialogue(v.getContext(), R.string.reset_settings_prompt, -1,
+                        R.string.no, R.string.yes,
                         (view) -> {
                             entry.removeDisplayParams();
                             entry.resetGroup();

@@ -27,7 +27,7 @@
     <string name="calendar_events">%d evs.</string>
     <string name="calendar_events_full">%d events</string>
     <string name="title_color_default">default</string>
-    <string name="description_fab">add item</string>
+    <string name="add_event_fab">Add event</string>
     <string name="settings_adaptive_background">Different lock screen backgroung according to day</string>
     <string name="settings_adaptive_color_balance">Adaptive color balance: %d</string>
     <string name="settings_adaptive_color">Tune event color to background</string>
@@ -114,6 +114,8 @@
     <string name="app_theme_system">System default</string>
     <string name="xiaomi_message">It looks like you are using a xiaomi phone, miui doesn\'t allow setting lockscreen wallpaper, so the app will most probably not work. Sorry, i can\'t do anything about it.</string>
     <string name="blank_group_name">none</string>
-    <string name="name_cant_be_empty">name can\'t be empty</string>
+    <string name="input_cant_be_empty">input can\'t be empty</string>
+    <string name="edit_event">Edit event</string>
+    <string name="overwrite">overwrite</string>
 
 </resources>

@@ -124,7 +124,8 @@ public class TodoListEntry {
     public TodoListEntry(Context context, String[] params, String groupName) {
         if (!groupName.isEmpty()) {
             group = new Group(context, groupName);
-            if(group.isNullGroup()){
+            if (group.isNullGroup()) {
+                log(WARNING, "Unknown group: " + groupName);
                 group = null;
             }
         }
@@ -132,7 +133,7 @@ public class TodoListEntry {
         reloadParams();
     }
     
-    public Group getGroup(){
+    public Group getGroup() {
         return group;
     }
     
@@ -141,12 +142,6 @@ public class TodoListEntry {
             return group.getName();
         } else {
             return "";
-        }
-    }
-    
-    public void setGroupName(String name) {
-        if (group != null) {
-            group.setName(name);
         }
     }
     

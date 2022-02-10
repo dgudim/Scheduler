@@ -1,7 +1,11 @@
 package prototype.xd.scheduler.adapters;
 
+import static java.lang.Math.max;
+import static prototype.xd.scheduler.entities.Group.groupIndexInList;
+import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
@@ -13,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,7 +27,9 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.DialogueUtilities;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.EntrySettings;
@@ -146,39 +151,39 @@ public class TodoListViewAdapter extends BaseAdapter {
                 todoListEntryStorage.updateTodoListAdapter(true);
             });
             
-            todoText.setOnLongClickListener(view1 -> {
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(view1.getContext());
-                View addView = LayoutInflater.from(view1.getContext()).inflate(R.layout.edit_text_spinner_dialogue, parent, false);
-                alertBuilder.setView(addView);
-                AlertDialog dialog = alertBuilder.create();
+            view.setOnLongClickListener(view1 -> {
                 
-                final EditText input = addView.findViewById(R.id.entryNameEditText);
-                input.setText(currentEntry.textValue);
-                
-                addView.findViewById(R.id.confirm_button).setOnClickListener(v1 -> {
-                    currentEntry.changeParameter(TEXT_VALUE, input.getText().toString());
-                    todoListEntryStorage.saveEntries();
-                    todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
-                    dialog.dismiss();
-                });
-                
-                View move_to_global_button = addView.findViewById(R.id.secondary_action_button);
-                
-                if (!currentEntry.isGlobalEntry) {
-                    move_to_global_button.setOnClickListener(v1 -> {
-                        currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
-                        todoListEntryStorage.saveEntries();
-                        todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
-                        dialog.dismiss();
-                    });
-                }else{
-                    move_to_global_button.setVisibility(View.GONE);
-                }
-    
-                addView.findViewById(R.id.cancel_button).setOnClickListener(v1 -> dialog.dismiss());
-                
-                dialog.show();
-                return false;
+                final ArrayList<Group> groupList = new ArrayList<>();
+                groupList.add(new Group(view1.getContext()));
+                groupList.addAll(readGroupFile());
+                int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
+                displayEditTextSpinnerDialogue(view1.getContext(), R.string.edit_event, -1, R.string.event_name_input_hint,
+                        R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.textValue, groupList,
+                        currentIndex, new DialogueUtilities.OnClickListenerWithEditText() {
+                            @Override
+                            public boolean onClick(View view, String text, int selectedIndex) {
+                                if (selectedIndex != currentIndex) {
+                                    currentEntry.changeGroup(groupList.get(selectedIndex));
+                                }
+                                currentEntry.changeParameter(TEXT_VALUE, text);
+                                todoListEntryStorage.saveEntries();
+                                todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
+                                return true;
+                            }
+                        },
+                        !currentEntry.isGlobalEntry ? new DialogueUtilities.OnClickListenerWithEditText() {
+                            @Override
+                            public boolean onClick(View view, String text, int selectedIndex) {
+                                if (selectedIndex != currentIndex) {
+                                    currentEntry.changeGroup(groupList.get(selectedIndex));
+                                }
+                                currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
+                                todoListEntryStorage.saveEntries();
+                                todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
+                                return true;
+                            }
+                        } : null);
+                return true;
             });
             settings.setOnClickListener(v -> entrySettings.show(currentEntry, v.getContext()));
         } else {

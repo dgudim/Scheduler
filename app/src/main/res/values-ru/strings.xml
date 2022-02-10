@@ -22,6 +22,7 @@
     <string name="are_you_sure">Вы уверены?</string>
     <string name="save">Сохранить</string>
     <string name="edit">Изменить</string>
+    <string name="edit_event">Изменить событие</string>
     <string name="item_global">(Общее)</string>
     <string name="item_tomorrow">(Завтра)</string>
     <string name="item_yesterday">(Вчера)</string>
@@ -57,7 +58,7 @@
     <string name="calendar_events_full">%d событий</string>
     <string name="calendar_events">%d соб.</string>
     <string name="title_color_default">дефолт</string>
-    <string name="description_fab">добавить пункт</string>
+    <string name="add_event_fab">Добавить событие</string>
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
     <string name="settings_adaptive_color_balance">Баланс подстраиваемого цвета: %d</string>
     <string name="settings_adaptive_color">Подстраивать цвет события под цвет фона</string>
@@ -107,5 +108,6 @@
     <string name="app_theme_light">Светлая</string>
     <string name="xiaomi_message">Похоже, вы используете телефон xiaomi, miui не позволяет устанавливать обои экрана блокировки, поэтому приложение, скорее всего, не будет работать. Извините, я ничего не могу с этим поделать.</string>
     <string name="blank_group_name">Нет</string>
-    <string name="name_cant_be_empty">название не может быть пустым</string>
+    <string name="input_cant_be_empty">ввод не может быть пустым</string>
+    <string name="overwrite">перезаписать</string>
 </resources>
