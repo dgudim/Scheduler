@@ -86,6 +86,7 @@ public class HomeFragment extends Fragment {
         });
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
+            
             AlertDialog.Builder builder = new AlertDialog.Builder(view1.getContext());
             View addView = inflater.inflate(R.layout.edit_text_spinner_dialogue, container, false);
             builder.setView(addView);

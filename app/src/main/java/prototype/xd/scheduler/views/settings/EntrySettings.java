@@ -173,7 +173,7 @@ public class EntrySettings extends PopupSettingsView {
                 R.string.title,
                 new DialogueUtilities.OnClickListenerWithEditText() {
                     @Override
-                    public boolean onClick(View view, TextInputEditText editText) {
+                    public boolean onClick(View view, TextInputEditText editText, int selection) {
                         if (editText.getText() == null || editText.getText().toString().trim().equals("")) {
                             editText.setError(view.getContext().getString(R.string.name_cant_be_empty));
                             return false;
