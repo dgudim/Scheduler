@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.DialogueUtilities.OnClickListenerWithEditText;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
 public class EntrySettings extends PopupSettingsView {
@@ -84,48 +83,42 @@ public class EntrySettings extends PopupSettingsView {
                     } else {
                         view.setOnLongClickListener(view1 -> {
                             
-                            displayEditTextDialogue(view.getContext(),
+                            displayEditTextDialogue(view1.getContext(),
                                     R.string.edit, R.string.title,
                                     R.string.cancel, R.string.save, R.string.delete_group,
                                     groupList.get(position).getName(),
-                                    new OnClickListenerWithEditText() {
-                                        @Override
-                                        public boolean onClick(View view, String text, int selectedIndex) {
-                                            String origName = groupList.get(position).getName();
-                                            groupList.get(position).setName(text);
-                                            saveGroupsFile(groupList);
-                                            for (TodoListEntry entry1 : todoListEntryStorage.getTodoListEntries()) {
-                                                if (entry1.getGroupName().equals(origName)) {
-                                                    entry1.setGroupName(text);
-                                                }
+                                    (view2, text, selectedIndex) -> {
+                                        String origName = groupList.get(position).getName();
+                                        groupList.get(position).setName(text);
+                                        saveGroupsFile(groupList);
+                                        for (TodoListEntry entry1 : todoListEntryStorage.getTodoListEntries()) {
+                                            if (entry1.getGroupName().equals(origName)) {
+                                                entry1.setGroupName(text);
                                             }
-                                            todoListEntryStorage.saveEntries();
-                                            notifyDataSetChanged();
-                                            return true;
                                         }
+                                        todoListEntryStorage.saveEntries();
+                                        notifyDataSetChanged();
+                                        return true;
                                     },
-                                    new OnClickListenerWithEditText() {
-                                        @Override
-                                        public boolean onClick(View view, String text, int selectedIndex) {
-                                            displayConfirmationDialogue(view1.getContext(),
-                                                    R.string.delete, R.string.are_you_sure,
-                                                    R.string.no, R.string.yes,
-                                                    v -> {
-                                                        String origName = groupList.get(group_spinner.getSelectedItemPosition()).getName();
-                                                        groupList.remove(group_spinner.getSelectedItemPosition());
-                                                        saveGroupsFile(groupList);
-                                                        for (TodoListEntry entry1 : todoListEntryStorage.getTodoListEntries()) {
-                                                            if (entry1.getGroupName().equals(origName)) {
-                                                                entry1.resetGroup();
-                                                            }
+                                    (view2, text, selectedIndex) -> {
+                                        displayConfirmationDialogue(view2.getContext(),
+                                                R.string.delete, R.string.are_you_sure,
+                                                R.string.no, R.string.yes,
+                                                v -> {
+                                                    String origName = groupList.get(group_spinner.getSelectedItemPosition()).getName();
+                                                    groupList.remove(group_spinner.getSelectedItemPosition());
+                                                    saveGroupsFile(groupList);
+                                                    for (TodoListEntry entry1 : todoListEntryStorage.getTodoListEntries()) {
+                                                        if (entry1.getGroupName().equals(origName)) {
+                                                            entry1.resetGroup();
                                                         }
-                                                        todoListEntryStorage.saveEntries();
-                                                        group_spinner.setSelection(0);
-                                                        updateIndicatorsAndPreviews(entry);
-                                                        notifyDataSetChanged();
-                                                    });
-                                            return true;
-                                        }
+                                                    }
+                                                    todoListEntryStorage.saveEntries();
+                                                    group_spinner.setSelection(0);
+                                                    updateIndicatorsAndPreviews(entry);
+                                                    notifyDataSetChanged();
+                                                });
+                                        return true;
                                     });
                             return true;
                         });
@@ -158,38 +151,35 @@ public class EntrySettings extends PopupSettingsView {
         add_group.setOnClickListener(v -> displayEditTextDialogue(v.getContext(), R.string.add_current_config_as_group_prompt,
                 R.string.add_current_config_as_group_message, R.string.title,
                 R.string.cancel, R.string.add,
-                new OnClickListenerWithEditText() {
-                    @Override
-                    public boolean onClick(View view, String text, int selection) {
-                        int groupIndex = groupIndexInList(groupList, text);
-                        if (groupIndex >= 0) {
-                            
-                            displayConfirmationDialogue(v.getContext(), R.string.group_with_same_name_exists, R.string.overwrite_prompt,
-                                    R.string.cancel, R.string.overwrite, v1 -> {
-                                        Group createdGroup = createGroup(text, entry.getDisplayParams());
-                                        groupList.set(groupIndex, createdGroup);
-                                        saveGroupsFile(groupList);
-                                        
-                                        entry.removeDisplayParams();
-                                        group_spinner.setSelection(groupIndex);
-                                        
-                                        for (TodoListEntry entry2 : todoListEntryStorage.getTodoListEntries()) {
-                                            if (entry2.getGroupName().equals(text)) {
-                                                entry2.changeGroup(createdGroup);
-                                            }
+                (view, text, selection) -> {
+                    int groupIndex = groupIndexInList(groupList, text);
+                    if (groupIndex >= 0) {
+                        
+                        displayConfirmationDialogue(view.getContext(), R.string.group_with_same_name_exists, R.string.overwrite_prompt,
+                                R.string.cancel, R.string.overwrite, v1 -> {
+                                    Group createdGroup = createGroup(text, entry.getDisplayParams());
+                                    groupList.set(groupIndex, createdGroup);
+                                    saveGroupsFile(groupList);
+                                    
+                                    entry.removeDisplayParams();
+                                    group_spinner.setSelection(groupIndex);
+                                    
+                                    for (TodoListEntry entry2 : todoListEntryStorage.getTodoListEntries()) {
+                                        if (entry2.getGroupName().equals(text)) {
+                                            entry2.changeGroup(createdGroup);
                                         }
-                                    });
-                            
-                        } else {
-                            Group createdGroup = createGroup(text, entry.getDisplayParams());
-                            groupList.add(createdGroup);
-                            saveGroupsFile(groupList);
-                            arrayAdapter.notifyDataSetChanged();
-                            entry.removeDisplayParams();
-                            group_spinner.setSelection(groupList.size() - 1);
-                        }
-                        return true;
+                                    }
+                                });
+                        
+                    } else {
+                        Group createdGroup = createGroup(text, entry.getDisplayParams());
+                        groupList.add(createdGroup);
+                        saveGroupsFile(groupList);
+                        arrayAdapter.notifyDataSetChanged();
+                        entry.removeDisplayParams();
+                        group_spinner.setSelection(groupList.size() - 1);
                     }
+                    return true;
                 }));
         
         settings_reset_button.setOnClickListener(v ->

@@ -36,7 +36,6 @@ import java.util.Objects;
 
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.DialogueUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
@@ -86,31 +85,25 @@ public class HomeFragment extends Fragment {
             groupList.addAll(readGroupFile());
             displayEditTextSpinnerDialogue(view1.getContext(), R.string.add_event_fab, -1, R.string.event_name_input_hint,
                     R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
-                    new DialogueUtilities.OnClickListenerWithEditText() {
-                        @Override
-                        public boolean onClick(View view, String text, int selectedIndex) {
-                            TodoListEntry newEntry = new TodoListEntry(view.getContext(), new String[]{
-                                    TEXT_VALUE, text,
-                                    ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
-                                    IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName());
-                            todoListEntryStorage.addEntry(newEntry);
-                            todoListEntryStorage.saveEntries();
-                            todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
-                            return true;
-                        }
+                    (view2, text, selectedIndex) -> {
+                        TodoListEntry newEntry = new TodoListEntry(view2.getContext(), new String[]{
+                                TEXT_VALUE, text,
+                                ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
+                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName());
+                        todoListEntryStorage.addEntry(newEntry);
+                        todoListEntryStorage.saveEntries();
+                        todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
+                        return true;
                     },
-                    new DialogueUtilities.OnClickListenerWithEditText() {
-                        @Override
-                        public boolean onClick(View view, String text, int selectedIndex) {
-                            TodoListEntry newEntry = new TodoListEntry(view.getContext(), new String[]{
-                                    TEXT_VALUE, text,
-                                    ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
-                                    IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName());
-                            todoListEntryStorage.addEntry(newEntry);
-                            todoListEntryStorage.saveEntries();
-                            todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
-                            return true;
-                        }
+                    (view2, text, selectedIndex) -> {
+                        TodoListEntry newEntry = new TodoListEntry(view2.getContext(), new String[]{
+                                TEXT_VALUE, text,
+                                ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
+                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName());
+                        todoListEntryStorage.addEntry(newEntry);
+                        todoListEntryStorage.saveEntries();
+                        todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
+                        return true;
                     });
         });
         

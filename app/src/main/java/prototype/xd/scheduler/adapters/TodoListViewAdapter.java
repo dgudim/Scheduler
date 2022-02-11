@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.DialogueUtilities;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.EntrySettings;
@@ -153,29 +152,23 @@ public class TodoListViewAdapter extends BaseAdapter {
                 int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
                 displayEditTextSpinnerDialogue(view1.getContext(), R.string.edit_event, -1, R.string.event_name_input_hint,
                         R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.textValue, groupList,
-                        currentIndex, new DialogueUtilities.OnClickListenerWithEditText() {
-                            @Override
-                            public boolean onClick(View view, String text, int selectedIndex) {
-                                if (selectedIndex != currentIndex) {
-                                    currentEntry.changeGroup(groupList.get(selectedIndex));
-                                }
-                                currentEntry.changeParameter(TEXT_VALUE, text);
-                                todoListEntryStorage.saveEntries();
-                                todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
-                                return true;
+                        currentIndex, (view2, text, selectedIndex) -> {
+                            if (selectedIndex != currentIndex) {
+                                currentEntry.changeGroup(groupList.get(selectedIndex));
                             }
+                            currentEntry.changeParameter(TEXT_VALUE, text);
+                            todoListEntryStorage.saveEntries();
+                            todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
+                            return true;
                         },
-                        !currentEntry.isGlobalEntry ? new DialogueUtilities.OnClickListenerWithEditText() {
-                            @Override
-                            public boolean onClick(View view, String text, int selectedIndex) {
-                                if (selectedIndex != currentIndex) {
-                                    currentEntry.changeGroup(groupList.get(selectedIndex));
-                                }
-                                currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
-                                todoListEntryStorage.saveEntries();
-                                todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
-                                return true;
+                        !currentEntry.isGlobalEntry ? (view2, text, selectedIndex) -> {
+                            if (selectedIndex != currentIndex) {
+                                currentEntry.changeGroup(groupList.get(selectedIndex));
                             }
+                            currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
+                            todoListEntryStorage.saveEntries();
+                            todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
+                            return true;
                         } : null);
                 return true;
             });

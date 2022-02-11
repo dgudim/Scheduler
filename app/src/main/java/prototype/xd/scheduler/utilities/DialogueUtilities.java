@@ -223,8 +223,9 @@ public class DialogueUtilities {
         return builder.show();
     }
     
-    public abstract static class OnClickListenerWithEditText {
-        public abstract boolean onClick(View view, String text, int selectedIndex);
+    @FunctionalInterface
+    public interface OnClickListenerWithEditText {
+        boolean onClick(View view, String text, int selectedIndex);
     }
     
 }
