@@ -90,7 +90,7 @@ public class HomeFragment extends Fragment {
                         @Override
                         public boolean onClick(View view, String text, int selectedIndex) {
                             TodoListEntry newEntry = new TodoListEntry(view.getContext(), new String[]{
-                                    TEXT_VALUE, text.trim(),
+                                    TEXT_VALUE, text,
                                     ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
                                     IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName());
                             todoListEntryStorage.addEntry(newEntry);
@@ -103,7 +103,7 @@ public class HomeFragment extends Fragment {
                         @Override
                         public boolean onClick(View view, String text, int selectedIndex) {
                             TodoListEntry newEntry = new TodoListEntry(view.getContext(), new String[]{
-                                    TEXT_VALUE, text.trim(),
+                                    TEXT_VALUE, text,
                                     ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
                                     IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName());
                             todoListEntryStorage.addEntry(newEntry);

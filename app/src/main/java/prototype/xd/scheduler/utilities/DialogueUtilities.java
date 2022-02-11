@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import prototype.xd.scheduler.R;
 
-@SuppressWarnings("ConstantConditions")
 public class DialogueUtilities {
     
     public static void displayConfirmationDialogue(Context context, int titleStringResource, int messageStringResource,
@@ -56,6 +55,7 @@ public class DialogueUtilities {
                 confirmationListener, null);
     }
     
+    @SuppressWarnings("ConstantConditions")
     public static void displayEditTextDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
                                                int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
                                                String defaultEditTextValue,
@@ -71,13 +71,13 @@ public class DialogueUtilities {
                 cancelButtonResource, confirmButtonResource, secondaryButtonResource,
                 v -> {
                     if (checkEmptyInput(editText)) {
-                        if (confirmationListener.onClick(v, editText.getText().toString(), 0)) {
+                        if (confirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
                             dialog.dismiss();
                         }
                     }
                 }, secondaryConfirmationListener == null ? null : v -> {
                     if (checkEmptyInput(editText)) {
-                        if (secondaryConfirmationListener.onClick(v, editText.getText().toString(), 0)) {
+                        if (secondaryConfirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
                             dialog.dismiss();
                         }
                     }
@@ -124,6 +124,7 @@ public class DialogueUtilities {
                 confirmationListener, secondaryConfirmationListener);
     }
     
+    @SuppressWarnings("ConstantConditions")
     public static void displayEditTextSpinnerDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
                                                       int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
                                                       String defaultEditTextValue,
@@ -159,13 +160,13 @@ public class DialogueUtilities {
                 cancelButtonResource, confirmButtonResource, secondaryButtonResource,
                 v -> {
                     if (checkEmptyInput(editText)) {
-                        if (confirmationListener.onClick(v, editText.getText().toString(), selectedIndex[0])) {
+                        if (confirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
                             dialog.dismiss();
                         }
                     }
                 }, secondaryConfirmationListener == null ? null : v -> {
                     if (checkEmptyInput(editText)) {
-                        if (secondaryConfirmationListener.onClick(v, editText.getText().toString(), selectedIndex[0])) {
+                        if (secondaryConfirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
                             dialog.dismiss();
                         }
                     }
