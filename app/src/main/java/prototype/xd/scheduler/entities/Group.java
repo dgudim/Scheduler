@@ -9,7 +9,6 @@ import static prototype.xd.scheduler.utilities.Utilities.loadObject;
 import static prototype.xd.scheduler.utilities.Utilities.saveObject;
 
 import android.content.Context;
-import android.text.Editable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -68,10 +67,6 @@ public class Group {
     
     public void setName(String newName) {
         name = newName;
-    }
-    
-    public void setName(Editable newName) {
-        name = newName.toString();
     }
     
     public static int groupIndexInList(ArrayList<Group> groupList, String groupName) {

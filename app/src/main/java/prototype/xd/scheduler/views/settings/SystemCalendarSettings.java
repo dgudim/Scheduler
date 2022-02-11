@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.views.settings;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
@@ -67,25 +68,20 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         updateAllIndicators();
         
-        settings_reset_button.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-            builder.setTitle(R.string.reset_settings_prompt);
-            
-            builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                Map<String, ?> allEntries = preferences.getAll();
-                SharedPreferences.Editor editor = preferences.edit();
-                for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-                    if (entry.getKey().startsWith(calendarKey)) {
-                        editor.remove(entry.getKey());
+        settings_reset_button.setOnClickListener(v ->
+                displayConfirmationDialogue(v.getContext(),
+                R.string.reset_settings_prompt,
+                R.string.cancel, R.string.reset, v1 -> {
+                    Map<String, ?> allEntries = preferences.getAll();
+                    SharedPreferences.Editor editor = preferences.edit();
+                    for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+                        if (entry.getKey().startsWith(calendarKey)) {
+                            editor.remove(entry.getKey());
+                        }
                     }
-                }
-                editor.apply();
-                initialise(calendarKey);
-            });
-            builder.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
-            
-            builder.show();
-        });
+                    editor.apply();
+                    initialise(calendarKey);
+                }));
         
         fontColor_select.setOnClickListener(view -> invokeColorDialogue(
                 fontColor_view_state, this,

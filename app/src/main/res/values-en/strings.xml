@@ -78,7 +78,7 @@
     <string name="cant_use_this_group_name">Can\'t use this name</string>
     <string name="add_current_config_as_group_message">(Parameters marked with green or blue rhombs(manually edited) will be added to the group)</string>
     <string name="settings_max_rWidth_lock">Stretch event background to fill lock screen width</string>
-    <string name="remove_all_saved_backgrounds_prompt">Delete all saved backgrounds?</string>
+    <string name="delete_all_saved_backgrounds_prompt">Delete all saved backgrounds?</string>
     <string name="day_monday">monday</string>
     <string name="day_tuesday">tuesday</string>
     <string name="day_wednesday">wednesday</string>
@@ -110,4 +110,5 @@
     <string name="input_cant_be_empty">input can\'t be empty</string>
     <string name="edit_event">Edit event</string>
     <string name="overwrite">overwrite</string>
+    <string name="reset">reset</string>
 </resources>

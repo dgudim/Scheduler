@@ -5,6 +5,7 @@ import static prototype.xd.scheduler.entities.Group.groupIndexInList;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
@@ -12,7 +13,6 @@ import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,21 +122,15 @@ public class TodoListViewAdapter extends BaseAdapter {
         
         if (!currentEntry.fromSystemCalendar) {
             
-            view.findViewById(R.id.deletionButton).setOnClickListener(view1 -> {
-                
-                AlertDialog.Builder alert = new AlertDialog.Builder(view1.getContext());
-                alert.setTitle(R.string.delete);
-                alert.setMessage(R.string.are_you_sure);
-                alert.setPositiveButton(R.string.yes, (dialog, which) -> {
-                    todoListEntryStorage.removeEntry(currentTodoListEntries_indexMap.get(i));
-                    todoListEntryStorage.saveEntries();
-                    todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
-                });
-                
-                alert.setNegativeButton(R.string.no, (dialog, which) -> dialog.dismiss());
-                
-                alert.show();
-            });
+            view.findViewById(R.id.deletionButton).setOnClickListener(view1 ->
+                    displayConfirmationDialogue(view1.getContext(),
+                            R.string.delete, R.string.are_you_sure,
+                            R.string.no, R.string.yes,
+                            (view2) -> {
+                                todoListEntryStorage.removeEntry(currentTodoListEntries_indexMap.get(i));
+                                todoListEntryStorage.saveEntries();
+                                todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
+                            }));
             
             CheckBox isDone = view.findViewById(R.id.isDone);
             

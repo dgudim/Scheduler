@@ -24,46 +24,104 @@ import prototype.xd.scheduler.R;
 public class DialogueUtilities {
     
     public static void displayConfirmationDialogue(Context context, int titleStringResource, int messageStringResource,
+                                                   int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
+                                                   View.OnClickListener confirmationListener,
+                                                   View.OnClickListener secondaryConfirmationListener) {
+        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.three_buttons);
+        
+        setupButtons(dialog,
+                cancelButtonResource, confirmButtonResource, secondaryButtonResource,
+                v -> {
+                    confirmationListener.onClick(v);
+                    dialog.dismiss();
+                }, secondaryConfirmationListener == null ? null : v -> {
+                    secondaryConfirmationListener.onClick(v);
+                    dialog.dismiss();
+                });
+    }
+    
+    public static void displayConfirmationDialogue(Context context, int titleStringResource, int messageStringResource,
                                                    int cancelButtonResource, int confirmButtonResource,
                                                    View.OnClickListener confirmationListener) {
-        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.confirmation_dialogue);
+        displayConfirmationDialogue(context, titleStringResource, messageStringResource,
+                cancelButtonResource, confirmButtonResource, -1,
+                confirmationListener, null);
+    }
     
-        MaterialButton cancel_button = dialog.findViewById(R.id.cancel_button);
-        MaterialButton confirm_button = dialog.findViewById(R.id.confirm_button);
+    public static void displayConfirmationDialogue(Context context, int titleStringResource,
+                                                   int cancelButtonResource, int confirmButtonResource,
+                                                   View.OnClickListener confirmationListener) {
+        displayConfirmationDialogue(context, titleStringResource, -1,
+                cancelButtonResource, confirmButtonResource, -1,
+                confirmationListener, null);
+    }
     
-        cancel_button.setText(cancelButtonResource);
-        confirm_button.setText(confirmButtonResource);
+    public static void displayEditTextDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
+                                               int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
+                                               String defaultEditTextValue,
+                                               OnClickListenerWithEditText confirmationListener,
+                                               OnClickListenerWithEditText secondaryConfirmationListener) {
+        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_dialogue);
         
-        cancel_button.setOnClickListener(v -> dialog.dismiss());
-        confirm_button.setOnClickListener(v -> {
-            confirmationListener.onClick(v);
-            dialog.dismiss();
-        });
+        ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintResource);
+        TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
+        setupEditText(editText, defaultEditTextValue);
+        
+        setupButtons(dialog,
+                cancelButtonResource, confirmButtonResource, secondaryButtonResource,
+                v -> {
+                    if (checkEmptyInput(editText)) {
+                        if (confirmationListener.onClick(v, editText.getText().toString(), 0)) {
+                            dialog.dismiss();
+                        }
+                    }
+                }, secondaryConfirmationListener == null ? null : v -> {
+                    if (checkEmptyInput(editText)) {
+                        if (secondaryConfirmationListener.onClick(v, editText.getText().toString(), 0)) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+    }
+    
+    public static void displayEditTextDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
+                                               int cancelButtonResource, int confirmButtonResource,
+                                               String defaultEditTextValue,
+                                               OnClickListenerWithEditText confirmationListener) {
+        displayEditTextDialogue(context, titleStringResource, messageStringResource, hintResource,
+                cancelButtonResource, confirmButtonResource, -1,
+                defaultEditTextValue,
+                confirmationListener, null);
     }
     
     public static void displayEditTextDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
                                                int cancelButtonResource, int confirmButtonResource,
                                                OnClickListenerWithEditText confirmationListener) {
-        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_dialogue);
-        
-        ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintResource);
-        TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
-        addFocusChangeListener(editText);
+        displayEditTextDialogue(context, titleStringResource, messageStringResource, hintResource,
+                cancelButtonResource, confirmButtonResource, -1,
+                "",
+                confirmationListener, null);
+    }
     
-        MaterialButton cancel_button = dialog.findViewById(R.id.cancel_button);
-        MaterialButton confirm_button = dialog.findViewById(R.id.confirm_button);
+    public static void displayEditTextDialogue(Context context, int titleStringResource, int hintResource,
+                                               int cancelButtonResource, int confirmButtonResource,
+                                               String defaultEditTextValue,
+                                               OnClickListenerWithEditText confirmationListener) {
+        displayEditTextDialogue(context, titleStringResource, -1, hintResource,
+                cancelButtonResource, confirmButtonResource, -1,
+                defaultEditTextValue,
+                confirmationListener, null);
+    }
     
-        cancel_button.setText(cancelButtonResource);
-        confirm_button.setText(confirmButtonResource);
-        
-        cancel_button.setOnClickListener(v -> dialog.dismiss());
-        confirm_button.setOnClickListener(v -> {
-            if (checkEmptyInput(editText)) {
-                if (confirmationListener.onClick(v, editText.getText().toString(), 0)) {
-                    dialog.dismiss();
-                }
-            }
-        });
+    public static void displayEditTextDialogue(Context context, int titleStringResource, int hintResource,
+                                               int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
+                                               String defaultEditTextValue,
+                                               OnClickListenerWithEditText confirmationListener,
+                                               OnClickListenerWithEditText secondaryConfirmationListener) {
+        displayEditTextDialogue(context, titleStringResource, -1, hintResource,
+                cancelButtonResource, confirmButtonResource, secondaryButtonResource,
+                defaultEditTextValue,
+                confirmationListener, secondaryConfirmationListener);
     }
     
     public static void displayEditTextSpinnerDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
@@ -75,8 +133,7 @@ public class DialogueUtilities {
         Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_spinner_dialogue);
         ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintResource);
         TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
-        editText.setText(defaultEditTextValue);
-        addFocusChangeListener(editText);
+        setupEditText(editText, defaultEditTextValue);
         Spinner spinner = dialog.findViewById(R.id.groupSpinner);
         
         final ArrayAdapter<?> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, items);
@@ -98,32 +155,52 @@ public class DialogueUtilities {
             }
         });
         
-        MaterialButton cancel_button = dialog.findViewById(R.id.cancel_button);
+        setupButtons(dialog,
+                cancelButtonResource, confirmButtonResource, secondaryButtonResource,
+                v -> {
+                    if (checkEmptyInput(editText)) {
+                        if (confirmationListener.onClick(v, editText.getText().toString(), selectedIndex[0])) {
+                            dialog.dismiss();
+                        }
+                    }
+                }, secondaryConfirmationListener == null ? null : v -> {
+                    if (checkEmptyInput(editText)) {
+                        if (secondaryConfirmationListener.onClick(v, editText.getText().toString(), selectedIndex[0])) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+    }
+    
+    private static void setupEditText(EditText editText, String defaultEditTextValue) {
+        editText.setText(defaultEditTextValue);
+        editText.setOnFocusChangeListener((v, hasFocus) -> editText.postDelayed(() -> {
+            InputMethodManager inputMethodManager = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+        }, 200));
+        editText.requestFocus();
+    }
+    
+    private static void setupButtons(Dialog dialog,
+                                     int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
+                                     View.OnClickListener confirmationListener,
+                                     View.OnClickListener secondaryConfirmationListener) {
+        
         MaterialButton confirm_button = dialog.findViewById(R.id.confirm_button);
         MaterialButton secondary_button = dialog.findViewById(R.id.secondary_action_button);
-    
+        MaterialButton cancel_button = dialog.findViewById(R.id.cancel_button);
+        
         cancel_button.setText(cancelButtonResource);
         confirm_button.setText(confirmButtonResource);
-        
-        cancel_button.setOnClickListener(v -> dialog.dismiss());
-        confirm_button.setOnClickListener(v -> {
-            if (checkEmptyInput(editText)) {
-                if (confirmationListener.onClick(v, editText.getText().toString(), selectedIndex[0])) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        if (secondaryConfirmationListener != null) {
+        if (secondaryButtonResource != -1) {
             secondary_button.setText(secondaryButtonResource);
-            secondary_button.setOnClickListener(v -> {
-                if (checkEmptyInput(editText)) {
-                    if (secondaryConfirmationListener.onClick(v, editText.getText().toString(), selectedIndex[0])) {
-                        dialog.dismiss();
-                    }
-                }
-            });
         } else {
             secondary_button.setVisibility(View.GONE);
+        }
+        cancel_button.setOnClickListener(v -> dialog.dismiss());
+        confirm_button.setOnClickListener(confirmationListener);
+        if (secondaryConfirmationListener != null) {
+            secondary_button.setOnClickListener(secondaryConfirmationListener);
         }
     }
     
@@ -133,14 +210,6 @@ public class DialogueUtilities {
             return false;
         }
         return true;
-    }
-    
-    private static void addFocusChangeListener(@NonNull EditText editText) {
-        editText.setOnFocusChangeListener((v, hasFocus) -> editText.postDelayed(() -> {
-            InputMethodManager inputMethodManager = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-        }, 200));
-        editText.requestFocus();
     }
     
     private static Dialog buildTemplate(Context context, int titleStringResource, int messageStringResource, int layout) {

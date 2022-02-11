@@ -94,7 +94,7 @@ public class SettingsFragment extends Fragment {
                 Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK,
                 getString(R.string.settings_max_rWidth_lock)));
         
-        settingsEntries.add(new ResetButtonSettingsEntry(this, view, savedInstanceState));
+        settingsEntries.add(new ResetButtonSettingsEntry(this, savedInstanceState));
     
         SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries);
         ((ListView) view.findViewById(R.id.settingsList)).setAdapter(settingsListViewAdapter);

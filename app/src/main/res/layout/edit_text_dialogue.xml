@@ -23,7 +23,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <include
-        layout="@layout/confirmation_dialogue"
+        layout="@layout/three_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

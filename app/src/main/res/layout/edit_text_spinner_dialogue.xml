@@ -60,7 +60,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <include
-        layout="@layout/secondary_button_dialogue"
+        layout="@layout/three_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"

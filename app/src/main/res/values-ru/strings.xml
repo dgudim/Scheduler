@@ -79,7 +79,7 @@
     <string name="settings_max_rWidth_lock">Растянуть фон события на всю ширину экрана блокировки</string>
     <string name="settings_font_size">Размер шрифта(Экран блокировки): %d</string>
     <string name="settings_expired_border_thickness">Толщина контура для пропущенных событий: %d</string>
-    <string name="remove_all_saved_backgrounds_prompt">Удалить все сохраненные фоны?</string>
+    <string name="delete_all_saved_backgrounds_prompt">Удалить все сохраненные фоны?</string>
     <string name="day_monday">понедельник</string>
     <string name="day_tuesday">вторник</string>
     <string name="day_wednesday">среда</string>
@@ -110,4 +110,5 @@
     <string name="blank_group_name">Нет</string>
     <string name="input_cant_be_empty">ввод не может быть пустым</string>
     <string name="overwrite">перезаписать</string>
+    <string name="reset">сбросить</string>
 </resources>

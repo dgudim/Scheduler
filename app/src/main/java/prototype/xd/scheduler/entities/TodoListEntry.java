@@ -32,7 +32,6 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValid
 
 import android.content.Context;
 import android.graphics.Paint;
-import android.text.Editable;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -145,7 +144,7 @@ public class TodoListEntry {
         }
     }
     
-    public void setGroupName(Editable name) {
+    public void setGroupName(String name) {
         if (group != null) {
             group.setName(name);
         }
