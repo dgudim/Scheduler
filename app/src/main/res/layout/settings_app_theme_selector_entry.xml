@@ -18,7 +18,7 @@
             android:text="@string/app_theme"
             android:textAppearance="@style/TextSmallMedium_primary" />
 
-        <Spinner
+        <prototype.xd.scheduler.views.Spinner
             android:id="@+id/themeSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

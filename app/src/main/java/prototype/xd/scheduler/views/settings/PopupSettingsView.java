@@ -7,13 +7,13 @@ import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.views.Spinner;
 import prototype.xd.scheduler.views.Switch;
 
 public class PopupSettingsView {

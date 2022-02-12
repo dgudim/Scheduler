@@ -1,9 +1,12 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.MainActivity.preferences_service;
+import static prototype.xd.scheduler.entities.Group.readGroupFile;
+import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
+import static prototype.xd.scheduler.utilities.Utilities.*;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 
 import android.content.Context;
@@ -12,6 +15,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
+import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 
@@ -24,10 +28,12 @@ public class TodoListEntryStorage {
     
     private final TodoListViewAdapter todoListViewAdapter;
     private ArrayList<TodoListEntry> todoListEntries;
+    private final ArrayList<Group> groups;
     
     public TodoListEntryStorage(final ViewGroup parent) {
         this.todoListViewAdapter = new TodoListViewAdapter(this, parent);
         this.todoListEntries = new ArrayList<>();
+        this.groups = readGroupFile(parent.getContext());
         new Thread(() -> calendars = getAllCalendars(parent.getContext(), false), "Cfetch thread").start();
     }
     
@@ -35,7 +41,7 @@ public class TodoListEntryStorage {
         return todoListViewAdapter;
     }
     
-    public int getCurrentlyVisibleEntries(){
+    public int getCurrentlyVisibleEntries() {
         return todoListViewAdapter.getCount();
     }
     
@@ -43,7 +49,7 @@ public class TodoListEntryStorage {
         if (updateBitmap) {
             preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
-        todoListEntries = Utilities.sortEntries(todoListEntries, currentlySelectedDay);
+        todoListEntries = sortEntries(todoListEntries, currentlySelectedDay);
         todoListViewAdapter.updateCurrentEntries();
         todoListViewAdapter.notifyDataSetChanged();
     }
@@ -52,11 +58,15 @@ public class TodoListEntryStorage {
         return todoListEntries;
     }
     
+    public ArrayList<Group> getGroups() {
+        return groups;
+    }
+    
     public void lazyLoadEntries(Context context) {
         if (loadedDay_start == 0) {
             loadedDay_start = currentlySelectedDay - 14;
             loadedDay_end = currentlySelectedDay + 14;
-            todoListEntries.addAll(loadTodoEntries(context, loadedDay_start, loadedDay_end));
+            todoListEntries.addAll(loadTodoEntries(context, loadedDay_start, loadedDay_end, groups));
         } else {
             long new_loadedDay_start = currentlySelectedDay - 14;
             long new_loadedDay_end = currentlySelectedDay + 14;
@@ -72,7 +82,7 @@ public class TodoListEntryStorage {
                 loadedDay_start = new_loadedDay_start;
             }
             if (day_start != 0) {
-                if(calendars != null){
+                if (calendars != null) {
                     for (int i = 0; i < calendars.size(); i++) {
                         addDistinct(calendars.get(i).getVisibleTodoListEntries(day_start, day_end));
                     }
@@ -92,6 +102,10 @@ public class TodoListEntryStorage {
     
     public void saveEntries() {
         Utilities.saveEntries(todoListEntries);
+    }
+    
+    public void saveGroups() {
+        saveGroupsFile(groups);
     }
     
     public void addEntry(TodoListEntry entry) {

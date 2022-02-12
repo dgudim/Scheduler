@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CompoundCustomizationEntry;
 import prototype.xd.scheduler.views.Switch;
@@ -60,7 +61,7 @@ public class Utilities {
         }
     }
     
-    public static ArrayList<TodoListEntry> loadTodoEntries(Context context, long day_start, long day_end) {
+    public static ArrayList<TodoListEntry> loadTodoEntries(Context context, long day_start, long day_end, ArrayList<Group> groups) {
         
         ArrayList<TodoListEntry> readEntries = new ArrayList<>();
         try {
@@ -72,7 +73,7 @@ public class Utilities {
             }
             
             for (int i = 0; i < entryParams.size(); i++) {
-                readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i)));
+                readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups));
             }
         } catch (Exception e) {
             log(INFO, "no todo list");

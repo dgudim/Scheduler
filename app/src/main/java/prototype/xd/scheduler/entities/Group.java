@@ -35,8 +35,7 @@ public class Group {
         return isNullGroup;
     }
     
-    public Group(Context context, String groupName) {
-        ArrayList<Group> groups = readGroupFile();
+    public Group(Context context, String groupName, ArrayList<Group> groups) {
         boolean foundGroup = false;
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).name.equals(groupName)) {
@@ -53,7 +52,7 @@ public class Group {
         }
     }
     
-    private Group(String groupName, String[] params) {
+    public Group(String groupName, String[] params) {
         name = groupName;
         this.params = params;
     }
@@ -80,7 +79,9 @@ public class Group {
         return groupIndex;
     }
     
-    public static ArrayList<Group> readGroupFile() {
+    public static ArrayList<Group> readGroupFile(Context context) {
+        ArrayList<Group> groups = new ArrayList<>();
+        groups.add(new Group(context)); // add "null" group
         try {
             
             ArrayList<String[]> groupParams = loadObject("groups");
@@ -90,7 +91,6 @@ public class Group {
                 log(WARNING, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
             }
             
-            ArrayList<Group> groups = new ArrayList<>();
             for (int i = 0; i < groupParams.size(); i++) {
                 groups.add(new Group(groupNames.get(i), groupParams.get(i)));
             }
@@ -99,7 +99,6 @@ public class Group {
         } catch (Exception e) {
             logException(e);
             log(INFO, "no groups file, creating one");
-            ArrayList<Group> groups = new ArrayList<>();
             saveGroupsFile(groups);
             return groups;
         }
@@ -125,14 +124,6 @@ public class Group {
         } catch (Exception e) {
             log(ERROR, "failed to save groups file: " + e.getMessage());
         }
-    }
-    
-    public static Group createGroup(String name, String[] params) {
-        ArrayList<Group> groups = readGroupFile();
-        Group createdGroup = new Group(name, params);
-        groups.add(createdGroup);
-        saveGroupsFile(groups);
-        return createdGroup;
     }
     
     @NonNull

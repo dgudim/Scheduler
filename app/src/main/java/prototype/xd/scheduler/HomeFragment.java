@@ -1,7 +1,6 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.MainActivity.preferences_service;
-import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.addTimeZoneOffset;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
@@ -80,16 +79,14 @@ public class HomeFragment extends Fragment {
         });
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
-            final ArrayList<Group> groupList = new ArrayList<>();
-            groupList.add(new Group(view1.getContext()));
-            groupList.addAll(readGroupFile());
+            final ArrayList<Group> groupList = todoListEntryStorage.getGroups();
             displayEditTextSpinnerDialogue(view1.getContext(), R.string.add_event_fab, -1, R.string.event_name_input_hint,
                     R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
                     (view2, text, selectedIndex) -> {
                         TodoListEntry newEntry = new TodoListEntry(view2.getContext(), new String[]{
                                 TEXT_VALUE, text,
                                 ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
-                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName());
+                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
                         todoListEntryStorage.addEntry(newEntry);
                         todoListEntryStorage.saveEntries();
                         todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
@@ -99,7 +96,7 @@ public class HomeFragment extends Fragment {
                         TodoListEntry newEntry = new TodoListEntry(view2.getContext(), new String[]{
                                 TEXT_VALUE, text,
                                 ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
-                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName());
+                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
                         todoListEntryStorage.addEntry(newEntry);
                         todoListEntryStorage.saveEntries();
                         todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());

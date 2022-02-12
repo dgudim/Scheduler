@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.views.Spinner;
 
 public class AppThemeSelectorEntry extends SettingsEntry {
     
@@ -41,17 +41,16 @@ public class AppThemeSelectorEntry extends SettingsEntry {
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         }
         Spinner spinnerView = convertView.findViewById(R.id.themeSpinner);
-        spinnerView.setOnItemSelectedListener(null);
         spinnerView.setAdapter(spinnerAdapter);
         switch (preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME)) {
             case APP_THEME_LIGHT:
-                spinnerView.setSelection(0);
+                spinnerView.setSelection(0, false);
                 break;
             case APP_THEME_DARK:
-                spinnerView.setSelection(1);
+                spinnerView.setSelection(1, false);
                 break;
             case APP_THEME_SYSTEM:
-                spinnerView.setSelection(2);
+                spinnerView.setSelection(2, false);
                 break;
         }
         

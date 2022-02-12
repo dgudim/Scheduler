@@ -120,9 +120,9 @@ public class TodoListEntry {
         reloadParams();
     }
     
-    public TodoListEntry(Context context, String[] params, String groupName) {
+    public TodoListEntry(Context context, String[] params, String groupName, ArrayList<Group> groups) {
         if (!groupName.isEmpty()) {
-            group = new Group(context, groupName);
+            group = new Group(context, groupName, groups);
             if (group.isNullGroup()) {
                 log(WARNING, "Unknown group: " + groupName);
                 group = null;

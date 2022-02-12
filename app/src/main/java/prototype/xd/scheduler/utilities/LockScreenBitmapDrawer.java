@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
@@ -43,6 +44,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
@@ -154,9 +156,10 @@ public class LockScreenBitmapDrawer {
     private void drawStringsOnBitmap(BackgroundSetterService backgroundSetterService, Bitmap src) throws InterruptedException {
         
         Canvas canvas = new Canvas(src);
+        ArrayList<Group> groups = readGroupFile(backgroundSetterService);
         
         ArrayList<TodoListEntry> toAdd = filterItems(sortEntries(
-                loadTodoEntries(backgroundSetterService, currentDay - 14, currentDay + 14), currentDay), backgroundSetterService);
+                loadTodoEntries(backgroundSetterService, currentDay - 14, currentDay + 14, groups), currentDay), backgroundSetterService);
         long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(src) + currentDay;
         if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
@@ -189,7 +192,7 @@ public class LockScreenBitmapDrawer {
                     if (toAdd.get(i).fromSystemCalendar) {
                         splitEntry = new TodoListEntry(toAdd.get(i).event);
                     } else {
-                        splitEntry = new TodoListEntry(backgroundSetterService, toAdd.get(i).params, toAdd.get(i).getGroupName());
+                        splitEntry = new TodoListEntry(backgroundSetterService, toAdd.get(i).params, toAdd.get(i).getGroupName(), groups);
                     }
                     copyDisplayData(toAdd.get(i), splitEntry);
                     splitEntry.changeParameter(TEXT_VALUE, toAdd.get(i).textValueSplit[i2]);

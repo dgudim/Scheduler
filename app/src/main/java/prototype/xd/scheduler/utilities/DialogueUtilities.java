@@ -8,7 +8,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 
@@ -19,6 +18,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.views.Spinner;
 
 public class DialogueUtilities {
     
@@ -142,7 +142,7 @@ public class DialogueUtilities {
         spinner.setAdapter(arrayAdapter);
         
         final int[] selectedIndex = {defaultIndex};
-        spinner.setSelection(defaultIndex);
+        spinner.setSelection(defaultIndex, false);
         
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

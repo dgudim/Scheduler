@@ -2,7 +2,6 @@ package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.groupIndexInList;
-import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
@@ -146,9 +145,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             
             view.setOnLongClickListener(view1 -> {
                 
-                final ArrayList<Group> groupList = new ArrayList<>();
-                groupList.add(new Group(view1.getContext()));
-                groupList.addAll(readGroupFile());
+                final ArrayList<Group> groupList = todoListEntryStorage.getGroups();
                 int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
                 displayEditTextSpinnerDialogue(view1.getContext(), R.string.edit_event, -1, R.string.event_name_input_hint,
                         R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.textValue, groupList,
