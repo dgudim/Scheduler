@@ -112,7 +112,7 @@ public class LockScreenBitmapDrawer {
             busy = true;
             new Thread(() -> {
                 try {
-    
+                    
                     float time = System.nanoTime();
                     log(INFO, "setting wallpaper");
                     
@@ -311,14 +311,16 @@ public class LockScreenBitmapDrawer {
     
     private ArrayList<TodoListEntry> filterItems(ArrayList<TodoListEntry> input, Context context) {
         ArrayList<TodoListEntry> toAdd = new ArrayList<>();
+        currentBitmapLongestText = "";
         for (int i = 0; i < input.size(); i++) {
             if (input.get(i).getLockViewState()) {
                 toAdd.add(input.get(i));
-                if (input.get(i).textValue.length() > currentBitmapLongestText.length()) {
-                    currentBitmapLongestText = input.get(i).textValue;
-                }
+                String textVal = input.get(i).textValue + input.get(i).getDayOffset(currentDay, context);
                 String time_string = input.get(i).getTimeSpan(context);
-                if(time_string.length() > currentBitmapLongestText.length()){
+                if (textVal.length() > currentBitmapLongestText.length()) {
+                    currentBitmapLongestText = textVal;
+                }
+                if (time_string.length() > currentBitmapLongestText.length()) {
                     currentBitmapLongestText = time_string;
                 }
             }

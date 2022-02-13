@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
 import static java.lang.Math.max;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTime;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
@@ -10,13 +11,9 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class Logger {
-    
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd  hh:mm");
     
     public enum ContentType {INFO, WARNING, ERROR}
     
@@ -29,12 +26,12 @@ public class Logger {
         if (contentType == ERROR) {
             stream = System.err;
         }
-        String msg = dtf.format(LocalDateTime.now()) + "  [" + contentType + "]: " + message;
+        String msg = getCurrentDateTime() + "  [" + contentType + "]: " + message;
         stream.println(msg);
         try {
             logFile.createNewFile();
             String before = new String(Files.readAllBytes(logFile.toPath()));
-            int maxIndex = before.length() - 1;
+            int maxIndex = max(before.length() - 1, 0);
             before = before.substring(max(maxIndex - MAX_SIZE, 0), maxIndex);
             PrintWriter out = new PrintWriter(logFile);
             out.print(before + "\n" + msg);

@@ -100,6 +100,10 @@ public class DateManager {
         return dateFormat.format(new Date()).split(" ")[1];
     }
     
+    public static String getCurrentDateTime() {
+        return dateFormat.format(new Date());
+    }
+    
     public static long daysFromDate(String date) {
         if (date.equals(DAY_FLAG_GLOBAL_STR)) {
             return DAY_FLAG_GLOBAL;

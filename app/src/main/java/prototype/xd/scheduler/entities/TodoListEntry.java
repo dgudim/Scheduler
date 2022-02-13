@@ -459,7 +459,7 @@ public class TodoListEntry {
         textPaint.setTextSize(lockScreenBitmapDrawer.fontSize_h);
         textPaint.setTextAlign(Paint.Align.CENTER);
         rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1, lockScreenBitmapDrawer.displayWidth / 2f - borderThickness);
-        maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - borderThickness * 2) / (textPaint.measureText("qwerty_") / 5f)) - 2;
+        maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - borderThickness) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         
         log(INFO, "loaded display data for " + textValue);
     }
