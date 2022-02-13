@@ -7,6 +7,8 @@ import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
+import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -101,7 +103,7 @@ public class BackgroundSetterService extends Service {
             foregroundNotificationChannelId = "BackgroundSetterService.NotificationChannel";
             
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            // Not exists so we create it at first time
+            
             if (notificationManager.getNotificationChannel(foregroundNotificationChannelId) == null) {
                 NotificationChannel nc = new NotificationChannel(
                         getForegroundNotificationChannelId(),
@@ -139,15 +141,19 @@ public class BackgroundSetterService extends Service {
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                log(INFO, "received ping (keep alive job)");
             } else {
                 if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                     updateDate(DAY_FLAG_GLOBAL_STR, false);
                     lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                    log(INFO, "received general ping");
                     updateNotification();
                 }
             }
         } else {
             initialized = true;
+            log(INFO, "received ping (initial)");
+            
             preferences_service = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
             
             screenOnOffReceiver = new BroadcastReceiver() {
@@ -156,13 +162,16 @@ public class BackgroundSetterService extends Service {
                     if (!lastUpdateSucceeded || preferences_service.getBoolean(SERVICE_UPDATE_SIGNAL, false)) {
                         ping(context);
                         preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
+                        log(INFO, "sent ping (on - off receiver)");
                     }
+                    log(INFO, "receiver state: " + intent.getAction());
                 }
             };
             pingReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     ping(context);
+                    log(INFO, "sent ping (date changed receiver)");
                 }
             };
             

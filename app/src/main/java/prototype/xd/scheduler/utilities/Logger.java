@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
+import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
 import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 
@@ -21,6 +22,8 @@ public class Logger {
     
     private static final File logFile = new File(rootDir, "log.txt");
     
+    private static final int MAX_SIZE = 30_000;
+    
     public static void log(ContentType contentType, String message) {
         PrintStream stream = System.out;
         if (contentType == ERROR) {
@@ -29,13 +32,12 @@ public class Logger {
         String msg = dtf.format(LocalDateTime.now()) + "  [" + contentType + "]: " + message;
         stream.println(msg);
         try {
-            if (logFile.length() > 500_000) {
-                logFile.delete();
-            }
             logFile.createNewFile();
             String before = new String(Files.readAllBytes(logFile.toPath()));
+            int maxIndex = before.length() - 1;
+            before = before.substring(max(maxIndex - MAX_SIZE, 0), maxIndex);
             PrintWriter out = new PrintWriter(logFile);
-            out.print(before + msg + "\n");
+            out.print(before + "\n" + msg);
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
