@@ -75,6 +75,8 @@ public class Utilities {
             for (int i = 0; i < entryParams.size(); i++) {
                 readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups));
             }
+    
+            log(INFO, "read todo list: " + readEntries.size());
         } catch (Exception e) {
             log(INFO, "no todo list");
             logException(e);
@@ -99,7 +101,7 @@ public class Utilities {
             
             saveObject("list", entryParams);
             saveObject("list_groupData", entryGroupNames);
-            log(INFO, "saving todo list");
+            log(INFO, "saved todo list");
         } catch (Exception e) {
             log(ERROR, "missing permission, failed to save todo list");
         }
@@ -285,7 +287,7 @@ public class Utilities {
     
     //switch listener for regular settings
     public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue) {
-        tSwitch.setChecked(preferences.getBoolean(key, defaultValue), false);
+        tSwitch.setCheckedSilent(preferences.getBoolean(key, defaultValue));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(key, isChecked).apply();
             preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
@@ -299,7 +301,7 @@ public class Utilities {
                                                final TodoListEntry entry,
                                                final String parameter,
                                                final boolean initialValue) {
-        tSwitch.setChecked(initialValue, false);
+        tSwitch.setCheckedSilent(initialValue);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             entry.setStateIconColor(stateIcon, parameter);
@@ -315,7 +317,7 @@ public class Utilities {
                                                final String calendarKey,
                                                final String parameter,
                                                final boolean initialValue) {
-        tSwitch.setChecked(initialValue, false);
+        tSwitch.setCheckedSilent(initialValue);
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);

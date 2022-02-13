@@ -49,7 +49,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
         ((TextView) convertView.findViewById(R.id.event_count)).setText(convertView.getContext().getString(R.string.calendar_events_full, calendarEventsCount));
         CheckBox checkBox = convertView.findViewById(R.id.check_box);
         checkBox.setButtonTintList(ColorStateList.valueOf(calendarColor));
-        checkBox.setChecked(preferences.getBoolean(calendarKey + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE), false);
+        checkBox.setCheckedSilent(preferences.getBoolean(calendarKey + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 preferences.edit().putBoolean(calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
         

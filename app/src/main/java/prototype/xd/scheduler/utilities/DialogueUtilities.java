@@ -142,7 +142,7 @@ public class DialogueUtilities {
         spinner.setAdapter(arrayAdapter);
         
         final int[] selectedIndex = {defaultIndex};
-        spinner.setSelection(defaultIndex, false);
+        spinner.setSelectionSilent(defaultIndex);
         
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class Logger {
     
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("y.M.d  h:m");
+    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy.MM.dd  hh:mm");
     
     public enum ContentType {INFO, WARNING, ERROR}
     

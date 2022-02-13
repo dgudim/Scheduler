@@ -44,13 +44,13 @@ public class AppThemeSelectorEntry extends SettingsEntry {
         spinnerView.setAdapter(spinnerAdapter);
         switch (preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME)) {
             case APP_THEME_LIGHT:
-                spinnerView.setSelection(0, false);
+                spinnerView.setSelectionSilent(0);
                 break;
             case APP_THEME_DARK:
-                spinnerView.setSelection(1, false);
+                spinnerView.setSelectionSilent(1);
                 break;
             case APP_THEME_SYSTEM:
-                spinnerView.setSelection(2, false);
+                spinnerView.setSelectionSilent(2);
                 break;
         }
         

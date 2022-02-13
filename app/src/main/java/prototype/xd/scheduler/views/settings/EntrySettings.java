@@ -129,7 +129,7 @@ public class EntrySettings extends PopupSettingsView {
         };
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         group_spinner.setAdapter(arrayAdapter);
-        group_spinner.setSelection(max(groupIndexInList(groupList, entry.getGroupName()), 0), false);
+        group_spinner.setSelectionSilent(max(groupIndexInList(groupList, entry.getGroupName()), 0));
         
         group_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -247,7 +247,7 @@ public class EntrySettings extends PopupSettingsView {
         
         todoListEntry.removeDisplayParams();
         arrayAdapter.notifyDataSetChanged();
-        group_spinner.setSelection(groupIndex, false);
+        group_spinner.setSelectionSilent(groupIndex);
         todoListEntry.changeGroup(groupList.get(groupIndex));
         rebuild(context);
     }

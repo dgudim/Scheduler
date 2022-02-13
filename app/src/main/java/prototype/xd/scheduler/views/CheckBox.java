@@ -32,9 +32,12 @@ public class CheckBox extends MaterialCheckBox {
         });
     }
     
-    public void setChecked(boolean checked, boolean notify) {
-        ignoreCheckedChange = !notify;
-        setChecked(checked);
-        ignoreCheckedChange = false;
+    public void setCheckedSilent(boolean checked) {
+        if (isChecked() != checked) {
+            ignoreCheckedChange = true;
+            setChecked(checked);
+            ignoreCheckedChange = false;
+            jumpDrawablesToCurrentState();
+        }
     }
 }

@@ -34,7 +34,7 @@ public class Spinner extends AppCompatSpinner {
                 }
                 listener.onItemSelected(parent, view, position, id);
             }
-    
+            
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 listener.onNothingSelected(parent);
@@ -42,10 +42,9 @@ public class Spinner extends AppCompatSpinner {
         });
     }
     
-    @Override
-    public void setSelection(int position, boolean notify) {
-        ignoreCheckedChange = !notify;
-        setSelection(position);
+    public void setSelectionSilent(int position) {
+        ignoreCheckedChange = true;
+        setSelection(position, false);
         ignoreCheckedChange = false;
     }
 }

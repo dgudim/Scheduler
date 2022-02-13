@@ -132,7 +132,8 @@ public class TodoListViewAdapter extends BaseAdapter {
             
             CheckBox isDone = view.findViewById(R.id.isDone);
             
-            isDone.setChecked(currentEntry.completed, false);
+            isDone.setCheckedSilent(currentEntry.completed);
+            
             isDone.setOnClickListener(view12 -> {
                 if (!currentEntry.isGlobalEntry) {
                     currentEntry.changeParameter(IS_COMPLETED, String.valueOf(isDone.isChecked()));
