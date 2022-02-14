@@ -189,6 +189,7 @@ public class BackgroundSetterService extends Service {
     }
     
     private void scheduleRestartJob(){
+        log(INFO, "restart job scheduled");
         getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
                 new ComponentName(getApplicationContext(), KeepAliveService.class))
                 .setPeriodic(15 * 60 * 1000, 5 * 60 * 1000).build());
@@ -196,6 +197,7 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public void onDestroy() {
+        log(INFO, "service destroyed");
         scheduleRestartJob();
         if (screenOnOffReceiver != null) {
             unregisterReceiver(screenOnOffReceiver);

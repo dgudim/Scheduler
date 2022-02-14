@@ -31,7 +31,7 @@ public class Logger {
         try {
             logFile.createNewFile();
             String before = new String(Files.readAllBytes(logFile.toPath()));
-            int maxIndex = max(before.length() - 1, 0);
+            int maxIndex = before.length();
             before = before.substring(max(maxIndex - MAX_SIZE, 0), maxIndex);
             PrintWriter out = new PrintWriter(logFile);
             out.print(before + "\n" + msg);
