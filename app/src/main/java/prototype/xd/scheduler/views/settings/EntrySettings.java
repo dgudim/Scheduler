@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -46,6 +47,7 @@ public class EntrySettings extends PopupSettingsView {
     
     public EntrySettings(final TodoListEntryStorage todoListEntryStorage, final View settingsView) {
         super(settingsView);
+        hide_expired_items_by_time_container.setVisibility(View.GONE);
         this.todoListEntryStorage = todoListEntryStorage;
         
         dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
@@ -101,7 +103,7 @@ public class EntrySettings extends PopupSettingsView {
                                         
                                         String origName = groupList.get(position).getName();
                                         groupList.get(position).setName(text);
-    
+                                        
                                         String finalText = text;
                                         forEachWithGroupMatch(origName, entry -> entry.setGroupName(finalText));
                                         
@@ -227,7 +229,7 @@ public class EntrySettings extends PopupSettingsView {
     
     private void forEachWithGroupMatch(String groupName, TodoListEntryAction action) {
         todoListEntryStorage.getTodoListEntries().forEach(todoListEntry -> {
-            if(todoListEntry.getGroupName().equals(groupName)){
+            if (todoListEntry.getGroupName().equals(groupName)) {
                 action.accept(todoListEntry);
             }
         });
@@ -237,7 +239,7 @@ public class EntrySettings extends PopupSettingsView {
         Group createdGroup = new Group(groupName, todoListEntry.getDisplayParams());
         if (groupIndex >= 0) {
             groupList.set(groupIndex, createdGroup);
-    
+            
             forEachWithGroupMatch(groupName, entry -> entry.changeGroup(createdGroup));
             
         } else {

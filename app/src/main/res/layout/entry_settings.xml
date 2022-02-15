@@ -20,7 +20,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <TextView
@@ -39,8 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_show_items_lock"
-                    android:textAppearance="@style/TextSmallMedium_primary"
-                    tools:ignore="TouchTargetSizeCheck" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -121,8 +120,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_adaptive_color"
-                    android:textAppearance="@style/TextSmallMedium_primary"
-                    tools:ignore="TouchTargetSizeCheck" />
+                    android:textAppearance="@style/TextSmallMedium_primary" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -525,6 +523,39 @@
                         android:progress="1" />
 
                 </LinearLayout>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/hide_expired_items_by_time_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            app:cardCornerRadius="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/hide_expired_items_by_time_state"
+                    android:layout_width="15dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/settings_state_symbol"
+                    android:textAlignment="center"
+
+                    android:textAppearance="@style/TextMedium_primary"
+                    android:textStyle="bold" />
+
+                <prototype.xd.scheduler.views.Switch
+                    android:id="@+id/hide_expired_items_by_time_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_hide_expired_entries_by_time"
+                    android:textAppearance="@style/TextSmallMedium_primary" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>

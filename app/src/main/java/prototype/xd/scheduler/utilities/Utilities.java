@@ -14,6 +14,7 @@ import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 
 import android.app.Activity;
@@ -75,7 +76,7 @@ public class Utilities {
             for (int i = 0; i < entryParams.size(); i++) {
                 readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups));
             }
-    
+            
             log(INFO, "read todo list: " + readEntries.size());
         } catch (Exception e) {
             log(INFO, "no todo list");
@@ -218,13 +219,16 @@ public class Utilities {
                                                 final boolean mapToBorderPreview,
                                                 final int stringResource,
                                                 final String parameter,
-                                                final int initialValue) {
+                                                final int initialValue,
+                                                final SeekBar.OnSeekBarChangeListener customListener) {
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (customListener != null)
+                    customListener.onProgressChanged(seekBar, progress, fromUser);
                 if (fromUser) {
                     displayTo.setText(displayTo.getContext().getString(stringResource, progress));
                     if (mapToBorderPreview) {
@@ -235,16 +239,28 @@ public class Utilities {
             
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-            
+                if (customListener != null) customListener.onStartTrackingTouch(seekBar);
             }
             
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if (customListener != null) customListener.onStopTrackingTouch(seekBar);
                 entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf(seekBar.getProgress()));
                 entrySettings.todoListEntryStorage.saveEntries();
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
+    }
+    
+    public static void addSeekBarChangeListener(final TextView displayTo,
+                                                final SeekBar seekBar,
+                                                final TextView stateIcon,
+                                                final EntrySettings entrySettings,
+                                                final boolean mapToBorderPreview,
+                                                final int stringResource,
+                                                final String parameter,
+                                                final int initialValue) {
+        addSeekBarChangeListener(displayTo, seekBar, stateIcon, entrySettings, mapToBorderPreview, stringResource, parameter, initialValue, null);
     }
     
     //listener for calendar settings
@@ -255,8 +271,10 @@ public class Utilities {
                                                 final boolean mapToBorderPreview,
                                                 final int stringResource,
                                                 final String calendarKey,
+                                                final ArrayList<String> calendarSubKeys,
                                                 final String parameter,
-                                                final int initialValue) {
+                                                final int defaultValue) {
+        int initialValue = preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue);
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -315,9 +333,10 @@ public class Utilities {
                                                final TextView stateIcon,
                                                final SystemCalendarSettings systemCalendarSettings,
                                                final String calendarKey,
+                                               final ArrayList<String> calendarSubKeys,
                                                final String parameter,
-                                               final boolean initialValue) {
-        tSwitch.setCheckedSilent(initialValue);
+                                               final boolean defaultValue) {
+        tSwitch.setCheckedSilent(preferences.getBoolean(getFirstValidKey(calendarSubKeys, parameter), defaultValue));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);
@@ -383,9 +402,10 @@ public class Utilities {
     public static void invokeColorDialogue(final TextView stateIcon,
                                            final SystemCalendarSettings systemCalendarSettings,
                                            final String calendarKey,
+                                           final ArrayList<String> calendarSubKeys,
                                            final String parameter,
-                                           final int initialValue) {
-        invokeColorDialogue(stateIcon.getContext(), initialValue, (dialog, selectedColor, allColors) -> {
+                                           final int defaultValue) {
+        invokeColorDialogue(stateIcon.getContext(), preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue), (dialog, selectedColor, allColors) -> {
             preferences.edit().putInt(calendarKey + "_" + parameter, selectedColor).apply();
             switch (parameter) {
                 case FONT_COLOR:
