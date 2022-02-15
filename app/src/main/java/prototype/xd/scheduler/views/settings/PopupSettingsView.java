@@ -4,6 +4,7 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 
+import android.content.res.ColorStateList;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -59,6 +60,7 @@ public class PopupSettingsView {
     protected final Switch show_on_lock_switch;
     protected final Switch adaptive_color_switch;
     protected final Switch hide_expired_items_by_time_switch;
+    protected final ColorStateList hide_expired_items_by_time_switch_def_colors;
     
     protected final CardView hide_expired_items_by_time_container;
     
@@ -106,6 +108,7 @@ public class PopupSettingsView {
         show_on_lock_switch = settingsView.findViewById(R.id.show_on_lock_switch);
         adaptive_color_switch = settingsView.findViewById(R.id.adaptive_color_switch);
         hide_expired_items_by_time_switch = settingsView.findViewById(R.id.hide_expired_items_by_time_switch);
+        hide_expired_items_by_time_switch_def_colors = hide_expired_items_by_time_switch.getTextColors();
         
         hide_expired_items_by_time_container = settingsView.findViewById(R.id.hide_expired_items_by_time_container);
         

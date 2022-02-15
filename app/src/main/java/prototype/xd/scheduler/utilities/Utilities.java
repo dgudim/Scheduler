@@ -219,16 +219,13 @@ public class Utilities {
                                                 final boolean mapToBorderPreview,
                                                 final int stringResource,
                                                 final String parameter,
-                                                final int initialValue,
-                                                final SeekBar.OnSeekBarChangeListener customListener) {
+                                                final int initialValue) {
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (customListener != null)
-                    customListener.onProgressChanged(seekBar, progress, fromUser);
                 if (fromUser) {
                     displayTo.setText(displayTo.getContext().getString(stringResource, progress));
                     if (mapToBorderPreview) {
@@ -239,28 +236,16 @@ public class Utilities {
             
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                if (customListener != null) customListener.onStartTrackingTouch(seekBar);
+            
             }
             
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (customListener != null) customListener.onStopTrackingTouch(seekBar);
                 entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf(seekBar.getProgress()));
                 entrySettings.todoListEntryStorage.saveEntries();
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
-    }
-    
-    public static void addSeekBarChangeListener(final TextView displayTo,
-                                                final SeekBar seekBar,
-                                                final TextView stateIcon,
-                                                final EntrySettings entrySettings,
-                                                final boolean mapToBorderPreview,
-                                                final int stringResource,
-                                                final String parameter,
-                                                final int initialValue) {
-        addSeekBarChangeListener(displayTo, seekBar, stateIcon, entrySettings, mapToBorderPreview, stringResource, parameter, initialValue, null);
     }
     
     //listener for calendar settings
@@ -273,7 +258,8 @@ public class Utilities {
                                                 final String calendarKey,
                                                 final ArrayList<String> calendarSubKeys,
                                                 final String parameter,
-                                                final int defaultValue) {
+                                                final int defaultValue,
+                                                final SeekBar.OnSeekBarChangeListener customListener) {
         int initialValue = preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue);
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
         seekBar.setProgress(initialValue);
@@ -281,6 +267,8 @@ public class Utilities {
             
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (customListener != null)
+                    customListener.onProgressChanged(seekBar, progress, fromUser);
                 if (fromUser) {
                     displayTo.setText(displayTo.getContext().getString(stringResource, progress));
                     if (mapToBorderPreview) {
@@ -291,16 +279,30 @@ public class Utilities {
             
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-            
+                if (customListener != null) customListener.onStartTrackingTouch(seekBar);
             }
             
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if (customListener != null) customListener.onStopTrackingTouch(seekBar);
                 preferences.edit().putInt(calendarKey + "_" + parameter, seekBar.getProgress()).apply();
                 systemCalendarSettings.setStateIconColor(stateIcon, parameter);
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
+    }
+    
+    public static void addSeekBarChangeListener(final TextView displayTo,
+                                                final SeekBar seekBar,
+                                                final TextView stateIcon,
+                                                final SystemCalendarSettings systemCalendarSettings,
+                                                final boolean mapToBorderPreview,
+                                                final int stringResource,
+                                                final String calendarKey,
+                                                final ArrayList<String> calendarSubKeys,
+                                                final String parameter,
+                                                final int defaultValue) {
+        addSeekBarChangeListener(displayTo, seekBar, stateIcon, systemCalendarSettings, mapToBorderPreview, stringResource, calendarKey, calendarSubKeys, parameter, defaultValue, null);
     }
     
     //switch listener for regular settings
