@@ -4,10 +4,12 @@ import static prototype.xd.scheduler.utilities.DateManager.getCurrentTime;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.LAST_KEEPALIVE_TIME;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.app.NotificationChannel;
@@ -140,13 +142,19 @@ public class BackgroundSetterService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
-                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                preferences_service.edit()
+                        .putBoolean(SERVICE_UPDATE_SIGNAL, true)
+                        .putLong(LAST_KEEPALIVE_TIME, getCurrentTimestamp()).apply();
                 log(INFO, "received ping (keep alive job)");
             } else {
                 if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                     updateDate(DAY_FLAG_GLOBAL_STR, false);
                     lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
                     log(INFO, "received general ping");
+                    if (preferences_service.getLong(LAST_KEEPALIVE_TIME, getCurrentTimestamp()) < 60 * 60 * 1000) {
+                        log(WARNING, "keepalive job died, restarting");
+                        scheduleRestartJob();
+                    }
                     updateNotification();
                 }
             }
@@ -188,7 +196,7 @@ public class BackgroundSetterService extends Service {
         return START_STICKY;
     }
     
-    private void scheduleRestartJob(){
+    private void scheduleRestartJob() {
         log(INFO, "restart job scheduled");
         getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
                 new ComponentName(getApplicationContext(), KeepAliveService.class))
