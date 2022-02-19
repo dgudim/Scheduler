@@ -8,6 +8,7 @@ import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
+import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.initLogger;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.isVerticalOrientation;
@@ -203,6 +204,7 @@ public class BackgroundSetterService extends Service {
                 lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
             }
         } else {
+            log(WARNING, "orientation not vertical");
             lastUpdateSucceeded = false;
         }
     }

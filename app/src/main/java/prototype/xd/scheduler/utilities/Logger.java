@@ -21,7 +21,7 @@ public class Logger {
     
     private static File logFile;
     
-    private static final int MAX_SIZE = 30_000;
+    private static final int MAX_SIZE = 50_000;
     
     public static void initLogger(Context context) {
         if (logFile == null) {
