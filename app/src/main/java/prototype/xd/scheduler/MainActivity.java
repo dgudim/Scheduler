@@ -5,9 +5,9 @@ import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
+import static prototype.xd.scheduler.utilities.Logger.initLogger;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Utilities.initStorage;
-import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
 
 import android.Manifest;
 import android.content.Context;
@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         
         preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         preferences_service = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
+        initLogger(this);
        /* try {
             Class.forName("dalvik.system.CloseGuard")
                     .getMethod("setEnabled", boolean.class)
@@ -124,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void launchMainActivity() {
-        initStorage(this);
         BackgroundSetterService.ping(getApplicationContext());
         setContentView(R.layout.activity_main);
     }
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                         
                         Bitmap fingerprintedBitmap = fingerPrintAndSaveBitmap(
                                 originalBitmap.copy(Bitmap.Config.ARGB_8888, true),
-                                new File(rootDir, availableDays[requestCode] + ".png"),
+                                new File(getRootDir(MainActivity.this), availableDays[requestCode] + ".png"),
                                 displayMetrics);
                         
                         originalBitmap.recycle();

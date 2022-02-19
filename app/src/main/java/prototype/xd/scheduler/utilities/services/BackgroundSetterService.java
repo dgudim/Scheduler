@@ -4,13 +4,13 @@ import static prototype.xd.scheduler.utilities.DateManager.getCurrentTime;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
-import static prototype.xd.scheduler.utilities.Keys.LAST_KEEPALIVE_TIME;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
+import static prototype.xd.scheduler.utilities.Logger.initLogger;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.Utilities.isVerticalOrientation;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
@@ -140,23 +139,15 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        initLogger(this);
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
-                preferences_service.edit()
-                        .putBoolean(SERVICE_UPDATE_SIGNAL, true)
-                        .putLong(LAST_KEEPALIVE_TIME, getCurrentTimestamp()).apply();
+                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
                 log(INFO, "received ping (keep alive job)");
             } else {
-                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    updateDate(DAY_FLAG_GLOBAL_STR, false);
-                    lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
-                    log(INFO, "received general ping");
-                    if (preferences_service.getLong(LAST_KEEPALIVE_TIME, getCurrentTimestamp()) < 60 * 60 * 1000) {
-                        log(WARNING, "keepalive job died, restarting");
-                        scheduleRestartJob();
-                    }
-                    updateNotification();
-                }
+                constructBitmap();
+                log(INFO, "received general ping");
+                updateNotification();
             }
         } else {
             initialized = true;
@@ -201,6 +192,19 @@ public class BackgroundSetterService extends Service {
         getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
                 new ComponentName(getApplicationContext(), KeepAliveService.class))
                 .setPeriodic(15 * 60 * 1000, 5 * 60 * 1000).build());
+    }
+    
+    private void constructBitmap() {
+        if (isVerticalOrientation(this)) {
+            updateDate(DAY_FLAG_GLOBAL_STR, false);
+            if (lockScreenBitmapDrawer == null) {
+                lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
+            } else {
+                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+            }
+        } else {
+            lastUpdateSucceeded = false;
+        }
     }
     
     @Override

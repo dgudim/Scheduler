@@ -20,6 +20,7 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEn
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -50,16 +51,23 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})
 public class Utilities {
     
-    public static File rootDir;
+    private static File rootDir;
     
-    public static void initStorage(Context context) {
-        rootDir = context.getExternalFilesDir("");
+    public static File getRootDir(Context context) {
         if (rootDir == null) {
-            throw new NullPointerException("Shared storage not available wtf");
+            rootDir = context.getExternalFilesDir("");
+            if (rootDir == null) {
+                throw new NullPointerException("Shared storage not available wtf");
+            }
+            if (!rootDir.exists()) {
+                rootDir.mkdirs();
+            }
         }
-        if (!rootDir.exists()) {
-            rootDir.mkdirs();
-        }
+        return rootDir;
+    }
+    
+    public static boolean isVerticalOrientation(Context context) {
+        return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
     
     public static ArrayList<TodoListEntry> loadTodoEntries(Context context, long day_start, long day_end, ArrayList<Group> groups) {

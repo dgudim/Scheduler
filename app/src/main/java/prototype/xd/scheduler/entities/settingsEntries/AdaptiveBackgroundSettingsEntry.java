@@ -4,7 +4,7 @@ import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
-import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
 
 import android.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -47,8 +47,8 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry {
                             R.string.cancel, R.string.delete,
                             (view2) -> {
                                 for (String availableDay : availableDays) {
-                                    new File(rootDir, availableDay + ".png").delete();
-                                    new File(rootDir, availableDay + ".png_min.png").delete();
+                                    new File(getRootDir(view1.getContext()), availableDay + ".png").delete();
+                                    new File(getRootDir(view1.getContext()), availableDay + ".png_min.png").delete();
                                 }
                                 gridViewAdapter.notifyDataSetChanged();
                             }));

@@ -3,7 +3,9 @@ package prototype.xd.scheduler.utilities;
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTime;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
-import static prototype.xd.scheduler.utilities.Utilities.rootDir;
+import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
+
+import android.content.Context;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,9 +19,15 @@ public class Logger {
     
     public enum ContentType {INFO, WARNING, ERROR}
     
-    private static final File logFile = new File(rootDir, "log.txt");
+    private static File logFile;
     
     private static final int MAX_SIZE = 30_000;
+    
+    public static void initLogger(Context context) {
+        if (logFile == null) {
+            logFile = new File(getRootDir(context), "log.txt");
+        }
+    }
     
     public static void log(ContentType contentType, String message) {
         PrintStream stream = System.out;

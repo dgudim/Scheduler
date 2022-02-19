@@ -17,8 +17,8 @@ import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
-import static prototype.xd.scheduler.utilities.Utilities.rootDir;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import android.annotation.SuppressLint;
@@ -45,8 +45,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class LockScreenBitmapDrawer {
     
@@ -67,7 +67,7 @@ public class LockScreenBitmapDrawer {
     public float fontSize_h = 0;
     private float fontSize_kM = 0;
     
-    public LockScreenBitmapDrawer(Context context) {
+    public LockScreenBitmapDrawer(Context context) throws IllegalStateException {
         wallpaperManager = WallpaperManager.getInstance(context);
         preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         
@@ -117,7 +117,7 @@ public class LockScreenBitmapDrawer {
                     log(INFO, "setting wallpaper");
                     
                     Bitmap bitmap = getBitmapFromLockScreen();
-                    File bg = getBackgroundAccordingToDayAndTime();
+                    File bg = getBackgroundAccordingToDayAndTime(backgroundSetterService);
                     
                     if (noFingerPrint(bitmap)) {
                         bitmap = fingerPrintAndSaveBitmap(bitmap, bg, displayMetrics);
@@ -126,7 +126,7 @@ public class LockScreenBitmapDrawer {
                             bitmap.recycle();
                             bitmap = readStream(new FileInputStream(bg));
                         } else {
-                            File defFile = new File(rootDir, defaultBackgroundName);
+                            File defFile = new File(getRootDir(backgroundSetterService), defaultBackgroundName);
                             if (defFile.exists()) {
                                 bitmap.recycle();
                                 bitmap = readStream(new FileInputStream(defFile));
