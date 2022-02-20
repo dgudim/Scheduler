@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         
         File rootDir = getExternalFilesDir("");
         if (rootDir == null) {
-            System.out.println("Shared storage not available wtf");
+            Log.e("MainActivity", "Shared storage not available wtf");
             System.exit(0);
         } else if (preferences.getString(ROOT_DIR, null) == null) {
             log(INFO, "Main Activity", "root dir: " + rootDir);

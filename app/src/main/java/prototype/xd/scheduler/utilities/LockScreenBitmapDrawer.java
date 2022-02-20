@@ -11,6 +11,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.DateManager.getBackgroundAccordingToDayAndTime;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_SCALED_DENSITY;
@@ -127,7 +128,7 @@ public class LockScreenBitmapDrawer {
             new Thread(() -> {
                 try {
                     
-                    float time = System.nanoTime();
+                    long time = getCurrentTimestamp();
                     log(INFO, "BitmapDrawer", "setting wallpaper");
                     
                     Bitmap bitmap = getBitmapFromLockScreen();
@@ -152,7 +153,7 @@ public class LockScreenBitmapDrawer {
                     
                     drawStringsOnBitmap(backgroundSetterService, bitmap);
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    log(INFO, "BitmapDrawer", "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
+                    log(INFO, "BitmapDrawer", "set wallpaper in " + (getCurrentTimestamp() - time) / 1000f + "s");
                     
                     bitmap.recycle();
                 } catch (Exception e) {
