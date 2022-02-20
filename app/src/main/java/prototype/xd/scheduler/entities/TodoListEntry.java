@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.entities;
 
+import static android.util.Log.INFO;
+import static android.util.Log.WARN;
 import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
@@ -25,8 +27,6 @@ import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 
@@ -124,7 +124,7 @@ public class TodoListEntry {
         if (!groupName.isEmpty()) {
             group = new Group(context, groupName, groups);
             if (group.isNullGroup()) {
-                log(WARNING, "Unknown group: " + groupName);
+                log(WARN, "TodoListEntry", "Unknown group: " + groupName);
                 group = null;
             }
         }
@@ -461,7 +461,7 @@ public class TodoListEntry {
         rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1, lockScreenBitmapDrawer.displayWidth / 2f - borderThickness);
         maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - borderThickness) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         
-        log(INFO, "loaded display data for " + textValue);
+        log(INFO, "TodoListEntry", "loaded display data for " + textValue);
     }
     
     private int getAdaptiveColor(int color) {
@@ -600,7 +600,7 @@ public class TodoListEntry {
                     adaptiveColorBalance = Integer.parseInt(params[i + 1]);
                     break;
                 default:
-                    log(WARNING, "unknown parameter: " + params[i] + " entry textValue: " + textValue);
+                    log(WARN, "TodoListEntry", "unknown parameter: " + params[i] + " entry textValue: " + textValue);
                     break;
             }
         }

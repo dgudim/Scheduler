@@ -97,7 +97,7 @@ public class SystemCalendarEvent {
                 
                 end = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, start);
             } catch (InvalidRecurrenceRuleException e) {
-                logException(e);
+                logException("SystemCalendarEvent", e);
             }
         }
         

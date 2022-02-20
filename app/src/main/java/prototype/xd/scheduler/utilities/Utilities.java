@@ -1,5 +1,8 @@
 package prototype.xd.scheduler.utilities;
 
+import static android.util.Log.ERROR;
+import static android.util.Log.INFO;
+import static android.util.Log.WARN;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
@@ -7,11 +10,9 @@ import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
@@ -48,22 +49,15 @@ import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-@SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class Utilities {
     
-    private static File rootDir;
+    public static String getRootDir() {
+        return preferences.getString(ROOT_DIR, "");
+    }
     
-    public static File getRootDir(Context context) {
-        if (rootDir == null) {
-            rootDir = context.getExternalFilesDir("");
-            if (rootDir == null) {
-                throw new NullPointerException("Shared storage not available wtf");
-            }
-            if (!rootDir.exists()) {
-                rootDir.mkdirs();
-            }
-        }
-        return rootDir;
+    public static File getFile(String filename) {
+        return new File(getRootDir(), filename);
     }
     
     public static boolean isVerticalOrientation(Context context) {
@@ -78,17 +72,17 @@ public class Utilities {
             ArrayList<String> entryGroupNames = loadObject("list_groupData");
             
             if (!(entryParams.size() == entryGroupNames.size())) {
-                log(WARNING, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
+                log(WARN, "Utilities", "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
             }
             
             for (int i = 0; i < entryParams.size(); i++) {
                 readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups));
             }
             
-            log(INFO, "read todo list: " + readEntries.size());
+            log(INFO, "Utilities", "read todo list: " + readEntries.size());
         } catch (Exception e) {
-            log(INFO, "no todo list");
-            logException(e);
+            log(INFO, "Utilities", "no todo list");
+            logException("Utilities", e);
         }
         
         readEntries.addAll(getTodoListEntriesFromCalendars(context, day_start, day_end));
@@ -110,25 +104,21 @@ public class Utilities {
             
             saveObject("list", entryParams);
             saveObject("list_groupData", entryGroupNames);
-            log(INFO, "saved todo list");
+            log(INFO, "Utilities", "saved todo list");
         } catch (Exception e) {
-            log(ERROR, "missing permission, failed to save todo list");
+            log(ERROR, "Utilities", "missing permission, failed to save todo list");
         }
     }
     
     public static <T> T loadObject(String fileName) throws IOException, ClassNotFoundException {
-        File file = new File(rootDir, fileName);
-        FileInputStream f = new FileInputStream(file);
-        ObjectInputStream s = new ObjectInputStream(f);
+        ObjectInputStream s = new ObjectInputStream(new FileInputStream(getFile(fileName)));
         Object object = s.readObject();
         s.close();
         return (T) object;
     }
     
     public static void saveObject(String fileName, Object object) throws IOException {
-        File file = new File(rootDir, fileName);
-        FileOutputStream f = new FileOutputStream(file);
-        ObjectOutputStream s = new ObjectOutputStream(f);
+        ObjectOutputStream s = new ObjectOutputStream(new FileOutputStream(getFile(fileName)));
         s.writeObject(object);
         s.close();
     }

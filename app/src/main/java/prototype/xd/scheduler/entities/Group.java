@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.entities;
 
-import static prototype.xd.scheduler.utilities.Logger.ContentType.ERROR;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.WARNING;
+import static android.util.Log.ERROR;
+import static android.util.Log.INFO;
+import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.loadObject;
@@ -88,7 +88,7 @@ public class Group {
             ArrayList<String> groupNames = loadObject("groupNames");
             
             if (!(groupParams.size() == groupNames.size())) {
-                log(WARNING, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
+                log(WARN, "Group", "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
             }
             
             for (int i = 0; i < groupParams.size(); i++) {
@@ -97,8 +97,8 @@ public class Group {
             
             return groups;
         } catch (Exception e) {
-            logException(e);
-            log(INFO, "no groups file, creating one");
+            logException("Group", e);
+            log(INFO, "Group", "no groups file, creating one");
             saveGroupsFile(groups);
             return groups;
         }
@@ -119,10 +119,10 @@ public class Group {
             saveObject("groups", groupParams);
             saveObject("groupNames", groupNames);
             
-            log(INFO, "saving groups file");
+            log(INFO, "Group", "saving groups file");
             
         } catch (Exception e) {
-            log(ERROR, "failed to save groups file: " + e.getMessage());
+            log(ERROR, "Group", "failed to save groups file: " + e.getMessage());
         }
     }
     

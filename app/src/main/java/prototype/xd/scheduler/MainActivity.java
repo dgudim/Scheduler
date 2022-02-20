@@ -1,11 +1,13 @@
 package prototype.xd.scheduler;
 
+import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
-import static prototype.xd.scheduler.utilities.Logger.initLogger;
+import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
+import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
 
@@ -19,10 +21,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -61,7 +60,19 @@ public class MainActivity extends AppCompatActivity {
         
         preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         preferences_service = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
-        initLogger(this);
+        
+        File rootDir = getExternalFilesDir("");
+        if (rootDir == null) {
+            System.out.println("Shared storage not available wtf");
+            System.exit(0);
+        } else if (preferences.getString(ROOT_DIR, null) == null) {
+            log(INFO, "Main Activity", "root dir: " + rootDir);
+            if (!rootDir.exists()) {
+                log(INFO, "Main Activity", "created folder structure: " + rootDir.mkdirs());
+            }
+            preferences.edit().putString(ROOT_DIR, rootDir.getAbsolutePath()).apply();
+        }
+        
        /* try {
             Class.forName("dalvik.system.CloseGuard")
                     .getMethod("setEnabled", boolean.class)
@@ -170,23 +181,16 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         Bitmap originalBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
                         
-                        WindowManager wm = (WindowManager) MainActivity.this.getSystemService(Context.WINDOW_SERVICE);
-                        Display display = wm.getDefaultDisplay();
-                        
-                        DisplayMetrics displayMetrics = new DisplayMetrics();
-                        display.getRealMetrics(displayMetrics);
-                        
                         Bitmap fingerprintedBitmap = fingerPrintAndSaveBitmap(
                                 originalBitmap.copy(Bitmap.Config.ARGB_8888, true),
-                                new File(getRootDir(MainActivity.this), availableDays[requestCode] + ".png"),
-                                displayMetrics);
+                                new File(getRootDir(), availableDays[requestCode] + ".png"));
                         
                         originalBitmap.recycle();
                         fingerprintedBitmap.recycle();
                         runOnUiThread(() -> ((SettingsFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
                                 .getChildFragmentManager().getFragments().get(0)).notifyBgSelected());
                     } catch (Exception e) {
-                        logException(e);
+                        logException("LBCP thread", e);
                     }
                 }, "LBCP thread").start();
             }

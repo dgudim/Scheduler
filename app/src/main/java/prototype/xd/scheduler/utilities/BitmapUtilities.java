@@ -1,6 +1,9 @@
 package prototype.xd.scheduler.utilities;
 
 import static java.lang.Math.max;
+import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
+import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,7 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.DisplayMetrics;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,8 +21,11 @@ import java.util.Arrays;
 public class BitmapUtilities {
     
     
-    public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output, DisplayMetrics displayMetrics) throws IOException {
-        Bitmap cut_bitmap = createScaledBitmap(bitmap, displayMetrics.widthPixels, displayMetrics.heightPixels, ScalingLogic.CROP);
+    public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output) throws IOException {
+        Bitmap cut_bitmap = createScaledBitmap(bitmap,
+                preferences.getInt(DISPLAY_METRICS_WIDTH, 100),
+                preferences.getInt(DISPLAY_METRICS_HEIGHT, 100),
+                ScalingLogic.CROP);
         fingerPrintBitmap(cut_bitmap);
         
         FileOutputStream outputStream = new FileOutputStream(output);
@@ -81,36 +86,6 @@ public class BitmapUtilities {
      */
     public enum ScalingLogic {
         CROP, FIT
-    }
-    
-    /**
-     * Calculate optimal down-sampling factor given the dimensions of a source
-     * image, the dimensions of a destination area and a scaling logic.
-     *
-     * @param srcWidth     Width of source image
-     * @param srcHeight    Height of source image
-     * @param dstWidth     Width of destination area
-     * @param dstHeight    Height of destination area
-     * @param scalingLogic Logic to use to avoid image stretching
-     * @return Optimal down scaling sample size for decoding
-     */
-    public static int calculateSampleSize(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-                                          ScalingLogic scalingLogic) {
-        final float srcAspect = (float) srcWidth / (float) srcHeight;
-        final float dstAspect = (float) dstWidth / (float) dstHeight;
-        if (scalingLogic == ScalingLogic.FIT) {
-            if (srcAspect > dstAspect) {
-                return srcWidth / dstWidth;
-            } else {
-                return srcHeight / dstHeight;
-            }
-        } else {
-            if (srcAspect > dstAspect) {
-                return srcHeight / dstHeight;
-            } else {
-                return srcWidth / dstWidth;
-            }
-        }
     }
     
     /**
@@ -213,7 +188,7 @@ public class BitmapUtilities {
             }
         }
         
-        if(actualPixelCount == 0){
+        if (actualPixelCount == 0) {
             return Color.BLACK;
         }
         

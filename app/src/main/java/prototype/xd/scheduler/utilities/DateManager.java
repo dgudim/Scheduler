@@ -3,9 +3,7 @@ package prototype.xd.scheduler.utilities;
 import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
-import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
-
-import android.content.Context;
+import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -63,10 +61,10 @@ public class DateManager {
         }
     }
     
-    static File getBackgroundAccordingToDayAndTime(Context context) {
+    static File getBackgroundAccordingToDayAndTime() {
         
         if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED)) {
-            return new File(getRootDir(context), defaultBackgroundName);
+            return getFile(defaultBackgroundName);
         }
         
         final Calendar cal = Calendar.getInstance();
@@ -78,11 +76,11 @@ public class DateManager {
             day_string = availableDays[day - 2];
         }
         
-        return new File(getRootDir(context), day_string + ".png");
+        return getFile(day_string + ".png");
     }
     
     public static long daysFromEpoch(long epoch, TimeZone timezone) {
-        return TimeUnit.DAYS.convert(addTimeZoneOffset(epoch, timezone) , TimeUnit.MILLISECONDS);
+        return TimeUnit.DAYS.convert(addTimeZoneOffset(epoch, timezone), TimeUnit.MILLISECONDS);
     }
     
     public static long dateToEpoch(int year, int month, int day) {

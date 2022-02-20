@@ -102,4 +102,10 @@ public class Keys {
     public static final String SERVICE_KILLED_IGNORE_BUTTON_CLICKED = "service_killed_ignore_count";
     public static final String SERVICE_UPDATE_SIGNAL = "update";
     public static final String SERVICE_KEEP_ALIVE_SIGNAL = "keep_alive";
+    
+    public static final String DISPLAY_METRICS_HEIGHT = "metrics_H";
+    public static final String DISPLAY_METRICS_WIDTH = "metrics_W";
+    public static final String DISPLAY_METRICS_SCALED_DENSITY = "metrics_SD";
+    
+    public static final String ROOT_DIR = "root_directory";
 }

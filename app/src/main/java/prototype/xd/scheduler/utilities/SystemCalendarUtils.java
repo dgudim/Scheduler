@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
+import static android.util.Log.INFO;
 import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
@@ -62,7 +62,7 @@ public class SystemCalendarUtils {
         for (int i = 0; i < calendars.size(); i++) {
             todoListEntries.addAll(calendars.get(i).getVisibleTodoListEntries(day_start, day_end));
         }
-        log(INFO, "read calendar entries: " + todoListEntries.size());
+        log(INFO, "CalendarUtils", "read calendar entries: " + todoListEntries.size());
         return todoListEntries;
     }
     

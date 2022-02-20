@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
+import static android.util.Log.INFO;
+import static android.util.Log.WARN;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
@@ -10,14 +12,17 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.defaultBackgroundName;
 import static prototype.xd.scheduler.utilities.DateManager.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
+import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
+import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_SCALED_DENSITY;
+import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.Logger.ContentType.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
+import static prototype.xd.scheduler.utilities.Utilities.getFile;
+import static prototype.xd.scheduler.utilities.Utilities.isVerticalOrientation;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
@@ -34,8 +39,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.WindowManager;
 
 import java.io.File;
@@ -54,7 +57,7 @@ public class LockScreenBitmapDrawer {
     
     public final int displayWidth;
     public final int displayHeight;
-    private final DisplayMetrics displayMetrics;
+    private float scaledDensity;
     private final Point displayCenter;
     
     private volatile boolean busy = false;
@@ -71,16 +74,24 @@ public class LockScreenBitmapDrawer {
         wallpaperManager = WallpaperManager.getInstance(context);
         preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
-        
-        displayMetrics = new DisplayMetrics();
-        display.getRealMetrics(displayMetrics);
+        if ((scaledDensity = preferences.getFloat(DISPLAY_METRICS_SCALED_DENSITY, -1)) == -1) {
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(displayMetrics);
+            
+            preferences.edit()
+                    .putInt(DISPLAY_METRICS_WIDTH, displayMetrics.widthPixels)
+                    .putInt(DISPLAY_METRICS_HEIGHT, displayMetrics.heightPixels)
+                    .putFloat(DISPLAY_METRICS_SCALED_DENSITY, displayMetrics.density).apply();
+            scaledDensity = displayMetrics.density;
+            
+            log(INFO, "BitmapDrawer", "got display metrics: " + displayMetrics);
+        }
         
         previous_hash = 0;
         
-        displayWidth = displayMetrics.widthPixels;
-        displayHeight = displayMetrics.heightPixels;
+        displayWidth = preferences.getInt(DISPLAY_METRICS_WIDTH, 100);
+        displayHeight = preferences.getInt(DISPLAY_METRICS_HEIGHT, 100);
+        
         displayCenter = new Point(displayWidth / 2, displayHeight / 2);
     }
     
@@ -103,9 +114,12 @@ public class LockScreenBitmapDrawer {
     
     public boolean constructBitmap(BackgroundSetterService backgroundSetterService) {
         
-        fontSize_h = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
-                preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE),
-                displayMetrics);
+        if (!isVerticalOrientation(backgroundSetterService)) {
+            log(WARN, "BitmapDrawer", "not starting bitmap thread, orientation not vertical");
+            return false;
+        }
+        
+        fontSize_h = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE) * scaledDensity;
         fontSize_kM = fontSize_h * 1.1f;
         
         if (!busy) {
@@ -114,19 +128,19 @@ public class LockScreenBitmapDrawer {
                 try {
                     
                     float time = System.nanoTime();
-                    log(INFO, "setting wallpaper");
+                    log(INFO, "BitmapDrawer", "setting wallpaper");
                     
                     Bitmap bitmap = getBitmapFromLockScreen();
-                    File bg = getBackgroundAccordingToDayAndTime(backgroundSetterService);
+                    File bg = getBackgroundAccordingToDayAndTime();
                     
                     if (noFingerPrint(bitmap)) {
-                        bitmap = fingerPrintAndSaveBitmap(bitmap, bg, displayMetrics);
+                        bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
                     } else {
                         if (bg.exists()) {
                             bitmap.recycle();
                             bitmap = readStream(new FileInputStream(bg));
                         } else {
-                            File defFile = new File(getRootDir(backgroundSetterService), defaultBackgroundName);
+                            File defFile = getFile(defaultBackgroundName);
                             if (defFile.exists()) {
                                 bitmap.recycle();
                                 bitmap = readStream(new FileInputStream(defFile));
@@ -138,13 +152,11 @@ public class LockScreenBitmapDrawer {
                     
                     drawStringsOnBitmap(backgroundSetterService, bitmap);
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    log(INFO, "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
+                    log(INFO, "BitmapDrawer", "set wallpaper in " + (System.nanoTime() - time) / 1000000000f + "s");
                     
                     bitmap.recycle();
-                } catch (InterruptedException e) {
-                    log(INFO, e.getMessage());
                 } catch (Exception e) {
-                    logException(e);
+                    logException("BitmapDrawer", e);
                 }
                 busy = false;
             }, "Bitmap thread").start();
