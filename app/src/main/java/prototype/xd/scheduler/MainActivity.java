@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
@@ -180,14 +179,9 @@ public class MainActivity extends AppCompatActivity {
             if (uri != null) {
                 new Thread(() -> {
                     try {
-                        Bitmap originalBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
-                        
-                        Bitmap fingerprintedBitmap = fingerPrintAndSaveBitmap(
-                                originalBitmap.copy(Bitmap.Config.ARGB_8888, true),
+                        fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(getContentResolver().openInputStream(uri)),
                                 new File(getRootDir(), availableDays[requestCode] + ".png"));
                         
-                        originalBitmap.recycle();
-                        fingerprintedBitmap.recycle();
                         runOnUiThread(() -> ((SettingsFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
                                 .getChildFragmentManager().getFragments().get(0)).notifyBgSelected());
                     } catch (Exception e) {

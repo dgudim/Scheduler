@@ -26,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -239,9 +238,7 @@ public class EntrySettings extends PopupSettingsView {
         Group createdGroup = new Group(groupName, todoListEntry.getDisplayParams());
         if (groupIndex >= 0) {
             groupList.set(groupIndex, createdGroup);
-            
             forEachWithGroupMatch(groupName, entry -> entry.changeGroup(createdGroup));
-            
         } else {
             groupIndex = groupList.size();
             groupList.add(createdGroup);

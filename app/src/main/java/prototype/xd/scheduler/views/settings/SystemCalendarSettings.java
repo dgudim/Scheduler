@@ -137,10 +137,9 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        hide_expired_items_by_time_switch.setClickable(seekBar.getProgress() == 0);
                         hide_expired_items_by_time_switch.setTextColor(seekBar.getProgress() == 0 ?
                                 hide_expired_items_by_time_switch_def_colors :
-                                ColorStateList.valueOf(seekBar.getContext().getColor(R.color.entry_settings_parameter_default)));
+                                ColorStateList.valueOf(seekBar.getContext().getColor(R.color.entry_settings_parameter_group_and_personal)));
                     }
             
                     @Override

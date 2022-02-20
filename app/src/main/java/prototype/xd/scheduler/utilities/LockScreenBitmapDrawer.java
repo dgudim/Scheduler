@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.makeMutable;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
@@ -103,7 +104,7 @@ public class LockScreenBitmapDrawer {
             wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM);
         }
         if (wallpaperFile != null) {
-            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(wallpaperFile.getFileDescriptor()).copy(Bitmap.Config.ARGB_8888, true);
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(wallpaperFile.getFileDescriptor());
             wallpaperFile.close();
             return bitmap;
         } else {
@@ -138,24 +139,24 @@ public class LockScreenBitmapDrawer {
                         bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
                     } else {
                         if (bg.exists()) {
-                            bitmap.recycle();
                             bitmap = readStream(new FileInputStream(bg));
                         } else {
                             File defFile = getFile(defaultBackgroundName);
                             if (defFile.exists()) {
-                                bitmap.recycle();
                                 bitmap = readStream(new FileInputStream(defFile));
                             } else {
                                 throw new FileNotFoundException("No available background to load");
                             }
                         }
                     }
-                    
+    
+                    bitmap = makeMutable(bitmap);
                     drawStringsOnBitmap(backgroundSetterService, bitmap);
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
                     log(INFO, "BitmapDrawer", "set wallpaper in " + (getCurrentTimestamp() - time) / 1000f + "s");
                     
-                    bitmap.recycle();
+                } catch (InterruptedException e) {
+                    log(INFO, "BitmapDrawer", e.getMessage());
                 } catch (Exception e) {
                     logException("BitmapDrawer", e);
                 }
@@ -233,7 +234,6 @@ public class LockScreenBitmapDrawer {
                     canvas1.drawBitmap(src, destRect, destRect, null);
                     
                     toAddSplit.get(i).adaptiveColor = getAverageColor(cutBitmap);
-                    cutBitmap.recycle();
                 }
             }
             

@@ -22,6 +22,7 @@ public class BitmapUtilities {
     
     
     public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output) throws IOException {
+        bitmap = makeMutable(bitmap);
         Bitmap cut_bitmap = createScaledBitmap(bitmap,
                 preferences.getInt(DISPLAY_METRICS_WIDTH, 100),
                 preferences.getInt(DISPLAY_METRICS_HEIGHT, 100),
@@ -38,17 +39,19 @@ public class BitmapUtilities {
         resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStream_min);
         outputStream_min.close();
         
-        resizedBitmap.recycle();
-        bitmap.recycle();
         return cut_bitmap;
     }
     
     public static Bitmap readStream(FileInputStream inputStream) throws IOException {
-        Bitmap orig = BitmapFactory.decodeStream(inputStream);
-        Bitmap copy = orig.copy(Bitmap.Config.ARGB_8888, true);
-        orig.recycle();
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
         inputStream.close();
-        return copy;
+        return bitmap;
+    }
+    
+    public static Bitmap makeMutable(Bitmap bitmap) {
+        if (!bitmap.isMutable())
+            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true); // make bitmap mutable if not already
+        return bitmap;
     }
     
     /**
