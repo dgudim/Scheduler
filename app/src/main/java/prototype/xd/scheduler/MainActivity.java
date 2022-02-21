@@ -8,7 +8,6 @@ import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
-import static prototype.xd.scheduler.utilities.Logger.initLogger;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
@@ -69,13 +68,12 @@ public class MainActivity extends AppCompatActivity {
             Log.e("MainActivity", "Shared storage not available wtf");
             System.exit(0);
         } else if (preferences.getString(ROOT_DIR, null) == null) {
+            preferences.edit().putString(ROOT_DIR, rootDir.getAbsolutePath()).apply();
             log(INFO, "Main Activity", "root dir: " + rootDir);
             if (!rootDir.exists()) {
                 log(INFO, "Main Activity", "created folder structure: " + rootDir.mkdirs());
             }
-            preferences.edit().putString(ROOT_DIR, rootDir.getAbsolutePath()).apply();
         }
-        initLogger(); // ensure root dir initialized
         
        /* try {
             Class.forName("dalvik.system.CloseGuard")

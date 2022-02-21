@@ -23,12 +23,15 @@ public class Logger {
     private static File logFile;
     private static File logFile_old;
     
-    public static void initLogger() {
-        logFile = new File(preferences.getString(ROOT_DIR, ""), "log.txt");
-        logFile_old = new File(preferences.getString(ROOT_DIR, ""), "log.old.txt");
+    private static void checkDirs() {
+        if (logFile == null) {
+            logFile = new File(preferences.getString(ROOT_DIR, ""), "log.txt");
+            logFile_old = new File(preferences.getString(ROOT_DIR, ""), "log.old.txt");
+        }
     }
     
     public static void log(int priority, String tag, String message) {
+        checkDirs();
         Log.println(priority, tag, message);
         try {
             logFile.createNewFile();
