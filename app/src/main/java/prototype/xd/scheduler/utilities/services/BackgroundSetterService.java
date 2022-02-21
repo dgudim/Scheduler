@@ -195,14 +195,13 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public void onDestroy() {
-        log(INFO, "Bg_setter_service", "service destroyed");
-        scheduleRestartJob();
         if (screenOnOffReceiver != null) {
             unregisterReceiver(screenOnOffReceiver);
         }
         if (pingReceiver != null) {
             unregisterReceiver(pingReceiver);
         }
+        // unregister receivers
         lockScreenBitmapDrawer = null;
     }
 }
