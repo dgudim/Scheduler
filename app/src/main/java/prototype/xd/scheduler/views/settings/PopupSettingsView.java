@@ -4,6 +4,7 @@ import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 
+import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -66,6 +67,8 @@ public class PopupSettingsView {
     
     protected final View settings_reset_button;
     
+    protected AlertDialog dialog;
+    
     PopupSettingsView(View settingsView) {
         
         fontColor_select = settingsView.findViewById(R.id.fontColor);
@@ -113,6 +116,8 @@ public class PopupSettingsView {
         hide_expired_items_by_time_container = settingsView.findViewById(R.id.hide_expired_items_by_time_container);
         
         settings_reset_button = settingsView.findViewById(R.id.settings_reset_button);
+    
+        settingsView.findViewById(R.id.close_settings_button).setOnClickListener(v -> dialog.dismiss());
     }
     
     protected void setStateIconColor(TextView icon, String parameter) {}

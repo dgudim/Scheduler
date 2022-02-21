@@ -111,4 +111,5 @@
     <string name="input_cant_be_empty">ввод не может быть пустым</string>
     <string name="overwrite">перезаписать</string>
     <string name="reset">сбросить</string>
+    <string name="close">закрыть</string>
 </resources>

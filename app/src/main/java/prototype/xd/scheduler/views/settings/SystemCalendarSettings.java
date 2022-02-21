@@ -29,7 +29,6 @@ import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
-    private final AlertDialog dialog;
     private ArrayList<String> calendarSubKeys;
     private TodoListEntry entry;
     private final TodoListEntryStorage todoListEntryStorage;

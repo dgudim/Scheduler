@@ -1,5 +1,6 @@
 package prototype.xd.scheduler;
 
+import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
@@ -7,6 +8,7 @@ import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
+import static prototype.xd.scheduler.utilities.Logger.initLogger;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
@@ -31,6 +33,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
             preferences.edit().putString(ROOT_DIR, rootDir.getAbsolutePath()).apply();
         }
+        initLogger(); // ensure root dir initialized
         
        /* try {
             Class.forName("dalvik.system.CloseGuard")
@@ -179,8 +183,16 @@ public class MainActivity extends AppCompatActivity {
             if (uri != null) {
                 new Thread(() -> {
                     try {
-                        fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(getContentResolver().openInputStream(uri)),
-                                new File(getRootDir(), availableDays[requestCode] + ".png"));
+                        
+                        InputStream stream = getContentResolver().openInputStream(uri);
+                        if (stream != null) {
+                            fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
+                                    new File(getRootDir(), availableDays[requestCode] + ".png"));
+                            stream.close();
+                        } else {
+                            log(ERROR, "MainActivity", "stream null for uri: " + uri.getPath());
+                        }
+                        
                         
                         runOnUiThread(() -> ((SettingsFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
                                 .getChildFragmentManager().getFragments().get(0)).notifyBgSelected());

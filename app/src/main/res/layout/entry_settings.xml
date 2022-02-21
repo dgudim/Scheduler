@@ -618,12 +618,27 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/settings_reset_button"
-            style="@style/defaultButtonStyle"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_reset_to_defaults" />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/settings_reset_button"
+                style="@style/defaultButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/settings_reset_to_defaults" />
+
+            <Button
+                android:id="@+id/close_settings_button"
+                style="@style/defaultButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/close" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

@@ -40,7 +40,6 @@ import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
 public class EntrySettings extends PopupSettingsView {
     
-    private final AlertDialog dialog;
     public final TodoListEntryStorage todoListEntryStorage;
     private TodoListEntry todoListEntry;
     

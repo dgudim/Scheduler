@@ -111,4 +111,5 @@
     <string name="edit_event">Edit event</string>
     <string name="overwrite">overwrite</string>
     <string name="reset">reset</string>
+    <string name="close">close</string>
 </resources>

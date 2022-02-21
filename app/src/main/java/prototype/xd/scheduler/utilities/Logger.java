@@ -20,8 +20,13 @@ import java.io.IOException;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class Logger {
     
-    private static final File logFile = new File(preferences.getString(ROOT_DIR, ""), "log.txt");
-    private static final File logFile_old = new File(preferences.getString(ROOT_DIR, ""), "log.old.txt");
+    private static File logFile;
+    private static File logFile_old;
+    
+    public static void initLogger() {
+        logFile = new File(preferences.getString(ROOT_DIR, ""), "log.txt");
+        logFile_old = new File(preferences.getString(ROOT_DIR, ""), "log.old.txt");
+    }
     
     public static void log(int priority, String tag, String message) {
         Log.println(priority, tag, message);

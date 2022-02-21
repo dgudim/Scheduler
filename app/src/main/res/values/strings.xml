@@ -73,6 +73,7 @@
     <string name="category_system_calendars">System calendar integration</string>
     <string name="category_appearance">Appearance</string>
     <string name="cancel">Cancel</string>
+    <string name="close">close</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="apply">Apply</string>
     <string name="add_to_global_list">Add to global list</string>
