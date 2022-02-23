@@ -207,7 +207,7 @@ public class TodoListEntry {
             while (it.hasNext() && instance <= timestamp) {
                 instance = it.next();
                 if (inRange(day, daysFromEpoch(instance, event.timeZone))) {
-                    return instance + timestamp_duration >= timestamp;
+                    return instance + timestamp_duration >= timestamp && daysFromEpoch(instance, event.timeZone) < currentDay;
                 }
             }
             return false;
@@ -406,12 +406,24 @@ public class TodoListEntry {
             borderColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
             borderThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
             
-            if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
-                showOnLock = isVisible_exact(currentTimestamp);
-            } else {
-                showOnLock = isVisible(currentDay);
+            boolean hideByContent = false;
+            if (preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.HIDE_ENTRIES_BY_CONTENT), Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT)) {
+                String matchString = preferences.getString(getFirstValidKey(calendarSubKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), "");
+                String[] split = matchString != null ? matchString.split("\\|\\|") : new String[0];
+                for (String str : split) {
+                    hideByContent = textValue.contains(str);
+                    if (hideByContent) break;
+                }
             }
-            showOnLock = showOnLock && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+            
+            if (!hideByContent) {
+                if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
+                    showOnLock = isVisible_exact(currentTimestamp);
+                } else {
+                    showOnLock = isVisible(currentDay);
+                }
+                showOnLock = showOnLock && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+            }
             
             adaptiveColor = 0xff_FFFFFF;
             setParams(params);

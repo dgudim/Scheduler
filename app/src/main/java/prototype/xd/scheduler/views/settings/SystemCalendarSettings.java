@@ -1,7 +1,9 @@
 package prototype.xd.scheduler.views.settings;
 
 import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
@@ -13,6 +15,8 @@ import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -140,15 +144,15 @@ public class SystemCalendarSettings extends PopupSettingsView {
                                 hide_expired_items_by_time_switch_def_colors :
                                 ColorStateList.valueOf(seekBar.getContext().getColor(R.color.entry_settings_parameter_group_and_personal)));
                     }
-            
+                    
                     @Override
                     public void onStartTrackingTouch(SeekBar seekBar) {
-                
+                    
                     }
-            
+                    
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                
+                    
                     }
                 });
         
@@ -169,6 +173,32 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 adaptiveColor_switch_state, this,
                 calendarKey, calendarSubKeys,
                 Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
+        
+        addSwitchChangeListener(
+                hide_by_content_switch,
+                hide_by_content_switch_state, this,
+                calendarKey, calendarSubKeys,
+                Keys.HIDE_ENTRIES_BY_CONTENT, Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT);
+    
+        hide_by_content_field.setText(preferences.getString(getFirstValidKey(calendarSubKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), ""));
+        hide_by_content_field.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        
+            }
+    
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                preferences.edit().putString(calendarKey + "_" + Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT, s.toString()).apply();
+                setStateIconColor(hide_by_content_field_state, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT);
+                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            }
+    
+            @Override
+            public void afterTextChanged(Editable s) {
+        
+            }
+        });
     }
     
     @Override

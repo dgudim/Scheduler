@@ -46,6 +46,7 @@ public class EntrySettings extends PopupSettingsView {
     public EntrySettings(final TodoListEntryStorage todoListEntryStorage, final View settingsView) {
         super(settingsView);
         hide_expired_items_by_time_container.setVisibility(View.GONE);
+        hide_by_content_container.setVisibility(View.GONE);
         this.todoListEntryStorage = todoListEntryStorage;
         
         dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {

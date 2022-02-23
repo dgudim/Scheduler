@@ -35,6 +35,8 @@ public class Keys {
     public static final int SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET = 0;
     public static final int SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET = 0;
     
+    public static final boolean SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT = false;
+    
     public static final float DEFAULT_COLOR_MIX_FACTOR = 0.85f;
     
     public static final int DAY_FLAG_GLOBAL = -1;
@@ -71,6 +73,9 @@ public class Keys {
     public static final String ADAPTIVE_BACKGROUND_ENABLED = "adaptive_background_enabled";
     public static final String ADAPTIVE_COLOR_ENABLED = "adaptive_color_enabled";
     public static final String ADAPTIVE_COLOR_BALANCE = "adaptive_color_balance";
+    
+    public static final String HIDE_ENTRIES_BY_CONTENT = "hide_entries_by_content";
+    public static final String HIDE_ENTRIES_BY_CONTENT_CONTENT = "hide_entries_by_content_content";
     
     public static final String UPCOMING_ITEMS_OFFSET = "dayOffset_upcoming";
     public static final String EXPIRED_ITEMS_OFFSET = "dayOffset_expired";

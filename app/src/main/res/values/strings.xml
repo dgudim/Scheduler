@@ -119,5 +119,8 @@
     <string name="edit_event">Edit event</string>
     <string name="overwrite">overwrite</string>
     <string name="reset">reset</string>
+    <string name="hide_by_content">Hide by content</string>
+    <string name="separate_multiple_statements_by">separate multiple statements by ||</string>
+    <string name="content">content</string>
 
 </resources>
