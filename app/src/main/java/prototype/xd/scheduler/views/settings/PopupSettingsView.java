@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.views.settings;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.app.AlertDialog;
 import android.content.res.ColorStateList;

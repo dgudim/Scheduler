@@ -3,7 +3,6 @@ package prototype.xd.scheduler.entities;
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
 import static org.apache.commons.lang.ArrayUtils.addAll;
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
@@ -28,6 +27,7 @@ import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 
 import android.content.Context;

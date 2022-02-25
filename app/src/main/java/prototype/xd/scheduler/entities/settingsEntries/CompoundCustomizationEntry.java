@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 

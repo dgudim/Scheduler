@@ -3,8 +3,6 @@ package prototype.xd.scheduler.utilities;
 import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
-import static prototype.xd.scheduler.MainActivity.preferences;
-import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
@@ -15,6 +13,8 @@ import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 

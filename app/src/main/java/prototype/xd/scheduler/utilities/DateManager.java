@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import java.io.File;

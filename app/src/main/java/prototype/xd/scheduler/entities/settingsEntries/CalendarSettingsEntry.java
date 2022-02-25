@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.CALENDAR;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 
 import android.app.AlertDialog;

@@ -1,6 +1,6 @@
 package prototype.xd.scheduler.entities.calendars;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;

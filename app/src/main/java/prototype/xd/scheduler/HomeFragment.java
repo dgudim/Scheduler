@@ -1,6 +1,5 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.utilities.DateManager.addTimeZoneOffset;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
@@ -15,6 +14,7 @@ import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

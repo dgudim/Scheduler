@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.utilities;
 
 import static android.util.Log.INFO;
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;

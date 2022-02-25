@@ -1,10 +1,10 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.*;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;

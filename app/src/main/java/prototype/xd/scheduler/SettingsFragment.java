@@ -1,7 +1,7 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.MainActivity.preferences_service;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 
 import android.os.Bundle;

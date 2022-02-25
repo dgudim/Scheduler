@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.utilities;
 
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

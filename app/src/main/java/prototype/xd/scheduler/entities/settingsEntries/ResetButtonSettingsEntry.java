@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.RESET_BUTTON;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.os.Bundle;
 import android.view.View;

@@ -1,10 +1,10 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.APP_THEME_SELECTOR;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_DARK;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_LIGHT;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_SYSTEM;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.content.Context;
 import android.view.View;

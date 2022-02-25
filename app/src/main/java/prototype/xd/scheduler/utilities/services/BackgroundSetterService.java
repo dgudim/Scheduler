@@ -10,6 +10,7 @@ import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -21,7 +22,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
@@ -31,10 +31,10 @@ import androidx.core.content.ContextCompat;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
+import prototype.xd.scheduler.utilities.PreferencesStore;
 
 public class BackgroundSetterService extends Service {
     
-    private SharedPreferences preferences_service;
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
     public static void ping(Context context) {
@@ -138,6 +138,7 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        PreferencesStore.init(this);
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
