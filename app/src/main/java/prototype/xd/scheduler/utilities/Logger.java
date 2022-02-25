@@ -6,9 +6,9 @@ import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static android.util.Log.VERBOSE;
 import static android.util.Log.WARN;
-import static prototype.xd.scheduler.MainActivity.preferences;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTime;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.util.Log;
 

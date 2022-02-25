@@ -5,17 +5,15 @@ import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.DateManager.availableDays;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
-import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
-import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
 import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -37,12 +35,10 @@ import java.util.Locale;
 import java.util.Objects;
 
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.PreferencesStore;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class MainActivity extends AppCompatActivity {
-    
-    public volatile static SharedPreferences preferences;
-    public volatile static SharedPreferences preferences_service;
     
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -59,9 +55,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        preferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        preferences_service = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
+    
+        PreferencesStore.init(this);
         
         File rootDir = getExternalFilesDir("");
         if (rootDir == null) {
