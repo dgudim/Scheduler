@@ -207,7 +207,7 @@ public class TodoListEntry {
             while (it.hasNext() && instance <= timestamp) {
                 instance = it.next();
                 if (inRange(day, daysFromEpoch(instance, event.timeZone))) {
-                    return instance + timestamp_duration >= timestamp && daysFromEpoch(instance, event.timeZone) < currentDay;
+                    return instance + timestamp_duration >= timestamp && (daysFromEpoch(instance, event.timeZone) <= currentDay || isUpcomingEntry);
                 }
             }
             return false;
