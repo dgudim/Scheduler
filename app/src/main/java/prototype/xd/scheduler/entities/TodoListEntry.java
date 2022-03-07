@@ -114,6 +114,7 @@ public class TodoListEntry {
     }
     
     public TodoListEntry(SystemCalendarEvent event) {
+        System.out.println("---------------------" + event.title + " === " + event.associatedCalendar.name + " === " + event.rSet + " === ");
         fromSystemCalendar = true;
         this.event = event;
         params = new String[]{};

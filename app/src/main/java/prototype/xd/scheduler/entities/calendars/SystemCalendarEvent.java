@@ -1,8 +1,10 @@
 package prototype.xd.scheduler.entities.calendars;
 
 import static android.provider.CalendarContract.Events;
+import static android.util.Log.ERROR;
+import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
-import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
+import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
@@ -17,7 +19,6 @@ import android.database.Cursor;
 
 import androidx.annotation.Nullable;
 
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.dmfs.rfc5545.recur.RecurrenceRule;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceList;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceRuleAdapter;
@@ -65,10 +66,9 @@ public class SystemCalendarEvent {
         end = getLong(cursor, calendarEventsColumns, Events.DTEND);
         allDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
         
-        timeZone = TimeZone.getTimeZone(getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE));
-        if (timeZone == null) {
-            timeZone = timeZone_SYSTEM;
-        }
+        String timeZoneId = getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE);
+        
+        timeZone = TimeZone.getTimeZone(timeZoneId == null ? associatedCalendar.timeZone.getID() : timeZoneId);
         
         duration = end - start;
         
@@ -81,18 +81,32 @@ public class SystemCalendarEvent {
                 rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
                 
                 if (rDate_str.length() > 0) {
-                    rSet.addInstances(new RecurrenceList(rDate_str, timeZone));
+                    try {
+                        DateTimeZonePair pair = checkRDates(rDate_str);
+                        rSet.addInstances(new RecurrenceList(pair.date, pair.timeZone));
+                    } catch (IllegalArgumentException e) {
+                        log(ERROR, "SystemCalendarEvent", "Error adding rDate: " + e.getMessage());
+                    }
                 }
                 
                 exRule_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.EXRULE));
                 exDate_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.EXDATE));
                 
                 if (exRule_str.length() > 0) {
-                    rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule_str)));
+                    try {
+                        rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule_str)));
+                    } catch (IllegalArgumentException e) {
+                        log(ERROR, "SystemCalendarEvent", "Error adding exRule: " + e.getMessage());
+                    }
                 }
                 
                 if (exDate_str.length() > 0) {
-                    rSet.addExceptions(new RecurrenceList(exDate_str, timeZone));
+                    try {
+                        DateTimeZonePair pair = checkRDates(exDate_str);
+                        rSet.addExceptions(new RecurrenceList(pair.date, pair.timeZone));
+                    } catch (IllegalArgumentException e) {
+                        log(ERROR, "SystemCalendarEvent", "Error adding exDate: " + e.getMessage());
+                    }
                 }
                 
                 String duration_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.DURATION));
@@ -102,7 +116,7 @@ public class SystemCalendarEvent {
                 }
                 
                 end = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, start);
-            } catch (InvalidRecurrenceRuleException e) {
+            } catch (Exception e) {
                 logException("SystemCalendarEvent", e);
             }
         }
@@ -114,6 +128,28 @@ public class SystemCalendarEvent {
         }
         
         subKeys = generateSubKeysFromKey(makeKey(this));
+    }
+    
+    private DateTimeZonePair checkRDates(String datesToParse){
+        TimeZone newTimeZone = timeZone;
+        if(datesToParse.contains(";")){
+            log(WARN, "SystemCalendarEvent", "Not standard dates for " + title + ", " + datesToParse + ", probably contains timezone, attempting to parse");
+            String[] split = datesToParse.split(";");
+            newTimeZone = TimeZone.getTimeZone(split[0]);
+            datesToParse = split[1];
+        }
+        return new DateTimeZonePair(datesToParse, newTimeZone);
+    }
+    
+    private static class DateTimeZonePair{
+    
+        String date;
+        TimeZone timeZone;
+        
+        DateTimeZonePair(String date, TimeZone timeZone){
+            this.date = date;
+            this.timeZone = timeZone;
+        }
     }
     
     private String nullWrapper(String str) {

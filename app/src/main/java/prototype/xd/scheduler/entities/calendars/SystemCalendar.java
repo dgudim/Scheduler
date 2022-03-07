@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.entities.calendars;
 
+import static android.provider.CalendarContract.Calendars;
+import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
@@ -11,7 +13,6 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
@@ -29,6 +31,8 @@ public class SystemCalendar {
     public final String account_name;
     
     public final String name;
+    
+    public TimeZone timeZone;
     
     public final long id;
     
@@ -41,19 +45,23 @@ public class SystemCalendar {
     public final ArrayList<Integer> eventCountsForColors;
     
     public SystemCalendar(Cursor cursor, ContentResolver contentResolver, boolean loadMinimal) {
-        account_type = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_TYPE);
-        account_name = getString(cursor, calendarColumns, CalendarContract.Calendars.ACCOUNT_NAME);
-        name = getString(cursor, calendarColumns, CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
-        id = getLong(cursor, calendarColumns, CalendarContract.Calendars._ID);
-        accessLevel = getInt(cursor, calendarColumns, CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL);
-        color = getInt(cursor, calendarColumns, CalendarContract.Calendars.CALENDAR_COLOR);
+        account_type = getString(cursor, calendarColumns, Calendars.ACCOUNT_TYPE);
+        account_name = getString(cursor, calendarColumns, Calendars.ACCOUNT_NAME);
+        name = getString(cursor, calendarColumns, Calendars.CALENDAR_DISPLAY_NAME);
+        id = getLong(cursor, calendarColumns, Calendars._ID);
+        accessLevel = getInt(cursor, calendarColumns, Calendars.CALENDAR_ACCESS_LEVEL);
+        color = getInt(cursor, calendarColumns, Calendars.CALENDAR_COLOR);
+        
+        String timeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
+        
+        timeZone = TimeZone.getTimeZone(timeZoneId == null ? timeZone_SYSTEM.getID() : timeZoneId);
         
         systemCalendarEvents = new ArrayList<>();
         availableEventColors = new ArrayList<>();
         eventCountsForColors = new ArrayList<>();
         
         loadCalendarEvents(contentResolver, loadMinimal);
-        if (accessLevel >= CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR) {
+        if (accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
             loadAvailableEventColors();
         }
     }
@@ -105,6 +113,10 @@ public class SystemCalendar {
             }
         }
         return todoListEntries;
+    }
+    
+    public void dropDuplicates(){
+    
     }
     
     @NonNull
