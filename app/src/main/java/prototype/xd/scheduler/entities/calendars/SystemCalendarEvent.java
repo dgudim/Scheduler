@@ -72,45 +72,33 @@ public class SystemCalendarEvent {
         
         duration = end - start;
         
-        rRule_str = getString(cursor, calendarEventsColumns, Events.RRULE);
-        rDate_str = getString(cursor, calendarEventsColumns, Events.RDATE);
-        if (rRule_str != null || rDate_str != null) {
+        rRule_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.RRULE));
+        rDate_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.RDATE));
+        if (rRule_str.length() > 0) {
             try {
                 rSet = new RecurrenceSet();
                 
-                if (rRule_str != null) {
-                    if (rRule_str.trim().length() > 0) {
-                        rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
-                    }
+                rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
+                
+                if (rDate_str.length() > 0) {
+                    rSet.addInstances(new RecurrenceList(rDate_str, timeZone));
                 }
                 
-                if (rDate_str != null) {
-                    if (rDate_str.trim().length() > 0) {
-                        rSet.addInstances(new RecurrenceList(rDate_str, timeZone));
-                    }
+                exRule_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.EXRULE));
+                exDate_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.EXDATE));
+                
+                if (exRule_str.length() > 0) {
+                    rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule_str)));
                 }
                 
-                exRule_str = getString(cursor, calendarEventsColumns, Events.EXRULE);
-                exDate_str = getString(cursor, calendarEventsColumns, Events.EXDATE);
-                
-                if (exRule_str != null) {
-                    if (exRule_str.trim().length() > 0) {
-                        rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule_str)));
-                    }
+                if (exDate_str.length() > 0) {
+                    rSet.addExceptions(new RecurrenceList(exDate_str, timeZone));
                 }
                 
-                if (exDate_str != null) {
-                    if (exDate_str.trim().length() > 0) {
-                        rSet.addExceptions(new RecurrenceList(exDate_str, timeZone));
-                    }
-                }
+                String duration_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.DURATION));
                 
-                String duration_str = getString(cursor, calendarEventsColumns, Events.DURATION);
-                
-                if (duration_str != null) {
-                    if (duration_str.trim().length() > 0) {
-                        duration = RFC2445ToMilliseconds(duration_str);
-                    }
+                if (duration_str.length() > 0) {
+                    duration = RFC2445ToMilliseconds(duration_str);
                 }
                 
                 end = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, start);
@@ -126,6 +114,10 @@ public class SystemCalendarEvent {
         }
         
         subKeys = generateSubKeysFromKey(makeKey(this));
+    }
+    
+    private String nullWrapper(String str) {
+        return str == null ? "" : str.trim();
     }
     
     public boolean fallsInRange(long dayStart, long dayEnd) {
