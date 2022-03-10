@@ -39,6 +39,8 @@ public class SystemCalendarEvent {
     public long end;
     public boolean allDay;
     
+    protected boolean invalidFlag = false;
+    
     private String rRule_str; // for comparison
     private String rDate_str;
     private String exRule_str;

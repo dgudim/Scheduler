@@ -183,7 +183,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         backgroundLayer.setCardBackgroundColor(currentEntry.bgColor);
         backgroundLayer.setStrokeColor(currentEntry.borderColor);
         
-        if (currentEntry.completed) {
+        if (currentEntry.completed || currentEntry.hideByContent()) {
             todoText.setTextColor(currentEntry.fontColor_completed);
         } else {
             todoText.setTextColor(currentEntry.fontColor);

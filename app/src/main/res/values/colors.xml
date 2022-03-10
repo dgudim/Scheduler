@@ -8,6 +8,8 @@
 
     <color name="light_gray_bg_tint">#55555555</color>
 
+    <color name="disabled_gray_color">#686868</color>
+
     <color name="button_text_color">#000000</color>
 
     <color name="entry_settings_parameter_default">#888888</color>

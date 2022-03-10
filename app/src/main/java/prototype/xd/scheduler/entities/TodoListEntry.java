@@ -114,7 +114,6 @@ public class TodoListEntry {
     }
     
     public TodoListEntry(SystemCalendarEvent event) {
-        System.out.println("---------------------" + event.title + " === " + event.associatedCalendar.name + " === " + event.rSet + " === ");
         fromSystemCalendar = true;
         this.event = event;
         params = new String[]{};
@@ -214,6 +213,20 @@ public class TodoListEntry {
             return false;
         }
         return inRange(daysFromEpoch(timestamp, event.timeZone), day_start) && timestamp_start + timestamp_duration >= timestamp;
+    }
+    
+    public boolean hideByContent() {
+        if (!fromSystemCalendar) return false;
+        boolean hideByContent = false;
+        if (preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT), Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT)) {
+            String matchString = preferences.getString(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), "");
+            String[] split = matchString != null ? matchString.split("\\|\\|") : new String[0];
+            for (String str : split) {
+                hideByContent = textValue.contains(str);
+                if (hideByContent) break;
+            }
+        }
+        return hideByContent;
     }
     
     public long getNearestEventTimestamp(long day) {
@@ -407,17 +420,7 @@ public class TodoListEntry {
             borderColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
             borderThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
             
-            boolean hideByContent = false;
-            if (preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.HIDE_ENTRIES_BY_CONTENT), Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT)) {
-                String matchString = preferences.getString(getFirstValidKey(calendarSubKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), "");
-                String[] split = matchString != null ? matchString.split("\\|\\|") : new String[0];
-                for (String str : split) {
-                    hideByContent = textValue.contains(str);
-                    if (hideByContent) break;
-                }
-            }
-            
-            if (!hideByContent) {
+            if (!hideByContent()) {
                 if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
                     showOnLock = isVisible_exact(currentTimestamp);
                 } else {

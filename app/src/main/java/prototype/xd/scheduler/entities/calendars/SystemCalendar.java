@@ -1,7 +1,9 @@
 package prototype.xd.scheduler.entities.calendars;
 
 import static android.provider.CalendarContract.Calendars;
+import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
+import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
@@ -17,6 +19,8 @@ import android.provider.CalendarContract.Events;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -64,6 +68,13 @@ public class SystemCalendar {
         if (accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
             loadAvailableEventColors();
         }
+        
+       /* System.out.println("CALENDAR-------------------------------------------------" + name);
+        Cursor cursor_all = query(contentResolver, Events.CONTENT_URI, null,
+                Events.CALENDAR_ID + " = " + id);
+        printTable(cursor_all);
+        cursor_all.close();*/
+        
     }
     
     void loadAvailableEventColors() {
@@ -100,6 +111,7 @@ public class SystemCalendar {
             cursor.moveToNext();
         }
         cursor.close();
+        dropDuplicates();
     }
     
     public ArrayList<TodoListEntry> getVisibleTodoListEntries(long day_start, long day_end) {
@@ -115,8 +127,48 @@ public class SystemCalendar {
         return todoListEntries;
     }
     
-    public void dropDuplicates(){
-    
+    public void dropDuplicates() {
+        ArrayList<SystemCalendarEvent> filteredSystemCalendarEvents = new ArrayList<>();
+        
+        for (int i = 0; i < systemCalendarEvents.size(); i++) {
+            SystemCalendarEvent event_recurrent = systemCalendarEvents.get(i);
+            if (event_recurrent.rSet != null) {
+               
+                for (int i2 = 0; i2 < systemCalendarEvents.size(); i2++) {
+                    SystemCalendarEvent event_static = systemCalendarEvents.get(i2);
+                    if (event_static.title.equals(event_recurrent.title) && event_static.rSet == null && !event_static.invalidFlag) {
+                        
+                        RecurrenceSetIterator it = event_recurrent.rSet.iterator(event_recurrent.timeZone, event_recurrent.start);
+                        long instance = 0;
+                        while (it.hasNext() && instance <= event_static.start) {
+                            instance = it.next();
+                            if (instance == event_static.start && instance + event_recurrent.duration == event_static.start + event_static.duration) {
+                                event_static.invalidFlag = true;
+                                log(WARN, "SystemCalendar", "Overlapping duplicate events: " + event_static.title + ", dropping");
+                                break;
+                            }
+                        }
+                        
+                    }
+                }
+                
+            }
+        }
+        
+        int filtered = 0;
+        
+        for (SystemCalendarEvent event : systemCalendarEvents) {
+            if (!event.invalidFlag) {
+                filteredSystemCalendarEvents.add(event);
+            } else {
+                filtered++;
+            }
+        }
+        if (filtered > 0) {
+            log(WARN, "SystemCalendar", "Calendar " + name + " is unstable, consider deleting duplicate events, you have " + filtered + " duplicates");
+        }
+        systemCalendarEvents.clear();
+        systemCalendarEvents.addAll(filteredSystemCalendarEvents);
     }
     
     @NonNull

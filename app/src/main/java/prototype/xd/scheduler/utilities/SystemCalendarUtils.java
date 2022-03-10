@@ -58,7 +58,7 @@ public class SystemCalendarUtils {
         for (int row = 0; row < cursor.getCount(); row++) {
             ArrayList<String> record = new ArrayList<>();
             for (int column = 0; column < column_names.length; column++) {
-                String column_val = cursor.getString(column);
+                String column_val = cursor.getString(column) + "";
                 record.add(column_val);
                 column_sizes.set(column, max(column_sizes.get(column), column_val.length()));
             }
@@ -66,10 +66,14 @@ public class SystemCalendarUtils {
             cursor.moveToNext();
         }
     
+        System.out.println("TABLE DIMENSIONS: " + table.size() + " x " + column_names.length);
+        System.out.println("TABLE DIMENSIONS_RAW: " + cursor.getCount() + " x " + cursor.getColumnNames().length);
+        
         for (int row = 0; row < table.size(); row++) {
             for (int column = 0; column < column_names.length; column++) {
-                System.out.println(addSpaces(table.get(row).get(column), column_sizes.get(column) + 1));
+                System.out.print(addSpaces(table.get(row).get(column), column_sizes.get(column) + 1));
             }
+            System.out.println();
         }
         
         cursor.moveToFirst();
