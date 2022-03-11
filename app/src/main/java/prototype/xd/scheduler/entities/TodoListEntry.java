@@ -207,12 +207,13 @@ public class TodoListEntry {
             while (it.hasNext() && instance <= timestamp) {
                 instance = it.next();
                 if (inRange(day, daysFromEpoch(instance, event.timeZone))) {
-                    return instance + timestamp_duration >= timestamp && (daysFromEpoch(instance, event.timeZone) <= currentDay || isUpcomingEntry);
+                    return isUpcomingEntry || (instance + timestamp_duration >= timestamp && daysFromEpoch(instance, event.timeZone) <= currentDay);
                 }
             }
             return false;
         }
-        return inRange(daysFromEpoch(timestamp, event.timeZone), day_start) && timestamp_start + timestamp_duration >= timestamp;
+        return inRange(daysFromEpoch(timestamp, event.timeZone), day_start)
+                && (isUpcomingEntry || (timestamp_start + timestamp_duration >= timestamp && daysFromEpoch(timestamp, event.timeZone) <= currentDay));
     }
     
     public boolean hideByContent() {
