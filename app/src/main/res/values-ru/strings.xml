@@ -112,7 +112,7 @@
     <string name="overwrite">перезаписать</string>
     <string name="reset">сбросить</string>
     <string name="close">закрыть</string>
-    <string name="hide_by_content">Скрывть по содержимому</string>
+    <string name="hide_by_content">Скрывать по содержимому</string>
     <string name="separate_multiple_statements_by">разделяйте строки с помощью ||</string>
     <string name="content">содежимое</string>
 </resources>

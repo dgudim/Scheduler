@@ -71,7 +71,7 @@ public class HomeFragment extends Fragment {
         });
         
         view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> {
-            calendarView.setDate(addTimeZoneOffset(currentTimestamp, timeZone_SYSTEM));
+            calendarView.setDate(currentTimestamp);
             currentlySelectedDay = currentDay;
             preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DATE).apply();
             todoListEntryStorage.updateTodoListAdapter(false);
