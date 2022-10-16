@@ -15,7 +15,7 @@ Clone this repository and import into **Android Studio**
 ```bash
 git clone https://github.com/dgudim/Scheduler
 ```
-Or just download ![latest build](https://github.com/dgudim/Scheduler/releases/latest)
+Or just download [latest build](https://github.com/dgudim/Scheduler/releases/latest)
 
 ## Screenshots
 
