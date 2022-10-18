@@ -1,5 +1,7 @@
-# Scheduler
-![icon](https://user-images.githubusercontent.com/34401005/196033085-63d5521c-666b-4d75-80f0-388dda16315a.svg)
+<h1 id="title">Scheduler</h1>
+
+<img src="https://user-images.githubusercontent.com/34401005/196503825-82b715a6-21ea-4f02-829a-e4109a37b4a9.png" height=150 id="icon"></img>
+
 
 A small app that shows your todo list on your lockscreen
 
@@ -21,7 +23,7 @@ Or just download [latest build](https://github.com/dgudim/Scheduler/releases/lat
 
 | Lock screen               | Main app menu              |
 | ------------------------- | -------------------------- |
-| ![](https://user-images.githubusercontent.com/34401005/196048503-c2671dff-2b91-487c-a6cb-89b8fd81d559.jpg) | ![](https://user-images.githubusercontent.com/34401005/196048501-52530d23-2682-48d6-b4b9-0c7c7f775405.jpg) |
+| ![](https://user-images.githubusercontent.com/34401005/196048503-c2671dff-2b91-487c-a6cb-89b8fd81d559.jpg) | <img id="thumb" src="https://user-images.githubusercontent.com/34401005/196048501-52530d23-2682-48d6-b4b9-0c7c7f775405.jpg"> |
 
 | Global settings           | Event settings             |
 | ------------------------- | -------------------------- |
