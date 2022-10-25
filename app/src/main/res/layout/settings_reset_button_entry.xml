@@ -4,6 +4,7 @@
     style="@style/defaultButtonStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="@string/settings_reset_to_defaults">
+    android:text="@string/settings_reset_to_defaults"
+    android:textAppearance="@style/TextLarge">
 
 </Button>

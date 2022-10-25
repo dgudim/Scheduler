@@ -8,7 +8,7 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKe
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
-import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.addSliderChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
@@ -21,7 +21,10 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.google.android.material.slider.Slider;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -30,6 +33,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
+import prototype.xd.scheduler.utilities.Utilities;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
@@ -105,58 +109,48 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 calendarKey, calendarSubKeys,
                 Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR));
         
-        addSeekBarChangeListener(
+        addSliderChangeListener(
                 border_thickness_description,
                 border_thickness_bar, border_size_state,
                 this, true, R.string.settings_border_thickness,
                 calendarKey, calendarSubKeys,
                 Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
         
-        addSeekBarChangeListener(
+        addSliderChangeListener(
                 priority_description,
                 priority_bar, priority_state,
                 this, false, R.string.settings_priority,
                 calendarKey, calendarSubKeys,
                 Keys.PRIORITY, Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
         
-        addSeekBarChangeListener(
+        addSliderChangeListener(
                 adaptive_color_balance_description,
                 adaptive_color_balance_bar, adaptiveColor_bar_state,
                 this, false, R.string.settings_adaptive_color_balance,
                 calendarKey, calendarSubKeys,
                 Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
         
-        addSeekBarChangeListener(
+        addSliderChangeListener(
                 show_days_beforehand_description,
                 show_days_beforehand_bar, showDaysUpcoming_bar_state,
                 this, false, R.string.settings_show_days_upcoming,
                 calendarKey, calendarSubKeys,
                 Keys.UPCOMING_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
         
-        addSeekBarChangeListener(
+        addSliderChangeListener(
                 show_days_after_description,
                 show_days_after_bar, showDaysExpired_bar_state,
                 this, false, R.string.settings_show_days_expired,
                 calendarKey, calendarSubKeys,
                 Keys.EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET,
-                new SeekBar.OnSeekBarChangeListener() {
+                new Slider.OnChangeListener() {
                     @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        hide_expired_items_by_time_switch.setTextColor(seekBar.getProgress() == 0 ?
+                    public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                        hide_expired_items_by_time_switch.setTextColor(slider.getValue() == 0 ?
                                 hide_expired_items_by_time_switch_def_colors :
-                                ColorStateList.valueOf(seekBar.getContext().getColor(R.color.entry_settings_parameter_group_and_personal)));
+                                ColorStateList.valueOf(slider.getContext().getColor(R.color.entry_settings_parameter_group_and_personal)));
                     }
-                    
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                    
-                    }
-                    
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                    
-                    }
-                });
+                }, null);
         
         addSwitchChangeListener(
                 hide_expired_items_by_time_switch,

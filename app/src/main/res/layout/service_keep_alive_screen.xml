@@ -41,14 +41,16 @@
                 style="@style/defaultButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/visit_dont_kill_my_app" />
+                android:text="@string/visit_dont_kill_my_app"
+                android:textAppearance="@style/TextLarge" />
 
             <Button
                 android:id="@+id/ignore_button"
                 style="@style/defaultButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ignore" />
+                android:text="@string/ignore"
+                android:textAppearance="@style/TextLarge" />
 
         </LinearLayout>
 
@@ -58,6 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/never_ask_again"
+            android:textAppearance="@style/TextLarge"
             android:visibility="gone" />
 
     </LinearLayout>

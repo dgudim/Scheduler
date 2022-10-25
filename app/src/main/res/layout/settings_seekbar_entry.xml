@@ -20,9 +20,8 @@
                 android:textAppearance="@style/TextSmallMedium_primary"
                 tools:ignore="HardcodedText" />
 
-            <SeekBar
-                android:id="@+id/seek_bar"
-                style="@android:style/Widget.Material.SeekBar"
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

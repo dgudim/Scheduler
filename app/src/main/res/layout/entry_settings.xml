@@ -153,14 +153,14 @@
                         android:text="@string/settings_priority"
                         android:textAppearance="@style/TextSmallMedium_primary" />
 
-                    <SeekBar
+                    <com.google.android.material.slider.Slider
                         android:id="@+id/priority_bar"
-                        style="@style/Widget.AppCompat.SeekBar.Discrete"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="40"
-                        android:min="0"
-                        android:progress="0" />
+                        android:valueFrom="0"
+                        android:valueTo="40"
+                        android:value="0"
+                        android:stepSize="1.0" />
 
                 </LinearLayout>
 
@@ -235,14 +235,13 @@
                         android:text="@string/settings_adaptive_color_balance"
                         android:textAppearance="@style/TextSmallMedium_primary" />
 
-                    <SeekBar
+                    <com.google.android.material.slider.Slider
                         android:id="@+id/adaptive_color_balance_bar"
-                        style="@android:style/Widget.Material.SeekBar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="1000"
-                        android:min="0"
-                        android:progress="0" />
+                        android:valueFrom="0"
+                        android:valueTo="1000"
+                        android:value="0" />
 
                 </LinearLayout>
 
@@ -487,14 +486,14 @@
                             android:text="@string/settings_border_thickness"
                             android:textAppearance="@style/TextSmallMedium_primary" />
 
-                        <SeekBar
+                        <com.google.android.material.slider.Slider
                             android:id="@+id/bevel_thickness_bar"
-                            style="@style/Widget.AppCompat.SeekBar.Discrete"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:max="15"
-                            android:min="0"
-                            android:progress="3" />
+                            android:valueFrom="0.0"
+                            android:valueTo="15.0"
+                            android:value="3.0"
+                            android:stepSize="1.0" />
 
                     </LinearLayout>
                 </LinearLayout>
@@ -538,14 +537,15 @@
                         android:text="@string/settings_show_days_upcoming"
                         android:textAppearance="@style/TextSmallMedium_primary" />
 
-                    <SeekBar
+                    <com.google.android.material.slider.Slider
                         android:id="@+id/show_days_beforehand_bar"
                         style="@style/Widget.AppCompat.SeekBar.Discrete"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="14"
-                        android:min="0"
-                        android:progress="1" />
+                        android:valueFrom="0.0"
+                        android:valueTo="14.0"
+                        android:value="1.0"
+                        android:stepSize="1.0" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -587,14 +587,15 @@
                         android:text="@string/settings_show_days_expired"
                         android:textAppearance="@style/TextSmallMedium_primary" />
 
-                    <SeekBar
+                    <com.google.android.material.slider.Slider
                         android:id="@+id/show_days_after_bar"
                         style="@style/Widget.AppCompat.SeekBar.Discrete"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="14"
-                        android:min="0"
-                        android:progress="1" />
+                        android:valueFrom="0.0"
+                        android:valueTo="14.0"
+                        android:value="1.0"
+                        android:stepSize="1.0" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -703,7 +704,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/settings_reset_to_defaults" />
+                android:text="@string/settings_reset_to_defaults"
+                android:textAppearance="@style/TextLarge" />
 
             <Button
                 android:id="@+id/close_settings_button"
@@ -711,7 +713,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/close" />
+                android:text="@string/close"
+                android:textAppearance="@style/TextLarge" />
         </LinearLayout>
 
     </LinearLayout>

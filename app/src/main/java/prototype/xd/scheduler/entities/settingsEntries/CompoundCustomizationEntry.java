@@ -4,7 +4,7 @@ import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.addSliderChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 import android.view.LayoutInflater;
@@ -17,6 +17,7 @@ import androidx.cardview.widget.CardView;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Utilities;
 
 public class CompoundCustomizationEntry extends SettingsEntry {
     
@@ -95,19 +96,19 @@ public class CompoundCustomizationEntry extends SettingsEntry {
             borderColor_expired_select.setOnClickListener(v -> invokeColorDialogue(borderColor_expired_select, this,
                     Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR));
             
-            addSeekBarChangeListener(
+            Utilities.addSliderChangeListener(
                     convertView.findViewById(R.id.upcoming_border_thickness_text),
                     convertView.findViewById(R.id.upcoming_border_thickness_seek_bar),
                     this, R.string.settings_upcoming_border_thickness,
                     Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
     
-            addSeekBarChangeListener(
+            Utilities.addSliderChangeListener(
                     convertView.findViewById(R.id.current_border_thickness_text),
                     convertView.findViewById(R.id.current_border_thickness_seek_bar),
                     this, R.string.settings_current_border_thickness,
                     Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
     
-            addSeekBarChangeListener(
+            Utilities.addSliderChangeListener(
                     convertView.findViewById(R.id.expired_border_thickness_text),
                     convertView.findViewById(R.id.expired_border_thickness_seek_bar),
                     this, R.string.settings_expired_border_thickness,

@@ -10,25 +10,25 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="TextSmall_secondary" parent="TextAppearance.AppCompat.Medium">
+    <style name="TextSmall_secondary" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="TextSmall_primary" parent="TextAppearance.AppCompat.Large">
+    <style name="TextSmall_primary" parent="TextAppearance.Material3.LabelLarge">
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="TextSmallMedium_primary" parent="TextAppearance.AppCompat.Large">
+    <style name="TextSmallMedium_primary" parent="TextAppearance.Material3.LabelLarge">
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="TextMedium_secondary" parent="TextAppearance.AppCompat.Medium" />
+    <style name="TextMedium_secondary" parent="TextAppearance.Material3.LabelMedium" />
 
-    <style name="TextMedium_primary" parent="TextAppearance.AppCompat.Large">
+    <style name="TextMedium_primary" parent="TextAppearance.Material3.LabelLarge">
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="TextLarge" parent="TextAppearance.AppCompat.Large" />
+    <style name="TextLarge" parent="TextAppearance.Material3.LabelLarge" />
 
     <style name="FullScreenDialog">
         <item name="android:windowFrame">@null</item>
@@ -40,7 +40,7 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
-    <style name="defaultButtonStyle" parent="Widget.MaterialComponents.Button">
+    <style name="defaultButtonStyle" parent="Widget.Material3.Button">
         <item name="android:textColor">@color/button_text_color</item>
         <item name="android:layout_marginLeft">3dp</item>
         <item name="android:layout_marginRight">3dp</item>

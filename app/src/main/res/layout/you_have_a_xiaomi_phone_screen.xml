@@ -36,6 +36,7 @@
         style="@style/defaultButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/ignore" />
+        android:text="@string/ignore"
+        android:textAppearance="@style/TextLarge" />
 
 </LinearLayout>

@@ -137,11 +137,12 @@
 
         <Button
             android:id="@+id/grant_permissions_button"
-            style="@style/Widget.AppCompat.Button.Colored"
+            style="@style/defaultButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/permissions_grant"
+            android:textAppearance="@style/TextLarge"
             android:textColor="@color/button_text_color" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

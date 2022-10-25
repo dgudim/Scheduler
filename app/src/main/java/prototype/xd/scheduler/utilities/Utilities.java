@@ -25,12 +25,14 @@ import android.content.res.Configuration;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.android.material.slider.Slider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -166,80 +168,75 @@ public class Utilities {
     }
     
     //listener for general settings
-    public static void addSeekBarChangeListener(final TextView displayTo,
-                                                final SeekBar seekBar,
-                                                @Nullable final CompoundCustomizationEntry customizationEntry,
-                                                final int stringResource,
-                                                final String key,
-                                                final int defaultValue) {
+    public static void addSliderChangeListener(final TextView displayTo,
+                                               final Slider slider,
+                                               @Nullable final CompoundCustomizationEntry customizationEntry,
+                                               final int stringResource,
+                                               final String key,
+                                               final int defaultValue) {
         displayTo.setText(displayTo.getContext().getString(stringResource, preferences.getInt(key, defaultValue)));
-        seekBar.setProgress(preferences.getInt(key, defaultValue));
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    displayTo.setText(displayTo.getContext().getString(stringResource, progress));
-                    if (customizationEntry != null) {
-                        switch (key) {
-                            case UPCOMING_BORDER_THICKNESS:
-                                customizationEntry.updateUpcomingPreviewBorderThickness(progress);
-                                break;
-                            case BORDER_THICKNESS:
-                                customizationEntry.updateCurrentPreviewBorderThickness(progress);
-                                break;
-                            case EXPIRED_BORDER_THICKNESS:
-                                customizationEntry.updateExpiredPreviewBorderThickness(progress);
-                                break;
-                        }
+        slider.setValue(preferences.getInt(key, defaultValue));
+        slider.addOnChangeListener((listener_slider, progress, fromUser) -> {
+            if (fromUser) {
+                displayTo.setText(displayTo.getContext().getString(stringResource, (int)progress));
+                if (customizationEntry != null) {
+                    switch (key) {
+                        case UPCOMING_BORDER_THICKNESS:
+                            customizationEntry.updateUpcomingPreviewBorderThickness((int) progress);
+                            break;
+                        case BORDER_THICKNESS:
+                            customizationEntry.updateCurrentPreviewBorderThickness((int) progress);
+                            break;
+                        case EXPIRED_BORDER_THICKNESS:
+                            customizationEntry.updateExpiredPreviewBorderThickness((int) progress);
+                            break;
                     }
                 }
             }
-            
+        });
+        slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(@NonNull Slider slider) {
             
             }
             
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                preferences.edit().putInt(key, seekBar.getProgress()).apply();
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                preferences.edit().putInt(key, (int) slider.getValue()).apply();
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
     
     //listener for entry settings
-    public static void addSeekBarChangeListener(final TextView displayTo,
-                                                final SeekBar seekBar,
-                                                final TextView stateIcon,
-                                                final EntrySettings entrySettings,
-                                                final boolean mapToBorderPreview,
-                                                final int stringResource,
-                                                final String parameter,
-                                                final int initialValue) {
+    public static void addSliderChangeListener(final TextView displayTo,
+                                               final Slider slider,
+                                               final TextView stateIcon,
+                                               final EntrySettings entrySettings,
+                                               final boolean mapToBorderPreview,
+                                               final int stringResource,
+                                               final String parameter,
+                                               final int initialValue) {
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
-        seekBar.setProgress(initialValue);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    displayTo.setText(displayTo.getContext().getString(stringResource, progress));
-                    if (mapToBorderPreview) {
-                        entrySettings.preview_border.setPadding(progress, progress, progress, 0);
-                    }
+        slider.setValue(initialValue);
+        slider.addOnChangeListener((slider1, progress, fromUser) -> {
+            if (fromUser) {
+                displayTo.setText(displayTo.getContext().getString(stringResource, (int)progress));
+                if (mapToBorderPreview) {
+                    //TODO: think about switching to floats
+                    entrySettings.preview_border.setPadding((int) progress, (int) progress, (int) progress, 0);
                 }
             }
-            
+        });
+        slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(@NonNull Slider slider) {
             
             }
             
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf(seekBar.getProgress()));
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf((int) slider.getValue()));
                 entrySettings.todoListEntryStorage.saveEntries();
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
@@ -247,60 +244,69 @@ public class Utilities {
     }
     
     //listener for calendar settings
-    public static void addSeekBarChangeListener(final TextView displayTo,
-                                                final SeekBar seekBar,
-                                                final TextView stateIcon,
-                                                final SystemCalendarSettings systemCalendarSettings,
-                                                final boolean mapToBorderPreview,
-                                                final int stringResource,
-                                                final String calendarKey,
-                                                final ArrayList<String> calendarSubKeys,
-                                                final String parameter,
-                                                final int defaultValue,
-                                                final SeekBar.OnSeekBarChangeListener customListener) {
+    public static void addSliderChangeListener(final TextView displayTo,
+                                               final Slider slider,
+                                               final TextView stateIcon,
+                                               final SystemCalendarSettings systemCalendarSettings,
+                                               final boolean mapToBorderPreview,
+                                               final int stringResource,
+                                               final String calendarKey,
+                                               final ArrayList<String> calendarSubKeys,
+                                               final String parameter,
+                                               final int defaultValue,
+                                               final Slider.OnChangeListener customProgressListener,
+                                               final Slider.OnSliderTouchListener customTouchListener) {
         int initialValue = preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue);
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
-        seekBar.setProgress(initialValue);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (customListener != null)
-                    customListener.onProgressChanged(seekBar, progress, fromUser);
-                if (fromUser) {
-                    displayTo.setText(displayTo.getContext().getString(stringResource, progress));
-                    if (mapToBorderPreview) {
-                        systemCalendarSettings.preview_border.setPadding(progress, progress, progress, 0);
-                    }
+        slider.setValue(initialValue);
+        slider.addOnChangeListener((slider1, progress, fromUser) -> {
+            if (customProgressListener != null)
+                customProgressListener.onValueChange(slider1, progress, fromUser);
+            if (fromUser) {
+                displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
+                if (mapToBorderPreview) {
+                    systemCalendarSettings.preview_border.setPadding((int) progress, (int) progress, (int) progress, 0);
                 }
             }
-            
+        });
+        slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                if (customListener != null) customListener.onStartTrackingTouch(seekBar);
+            public void onStartTrackingTouch(@NonNull Slider slider) {
+                if (customTouchListener != null) customTouchListener.onStartTrackingTouch(slider);
             }
             
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                if (customListener != null) customListener.onStopTrackingTouch(seekBar);
-                preferences.edit().putInt(calendarKey + "_" + parameter, seekBar.getProgress()).apply();
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                if (customTouchListener != null) customTouchListener.onStopTrackingTouch(slider);
+                preferences.edit().putInt(calendarKey + "_" + parameter, (int) slider.getValue()).apply();
                 systemCalendarSettings.setStateIconColor(stateIcon, parameter);
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
     
-    public static void addSeekBarChangeListener(final TextView displayTo,
-                                                final SeekBar seekBar,
-                                                final TextView stateIcon,
-                                                final SystemCalendarSettings systemCalendarSettings,
-                                                final boolean mapToBorderPreview,
-                                                final int stringResource,
-                                                final String calendarKey,
-                                                final ArrayList<String> calendarSubKeys,
-                                                final String parameter,
-                                                final int defaultValue) {
-        addSeekBarChangeListener(displayTo, seekBar, stateIcon, systemCalendarSettings, mapToBorderPreview, stringResource, calendarKey, calendarSubKeys, parameter, defaultValue, null);
+    public static void addSliderChangeListener(final TextView displayTo,
+                                               final Slider slider,
+                                               final TextView stateIcon,
+                                               final SystemCalendarSettings systemCalendarSettings,
+                                               final boolean mapToBorderPreview,
+                                               final int stringResource,
+                                               final String calendarKey,
+                                               final ArrayList<String> calendarSubKeys,
+                                               final String parameter,
+                                               final int defaultValue) {
+        addSliderChangeListener(
+                displayTo,
+                slider,
+                stateIcon,
+                systemCalendarSettings,
+                mapToBorderPreview,
+                stringResource,
+                calendarKey,
+                calendarSubKeys,
+                parameter,
+                defaultValue,
+                null, null);
     }
     
     //switch listener for regular settings

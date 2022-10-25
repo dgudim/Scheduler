@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 
+import com.google.android.material.slider.Slider;
+
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.Spinner;
@@ -52,15 +54,15 @@ public class PopupSettingsView {
     private final LinearLayout preview_border_expired;
     
     protected final TextView border_thickness_description;
-    protected final SeekBar border_thickness_bar;
+    protected final Slider border_thickness_bar;
     protected final TextView priority_description;
-    protected final SeekBar priority_bar;
+    protected final Slider priority_bar;
     protected final TextView adaptive_color_balance_description;
-    protected final SeekBar adaptive_color_balance_bar;
+    protected final Slider adaptive_color_balance_bar;
     protected final TextView show_days_beforehand_description;
-    protected final SeekBar show_days_beforehand_bar;
+    protected final Slider show_days_beforehand_bar;
     protected final TextView show_days_after_description;
-    protected final SeekBar show_days_after_bar;
+    protected final Slider show_days_after_bar;
     protected final Switch show_on_lock_switch;
     protected final Switch adaptive_color_switch;
     protected final Switch hide_expired_items_by_time_switch;

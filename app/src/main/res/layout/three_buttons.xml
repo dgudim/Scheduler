@@ -16,20 +16,24 @@
             style="@style/defaultButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cancel" />
+            android:text="@string/cancel"
+            android:textAppearance="@style/TextLarge" />
 
         <Button
             android:id="@+id/confirm_button"
             style="@style/defaultButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/add" />
+            android:text="@string/add"
+            android:textAppearance="@style/TextLarge" />
+
+        <Button
+            android:id="@+id/secondary_action_button"
+            style="@style/defaultButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_to_global_list"
+            android:textAppearance="@style/TextLarge" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/secondary_action_button"
-        style="@style/defaultButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/add_to_global_list" />
 </LinearLayout>

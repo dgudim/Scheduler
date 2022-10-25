@@ -24,7 +24,8 @@
         style="@style/defaultButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settings_reset_bg" />
+        android:text="@string/settings_reset_bg"
+        android:textAppearance="@style/TextLarge" />
 
     <include layout="@layout/grid_selection_view" />
 

@@ -1,13 +1,15 @@
 package prototype.xd.scheduler.entities.settingsEntries;
 
 import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.SEEK_BAR;
-import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.addSliderChangeListener;
 
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SeekBar;
+
+import com.google.android.material.slider.Slider;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.Utilities;
 
 public class SeekBarSettingsEntry extends SettingsEntry{
     
@@ -29,11 +31,11 @@ public class SeekBarSettingsEntry extends SettingsEntry{
     
     @Override
     protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
-        SeekBar seekBar = convertView.findViewById(R.id.seek_bar);
-        seekBar.setMin(seek_min);
-        seekBar.setMax(seek_max);
-        addSeekBarChangeListener(
-                convertView.findViewById(R.id.seek_bar_description), seekBar,
+        Slider slider = convertView.findViewById(R.id.slider);
+        slider.setValueFrom(seek_min);
+        slider.setValueTo(seek_max);
+        Utilities.addSliderChangeListener(
+                convertView.findViewById(R.id.seek_bar_description), slider,
                 null,
                 stringResource,
                 key, defaultValue);

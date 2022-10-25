@@ -16,7 +16,7 @@ import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
-import static prototype.xd.scheduler.utilities.Utilities.addSeekBarChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.addSliderChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
@@ -37,6 +37,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
+import prototype.xd.scheduler.utilities.Utilities;
 
 public class EntrySettings extends PopupSettingsView {
     
@@ -183,31 +184,31 @@ public class EntrySettings extends PopupSettingsView {
                 padColor_view_state, this, todoListEntryStorage,
                 entry, BORDER_COLOR, entry.borderColor_original));
         
-        addSeekBarChangeListener(
+        Utilities.addSliderChangeListener(
                 border_thickness_description,
                 border_thickness_bar, border_size_state,
                 this, true, R.string.settings_border_thickness,
                 BORDER_THICKNESS, entry.border_thickness_original);
         
-        addSeekBarChangeListener(
+        Utilities.addSliderChangeListener(
                 priority_description,
                 priority_bar, priority_state,
                 this, false, R.string.settings_priority,
                 PRIORITY, entry.priority);
         
-        addSeekBarChangeListener(
+        Utilities.addSliderChangeListener(
                 adaptive_color_balance_description,
                 adaptive_color_balance_bar, adaptiveColor_bar_state,
                 this, false, R.string.settings_adaptive_color_balance,
                 ADAPTIVE_COLOR_BALANCE, entry.adaptiveColorBalance);
         
-        addSeekBarChangeListener(
+        Utilities.addSliderChangeListener(
                 show_days_beforehand_description,
                 show_days_beforehand_bar, showDaysUpcoming_bar_state,
                 this, false, R.string.settings_show_days_upcoming,
                 UPCOMING_ITEMS_OFFSET, entry.dayOffset_upcoming);
         
-        addSeekBarChangeListener(
+        Utilities.addSliderChangeListener(
                 show_days_after_description,
                 show_days_after_bar, showDaysExpired_bar_state,
                 this, false, R.string.settings_show_days_expired,
