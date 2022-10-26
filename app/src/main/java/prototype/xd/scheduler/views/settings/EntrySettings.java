@@ -50,7 +50,7 @@ public class EntrySettings extends PopupSettingsView {
         hide_by_content_container.setVisibility(View.GONE);
         this.todoListEntryStorage = todoListEntryStorage;
         
-        dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
+        dialog = new AlertDialog.Builder(settingsView.getContext(), R.style.FullScreenDialog).setOnDismissListener(dialog -> {
             todoListEntryStorage.saveEntries();
             todoListEntryStorage.saveGroups();
             todoListEntryStorage.updateTodoListAdapter(false);

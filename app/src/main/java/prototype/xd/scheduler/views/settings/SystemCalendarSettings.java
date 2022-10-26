@@ -50,7 +50,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         this.todoListEntryStorage = todoListEntryStorage;
         
-        dialog = new AlertDialog.Builder(settingsView.getContext()).setOnDismissListener(dialog -> {
+        dialog = new AlertDialog.Builder(settingsView.getContext(), R.style.FullScreenDialog).setOnDismissListener(dialog -> {
             if (todoListEntryStorage != null) {
                 todoListEntryStorage.updateTodoListAdapter(false);
             }
