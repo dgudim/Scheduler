@@ -43,7 +43,7 @@
         style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:background="@color/image_button_bg"
+        android:background="@color/transparent"
         app:srcCompat="@drawable/ic_settings"
         tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck" />
 

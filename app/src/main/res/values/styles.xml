@@ -1,11 +1,7 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -41,7 +37,6 @@
     </style>
 
     <style name="defaultButtonStyle" parent="Widget.Material3.Button">
-        <item name="android:textColor">@color/button_text_color</item>
         <item name="android:layout_marginLeft">3dp</item>
         <item name="android:layout_marginRight">3dp</item>
     </style>

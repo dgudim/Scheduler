@@ -1,39 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="end"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="end"
-        android:orientation="horizontal">
+    <Button
+        android:id="@+id/cancel_button"
+        style="@style/defaultButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:text="@string/cancel"
+        android:textAppearance="@style/TextLarge" />
 
-        <Button
-            android:id="@+id/cancel_button"
-            style="@style/defaultButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            android:textAppearance="@style/TextLarge" />
+    <Button
+        android:id="@+id/confirm_button"
+        style="@style/defaultButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:text="@string/add"
+        android:textAppearance="@style/TextLarge" />
 
-        <Button
-            android:id="@+id/confirm_button"
-            style="@style/defaultButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add"
-            android:textAppearance="@style/TextLarge" />
-
-        <Button
-            android:id="@+id/secondary_action_button"
-            style="@style/defaultButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add_to_global_list"
-            android:textAppearance="@style/TextLarge" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/secondary_action_button"
+        style="@style/defaultButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:text="@string/add_to_global_list"
+        android:textAppearance="@style/TextLarge" />
 
 </LinearLayout>

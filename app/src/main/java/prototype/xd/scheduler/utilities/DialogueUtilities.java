@@ -12,6 +12,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -214,7 +215,7 @@ public class DialogueUtilities {
     }
     
     private static Dialog buildTemplate(Context context, int titleStringResource, int messageStringResource, int layout) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setTitle(titleStringResource);
         if (messageStringResource != -1) {
             builder.setMessage(messageStringResource);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -63,31 +63,32 @@
                     android:text="@string/settings_preview_upcoming"
                     android:textAppearance="@style/TextSmallMedium_primary" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/backgroundColor_upcoming"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp" />
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/fontColor_upcoming"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp" />
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/borderColor_upcoming"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp">
-
-                </androidx.cardview.widget.CardView>
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -103,31 +104,32 @@
                     android:text="@string/settings_preview_current"
                     android:textAppearance="@style/TextSmallMedium_primary" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/backgroundColor"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp" />
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/fontColor"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp" />
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/borderColor"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp">
-
-                </androidx.cardview.widget.CardView>
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -143,31 +145,33 @@
                     android:text="@string/settings_preview_expired"
                     android:textAppearance="@style/TextSmallMedium_primary" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/backgroundColor_expired"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp" />
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/fontColor_expired"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp" />
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
 
-                <androidx.cardview.widget.CardView
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/borderColor_expired"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
                     app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp">
+                    app:cardElevation="5dp"
+                    app:strokeWidth="0dp" />
 
-                </androidx.cardview.widget.CardView>
             </LinearLayout>
 
         </LinearLayout>
@@ -303,4 +307,4 @@
         </LinearLayout>
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

@@ -142,7 +142,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/permissions_grant"
-            android:textAppearance="@style/TextLarge"
-            android:textColor="@color/button_text_color" />
+            android:textAppearance="@style/TextLarge" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#0098FF</color>
-    <color name="colorPrimaryDark">#0079CA</color>
-    <color name="colorAccent">#62A1FF</color>
-    <color name="colorAccent2">#FF6D34</color>
-
-    <color name="image_button_bg">#00000000</color>
+    <color name="transparent">#00000000</color>
 
     <color name="light_gray_bg_tint">#55555555</color>
 
     <color name="disabled_gray_color">#686868</color>
-
-    <color name="button_text_color">#000000</color>
 
     <color name="entry_settings_parameter_default">#888888</color>
     <color name="entry_settings_parameter_personal">#6FFF6F</color>

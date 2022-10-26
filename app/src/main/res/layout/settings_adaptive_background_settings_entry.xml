@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -24,10 +24,10 @@
             style="@android:style/Widget.Material.Light.ImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/image_button_bg"
+            android:background="@color/transparent"
             app:srcCompat="@drawable/ic_settings"
             tools:ignore="SpeakableTextPresentCheck" />
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

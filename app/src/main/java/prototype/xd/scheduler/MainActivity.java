@@ -29,6 +29,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 
+import com.google.android.material.color.DynamicColors;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Locale;
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    
+        
         PreferencesStore.init(this);
         
         File rootDir = getExternalFilesDir("");
@@ -78,7 +80,9 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }*/
         
+        // init theme
         AppCompatDelegate.setDefaultNightMode(preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME));
+        DynamicColors.applyToActivityIfAvailable(this);
         
         if (!refreshPermissionStates(false)) {
             setContentView(R.layout.permissions_request_screen);
