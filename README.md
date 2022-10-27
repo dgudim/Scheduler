@@ -9,6 +9,7 @@ A small app that shows your todo list on your lockscreen
 - Your todo list on the lockscreen
 - Sync with your system calendars (google, samsung, local)
 - Configurable per-day wallpapers
+- Material you theming support
 - Plethora of settings
 - Low memory and cpu consumption
 
@@ -27,10 +28,8 @@ Or just download [latest build](https://github.com/dgudim/Scheduler/releases/lat
 
 | Global settings           | Event settings             |
 | ------------------------- | -------------------------- |
-| ![](https://user-images.githubusercontent.com/34401005/196048496-1fb7b9ab-c5be-4576-9683-fa58d3b4f737.jpg) | ![](https://user-images.githubusercontent.com/34401005/196049385-cf110277-13e6-4787-8bb1-08477144ed92.jpg) |
+| ![](https://user-images.githubusercontent.com/34401005/198278507-29dd6cac-8f63-49bb-adbb-803271715ffe.jpg) | ![](https://user-images.githubusercontent.com/34401005/198276799-bb35598c-6e4e-43e0-87fe-5ebb1ad66123.jpg) |
 
-| Per-day wallpapers        | Sync with system calendars |
+| Per-day wallpapers        | Material you theming       |
 | ------------------------- | -------------------------- |
-| ![](https://user-images.githubusercontent.com/34401005/196048497-5718d48a-df6d-422c-ad69-91aeaa555753.jpg) | ![](https://user-images.githubusercontent.com/34401005/196048499-7f71db12-1ed6-475b-b155-bfa853ed28e8.jpg) |
-
-
+| ![](https://user-images.githubusercontent.com/34401005/198276952-9ad2f75a-d8d5-45d5-a83a-d7ce6d6b7b77.jpg) | ![](https://user-images.githubusercontent.com/34401005/198277522-14dc58c7-1ab8-4713-bd3c-58071fa4cf3a.gif) |
