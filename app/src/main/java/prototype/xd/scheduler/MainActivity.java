@@ -31,6 +31,8 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.color.DynamicColors;
+import com.google.android.material.color.HarmonizedColors;
+import com.google.android.material.color.HarmonizedColorsOptions;
 import com.google.android.material.color.MaterialColors;
 
 import java.io.File;
@@ -84,6 +86,16 @@ public class MainActivity extends AppCompatActivity {
         
         // init theme
         AppCompatDelegate.setDefaultNightMode(preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME));
+        
+        
+        HarmonizedColors.applyToContextIfAvailable(this,
+                new HarmonizedColorsOptions.Builder()
+                        .setColorResourceIds(new int[]{
+                                R.color.entry_settings_parameter_default,
+                                R.color.entry_settings_parameter_group,
+                                R.color.entry_settings_parameter_group_and_personal,
+                                R.color.entry_settings_parameter_personal})
+                        .build());
         DynamicColors.applyToActivityIfAvailable(this);
         
         if (!refreshPermissionStates(false)) {
@@ -151,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             setPermissionChipColor(calendar_granted,
                     findViewById(R.id.calendar_permission_granted),
                     findViewById(R.id.calendar_permission_granted_bg));
-    
+            
             setPermissionChipColor(storage_granted,
                     findViewById(R.id.storage_permission_granted),
                     findViewById(R.id.storage_permission_granted_bg));
