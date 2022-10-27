@@ -28,7 +28,7 @@ Or just download [latest build](https://github.com/dgudim/Scheduler/releases/lat
 
 | Global settings           | Event settings             |
 | ------------------------- | -------------------------- |
-| ![](https://user-images.githubusercontent.com/34401005/198276277-ee2f6078-75b5-47d0-ac3c-dc86383ff50b.jpg) | ![](https://user-images.githubusercontent.com/34401005/198276799-bb35598c-6e4e-43e0-87fe-5ebb1ad66123.jpg) |
+| ![](https://user-images.githubusercontent.com/34401005/198278507-29dd6cac-8f63-49bb-adbb-803271715ffe.jpg) | ![](https://user-images.githubusercontent.com/34401005/198276799-bb35598c-6e4e-43e0-87fe-5ebb1ad66123.jpg) |
 
 | Per-day wallpapers        | Material you theming       |
 | ------------------------- | -------------------------- |
