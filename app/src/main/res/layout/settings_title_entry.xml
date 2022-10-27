@@ -9,5 +9,5 @@
     android:paddingTop="15dp"
     android:text="title"
     android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-    android:textColor="?attr/colorPrimaryVariant"
+    android:textColor="?colorTertiary"
     tools:ignore="HardcodedText" />

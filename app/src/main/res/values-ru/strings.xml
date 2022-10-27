@@ -109,9 +109,13 @@
     <string name="blank_group_name">Нет</string>
     <string name="input_cant_be_empty">ввод не может быть пустым</string>
     <string name="overwrite">перезаписать</string>
-    <string name="reset">сбросить</string>
-    <string name="close">закрыть</string>
+    <string name="reset">Сбросить</string>
+    <string name="close">Закрыть</string>
     <string name="hide_by_content">Скрывать по содержимому</string>
     <string name="separate_multiple_statements_by">разделяйте строки с помощью ||</string>
     <string name="content">содежимое</string>
+    <string name="editing_system_calendar">%1$s в %2$s</string>
+    <string name="editing_system_calendar_color">События с цветом: ■ из %1$s в %2$s</string>
+    <string name="calendar_main">основной</string>
+
 </resources>

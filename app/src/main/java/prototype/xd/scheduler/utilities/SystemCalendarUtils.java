@@ -10,10 +10,13 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.CalendarContract;
+import android.text.Spannable;
+import android.text.SpannableString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
@@ -50,7 +53,7 @@ public class SystemCalendarUtils {
         ArrayList<Integer> column_sizes = new ArrayList<>();
         String[] column_names = cursor.getColumnNames();
         table.add(new ArrayList<>(Arrays.asList(column_names)));
-    
+        
         for (String column_name : column_names) {
             column_sizes.add(column_name.length());
         }
@@ -65,7 +68,7 @@ public class SystemCalendarUtils {
             table.add(record);
             cursor.moveToNext();
         }
-    
+        
         System.out.println("TABLE DIMENSIONS: " + table.size() + " x " + column_names.length);
         System.out.println("TABLE DIMENSIONS_RAW: " + cursor.getCount() + " x " + cursor.getColumnNames().length);
         
@@ -79,9 +82,9 @@ public class SystemCalendarUtils {
         cursor.moveToFirst();
     }
     
-    public static String addSpaces(String input, int len){
+    public static String addSpaces(String input, int len) {
         StringBuilder out = new StringBuilder(input);
-        for(int i = input.length(); i < len; i++){
+        for (int i = input.length(); i < len; i++) {
             out.append(" ");
         }
         return out.toString();
@@ -124,6 +127,26 @@ public class SystemCalendarUtils {
             calendarSubKeys.add(buffer.toString());
         }
         return calendarSubKeys;
+    }
+    
+    public static Spannable calendarKeyToReadable(Context context, String calendar_key) {
+        String[] key_split = calendar_key.split("_");
+        switch (key_split.length) {
+            case 1:
+            default:
+                return new SpannableString(calendar_key);
+            case 2:
+                if (key_split[0].equals(key_split[1])) {
+                    key_split[1] = context.getString(R.string.calendar_main);
+                }
+                return new SpannableString(context.getString(R.string.editing_system_calendar, key_split[1], key_split[0]));
+            case 3:
+                if (key_split[0].equals(key_split[1])) {
+                    key_split[1] = context.getString(R.string.calendar_main);
+                }
+                return Utilities.colorize(context.getString(R.string.editing_system_calendar_color, key_split[1], key_split[0]),
+                        "■", Integer.parseInt(key_split[2]));
+        }
     }
     
     public static int getFirstValidKeyIndex(ArrayList<String> calendarSubKeys, String parameter) {

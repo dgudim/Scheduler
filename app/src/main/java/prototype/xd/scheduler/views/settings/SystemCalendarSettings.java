@@ -4,6 +4,7 @@ import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirma
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarKeyToReadable;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
@@ -18,13 +19,9 @@ import android.content.res.ColorStateList;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.google.android.material.slider.Slider;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -33,7 +30,6 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
-import prototype.xd.scheduler.utilities.Utilities;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
@@ -69,6 +65,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
     }
     
     private void initialise(final String calendarKey) {
+        
+        titleText.setText(calendarKeyToReadable(dialog.getContext(), calendarKey));
         
         calendarSubKeys = generateSubKeysFromKey(calendarKey);
         
@@ -143,14 +141,10 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 this, false, R.string.settings_show_days_expired,
                 calendarKey, calendarSubKeys,
                 Keys.EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET,
-                new Slider.OnChangeListener() {
-                    @Override
-                    public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                (slider, value, fromUser) ->
                         hide_expired_items_by_time_switch.setTextColor(slider.getValue() == 0 ?
                                 hide_expired_items_by_time_switch_def_colors :
-                                ColorStateList.valueOf(slider.getContext().getColor(R.color.entry_settings_parameter_group_and_personal)));
-                    }
-                }, null);
+                                ColorStateList.valueOf(slider.getContext().getColor(R.color.entry_settings_parameter_group_and_personal))), null);
         
         addSwitchChangeListener(
                 hide_expired_items_by_time_switch,
@@ -175,17 +169,17 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 hide_by_content_switch_state, this,
                 calendarKey, calendarSubKeys,
                 Keys.HIDE_ENTRIES_BY_CONTENT, Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT);
-    
+        
         hide_by_content_field.setText(preferences.getString(getFirstValidKey(calendarSubKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), ""));
-        if(currentListener != null){
+        if (currentListener != null) {
             hide_by_content_field.removeTextChangedListener(currentListener);
         }
         currentListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        
+            
             }
-    
+            
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 System.out.println(calendarKey);
@@ -193,10 +187,10 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 setStateIconColor(hide_by_content_field_state, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT);
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
-    
+            
             @Override
             public void afterTextChanged(Editable s) {
-        
+            
             }
         };
         hide_by_content_field.addTextChangedListener(currentListener);

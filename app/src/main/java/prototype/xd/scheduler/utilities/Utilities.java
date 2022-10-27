@@ -22,7 +22,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.widget.SeekBar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -178,7 +180,7 @@ public class Utilities {
         slider.setValue(preferences.getInt(key, defaultValue));
         slider.addOnChangeListener((listener_slider, progress, fromUser) -> {
             if (fromUser) {
-                displayTo.setText(displayTo.getContext().getString(stringResource, (int)progress));
+                displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
                 if (customizationEntry != null) {
                     switch (key) {
                         case UPCOMING_BORDER_THICKNESS:
@@ -221,7 +223,7 @@ public class Utilities {
         slider.setValue(initialValue);
         slider.addOnChangeListener((slider1, progress, fromUser) -> {
             if (fromUser) {
-                displayTo.setText(displayTo.getContext().getString(stringResource, (int)progress));
+                displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
                 if (mapToBorderPreview) {
                     //TODO: think about switching to floats
                     entrySettings.preview_border.setPadding((int) progress, (int) progress, (int) progress, 0);
@@ -440,6 +442,33 @@ public class Utilities {
                 .setPositiveButton(context.getString(R.string.apply), listener)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                 }).build().show();
+    }
+    
+    /**
+     * Colorize a specific substring in a string for TextView. Use it like this: <pre>
+     * textView.setText(
+     *     Strings.colorized("This word is black.","black", Color.BLACK),
+     *     TextView.BufferType.SPANNABLE
+     * );
+     * </pre>
+     *
+     * @param text Text that contains a substring to colorize
+     * @param word Substring to colorize
+     * @param argb Color
+     * @return Spannable
+     */
+    public static Spannable colorize(final String text, final String word, final int argb) {
+        final Spannable spannable = new SpannableString(text);
+        int substringStart = 0;
+        int start;
+        while ((start = text.indexOf(word, substringStart)) >= 0) {
+            spannable.setSpan(
+                    new ForegroundColorSpan(argb), start, start + word.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+            substringStart = start + word.length();
+        }
+        return spannable;
     }
     
     public static long RFC2445ToMilliseconds(String str) {

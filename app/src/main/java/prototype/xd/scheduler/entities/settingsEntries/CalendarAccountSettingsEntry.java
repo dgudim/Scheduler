@@ -28,9 +28,14 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
     }
     
     private int getIconFromAccountType() {
-        if (accountType.toLowerCase(Locale.ROOT).contains("google")) {
+        String type = accountType.toLowerCase(Locale.ROOT);
+        if(type.contains("exchange")) {
+            return R.drawable.ic_microsoft_exchange;
+        }
+        if (type.contains("google")) {
             return R.drawable.ic_google;
-        } else if (accountType.toLowerCase(Locale.ROOT).contains("local")) {
+        }
+        if (type.contains("local")) {
             return R.drawable.ic_mobile;
         }
         return R.drawable.ic_account_circle;

@@ -64,6 +64,8 @@ public class EntrySettings extends PopupSettingsView {
     
     private void initialise(TodoListEntry entry, Context context) {
         
+        titleText.setVisibility(View.GONE);
+        
         todoListEntry = entry;
         
         updateAllIndicators();

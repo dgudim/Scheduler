@@ -10,9 +10,4 @@
     <color name="entry_settings_parameter_group_and_personal">#3D6EFF</color>
 
     <color name="ic_launcher_background">#000000</color>
-
-    <color name="color_permission_granted">#008107</color>
-    <color name="color_permission_not_granted">#DD2C00</color>
-    <color name="color_permission_granted_bg">#30008107</color>
-    <color name="color_permission_not_granted_bg">#30DD2C00</color>
 </resources>

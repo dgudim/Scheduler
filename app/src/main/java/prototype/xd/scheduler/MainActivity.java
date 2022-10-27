@@ -16,6 +16,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.material.color.DynamicColors;
+import com.google.android.material.color.MaterialColors;
 
 import java.io.File;
 import java.io.InputStream;
@@ -146,21 +148,24 @@ public class MainActivity extends AppCompatActivity {
         boolean calendar_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED;
         
         if (display) {
-            TextView calendar_permission_text = findViewById(R.id.calendar_permission_granted);
-            TextView storage_permission_text = findViewById(R.id.storage_permission_granted);
-            CardView calendar_permission_text_bg = findViewById(R.id.calendar_permission_granted_bg);
-            CardView storage_permission_text_bg = findViewById(R.id.storage_permission_granted_bg);
-            
-            calendar_permission_text.setText(calendar_granted ? R.string.permissions_granted : R.string.permissions_not_granted);
-            calendar_permission_text.setTextColor(getColor(calendar_granted ? R.color.color_permission_granted : R.color.color_permission_not_granted));
-            calendar_permission_text_bg.setCardBackgroundColor(getColor(calendar_granted ? R.color.color_permission_granted_bg : R.color.color_permission_not_granted_bg));
-            
-            storage_permission_text.setText(storage_granted ? R.string.permissions_granted : R.string.permissions_not_granted);
-            storage_permission_text.setTextColor(getColor(storage_granted ? R.color.color_permission_granted : R.color.color_permission_not_granted));
-            storage_permission_text_bg.setCardBackgroundColor(getColor(storage_granted ? R.color.color_permission_granted_bg : R.color.color_permission_not_granted_bg));
+            setPermissionChipColor(calendar_granted,
+                    findViewById(R.id.calendar_permission_granted),
+                    findViewById(R.id.calendar_permission_granted_bg));
+    
+            setPermissionChipColor(storage_granted,
+                    findViewById(R.id.storage_permission_granted),
+                    findViewById(R.id.storage_permission_granted_bg));
         }
         
         return storage_granted && calendar_granted;
+    }
+    
+    private void setPermissionChipColor(boolean permission_granted, TextView permission_text, CardView permission_text_bg) {
+        permission_text.setText(permission_granted ? R.string.permissions_granted : R.string.permissions_not_granted);
+        permission_text.setTextColor(MaterialColors.getColor(permission_text, permission_granted ? R.attr.colorOnTertiaryContainer : R.attr.colorOnErrorContainer,
+                permission_granted ? Color.GREEN : Color.RED));
+        permission_text_bg.setCardBackgroundColor(MaterialColors.getColor(permission_text_bg, permission_granted ? R.attr.colorTertiaryContainer : R.attr.colorErrorContainer,
+                Color.LTGRAY));
     }
     
     @Override

@@ -73,7 +73,7 @@
     <string name="category_system_calendars">System calendar integration</string>
     <string name="category_appearance">Appearance</string>
     <string name="cancel">Cancel</string>
-    <string name="close">close</string>
+    <string name="close">Close</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="apply">Apply</string>
     <string name="add_to_global_list">Add to global list</string>
@@ -122,5 +122,8 @@
     <string name="hide_by_content">Hide by content</string>
     <string name="separate_multiple_statements_by">separate multiple statements by ||</string>
     <string name="content">content</string>
+    <string name="editing_system_calendar">%1$s in %2$s</string>
+    <string name="editing_system_calendar_color">Events with color: ■ from %1$s in %2$s</string>
+    <string name="calendar_main">main</string>
 
 </resources>

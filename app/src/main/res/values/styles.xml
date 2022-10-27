@@ -4,6 +4,7 @@
         <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@color/transparent</item>
     </style>
 
     <style name="TextSmall_secondary" parent="TextAppearance.Material3.LabelMedium">

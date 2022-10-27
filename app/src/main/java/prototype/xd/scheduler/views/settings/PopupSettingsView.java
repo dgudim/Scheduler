@@ -9,7 +9,6 @@ import android.content.res.ColorStateList;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
@@ -22,6 +21,8 @@ import prototype.xd.scheduler.views.Spinner;
 import prototype.xd.scheduler.views.Switch;
 
 public class PopupSettingsView {
+    
+    protected final TextView titleText;
     
     protected final CardView fontColor_select;
     protected final CardView bgColor_select;
@@ -80,9 +81,12 @@ public class PopupSettingsView {
     
     PopupSettingsView(View settingsView) {
         
+        titleText = settingsView.findViewById(R.id.entry_settings_title);
+        
         fontColor_select = settingsView.findViewById(R.id.fontColor);
         bgColor_select = settingsView.findViewById(R.id.backgroundColor);
         borderColor_select = settingsView.findViewById(R.id.borderColor);
+        
         add_group = settingsView.findViewById(R.id.addGroup);
         group_spinner = settingsView.findViewById(R.id.groupSpinner);
         
