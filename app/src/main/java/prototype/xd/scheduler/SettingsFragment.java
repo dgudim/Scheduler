@@ -24,7 +24,6 @@ import prototype.xd.scheduler.entities.settingsEntries.CalendarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.CompoundCustomizationEntry;
 import prototype.xd.scheduler.entities.settingsEntries.DiscreteSeekBarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.ResetButtonSettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.SeekBarSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.SettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.SwitchSettingsEntry;
 import prototype.xd.scheduler.entities.settingsEntries.TitleBarSettingsEntry;
@@ -72,7 +71,7 @@ public class SettingsFragment extends Fragment {
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED,
                 getString(R.string.settings_adaptive_color)));
-        settingsEntries.add(new SeekBarSettingsEntry(0, 1000, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 10, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE,
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance));
         settingsEntries.add(new CompoundCustomizationEntry());
         settingsEntries.add(new DiscreteSeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE,

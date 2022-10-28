@@ -37,6 +37,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.math.MathUtils;
 
+import com.google.android.material.color.MaterialColors;
+
 import org.apache.commons.lang.WordUtils;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
@@ -480,11 +482,12 @@ public class TodoListEntry {
         log(INFO, "TodoListEntry", "loaded display data for " + textValue);
     }
     
-    private int getAdaptiveColor(int color) {
+    private int getAdaptiveColor(int inputColor) {
         if (adaptiveColorEnabled) {
-            return mixTwoColors(color, adaptiveColor, adaptiveColorBalance / 1000d);
+            return mixTwoColors(MaterialColors.harmonize(inputColor, adaptiveColor),
+                    adaptiveColor, adaptiveColorBalance / 10d);
         }
-        return color;
+        return inputColor;
     }
     
     public void initializeBgAndPadPaints() {
