@@ -1,16 +1,12 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.DateManager.addTimeZoneOffset;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
-import static prototype.xd.scheduler.utilities.DateManager.dateToEpoch;
-import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
-import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
@@ -20,7 +16,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -37,6 +32,7 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
+import prototype.xd.scheduler.views.CalendarView;
 
 public class HomeFragment extends Fragment {
     
@@ -57,23 +53,27 @@ public class HomeFragment extends Fragment {
         todoListEntryStorage = new TodoListEntryStorage(container);
         listView.setAdapter(todoListEntryStorage.getTodoListViewAdapter());
         
-        CalendarView calendarView = view.findViewById(R.id.calendar);
+        // construct custom calendar view
+        CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar));
+        
         TextView statusText = view.findViewById(R.id.status_text);
-        long epoch;
-        if ((epoch = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
-            calendarView.setDate(addTimeZoneOffset(epoch, timeZone_SYSTEM));
+        long day;
+        if ((day = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
+            calendarView.selectDay(day);
         }
-        calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
-            preferences_service.edit().putLong(Keys.PREVIOUSLY_SELECTED_DATE, dateToEpoch(year, month + 1, dayOfMonth)).apply();
-            updateDate(year + "_" + (month + 1) + "_" + dayOfMonth, true);
-            todoListEntryStorage.lazyLoadEntries(view1.getContext());
+        
+        calendarView.setOnDateChangeListener((selectedDate, context) -> {
+            long epoch_day = selectedDate.toEpochDay();
+            preferences_service.edit().putLong(Keys.PREVIOUSLY_SELECTED_DAY, epoch_day).apply();
+            updateDate(epoch_day, true);
+            todoListEntryStorage.lazyLoadEntries(context);
             updateStatusText(statusText);
         });
         
         view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> {
-            calendarView.setDate(currentTimestamp);
+            calendarView.selectDay(currentDay);
             currentlySelectedDay = currentDay;
-            preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DATE).apply();
+            preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
             todoListEntryStorage.updateTodoListAdapter(false);
             updateStatusText(statusText);
         });
@@ -105,8 +105,12 @@ public class HomeFragment extends Fragment {
         });
         
         view.findViewById(R.id.openSettingsButton).setOnClickListener(v ->
-                ((NavHostFragment) Objects.requireNonNull(requireActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)))
-                        .getNavController().navigate(R.id.action_HomeFragment_to_SettingsFragment));
+                ((NavHostFragment) Objects.requireNonNull(
+                        requireActivity()
+                                .getSupportFragmentManager()
+                                .findFragmentById(R.id.nav_host_fragment)))
+                        .getNavController()
+                        .navigate(R.id.action_HomeFragment_to_SettingsFragment));
         
         return view;
     }
@@ -115,12 +119,13 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        updateDate(DAY_FLAG_GLOBAL_STR, true);
+        updateDate(DAY_FLAG_GLOBAL, true);
         
-        long epoch;
-        if ((epoch = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DATE, 0)) != 0) {
-            currentlySelectedDay = daysFromEpoch(epoch, timeZone_SYSTEM);
+        long day;
+        if ((day = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
+            currentlySelectedDay = day;
         }
+        
         todoListEntryStorage.lazyLoadEntries(view.getContext());
         
         updateStatusText(view.findViewById(R.id.status_text));
@@ -134,7 +139,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroy() {
         todoListEntryStorage = null;
-        preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DATE).apply();
+        preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
         super.onDestroy();
     }
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="7"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/month_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="TextView"
+        android:textAppearance="@style/TextMedium_primary" />
+
+    <LinearLayout
+        android:id="@+id/weekday_titles_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp">
+
+        <include layout="@layout/calendar_day_title" />
+
+        <include layout="@layout/calendar_day_title" />
+
+        <include layout="@layout/calendar_day_title" />
+
+        <include layout="@layout/calendar_day_title" />
+
+        <include layout="@layout/calendar_day_title" />
+
+        <include layout="@layout/calendar_day_title" />
+
+        <include layout="@layout/calendar_day_title" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -47,10 +47,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="ImageContrastCheck" />
 
-    <CalendarView
+    <com.kizitonwose.calendar.view.CalendarView
         android:id="@+id/calendar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:cv_daySize="seventhWidth"
+        app:cv_dayViewResource="@layout/calendar_day_layout"
+        app:cv_monthHeaderResource="@layout/calendar_header"
+        app:cv_outDateStyle="endOfGrid"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

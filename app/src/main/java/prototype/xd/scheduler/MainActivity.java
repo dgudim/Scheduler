@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         HarmonizedColors.applyToContextIfAvailable(this,
                 new HarmonizedColorsOptions.Builder()
                         .setColorResourceIds(new int[]{
+                                R.color.gray_harmonized,
                                 R.color.entry_settings_parameter_default,
                                 R.color.entry_settings_parameter_group,
                                 R.color.entry_settings_parameter_group_and_personal,

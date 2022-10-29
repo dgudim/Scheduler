@@ -3,6 +3,8 @@
     <color name="transparent">#00000000</color>
     <color name="light_gray_bg_tint">#55555555</color>
 
+    <color name="gray_harmonized">#808080</color>
+
     <color name="ic_launcher_background">#000000</color>
     <color name="ic_launcher_outer_color">#5599ff</color>
     <color name="ic_launcher_outline_color">#000000</color>

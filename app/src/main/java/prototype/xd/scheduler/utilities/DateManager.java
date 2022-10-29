@@ -1,15 +1,13 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -20,6 +18,8 @@ public class DateManager {
     
     public static final TimeZone timeZone_SYSTEM = TimeZone.getDefault();
     
+    public static final LocalDate currentDate = LocalDate.now();
+    
     public static long currentDay = DAY_FLAG_GLOBAL;
     public static long currentTimestamp = DAY_FLAG_GLOBAL;
     public static long currentlySelectedDay = DAY_FLAG_GLOBAL;
@@ -29,15 +29,14 @@ public class DateManager {
     public static final String[] availableDays = new String[]{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"};
     public static final String defaultBackgroundName = "default.png";
     
-    public static void updateDate(String selectedDate_string, boolean updateCurrentlySelected) {
-        long selectedDay = daysFromDate(selectedDate_string);
+    public static void updateDate(long day, boolean updateCurrentlySelected) {
         currentTimestamp = getCurrentTimestamp();
         currentDay = daysFromEpoch(currentTimestamp, timeZone_SYSTEM);
         if (updateCurrentlySelected) {
-            if (selectedDay == DAY_FLAG_GLOBAL) {
+            if (day == DAY_FLAG_GLOBAL) {
                 currentlySelectedDay = currentDay;
             } else {
-                currentlySelectedDay = selectedDay;
+                currentlySelectedDay = day;
             }
         }
     }
@@ -83,11 +82,6 @@ public class DateManager {
         return TimeUnit.DAYS.convert(addTimeZoneOffset(epoch, timezone), TimeUnit.MILLISECONDS);
     }
     
-    public static long dateToEpoch(int year, int month, int day) {
-        return LocalDateTime.of(year, month, day, 0, 0, 0, 0).toInstant(ZoneOffset.UTC)
-                .toEpochMilli();
-    }
-    
     public static String datetimeFromEpoch(long epoch) {
         return dateFormat.format(new Date(epoch));
     }
@@ -102,17 +96,6 @@ public class DateManager {
     
     public static String getCurrentDateTime() {
         return dateFormat.format(new Date());
-    }
-    
-    public static long daysFromDate(String date) {
-        if (date.equals(DAY_FLAG_GLOBAL_STR)) {
-            return DAY_FLAG_GLOBAL;
-        }
-        String[] dateParts_current = date.split("_");
-        int year = Integer.parseInt(dateParts_current[0]);
-        int month = Integer.parseInt(dateParts_current[1]);
-        int day = Integer.parseInt(dateParts_current[2]);
-        return daysFromEpoch(dateToEpoch(year, month, day), timeZone_SYSTEM);
     }
     
     public static long addTimeZoneOffset(long epoch, TimeZone timeZone) {
