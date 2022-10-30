@@ -41,7 +41,7 @@ public class TodoListEntryStorage {
         return todoListViewAdapter;
     }
     
-    public int getCurrentlyVisibleEntries() {
+    public int getCurrentlyVisibleEntriesCount() {
         return todoListViewAdapter.getCount();
     }
     

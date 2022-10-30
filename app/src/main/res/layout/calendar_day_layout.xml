@@ -3,27 +3,68 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/calendarDayCard"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
+    app:cardBackgroundColor="@color/transparent"
     app:cardCornerRadius="4dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/transparent"
-    app:cardBackgroundColor="@color/transparent"
-    android:id="@+id/calendarDayCard">
+    app:strokeColor="@color/transparent">
 
-    <TextView
-        android:id="@+id/calendarDayText"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:paddingBottom="21dp"
-        android:textSize="16sp"
-        tools:text="22"
-        android:textColor="?colorPrimary">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="2dp">
 
-    </TextView>
+        <TextView
+            android:id="@+id/calendarDayText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:textAlignment="center"
+            android:textColor="?colorPrimary"
+            android:textSize="16sp"
+            tools:text="22" />
+
+        <View
+            android:id="@+id/event_indicator1"
+            android:layout_width="wrap_content"
+            android:layout_height="3dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1.5dp"
+            android:background="@drawable/round_bg" />
+
+        <View
+            android:id="@+id/event_indicator2"
+            android:layout_width="wrap_content"
+            android:layout_height="3dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1.5dp"
+            android:background="@drawable/round_bg" />
+
+        <View
+            android:id="@+id/event_indicator3"
+            android:layout_width="wrap_content"
+            android:layout_height="3dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1.5dp"
+            android:background="@drawable/round_bg" />
+
+        <View
+            android:id="@+id/event_indicator4"
+            android:layout_width="wrap_content"
+            android:layout_height="3dp"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginBottom="1.5dp"
+            android:background="@drawable/round_bg" />
+
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
 

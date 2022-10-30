@@ -30,6 +30,7 @@ import java.util.Objects;
 
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 import prototype.xd.scheduler.views.CalendarView;
@@ -54,12 +55,14 @@ public class HomeFragment extends Fragment {
         listView.setAdapter(todoListEntryStorage.getTodoListViewAdapter());
         
         // construct custom calendar view
-        CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar));
+        CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryStorage);
         
         TextView statusText = view.findViewById(R.id.status_text);
         long day;
         if ((day = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
             calendarView.selectDay(day);
+        } else {
+            calendarView.selectDate(DateManager.currentDate);
         }
         
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
@@ -133,7 +136,7 @@ public class HomeFragment extends Fragment {
     
     private void updateStatusText(TextView statusText) {
         statusText.setText(getString(R.string.status, dateFromEpoch(currentlySelectedDay * 86400000),
-                todoListEntryStorage.getCurrentlyVisibleEntries()));
+                todoListEntryStorage.getCurrentlyVisibleEntriesCount()));
     }
     
     @Override

@@ -42,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -442,6 +443,13 @@ public class Utilities {
                 .setPositiveButton(context.getString(R.string.apply), listener)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                 }).build().show();
+    }
+    
+    public static boolean datesEqual(LocalDate date1, LocalDate date2) {
+        if(date1 == null || date2 == null) {
+            return false;
+        }
+        return date1.isEqual(date2);
     }
     
     /**

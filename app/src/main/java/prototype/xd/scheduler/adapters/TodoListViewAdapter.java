@@ -11,7 +11,6 @@ import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 
-import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,7 +99,6 @@ public class TodoListViewAdapter extends BaseAdapter {
         return currentTodoListEntries.get(i).fromSystemCalendar ? 1 : 0;
     }
     
-    @SuppressLint("SetTextI18n")
     @Override
     public View getView(final int i, View view, ViewGroup parent) {
         
@@ -115,11 +113,15 @@ public class TodoListViewAdapter extends BaseAdapter {
         }
         
         TextView todoText = view.findViewById(R.id.todoText);
-        
         ImageView settings = view.findViewById(R.id.settings);
         
-        if (!currentEntry.fromSystemCalendar) {
-            
+        if (currentEntry.fromSystemCalendar) {
+            ((CardView) view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
+            TextView time = view.findViewById(R.id.time_text);
+            time.setText(currentEntry.getTimeSpan(view.getContext()));
+            time.setTextColor(currentEntry.fontColor);
+            settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
+        } else {
             view.findViewById(R.id.deletionButton).setOnClickListener(view1 ->
                     displayConfirmationDialogue(view1.getContext(),
                             R.string.delete, R.string.are_you_sure,
@@ -171,12 +173,6 @@ public class TodoListViewAdapter extends BaseAdapter {
                 return true;
             });
             settings.setOnClickListener(v -> entrySettings.show(currentEntry, v.getContext()));
-        } else {
-            ((CardView) view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
-            TextView time = view.findViewById(R.id.time_text);
-            time.setText(currentEntry.getTimeSpan(view.getContext()));
-            time.setTextColor(currentEntry.fontColor);
-            settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
         }
         
         MaterialCardView backgroundLayer = view.findViewById(R.id.backgroundLayer);

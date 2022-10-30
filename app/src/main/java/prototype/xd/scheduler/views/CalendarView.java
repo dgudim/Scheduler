@@ -1,8 +1,10 @@
 package prototype.xd.scheduler.views;
 
 import static com.kizitonwose.calendar.core.ExtensionsKt.daysOfWeek;
+import static prototype.xd.scheduler.utilities.Utilities.datesEqual;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,12 +30,17 @@ import java.util.Locale;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
+import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
 public class CalendarView {
     
     static class CalendarDayViewContainer extends ViewContainer {
         
         TextView textView;
+        
+        final int maxIndicators = 4;
+        View[] eventIndicators;
+        
         public MaterialCardView cardView;
         public LocalDate date;
         
@@ -41,15 +48,35 @@ public class CalendarView {
             super(view);
             textView = view.findViewById(R.id.calendarDayText);
             cardView = view.findViewById(R.id.calendarDayCard);
+            
+            eventIndicators = new View[maxIndicators];
+            eventIndicators[0] = view.findViewById(R.id.event_indicator1);
+            eventIndicators[1] = view.findViewById(R.id.event_indicator2);
+            eventIndicators[2] = view.findViewById(R.id.event_indicator3);
+            eventIndicators[3] = view.findViewById(R.id.event_indicator4);
+            
             cardView.setOnClickListener(v -> container.selectDate(date));
         }
         
-        public void bind(CalendarDay elementDay, CalendarView calendarView) {
+        private void setEventIndicators(Integer[] colors) {
+            for (int i = 0; i < maxIndicators; i++){
+                if(colors.length <= i || colors[i] == null) {
+                    eventIndicators[i].setVisibility(View.INVISIBLE);
+                } else {
+                    eventIndicators[i].setVisibility(View.VISIBLE);
+                    eventIndicators[i].setBackgroundTintList(ColorStateList.valueOf(colors[i]));
+                }
+            }
+        }
+        
+        public void bind(CalendarDay elementDay, CalendarView calendarView, TodoListEntryStorage todoListEntryStorage) {
             Context context = calendarView.rootCalendarView.getContext();
             date = elementDay.getDate();
             textView.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
+            
+            
             if (elementDay.component2() == DayPosition.MonthDate) {
-                if (date.isEqual(DateManager.currentDate)) {
+                if (datesEqual(date, DateManager.currentDate)) {
                     textView.setTextColor(MaterialColors.getColor(context, R.attr.colorPrimary, Color.WHITE));
                 } else {
                     textView.setTextColor(MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE));
@@ -57,8 +84,10 @@ public class CalendarView {
             } else {
                 textView.setTextColor(context.getColor(R.color.gray_harmonized));
             }
+    
+            setEventIndicators(new Integer[]{});
             
-            if (date.isEqual(calendarView.selectedDate)) {
+            if (datesEqual(date, calendarView.selectedDate) && elementDay.component2() == DayPosition.MonthDate) {
                 cardView.setStrokeColor(MaterialColors.getColor(context, R.attr.colorAccent, Color.WHITE));
                 cardView.setCardBackgroundColor(MaterialColors.getColor(context, R.attr.colorSurfaceVariant, Color.WHITE));
             } else {
@@ -97,7 +126,7 @@ public class CalendarView {
     com.kizitonwose.calendar.view.CalendarView rootCalendarView;
     DateChangedListener dateChangedListener;
     
-    public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView) {
+    public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoListEntryStorage todoListEntryStorage) {
         this.rootCalendarView = rootCalendarView;
         
         YearMonth currentMonth = YearMonth.now();
@@ -114,7 +143,7 @@ public class CalendarView {
             
             @Override
             public void bind(@NonNull CalendarDayViewContainer container, CalendarDay calendarDay) {
-                container.bind(calendarDay, CalendarView.this);
+                container.bind(calendarDay, CalendarView.this, todoListEntryStorage);
             }
         });
         rootCalendarView.setMonthHeaderBinder(new MonthHeaderFooterBinder<CalendarMonthViewContainer>() {
@@ -137,9 +166,10 @@ public class CalendarView {
     public void selectDate(LocalDate targetDate) {
         LocalDate prevSelection = selectedDate;
         
+        rootCalendarView.smoothScrollToDate(targetDate);
+        
         // we selected another date
-        if (prevSelection == null || !targetDate.isEqual(prevSelection)) {
-            rootCalendarView.scrollToDate(targetDate);
+        if (!datesEqual(targetDate, prevSelection)) {
             if (prevSelection != null) {
                 rootCalendarView.notifyDateChanged(prevSelection);
             }
