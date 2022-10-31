@@ -41,6 +41,8 @@ public class TodoListViewAdapter extends BaseAdapter {
     private final EntrySettings entrySettings;
     private final SystemCalendarSettings systemCalendarSettings;
     
+    private DayStateUpdateListener dayStateUpdateListener;
+    
     public TodoListViewAdapter(final TodoListEntryStorage todoListEntryStorage, final ViewGroup parent) {
         this.todoListEntryStorage = todoListEntryStorage;
         currentTodoListEntries = new ArrayList<>();
@@ -111,6 +113,10 @@ public class TodoListViewAdapter extends BaseAdapter {
                                 todoListEntryStorage.removeEntry(currentEntry);
                                 todoListEntryStorage.saveEntries();
                                 todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
+                                // deleting a global entry does not change indicators
+                                if (!currentEntry.isGlobalEntry) {
+                                    dayStateUpdateListener.onDayStateUpdated();
+                                }
                             }));
             
             CheckBox isDone = view.findViewById(R.id.isDone);
@@ -125,6 +131,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                 }
                 todoListEntryStorage.saveEntries();
                 todoListEntryStorage.updateTodoListAdapter(true);
+                dayStateUpdateListener.onDayStateUpdated();
             });
             
             view.setOnLongClickListener(view1 -> {
@@ -147,6 +154,11 @@ public class TodoListViewAdapter extends BaseAdapter {
                                 currentEntry.changeGroup(groupList.get(selectedIndex));
                             }
                             currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
+                            // completed -> global = indicators don't change, no need to update
+                            if (!currentEntry.completed) {
+                                dayStateUpdateListener.onDayStateUpdated();
+                            }
+                            currentEntry.changeParameter(IS_COMPLETED, "false");
                             todoListEntryStorage.saveEntries();
                             todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
                             return true;
@@ -169,5 +181,14 @@ public class TodoListViewAdapter extends BaseAdapter {
         todoText.setText(currentEntry.textValue + currentEntry.getDayOffset(currentlySelectedDay, view.getContext()));
         
         return view;
+    }
+    
+    public void setDateUpdateListener(DayStateUpdateListener dayStateUpdateListener) {
+        this.dayStateUpdateListener = dayStateUpdateListener;
+    }
+    
+    @FunctionalInterface
+    public interface DayStateUpdateListener {
+        void onDayStateUpdated();
     }
 }

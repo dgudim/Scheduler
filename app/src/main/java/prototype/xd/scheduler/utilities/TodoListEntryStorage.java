@@ -13,7 +13,6 @@ import android.content.Context;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
@@ -29,7 +28,6 @@ public class TodoListEntryStorage {
     
     private final TodoListViewAdapter todoListViewAdapter;
     private ArrayList<TodoListEntry> todoListEntries;
-    private HashMap<Integer, ArrayList<Integer>> todoListEntriesDayLookup;
     private final ArrayList<Group> groups;
     
     public TodoListEntryStorage(final ViewGroup parent) {

@@ -56,7 +56,7 @@ public class HomeFragment extends Fragment {
         
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryStorage);
-        
+        todoListEntryStorage.getTodoListViewAdapter().setDateUpdateListener(calendarView::notifyCurrentDayChanged);
         
         long day;
         if ((day = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
@@ -74,9 +74,9 @@ public class HomeFragment extends Fragment {
             updateStatusText(statusText);
         });
         
-        calendarView.setOnMonthPreChangeListener((calendarMonth, first_visible_day, last_visible_day, context) -> {
-            todoListEntryStorage.lazyLoadEntries(context, first_visible_day, last_visible_day);
-        });
+        calendarView.setOnMonthPreChangeListener((calendarMonth, first_visible_day, last_visible_day, context) ->
+                // load current month before displaying the data
+                todoListEntryStorage.lazyLoadEntries(context, first_visible_day, last_visible_day));
         
         view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> {
             calendarView.selectDay(currentDay);
@@ -95,6 +95,7 @@ public class HomeFragment extends Fragment {
                         todoListEntryStorage.addEntry(newEntry);
                         todoListEntryStorage.saveEntries();
                         todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
+                        calendarView.notifyCurrentDayChanged();
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
