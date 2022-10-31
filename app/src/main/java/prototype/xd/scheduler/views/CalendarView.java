@@ -191,7 +191,6 @@ public class CalendarView {
         
         rootCalendarView.setup(startMonth, endMonth, daysOfWeek.get(0));
         rootCalendarView.scrollToMonth(currentMonth);
-        rootCalendarView.setItemAnimator(null);
     }
     
     public void selectDate(LocalDate targetDate) {

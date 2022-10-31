@@ -41,7 +41,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
     implementation 'androidx.navigation:navigation-ui:2.5.3'
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
-    implementation 'com.kizitonwose.calendar:view:2.0.0'
-    implementation group: 'org.dmfs', name: 'lib-recur', version: '0.12.2'
+    implementation 'com.kizitonwose.calendar:view:2.0.1'
+    implementation 'org.dmfs:lib-recur:0.12.2'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 }
