@@ -180,6 +180,18 @@ public class TodoListEntry {
         return day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL;
     }
     
+    public boolean visibleInList(long day) {
+        boolean visibilityFlag = !completed || showInList_ifCompleted;
+        boolean show;
+        if (day == currentDay) {
+            show = isUpcomingEntry || isExpiredEntry || isVisible(day);
+            show = show && visibilityFlag;
+        } else {
+            show = isVisible(day);
+        }
+        return show;
+    }
+    
     public boolean isVisible(long day) {
         if (recurrenceSet != null) {
             if (day > day_end) {

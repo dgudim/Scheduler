@@ -2,7 +2,6 @@ package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.groupIndexInList;
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
@@ -11,6 +10,7 @@ import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +36,7 @@ public class TodoListViewAdapter extends BaseAdapter {
     
     private final TodoListEntryStorage todoListEntryStorage;
     
-    private final ArrayList<TodoListEntry> currentTodoListEntries;
-    private final ArrayList<Integer> currentTodoListEntries_indexMap;
+    private ArrayList<TodoListEntry> currentTodoListEntries;
     
     private final EntrySettings entrySettings;
     private final SystemCalendarSettings systemCalendarSettings;
@@ -45,8 +44,8 @@ public class TodoListViewAdapter extends BaseAdapter {
     public TodoListViewAdapter(final TodoListEntryStorage todoListEntryStorage, final ViewGroup parent) {
         this.todoListEntryStorage = todoListEntryStorage;
         currentTodoListEntries = new ArrayList<>();
-        currentTodoListEntries_indexMap = new ArrayList<>();
-        entrySettings = new EntrySettings(todoListEntryStorage, LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
+        entrySettings = new EntrySettings(todoListEntryStorage,
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
         systemCalendarSettings = new SystemCalendarSettings(todoListEntryStorage,
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
     }
@@ -67,26 +66,7 @@ public class TodoListViewAdapter extends BaseAdapter {
     }
     
     public void updateCurrentEntries() {
-        currentTodoListEntries.clear();
-        currentTodoListEntries_indexMap.clear();
-        ArrayList<TodoListEntry> entries = todoListEntryStorage.getTodoListEntries();
-        for (int i = 0; i < entries.size(); i++) {
-            TodoListEntry currentEntry = entries.get(i);
-            
-            boolean visibilityFlag = !currentEntry.completed || currentEntry.showInList_ifCompleted;
-            boolean show;
-            if (currentlySelectedDay == currentDay) {
-                show = currentEntry.isUpcomingEntry || currentEntry.isExpiredEntry || currentEntry.isVisible(currentlySelectedDay);
-                show = show && visibilityFlag;
-            } else {
-                show = currentEntry.isVisible(currentlySelectedDay);
-            }
-            
-            if (show) {
-                currentTodoListEntries.add(currentEntry);
-                currentTodoListEntries_indexMap.add(i);
-            }
-        }
+        currentTodoListEntries = todoListEntryStorage.getVisibleTodoListEntries(currentlySelectedDay);
     }
     
     @Override
@@ -99,6 +79,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         return currentTodoListEntries.get(i).fromSystemCalendar ? 1 : 0;
     }
     
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(final int i, View view, ViewGroup parent) {
         
@@ -127,7 +108,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                             R.string.delete, R.string.are_you_sure,
                             R.string.no, R.string.yes,
                             (view2) -> {
-                                todoListEntryStorage.removeEntry(currentTodoListEntries_indexMap.get(i));
+                                todoListEntryStorage.removeEntry(currentEntry);
                                 todoListEntryStorage.saveEntries();
                                 todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState());
                             }));

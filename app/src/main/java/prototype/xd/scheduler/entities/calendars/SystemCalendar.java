@@ -117,8 +117,7 @@ public class SystemCalendar {
     public ArrayList<TodoListEntry> getVisibleTodoListEntries(long day_start, long day_end) {
         ArrayList<TodoListEntry> todoListEntries = new ArrayList<>();
         if (preferences.getBoolean(makeKey(this) + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
-            for (int i = 0; i < systemCalendarEvents.size(); i++) {
-                SystemCalendarEvent event = systemCalendarEvents.get(i);
+            for (SystemCalendarEvent event: systemCalendarEvents) {
                 if (event.fallsInRange(day_start, day_end)) {
                     todoListEntries.add(new TodoListEntry(event));
                 }

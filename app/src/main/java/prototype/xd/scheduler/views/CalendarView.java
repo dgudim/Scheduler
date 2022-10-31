@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.views;
 
 import static com.kizitonwose.calendar.core.ExtensionsKt.daysOfWeek;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Utilities.datesEqual;
 
 import android.content.Context;
@@ -25,10 +26,13 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
@@ -58,13 +62,20 @@ public class CalendarView {
             cardView.setOnClickListener(v -> container.selectDate(date));
         }
         
-        private void setEventIndicators(Integer[] colors) {
-            for (int i = 0; i < maxIndicators; i++){
-                if(colors.length <= i || colors[i] == null) {
+        private void setEventIndicators(TodoListEntryStorage todoListEntryStorage, View context, DayPosition dayPosition) {
+            long day = date.toEpochDay();
+            ArrayList<TodoListEntry> todoListEntries = todoListEntryStorage.getVisibleTodoListEntries(day);
+            for (int i = 0; i < maxIndicators; i++) {
+                if (todoListEntries.size() <= i) {
                     eventIndicators[i].setVisibility(View.INVISIBLE);
                 } else {
+                    TodoListEntry todoListEntry = todoListEntries.get(i);
+                    int color = todoListEntry.bgColor;
+                    if (dayPosition != DayPosition.MonthDate) {
+                        color = mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), 0.8);
+                    }
                     eventIndicators[i].setVisibility(View.VISIBLE);
-                    eventIndicators[i].setBackgroundTintList(ColorStateList.valueOf(colors[i]));
+                    eventIndicators[i].setBackgroundTintList(ColorStateList.valueOf(color));
                 }
             }
         }
@@ -74,8 +85,9 @@ public class CalendarView {
             date = elementDay.getDate();
             textView.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
             
+            DayPosition dayPosition = elementDay.component2();
             
-            if (elementDay.component2() == DayPosition.MonthDate) {
+            if (dayPosition == DayPosition.MonthDate) {
                 if (datesEqual(date, DateManager.currentDate)) {
                     textView.setTextColor(MaterialColors.getColor(context, R.attr.colorPrimary, Color.WHITE));
                 } else {
@@ -84,10 +96,10 @@ public class CalendarView {
             } else {
                 textView.setTextColor(context.getColor(R.color.gray_harmonized));
             }
-    
-            setEventIndicators(new Integer[]{});
             
-            if (datesEqual(date, calendarView.selectedDate) && elementDay.component2() == DayPosition.MonthDate) {
+            setEventIndicators(todoListEntryStorage, calendarView.rootCalendarView, dayPosition);
+            
+            if (datesEqual(date, calendarView.selectedDate) && dayPosition == DayPosition.MonthDate) {
                 cardView.setStrokeColor(MaterialColors.getColor(context, R.attr.colorAccent, Color.WHITE));
                 cardView.setCardBackgroundColor(MaterialColors.getColor(context, R.attr.colorSurfaceVariant, Color.WHITE));
             } else {
@@ -124,7 +136,8 @@ public class CalendarView {
     
     LocalDate selectedDate;
     com.kizitonwose.calendar.view.CalendarView rootCalendarView;
-    DateChangedListener dateChangedListener;
+    DateChangeListener dateChangeListener;
+    MonthChangeListener monthPreChangeListener;
     
     public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoListEntryStorage todoListEntryStorage) {
         this.rootCalendarView = rootCalendarView;
@@ -146,6 +159,7 @@ public class CalendarView {
                 container.bind(calendarDay, CalendarView.this, todoListEntryStorage);
             }
         });
+        
         rootCalendarView.setMonthHeaderBinder(new MonthHeaderFooterBinder<CalendarMonthViewContainer>() {
             @NonNull
             @Override
@@ -156,17 +170,25 @@ public class CalendarView {
             @Override
             public void bind(@NonNull CalendarMonthViewContainer container, CalendarMonth calendarMonth) {
                 container.bind(calendarMonth, daysOfWeek);
+                if(monthPreChangeListener != null) {
+                    YearMonth yearMonth = calendarMonth.getYearMonth();
+                    monthPreChangeListener.onMonthChanged(calendarMonth,
+                            yearMonth.atDay(1).toEpochDay(),
+                            yearMonth.atEndOfMonth().toEpochDay(),
+                            rootCalendarView.getContext());
+                }
             }
         });
         
         rootCalendarView.setup(startMonth, endMonth, daysOfWeek.get(0));
         rootCalendarView.scrollToMonth(currentMonth);
+        rootCalendarView.setItemAnimator(null);
     }
     
     public void selectDate(LocalDate targetDate) {
         LocalDate prevSelection = selectedDate;
         
-        rootCalendarView.smoothScrollToDate(targetDate);
+        rootCalendarView.scrollToDate(targetDate);
         
         // we selected another date
         if (!datesEqual(targetDate, prevSelection)) {
@@ -175,8 +197,8 @@ public class CalendarView {
             }
             rootCalendarView.notifyDateChanged(targetDate);
             selectedDate = targetDate;
-            if (dateChangedListener != null) {
-                dateChangedListener.onDateChanged(selectedDate, rootCalendarView.getContext());
+            if (dateChangeListener != null) {
+                dateChangeListener.onDateChanged(selectedDate, rootCalendarView.getContext());
             }
         }
     }
@@ -185,13 +207,32 @@ public class CalendarView {
         selectDate(LocalDate.ofEpochDay(day));
     }
     
-    public void setOnDateChangeListener(DateChangedListener dateChangedListener) {
-        this.dateChangedListener = dateChangedListener;
+    public void setOnDateChangeListener(DateChangeListener dateChangeListener) {
+        this.dateChangeListener = dateChangeListener;
+    }
+    
+    public void setOnMonthPostChangeListener(MonthChangeListener monthPostChangeListener) {
+        rootCalendarView.setMonthScrollListener(calendarMonth -> {
+            monthPostChangeListener.onMonthChanged(calendarMonth,
+                    Objects.requireNonNull(rootCalendarView.findFirstVisibleDay()).getDate().toEpochDay(),
+                    Objects.requireNonNull(rootCalendarView.findLastVisibleDay()).getDate().toEpochDay(),
+                    rootCalendarView.getContext());
+            return null;
+        });
+    }
+    
+    public void setOnMonthPreChangeListener(MonthChangeListener monthPreChangeListener) {
+        this.monthPreChangeListener = monthPreChangeListener;
     }
     
     @FunctionalInterface
-    public interface DateChangedListener {
+    public interface DateChangeListener {
         void onDateChanged(LocalDate selectedDate, Context context);
+    }
+    
+    @FunctionalInterface
+    public interface MonthChangeListener {
+        void onMonthChanged(CalendarMonth calendarMonth, long first_visible_day, long last_visible_day, Context context);
     }
 }
 

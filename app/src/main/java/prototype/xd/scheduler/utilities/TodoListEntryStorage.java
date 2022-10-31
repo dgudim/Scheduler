@@ -6,13 +6,14 @@ import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
-import static prototype.xd.scheduler.utilities.Utilities.*;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
+import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import android.content.Context;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
@@ -28,6 +29,7 @@ public class TodoListEntryStorage {
     
     private final TodoListViewAdapter todoListViewAdapter;
     private ArrayList<TodoListEntry> todoListEntries;
+    private HashMap<Integer, ArrayList<Integer>> todoListEntriesDayLookup;
     private final ArrayList<Group> groups;
     
     public TodoListEntryStorage(final ViewGroup parent) {
@@ -43,6 +45,17 @@ public class TodoListEntryStorage {
     
     public int getCurrentlyVisibleEntriesCount() {
         return todoListViewAdapter.getCount();
+    }
+    
+    public ArrayList<TodoListEntry> getVisibleTodoListEntries(long day) {
+        ArrayList<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
+        for (int i = 0; i < todoListEntries.size(); i++) {
+            TodoListEntry currentEntry = todoListEntries.get(i);
+            if (currentEntry.visibleInList(day)) {
+                filteredTodoListEntries.add(currentEntry);
+            }
+        }
+        return filteredTodoListEntries;
     }
     
     public void updateTodoListAdapter(boolean updateBitmap) {
@@ -62,30 +75,26 @@ public class TodoListEntryStorage {
         return groups;
     }
     
-    public void lazyLoadEntries(Context context) {
+    public void lazyLoadEntries(Context context, long toLoad_day_start, long toLoadDay_end) {
         if (loadedDay_start == 0) {
-            loadedDay_start = currentlySelectedDay - 14;
-            loadedDay_end = currentlySelectedDay + 14;
+            loadedDay_start = toLoad_day_start;
+            loadedDay_end = toLoadDay_end;
             todoListEntries.addAll(loadTodoEntries(context, loadedDay_start, loadedDay_end, groups));
         } else {
-            long new_loadedDay_start = currentlySelectedDay - 14;
-            long new_loadedDay_end = currentlySelectedDay + 14;
             long day_start = 0;
             long day_end = 0;
-            if (new_loadedDay_end > loadedDay_end) {
+            if (toLoadDay_end > loadedDay_end) {
                 day_start = loadedDay_end + 1;
-                day_end = new_loadedDay_end;
-                loadedDay_end = new_loadedDay_end;
-            } else if (new_loadedDay_start < loadedDay_start) {
-                day_start = new_loadedDay_start;
+                day_end = toLoadDay_end;
+                loadedDay_end = toLoadDay_end;
+            } else if (toLoad_day_start < loadedDay_start) {
+                day_start = toLoad_day_start;
                 day_end = loadedDay_start - 1;
-                loadedDay_start = new_loadedDay_start;
+                loadedDay_start = toLoad_day_start;
             }
-            if (day_start != 0) {
-                if (calendars != null) {
-                    for (int i = 0; i < calendars.size(); i++) {
-                        addDistinct(calendars.get(i).getVisibleTodoListEntries(day_start, day_end));
-                    }
+            if (day_start != 0 && calendars != null) {
+                for (int i = 0; i < calendars.size(); i++) {
+                    addDistinct(calendars.get(i).getVisibleTodoListEntries(day_start, day_end));
                 }
             }
         }
@@ -112,7 +121,7 @@ public class TodoListEntryStorage {
         todoListEntries.add(entry);
     }
     
-    public void removeEntry(int i) {
-        todoListEntries.remove(i);
+    public void removeEntry(TodoListEntry entry) {
+        todoListEntries.remove(entry);
     }
 }

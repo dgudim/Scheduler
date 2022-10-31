@@ -57,28 +57,30 @@ public class HomeFragment extends Fragment {
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryStorage);
         
-        TextView statusText = view.findViewById(R.id.status_text);
+        
         long day;
         if ((day = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
             calendarView.selectDay(day);
         } else {
             calendarView.selectDate(DateManager.currentDate);
         }
-        
+    
+        TextView statusText = view.findViewById(R.id.status_text);
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             long epoch_day = selectedDate.toEpochDay();
             preferences_service.edit().putLong(Keys.PREVIOUSLY_SELECTED_DAY, epoch_day).apply();
             updateDate(epoch_day, true);
-            todoListEntryStorage.lazyLoadEntries(context);
+            todoListEntryStorage.updateTodoListAdapter(false);
             updateStatusText(statusText);
+        });
+        
+        calendarView.setOnMonthPreChangeListener((calendarMonth, first_visible_day, last_visible_day, context) -> {
+            todoListEntryStorage.lazyLoadEntries(context, first_visible_day, last_visible_day);
         });
         
         view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> {
             calendarView.selectDay(currentDay);
-            currentlySelectedDay = currentDay;
             preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
-            todoListEntryStorage.updateTodoListAdapter(false);
-            updateStatusText(statusText);
         });
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
@@ -128,8 +130,6 @@ public class HomeFragment extends Fragment {
         if ((day = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
             currentlySelectedDay = day;
         }
-        
-        todoListEntryStorage.lazyLoadEntries(view.getContext());
         
         updateStatusText(view.findViewById(R.id.status_text));
     }
