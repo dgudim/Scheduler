@@ -2,7 +2,7 @@ package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
@@ -10,10 +10,15 @@ import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.ViewGroup;
+
+import com.google.android.material.color.MaterialColors;
 
 import java.util.ArrayList;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
@@ -27,7 +32,8 @@ public class TodoListEntryStorage {
     private long loadedDay_end;
     
     private final TodoListViewAdapter todoListViewAdapter;
-    private ArrayList<TodoListEntry> todoListEntries;
+    private final ArrayList<TodoListEntry> todoListEntries;
+    
     private final ArrayList<Group> groups;
     
     public TodoListEntryStorage(final ViewGroup parent) {
@@ -47,22 +53,42 @@ public class TodoListEntryStorage {
     
     public ArrayList<TodoListEntry> getVisibleTodoListEntries(long day) {
         ArrayList<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
-        for (int i = 0; i < todoListEntries.size(); i++) {
-            TodoListEntry currentEntry = todoListEntries.get(i);
-            if (currentEntry.visibleInList(day)) {
-                filteredTodoListEntries.add(currentEntry);
+        // get all entries visible on a particular day
+        for (TodoListEntry todoEntry: todoListEntries) {
+            if (todoEntry.visibleInList(day)) {
+                filteredTodoListEntries.add(todoEntry);
             }
         }
-        return filteredTodoListEntries;
+        // fancy sort
+        return sortEntries(filteredTodoListEntries, day);
+    }
+    
+    public ArrayList<ColorStateList> getEventIndicators(long day, boolean offTheCalendar, Context context) {
+        ArrayList<ColorStateList> entryIndicators = new ArrayList<>();
+        ArrayList<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
+        // get all relevant entries
+        for (TodoListEntry todoEntry: todoListEntries) {
+            if (!todoEntry.isGlobal() && !todoEntry.completed && todoEntry.visibleInList(day)) {
+                filteredTodoListEntries.add(todoEntry);
+            }
+        }
+        // fancy sort
+        filteredTodoListEntries = sortEntries(filteredTodoListEntries, day);
+        for (TodoListEntry todoEntry: filteredTodoListEntries) {
+            int color = todoEntry.bgColor;
+            if (offTheCalendar) {
+                color = mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), 0.8);
+            }
+            entryIndicators.add(ColorStateList.valueOf(color));
+        }
+        return entryIndicators;
     }
     
     public void updateTodoListAdapter(boolean updateBitmap) {
         if (updateBitmap) {
             preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
-        todoListEntries = sortEntries(todoListEntries, currentlySelectedDay);
-        todoListViewAdapter.updateCurrentEntries();
-        todoListViewAdapter.notifyDataSetChanged();
+        todoListViewAdapter.updateTodoEntries();
     }
     
     public ArrayList<TodoListEntry> getTodoListEntries() {

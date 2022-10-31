@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.views;
 
 import static com.kizitonwose.calendar.core.ExtensionsKt.daysOfWeek;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.Utilities.datesEqual;
 
@@ -33,7 +32,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
@@ -63,29 +61,14 @@ public class CalendarView {
             cardView.setOnClickListener(v -> container.selectDate(date));
         }
         
-        private void setEventIndicators(TodoListEntryStorage todoListEntryStorage, View context, DayPosition dayPosition) {
-            long day = date.toEpochDay();
-            ArrayList<TodoListEntry> todoListEntries = todoListEntryStorage.getVisibleTodoListEntries(day);
-            int currentIndicatorIndex = 0;
-            int currentEntryIndex = 0;
-            while (currentIndicatorIndex < eventIndicators.length && currentEntryIndex < todoListEntries.size()) {
-                TodoListEntry todoListEntry = todoListEntries.get(currentEntryIndex);
-                
-                if (!todoListEntry.isGlobal() && !todoListEntry.completed) {
-                    int color = todoListEntry.bgColor;
-                    if (dayPosition != DayPosition.MonthDate) {
-                        color = mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), 0.8);
-                    }
-                    eventIndicators[currentIndicatorIndex].setVisibility(View.VISIBLE);
-                    eventIndicators[currentIndicatorIndex].setBackgroundTintList(ColorStateList.valueOf(color));
-                    currentIndicatorIndex ++;
+        private void setEventIndicators(ArrayList<ColorStateList> eventIndicatorColors) {
+            for (int i = 0; i < maxIndicators; i++){
+                if(eventIndicatorColors.size() <= i) {
+                    eventIndicators[i].setVisibility(View.INVISIBLE);
+                    continue;
                 }
-                
-                currentEntryIndex++;
-            }
-            // hide access indicators
-            for(int i = currentIndicatorIndex; i < eventIndicators.length; i++) {
-                eventIndicators[i].setVisibility(View.INVISIBLE);
+                eventIndicators[i].setVisibility(View.VISIBLE);
+                eventIndicators[i].setBackgroundTintList(eventIndicatorColors.get(i));
             }
         }
         
@@ -106,7 +89,10 @@ public class CalendarView {
                 textView.setTextColor(context.getColor(R.color.gray_harmonized));
             }
             
-            setEventIndicators(todoListEntryStorage, calendarView.rootCalendarView, dayPosition);
+            setEventIndicators(todoListEntryStorage.getEventIndicators(
+                    date.toEpochDay(),
+                    dayPosition != DayPosition.MonthDate,
+                    context));
             
             if (datesEqual(date, calendarView.selectedDate) && dayPosition == DayPosition.MonthDate) {
                 cardView.setStrokeColor(MaterialColors.getColor(context, R.attr.colorAccent, Color.WHITE));

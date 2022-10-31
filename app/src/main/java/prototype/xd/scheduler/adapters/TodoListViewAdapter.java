@@ -67,8 +67,9 @@ public class TodoListViewAdapter extends BaseAdapter {
         return i;
     }
     
-    public void updateCurrentEntries() {
+    public void updateTodoEntries() {
         currentTodoListEntries = todoListEntryStorage.getVisibleTodoListEntries(currentlySelectedDay);
+        notifyDataSetChanged();
     }
     
     @Override
