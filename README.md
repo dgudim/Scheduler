@@ -24,7 +24,7 @@ Or just download [latest build](https://github.com/dgudim/Scheduler/releases/lat
 
 | Lock screen               | Main app menu              |
 | ------------------------- | -------------------------- |
-| ![](https://user-images.githubusercontent.com/34401005/196048503-c2671dff-2b91-487c-a6cb-89b8fd81d559.jpg) | <img id="thumb" src="https://user-images.githubusercontent.com/34401005/196048501-52530d23-2682-48d6-b4b9-0c7c7f775405.jpg"> |
+| ![](https://user-images.githubusercontent.com/34401005/196048503-c2671dff-2b91-487c-a6cb-89b8fd81d559.jpg) | <img id="thumb" src="https://user-images.githubusercontent.com/34401005/198995164-62ef0c89-a3c9-4f28-bef1-8806cea6a9f8.jpg"> |
 
 | Global settings           | Event settings             |
 | ------------------------- | -------------------------- |
