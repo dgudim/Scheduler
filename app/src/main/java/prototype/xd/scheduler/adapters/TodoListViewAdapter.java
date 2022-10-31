@@ -92,7 +92,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             if (currentEntry.fromSystemCalendar) {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_selection_calendar, parent, false);
             } else {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_selection, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_selection_todo, parent, false);
             }
         }
         

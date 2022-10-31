@@ -32,6 +32,18 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
     }
     namespace 'prototype.xd.scheduler'
+    sourceSets {
+        main {
+            res {
+                srcDirs 'src/main/res',
+                        'src/main/res/layouts/calendar',
+                        'src/main/res/layouts/partials',
+                        'src/main/res/layouts/full_views',
+                        'src/main/res/layouts/settings',
+                        'src/main/res/layouts/dialogs'
+            }
+        }
+    }
 }
 
 dependencies {
