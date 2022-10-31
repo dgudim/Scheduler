@@ -37,7 +37,7 @@
             android:minLines="1"
             android:padding="2dp"
             android:text="@string/app_name"
-            android:textAppearance="@style/TextMedium_primary" />
+            android:textAppearance="@style/MediumHeading" />
     </com.google.android.material.card.MaterialCardView>
 
     <ImageView

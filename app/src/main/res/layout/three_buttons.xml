@@ -7,26 +7,23 @@
 
     <Button
         android:id="@+id/cancel_button"
-        style="@style/defaultButtonStyle"
+        style="@style/DefaultButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:text="@string/cancel"
-        android:textAppearance="@style/TextLarge" />
+        android:text="@string/cancel" />
 
     <Button
         android:id="@+id/confirm_button"
-        style="@style/defaultButtonStyle"
+        style="@style/DefaultButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:text="@string/add"
-        android:textAppearance="@style/TextLarge" />
+        android:text="@string/add" />
 
     <Button
         android:id="@+id/secondary_action_button"
-        style="@style/defaultButtonStyle"
+        style="@style/DefaultButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:text="@string/add_to_global_list"
-        android:textAppearance="@style/TextLarge" />
+        android:text="@string/add_to_global_list" />
 
 </LinearLayout>

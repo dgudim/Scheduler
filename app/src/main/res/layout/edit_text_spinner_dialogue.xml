@@ -15,7 +15,8 @@
         android:hint="hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/entryNameEditText"
@@ -33,7 +34,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textField"
-        app:strokeColor="@color/material_on_surface_stroke"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -47,7 +47,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="@string/group"
-                android:textAppearance="@style/TextMedium_secondary" />
+                android:textAppearance="@style/SmallHeading" />
 
             <prototype.xd.scheduler.views.Spinner
                 android:id="@+id/groupSpinner"

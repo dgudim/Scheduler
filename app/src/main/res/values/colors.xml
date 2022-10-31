@@ -3,13 +3,16 @@
     <color name="transparent">#00000000</color>
     <color name="light_gray_bg_tint">#55555555</color>
 
+    <!-- harmonized at runtime -->
     <color name="gray_harmonized">#808080</color>
 
+    <!-- colors for icon -->
     <color name="ic_launcher_background">#000000</color>
     <color name="ic_launcher_outer_color">#5599ff</color>
     <color name="ic_launcher_outline_color">#000000</color>
     <color name="ic_launcher_tick_color">#ffcc00</color>
 
+    <!-- colors for entry settings status -->
     <color name="entry_settings_parameter_default">#888888</color>
     <color name="entry_settings_parameter_personal">#6FFF6F</color>
     <color name="entry_settings_parameter_group">#FFDD00</color>

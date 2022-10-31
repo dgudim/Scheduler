@@ -1,6 +1,5 @@
 package prototype.xd.scheduler.utilities;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:weightSum="7"
@@ -10,8 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="TextView"
-        android:textAppearance="@style/TextMedium_primary" />
+        android:text="Month"
+        android:textAppearance="@style/MediumHeading"
+        tools:ignore="HardcodedText" />
 
     <LinearLayout
         android:id="@+id/weekday_titles_container"

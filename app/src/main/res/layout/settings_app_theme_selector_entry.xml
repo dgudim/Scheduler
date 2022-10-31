@@ -16,7 +16,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/app_theme"
-            android:textAppearance="@style/TextSmallMedium_primary" />
+            android:textAppearance="@style/SmallHeading" />
 
         <prototype.xd.scheduler.views.Spinner
             android:id="@+id/themeSpinner"

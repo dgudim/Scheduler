@@ -41,7 +41,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
-                    android:textAppearance="@style/TextMedium_primary"
+                    android:textAppearance="@style/MediumHeading"
                     android:textStyle="bold" />
 
                 <prototype.xd.scheduler.views.Switch
@@ -49,7 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_show_items_lock"
-                    android:textAppearance="@style/TextSmallMedium_primary"
+                    android:textAppearance="@style/SmallHeading"
                     tools:ignore="TextContrastCheck" />
             </LinearLayout>
 
@@ -81,7 +81,7 @@
                         android:text="@string/settings_state_symbol"
 
                         android:textAlignment="center"
-                        android:textAppearance="@style/TextMedium_primary"
+                        android:textAppearance="@style/MediumHeading"
                         android:textStyle="bold" />
 
                     <prototype.xd.scheduler.views.Switch
@@ -89,7 +89,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/hide_by_content"
-                        android:textAppearance="@style/TextSmallMedium_primary"
+                        android:textAppearance="@style/SmallHeading"
                         tools:ignore="TextContrastCheck" />
                 </LinearLayout>
 
@@ -97,7 +97,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/separate_multiple_statements_by"
-                    android:textAppearance="@style/TextSmall_secondary" />
+                    android:textAppearance="@style/SmallHeadingSubtext" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -112,7 +112,7 @@
                         android:text="@string/settings_state_symbol"
                         android:textAlignment="center"
 
-                        android:textAppearance="@style/TextMedium_primary"
+                        android:textAppearance="@style/MediumHeading"
                         android:textStyle="bold" />
 
                     <EditText
@@ -122,7 +122,7 @@
                         android:hint="@string/content"
                         android:importantForAutofill="no"
                         android:inputType="text"
-                        android:textAppearance="@style/TextSmallMedium_primary"
+                        android:textAppearance="@style/SmallHeading"
                         tools:ignore="TouchTargetSizeCheck" />
                 </LinearLayout>
 
@@ -149,7 +149,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
-                    android:textAppearance="@style/TextMedium_primary"
+                    android:textAppearance="@style/MediumHeading"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -163,7 +163,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:text="@string/settings_priority"
-                        android:textAppearance="@style/TextSmallMedium_primary"
+                        android:textAppearance="@style/SmallHeading"
                         tools:ignore="TextContrastCheck" />
 
                     <com.google.android.material.slider.Slider
@@ -200,7 +200,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
-                    android:textAppearance="@style/TextMedium_primary"
+                    android:textAppearance="@style/MediumHeading"
                     android:textStyle="bold" />
 
                 <prototype.xd.scheduler.views.Switch
@@ -208,7 +208,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_adaptive_color"
-                    android:textAppearance="@style/TextSmallMedium_primary"
+                    android:textAppearance="@style/SmallHeading"
                     tools:ignore="TextContrastCheck" />
             </LinearLayout>
 
@@ -234,7 +234,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
-                    android:textAppearance="@style/TextMedium_primary"
+                    android:textAppearance="@style/MediumHeading"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -248,7 +248,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:text="@string/settings_adaptive_color_balance"
-                        android:textAppearance="@style/TextSmallMedium_primary" />
+                        android:textAppearance="@style/SmallHeading" />
 
                     <com.google.android.material.slider.Slider
                         android:id="@+id/adaptive_color_balance_bar"
@@ -280,7 +280,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/settings_colors"
-                    android:textAppearance="@style/TextMedium_primary"
+                    android:textAppearance="@style/MediumHeading"
                     tools:ignore="TextContrastCheck" />
 
                 <View
@@ -307,7 +307,7 @@
                             android:text="@string/settings_state_symbol"
                             android:textAlignment="center"
 
-                            android:textAppearance="@style/TextMedium_primary"
+                            android:textAppearance="@style/MediumHeading"
                             android:textStyle="bold" />
 
                         <TextView
@@ -319,7 +319,7 @@
                             android:text="@string/settings_state_symbol"
                             android:textAlignment="center"
 
-                            android:textAppearance="@style/TextMedium_primary"
+                            android:textAppearance="@style/MediumHeading"
                             android:textStyle="bold" />
 
                         <TextView
@@ -331,7 +331,7 @@
                             android:text="@string/settings_state_symbol"
                             android:textAlignment="center"
 
-                            android:textAppearance="@style/TextMedium_primary"
+                            android:textAppearance="@style/MediumHeading"
                             android:textStyle="bold" />
 
                     </LinearLayout>
@@ -347,7 +347,7 @@
                             android:layout_weight="1"
                             android:gravity="center_vertical"
                             android:text="@string/settings_bg_color"
-                            android:textAppearance="@style/TextSmallMedium_primary" />
+                            android:textAppearance="@style/SmallHeading" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -355,7 +355,7 @@
                             android:layout_weight="1"
                             android:gravity="center_vertical"
                             android:text="@string/settings_text_color"
-                            android:textAppearance="@style/TextSmallMedium_primary" />
+                            android:textAppearance="@style/SmallHeading" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -363,7 +363,7 @@
                             android:layout_weight="1"
                             android:gravity="center_vertical"
                             android:text="@string/settings_border_color"
-                            android:textAppearance="@style/TextSmallMedium_primary" />
+                            android:textAppearance="@style/SmallHeading" />
 
                     </LinearLayout>
 
@@ -428,7 +428,7 @@
                                 android:gravity="center"
                                 android:paddingBottom="3dp"
                                 android:text="@string/settings_preview_upcoming"
-                                android:textAppearance="@style/TextSmallMedium_primary" />
+                                android:textAppearance="@style/SmallHeading" />
 
                         </LinearLayout>
 
@@ -447,7 +447,7 @@
                                 android:gravity="center"
                                 android:paddingBottom="3dp"
                                 android:text="@string/settings_preview_current"
-                                android:textAppearance="@style/TextSmallMedium_primary" />
+                                android:textAppearance="@style/SmallHeading" />
 
                         </LinearLayout>
 
@@ -464,7 +464,7 @@
                                 android:gravity="center"
                                 android:paddingBottom="3dp"
                                 android:text="@string/settings_preview_expired"
-                                android:textAppearance="@style/TextSmallMedium_primary" />
+                                android:textAppearance="@style/SmallHeading" />
 
                         </LinearLayout>
 
@@ -490,7 +490,7 @@
                         android:text="@string/settings_state_symbol"
                         android:textAlignment="center"
 
-                        android:textAppearance="@style/TextMedium_primary"
+                        android:textAppearance="@style/MediumHeading"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -504,7 +504,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:text="@string/settings_border_thickness"
-                            android:textAppearance="@style/TextSmallMedium_primary" />
+                            android:textAppearance="@style/SmallHeading" />
 
                         <com.google.android.material.slider.Slider
                             android:id="@+id/bevel_thickness_bar"
@@ -542,7 +542,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
-                    android:textAppearance="@style/TextMedium_primary"
+                    android:textAppearance="@style/MediumHeading"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -556,7 +556,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:text="@string/settings_show_days_upcoming"
-                        android:textAppearance="@style/TextSmallMedium_primary" />
+                        android:textAppearance="@style/SmallHeading" />
 
                     <com.google.android.material.slider.Slider
                         android:id="@+id/show_days_beforehand_bar"
@@ -594,7 +594,7 @@
                     android:textAlignment="center"
 
                     android:textStyle="bold"
-                    android:textAppearance="@style/TextMedium_primary" />
+                    android:textAppearance="@style/MediumHeading" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -607,7 +607,7 @@
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:text="@string/settings_show_days_expired"
-                        android:textAppearance="@style/TextSmallMedium_primary" />
+                        android:textAppearance="@style/SmallHeading" />
 
                     <com.google.android.material.slider.Slider
                         android:id="@+id/show_days_after_bar"
@@ -645,7 +645,7 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
-                    android:textAppearance="@style/TextMedium_primary"
+                    android:textAppearance="@style/MediumHeading"
                     android:textStyle="bold" />
 
                 <prototype.xd.scheduler.views.Switch
@@ -653,7 +653,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_hide_expired_entries_by_time"
-                    android:textAppearance="@style/TextSmallMedium_primary" />
+                    android:textAppearance="@style/SmallHeading" />
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -684,7 +684,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:text="@string/group"
-                        android:textAppearance="@style/TextMedium_secondary"
+                        android:textAppearance="@style/SmallHeading"
                         tools:ignore="TextContrastCheck" />
 
                     <prototype.xd.scheduler.views.Spinner
@@ -724,21 +724,19 @@
 
             <Button
                 android:id="@+id/settings_reset_button"
-                style="@style/defaultButtonStyle"
+                style="@style/DefaultButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/settings_reset_to_defaults"
-                android:textAppearance="@style/TextLarge" />
+                android:text="@string/settings_reset_to_defaults" />
 
             <Button
                 android:id="@+id/close_settings_button"
-                style="@style/defaultButtonStyle"
+                style="@style/DefaultButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/close"
-                android:textAppearance="@style/TextLarge" />
+                android:text="@string/close" />
         </LinearLayout>
 
     </LinearLayout>

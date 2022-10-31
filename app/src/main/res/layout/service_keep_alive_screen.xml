@@ -13,17 +13,17 @@
         app:srcCompat="@drawable/ic_alert" />
 
     <TextView
+        style="@style/LargeHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/alert"
-        android:textAppearance="@style/TextLarge" />
+        android:text="@string/alert" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/service_killed_message"
-        android:textAppearance="@style/TextMedium_primary" />
+        android:textAppearance="@style/MediumHeading" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -38,29 +38,26 @@
 
             <Button
                 android:id="@+id/learn_howTo_button"
-                style="@style/defaultButtonStyle"
+                style="@style/DefaultButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/visit_dont_kill_my_app"
-                android:textAppearance="@style/TextLarge" />
+                android:text="@string/visit_dont_kill_my_app" />
 
             <Button
                 android:id="@+id/ignore_button"
-                style="@style/defaultButtonStyle"
+                style="@style/DefaultButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ignore"
-                android:textAppearance="@style/TextLarge" />
+                android:text="@string/ignore" />
 
         </LinearLayout>
 
         <Button
             android:id="@+id/never_ask_again_button"
-            style="@style/defaultButtonStyle"
+            style="@style/DefaultButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/never_ask_again"
-            android:textAppearance="@style/TextLarge"
             android:visibility="gone" />
 
     </LinearLayout>
