@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.widget.TextView;
 
@@ -42,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,6 +59,8 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 @SuppressWarnings({"unchecked"})
 public class Utilities {
     
+    private static final String NAME = "Utilities";
+    
     public static String getRootDir() {
         return preferences.getString(ROOT_DIR, "");
     }
@@ -69,6 +73,18 @@ public class Utilities {
         return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
     
+    public static <T extends Exception> void throwOnFalse(boolean result, String message, Class<T> exceptionClass)
+            throws T, IllegalArgumentException {
+        if (!result) {
+            try {
+                throw exceptionClass.getConstructor(String.class).newInstance(message);
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+                throw new IllegalArgumentException("Error throwing exception");
+            }
+        }
+    }
+    
     public static ArrayList<TodoListEntry> loadTodoEntries(Context context, long day_start, long day_end, ArrayList<Group> groups) {
         
         ArrayList<TodoListEntry> readEntries = new ArrayList<>();
@@ -76,18 +92,18 @@ public class Utilities {
             ArrayList<String[]> entryParams = loadObject("list");
             ArrayList<String> entryGroupNames = loadObject("list_groupData");
             
-            if (!(entryParams.size() == entryGroupNames.size())) {
-                log(WARN, "Utilities", "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
+            if (entryParams.size() != entryGroupNames.size()) {
+                log(WARN, NAME, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
             }
             
             for (int i = 0; i < entryParams.size(); i++) {
                 readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups));
             }
             
-            log(INFO, "Utilities", "read todo list: " + readEntries.size());
+            log(INFO, NAME, "read todo list: " + readEntries.size());
         } catch (Exception e) {
-            log(INFO, "Utilities", "no todo list");
-            logException("Utilities", e);
+            log(INFO, NAME, "no todo list");
+            logException(NAME, e);
         }
         
         readEntries.addAll(getTodoListEntriesFromCalendars(context, day_start, day_end));
@@ -109,23 +125,24 @@ public class Utilities {
             
             saveObject("list", entryParams);
             saveObject("list_groupData", entryGroupNames);
-            log(INFO, "Utilities", "saved todo list");
+            log(INFO, NAME, "saved todo list");
         } catch (Exception e) {
-            log(ERROR, "Utilities", "missing permission, failed to save todo list");
+            log(ERROR, NAME, "missing permission, failed to save todo list");
         }
     }
     
     public static <T> T loadObject(String fileName) throws IOException, ClassNotFoundException {
-        ObjectInputStream s = new ObjectInputStream(new FileInputStream(getFile(fileName)));
-        Object object = s.readObject();
-        s.close();
+        Object object;
+        try (ObjectInputStream s = new ObjectInputStream(new FileInputStream(getFile(fileName)))) {
+            object = s.readObject();
+        }
         return (T) object;
     }
     
     public static void saveObject(String fileName, Object object) throws IOException {
-        ObjectOutputStream s = new ObjectOutputStream(new FileOutputStream(getFile(fileName)));
-        s.writeObject(object);
-        s.close();
+        try (ObjectOutputStream s = new ObjectOutputStream(new FileOutputStream(getFile(fileName)))) {
+            s.writeObject(object);
+        }
     }
     
     public static void callImageFileChooser(Activity activity, int requestCode) {
@@ -145,13 +162,13 @@ public class Utilities {
         ArrayList<TodoListEntry> globalEntries = new ArrayList<>();
         ArrayList<TodoListEntry> otherEntries = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
-            if (entries.get(i).isTodayEntry) {
+            if (entries.get(i).isToday()) {
                 todayEntries.add(entries.get(i));
-            } else if (entries.get(i).isExpiredEntry) {
+            } else if (entries.get(i).isExpired()) {
                 oldEntries.add(entries.get(i));
-            } else if (entries.get(i).isUpcomingEntry) {
+            } else if (entries.get(i).isUpcoming()) {
                 newEntries.add(entries.get(i));
-            } else if (entries.get(i).isGlobalEntry) {
+            } else if (entries.get(i).isGlobal()) {
                 globalEntries.add(entries.get(i));
             } else {
                 otherEntries.add(entries.get(i));
@@ -200,7 +217,7 @@ public class Utilities {
         slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
-            
+                // not needed
             }
             
             @Override
@@ -226,7 +243,6 @@ public class Utilities {
             if (fromUser) {
                 displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
                 if (mapToBorderPreview) {
-                    //TODO: think about switching to floats
                     entrySettings.preview_border.setPadding((int) progress, (int) progress, (int) progress, 0);
                 }
             }
@@ -234,7 +250,7 @@ public class Utilities {
         slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
-            
+                // not needed
             }
             
             @Override
@@ -446,7 +462,7 @@ public class Utilities {
     }
     
     public static boolean datesEqual(LocalDate date1, LocalDate date2) {
-        if(date1 == null || date2 == null) {
+        if (date1 == null || date2 == null) {
             return false;
         }
         return date1.isEqual(date2);
@@ -472,7 +488,7 @@ public class Utilities {
         while ((start = text.indexOf(word, substringStart)) >= 0) {
             spannable.setSpan(
                     new ForegroundColorSpan(argb), start, start + word.length(),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             );
             substringStart = start + word.length();
         }

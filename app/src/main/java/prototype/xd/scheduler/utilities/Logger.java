@@ -9,6 +9,7 @@ import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTime;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
+import static prototype.xd.scheduler.utilities.Utilities.throwOnFalse;
 
 import android.util.Log;
 
@@ -16,17 +17,17 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
 public class Logger {
     
     private static File logFile;
-    private static File logFile_old;
+    private static File logFileOld;
     
     private static void checkDirs() {
         if (logFile == null) {
             logFile = new File(preferences.getString(ROOT_DIR, ""), "log.txt");
-            logFile_old = new File(preferences.getString(ROOT_DIR, ""), "log.old.txt");
+            logFileOld = new File(preferences.getString(ROOT_DIR, ""), "log.old.txt");
         }
     }
     
@@ -34,13 +35,13 @@ public class Logger {
         checkDirs();
         Log.println(priority, tag, message);
         try {
-            logFile.createNewFile();
-            BufferedWriter out = new BufferedWriter(new FileWriter(logFile, true));
-            out.write("\n" + (getCurrentDateTime() + "  [" + priorityToStr(priority) + "]: " + message));
-            out.close();
+            throwOnFalse(logFile.createNewFile(), "Error creating new file", IOException.class);
+            try (BufferedWriter out = new BufferedWriter(new FileWriter(logFile, true))) {
+                out.write("\n" + (getCurrentDateTime() + "  [" + priorityToStr(priority) + "]: " + message));
+            }
             if (logFile.length() > 100_000) {
-                logFile_old.delete();
-                logFile.renameTo(logFile_old);
+                Files.delete(logFileOld.toPath());
+                throwOnFalse(logFile.renameTo(logFileOld), "Error renaming to old file", IOException.class);
                 log(INFO, "Logger", "moved to log_old");
             }
         } catch (IOException e) {

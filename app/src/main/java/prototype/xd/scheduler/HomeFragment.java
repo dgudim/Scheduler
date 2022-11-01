@@ -70,7 +70,7 @@ public class HomeFragment extends Fragment {
             long epoch_day = selectedDate.toEpochDay();
             preferences_service.edit().putLong(Keys.PREVIOUSLY_SELECTED_DAY, epoch_day).apply();
             updateDate(epoch_day, true);
-            todoListEntryStorage.updateTodoListAdapter(false);
+            todoListEntryStorage.updateTodoListAdapter(false, false);
             updateStatusText(statusText);
         });
         
@@ -94,8 +94,7 @@ public class HomeFragment extends Fragment {
                                 IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
                         todoListEntryStorage.addEntry(newEntry);
                         todoListEntryStorage.saveEntries();
-                        todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
-                        calendarView.notifyCurrentDayChanged();
+                        todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState(), true);
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
@@ -105,7 +104,7 @@ public class HomeFragment extends Fragment {
                                 IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
                         todoListEntryStorage.addEntry(newEntry);
                         todoListEntryStorage.saveEntries();
-                        todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState());
+                        todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState(), false);
                         return true;
                     });
         });

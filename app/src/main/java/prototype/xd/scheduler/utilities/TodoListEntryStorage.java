@@ -84,11 +84,11 @@ public class TodoListEntryStorage {
         return entryIndicators;
     }
     
-    public void updateTodoListAdapter(boolean updateBitmap) {
+    public void updateTodoListAdapter(boolean updateBitmap, boolean updateCurrentCalendarIndicators) {
         if (updateBitmap) {
             preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
-        todoListViewAdapter.updateTodoEntries();
+        todoListViewAdapter.notifyVisibleEntriesUpdated(updateCurrentCalendarIndicators);
     }
     
     public ArrayList<TodoListEntry> getTodoListEntries() {
@@ -122,7 +122,7 @@ public class TodoListEntryStorage {
                 }
             }
         }
-        updateTodoListAdapter(false);
+        updateTodoListAdapter(false, false);
     }
     
     private void addDistinct(ArrayList<TodoListEntry> entriesToAdd) {

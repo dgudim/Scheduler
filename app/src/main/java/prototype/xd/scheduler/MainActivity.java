@@ -28,7 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.color.HarmonizedColors;
@@ -45,6 +45,8 @@ import prototype.xd.scheduler.utilities.PreferencesStore;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class MainActivity extends AppCompatActivity {
+    
+    private static final String NAME = "MainActivity";
     
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -66,13 +68,13 @@ public class MainActivity extends AppCompatActivity {
         
         File rootDir = getExternalFilesDir("");
         if (rootDir == null) {
-            Log.e("MainActivity", "Shared storage not available wtf");
+            Log.e(NAME, "Shared storage not available wtf");
             System.exit(0);
         } else if (preferences.getString(ROOT_DIR, null) == null) {
             preferences.edit().putString(ROOT_DIR, rootDir.getAbsolutePath()).apply();
-            log(INFO, "Main Activity", "root dir: " + rootDir);
+            log(INFO, NAME, "root dir: " + rootDir);
             if (!rootDir.exists()) {
-                log(INFO, "Main Activity", "created folder structure: " + rootDir.mkdirs());
+                log(INFO, NAME, "created folder structure: " + rootDir.mkdirs());
             }
         }
         
@@ -157,8 +159,8 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private boolean refreshPermissionStates(boolean display) {
-        boolean storage_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-        boolean calendar_granted = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED;
+        boolean storage_granted = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        boolean calendar_granted = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED;
         
         if (display) {
             setPermissionChipColor(calendar_granted,
@@ -205,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
                                     new File(getRootDir(), availableDays[requestCode] + ".png"));
                             stream.close();
                         } else {
-                            log(ERROR, "MainActivity", "stream null for uri: " + uri.getPath());
+                            log(ERROR, NAME, "stream null for uri: " + uri.getPath());
                         }
                         
                         

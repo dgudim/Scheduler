@@ -41,18 +41,18 @@ public class CalendarView {
         
         TextView textView;
         
-        final int maxIndicators = 4;
+        private static final int MAX_INDICATORS = 4;
         View[] eventIndicators;
         
-        public MaterialCardView cardView;
-        public LocalDate date;
+        private final MaterialCardView cardView;
+        private LocalDate date;
         
         public CalendarDayViewContainer(@NonNull View view, CalendarView container) {
             super(view);
             textView = view.findViewById(R.id.calendarDayText);
             cardView = view.findViewById(R.id.calendarDayCard);
             
-            eventIndicators = new View[maxIndicators];
+            eventIndicators = new View[MAX_INDICATORS];
             eventIndicators[0] = view.findViewById(R.id.event_indicator1);
             eventIndicators[1] = view.findViewById(R.id.event_indicator2);
             eventIndicators[2] = view.findViewById(R.id.event_indicator3);
@@ -62,7 +62,7 @@ public class CalendarView {
         }
         
         private void setEventIndicators(ArrayList<ColorStateList> eventIndicatorColors) {
-            for (int i = 0; i < maxIndicators; i++){
+            for (int i = 0; i < MAX_INDICATORS; i++){
                 if(eventIndicatorColors.size() <= i) {
                     eventIndicators[i].setVisibility(View.INVISIBLE);
                     continue;

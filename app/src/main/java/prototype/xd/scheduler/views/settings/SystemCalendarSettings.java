@@ -48,7 +48,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         dialog = new AlertDialog.Builder(settingsView.getContext(), R.style.FullScreenDialog).setOnDismissListener(dialog -> {
             if (todoListEntryStorage != null) {
-                todoListEntryStorage.updateTodoListAdapter(false);
+                todoListEntryStorage.updateTodoListAdapter(false, true);
             }
         }).setView(settingsView).create();
     }
@@ -81,11 +81,11 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 displayConfirmationDialogue(v.getContext(),
                         R.string.reset_settings_prompt,
                         R.string.cancel, R.string.reset, v1 -> {
-                            Map<String, ?> allEntries = preferences.getAll();
+                            Map<String, ?> allPreferences = preferences.getAll();
                             SharedPreferences.Editor editor = preferences.edit();
-                            for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-                                if (entry.getKey().startsWith(calendarKey)) {
-                                    editor.remove(entry.getKey());
+                            for (Map.Entry<String, ?> preferenceEntry : allPreferences.entrySet()) {
+                                if (preferenceEntry.getKey().startsWith(calendarKey)) {
+                                    editor.remove(preferenceEntry.getKey());
                                 }
                             }
                             editor.apply();
@@ -177,12 +177,11 @@ public class SystemCalendarSettings extends PopupSettingsView {
         currentListener = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            
+                //ignore
             }
             
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                System.out.println(calendarKey);
                 preferences.edit().putString(calendarKey + "_" + Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT, s.toString()).apply();
                 setStateIconColor(hide_by_content_field_state, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT);
                 preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
@@ -190,7 +189,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
             
             @Override
             public void afterTextChanged(Editable s) {
-            
+                //ignore
             }
         };
         hide_by_content_field.addTextChangedListener(currentListener);
@@ -208,10 +207,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
         }
         if (todoListEntryStorage != null) {
             for (TodoListEntry current_entry : todoListEntryStorage.getTodoListEntries()) {
-                if (current_entry.fromSystemCalendar) {
-                    if (current_entry.event.subKeys.equals(entry.event.subKeys)) {
-                        current_entry.reloadParams();
-                    }
+                if (current_entry.fromSystemCalendar && current_entry.event.subKeys.equals(entry.event.subKeys)) {
+                    current_entry.reloadParams();
                 }
             }
         }

@@ -16,7 +16,6 @@ import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
-import static prototype.xd.scheduler.utilities.Utilities.addSliderChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
@@ -50,11 +49,12 @@ public class EntrySettings extends PopupSettingsView {
         hide_by_content_container.setVisibility(View.GONE);
         this.todoListEntryStorage = todoListEntryStorage;
         
-        dialog = new AlertDialog.Builder(settingsView.getContext(), R.style.FullScreenDialog).setOnDismissListener(dialog -> {
-            todoListEntryStorage.saveEntries();
-            todoListEntryStorage.saveGroups();
-            todoListEntryStorage.updateTodoListAdapter(false);
-        }).setView(settingsView).create();
+        dialog = new AlertDialog.Builder(settingsView.getContext(), R.style.FullScreenDialog)
+                .setOnDismissListener(dialog -> {
+                    todoListEntryStorage.saveEntries();
+                    todoListEntryStorage.saveGroups();
+                    todoListEntryStorage.updateTodoListAdapter(false, true);
+                }).setView(settingsView).create();
     }
     
     public void show(final TodoListEntry entry, final Context context) {
@@ -146,7 +146,7 @@ public class EntrySettings extends PopupSettingsView {
             
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-            
+                //ignore
             }
         });
         
@@ -157,9 +157,9 @@ public class EntrySettings extends PopupSettingsView {
                     int groupIndex = groupIndexInList(groupList, text);
                     if (groupIndex >= 0) {
                         displayConfirmationDialogue(view.getContext(), R.string.group_with_same_name_exists, R.string.overwrite_prompt,
-                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(context, groupList, text, groupIndex, arrayAdapter));
+                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(groupList, text, groupIndex, context, arrayAdapter));
                     } else {
-                        addGroupToGroupList(context, groupList, text, groupIndex, arrayAdapter);
+                        addGroupToGroupList(groupList, text, groupIndex, context, arrayAdapter);
                     }
                     return true;
                 }));
@@ -230,14 +230,18 @@ public class EntrySettings extends PopupSettingsView {
     }
     
     private void forEachWithGroupMatch(String groupName, TodoListEntryAction action) {
-        todoListEntryStorage.getTodoListEntries().forEach(todoListEntry -> {
-            if (todoListEntry.getGroupName().equals(groupName)) {
-                action.accept(todoListEntry);
+        todoListEntryStorage.getTodoListEntries().forEach(entry -> {
+            if (entry.getGroupName().equals(groupName)) {
+                action.accept(entry);
             }
         });
     }
     
-    private void addGroupToGroupList(Context context, ArrayList<Group> groupList, String groupName, int groupIndex, ArrayAdapter<Group> arrayAdapter) {
+    private void addGroupToGroupList(ArrayList<Group> groupList,
+                                     String groupName,
+                                     int groupIndex,
+                                     Context context,
+                                     ArrayAdapter<Group> arrayAdapter) {
         Group createdGroup = new Group(groupName, todoListEntry.getDisplayParams());
         if (groupIndex >= 0) {
             groupList.set(groupIndex, createdGroup);

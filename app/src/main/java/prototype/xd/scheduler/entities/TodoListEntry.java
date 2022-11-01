@@ -105,10 +105,7 @@ public class TodoListEntry {
     public Paint padPaint;
     public Paint indicatorPaint;
     
-    public boolean isTodayEntry = false;
-    public boolean isGlobalEntry = false;
-    public boolean isExpiredEntry = false;
-    public boolean isUpcomingEntry = false;
+    EntryType entryType;
     
     public String[] params;
     
@@ -177,14 +174,26 @@ public class TodoListEntry {
     }
     
     public boolean isGlobal() {
-        return day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL;
+        return day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL || entryType == EntryType.GLOBAL;
+    }
+    
+    public boolean isExpired() {
+        return entryType == EntryType.EXPIRED;
+    }
+    
+    public boolean isUpcoming() {
+        return entryType == EntryType.UPCOMING;
+    }
+    
+    public boolean isToday() {
+        return entryType == EntryType.TODAY;
     }
     
     public boolean visibleInList(long day) {
         boolean visibilityFlag = !completed || showInList_ifCompleted;
         boolean show;
         if (day == currentDay) {
-            show = isUpcomingEntry || isExpiredEntry || isVisible(day);
+            show = isUpcoming() || isExpired() || isVisible(day);
             show = show && visibilityFlag;
         } else {
             show = isVisible(day);
@@ -210,7 +219,7 @@ public class TodoListEntry {
         return inRange(day, day_start);
     }
     
-    public boolean isVisible_exact(long timestamp) {
+    public boolean isVisibleExact(long timestamp) {
         if (recurrenceSet != null) {
             if (timestamp > timestamp_end) {
                 return false;
@@ -221,13 +230,13 @@ public class TodoListEntry {
             while (it.hasNext() && instance <= timestamp) {
                 instance = it.next();
                 if (inRange(day, daysFromEpoch(instance, event.timeZone))) {
-                    return isUpcomingEntry || (instance + timestamp_duration >= timestamp && daysFromEpoch(instance, event.timeZone) <= currentDay);
+                    return isUpcoming() || (instance + timestamp_duration >= timestamp && daysFromEpoch(instance, event.timeZone) <= currentDay);
                 }
             }
             return false;
         }
         return inRange(daysFromEpoch(timestamp, event.timeZone), day_start)
-                && (isUpcomingEntry || (timestamp_start + timestamp_duration >= timestamp && daysFromEpoch(timestamp, event.timeZone) <= currentDay));
+                && (isUpcoming() || (timestamp_start + timestamp_duration >= timestamp && daysFromEpoch(timestamp, event.timeZone) <= currentDay));
     }
     
     public boolean hideByContent() {
@@ -235,7 +244,7 @@ public class TodoListEntry {
         boolean hideByContent = false;
         if (preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT), Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT)) {
             String matchString = preferences.getString(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), "");
-            String[] split = matchString != null ? matchString.split("\\|\\|") : new String[0];
+            String[] split = !matchString.isEmpty() ? matchString.split("\\|\\|") : new String[0];
             for (String str : split) {
                 hideByContent = textValue.contains(str);
                 if (hideByContent) break;
@@ -426,9 +435,11 @@ public class TodoListEntry {
             dayOffset_expired = preferences.getInt(getFirstValidKey(calendarSubKeys, EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
             
             long nearestDay = getNearestEventDay(currentDay);
-            isUpcomingEntry = currentDay + dayOffset_upcoming >= nearestDay && currentDay < nearestDay;
-            isExpiredEntry = !isUpcomingEntry &&
-                    (currentDay - dayOffset_expired <= nearestDay + duration_in_days && currentDay > nearestDay + duration_in_days);
+            if(currentDay + dayOffset_upcoming >= nearestDay && currentDay < nearestDay) {
+                setEntryType(EntryType.UPCOMING);
+            } else if (currentDay - dayOffset_expired <= nearestDay + duration_in_days && currentDay > nearestDay + duration_in_days) {
+                setEntryType(EntryType.EXPIRED);
+            }
             
             setFontColor(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR);
             bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR);
@@ -437,7 +448,7 @@ public class TodoListEntry {
             
             if (!hideByContent()) {
                 if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
-                    showOnLock = isVisible_exact(currentTimestamp);
+                    showOnLock = isVisibleExact(currentTimestamp);
                 } else {
                     showOnLock = isVisible(currentDay);
                 }
@@ -455,12 +466,12 @@ public class TodoListEntry {
         borderColor_original = borderColor;
         border_thickness_original = borderThickness;
         
-        if (isUpcomingEntry) {
+        if (isUpcoming()) {
             setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
             bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             borderColor = mixTwoColors(borderColor, preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             borderThickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
-        } else if (isExpiredEntry) {
+        } else if (isExpired()) {
             setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
             bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             borderColor = mixTwoColors(borderColor, preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR);
@@ -469,10 +480,7 @@ public class TodoListEntry {
     }
     
     private void setEntryType(EntryType entryType) {
-        isTodayEntry = entryType == EntryType.TODAY;
-        isGlobalEntry = entryType == EntryType.GLOBAL;
-        isExpiredEntry = entryType == EntryType.EXPIRED;
-        isUpcomingEntry = entryType == EntryType.UPCOMING;
+        this.entryType = entryType;
     }
     
     private void setFontColor(int color) {
