@@ -23,6 +23,7 @@ import androidx.cardview.widget.CardView;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
@@ -36,7 +37,7 @@ public class TodoListViewAdapter extends BaseAdapter {
     
     private final TodoListEntryStorage todoListEntryStorage;
     
-    private ArrayList<TodoListEntry> currentTodoListEntries;
+    private List<TodoListEntry> currentTodoListEntries;
     
     private final EntrySettings entrySettings;
     private final SystemCalendarSettings systemCalendarSettings;
@@ -113,7 +114,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                     displayConfirmationDialogue(view1.getContext(),
                             R.string.delete, R.string.are_you_sure,
                             R.string.no, R.string.yes,
-                            (view2) -> {
+                            view2 -> {
                                 todoListEntryStorage.removeEntry(currentEntry);
                                 todoListEntryStorage.saveEntries();
                                 // deleting a global entry does not change indicators
@@ -136,7 +137,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             
             view.setOnLongClickListener(view1 -> {
                 
-                final ArrayList<Group> groupList = todoListEntryStorage.getGroups();
+                final List<Group> groupList = todoListEntryStorage.getGroups();
                 int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
                 displayEditTextSpinnerDialogue(view1.getContext(), R.string.edit_event, -1, R.string.event_name_input_hint,
                         R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.textValue, groupList,

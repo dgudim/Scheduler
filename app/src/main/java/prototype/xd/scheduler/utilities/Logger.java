@@ -24,6 +24,10 @@ public class Logger {
     private static File logFile;
     private static File logFileOld;
     
+    private Logger() {
+        throw new IllegalStateException("Utility logger class");
+    }
+    
     private static void checkDirs() {
         if (logFile == null) {
             logFile = new File(preferences.getString(ROOT_DIR, ""), "log.txt");
@@ -35,7 +39,7 @@ public class Logger {
         checkDirs();
         Log.println(priority, tag, message);
         try {
-            throwOnFalse(logFile.createNewFile(), "Error creating new file", IOException.class);
+            logFile.createNewFile();
             try (BufferedWriter out = new BufferedWriter(new FileWriter(logFile, true))) {
                 out.write("\n" + (getCurrentDateTime() + "  [" + priorityToStr(priority) + "]: " + message));
             }

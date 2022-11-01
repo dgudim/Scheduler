@@ -4,23 +4,27 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class QueryUtilities {
     
-    public static String getString(Cursor cursor, ArrayList<String> columns, String column){
+    private QueryUtilities() {
+        throw new IllegalStateException("Query utility class");
+    }
+    
+    public static String getString(Cursor cursor, List<String> columns, String column){
         return cursor.getString(columns.indexOf(column));
     }
     
-    public static long getLong(Cursor cursor, ArrayList<String> columns, String column){
+    public static long getLong(Cursor cursor, List<String> columns, String column){
         return cursor.getLong(columns.indexOf(column));
     }
     
-    public static boolean getBoolean(Cursor cursor, ArrayList<String> columns, String column){
+    public static boolean getBoolean(Cursor cursor, List<String> columns, String column){
         return cursor.getInt(columns.indexOf(column)) > 0;
     }
     
-    public static int getInt(Cursor cursor, ArrayList<String> columns, String column){
+    public static int getInt(Cursor cursor, List<String> columns, String column){
         return cursor.getInt(columns.indexOf(column));
     }
     

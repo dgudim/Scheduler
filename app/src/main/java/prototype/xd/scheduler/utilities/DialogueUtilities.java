@@ -15,7 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.views.Spinner;
@@ -70,16 +70,14 @@ public class DialogueUtilities {
         setupButtons(dialog,
                 cancelButtonResource, confirmButtonResource, secondaryButtonResource,
                 v -> {
-                    if (checkEmptyInput(editText)) {
-                        if (confirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
-                            dialog.dismiss();
-                        }
+                    if (checkEmptyInput(editText)
+                            && confirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
+                        dialog.dismiss();
                     }
                 }, secondaryConfirmationListener == null ? null : v -> {
-                    if (checkEmptyInput(editText)) {
-                        if (secondaryConfirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
-                            dialog.dismiss();
-                        }
+                    if (checkEmptyInput(editText)
+                            && secondaryConfirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
+                        dialog.dismiss();
                     }
                 });
     }
@@ -128,7 +126,7 @@ public class DialogueUtilities {
     public static void displayEditTextSpinnerDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
                                                       int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
                                                       String defaultEditTextValue,
-                                                      ArrayList<?> items, int defaultIndex,
+                                                      List<?> items, int defaultIndex,
                                                       OnClickListenerWithEditText confirmationListener,
                                                       OnClickListenerWithEditText secondaryConfirmationListener) {
         Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_spinner_dialogue);
@@ -152,23 +150,21 @@ public class DialogueUtilities {
             
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-            
+                //ignore
             }
         });
         
         setupButtons(dialog,
                 cancelButtonResource, confirmButtonResource, secondaryButtonResource,
                 v -> {
-                    if (checkEmptyInput(editText)) {
-                        if (confirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
-                            dialog.dismiss();
-                        }
+                    if (checkEmptyInput(editText)
+                            && confirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
+                        dialog.dismiss();
                     }
                 }, secondaryConfirmationListener == null ? null : v -> {
-                    if (checkEmptyInput(editText)) {
-                        if (secondaryConfirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
-                            dialog.dismiss();
-                        }
+                    if (checkEmptyInput(editText)
+                            && secondaryConfirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
+                        dialog.dismiss();
                     }
                 });
     }
@@ -187,21 +183,21 @@ public class DialogueUtilities {
                                      View.OnClickListener confirmationListener,
                                      View.OnClickListener secondaryConfirmationListener) {
         
-        MaterialButton confirm_button = dialog.findViewById(R.id.confirm_button);
-        MaterialButton secondary_button = dialog.findViewById(R.id.secondary_action_button);
-        MaterialButton cancel_button = dialog.findViewById(R.id.cancel_button);
+        MaterialButton confirmButton = dialog.findViewById(R.id.confirm_button);
+        MaterialButton secondaryButton = dialog.findViewById(R.id.secondary_action_button);
+        MaterialButton cancelButton = dialog.findViewById(R.id.cancel_button);
         
-        cancel_button.setText(cancelButtonResource);
-        confirm_button.setText(confirmButtonResource);
+        cancelButton.setText(cancelButtonResource);
+        confirmButton.setText(confirmButtonResource);
         if (secondaryButtonResource != -1) {
-            secondary_button.setText(secondaryButtonResource);
+            secondaryButton.setText(secondaryButtonResource);
         } else {
-            secondary_button.setVisibility(View.GONE);
+            secondaryButton.setVisibility(View.GONE);
         }
-        cancel_button.setOnClickListener(v -> dialog.dismiss());
-        confirm_button.setOnClickListener(confirmationListener);
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+        confirmButton.setOnClickListener(confirmationListener);
         if (secondaryConfirmationListener != null) {
-            secondary_button.setOnClickListener(secondaryConfirmationListener);
+            secondaryButton.setOnClickListener(secondaryConfirmationListener);
         }
     }
     

@@ -14,7 +14,7 @@ import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
+import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 
@@ -47,11 +47,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.settingsEntries.CompoundCustomizationEntry;
+import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntry;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
@@ -67,6 +68,10 @@ public class Utilities {
     
     public static File getFile(String filename) {
         return new File(getRootDir(), filename);
+    }
+    
+    private Utilities() {
+        throw new IllegalStateException("Utility class");
     }
     
     public static boolean isVerticalOrientation(Context context) {
@@ -85,12 +90,12 @@ public class Utilities {
         }
     }
     
-    public static ArrayList<TodoListEntry> loadTodoEntries(Context context, long day_start, long day_end, ArrayList<Group> groups) {
-        
-        ArrayList<TodoListEntry> readEntries = new ArrayList<>();
+    public static List<TodoListEntry> loadTodoEntries(Context context, long dayStart, long dayEnd, List<Group> groups) {
+    
+        List<TodoListEntry> readEntries = new ArrayList<>();
         try {
-            ArrayList<String[]> entryParams = loadObject("list");
-            ArrayList<String> entryGroupNames = loadObject("list_groupData");
+            List<String[]> entryParams = loadObject("list");
+            List<String> entryGroupNames = loadObject("list_groupData");
             
             if (entryParams.size() != entryGroupNames.size()) {
                 log(WARN, NAME, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
@@ -106,14 +111,14 @@ public class Utilities {
             logException(NAME, e);
         }
         
-        readEntries.addAll(getTodoListEntriesFromCalendars(context, day_start, day_end));
+        readEntries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd));
         return readEntries;
     }
     
-    public static void saveEntries(ArrayList<TodoListEntry> entries) {
+    public static void saveEntries(List<TodoListEntry> entries) {
         try {
-            ArrayList<String[]> entryParams = new ArrayList<>();
-            ArrayList<String> entryGroupNames = new ArrayList<>();
+            List<String[]> entryParams = new ArrayList<>();
+            List<String> entryGroupNames = new ArrayList<>();
             
             for (int i = 0; i < entries.size(); i++) {
                 TodoListEntry entry = entries.get(i);
@@ -155,27 +160,28 @@ public class Utilities {
         activity.startActivityForResult(intent, requestCode);
     }
     
-    public static ArrayList<TodoListEntry> sortEntries(ArrayList<TodoListEntry> entries, long day) {
-        ArrayList<TodoListEntry> newEntries = new ArrayList<>();
-        ArrayList<TodoListEntry> oldEntries = new ArrayList<>();
-        ArrayList<TodoListEntry> todayEntries = new ArrayList<>();
-        ArrayList<TodoListEntry> globalEntries = new ArrayList<>();
-        ArrayList<TodoListEntry> otherEntries = new ArrayList<>();
-        for (int i = 0; i < entries.size(); i++) {
-            if (entries.get(i).isToday()) {
-                todayEntries.add(entries.get(i));
-            } else if (entries.get(i).isExpired()) {
-                oldEntries.add(entries.get(i));
-            } else if (entries.get(i).isUpcoming()) {
-                newEntries.add(entries.get(i));
-            } else if (entries.get(i).isGlobal()) {
-                globalEntries.add(entries.get(i));
+    public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long day) {
+        List<TodoListEntry> newEntries = new ArrayList<>();
+        List<TodoListEntry> oldEntries = new ArrayList<>();
+        List<TodoListEntry> todayEntries = new ArrayList<>();
+        List<TodoListEntry> globalEntries = new ArrayList<>();
+        List<TodoListEntry> otherEntries = new ArrayList<>();
+        
+        for (TodoListEntry entry: entries) {
+            if (entry.isToday()) {
+                todayEntries.add(entry);
+            } else if (entry.isExpired()) {
+                oldEntries.add(entry);
+            } else if (entry.isUpcoming()) {
+                newEntries.add(entry);
+            } else if (entry.isGlobal()) {
+                globalEntries.add(entry);
             } else {
-                otherEntries.add(entries.get(i));
+                otherEntries.add(entry);
             }
         }
-        
-        ArrayList<TodoListEntry> merged = new ArrayList<>();
+    
+        List<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
         merged.addAll(newEntries);
@@ -196,7 +202,7 @@ public class Utilities {
                                                final int defaultValue) {
         displayTo.setText(displayTo.getContext().getString(stringResource, preferences.getInt(key, defaultValue)));
         slider.setValue(preferences.getInt(key, defaultValue));
-        slider.addOnChangeListener((listener_slider, progress, fromUser) -> {
+        slider.addOnChangeListener((listenerSlider, progress, fromUser) -> {
             if (fromUser) {
                 displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
                 if (customizationEntry != null) {
@@ -204,11 +210,12 @@ public class Utilities {
                         case UPCOMING_BORDER_THICKNESS:
                             customizationEntry.updateUpcomingPreviewBorderThickness((int) progress);
                             break;
-                        case BORDER_THICKNESS:
-                            customizationEntry.updateCurrentPreviewBorderThickness((int) progress);
-                            break;
                         case EXPIRED_BORDER_THICKNESS:
                             customizationEntry.updateExpiredPreviewBorderThickness((int) progress);
+                            break;
+                        case BORDER_THICKNESS:
+                        default:
+                            customizationEntry.updateCurrentPreviewBorderThickness((int) progress);
                             break;
                     }
                 }
@@ -223,7 +230,7 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 preferences.edit().putInt(key, (int) slider.getValue()).apply();
-                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
@@ -257,7 +264,7 @@ public class Utilities {
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf((int) slider.getValue()));
                 entrySettings.todoListEntryStorage.saveEntries();
-                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
@@ -270,7 +277,7 @@ public class Utilities {
                                                final boolean mapToBorderPreview,
                                                final int stringResource,
                                                final String calendarKey,
-                                               final ArrayList<String> calendarSubKeys,
+                                               final List<String> calendarSubKeys,
                                                final String parameter,
                                                final int defaultValue,
                                                final Slider.OnChangeListener customProgressListener,
@@ -299,7 +306,7 @@ public class Utilities {
                 if (customTouchListener != null) customTouchListener.onStopTrackingTouch(slider);
                 preferences.edit().putInt(calendarKey + "_" + parameter, (int) slider.getValue()).apply();
                 systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
@@ -311,7 +318,7 @@ public class Utilities {
                                                final boolean mapToBorderPreview,
                                                final int stringResource,
                                                final String calendarKey,
-                                               final ArrayList<String> calendarSubKeys,
+                                               final List<String> calendarSubKeys,
                                                final String parameter,
                                                final int defaultValue) {
         addSliderChangeListener(
@@ -333,7 +340,7 @@ public class Utilities {
         tSwitch.setCheckedSilent(preferences.getBoolean(key, defaultValue));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(key, isChecked).apply();
-            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -349,7 +356,7 @@ public class Utilities {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             entry.setStateIconColor(stateIcon, parameter);
             todoListEntryStorage.saveEntries();
-            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -358,14 +365,14 @@ public class Utilities {
                                                final TextView stateIcon,
                                                final SystemCalendarSettings systemCalendarSettings,
                                                final String calendarKey,
-                                               final ArrayList<String> calendarSubKeys,
+                                               final List<String> calendarSubKeys,
                                                final String parameter,
                                                final boolean defaultValue) {
         tSwitch.setCheckedSilent(preferences.getBoolean(getFirstValidKey(calendarSubKeys, parameter), defaultValue));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -393,7 +400,7 @@ public class Utilities {
                     customizationEntry.updatePreviewBorders();
                     break;
             }
-            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -411,15 +418,16 @@ public class Utilities {
                 case FONT_COLOR:
                     settings.updatePreviewFont(selectedColor);
                     break;
-                case BG_COLOR:
-                    settings.updatePreviewBg(selectedColor);
-                    break;
                 case BORDER_COLOR:
                     settings.updatePreviewBorder(selectedColor);
                     break;
+                case BG_COLOR:
+                default:
+                    settings.updatePreviewBg(selectedColor);
+                    break;
             }
             todoListEntry.setStateIconColor(stateIcon, parameter);
-            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -427,7 +435,7 @@ public class Utilities {
     public static void invokeColorDialogue(final TextView stateIcon,
                                            final SystemCalendarSettings systemCalendarSettings,
                                            final String calendarKey,
-                                           final ArrayList<String> calendarSubKeys,
+                                           final List<String> calendarSubKeys,
                                            final String parameter,
                                            final int defaultValue) {
         invokeColorDialogue(stateIcon.getContext(), preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue), (dialog, selectedColor, allColors) -> {
@@ -444,7 +452,7 @@ public class Utilities {
                     break;
             }
             systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-            preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     
@@ -495,7 +503,7 @@ public class Utilities {
         return spannable;
     }
     
-    public static long RFC2445ToMilliseconds(String str) {
+    public static long rfc2445ToMilliseconds(String str) {
         if (str == null || str.isEmpty())
             throw new IllegalArgumentException("Null or empty RFC string");
         

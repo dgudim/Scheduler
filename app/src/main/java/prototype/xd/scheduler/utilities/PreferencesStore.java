@@ -8,13 +8,17 @@ import android.content.SharedPreferences;
 
 public class PreferencesStore {
     
+    private PreferencesStore() {
+        throw new IllegalStateException("Preferences storage class");
+    }
+    
     public volatile static SharedPreferences preferences;
-    public volatile static SharedPreferences preferences_service;
+    public volatile static SharedPreferences servicePreferences;
     
     public static void init(Context context) {
         if (preferences == null) {
             preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-            preferences_service = context.getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
+            servicePreferences = context.getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
         }
     }
     

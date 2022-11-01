@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
@@ -20,8 +20,8 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
     
     private final int calendarColor;
     
-    private final ArrayList<Integer> colors;
-    private final ArrayList<Integer> color_eventCounts;
+    private final List<Integer> colors;
+    private final List<Integer> color_eventCounts;
     
     private final SettingsFragment fragment;
     

@@ -10,7 +10,7 @@ import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
+import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,7 +25,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import prototype.xd.scheduler.entities.Group;
@@ -59,7 +59,7 @@ public class HomeFragment extends Fragment {
         todoListEntryStorage.getTodoListViewAdapter().setDateUpdateListener(calendarView::notifyCurrentDayChanged);
         
         long day;
-        if ((day = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
+        if ((day = servicePreferences.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
             calendarView.selectDay(day);
         } else {
             calendarView.selectDate(DateManager.currentDate);
@@ -67,24 +67,24 @@ public class HomeFragment extends Fragment {
     
         TextView statusText = view.findViewById(R.id.status_text);
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
-            long epoch_day = selectedDate.toEpochDay();
-            preferences_service.edit().putLong(Keys.PREVIOUSLY_SELECTED_DAY, epoch_day).apply();
-            updateDate(epoch_day, true);
+            long epochDay = selectedDate.toEpochDay();
+            servicePreferences.edit().putLong(Keys.PREVIOUSLY_SELECTED_DAY, epochDay).apply();
+            updateDate(epochDay, true);
             todoListEntryStorage.updateTodoListAdapter(false, false);
             updateStatusText(statusText);
         });
         
-        calendarView.setOnMonthPreChangeListener((calendarMonth, first_visible_day, last_visible_day, context) ->
+        calendarView.setOnMonthPreChangeListener((calendarMonth, firstVisibleDay, lastVisibleDay, context) ->
                 // load current month before displaying the data
-                todoListEntryStorage.lazyLoadEntries(context, first_visible_day, last_visible_day));
+                todoListEntryStorage.lazyLoadEntries(context, firstVisibleDay, lastVisibleDay));
         
         view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> {
             calendarView.selectDay(currentDay);
-            preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
+            servicePreferences.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
         });
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
-            final ArrayList<Group> groupList = todoListEntryStorage.getGroups();
+            final List<Group> groupList = todoListEntryStorage.getGroups();
             displayEditTextSpinnerDialogue(view1.getContext(), R.string.add_event_fab, -1, R.string.event_name_input_hint,
                     R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
                     (view2, text, selectedIndex) -> {
@@ -127,7 +127,7 @@ public class HomeFragment extends Fragment {
         updateDate(DAY_FLAG_GLOBAL, true);
         
         long day;
-        if ((day = preferences_service.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
+        if ((day = servicePreferences.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
             currentlySelectedDay = day;
         }
         
@@ -142,7 +142,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroy() {
         todoListEntryStorage = null;
-        preferences_service.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
+        servicePreferences.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
         super.onDestroy();
     }
 }

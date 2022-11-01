@@ -1,6 +1,6 @@
-package prototype.xd.scheduler.entities.settingsEntries;
+package prototype.xd.scheduler.entities.settings_entries;
 
-import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.CALENDAR;
+import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 
@@ -44,7 +44,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
     }
     
     @Override
-    protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
+    protected View initInnerViews(View convertView, ViewGroup viewGroup) {
         ((TextView) convertView.findViewById(R.id.calendar_name)).setText(calendarName);
         ((TextView) convertView.findViewById(R.id.event_count)).setText(convertView.getContext().getString(R.string.calendar_events_full, calendarEventsCount));
         CheckBox checkBox = convertView.findViewById(R.id.check_box);
@@ -75,6 +75,6 @@ public class CalendarSettingsEntry extends SettingsEntry {
             colorSelector.setVisibility(View.GONE);
         }
         
-        return super.InitInnerViews(convertView, viewGroup);
+        return super.initInnerViews(convertView, viewGroup);
     }
 }

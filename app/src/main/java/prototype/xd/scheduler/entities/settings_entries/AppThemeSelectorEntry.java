@@ -1,6 +1,6 @@
-package prototype.xd.scheduler.entities.settingsEntries;
+package prototype.xd.scheduler.entities.settings_entries;
 
-import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.APP_THEME_SELECTOR;
+import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.APP_THEME_SELECTOR;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_DARK;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_LIGHT;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_SYSTEM;
@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
@@ -30,14 +31,14 @@ public class AppThemeSelectorEntry extends SettingsEntry {
     }
     
     @Override
-    protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
+    protected View initInnerViews(View convertView, ViewGroup viewGroup) {
         if (spinnerAdapter == null) {
-            ArrayList<String> theme_names = new ArrayList<>();
+            List<String> themeNames = new ArrayList<>();
             Context context = convertView.getContext();
-            theme_names.add(context.getString(R.string.app_theme_light));
-            theme_names.add(context.getString(R.string.app_theme_dark));
-            theme_names.add(context.getString(R.string.app_theme_system));
-            spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, theme_names);
+            themeNames.add(context.getString(R.string.app_theme_light));
+            themeNames.add(context.getString(R.string.app_theme_dark));
+            themeNames.add(context.getString(R.string.app_theme_system));
+            spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, themeNames);
             spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         }
         Spinner spinnerView = convertView.findViewById(R.id.themeSpinner);
@@ -69,9 +70,9 @@ public class AppThemeSelectorEntry extends SettingsEntry {
             
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-            
+                //ignore
             }
         });
-        return super.InitInnerViews(convertView, viewGroup);
+        return super.initInnerViews(convertView, viewGroup);
     }
 }

@@ -1,6 +1,6 @@
-package prototype.xd.scheduler.entities.settingsEntries;
+package prototype.xd.scheduler.entities.settings_entries;
 
-import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.SWITCH;
+import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.SWITCH;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 
 import android.view.View;
@@ -24,10 +24,10 @@ public class SwitchSettingsEntry extends SettingsEntry{
     }
     
     @Override
-    protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
+    protected View initInnerViews(View convertView, ViewGroup viewGroup) {
         Switch switchView = convertView.findViewById(R.id.Switch);
         switchView.setText(text);
         addSwitchChangeListener(switchView, key, defaultValue);
-        return super.InitInnerViews(convertView, viewGroup);
+        return super.initInnerViews(convertView, viewGroup);
     }
 }

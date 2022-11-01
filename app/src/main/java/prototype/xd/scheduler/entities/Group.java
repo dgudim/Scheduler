@@ -15,19 +15,22 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import prototype.xd.scheduler.R;
 
 public class Group {
     
+    private static final String NAME = "Entry group";
+    
     private boolean isNullGroup = false;
-    private String name;
+    private String groupName;
     
     String[] params = new String[]{};
     
     public Group(Context context) {
-        name = context.getString(R.string.blank_group_name);
+        groupName = context.getString(R.string.blank_group_name);
         isNullGroup = true;
     }
     
@@ -35,25 +38,25 @@ public class Group {
         return isNullGroup;
     }
     
-    public Group(Context context, String groupName, ArrayList<Group> groups) {
+    public Group(Context context, String groupName, List<Group> groups) {
         boolean foundGroup = false;
         for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).name.equals(groupName)) {
+            if (groups.get(i).groupName.equals(groupName)) {
                 params = groups.get(i).params;
                 foundGroup = true;
                 break;
             }
         }
         if (foundGroup) {
-            name = groupName;
+            this.groupName = groupName;
         } else {
-            name = context.getString(R.string.blank_group_name);
+            this.groupName = context.getString(R.string.blank_group_name);
             isNullGroup = true;
         }
     }
     
     public Group(String groupName, String[] params) {
-        name = groupName;
+        this.groupName = groupName;
         this.params = params;
     }
     
@@ -61,14 +64,14 @@ public class Group {
         if (isNullGroup) {
             return "";
         }
-        return name;
+        return groupName;
     }
     
     public void setName(String newName) {
-        name = newName;
+        groupName = newName;
     }
     
-    public static int groupIndexInList(ArrayList<Group> groupList, String groupName) {
+    public static int groupIndexInList(List<Group> groupList, String groupName) {
         int groupIndex = -1;
         for (int i = 0; i < groupList.size(); i++) {
             if (groupList.get(i).getName().equals(groupName)) {
@@ -79,16 +82,16 @@ public class Group {
         return groupIndex;
     }
     
-    public static ArrayList<Group> readGroupFile(Context context) {
-        ArrayList<Group> groups = new ArrayList<>();
+    public static List<Group> readGroupFile(Context context) {
+        List<Group> groups = new ArrayList<>();
         groups.add(new Group(context)); // add "null" group
         try {
+    
+            List<String[]> groupParams = loadObject("groups");
+            List<String> groupNames = loadObject("groupNames");
             
-            ArrayList<String[]> groupParams = loadObject("groups");
-            ArrayList<String> groupNames = loadObject("groupNames");
-            
-            if (!(groupParams.size() == groupNames.size())) {
-                log(WARN, "Group", "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
+            if (groupParams.size() != groupNames.size()) {
+                log(WARN, NAME, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
             }
             
             for (int i = 0; i < groupParams.size(); i++) {
@@ -97,44 +100,44 @@ public class Group {
             
             return groups;
         } catch (Exception e) {
-            logException("Group", e);
-            log(INFO, "Group", "no groups file, creating one");
+            logException(NAME, e);
+            log(INFO, NAME, "no groups file, creating one");
             saveGroupsFile(groups);
             return groups;
         }
     }
     
-    public static void saveGroupsFile(ArrayList<Group> groups) {
+    public static void saveGroupsFile(List<Group> groups) {
         try {
-            
-            ArrayList<String[]> groupParams = new ArrayList<>();
-            ArrayList<String> groupNames = new ArrayList<>();
+    
+            List<String[]> groupParams = new ArrayList<>();
+            List<String> groupNames = new ArrayList<>();
             for (int i = 0; i < groups.size(); i++) {
                 if (!groups.get(i).isNullGroup) {
                     groupParams.add(groups.get(i).params);
-                    groupNames.add(groups.get(i).name);
+                    groupNames.add(groups.get(i).groupName);
                 }
             }
             
             saveObject("groups", groupParams);
             saveObject("groupNames", groupNames);
             
-            log(INFO, "Group", "saving groups file");
+            log(INFO, NAME, "saving groups file");
             
         } catch (Exception e) {
-            log(ERROR, "Group", "failed to save groups file: " + e.getMessage());
+            log(ERROR, NAME, "failed to save groups file: " + e.getMessage());
         }
     }
     
     @NonNull
     @Override
     public String toString() {
-        return name;
+        return groupName;
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(Arrays.hashCode(params), name);
+        return Objects.hash(Arrays.hashCode(params), groupName);
     }
     
     @Override
@@ -148,7 +151,7 @@ public class Group {
             if (isNullGroup && group.isNullGroup) {
                 return true;
             }
-            return Arrays.equals(params, group.params) && name.equals(group.name);
+            return Arrays.equals(params, group.params) && groupName.equals(group.groupName);
         }
         return super.equals(obj);
     }

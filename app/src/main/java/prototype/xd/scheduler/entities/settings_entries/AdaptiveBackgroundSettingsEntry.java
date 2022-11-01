@@ -1,7 +1,7 @@
-package prototype.xd.scheduler.entities.settingsEntries;
+package prototype.xd.scheduler.entities.settings_entries;
 
-import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
-import static prototype.xd.scheduler.utilities.DateManager.availableDays;
+import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
+import static prototype.xd.scheduler.utilities.DateManager.AVAILABLE_DAYS;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
@@ -17,7 +17,6 @@ import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.adapters.BackgroundImagesGridViewAdapter;
 import prototype.xd.scheduler.utilities.Keys;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
 public class AdaptiveBackgroundSettingsEntry extends SettingsEntry {
     
     private final BackgroundImagesGridViewAdapter gridViewAdapter;
@@ -33,7 +32,8 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry {
     }
     
     @Override
-    protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    protected View initInnerViews(View convertView, ViewGroup viewGroup) {
         convertView.findViewById(R.id.adaptive_bg_settings).setOnClickListener(v -> {
             final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext(), R.style.FullScreenDialog);
             
@@ -43,8 +43,8 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry {
             view.findViewById(R.id.resetBgButton).setOnClickListener(view1 ->
                     displayConfirmationDialogue(view1.getContext(), R.string.delete_all_saved_backgrounds_prompt,
                             R.string.cancel, R.string.delete,
-                            (view2) -> {
-                                for (String availableDay : availableDays) {
+                            view2 -> {
+                                for (String availableDay : AVAILABLE_DAYS) {
                                     getFile(availableDay + ".png").delete();
                                     getFile(availableDay + ".png_min.png").delete();
                                 }
@@ -60,6 +60,6 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry {
             alert.setView(view);
             alert.show();
         });
-        return super.InitInnerViews(convertView, viewGroup);
+        return super.initInnerViews(convertView, viewGroup);
     }
 }

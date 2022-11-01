@@ -1,6 +1,6 @@
-package prototype.xd.scheduler.entities.settingsEntries;
+package prototype.xd.scheduler.entities.settings_entries;
 
-import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.TITLE_BAR;
+import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.TITLE_BAR;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +19,8 @@ public class TitleBarSettingsEntry extends SettingsEntry{
     }
     
     @Override
-    protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
+    protected View initInnerViews(View convertView, ViewGroup viewGroup) {
         ((TextView)convertView.findViewById(R.id.textView)).setText(text);
-        return super.InitInnerViews(convertView, viewGroup);
+        return super.initInnerViews(convertView, viewGroup);
     }
 }

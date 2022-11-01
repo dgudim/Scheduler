@@ -45,6 +45,7 @@ import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import prototype.xd.scheduler.R;
@@ -54,6 +55,8 @@ import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class TodoListEntry {
+    
+    private static final String NAME = "Todo list entry";
     
     enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING, NEUTRAL}
     
@@ -119,11 +122,11 @@ public class TodoListEntry {
         reloadParams();
     }
     
-    public TodoListEntry(Context context, String[] params, String groupName, ArrayList<Group> groups) {
+    public TodoListEntry(Context context, String[] params, String groupName, List<Group> groups) {
         if (!groupName.isEmpty()) {
             group = new Group(context, groupName, groups);
             if (group.isNullGroup()) {
-                log(WARN, "TodoListEntry", "Unknown group: " + groupName);
+                log(WARN, NAME, "Unknown group: " + groupName);
                 group = null;
             }
         }
@@ -167,8 +170,8 @@ public class TodoListEntry {
         return (showOnLock && !completed);
     }
     
-    private boolean inRange(long day, long event_start_day) {
-        return isGlobal() || (day >= event_start_day - dayOffset_upcoming && day <= event_start_day + duration_in_days + dayOffset_expired);
+    private boolean inRange(long day, long eventStartDay) {
+        return isGlobal() || (day >= eventStartDay - dayOffset_upcoming && day <= eventStartDay + duration_in_days + dayOffset_expired);
         // | days after the event ended ------ event start |event| event end ------ days before the event starts |
         // | ++++++++++++++++++++++++++       -------------|-----|----------        +++++++++++++++++++++++++++++|
     }
@@ -294,7 +297,7 @@ public class TodoListEntry {
     }
     
     public String[] getDisplayParams() {
-        ArrayList<String> displayParams = new ArrayList<>();
+        List<String> displayParams = new ArrayList<>();
         for (int i = 0; i < params.length; i += 2) {
             
             if (!(params[i].equals(TEXT_VALUE)
@@ -304,15 +307,11 @@ public class TodoListEntry {
                 displayParams.add(params[i + 1]);
             }
         }
-        String[] displayParams_new = new String[displayParams.size()];
-        for (int i = 0; i < displayParams.size(); i++) {
-            displayParams_new[i] = displayParams.get(i);
-        }
-        return displayParams_new;
+        return displayParams.toArray(new String[0]);
     }
     
     public void removeDisplayParams() {
-        ArrayList<String> displayParams = new ArrayList<>();
+        List<String> displayParams = new ArrayList<>();
         for (int i = 0; i < params.length; i += 2) {
             
             if (params[i].equals(TEXT_VALUE)
@@ -322,11 +321,7 @@ public class TodoListEntry {
                 displayParams.add(params[i + 1]);
             }
         }
-        String[] params_new = new String[displayParams.size()];
-        for (int i = 0; i < displayParams.size(); i++) {
-            params_new[i] = displayParams.get(i);
-        }
-        params = params_new;
+        params = displayParams.toArray(new String[0]);;
         reloadParams();
     }
     
@@ -340,13 +335,13 @@ public class TodoListEntry {
                     
                     setParamsWithGroup();
                     
-                    long days_associated = currentDay;
-                    long days_from_param = Long.parseLong(params[i + 1]);
-                    if (days_from_param != DAY_FLAG_GLOBAL) {
-                        days_associated = days_from_param;
+                    long daysAssociated = currentDay;
+                    long daysFromParam = Long.parseLong(params[i + 1]);
+                    if (daysFromParam != DAY_FLAG_GLOBAL) {
+                        daysAssociated = daysFromParam;
                     }
                     
-                    if (days_from_param == currentDay || days_from_param == DAY_FLAG_GLOBAL) {
+                    if (daysFromParam == currentDay || daysFromParam == DAY_FLAG_GLOBAL) {
                         
                         bgColor = preferences.getInt(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR);
                         borderColor = preferences.getInt(Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR);
@@ -357,14 +352,14 @@ public class TodoListEntry {
                         showOnLock = true;
                         showInList_ifCompleted = true;
                         
-                        if (days_from_param == DAY_FLAG_GLOBAL) {
+                        if (daysFromParam == DAY_FLAG_GLOBAL) {
                             showOnLock = preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
                             setEntryType(EntryType.GLOBAL);
                         } else {
                             setEntryType(EntryType.TODAY);
                         }
                         
-                    } else if (days_associated < currentDay && currentDay - days_associated <= dayOffset_expired) {
+                    } else if (daysAssociated < currentDay && currentDay - daysAssociated <= dayOffset_expired) {
                         
                         bgColor = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
                         borderColor = preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR);
@@ -376,7 +371,7 @@ public class TodoListEntry {
                         showOnLock = true;
                         
                         setEntryType(EntryType.EXPIRED);
-                    } else if (days_associated > currentDay && days_associated - currentDay <= dayOffset_upcoming) {
+                    } else if (daysAssociated > currentDay && daysAssociated - currentDay <= dayOffset_upcoming) {
                         
                         bgColor = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
                         borderColor = preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR);
@@ -423,8 +418,8 @@ public class TodoListEntry {
             duration_in_days = daysFromEpoch(timestamp_start + timestamp_duration, event.timeZone) - day_start;
             
             textValue = event.title;
-            
-            ArrayList<String> calendarSubKeys = event.subKeys;
+    
+            List<String> calendarSubKeys = event.subKeys;
             
             adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
             adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
@@ -494,12 +489,12 @@ public class TodoListEntry {
     
     public void loadDisplayData(LockScreenBitmapDrawer lockScreenBitmapDrawer) {
         textPaint = createNewPaint(fontColor);
-        textPaint.setTextSize(lockScreenBitmapDrawer.fontSize_h);
+        textPaint.setTextSize(lockScreenBitmapDrawer.getDensityIndependentTextSize());
         textPaint.setTextAlign(Paint.Align.CENTER);
-        rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.currentBitmapLongestText), 1, lockScreenBitmapDrawer.displayWidth / 2f - borderThickness);
+        rWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.getLongestText()), 1, lockScreenBitmapDrawer.displayWidth / 2f - borderThickness);
         maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - borderThickness) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         
-        log(INFO, "TodoListEntry", "loaded display data for " + textValue);
+        log(INFO, NAME, "Loaded display data for " + textValue);
     }
     
     private int getAdaptiveColor(int inputColor) {
@@ -639,7 +634,7 @@ public class TodoListEntry {
                     adaptiveColorBalance = Integer.parseInt(params[i + 1]);
                     break;
                 default:
-                    log(WARN, "TodoListEntry", "unknown parameter: " + params[i] + " entry textValue: " + textValue);
+                    log(WARN, NAME, "unknown parameter: " + params[i] + " entry textValue: " + textValue);
                     break;
             }
         }

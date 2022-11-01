@@ -1,7 +1,7 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
+import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 
 import android.os.Bundle;
@@ -14,19 +14,20 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
-import prototype.xd.scheduler.entities.settingsEntries.AdaptiveBackgroundSettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.AppThemeSelectorEntry;
-import prototype.xd.scheduler.entities.settingsEntries.CalendarAccountSettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.CalendarSettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.CompoundCustomizationEntry;
-import prototype.xd.scheduler.entities.settingsEntries.DiscreteSeekBarSettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.ResetButtonSettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.SettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.SwitchSettingsEntry;
-import prototype.xd.scheduler.entities.settingsEntries.TitleBarSettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntry;
+import prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.CalendarSettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntry;
+import prototype.xd.scheduler.entities.settings_entries.DiscreteSeekBarSettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.SettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntry;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
@@ -43,7 +44,7 @@ public class SettingsFragment extends Fragment {
     
     @Override
     public void onDestroyView() {
-        preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+        servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         super.onDestroyView();
     }
     
@@ -58,10 +59,11 @@ public class SettingsFragment extends Fragment {
         adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated();
     }
     
+    @Override
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
-        ArrayList<SettingsEntry> settingsEntries = new ArrayList<>();
+    
+        List<SettingsEntry> settingsEntries = new ArrayList<>();
         
         adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntry(this);
         
@@ -98,38 +100,35 @@ public class SettingsFragment extends Fragment {
         SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries);
         ((ListView) view.findViewById(R.id.settingsList)).setAdapter(settingsListViewAdapter);
     
-        ArrayList<SettingsEntry> settingsEntries_additional = new ArrayList<>();
+        List<SettingsEntry> additionalSettingsEntries = new ArrayList<>();
         new Thread(() -> {
-            settingsEntries_additional.add(new TitleBarSettingsEntry(getString(R.string.category_system_calendars)));
-            ArrayList<SystemCalendar> calendars = getAllCalendars(view.getContext(), true);
-            ArrayList<ArrayList<SystemCalendar>> calendars_sorted = new ArrayList<>();
-            ArrayList<String> calendars_sorted_names = new ArrayList<>();
+            additionalSettingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_system_calendars)));
+            List<SystemCalendar> calendars = getAllCalendars(view.getContext(), true);
+            List<List<SystemCalendar>> sortedCalendars = new ArrayList<>();
+            List<String> sortedCalendarNames = new ArrayList<>();
 
-            for (int i = 0; i < calendars.size(); i++) {
-                SystemCalendar calendar = calendars.get(i);
-                if (calendars_sorted_names.contains(calendar.account_name)) {
-                    calendars_sorted.get(calendars_sorted_names.indexOf(calendar.account_name)).add(calendar);
+            for (SystemCalendar calendar: calendars) {
+                if (sortedCalendarNames.contains(calendar.account_name)) {
+                    sortedCalendars.get(sortedCalendarNames.indexOf(calendar.account_name)).add(calendar);
                 } else {
-                    ArrayList<SystemCalendar> calendar_group = new ArrayList<>();
-                    calendar_group.add(calendar);
-                    calendars_sorted.add(calendar_group);
-                    calendars_sorted_names.add(calendar.account_name);
+                    List<SystemCalendar> calendarGroup = new ArrayList<>();
+                    calendarGroup.add(calendar);
+                    sortedCalendars.add(calendarGroup);
+                    sortedCalendarNames.add(calendar.account_name);
                 }
             }
 
-            for (int g = 0; g < calendars_sorted.size(); g++) {
-                ArrayList<SystemCalendar> calendar_group = calendars_sorted.get(g);
-                SystemCalendar calendar0 = calendar_group.get(0);
+            for (List<SystemCalendar> calendarGroup: sortedCalendars) {
+                SystemCalendar calendar0 = calendarGroup.get(0);
     
-                settingsEntries_additional.add(new CalendarAccountSettingsEntry(SettingsFragment.this, calendar0));
+                additionalSettingsEntries.add(new CalendarAccountSettingsEntry(SettingsFragment.this, calendar0));
     
-                for (int c = 0; c < calendar_group.size(); c++) {
-                    SystemCalendar current_calendar = calendar_group.get(c);
-                    settingsEntries_additional.add(new CalendarSettingsEntry(SettingsFragment.this, current_calendar));
+                for (SystemCalendar currentCalendar: calendarGroup) {
+                    additionalSettingsEntries.add(new CalendarSettingsEntry(SettingsFragment.this, currentCalendar));
                 }
             }
             requireActivity().runOnUiThread(() -> {
-                settingsEntries.addAll(settingsEntries_additional);
+                settingsEntries.addAll(additionalSettingsEntries);
                 settingsListViewAdapter.notifyDataSetChanged();
             });
         }, "SSCfetch thread").start();

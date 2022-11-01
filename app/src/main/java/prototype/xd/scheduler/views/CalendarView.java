@@ -26,10 +26,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
@@ -61,9 +59,9 @@ public class CalendarView {
             cardView.setOnClickListener(v -> container.selectDate(date));
         }
         
-        private void setEventIndicators(ArrayList<ColorStateList> eventIndicatorColors) {
-            for (int i = 0; i < MAX_INDICATORS; i++){
-                if(eventIndicatorColors.size() <= i) {
+        private void setEventIndicators(List<ColorStateList> eventIndicatorColors) {
+            for (int i = 0; i < MAX_INDICATORS; i++) {
+                if (eventIndicatorColors.size() <= i) {
                     eventIndicators[i].setVisibility(View.INVISIBLE);
                     continue;
                 }
@@ -209,16 +207,6 @@ public class CalendarView {
         rootCalendarView.notifyDateChanged(LocalDate.ofEpochDay(currentlySelectedDay));
     }
     
-    public void setOnMonthPostChangeListener(MonthChangeListener monthPostChangeListener) {
-        rootCalendarView.setMonthScrollListener(calendarMonth -> {
-            monthPostChangeListener.onMonthChanged(calendarMonth,
-                    Objects.requireNonNull(rootCalendarView.findFirstVisibleDay()).getDate().toEpochDay(),
-                    Objects.requireNonNull(rootCalendarView.findLastVisibleDay()).getDate().toEpochDay(),
-                    rootCalendarView.getContext());
-            return null;
-        });
-    }
-    
     public void setOnMonthPreChangeListener(MonthChangeListener monthPreChangeListener) {
         this.monthPreChangeListener = monthPreChangeListener;
     }
@@ -230,7 +218,7 @@ public class CalendarView {
     
     @FunctionalInterface
     public interface MonthChangeListener {
-        void onMonthChanged(CalendarMonth calendarMonth, long first_visible_day, long last_visible_day, Context context);
+        void onMonthChanged(CalendarMonth calendarMonth, long firstVisibleDay, long lastVisibleDay, Context context);
     }
 }
 

@@ -16,6 +16,10 @@ import java.util.concurrent.TimeUnit;
 
 public class DateManager {
     
+    private DateManager() {
+        throw new IllegalStateException("Utility date manager class");
+    }
+    
     public static final TimeZone timeZone_SYSTEM = TimeZone.getDefault();
     
     public static final LocalDate currentDate = LocalDate.now();
@@ -24,10 +28,10 @@ public class DateManager {
     public static long currentTimestamp = DAY_FLAG_GLOBAL;
     public static long currentlySelectedDay = DAY_FLAG_GLOBAL;
     
-    static final DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.ROOT);
+    private static final DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.ROOT);
     
-    public static final String[] availableDays = new String[]{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"};
-    public static final String defaultBackgroundName = "default.png";
+    public static final String[] AVAILABLE_DAYS = new String[]{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"};
+    public static final String DEFAULT_BACKGROUND_NAME = "default.png";
     
     public static void updateDate(long day, boolean updateCurrentlySelected) {
         currentTimestamp = getCurrentTimestamp();
@@ -41,21 +45,21 @@ public class DateManager {
         }
     }
     
-    public static String getTimeSpan(long time1, long time2) {
-        String date1 = datetimeFromEpoch(time1);
-        String date2 = datetimeFromEpoch(time2);
-        String[] date1_split = date1.split(" ");
-        String[] date2_split = date2.split(" ");
-        if (date1.equals(date2) || date1_split[0].equals(date2_split[0])) {
-            return date1_split[1] + " - " + date2_split[1];
+    public static String getTimeSpan(long timeFrom, long timeTo) {
+        String dateFrom = datetimeFromEpoch(timeFrom);
+        String dateTo = datetimeFromEpoch(timeTo);
+        String[] dateFromSplit = dateFrom.split(" ");
+        String[] dateToSplit = dateTo.split(" ");
+        if (dateFrom.equals(dateTo) || dateFromSplit[0].equals(dateToSplit[0])) {
+            return dateFromSplit[1] + " - " + dateToSplit[1];
         } else {
-            String[] date1_split_split = date1_split[0].split("/");
-            String[] date2_split_split = date2_split[0].split("/");
-            boolean month_same = date1_split_split[0].equals(date2_split_split[0]);
-            if (month_same) {
-                return date1_split_split[1] + " " + date1_split[1] + " - " + date2_split_split[1] + " " + date2_split[1];
+            String[] dateFromMonthDay = dateFromSplit[0].split("/");
+            String[] dateToMonthDay = dateToSplit[0].split("/");
+            //month is the same
+            if (dateFromMonthDay[0].equals(dateToMonthDay[0])) {
+                return dateFromMonthDay[1] + " " + dateFromSplit[1] + " - " + dateToMonthDay[1] + " " + dateToSplit[1];
             } else {
-                return date1 + " - " + date2;
+                return dateFrom + " - " + dateTo;
             }
         }
     }
@@ -63,19 +67,18 @@ public class DateManager {
     static File getBackgroundAccordingToDayAndTime() {
         
         if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED)) {
-            return getFile(defaultBackgroundName);
+            return getFile(DEFAULT_BACKGROUND_NAME);
         }
         
-        final Calendar cal = Calendar.getInstance();
-        int day = cal.get(Calendar.DAY_OF_WEEK);
-        CharSequence day_string;
+        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        CharSequence dayString;
         if (day == 1) {
-            day_string = availableDays[6];
+            dayString = AVAILABLE_DAYS[6];
         } else {
-            day_string = availableDays[day - 2];
+            dayString = AVAILABLE_DAYS[day - 2];
         }
         
-        return getFile(day_string + ".png");
+        return getFile(dayString + ".png");
     }
     
     public static long daysFromEpoch(long epoch, TimeZone timezone) {

@@ -23,23 +23,23 @@ public class BitmapUtilities {
     
     public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output) throws IOException {
         bitmap = makeMutable(bitmap);
-        Bitmap cut_bitmap = createScaledBitmap(bitmap,
+        Bitmap cutBitmap = createScaledBitmap(bitmap,
                 preferences.getInt(DISPLAY_METRICS_WIDTH, 100),
                 preferences.getInt(DISPLAY_METRICS_HEIGHT, 100),
                 ScalingLogic.CROP);
-        fingerPrintBitmap(cut_bitmap);
+        fingerPrintBitmap(cutBitmap);
         
         FileOutputStream outputStream = new FileOutputStream(output);
-        cut_bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        cutBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         outputStream.close();
         
-        Bitmap resizedBitmap = createScaledBitmap(cut_bitmap, (int) (cut_bitmap.getWidth() / 4f), (int) (cut_bitmap.getHeight() / 4f), BitmapUtilities.ScalingLogic.FIT);
+        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4f), (int) (cutBitmap.getHeight() / 4f), BitmapUtilities.ScalingLogic.FIT);
         
-        FileOutputStream outputStream_min = new FileOutputStream(output.getAbsolutePath() + "_min.png");
-        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStream_min);
-        outputStream_min.close();
+        FileOutputStream outputStreamMin = new FileOutputStream(output.getAbsolutePath() + "_min.png");
+        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStreamMin);
+        outputStreamMin.close();
         
-        return cut_bitmap;
+        return cutBitmap;
     }
     
     public static Bitmap readStream(FileInputStream inputStream) throws IOException {

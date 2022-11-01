@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -36,7 +37,7 @@ public class SystemCalendar {
     
     public final String name;
     
-    public TimeZone timeZone;
+    public final TimeZone timeZone;
     
     public final long id;
     
@@ -44,9 +45,9 @@ public class SystemCalendar {
     
     public final int color;
     
-    public final ArrayList<SystemCalendarEvent> systemCalendarEvents;
-    public final ArrayList<Integer> availableEventColors;
-    public final ArrayList<Integer> eventCountsForColors;
+    public final List<SystemCalendarEvent> systemCalendarEvents;
+    public final List<Integer> availableEventColors;
+    public final List<Integer> eventCountsForColors;
     
     public SystemCalendar(Cursor cursor, ContentResolver contentResolver, boolean loadMinimal) {
         account_type = getString(cursor, calendarColumns, Calendars.ACCOUNT_TYPE);
@@ -68,13 +69,6 @@ public class SystemCalendar {
         if (accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
             loadAvailableEventColors();
         }
-        
-       /* System.out.println("CALENDAR-------------------------------------------------" + name);
-        Cursor cursor_all = query(contentResolver, Events.CONTENT_URI, null,
-                Events.CALENDAR_ID + " = " + id);
-        printTable(cursor_all);
-        cursor_all.close();*/
-        
     }
     
     void loadAvailableEventColors() {
@@ -82,10 +76,10 @@ public class SystemCalendar {
         eventCountsForColors.clear();
         
         for (int i = 0; i < systemCalendarEvents.size(); i++) {
-            int color = systemCalendarEvents.get(i).color;
-            if (!availableEventColors.contains(color)) {
-                availableEventColors.add(color);
-                eventCountsForColors.add(getEventCountWithColor(color));
+            int eventColor = systemCalendarEvents.get(i).color;
+            if (!availableEventColors.contains(eventColor)) {
+                availableEventColors.add(eventColor);
+                eventCountsForColors.add(getEventCountWithColor(eventColor));
             }
         }
     }
@@ -114,11 +108,11 @@ public class SystemCalendar {
         dropDuplicates();
     }
     
-    public ArrayList<TodoListEntry> getVisibleTodoListEntries(long day_start, long day_end) {
-        ArrayList<TodoListEntry> todoListEntries = new ArrayList<>();
+    public List<TodoListEntry> getVisibleTodoListEntries(long dayStart, long dayEnd) {
+        List<TodoListEntry> todoListEntries = new ArrayList<>();
         if (preferences.getBoolean(makeKey(this) + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
             for (SystemCalendarEvent event: systemCalendarEvents) {
-                if (event.fallsInRange(day_start, day_end)) {
+                if (event.fallsInRange(dayStart, dayEnd)) {
                     todoListEntries.add(new TodoListEntry(event));
                 }
             }
@@ -127,23 +121,23 @@ public class SystemCalendar {
     }
     
     public void dropDuplicates() {
-        ArrayList<SystemCalendarEvent> filteredSystemCalendarEvents = new ArrayList<>();
+        List<SystemCalendarEvent> filteredSystemCalendarEvents = new ArrayList<>();
         
         for (int i = 0; i < systemCalendarEvents.size(); i++) {
-            SystemCalendarEvent event_recurrent = systemCalendarEvents.get(i);
-            if (event_recurrent.rSet != null) {
+            SystemCalendarEvent recurrentEvent = systemCalendarEvents.get(i);
+            if (recurrentEvent.rSet != null) {
                
                 for (int i2 = 0; i2 < systemCalendarEvents.size(); i2++) {
-                    SystemCalendarEvent event_static = systemCalendarEvents.get(i2);
-                    if (event_static.title.equals(event_recurrent.title) && event_static.rSet == null && !event_static.invalidFlag) {
+                    SystemCalendarEvent staticEvent = systemCalendarEvents.get(i2);
+                    if (staticEvent.title.equals(recurrentEvent.title) && staticEvent.rSet == null && !staticEvent.invalidFlag) {
                         
-                        RecurrenceSetIterator it = event_recurrent.rSet.iterator(event_recurrent.timeZone, event_recurrent.start);
+                        RecurrenceSetIterator it = recurrentEvent.rSet.iterator(recurrentEvent.timeZone, recurrentEvent.start);
                         long instance = 0;
-                        while (it.hasNext() && instance <= event_static.start) {
+                        while (it.hasNext() && instance <= staticEvent.start) {
                             instance = it.next();
-                            if (instance == event_static.start && instance + event_recurrent.duration == event_static.start + event_static.duration) {
-                                event_static.invalidFlag = true;
-                                log(WARN, "SystemCalendar", "Overlapping duplicate events: " + event_static.title + ", dropping");
+                            if (instance == staticEvent.start && instance + recurrentEvent.duration == staticEvent.start + staticEvent.duration) {
+                                staticEvent.invalidFlag = true;
+                                log(WARN, "SystemCalendar", "Overlapping duplicate events: " + staticEvent.title + ", dropping");
                                 break;
                             }
                         }
@@ -188,13 +182,13 @@ public class SystemCalendar {
         } else if (obj == this) {
             return true;
         } else if (obj instanceof SystemCalendar) {
-            SystemCalendar s_calendar = (SystemCalendar) obj;
-            return Objects.equals(account_type, s_calendar.account_type) &&
-                    Objects.equals(account_name, s_calendar.account_name) &&
-                    Objects.equals(name, s_calendar.name) &&
-                    Objects.equals(id, s_calendar.id) &&
-                    Objects.equals(accessLevel, s_calendar.accessLevel) &&
-                    Objects.equals(color, s_calendar.color);
+            SystemCalendar systemCalendar = (SystemCalendar) obj;
+            return Objects.equals(account_type, systemCalendar.account_type) &&
+                    Objects.equals(account_name, systemCalendar.account_name) &&
+                    Objects.equals(name, systemCalendar.name) &&
+                    Objects.equals(id, systemCalendar.id) &&
+                    Objects.equals(accessLevel, systemCalendar.accessLevel) &&
+                    Objects.equals(color, systemCalendar.color);
         }
         return super.equals(obj);
     }

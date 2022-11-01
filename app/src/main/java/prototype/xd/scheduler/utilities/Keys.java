@@ -6,6 +6,10 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 
 public class Keys {
     
+    private Keys() {
+        throw new IllegalStateException("Utility key storage class");
+    }
+    
     public static final int SETTINGS_DEFAULT_BG_COLOR = 0xff_FFFFFF;
     public static final int SETTINGS_DEFAULT_UPCOMING_BG_COLOR = 0xff_CCFFCC;
     public static final int SETTINGS_DEFAULT_EXPIRED_BG_COLOR = 0xff_FFCCCC;

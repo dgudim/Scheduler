@@ -1,6 +1,6 @@
-package prototype.xd.scheduler.entities.settingsEntries;
+package prototype.xd.scheduler.entities.settings_entries;
 
-import static prototype.xd.scheduler.entities.settingsEntries.SettingsEntryType.CALENDAR_ACCOUNT;
+import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR_ACCOUNT;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,11 +42,11 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
     }
     
     @Override
-    protected View InitInnerViews(View convertView, ViewGroup viewGroup) {
+    protected View initInnerViews(View convertView, ViewGroup viewGroup) {
         ((ImageView) convertView.findViewById(R.id.account_icon)).setImageResource(getIconFromAccountType());
         ((TextView) convertView.findViewById(R.id.calendar_name)).setText(accountName);
         ((TextView) convertView.findViewById(R.id.account_type)).setText(accountType);
         convertView.findViewById(R.id.edit_button).setOnClickListener(v -> fragment.calendarSettingsDialogue.show(accountName));
-        return super.InitInnerViews(convertView, viewGroup);
+        return super.initInnerViews(convertView, viewGroup);
     }
 }

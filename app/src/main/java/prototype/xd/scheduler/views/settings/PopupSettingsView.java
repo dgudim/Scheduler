@@ -20,7 +20,7 @@ import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.Spinner;
 import prototype.xd.scheduler.views.Switch;
 
-public class PopupSettingsView {
+public abstract class PopupSettingsView {
     
     protected final TextView titleText;
     
@@ -138,7 +138,7 @@ public class PopupSettingsView {
         settingsView.findViewById(R.id.close_settings_button).setOnClickListener(v -> dialog.dismiss());
     }
     
-    protected void setStateIconColor(TextView icon, String parameter) {}
+    protected abstract void setStateIconColor(TextView icon, String parameter);
     
     void updateAllIndicators() {
         setStateIconColor(fontColor_view_state, Keys.FONT_COLOR);
@@ -163,13 +163,13 @@ public class PopupSettingsView {
         preview_border.setPadding(borderThickness,
                 borderThickness, borderThickness, 0);
         
-        int upcoming_border_thickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
-        int expired_border_thickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
+        int upcomingBorderThickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
+        int expiredBorderThickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
         
-        preview_border_upcoming.setPadding(upcoming_border_thickness,
-                upcoming_border_thickness, upcoming_border_thickness, 0);
-        preview_border_expired.setPadding(expired_border_thickness,
-                expired_border_thickness, expired_border_thickness, 0);
+        preview_border_upcoming.setPadding(upcomingBorderThickness,
+                upcomingBorderThickness, upcomingBorderThickness, 0);
+        preview_border_expired.setPadding(expiredBorderThickness,
+                expiredBorderThickness, expiredBorderThickness, 0);
     }
     
     public void updatePreviewFont(int fontColor) {

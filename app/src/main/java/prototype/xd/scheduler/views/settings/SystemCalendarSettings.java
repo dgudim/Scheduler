@@ -3,7 +3,7 @@ package prototype.xd.scheduler.views.settings;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences_service;
+import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarKeyToReadable;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import prototype.xd.scheduler.R;
@@ -33,7 +33,7 @@ import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
-    private ArrayList<String> calendarSubKeys;
+    private List<String> calendarSubKeys;
     private TodoListEntry entry;
     private final TodoListEntryStorage todoListEntryStorage;
     
@@ -184,7 +184,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 preferences.edit().putString(calendarKey + "_" + Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT, s.toString()).apply();
                 setStateIconColor(hide_by_content_field_state, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT);
-                preferences_service.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
             
             @Override

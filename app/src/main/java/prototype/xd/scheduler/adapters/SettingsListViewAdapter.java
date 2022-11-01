@@ -4,15 +4,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import prototype.xd.scheduler.entities.settingsEntries.SettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.SettingsEntry;
 
 public class SettingsListViewAdapter extends BaseAdapter {
     
-    private final ArrayList<SettingsEntry> settingsEntries;
+    private final List<SettingsEntry> settingsEntries;
     
-    public SettingsListViewAdapter(ArrayList<SettingsEntry> settingsEntries) {
+    public SettingsListViewAdapter(List<SettingsEntry> settingsEntries) {
         this.settingsEntries = settingsEntries;
     }
     
