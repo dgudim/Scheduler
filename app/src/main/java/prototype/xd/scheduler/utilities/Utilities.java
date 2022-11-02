@@ -12,7 +12,6 @@ import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
@@ -108,7 +107,6 @@ public class Utilities {
             log(INFO, NAME, "read todo list: " + readEntries.size());
         } catch (Exception e) {
             log(INFO, NAME, "no todo list");
-            logException(NAME, e);
         }
         
         readEntries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd));

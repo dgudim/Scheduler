@@ -95,7 +95,7 @@
     <string name="settings_preview_upcoming">Будущие</string>
     <string name="settings_hide_expired_entries_by_time">Скрывать прошедшие события на экране блокировки(по времени)</string>
     <string name="alert">Внимание!</string>
-    <string name="ignore">игнорировать</string>
+    <string name="ignore">Игнорировать</string>
     <string name="visit_dont_kill_my_app">узнать как</string>
     <string name="service_killed_message">Похоже, что система Android убивает службу фонового обновления приложения, без службы приложение не будет обновлять ваши обои вовремя, пожалуйста, добавьте приложение в белый список оптимизации батареи (нажмите \"узнать как\", если вы не знаете, как это сделать)</string>
     <string name="never_ask_again">Больше не спрашивать</string>

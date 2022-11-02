@@ -118,8 +118,8 @@ public class TodoListEntryStorage {
                 loadedDay_start = toLoadDayStart;
             }
             if (dayStart != 0 && calendars != null) {
-                for (int i = 0; i < calendars.size(); i++) {
-                    addDistinct(calendars.get(i).getVisibleTodoListEntries(dayStart, dayEnd));
+                for (SystemCalendar calendar: calendars) {
+                    addDistinct(calendar.getVisibleTodoListEntries(dayStart, dayEnd));
                 }
             }
         }

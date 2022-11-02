@@ -103,7 +103,7 @@
     <string name="settings_preview_upcoming">Upcoming</string>
     <string name="settings_hide_expired_entries_by_time">Hide passed events on lockscreen(by time)</string>
     <string name="alert">Alert!</string>
-    <string name="ignore">ignore</string>
+    <string name="ignore">Ignore</string>
     <string name="visit_dont_kill_my_app">learn how to</string>
     <string name="service_killed_message">It looks like android system is killing app background update service, without the service the app won\'t update your wallpaper in time, please whitelist the app from battery optimizations(click \"learn how to\" if you don\'t know how to do it)</string>
     <string name="never_ask_again">Never ask again</string>
