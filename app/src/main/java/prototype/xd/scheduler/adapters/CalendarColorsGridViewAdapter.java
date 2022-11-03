@@ -13,8 +13,8 @@ import androidx.cardview.widget.CardView;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarColorsGridViewAdapter extends BaseAdapter {
     
@@ -23,12 +23,12 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
     private final List<Integer> colors;
     private final List<Integer> color_eventCounts;
     
-    private final SettingsFragment fragment;
+    private final SystemCalendarSettings systemCalendarSettings;
     
     private final SystemCalendar calendar;
     
-    public CalendarColorsGridViewAdapter(final SettingsFragment fragment, final SystemCalendar calendar) {
-        this.fragment = fragment;
+    public CalendarColorsGridViewAdapter(final SystemCalendarSettings systemCalendarSettings, final SystemCalendar calendar) {
+        this.systemCalendarSettings = systemCalendarSettings;
         colors = calendar.availableEventColors;
         calendarColor = calendar.color;
         color_eventCounts = calendar.eventCountsForColors;
@@ -59,7 +59,7 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(colors.get(i));
         view.findViewById(R.id.title_default).setVisibility(calendarColor == colors.get(i) ? View.VISIBLE : View.GONE);
         ((TextView) view.findViewById(R.id.event_count)).setText(view.getContext().getString(R.string.calendar_events, color_eventCounts.get(i)));
-        view.findViewById(R.id.settings).setOnClickListener(v -> fragment.calendarSettingsDialogue.show(makeKey(calendar, colors.get(i))));
+        view.findViewById(R.id.settings).setOnClickListener(v -> systemCalendarSettings.show(makeKey(calendar, colors.get(i))));
         
         return view;
     }

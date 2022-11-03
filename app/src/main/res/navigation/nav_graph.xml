@@ -14,16 +14,14 @@
             android:id="@+id/action_HomeFragment_to_SettingsFragment"
             app:destination="@id/SettingsFragment" />
     </fragment>
-    <fragment
+
+    <dialog
         android:id="@+id/SettingsFragment"
         android:name="prototype.xd.scheduler.SettingsFragment"
         android:label="@string/settings_fragment_label"
         tools:layout="@layout/fragment_settings">
 
-        <action
-            android:id="@+id/action_SettingsFragment_to_HomeFragment"
-            app:destination="@id/HomeFragment" />
-    </fragment>
+    </dialog>
 
 
 </navigation>

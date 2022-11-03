@@ -10,7 +10,6 @@ import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -30,8 +29,6 @@ import java.util.Objects;
 
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoListEntryStorage;
 import prototype.xd.scheduler.views.CalendarView;
 
@@ -58,18 +55,9 @@ public class HomeFragment extends Fragment {
         CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryStorage);
         todoListEntryStorage.getTodoListViewAdapter().setDateUpdateListener(calendarView::notifyCurrentDayChanged);
         
-        long day;
-        if ((day = servicePreferences.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
-            calendarView.selectDay(day);
-        } else {
-            calendarView.selectDate(DateManager.currentDate);
-        }
-    
         TextView statusText = view.findViewById(R.id.status_text);
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
-            long epochDay = selectedDate.toEpochDay();
-            servicePreferences.edit().putLong(Keys.PREVIOUSLY_SELECTED_DAY, epochDay).apply();
-            updateDate(epochDay, true);
+            updateDate(selectedDate.toEpochDay(), true);
             todoListEntryStorage.updateTodoListAdapter(false, false);
             updateStatusText(statusText);
         });
@@ -78,10 +66,7 @@ public class HomeFragment extends Fragment {
                 // load current month before displaying the data
                 todoListEntryStorage.lazyLoadEntries(context, firstVisibleDay, lastVisibleDay));
         
-        view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> {
-            calendarView.selectDay(currentDay);
-            servicePreferences.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
-        });
+        view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> calendarView.selectDay(currentDay));
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
             final List<Group> groupList = todoListEntryStorage.getGroups();
@@ -126,11 +111,6 @@ public class HomeFragment extends Fragment {
         
         updateDate(DAY_FLAG_GLOBAL, true);
         
-        long day;
-        if ((day = servicePreferences.getLong(Keys.PREVIOUSLY_SELECTED_DAY, 0)) != 0) {
-            currentlySelectedDay = day;
-        }
-        
         updateStatusText(view.findViewById(R.id.status_text));
     }
     
@@ -142,7 +122,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroy() {
         todoListEntryStorage = null;
-        servicePreferences.edit().remove(Keys.PREVIOUSLY_SELECTED_DAY).apply();
         super.onDestroy();
     }
 }

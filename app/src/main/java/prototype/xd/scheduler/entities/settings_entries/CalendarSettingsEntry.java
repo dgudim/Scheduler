@@ -13,15 +13,15 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.CheckBox;
+import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntry extends SettingsEntry {
     
-    private final SettingsFragment fragment;
+    private final SystemCalendarSettings systemCalendarSettings;
     private final String calendarName;
     private final String calendarKey;
     private final int calendarEventsCount;
@@ -29,9 +29,9 @@ public class CalendarSettingsEntry extends SettingsEntry {
     
     private CalendarColorsGridViewAdapter gridViewAdapter;
     
-    public CalendarSettingsEntry(final SettingsFragment fragment, final SystemCalendar calendar) {
+    public CalendarSettingsEntry(final SystemCalendarSettings systemCalendarSettings, final SystemCalendar calendar) {
         super(R.layout.calendar_entry);
-        this.fragment = fragment;
+        this.systemCalendarSettings = systemCalendarSettings;
         this.calendarName = calendar.name;
         calendarKey = makeKey(calendar);
         this.calendarColor = calendar.color;
@@ -39,7 +39,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
         entryType = CALENDAR;
         
         if (calendar.availableEventColors.size() > 0 && calendar.systemCalendarEvents.size() > 0) {
-            gridViewAdapter = new CalendarColorsGridViewAdapter(fragment, calendar);
+            gridViewAdapter = new CalendarColorsGridViewAdapter(systemCalendarSettings, calendar);
         }
     }
     
@@ -53,7 +53,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                 preferences.edit().putBoolean(calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
         
-        convertView.findViewById(R.id.edit_button).setOnClickListener(view -> fragment.calendarSettingsDialogue.show(calendarKey));
+        convertView.findViewById(R.id.edit_button).setOnClickListener(view -> systemCalendarSettings.show(calendarKey));
         
         View colorSelector = convertView.findViewById(R.id.color_select_button);
         if (gridViewAdapter != null) {

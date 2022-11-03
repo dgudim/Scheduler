@@ -10,18 +10,18 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntry extends SettingsEntry {
     
-    private final SettingsFragment fragment;
+    private final SystemCalendarSettings systemCalendarSettings;
     private final String accountName;
     private final String accountType;
     
-    public CalendarAccountSettingsEntry(final SettingsFragment fragment, SystemCalendar calendar) {
+    public CalendarAccountSettingsEntry(final SystemCalendarSettings systemCalendarSettings, SystemCalendar calendar) {
         super(R.layout.account_entry);
-        this.fragment = fragment;
+        this.systemCalendarSettings = systemCalendarSettings;
         this.accountName = calendar.account_name;
         this.accountType = calendar.account_type;
         entryType = CALENDAR_ACCOUNT;
@@ -46,7 +46,7 @@ public class CalendarAccountSettingsEntry extends SettingsEntry {
         ((ImageView) convertView.findViewById(R.id.account_icon)).setImageResource(getIconFromAccountType());
         ((TextView) convertView.findViewById(R.id.calendar_name)).setText(accountName);
         ((TextView) convertView.findViewById(R.id.account_type)).setText(accountType);
-        convertView.findViewById(R.id.edit_button).setOnClickListener(v -> fragment.calendarSettingsDialogue.show(accountName));
+        convertView.findViewById(R.id.edit_button).setOnClickListener(v -> systemCalendarSettings.show(accountName));
         return super.initInnerViews(convertView, viewGroup);
     }
 }

@@ -11,7 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,27 +32,38 @@ import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntry;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends DialogFragment {
     
     private AdaptiveBackgroundSettingsEntry adaptiveBackgroundSettingsEntry;
-    public SystemCalendarSettings calendarSettingsDialogue;
+    private SystemCalendarSettings systemCalendarSettings;
     
+    // initial window creation
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL,
+                R.style.FullScreenDialog);
+    }
+    
+    // view creation begin
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        calendarSettingsDialogue = new SystemCalendarSettings(null, inflater.inflate(R.layout.entry_settings, container, false));
+        systemCalendarSettings = new SystemCalendarSettings(null, inflater.inflate(R.layout.entry_settings, container, false));
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
     
+    // fragment becomes not visible
     @Override
     public void onDestroyView() {
         servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         super.onDestroyView();
     }
     
+    // full destroy
     @Override
     public void onDestroy() {
         adaptiveBackgroundSettingsEntry = null;
-        calendarSettingsDialogue = null;
+        systemCalendarSettings = null;
         super.onDestroy();
     }
     
@@ -59,10 +71,11 @@ public class SettingsFragment extends Fragment {
         adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated();
     }
     
+    // view creation end (fragment visible)
     @Override
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    
+        
         List<SettingsEntry> settingsEntries = new ArrayList<>();
         
         adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntry(this);
@@ -96,18 +109,18 @@ public class SettingsFragment extends Fragment {
                 getString(R.string.settings_max_rWidth_lock)));
         
         settingsEntries.add(new ResetButtonSettingsEntry(this, savedInstanceState));
-    
+        
         SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries);
         ((ListView) view.findViewById(R.id.settingsList)).setAdapter(settingsListViewAdapter);
-    
+        
         List<SettingsEntry> additionalSettingsEntries = new ArrayList<>();
         new Thread(() -> {
             additionalSettingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_system_calendars)));
             List<SystemCalendar> calendars = getAllCalendars(view.getContext(), true);
             List<List<SystemCalendar>> sortedCalendars = new ArrayList<>();
             List<String> sortedCalendarNames = new ArrayList<>();
-
-            for (SystemCalendar calendar: calendars) {
+            
+            for (SystemCalendar calendar : calendars) {
                 if (sortedCalendarNames.contains(calendar.account_name)) {
                     sortedCalendars.get(sortedCalendarNames.indexOf(calendar.account_name)).add(calendar);
                 } else {
@@ -117,20 +130,20 @@ public class SettingsFragment extends Fragment {
                     sortedCalendarNames.add(calendar.account_name);
                 }
             }
-
-            for (List<SystemCalendar> calendarGroup: sortedCalendars) {
+            
+            for (List<SystemCalendar> calendarGroup : sortedCalendars) {
                 SystemCalendar calendar0 = calendarGroup.get(0);
-    
-                additionalSettingsEntries.add(new CalendarAccountSettingsEntry(SettingsFragment.this, calendar0));
-    
-                for (SystemCalendar currentCalendar: calendarGroup) {
-                    additionalSettingsEntries.add(new CalendarSettingsEntry(SettingsFragment.this, currentCalendar));
+                
+                additionalSettingsEntries.add(new CalendarAccountSettingsEntry(systemCalendarSettings, calendar0));
+                
+                for (SystemCalendar currentCalendar : calendarGroup) {
+                    additionalSettingsEntries.add(new CalendarSettingsEntry(systemCalendarSettings, currentCalendar));
                 }
             }
             requireActivity().runOnUiThread(() -> {
                 settingsEntries.addAll(additionalSettingsEntries);
                 settingsListViewAdapter.notifyDataSetChanged();
             });
-        }, "SSCfetch thread").start();
+        }, "SSCFetch thread").start();
     }
 }

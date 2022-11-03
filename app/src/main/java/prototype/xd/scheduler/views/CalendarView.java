@@ -174,6 +174,7 @@ public class CalendarView {
         });
         
         rootCalendarView.setup(startMonth, endMonth, daysOfWeek.get(0));
+        selectDate(DateManager.currentDate);
         rootCalendarView.scrollToMonth(currentMonth);
     }
     

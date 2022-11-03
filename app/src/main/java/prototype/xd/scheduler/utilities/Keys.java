@@ -90,8 +90,6 @@ public class Keys {
     
     public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
     
-    public static final String PREVIOUSLY_SELECTED_DAY = "previously_selected_day";
-    
     public static final byte APP_THEME_LIGHT = MODE_NIGHT_NO;
     public static final byte APP_THEME_DARK = MODE_NIGHT_YES;
     public static final byte APP_THEME_SYSTEM = MODE_NIGHT_FOLLOW_SYSTEM;
