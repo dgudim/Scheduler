@@ -63,7 +63,7 @@ public class CalendarSettingsEntry extends SettingsEntry {
                 
                 View view = LayoutInflater.from(convertView.getContext()).inflate(R.layout.grid_selection_view, viewGroup, false);
                 GridView gridView = view.findViewById(R.id.grid_view);
-                gridView.setNumColumns(5);
+                gridView.setNumColumns(2);
                 gridView.setHorizontalSpacing(5);
                 gridView.setVerticalSpacing(5);
                 gridView.setAdapter(gridViewAdapter);

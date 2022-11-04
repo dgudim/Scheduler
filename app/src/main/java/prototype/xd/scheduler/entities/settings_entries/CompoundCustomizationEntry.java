@@ -94,19 +94,19 @@ public class CompoundCustomizationEntry extends SettingsEntry {
                 convertView.findViewById(R.id.upcoming_border_thickness_text),
                 convertView.findViewById(R.id.upcoming_border_thickness_seek_bar),
                 this, R.string.settings_upcoming_border_thickness,
-                Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
+                Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS, true);
     
         Utilities.addSliderChangeListener(
                 convertView.findViewById(R.id.current_border_thickness_text),
                 convertView.findViewById(R.id.current_border_thickness_seek_bar),
                 this, R.string.settings_current_border_thickness,
-                Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
+                Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS, true);
     
         Utilities.addSliderChangeListener(
                 convertView.findViewById(R.id.expired_border_thickness_text),
                 convertView.findViewById(R.id.expired_border_thickness_seek_bar),
                 this, R.string.settings_expired_border_thickness,
-                Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
+                Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS, true);
     }
     
     protected void updatePreviews() {

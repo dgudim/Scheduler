@@ -35,6 +35,7 @@
     <string name="overwrite_prompt">Перезаписать?</string>
     <string name="no">Нет</string>
     <string name="yes">Да</string>
+    <string name="off">Выключено</string>
     <string name="reset_settings_prompt">Сбросить настройки?</string>
     <string name="cancel">Отмена</string>
     <string name="move_to_global_list">Переместить в общий список</string>
@@ -59,8 +60,7 @@
     <string name="title_color_default">дефолт</string>
     <string name="add_event_fab">Добавить событие</string>
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
-    <string name="settings_adaptive_color_balance">Баланс подстраиваемого цвета: %d</string>
-    <string name="settings_adaptive_color">Подстраивать цвет события под цвет фона</string>
+    <string name="settings_adaptive_color_balance">Слияние с фоном: %s</string>
     <string name="settings_show_days_expired">Показывать события после %d дня/дней</string>
     <string name="settings_show_days_upcoming">Показывать события за %d дня/дней</string>
     <string name="settings_border_thickness">Толщина контура: %d</string>

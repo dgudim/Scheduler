@@ -159,12 +159,6 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 Keys.SHOW_ON_LOCK, Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
         
         addSwitchChangeListener(
-                adaptive_color_switch,
-                adaptiveColor_switch_state, this,
-                calendarKey, calendarSubKeys,
-                Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
-        
-        addSwitchChangeListener(
                 hide_by_content_switch,
                 hide_by_content_switch_state, this,
                 calendarKey, calendarSubKeys,

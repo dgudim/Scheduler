@@ -34,7 +34,6 @@ public abstract class PopupSettingsView {
     protected final TextView fontColor_view_state;
     protected final TextView bgColor_view_state;
     protected final TextView padColor_view_state;
-    protected final TextView adaptiveColor_switch_state;
     protected final TextView priority_state;
     protected final TextView border_size_state;
     protected final TextView show_on_lock_state;
@@ -65,7 +64,6 @@ public abstract class PopupSettingsView {
     protected final TextView show_days_after_description;
     protected final Slider show_days_after_bar;
     protected final Switch show_on_lock_switch;
-    protected final Switch adaptive_color_switch;
     protected final Switch hide_expired_items_by_time_switch;
     protected final Switch hide_by_content_switch;
     protected final ColorStateList hide_expired_items_by_time_switch_def_colors;
@@ -96,7 +94,6 @@ public abstract class PopupSettingsView {
         priority_state = settingsView.findViewById(R.id.priority_state);
         border_size_state = settingsView.findViewById(R.id.bevel_size_state);
         show_on_lock_state = settingsView.findViewById(R.id.show_on_lock_state);
-        adaptiveColor_switch_state = settingsView.findViewById(R.id.adaptive_color_state);
         adaptiveColor_bar_state = settingsView.findViewById(R.id.adaptive_color_balance_state);
         showDaysUpcoming_bar_state = settingsView.findViewById(R.id.days_beforehand_state);
         showDaysExpired_bar_state = settingsView.findViewById(R.id.days_after_state);
@@ -124,7 +121,6 @@ public abstract class PopupSettingsView {
         show_days_after_description = settingsView.findViewById(R.id.show_days_after_description);
         show_days_after_bar = settingsView.findViewById(R.id.show_days_after_bar);
         show_on_lock_switch = settingsView.findViewById(R.id.show_on_lock_switch);
-        adaptive_color_switch = settingsView.findViewById(R.id.adaptive_color_switch);
         hide_expired_items_by_time_switch = settingsView.findViewById(R.id.hide_expired_items_by_time_switch);
         hide_expired_items_by_time_switch_def_colors = hide_expired_items_by_time_switch.getTextColors();
         hide_by_content_switch = settingsView.findViewById(R.id.hide_by_content_switch);
@@ -147,7 +143,6 @@ public abstract class PopupSettingsView {
         setStateIconColor(border_size_state, Keys.BORDER_THICKNESS);
         setStateIconColor(priority_state, Keys.PRIORITY);
         setStateIconColor(show_on_lock_state, Keys.SHOW_ON_LOCK);
-        setStateIconColor(adaptiveColor_switch_state, Keys.ADAPTIVE_COLOR_ENABLED);
         setStateIconColor(adaptiveColor_bar_state, Keys.ADAPTIVE_COLOR_BALANCE);
         setStateIconColor(showDaysUpcoming_bar_state, Keys.UPCOMING_ITEMS_OFFSET);
         setStateIconColor(showDaysExpired_bar_state, Keys.EXPIRED_ITEMS_OFFSET);

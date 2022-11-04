@@ -12,8 +12,8 @@ android {
         applicationId "prototype.xd.scheduler"
         minSdkVersion 26
         targetSdkVersion 33
-        versionCode 20
-        versionName "0.4"
+        versionCode 41
+        versionName "0.4.1"
         signingConfig signingConfigs.debug
     }
 

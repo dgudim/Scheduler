@@ -221,7 +221,7 @@ public class LockScreenBitmapDrawer {
             }
             
             for (int i = 0; i < toAddSplit.size(); i++) {
-                if (toAddSplit.get(i).adaptiveColorEnabled && !toAddSplit.get(i).textValue.equals(BLANK_TEXT)) {
+                if (toAddSplit.get(i).adaptiveColorBalance > 0 && !toAddSplit.get(i).textValue.equals(BLANK_TEXT)) {
                     int width = (int) (toAddSplit.get(i).rWidth * 2);
                     int height = (int) (fontSizeH / 2f + fontSizeKm);
                     int vOffset = (int) (displayCenter.y + totalHeight - fontSizeKm * (i + 1));
@@ -241,7 +241,8 @@ public class LockScreenBitmapDrawer {
             }
             
             for (List<TodoListEntry> splits : splitEntries) {
-                if (splits.get(0).adaptiveColorEnabled) {
+                //TODO: fixfixfix
+                if (splits.get(0).adaptiveColorBalance > 0) {
                     int red = 0;
                     int green = 0;
                     int blue = 0;

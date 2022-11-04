@@ -22,7 +22,7 @@ public class DateManager {
     
     public static final TimeZone timeZone_SYSTEM = TimeZone.getDefault();
     
-    public static final LocalDate currentDate = LocalDate.now();
+    public static LocalDate currentDate = LocalDate.now();
     
     public static long currentDay = DAY_FLAG_GLOBAL;
     public static long currentTimestamp = DAY_FLAG_GLOBAL;
@@ -35,7 +35,8 @@ public class DateManager {
     
     public static void updateDate(long day, boolean updateCurrentlySelected) {
         currentTimestamp = getCurrentTimestamp();
-        currentDay = daysFromEpoch(currentTimestamp, timeZone_SYSTEM);
+        currentDate = LocalDate.now();
+        currentDay = currentDate.toEpochDay();
         if (updateCurrentlySelected) {
             if (day == DAY_FLAG_GLOBAL) {
                 currentlySelectedDay = currentDay;
@@ -93,11 +94,11 @@ public class DateManager {
         return dateFormat.format(new Date(epoch)).split(" ")[0];
     }
     
-    public static String getCurrentTime() {
+    public static String getCurrentTimeString() {
         return dateFormat.format(new Date()).split(" ")[1];
     }
     
-    public static String getCurrentDateTime() {
+    public static String getCurrentDateTimeString() {
         return dateFormat.format(new Date());
     }
     

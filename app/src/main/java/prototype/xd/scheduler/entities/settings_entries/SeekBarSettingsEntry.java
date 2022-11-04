@@ -15,14 +15,16 @@ public class SeekBarSettingsEntry extends SettingsEntry{
     private final int seekMin;
     private final int seekMax;
     private final int defaultValue;
+    private final boolean zeroIsOff;
     private final String key;
     private final int stringResource;
     
-    public SeekBarSettingsEntry(int seekMin, int seekMax, int defaultValue, String key, int stringResource) {
+    public SeekBarSettingsEntry(int seekMin, int seekMax, int defaultValue, boolean zeroIfOff, String key, int stringResource) {
         super(R.layout.settings_seekbar_entry);
         this.seekMin = seekMin;
         this.seekMax = seekMax;
         this.defaultValue = defaultValue;
+        this.zeroIsOff = zeroIfOff;
         this.key = key;
         this.stringResource = stringResource;
         entryType = SEEK_BAR;
@@ -37,7 +39,7 @@ public class SeekBarSettingsEntry extends SettingsEntry{
                 convertView.findViewById(R.id.seek_bar_description), slider,
                 null,
                 stringResource,
-                key, defaultValue);
+                key, defaultValue, zeroIsOff);
         return super.initInnerViews(convertView, viewGroup);
     }
 }

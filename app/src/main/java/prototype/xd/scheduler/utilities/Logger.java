@@ -6,7 +6,7 @@ import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static android.util.Log.VERBOSE;
 import static android.util.Log.WARN;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTime;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTimeString;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.throwOnFalse;
@@ -41,7 +41,7 @@ public class Logger {
         try {
             logFile.createNewFile();
             try (BufferedWriter out = new BufferedWriter(new FileWriter(logFile, true))) {
-                out.write("\n" + (getCurrentDateTime() + "  [" + priorityToStr(priority) + "]: " + message));
+                out.write("\n" + (getCurrentDateTimeString() + "  [" + priorityToStr(priority) + "]: " + message));
             }
             if (logFile.length() > 100_000) {
                 Files.delete(logFileOld.toPath());

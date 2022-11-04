@@ -3,10 +3,12 @@ package prototype.xd.scheduler.utilities;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 
@@ -193,6 +195,10 @@ public class DialogueUtilities {
             secondaryButton.setText(secondaryButtonResource);
         } else {
             secondaryButton.setVisibility(View.GONE);
+            dialog.findViewById(R.id.button_flex_container).setLayoutParams(
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
         }
         cancelButton.setOnClickListener(v -> dialog.dismiss());
         confirmButton.setOnClickListener(confirmationListener);

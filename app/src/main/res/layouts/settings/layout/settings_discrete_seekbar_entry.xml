@@ -24,10 +24,10 @@
                 android:id="@+id/slider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:ignore="SpeakableTextPresentCheck"
+                android:stepSize="1.0"
                 android:valueFrom="0.0"
                 android:valueTo="100.0"
-                android:stepSize="1.0" />
+                tools:ignore="SpeakableTextPresentCheck" />
 
         </LinearLayout>
 

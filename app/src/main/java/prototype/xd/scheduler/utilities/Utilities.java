@@ -90,7 +90,7 @@ public class Utilities {
     }
     
     public static List<TodoListEntry> loadTodoEntries(Context context, long dayStart, long dayEnd, List<Group> groups) {
-    
+        
         List<TodoListEntry> readEntries = new ArrayList<>();
         try {
             List<String[]> entryParams = loadObject("list");
@@ -165,7 +165,7 @@ public class Utilities {
         List<TodoListEntry> globalEntries = new ArrayList<>();
         List<TodoListEntry> otherEntries = new ArrayList<>();
         
-        for (TodoListEntry entry: entries) {
+        for (TodoListEntry entry : entries) {
             if (entry.isToday()) {
                 todayEntries.add(entry);
             } else if (entry.isExpired()) {
@@ -178,7 +178,7 @@ public class Utilities {
                 otherEntries.add(entry);
             }
         }
-    
+        
         List<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
@@ -197,12 +197,23 @@ public class Utilities {
                                                @Nullable final CompoundCustomizationEntry customizationEntry,
                                                final int stringResource,
                                                final String key,
-                                               final int defaultValue) {
-        displayTo.setText(displayTo.getContext().getString(stringResource, preferences.getInt(key, defaultValue)));
+                                               final int defaultValue,
+                                               boolean zeroIsOff) {
+        int loadedVal = preferences.getInt(key, defaultValue);
+        Context context = displayTo.getContext();
+        if (loadedVal == 0 && zeroIsOff) {
+            displayTo.setText(context.getString(stringResource, context.getString(R.string.off)));
+        } else {
+            displayTo.setText(displayTo.getContext().getString(stringResource, loadedVal));
+        }
         slider.setValue(preferences.getInt(key, defaultValue));
         slider.addOnChangeListener((listenerSlider, progress, fromUser) -> {
             if (fromUser) {
-                displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
+                if (progress == 0 && zeroIsOff) {
+                    displayTo.setText(context.getString(stringResource, context.getString(R.string.off)));
+                } else {
+                    displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
+                }
                 if (customizationEntry != null) {
                     switch (key) {
                         case UPCOMING_BORDER_THICKNESS:

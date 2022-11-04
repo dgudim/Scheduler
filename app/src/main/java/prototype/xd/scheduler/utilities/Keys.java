@@ -28,7 +28,6 @@ public class Keys {
     
     public static final int SETTINGS_DEFAULT_FONT_SIZE = 19;
     public static final boolean SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED = false;
-    public static final boolean SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED = false;
     public static final int SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE = 2;
     
     public static final boolean SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK = false;
@@ -75,7 +74,6 @@ public class Keys {
     
     public static final String FONT_SIZE = "fontSize";
     public static final String ADAPTIVE_BACKGROUND_ENABLED = "adaptive_background_enabled";
-    public static final String ADAPTIVE_COLOR_ENABLED = "adaptive_color_enabled";
     public static final String ADAPTIVE_COLOR_BALANCE = "adaptive_color_balance";
     
     public static final String HIDE_ENTRIES_BY_CONTENT = "hide_entries_by_content";

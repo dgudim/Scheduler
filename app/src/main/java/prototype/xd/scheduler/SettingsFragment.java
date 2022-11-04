@@ -83,20 +83,17 @@ public class SettingsFragment extends DialogFragment {
         settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_appearance)));
         settingsEntries.add(new AppThemeSelectorEntry());
         settingsEntries.add(adaptiveBackgroundSettingsEntry);
-        settingsEntries.add(new SwitchSettingsEntry(
-                Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED,
-                getString(R.string.settings_adaptive_color)));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 10, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 10, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE, true,
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance));
         settingsEntries.add(new CompoundCustomizationEntry());
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE, false,
                 Keys.FONT_SIZE, R.string.settings_font_size));
         
         
         settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_visibility)));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET, false,
                 Keys.UPCOMING_ITEMS_OFFSET, R.string.settings_show_days_upcoming));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET,
+        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET, false,
                 Keys.EXPIRED_ITEMS_OFFSET, R.string.settings_show_days_expired));
         settingsEntries.add(new SwitchSettingsEntry(
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME,

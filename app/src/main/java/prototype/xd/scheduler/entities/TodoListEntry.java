@@ -10,7 +10,6 @@ import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.datetimeFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
-import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
@@ -90,7 +89,6 @@ public class TodoListEntry {
     
     public int priority = 0;
     
-    public boolean adaptiveColorEnabled;
     public int adaptiveColorBalance;
     public int adaptiveColor;
     
@@ -321,7 +319,7 @@ public class TodoListEntry {
                 displayParams.add(params[i + 1]);
             }
         }
-        params = displayParams.toArray(new String[0]);;
+        params = displayParams.toArray(new String[0]);
         reloadParams();
     }
     
@@ -399,7 +397,6 @@ public class TodoListEntry {
                 }
             }
             
-            adaptiveColorEnabled = preferences.getBoolean(Keys.ADAPTIVE_COLOR_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
             adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
             adaptiveColor = 0xff_FFFFFF;
             priority = ENTITY_SETTINGS_DEFAULT_PRIORITY;
@@ -418,11 +415,10 @@ public class TodoListEntry {
             duration_in_days = daysFromEpoch(timestamp_start + timestamp_duration, event.timeZone) - day_start;
             
             textValue = event.title;
-    
+            
             List<String> calendarSubKeys = event.subKeys;
             
             adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-            adaptiveColorEnabled = preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_ENABLED), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_ENABLED);
             
             priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
             
@@ -430,7 +426,7 @@ public class TodoListEntry {
             dayOffset_expired = preferences.getInt(getFirstValidKey(calendarSubKeys, EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
             
             long nearestDay = getNearestEventDay(currentDay);
-            if(currentDay + dayOffset_upcoming >= nearestDay && currentDay < nearestDay) {
+            if (currentDay + dayOffset_upcoming >= nearestDay && currentDay < nearestDay) {
                 setEntryType(EntryType.UPCOMING);
             } else if (currentDay - dayOffset_expired <= nearestDay + duration_in_days && currentDay > nearestDay + duration_in_days) {
                 setEntryType(EntryType.EXPIRED);
@@ -498,9 +494,10 @@ public class TodoListEntry {
     }
     
     private int getAdaptiveColor(int inputColor) {
-        if (adaptiveColorEnabled) {
+        if (adaptiveColorBalance > 0) {
             return mixTwoColors(MaterialColors.harmonize(inputColor, adaptiveColor),
-                    adaptiveColor, adaptiveColorBalance / 10d);
+                    adaptiveColor, (adaptiveColorBalance - 1) / 9d);
+            //active adaptiveColorBalance is from 1 to 10, so we make it from 0 to 9
         }
         return inputColor;
     }
@@ -626,9 +623,6 @@ public class TodoListEntry {
                 case (ASSOCIATED_DAY):
                     day_start = Long.parseLong(params[i + 1]);
                     day_end = day_start;
-                    break;
-                case (ADAPTIVE_COLOR_ENABLED):
-                    adaptiveColorEnabled = Boolean.parseBoolean(params[i + 1]);
                     break;
                 case (ADAPTIVE_COLOR_BALANCE):
                     adaptiveColorBalance = Integer.parseInt(params[i + 1]);

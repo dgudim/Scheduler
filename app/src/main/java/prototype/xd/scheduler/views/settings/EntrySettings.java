@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.entities.Group.groupIndexInList;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
-import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_ENABLED;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
@@ -222,11 +221,6 @@ public class EntrySettings extends PopupSettingsView {
                 todoListEntryStorage, entry,
                 SHOW_ON_LOCK, entry.showOnLock);
         
-        addSwitchChangeListener(
-                adaptive_color_switch,
-                adaptiveColor_switch_state,
-                todoListEntryStorage, entry,
-                ADAPTIVE_COLOR_ENABLED, entry.adaptiveColorEnabled);
     }
     
     private void forEachWithGroupMatch(String groupName, TodoListEntryAction action) {

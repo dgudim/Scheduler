@@ -1,19 +1,13 @@
 <resources>
     <string name="app_name" translatable="false">Scheduler</string>
     <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
     <string name="home_fragment_label">Home Fragment</string>
     <string name="settings_fragment_label">Settings Fragment</string>
     <string name="delete_item">Delete item</string>
-
     <string name="settings_state_symbol" translatable="false">⬧</string>
-
     <string name="settings_current_border_thickness">Current events border thickness: %d</string>
-
     <string name="calendar_event_all_day">all day</string>
-
     <string name="permissions_granted">granted</string>
-
     <string name="service_name">Background updater service</string>
     <string name="service_description">Service to update your lock screen background</string>
     <string name="permissions_grant">Grant</string>
@@ -28,9 +22,8 @@
     <string name="calendar_events_full">%d events</string>
     <string name="title_color_default">default</string>
     <string name="add_event_fab">Add event</string>
-    <string name="settings_adaptive_background">Different lock screen backgroung according to day</string>
-    <string name="settings_adaptive_color_balance">Adaptive color balance: %d</string>
-    <string name="settings_adaptive_color">Tune event color to background</string>
+    <string name="settings_adaptive_background">Different lock screen background according to day</string>
+    <string name="settings_adaptive_color_balance">Blend with background: %s</string>
     <string name="settings_show_days_expired">Show events after %d day/days</string>
     <string name="settings_show_days_upcoming">Show events in %d day/days</string>
     <string name="settings_border_thickness">Border thickness: %d</string>
@@ -42,6 +35,7 @@
     <string name="settings_reset_to_defaults">Reset settings</string>
     <string name="title">Name</string>
     <string name="yes">Yes</string>
+    <string name="off">Off</string>
     <string name="settings_upcoming_border_thickness">Upcoming events border thickness: %d</string>
     <string name="settings_show_items_lock">Show on lock screen</string>
     <string name="settings_show_global_items_lock">Show global events on lock screen</string>
