@@ -89,7 +89,7 @@ public class TodoListEntry {
     
     public int priority = 0;
     
-    public int adaptiveColorBalance;
+    private int adaptiveColorBalance;
     public int adaptiveColor;
     
     public int maxChars = 0;
@@ -491,6 +491,14 @@ public class TodoListEntry {
         maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - borderThickness) / (textPaint.measureText("qwerty_") / 5f)) - 2;
         
         log(INFO, NAME, "Loaded display data for " + textValue);
+    }
+    
+    public int getAdaptiveColorBalance() {
+        return adaptiveColorBalance;
+    }
+    
+    public boolean isAdaptiveColorEnabled() {
+        return adaptiveColorBalance > 0;
     }
     
     private int getAdaptiveColor(int inputColor) {

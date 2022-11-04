@@ -201,7 +201,7 @@ public class EntrySettings extends PopupSettingsView {
                 adaptive_color_balance_description,
                 adaptive_color_balance_bar, adaptiveColor_bar_state,
                 this, false, R.string.settings_adaptive_color_balance,
-                ADAPTIVE_COLOR_BALANCE, entry.adaptiveColorBalance);
+                ADAPTIVE_COLOR_BALANCE, entry.getAdaptiveColorBalance());
         
         Utilities.addSliderChangeListener(
                 show_days_beforehand_description,
