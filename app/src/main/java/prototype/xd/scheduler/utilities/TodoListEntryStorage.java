@@ -69,7 +69,7 @@ public class TodoListEntryStorage {
         List<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
         // get all relevant entries
         for (TodoListEntry todoEntry: todoListEntries) {
-            if (!todoEntry.isGlobal() && !todoEntry.completed && todoEntry.visibleInList(day)) {
+            if (!todoEntry.isGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day)) {
                 filteredTodoListEntries.add(todoEntry);
             }
         }

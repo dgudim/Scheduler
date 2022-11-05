@@ -203,7 +203,7 @@ public class LockScreenBitmapDrawer {
                 List<TodoListEntry> splits = new ArrayList<>();
                 for (int i2 = toAdd.get(i).textValueSplit.length - 1; i2 >= 0; i2--) {
                     if (preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK)) {
-                        toAdd.get(i).rWidth = displayWidth / 2f - toAdd.get(i).borderThickness;
+                        toAdd.get(i).halfWidth = displayWidth / 2f - toAdd.get(i).borderThickness;
                     }
                     TodoListEntry splitEntry;
                     if (toAdd.get(i).fromSystemCalendar) {
@@ -222,7 +222,7 @@ public class LockScreenBitmapDrawer {
             
             for (int i = 0; i < toAddSplit.size(); i++) {
                 if (toAddSplit.get(i).isAdaptiveColorEnabled() && !toAddSplit.get(i).textValue.equals(BLANK_TEXT)) {
-                    int width = (int) (toAddSplit.get(i).rWidth * 2);
+                    int width = (int) (toAddSplit.get(i).halfWidth * 2);
                     int height = (int) (fontSizeH / 2f + fontSizeKm);
                     int vOffset = (int) (displayCenter.y + totalHeight - fontSizeKm * (i + 1));
                     int hOffset = (src.getWidth() - width) / 2;
@@ -236,7 +236,7 @@ public class LockScreenBitmapDrawer {
                     Canvas canvas1 = new Canvas(cutBitmap);
                     canvas1.drawBitmap(src, destRect, destRect, null);
                     
-                    toAddSplit.get(i).adaptiveColor = getAverageColor(cutBitmap);
+                    toAddSplit.get(i).averageBackgroundColor = getAverageColor(cutBitmap);
                 }
             }
             
@@ -246,12 +246,12 @@ public class LockScreenBitmapDrawer {
                     int green = 0;
                     int blue = 0;
                     for (int i = 0; i < splits.size(); i++) {
-                        red += (splits.get(i).adaptiveColor >> 16) & 0xFF;
-                        green += (splits.get(i).adaptiveColor >> 8) & 0xFF;
-                        blue += (splits.get(i).adaptiveColor & 0xFF);
+                        red += (splits.get(i).averageBackgroundColor >> 16) & 0xFF;
+                        green += (splits.get(i).averageBackgroundColor >> 8) & 0xFF;
+                        blue += (splits.get(i).averageBackgroundColor & 0xFF);
                     }
                     for (int i = 0; i < splits.size(); i++) {
-                        splits.get(i).adaptiveColor = Color.argb(
+                        splits.get(i).averageBackgroundColor = Color.argb(
                                 255,
                                 red / splits.size(),
                                 green / splits.size(),
@@ -276,7 +276,7 @@ public class LockScreenBitmapDrawer {
         to.bgPaint = from.bgPaint;
         to.textPaint = from.textPaint;
         to.maxChars = from.maxChars;
-        to.rWidth = from.rWidth;
+        to.halfWidth = from.halfWidth;
     }
     
     private void drawTextListOnCanvas(List<TodoListEntry> toAdd, Canvas canvas, float maxHeight) {
@@ -294,23 +294,23 @@ public class LockScreenBitmapDrawer {
                 
                 if (toAdd.get(i).borderThickness > 0) {
                     drawRectRelativeToTheCenter(canvas, toAdd.get(i).padPaint, maxHeight,
-                            -toAdd.get(i).rWidth - toAdd.get(i).borderThickness,
+                            -toAdd.get(i).halfWidth - toAdd.get(i).borderThickness,
                             fontSizeH / 2f - fontSizeKm * i,
-                            toAdd.get(i).rWidth + toAdd.get(i).borderThickness,
+                            toAdd.get(i).halfWidth + toAdd.get(i).borderThickness,
                             -fontSizeKm * (i + 1) - toAdd.get(i).borderThickness);
                 }
                 
                 drawRectRelativeToTheCenter(canvas, toAdd.get(i).bgPaint, maxHeight,
-                        -toAdd.get(i).rWidth,
+                        -toAdd.get(i).halfWidth,
                         fontSizeH / 2f - fontSizeKm * i,
-                        toAdd.get(i).rWidth,
+                        toAdd.get(i).halfWidth,
                         -fontSizeKm * (i + 1));
                 
                 if (toAdd.get(i).fromSystemCalendar) {
                     drawRectRelativeToTheCenter(canvas, toAdd.get(i).indicatorPaint, maxHeight,
-                            -toAdd.get(i).rWidth + 10,
+                            -toAdd.get(i).halfWidth + 10,
                             fontSizeH / 2f - fontSizeKm * i,
-                            -toAdd.get(i).rWidth + 35,
+                            -toAdd.get(i).halfWidth + 35,
                             -fontSizeKm * (i + 1));
                 }
                 

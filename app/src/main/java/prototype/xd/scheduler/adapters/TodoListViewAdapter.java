@@ -123,7 +123,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             
             CheckBox isDone = view.findViewById(R.id.isDone);
             
-            isDone.setCheckedSilent(currentEntry.completed);
+            isDone.setCheckedSilent(currentEntry.isCompleted());
             
             isDone.setOnClickListener(view12 -> {
                 if (!currentEntry.isGlobal()) {
@@ -158,7 +158,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                             currentEntry.changeParameter(IS_COMPLETED, "false");
                             todoListEntryStorage.saveEntries();
                             // completed -> global = indicators don't change, no need to update
-                            todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState(), !currentEntry.completed);
+                            todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState(), !currentEntry.isCompleted());
                             return true;
                         } : null);
                 return true;
@@ -170,7 +170,7 @@ public class TodoListViewAdapter extends BaseAdapter {
         backgroundLayer.setCardBackgroundColor(currentEntry.bgColor);
         backgroundLayer.setStrokeColor(currentEntry.borderColor);
         
-        if (currentEntry.completed || currentEntry.hideByContent()) {
+        if (currentEntry.isCompleted() || currentEntry.hideByContent()) {
             todoText.setTextColor(currentEntry.fontColor_completed);
         } else {
             todoText.setTextColor(currentEntry.fontColor);
