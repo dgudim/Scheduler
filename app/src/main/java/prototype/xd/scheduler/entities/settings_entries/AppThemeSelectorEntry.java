@@ -6,73 +6,62 @@ import static prototype.xd.scheduler.utilities.Keys.APP_THEME_LIGHT;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_SYSTEM;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
-import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.views.Spinner;
 
 public class AppThemeSelectorEntry extends SettingsEntry {
-    
-    private ArrayAdapter<String> spinnerAdapter;
     
     public AppThemeSelectorEntry() {
         super(R.layout.settings_app_theme_selector_entry);
         entryType = APP_THEME_SELECTOR;
     }
     
-    @Override
-    protected View initInnerViews(View convertView, ViewGroup viewGroup) {
-        if (spinnerAdapter == null) {
-            List<String> themeNames = new ArrayList<>();
-            Context context = convertView.getContext();
-            themeNames.add(context.getString(R.string.app_theme_light));
-            themeNames.add(context.getString(R.string.app_theme_dark));
-            themeNames.add(context.getString(R.string.app_theme_system));
-            spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, themeNames);
-            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        }
-        Spinner spinnerView = convertView.findViewById(R.id.themeSpinner);
-        spinnerView.setAdapter(spinnerAdapter);
-        switch (preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME)) {
-            case APP_THEME_LIGHT:
-                spinnerView.setSelectionSilent(0);
-                break;
+    private final List<Byte> themes = Arrays.asList(APP_THEME_DARK, APP_THEME_SYSTEM, APP_THEME_LIGHT);
+    
+    private void updateThemeIcon(ImageButton themeButton, byte themeId) {
+        switch (themeId) {
             case APP_THEME_DARK:
-                spinnerView.setSelectionSilent(1);
+                themeButton.setImageResource(R.drawable.ic_theme_dark);
+                break;
+            case APP_THEME_LIGHT:
+                themeButton.setImageResource(R.drawable.ic_theme_light);
                 break;
             case APP_THEME_SYSTEM:
-                spinnerView.setSelectionSilent(2);
+            default:
+                themeButton.setImageResource(R.drawable.ic_theme_auto);
                 break;
         }
+    }
+    
+    @Override
+    protected View initInnerViews(View convertView, ViewGroup viewGroup) {
+    
+        AtomicReference<Integer> themeIndex = new AtomicReference<>(0);
+        AtomicReference<Byte> themeId = new AtomicReference<>((byte) 0);
         
-        spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                int theme = APP_THEME_SYSTEM;
-                if (position == 0) {
-                    theme = APP_THEME_LIGHT;
-                } else if (position == 1) {
-                    theme = APP_THEME_DARK;
-                }
-                preferences.edit().putInt(Keys.APP_THEME, theme).apply();
-                AppCompatDelegate.setDefaultNightMode(theme);
-            }
-            
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                //ignore
-            }
+        ImageButton themeButton = convertView.findViewById(R.id.theme_switch_button);
+        themeId.set((byte) preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME));
+        themeIndex.set(themes.indexOf(themeId.get()));
+        updateThemeIcon(themeButton, themeId.get());
+        
+        themeButton.setOnClickListener(v -> {
+            themeIndex.set((themeIndex.get() + 1) % themes.size());
+            themeId.set(themes.get(themeIndex.get()));
+            AppCompatDelegate.setDefaultNightMode(themeId.get());
+            preferences.edit().putInt(Keys.APP_THEME, themeId.get()).apply();
+            updateThemeIcon(themeButton, themeId.get());
         });
+        
         return super.initInnerViews(convertView, viewGroup);
     }
 }
