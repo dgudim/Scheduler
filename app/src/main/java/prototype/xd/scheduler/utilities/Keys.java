@@ -4,6 +4,10 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class Keys {
     
     private Keys() {
@@ -92,6 +96,7 @@ public class Keys {
     public static final byte APP_THEME_DARK = MODE_NIGHT_YES;
     public static final byte APP_THEME_SYSTEM = MODE_NIGHT_FOLLOW_SYSTEM;
     public static final byte DEFAULT_APP_THEME = APP_THEME_SYSTEM;
+    public static final List<Byte> appThemes = Collections.unmodifiableList(Arrays.asList(APP_THEME_DARK, APP_THEME_SYSTEM, APP_THEME_LIGHT));
     public static final String APP_THEME = "app_theme";
     
     public static final String BLANK_TEXT = "_BLANK_";
@@ -99,12 +104,9 @@ public class Keys {
     public static final String PREFERENCES = "prefs";
     public static final String PREFERENCES_SERVICE = "prefs_s";
     
-    public static final String XIAOMI_MESSAGE_IGNORE = "crap_ignore";
+    public static final String INTRO_SHOWN = "app_intro";
     
     public static final String LAST_UPDATE_TIME = "last_update_time";
-    public static final String SERVICE_KILL_THRESHOLD_REACHED = "service_supposedly_killed";
-    public static final String SERVICE_KILLED_DONT_BOTHER = "service_killed_ignore";
-    public static final String SERVICE_KILLED_IGNORE_BUTTON_CLICKED = "service_killed_ignore_count";
     public static final String SERVICE_UPDATE_SIGNAL = "update";
     public static final String SERVICE_KEEP_ALIVE_SIGNAL = "keep_alive";
     

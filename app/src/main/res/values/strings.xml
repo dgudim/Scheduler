@@ -119,5 +119,15 @@
     <string name="editing_system_calendar">%1$s in %2$s</string>
     <string name="editing_system_calendar_color">Events with color: ■ from %1$s in %2$s</string>
     <string name="calendar_main">main</string>
+    <string name="all_set">All set!</string>
+    <string name="ignore_battery_optimization">Ignore battery optimization</string>
+    <string name="ignore_battery_optimization_description">(optional) For the background service to work reliably, don\'t worry, it won\'t consume much energy</string>
+    <string name="thanks_for_installing">Thanks for installing Scheduler</string>
+    <string name="choose_application_theme">Choose application theme</string>
+    <string name="change_theme_later">You will be able to change it later</string>
+    <string name="a_few_notes">A few notes before you go</string>
+    <string name="note_animated_wallpapers">The app doesn\'t work with animated wallpapers, so if you have one consider either not using the app or setting a regular wallpaper</string>
+    <string name="note_bugs">The app is still in it\'s early development so bugs are to be expected</string>
+    <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on my github (click me)</string>
 
 </resources>

@@ -15,6 +15,10 @@
         <item name="android:textSize">24sp</item>
     </style>
 
+    <style name="LargeBoldHeading" parent="LargeHeading">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="LargeHeadingSubtext" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textSize">16sp</item>
     </style>

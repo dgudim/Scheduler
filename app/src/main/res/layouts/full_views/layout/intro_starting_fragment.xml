@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurface"
+    android:orientation="vertical"
+    tools:context=".IntroActivity">
+
+    <TextView
+        android:id="@+id/textView4"
+        style="@style/LargeBoldHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="10dp"
+        android:text="@string/thanks_for_installing"
+        app:drawableBottomCompat="@drawable/ic_launcher_foreground" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        app:srcCompat="@drawable/intro_logo"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView5"
+            style="@style/MediumHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="@string/choose_application_theme" />
+
+        <TextView
+            android:id="@+id/textView6"
+            style="@style/MediumHeadingSubtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp"
+            android:text="@string/change_theme_later" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/app_theme_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@color/transparent"
+                android:clickable="true"
+                android:contentDescription="@string/app_theme"
+                android:focusable="true"
+                app:srcCompat="@drawable/ic_theme_auto"
+                tools:ignore="TouchTargetSizeCheck" />
+
+            <TextView
+                android:id="@+id/app_theme_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/round_bg_text_container_20"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="10dp"
+                android:text="System default"
+                android:textColor="?colorOnSecondaryContainer"
+                tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="413dp">
+
+        <TextView
+            android:id="@+id/textView8"
+            style="@style/SmallHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/a_few_notes" />
+
+        <TextView
+            android:id="@+id/textView9"
+            style="@style/MediumHeadingSubtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/round_bg_text_container_10"
+            android:drawablePadding="3dp"
+            android:padding="3dp"
+            android:text="@string/note_animated_wallpapers"
+            android:textColor="?colorOnSecondaryContainer"
+            app:drawableStartCompat="@drawable/ic_animation" />
+
+        <TextView
+            android:id="@+id/textView10"
+            style="@style/MediumHeadingSubtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/round_bg_text_container_10"
+            android:drawablePadding="3dp"
+            android:padding="3dp"
+            android:text="@string/note_bugs"
+            android:textColor="?colorOnSecondaryContainer"
+            app:drawableStartCompat="@drawable/ic_bug" />
+
+        <TextView
+            android:id="@+id/github_text"
+            style="@style/MediumHeadingSubtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:background="@drawable/round_bg_text_container_10"
+            android:drawablePadding="3dp"
+            android:padding="3dp"
+            android:text="@string/note_contribute"
+            android:textColor="?colorOnSecondaryContainer"
+            app:drawableStartCompat="@drawable/ic_github" />
+    </LinearLayout>
+
+</LinearLayout>

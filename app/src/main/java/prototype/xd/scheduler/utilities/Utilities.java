@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 
 import com.flask.colorpicker.ColorPickerView;
@@ -195,7 +196,7 @@ public class Utilities {
     public static void addSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
                                                @Nullable final CompoundCustomizationEntry customizationEntry,
-                                               final int stringResource,
+                                               @StringRes final int stringResource,
                                                final String key,
                                                final int defaultValue,
                                                boolean zeroIsOff) {
@@ -250,7 +251,7 @@ public class Utilities {
                                                final TextView stateIcon,
                                                final EntrySettings entrySettings,
                                                final boolean mapToBorderPreview,
-                                               final int stringResource,
+                                               @StringRes final int stringResource,
                                                final String parameter,
                                                final int initialValue) {
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
@@ -284,7 +285,7 @@ public class Utilities {
                                                final TextView stateIcon,
                                                final SystemCalendarSettings systemCalendarSettings,
                                                final boolean mapToBorderPreview,
-                                               final int stringResource,
+                                               @StringRes final int stringResource,
                                                final String calendarKey,
                                                final List<String> calendarSubKeys,
                                                final String parameter,

@@ -5,6 +5,10 @@
 
     <!-- harmonized at runtime -->
     <color name="gray_harmonized">#808080</color>
+    <color name="green_harmonized">#49FF2B</color>
+    <color name="yellow_harmonized">#FFE32B</color>
+    <color name="green_outline_harmonized">#2D9C1B</color>
+    <color name="yellow_outline_harmonized">#BCA71F</color>
 
     <!-- colors for icon -->
     <color name="ic_launcher_background">#000000</color>

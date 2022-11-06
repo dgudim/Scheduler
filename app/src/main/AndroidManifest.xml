@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:allowBackup="true"
@@ -24,13 +25,16 @@
             android:name=".utilities.services.BackgroundSetterService"
             android:enabled="true"
             android:exported="false" />
-
         <service
             android:name=".utilities.services.KeepAliveService"
             android:enabled="true"
             android:exported="false"
             android:label="Keep alive service"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <activity
+            android:name=".IntroActivity"
+            android:exported="true" />
 
         <activity
             android:name=".MainActivity"
@@ -51,7 +55,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

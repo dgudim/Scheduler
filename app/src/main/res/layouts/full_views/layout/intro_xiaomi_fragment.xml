@@ -5,7 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?colorSurface"
+    tools:context=".IntroActivity">
+
+    <TextView
+        android:id="@+id/textView3"
+        style="@style/LargeHeading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Before you continue" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -19,24 +28,11 @@
         tools:layout_editor_absoluteY="325dp" />
 
     <TextView
-        style="@style/LargeHeading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/alert" />
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="fill"
-        android:padding="3dp"
+        android:padding="5dp"
         android:text="@string/xiaomi_message"
         android:textAppearance="@style/MediumHeading" />
-
-    <Button
-        android:id="@+id/ignore_button"
-        style="@style/DefaultButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/ignore" />
 
 </LinearLayout>
