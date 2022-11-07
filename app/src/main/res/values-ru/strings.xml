@@ -27,10 +27,6 @@
     <string name="item_yesterday">(Вчера)</string>
     <string name="add_current_config_as_group_prompt">Добавить текущую конфигурацию как группу?</string>
     <string name="title">Название</string>
-    <string name="cant_rename_this_group">Нельзя переименовать эту группу</string>
-    <string name="cant_use_this_group_name">Нельзя использовать это имя</string>
-    <string name="cant_create_group_with_this_name">Нельзя создать группу с таким названием</string>
-    <string name="break_settings_reset_message">Ты сломаешь сброс настроек</string>
     <string name="group_with_same_name_exists">Группа с таким именем уже существует</string>
     <string name="overwrite_prompt">Перезаписать?</string>
     <string name="no">Нет</string>
@@ -96,18 +92,13 @@
     <string name="settings_preview_expired">Прошедшие</string>
     <string name="settings_preview_upcoming">Будущие</string>
     <string name="settings_hide_expired_entries_by_time">Скрывать прошедшие события на экране блокировки(по времени)</string>
-    <string name="alert">Внимание!</string>
-    <string name="ignore">Игнорировать</string>
-    <string name="visit_dont_kill_my_app">узнать как</string>
-    <string name="service_killed_message">Похоже, что система Android убивает службу фонового обновления приложения, без службы приложение не будет обновлять ваши обои вовремя, пожалуйста, добавьте приложение в белый список оптимизации батареи (нажмите \"узнать как\", если вы не знаете, как это сделать)</string>
-    <string name="never_ask_again">Больше не спрашивать</string>
     <string name="event_name_input_hint">Событие</string>
     <string name="status">Дата: %s  Событий: %d</string>
     <string name="app_theme">Тема приложения</string>
     <string name="app_theme_system">Системная</string>
     <string name="app_theme_dark">Тёмная</string>
     <string name="app_theme_light">Светлая</string>
-    <string name="xiaomi_message">Похоже, вы используете телефон xiaomi, miui не позволяет устанавливать обои экрана блокировки, поэтому приложение, скорее всего, не будет работать. Извините, я ничего не могу с этим поделать.</string>
+    <string name="xiaomi_message">Похоже, вы используете телефон xiaomi, некоторые версии miui не позволяют устанавливать обои экрана блокировки без участия пользователя, поэтому приложение, скорее всего, не будет работать. Извините, я ничего не могу с этим сделать.</string>
     <string name="blank_group_name">Нет</string>
     <string name="input_cant_be_empty">ввод не может быть пустым</string>
     <string name="overwrite">перезаписать</string>
@@ -127,5 +118,7 @@
     <string name="note_animated_wallpapers">Приложение не работает с анимированными обоями, так что если вы используете такой, смените на обычный</string>
     <string name="note_bugs">Приложение находится в ранней стадии разработки, так что скорее всего будут баги.</string>
     <string name="note_contribute">Если у вас есть предложения или вы хотите внести вклад, прошу на мой гитхаб  (тык)</string>
-
+    <string name="finish">Завершить</string>
+    <string name="before_you_continue">Перед тем как продолжить</string>
+    <string name="read_and_understood">Я прочитал и понял все вышесказанное</string>
 </resources>

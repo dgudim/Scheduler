@@ -5,6 +5,7 @@ import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -42,21 +43,26 @@ public class IntroActivity extends AppIntro {
         if (isXiaomiPhone()) {
             addSlide(AppIntroCustomLayoutFragment.newInstance(R.layout.intro_xiaomi_fragment));
         }
-        int surfaceColor = MaterialColors.getColor(findViewById(android.R.id.content).getRootView(), R.attr.colorSurface);
+    
+        View rootView = findViewById(android.R.id.content).getRootView();
+        int surfaceColor = MaterialColors.getColor(rootView, R.attr.colorSurface);
+        int primaryColor = MaterialColors.getColor(rootView, R.attr.colorPrimary);
+        
         setNavBarColor(surfaceColor);
         showStatusBar(true);
         setStatusBarColor(surfaceColor);
+        
         setSystemBackButtonLocked(true);
+        setSkipButtonEnabled(false);
+        setNextArrowColor(primaryColor);
+        setDoneTextAppearance(R.style.MediumHeading);
+        setColorDoneText(primaryColor);
+        setDoneText(R.string.finish);
+        setIndicatorColor(primaryColor, MaterialColors.getColor(rootView, R.attr.colorSurfaceVariant));
     }
     
     private boolean isXiaomiPhone() {
         return Build.MANUFACTURER.toLowerCase(Locale.ROOT).contains("xiaomi") || Build.MODEL.toLowerCase(Locale.ROOT).contains("xiaomi");
-    }
-    
-    @Override
-    protected void onSkipPressed(@Nullable Fragment currentFragment) {
-        super.onSkipPressed(currentFragment);
-        goToNextSlide();
     }
     
     @Override

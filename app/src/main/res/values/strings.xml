@@ -74,10 +74,6 @@
     <string name="event_name_input_hint">Event</string>
     <string name="add">Add</string>
     <string name="add_current_config_as_group_prompt">Add current configuration as a group?</string>
-    <string name="break_settings_reset_message">You will break settings reset</string>
-    <string name="cant_create_group_with_this_name">Can\'t create a group with this name</string>
-    <string name="cant_rename_this_group">Can\'t rename this group</string>
-    <string name="cant_use_this_group_name">Can\'t use this name</string>
     <string name="add_current_config_as_group_message">(Parameters marked with green or blue rhombs(manually edited) will be added to the group)</string>
     <string name="settings_max_rWidth_lock">Stretch event background to fill lock screen width</string>
     <string name="delete_all_saved_backgrounds_prompt">Delete all saved backgrounds?</string>
@@ -96,18 +92,12 @@
     <string name="settings_preview_expired">Expired</string>
     <string name="settings_preview_upcoming">Upcoming</string>
     <string name="settings_hide_expired_entries_by_time">Hide passed events on lockscreen(by time)</string>
-    <string name="alert">Alert!</string>
-    <string name="ignore">Ignore</string>
-    <string name="visit_dont_kill_my_app">learn how to</string>
-    <string name="service_killed_message">It looks like android system is killing app background update service, without the service the app won\'t update your wallpaper in time, please whitelist the app from battery optimizations(click \"learn how to\" if you don\'t know how to do it)</string>
-    <string name="never_ask_again">Never ask again</string>
-
     <string name="status">Date: %s  Events: %d</string>
     <string name="app_theme">App theme:</string>
     <string name="app_theme_light">Light</string>
     <string name="app_theme_dark">Dark</string>
     <string name="app_theme_system">System default</string>
-    <string name="xiaomi_message">It looks like you are using a xiaomi phone, miui doesn\'t allow setting lockscreen wallpaper, so the app will most probably not work. Sorry, i can\'t do anything about it.</string>
+    <string name="xiaomi_message">It looks like you are using a xiaomi phone, some version of miui don\'t allow setting lockscreen wallpaper programmatically, so the app will most probably not work. Sorry, i can\'t do anything about it.</string>
     <string name="blank_group_name">none</string>
     <string name="input_cant_be_empty">input can\'t be empty</string>
     <string name="edit_event">Edit event</string>
@@ -129,5 +119,8 @@
     <string name="note_animated_wallpapers">The app doesn\'t work with animated wallpapers, so if you have one consider either not using the app or setting a regular wallpaper</string>
     <string name="note_bugs">The app is still in it\'s early development so bugs are to be expected</string>
     <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on my github (click me)</string>
+    <string name="finish">Finish</string>
+    <string name="before_you_continue">Before you continue</string>
+    <string name="read_and_understood">I have read and understood all the things above</string>
 
 </resources>

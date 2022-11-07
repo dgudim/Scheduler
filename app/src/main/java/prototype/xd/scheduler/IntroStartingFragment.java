@@ -1,74 +1,42 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.Keys.APP_THEME_DARK;
-import static prototype.xd.scheduler.utilities.Keys.APP_THEME_LIGHT;
-import static prototype.xd.scheduler.utilities.Keys.APP_THEME_SYSTEM;
-import static prototype.xd.scheduler.utilities.Keys.appThemes;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
-import java.util.concurrent.atomic.AtomicReference;
+import com.github.appintro.SlidePolicy;
 
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.views.CheckBox;
 
-public class IntroStartingFragment extends Fragment {
+public class IntroStartingFragment extends Fragment implements SlidePolicy {
     
-    private void updateThemeIcon(ImageButton themeButton, TextView themeText, byte themeId) {
-        switch (themeId) {
-            case APP_THEME_DARK:
-                themeButton.setImageResource(R.drawable.ic_theme_dark);
-                themeText.setText(themeText.getContext().getString(R.string.app_theme_dark));
-                break;
-            case APP_THEME_LIGHT:
-                themeButton.setImageResource(R.drawable.ic_theme_light);
-                themeText.setText(themeText.getContext().getString(R.string.app_theme_light));
-                break;
-            case APP_THEME_SYSTEM:
-            default:
-                themeButton.setImageResource(R.drawable.ic_theme_auto);
-                themeText.setText(themeText.getContext().getString(R.string.app_theme_system));
-                break;
-        }
-    }
+    private CheckBox understoodCheckbox;
     
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.intro_starting_fragment, container, false);
-    
-        AtomicReference<Integer> themeIndex = new AtomicReference<>(0);
-        AtomicReference<Byte> themeId = new AtomicReference<>((byte) 0);
-        
-        themeId.set((byte) preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME));
-        themeIndex.set(appThemes.indexOf(themeId.get()));
-        
-        TextView themeText = view.findViewById(R.id.app_theme_text);
-        ImageButton themeButton = view.findViewById(R.id.app_theme_button);
-    
-        updateThemeIcon(themeButton, themeText, themeId.get());
-    
-        View.OnClickListener onClickListener = v -> {
-            themeIndex.set((themeIndex.get() + 1) % appThemes.size());
-            themeId.set(appThemes.get(themeIndex.get()));
-            AppCompatDelegate.setDefaultNightMode(themeId.get());
-            preferences.edit().putInt(Keys.APP_THEME, themeId.get()).apply();
-            updateThemeIcon(themeButton, themeText, themeId.get());
-        };
-        
-        themeText.setOnClickListener(onClickListener);
-        themeButton.setOnClickListener(onClickListener);
-        
+        view.findViewById(R.id.github_button).setOnClickListener(v ->
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/dgudim/Scheduler/issues"))));
+        understoodCheckbox = view.findViewById(R.id.understood_checkbox);
         return view;
     }
     
+    @Override
+    public boolean isPolicyRespected() {
+        return understoodCheckbox.isChecked();
+    }
+    
+    @Override
+    public void onUserIllegallyRequestedNextPage() {
+        Toast.makeText(getActivity(), "Please read the notes",
+                Toast.LENGTH_LONG).show();
+    }
 }

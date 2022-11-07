@@ -1,7 +1,6 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Theme.App" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@color/transparent</item>
@@ -9,6 +8,7 @@
         <item name="materialButtonStyle">@style/DefaultButtonStyle</item>
     </style>
 
+    <!-- font styles -->
     <style name="LargeHeading" parent="TextAppearance.Material3.HeadlineSmall">
         <item name="android:textColor">?attr/colorTertiary</item>
         <item name="android:gravity">center</item>
@@ -38,6 +38,8 @@
     <style name="SmallHeadingSubtext" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textSize">14sp</item>
     </style>
+    <!-- end -->
+
 
     <style name="FullScreenDialog">
         <item name="android:windowFrame">@null</item>
@@ -49,6 +51,7 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
+    <!-- default styles -->
     <style name="DefaultButtonStyle" parent="Widget.Material3.Button">
         <item name="android:layout_marginStart">3dp</item>
         <item name="android:layout_marginEnd">3dp</item>
@@ -63,6 +66,50 @@
     <style name="DefaultAlertDialogStyle" parent="@style/MaterialAlertDialog.Material3">
         <item name="shapeAppearance">?attr/shapeAppearanceCornerMedium</item>
         <item name="shapeAppearanceOverlay">@null</item>
+    </style>
+    <!-- end -->
+
+
+    <!-- secondary button styles -->
+    <style name="SecondaryButtonStyleRound" parent="Widget.Material3.Button">
+        <item name="backgroundColor">?colorSecondaryContainer</item>
+        <item name="materialThemeOverlay">@style/SecondaryButtonThemeOverlay</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="iconPadding">3dp</item>
+        <item name="iconSize">24dp</item>
+        <item name="minWidth">60dp</item>
+    </style>
+
+    <style name="SecondaryButtonStyleNormal" parent="SecondaryButtonStyleRound">
+        <item name="shapeAppearance">?attr/shapeAppearanceMediumComponent</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:layout_margin">3dp</item>
+    </style>
+
+    <style name="SecondaryButtonThemeOverlay" parent="ThemeOverlay.Material3.Button">
+        <item name="colorOnContainer">?colorOnSecondaryContainer</item>
+        <item name="colorContainer">?colorSecondaryContainer</item>
+    </style>
+    <!-- end -->
+
+    <style name="SecondaryAccentedTextStyle" parent="MediumHeadingSubtext">
+        <item name="android:padding">3dp</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:drawablePadding">3dp</item>
+        <item name="android:background">@drawable/round_bg_medium_component</item>
+        <item name="android:textColor">?colorOnSecondaryContainer</item>
+        <item name="backgroundTint">?colorSecondaryContainer</item>
+    </style>
+
+    <style name="PrimaryAccentedCheckboxStyle" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="android:padding">3dp</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:background">@drawable/round_bg</item>
+        <item name="backgroundTint">?colorPrimaryContainer</item>
+        <item name="android:textColor">?colorOnPrimaryContainer</item>
     </style>
 
 </resources>
