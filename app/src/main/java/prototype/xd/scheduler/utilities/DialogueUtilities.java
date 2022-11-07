@@ -10,12 +10,17 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -24,14 +29,18 @@ import prototype.xd.scheduler.views.Spinner;
 
 public class DialogueUtilities {
     
-    public static void displayConfirmationDialogue(Context context, int titleStringResource, int messageStringResource,
-                                                   int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
-                                                   View.OnClickListener confirmationListener,
-                                                   View.OnClickListener secondaryConfirmationListener) {
+    public static void displayConfirmationDialogue(Context context,
+                                                   @StringRes int titleStringResource,
+                                                   @StringRes int messageStringResource,
+                                                   @StringRes int cancelButtonStringResource,
+                                                   @StringRes int confirmButtonStringResource,
+                                                   @StringRes int secondaryButtonStringResource,
+                                                   @NotNull View.OnClickListener confirmationListener,
+                                                   @Nullable View.OnClickListener secondaryConfirmationListener) {
         Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.three_buttons);
         
         setupButtons(dialog,
-                cancelButtonResource, confirmButtonResource, secondaryButtonResource,
+                cancelButtonStringResource, confirmButtonStringResource, secondaryButtonStringResource,
                 v -> {
                     confirmationListener.onClick(v);
                     dialog.dismiss();
@@ -41,36 +50,46 @@ public class DialogueUtilities {
                 });
     }
     
-    public static void displayConfirmationDialogue(Context context, int titleStringResource, int messageStringResource,
-                                                   int cancelButtonResource, int confirmButtonResource,
-                                                   View.OnClickListener confirmationListener) {
+    public static void displayConfirmationDialogue(Context context,
+                                                   @StringRes int titleStringResource,
+                                                   @StringRes int messageStringResource,
+                                                   @StringRes int cancelButtonStringResource,
+                                                   @StringRes int confirmButtonStringResource,
+                                                   @NotNull View.OnClickListener confirmationListener) {
         displayConfirmationDialogue(context, titleStringResource, messageStringResource,
-                cancelButtonResource, confirmButtonResource, -1,
+                cancelButtonStringResource, confirmButtonStringResource, -1,
                 confirmationListener, null);
     }
     
-    public static void displayConfirmationDialogue(Context context, int titleStringResource,
-                                                   int cancelButtonResource, int confirmButtonResource,
-                                                   View.OnClickListener confirmationListener) {
+    public static void displayConfirmationDialogue(Context context,
+                                                   @StringRes int titleStringResource,
+                                                   @StringRes int cancelButtonStringResource,
+                                                   @StringRes int confirmButtonStringResource,
+                                                   @NotNull View.OnClickListener confirmationListener) {
         displayConfirmationDialogue(context, titleStringResource, -1,
-                cancelButtonResource, confirmButtonResource, -1,
+                cancelButtonStringResource, confirmButtonStringResource, -1,
                 confirmationListener, null);
     }
     
     @SuppressWarnings("ConstantConditions")
-    public static void displayEditTextDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
-                                               int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
-                                               String defaultEditTextValue,
-                                               OnClickListenerWithEditText confirmationListener,
-                                               OnClickListenerWithEditText secondaryConfirmationListener) {
+    public static void displayEditTextDialogue(@NotNull Context context,
+                                               @StringRes int titleStringResource,
+                                               @StringRes int messageStringResource,
+                                               @StringRes int hintStringResource,
+                                               @StringRes int cancelButtonStringResource,
+                                               @StringRes int confirmButtonStringResource,
+                                               @StringRes int secondaryButtonResource,
+                                               @NotNull String defaultEditTextValue,
+                                               @NotNull OnClickListenerWithEditText confirmationListener,
+                                               @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {
         Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_dialogue);
         
-        ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintResource);
+        ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintStringResource);
         TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
         setupEditText(editText, defaultEditTextValue);
         
         setupButtons(dialog,
-                cancelButtonResource, confirmButtonResource, secondaryButtonResource,
+                cancelButtonStringResource, confirmButtonStringResource, secondaryButtonResource,
                 v -> {
                     if (checkEmptyInput(editText)
                             && confirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
@@ -84,55 +103,76 @@ public class DialogueUtilities {
                 });
     }
     
-    public static void displayEditTextDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
-                                               int cancelButtonResource, int confirmButtonResource,
-                                               String defaultEditTextValue,
-                                               OnClickListenerWithEditText confirmationListener) {
-        displayEditTextDialogue(context, titleStringResource, messageStringResource, hintResource,
-                cancelButtonResource, confirmButtonResource, -1,
+    public static void displayEditTextDialogue(@NotNull Context context,
+                                               @StringRes int titleStringResource,
+                                               @StringRes int messageStringResource,
+                                               @StringRes int hintStringResource,
+                                               @StringRes int cancelButtonStringResource,
+                                               @StringRes int confirmButtonStringResource,
+                                               @NotNull String defaultEditTextValue,
+                                               @NotNull OnClickListenerWithEditText confirmationListener) {
+        displayEditTextDialogue(context, titleStringResource, messageStringResource, hintStringResource,
+                cancelButtonStringResource, confirmButtonStringResource, -1,
                 defaultEditTextValue,
                 confirmationListener, null);
     }
     
-    public static void displayEditTextDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
-                                               int cancelButtonResource, int confirmButtonResource,
-                                               OnClickListenerWithEditText confirmationListener) {
-        displayEditTextDialogue(context, titleStringResource, messageStringResource, hintResource,
-                cancelButtonResource, confirmButtonResource, -1,
+    public static void displayEditTextDialogue(@NotNull Context context,
+                                               @StringRes int titleStringResource,
+                                               @StringRes int messageStringResource,
+                                               @StringRes int hintStringResource,
+                                               @StringRes int cancelButtonStringResource,
+                                               @StringRes int confirmButtonStringResource,
+                                               @NotNull OnClickListenerWithEditText confirmationListener) {
+        displayEditTextDialogue(context, titleStringResource, messageStringResource, hintStringResource,
+                cancelButtonStringResource, confirmButtonStringResource, -1,
                 "",
                 confirmationListener, null);
     }
     
-    public static void displayEditTextDialogue(Context context, int titleStringResource, int hintResource,
-                                               int cancelButtonResource, int confirmButtonResource,
-                                               String defaultEditTextValue,
-                                               OnClickListenerWithEditText confirmationListener) {
-        displayEditTextDialogue(context, titleStringResource, -1, hintResource,
-                cancelButtonResource, confirmButtonResource, -1,
+    public static void displayEditTextDialogue(@NotNull Context context,
+                                               @StringRes int titleStringResource,
+                                               @StringRes int hintStringResource,
+                                               @StringRes int cancelButtonStringResource,
+                                               @StringRes int confirmButtonStringResource,
+                                               @NotNull String defaultEditTextValue,
+                                               @NotNull OnClickListenerWithEditText confirmationListener) {
+        displayEditTextDialogue(context, titleStringResource, -1, hintStringResource,
+                cancelButtonStringResource, confirmButtonStringResource, -1,
                 defaultEditTextValue,
                 confirmationListener, null);
     }
     
-    public static void displayEditTextDialogue(Context context, int titleStringResource, int hintResource,
-                                               int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
-                                               String defaultEditTextValue,
-                                               OnClickListenerWithEditText confirmationListener,
-                                               OnClickListenerWithEditText secondaryConfirmationListener) {
-        displayEditTextDialogue(context, titleStringResource, -1, hintResource,
-                cancelButtonResource, confirmButtonResource, secondaryButtonResource,
+    public static void displayEditTextDialogue(@NotNull Context context,
+                                               @StringRes int titleStringResource,
+                                               @StringRes int hintStringResource,
+                                               @StringRes int cancelButtonStringResource,
+                                               @StringRes int confirmButtonStringResource,
+                                               @StringRes int secondaryButtonStringResource,
+                                               @NotNull String defaultEditTextValue,
+                                               @NotNull OnClickListenerWithEditText confirmationListener,
+                                               @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {
+        displayEditTextDialogue(context, titleStringResource, -1, hintStringResource,
+                cancelButtonStringResource, confirmButtonStringResource, secondaryButtonStringResource,
                 defaultEditTextValue,
                 confirmationListener, secondaryConfirmationListener);
     }
     
     @SuppressWarnings("ConstantConditions")
-    public static void displayEditTextSpinnerDialogue(Context context, int titleStringResource, int messageStringResource, int hintResource,
-                                                      int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
-                                                      String defaultEditTextValue,
-                                                      List<?> items, int defaultIndex,
-                                                      OnClickListenerWithEditText confirmationListener,
-                                                      OnClickListenerWithEditText secondaryConfirmationListener) {
+    public static void displayEditTextSpinnerDialogue(@NotNull Context context,
+                                                      @StringRes int titleStringResource,
+                                                      @StringRes int messageStringResource,
+                                                      @StringRes int hintStringResource,
+                                                      @StringRes int cancelButtonStringResource,
+                                                      @StringRes int confirmButtonStringResource,
+                                                      @StringRes int secondaryButtonStringResource,
+                                                      @NotNull String defaultEditTextValue,
+                                                      @NotNull List<?> items,
+                                                      int defaultIndex,
+                                                      @NotNull OnClickListenerWithEditText confirmationListener,
+                                                      @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {
         Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_spinner_dialogue);
-        ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintResource);
+        ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintStringResource);
         TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
         setupEditText(editText, defaultEditTextValue);
         Spinner spinner = dialog.findViewById(R.id.groupSpinner);
@@ -157,7 +197,7 @@ public class DialogueUtilities {
         });
         
         setupButtons(dialog,
-                cancelButtonResource, confirmButtonResource, secondaryButtonResource,
+                cancelButtonStringResource, confirmButtonStringResource, secondaryButtonStringResource,
                 v -> {
                     if (checkEmptyInput(editText)
                             && confirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
@@ -171,7 +211,8 @@ public class DialogueUtilities {
                 });
     }
     
-    private static void setupEditText(EditText editText, String defaultEditTextValue) {
+    private static void setupEditText(@NotNull EditText editText,
+                                      @NotNull String defaultEditTextValue) {
         editText.setText(defaultEditTextValue);
         editText.setOnFocusChangeListener((v, hasFocus) -> editText.postDelayed(() -> {
             InputMethodManager inputMethodManager = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -181,18 +222,20 @@ public class DialogueUtilities {
     }
     
     private static void setupButtons(Dialog dialog,
-                                     int cancelButtonResource, int confirmButtonResource, int secondaryButtonResource,
-                                     View.OnClickListener confirmationListener,
-                                     View.OnClickListener secondaryConfirmationListener) {
+                                     @StringRes int cancelButtonStringResource,
+                                     @StringRes int confirmButtonStringResource,
+                                     @StringRes int secondaryButtonStringResource,
+                                     @NotNull View.OnClickListener confirmationListener,
+                                     @Nullable View.OnClickListener secondaryConfirmationListener) {
         
         MaterialButton confirmButton = dialog.findViewById(R.id.confirm_button);
         MaterialButton secondaryButton = dialog.findViewById(R.id.secondary_action_button);
         MaterialButton cancelButton = dialog.findViewById(R.id.cancel_button);
         
-        cancelButton.setText(cancelButtonResource);
-        confirmButton.setText(confirmButtonResource);
-        if (secondaryButtonResource != -1) {
-            secondaryButton.setText(secondaryButtonResource);
+        cancelButton.setText(cancelButtonStringResource);
+        confirmButton.setText(confirmButtonStringResource);
+        if (secondaryButtonStringResource != -1) {
+            secondaryButton.setText(secondaryButtonStringResource);
         } else {
             secondaryButton.setVisibility(View.GONE);
             dialog.findViewById(R.id.button_flex_container).setLayoutParams(
@@ -215,13 +258,16 @@ public class DialogueUtilities {
         return true;
     }
     
-    private static Dialog buildTemplate(Context context, int titleStringResource, int messageStringResource, int layout) {
+    private static Dialog buildTemplate(@NotNull Context context,
+                                        @StringRes int titleStringResource,
+                                        @StringRes int messageStringResource,
+                                        @LayoutRes int layoutRes) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setTitle(titleStringResource);
         if (messageStringResource != -1) {
             builder.setMessage(messageStringResource);
         }
-        builder.setView(layout);
+        builder.setView(layoutRes);
         return builder.show();
     }
     
