@@ -118,7 +118,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                                 todoListEntryStorage.removeEntry(currentEntry);
                                 todoListEntryStorage.saveEntries();
                                 // deleting a global entry does not change indicators
-                                todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState(), !currentEntry.isGlobal());
+                                todoListEntryStorage.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isGlobal());
                             }));
             
             CheckBox isDone = view.findViewById(R.id.isDone);
@@ -140,14 +140,14 @@ public class TodoListViewAdapter extends BaseAdapter {
                 final List<Group> groupList = todoListEntryStorage.getGroups();
                 int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
                 displayEditTextSpinnerDialogue(view1.getContext(), R.string.edit_event, -1, R.string.event_name_input_hint,
-                        R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.textValue, groupList,
+                        R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.getRawTextValue(), groupList,
                         currentIndex, (view2, text, selectedIndex) -> {
                             if (selectedIndex != currentIndex) {
                                 currentEntry.changeGroup(groupList.get(selectedIndex));
                             }
                             currentEntry.changeParameter(TEXT_VALUE, text);
                             todoListEntryStorage.saveEntries();
-                            todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState(), false);
+                            todoListEntryStorage.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), false);
                             return true;
                         },
                         !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
@@ -158,7 +158,7 @@ public class TodoListViewAdapter extends BaseAdapter {
                             currentEntry.changeParameter(IS_COMPLETED, "false");
                             todoListEntryStorage.saveEntries();
                             // completed -> global = indicators don't change, no need to update
-                            todoListEntryStorage.updateTodoListAdapter(currentEntry.getLockViewState(), !currentEntry.isCompleted());
+                            todoListEntryStorage.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isCompleted());
                             return true;
                         } : null);
                 return true;
@@ -176,7 +176,7 @@ public class TodoListViewAdapter extends BaseAdapter {
             todoText.setTextColor(currentEntry.fontColor);
         }
         
-        todoText.setText(currentEntry.textValue + currentEntry.getDayOffset(currentlySelectedDay, view.getContext()));
+        todoText.setText(currentEntry.getTextOnDay(currentlySelectedDay, view.getContext()));
         
         return view;
     }

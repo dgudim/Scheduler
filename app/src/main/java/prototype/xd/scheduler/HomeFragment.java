@@ -79,7 +79,7 @@ public class HomeFragment extends Fragment {
                                 IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
                         todoListEntryStorage.addEntry(newEntry);
                         todoListEntryStorage.saveEntries();
-                        todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState(), true);
+                        todoListEntryStorage.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), true);
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
@@ -89,7 +89,7 @@ public class HomeFragment extends Fragment {
                                 IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
                         todoListEntryStorage.addEntry(newEntry);
                         todoListEntryStorage.saveEntries();
-                        todoListEntryStorage.updateTodoListAdapter(newEntry.getLockViewState(), false);
+                        todoListEntryStorage.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), false);
                         return true;
                     });
         });

@@ -1,9 +1,7 @@
 package prototype.xd.scheduler.entities;
 
-import static android.util.Log.INFO;
 import static android.util.Log.WARN;
 import static org.apache.commons.lang.ArrayUtils.addAll;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.createNewPaint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
@@ -12,7 +10,6 @@ import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BLANK_TEXT;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
@@ -30,15 +27,12 @@ import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.core.math.MathUtils;
 
 import com.google.android.material.color.MaterialColors;
 
-import org.apache.commons.lang.WordUtils;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
@@ -51,7 +45,6 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 
 public class TodoListEntry {
     
@@ -92,26 +85,14 @@ public class TodoListEntry {
     public int adaptiveColorBalance;
     public int averageBackgroundColor;
     
-    public int maxChars = 0;
-    public float halfWidth = 0;
-    
     public boolean showOnLock = false;
     private boolean showInList_ifCompleted = false;
     
-    public String textValue = BLANK_TEXT;
-    public String[] textValueSplit;
-    
-    public Paint textPaint;
-    public Paint bgPaint;
-    public Paint padPaint;
-    public Paint indicatorPaint;
+    private String textValue = "";
     
     EntryType entryType;
     
     public String[] params;
-    
-    public TodoListEntry() {
-    }
     
     public TodoListEntry(SystemCalendarEvent event) {
         fromSystemCalendar = true;
@@ -164,7 +145,7 @@ public class TodoListEntry {
         }
     }
     
-    public boolean getLockViewState() {
+    public boolean isVisibleOnLockscreen() {
         return (showOnLock && !completed);
     }
     
@@ -491,21 +472,11 @@ public class TodoListEntry {
         setFontColor(preferences.getInt(key, defaultColor));
     }
     
-    public void loadDisplayData(LockScreenBitmapDrawer lockScreenBitmapDrawer) {
-        textPaint = createNewPaint(fontColor);
-        textPaint.setTextSize(lockScreenBitmapDrawer.getDensityIndependentTextSize());
-        textPaint.setTextAlign(Paint.Align.CENTER);
-        halfWidth = MathUtils.clamp(textPaint.measureText(lockScreenBitmapDrawer.getLongestText()), 1, lockScreenBitmapDrawer.displayWidth / 2f - borderThickness);
-        maxChars = (int) ((lockScreenBitmapDrawer.displayWidth - borderThickness) / (textPaint.measureText("qwerty_") / 5f)) - 2;
-        
-        log(INFO, NAME, "Loaded display data for " + textValue);
-    }
-    
     public boolean isAdaptiveColorEnabled() {
         return adaptiveColorBalance > 0;
     }
     
-    private int getAdaptiveColor(int inputColor) {
+    public int getAdaptiveColor(int inputColor) {
         if (adaptiveColorBalance > 0) {
             return mixTwoColors(MaterialColors.harmonize(inputColor, averageBackgroundColor),
                     averageBackgroundColor, (adaptiveColorBalance - 1) / 9d);
@@ -514,12 +485,12 @@ public class TodoListEntry {
         return inputColor;
     }
     
-    public void initializeBgAndPadPaints() {
-        bgPaint = createNewPaint(getAdaptiveColor(bgColor));
-        padPaint = createNewPaint(getAdaptiveColor(borderColor));
-        if (fromSystemCalendar) {
-            indicatorPaint = createNewPaint(event.color);
-        }
+    public String getRawTextValue() {
+        return textValue;
+    }
+    
+    public String getTextOnDay(long day, Context context) {
+        return textValue + getDayOffset(day, context);
     }
     
     public String getDayOffset(long day, Context context) {
@@ -585,10 +556,6 @@ public class TodoListEntry {
             return " " + dayOffset;
         }
         return dayOffset;
-    }
-    
-    public void splitText(Context context) {
-        textValueSplit = (WordUtils.wrap(textValue + getDayOffset(currentDay, context), maxChars, "\n", true) + "\n" + getTimeSpan(context)).split("\n");
     }
     
     private void setParamsWithGroup() {

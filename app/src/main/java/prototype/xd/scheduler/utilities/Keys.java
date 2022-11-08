@@ -99,8 +99,6 @@ public class Keys {
     public static final List<Byte> appThemes = Collections.unmodifiableList(Arrays.asList(APP_THEME_DARK, APP_THEME_SYSTEM, APP_THEME_LIGHT));
     public static final String APP_THEME = "app_theme";
     
-    public static final String BLANK_TEXT = "_BLANK_";
-    
     public static final String PREFERENCES = "prefs";
     public static final String PREFERENCES_SERVICE = "prefs_s";
     

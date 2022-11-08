@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +40,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    
+        // enable warnings in debug mode
+        if (BuildConfig.DEBUG) {
+            StrictMode.enableDefaults();
+            /* try {
+            Class.forName("dalvik.system.CloseGuard")
+                    .getMethod("setEnabled", boolean.class)
+                    .invoke(null, true);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }*/
+        }
         
         PreferencesStore.init(this);
         

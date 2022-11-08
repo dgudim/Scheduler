@@ -163,51 +163,41 @@ public class BitmapUtilities {
         return Color.argb(a, r, g, b);
     }
     
-    public static int getAverageColor(Bitmap bitmap) {
-        if (bitmap == null) return Color.BLACK;
+    public static int getAverageColor(int[] pixels) {
         
         int redBucket = 0;
         int greenBucket = 0;
         int blueBucket = 0;
         
-        int pixelCount = bitmap.getWidth() * bitmap.getHeight();
-        int[] pixels = new int[pixelCount];
-        bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        
-        int actualPixelCount = 0;
-        
-        for (int y = 0, h = bitmap.getHeight(); y < h; y++) {
-            for (int x = 0, w = bitmap.getWidth(); x < w; x++) {
-                int color = pixels[x + y * w]; // x + y * width
-                int red = (color >> 16) & 0xFF;
-                int green = (color >> 8) & 0xFF;
-                int blue = color & 0xFF;
-                if (red + green + blue != 0) {
-                    redBucket += red;
-                    greenBucket += green;
-                    blueBucket += blue;
-                    actualPixelCount++;
-                }
+        int nonBlackPixelCount = 0;
+    
+        for (int color : pixels) {
+            int red = (color >> 16) & 0xFF;
+            int green = (color >> 8) & 0xFF;
+            int blue = color & 0xFF;
+            if (red + green + blue != 0) {
+                redBucket += red;
+                greenBucket += green;
+                blueBucket += blue;
+                nonBlackPixelCount++;
             }
         }
         
-        if (actualPixelCount == 0) {
+        if (nonBlackPixelCount == 0) {
             return Color.BLACK;
         }
         
-        pixelCount = actualPixelCount;
-        
-        if (max(max(redBucket, greenBucket), blueBucket) / pixelCount < 200) {
-            redBucket += 50 * pixelCount;
-            greenBucket += 50 * pixelCount;
-            blueBucket += 50 * pixelCount;
+        if (max(max(redBucket, greenBucket), blueBucket) / nonBlackPixelCount < 200) {
+            redBucket += 50 * nonBlackPixelCount;
+            greenBucket += 50 * nonBlackPixelCount;
+            blueBucket += 50 * nonBlackPixelCount;
         }
         
         return Color.argb(
                 255,
-                redBucket / pixelCount,
-                greenBucket / pixelCount,
-                blueBucket / pixelCount);
+                redBucket / nonBlackPixelCount,
+                greenBucket / nonBlackPixelCount,
+                blueBucket / nonBlackPixelCount);
     }
     
     public static void fingerPrintBitmap(Bitmap bitmap) {

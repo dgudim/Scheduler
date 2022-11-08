@@ -39,6 +39,7 @@ android {
             res {
                 srcDirs 'src/main/res',
                         'src/main/res/layouts/calendar',
+                        'src/main/res/layouts/lockscreen_views',
                         'src/main/res/layouts/partials',
                         'src/main/res/layouts/full_views',
                         'src/main/res/layouts/settings',
