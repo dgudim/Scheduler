@@ -49,8 +49,8 @@
     <string name="move_to_global_list">Move to global list</string>
     <string name="item_yesterday">(Yesterday)</string>
     <string name="item_tomorrow">(Tomorrow)</string>
-    <string name="item_N_days_ago_double">(% days ago)</string>
-    <string name="item_N_days_ago_single">(% days ago)</string>
+    <string name="item_N_days_ago_double">(%d days ago)</string>
+    <string name="item_N_days_ago_single">(%d days ago)</string>
     <string name="item_more_than_a_month_ago">(> than a month ago)</string>
     <string name="item_in_N_days_double">(in %d days)</string>
     <string name="item_in_N_days_single">(in %d days)</string>

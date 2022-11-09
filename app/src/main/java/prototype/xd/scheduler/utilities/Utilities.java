@@ -105,9 +105,9 @@ public class Utilities {
                 readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups));
             }
             
-            log(INFO, NAME, "read todo list: " + readEntries.size());
+            log(INFO, NAME, "Read todo list: " + readEntries.size());
         } catch (Exception e) {
-            log(INFO, NAME, "no todo list");
+            log(INFO, NAME, "No todo list");
         }
         
         readEntries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd));
@@ -129,9 +129,9 @@ public class Utilities {
             
             saveObject("list", entryParams);
             saveObject("list_groupData", entryGroupNames);
-            log(INFO, NAME, "saved todo list");
+            log(INFO, NAME, "Saved todo list");
         } catch (Exception e) {
-            log(ERROR, NAME, "missing permission, failed to save todo list");
+            log(ERROR, NAME, "Missing permission, failed to save todo list");
         }
     }
     

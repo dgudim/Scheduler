@@ -61,5 +61,5 @@ dependencies {
     implementation 'com.github.AppIntro:AppIntro:6.2.0'
     implementation 'org.dmfs:lib-recur:0.12.2'
     implementation 'androidx.appcompat:appcompat:1.5.1'
-    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 }

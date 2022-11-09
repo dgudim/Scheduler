@@ -53,7 +53,10 @@ public class HomeFragment extends Fragment {
         
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryStorage);
-        todoListEntryStorage.getTodoListViewAdapter().setDateUpdateListener(calendarView::notifyCurrentDayChanged);
+        todoListEntryStorage.getTodoListViewAdapter().setDateUpdateListener(() -> {
+            todoListEntryStorage.invalidateIndicatorCache(currentDay);
+            calendarView.notifyCurrentDayChanged();
+        });
         
         TextView statusText = view.findViewById(R.id.status_text);
         calendarView.setOnDateChangeListener((selectedDate, context) -> {

@@ -4,7 +4,6 @@ import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.loadObject;
 import static prototype.xd.scheduler.utilities.Utilities.saveObject;
 
@@ -13,6 +12,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -99,9 +99,8 @@ public class Group {
             }
             
             return groups;
-        } catch (Exception e) {
-            logException(NAME, e);
-            log(INFO, NAME, "no groups file, creating one");
+        } catch (IOException | ClassNotFoundException e) {
+            log(INFO, NAME, "No groups file, creating one");
             saveGroupsFile(groups);
             return groups;
         }
@@ -125,7 +124,7 @@ public class Group {
             log(INFO, NAME, "saving groups file");
             
         } catch (Exception e) {
-            log(ERROR, NAME, "failed to save groups file: " + e.getMessage());
+            log(ERROR, NAME, "failed saving groups file: " + e.getMessage());
         }
     }
     

@@ -187,7 +187,9 @@ public class LockScreenBitmapDrawer {
         // inflate the root container
         LinearLayout rootView = (LinearLayout) layoutInflater.inflate(R.layout.lockscreen_root_container, null);
         
-        // first pass, construct the hierarchy, hide indicators and time text on not system calendar entries
+        List<View> children = new ArrayList<>();
+        
+        // first pass, inflate all views, hide indicators and time text on not system calendar entries
         for (TodoListEntry todoListEntry : toAdd) {
             View basicView = layoutInflater.inflate(R.layout.entry_basic, null);
             
@@ -202,27 +204,14 @@ public class LockScreenBitmapDrawer {
                 timeText.setVisibility(View.GONE);
                 indicator.setVisibility(View.GONE);
             }
-            
-            basicView.setLayoutParams(new LinearLayout.LayoutParams(
-                    preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK) ?
-                            LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
-            
-            rootView.addView(basicView);
+    
+            children.add(basicView);
         }
         
-        // lay everything out assigning real sizes
-        int measuredWidthSpec = View.MeasureSpec.makeMeasureSpec(displayWidth, View.MeasureSpec.EXACTLY);
-        int measuredHeightSpec = View.MeasureSpec.makeMeasureSpec(displayHeight, View.MeasureSpec.EXACTLY);
-        
-        // measure and layout the view with the screen dimensions
-        rootView.measure(measuredWidthSpec, measuredHeightSpec);
-        rootView.layout(0, 0, rootView.getMeasuredWidth(), rootView.getMeasuredHeight());
-        
         // second pass, apply common values
-        for (int i = 0; i < rootView.getChildCount(); i++) {
+        for (int i = 0; i < children.size(); i++) {
             TodoListEntry todoListEntry = toAdd.get(i);
-            View child = rootView.getChildAt(i);
+            View child = children.get(i);
             
             if (todoListEntry.isAdaptiveColorEnabled()) {
                 int width = child.getWidth();
@@ -245,7 +234,22 @@ public class LockScreenBitmapDrawer {
             title.setText(todoListEntry.getTextOnDay(currentDay, context));
             title.setTextColor(MaterialColors.harmonize(todoListEntry.fontColor, bgColor));
             title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, densityScaledFontSize * 1.1F);
+    
+            child.setLayoutParams(new LinearLayout.LayoutParams(
+                    preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK) ?
+                            LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+    
+            rootView.addView(child);
         }
+    
+        // lay everything out assigning real sizes
+        int measuredWidthSpec = View.MeasureSpec.makeMeasureSpec(displayWidth, View.MeasureSpec.EXACTLY);
+        int measuredHeightSpec = View.MeasureSpec.makeMeasureSpec(displayHeight, View.MeasureSpec.EXACTLY);
+    
+        // measure and layout the view with the screen dimensions
+        rootView.measure(measuredWidthSpec, measuredHeightSpec);
+        rootView.layout(0, 0, rootView.getMeasuredWidth(), rootView.getMeasuredHeight());
         
         rootView.draw(canvas);
     }
