@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp">
+    android:paddingTop="2.5dp"
+    android:paddingBottom="2.5dp">
 
     <LinearLayout
         android:id="@+id/background_outline"
@@ -38,10 +38,11 @@
             <TextView
                 android:id="@+id/title_text"
                 style="@style/MediumHeading"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
+                android:gravity="center"
                 android:text="Title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/indicator_view"
@@ -51,10 +52,11 @@
             <TextView
                 android:id="@+id/time_text"
                 style="@style/MediumHeadingSubtext"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
+                android:gravity="center"
                 android:text="00:00 - 5:00"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/indicator_view"
