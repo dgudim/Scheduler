@@ -29,12 +29,12 @@ import java.util.Objects;
 
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.TodoListEntryStorage;
+import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.views.CalendarView;
 
 public class HomeFragment extends Fragment {
     
-    private volatile TodoListEntryStorage todoListEntryStorage;
+    private volatile TodoListEntryManager todoListEntryManager;
     
     public HomeFragment() {
         super();
@@ -48,31 +48,33 @@ public class HomeFragment extends Fragment {
         ListView listView = view.findViewById(R.id.list);
         listView.setDividerHeight(0);
         
-        todoListEntryStorage = new TodoListEntryStorage(container);
-        listView.setAdapter(todoListEntryStorage.getTodoListViewAdapter());
+        todoListEntryManager = new TodoListEntryManager(container);
+        
+        listView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
         
         // construct custom calendar view
-        CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryStorage);
-        todoListEntryStorage.getTodoListViewAdapter().setDateUpdateListener(() -> {
-            todoListEntryStorage.invalidateIndicatorCache(currentDay);
-            calendarView.notifyCurrentDayChanged();
-        });
+        CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryManager);
+        todoListEntryManager.setCurrentDayIndicatorChangeListener(calendarView::notifyCurrentDayChanged);
         
         TextView statusText = view.findViewById(R.id.status_text);
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             updateDate(selectedDate.toEpochDay(), true);
-            todoListEntryStorage.updateTodoListAdapter(false, false);
+            todoListEntryManager.updateTodoListAdapter(false, false);
             updateStatusText(statusText);
         });
         
-        calendarView.setOnMonthPreChangeListener((calendarMonth, firstVisibleDay, lastVisibleDay, context) ->
-                // load current month before displaying the data
-                todoListEntryStorage.lazyLoadEntries(context, firstVisibleDay, lastVisibleDay));
+        calendarView.setOnMonthPreChangeListener((firstVisibleDay, lastVisibleDay, context) ->
+                // load current month entries before displaying the data
+                todoListEntryManager.loadEntries(firstVisibleDay, lastVisibleDay)
+        );
+        
+        // when all entries are loaded, update current month
+        todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(calendarView::notifyCurrentMonthChanged));
         
         view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> calendarView.selectDay(currentDay));
         
         view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
-            final List<Group> groupList = todoListEntryStorage.getGroups();
+            final List<Group> groupList = todoListEntryManager.getGroups();
             displayEditTextSpinnerDialogue(view1.getContext(), R.string.add_event_fab, -1, R.string.event_name_input_hint,
                     R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
                     (view2, text, selectedIndex) -> {
@@ -80,9 +82,9 @@ public class HomeFragment extends Fragment {
                                 TEXT_VALUE, text,
                                 ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
                                 IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
-                        todoListEntryStorage.addEntry(newEntry);
-                        todoListEntryStorage.saveEntries();
-                        todoListEntryStorage.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), true);
+                        todoListEntryManager.addEntry(newEntry);
+                        todoListEntryManager.saveEntriesAsync();
+                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), true);
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
@@ -90,9 +92,9 @@ public class HomeFragment extends Fragment {
                                 TEXT_VALUE, text,
                                 ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
                                 IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
-                        todoListEntryStorage.addEntry(newEntry);
-                        todoListEntryStorage.saveEntries();
-                        todoListEntryStorage.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), false);
+                        todoListEntryManager.addEntry(newEntry);
+                        todoListEntryManager.saveEntriesAsync();
+                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), false);
                         return true;
                     });
         });
@@ -119,12 +121,12 @@ public class HomeFragment extends Fragment {
     
     private void updateStatusText(TextView statusText) {
         statusText.setText(getString(R.string.status, dateFromEpoch(currentlySelectedDay * 86400000),
-                todoListEntryStorage.getCurrentlyVisibleEntriesCount()));
+                todoListEntryManager.getCurrentlyVisibleEntriesCount()));
     }
     
     @Override
     public void onDestroy() {
-        todoListEntryStorage = null;
+        todoListEntryManager = null;
         super.onDestroy();
     }
 }

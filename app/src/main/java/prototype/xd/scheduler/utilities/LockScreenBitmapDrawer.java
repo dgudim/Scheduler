@@ -2,7 +2,6 @@ package prototype.xd.scheduler.utilities;
 
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
-import static prototype.xd.scheduler.entities.Group.readGroupFile;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
@@ -23,6 +22,7 @@ import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 import static prototype.xd.scheduler.utilities.Utilities.isVerticalOrientation;
+import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
@@ -174,10 +174,16 @@ public class LockScreenBitmapDrawer {
     private void drawItemsOnBitmap(@NonNull Context context, @NonNull Bitmap bitmap) throws InterruptedException {
         
         Canvas canvas = new Canvas(bitmap);
-        List<Group> groups = readGroupFile(context);
+        List<Group> groups = loadGroups(context);
         
-        List<TodoListEntry> toAdd = filterItems(sortEntries(
-                loadTodoEntries(context, currentDay - 14, currentDay + 14, groups), currentDay));
+        // load user defined entries (from files)
+        // add entries from all calendars spanning 4 weeks
+        // sort and filter entries
+        List<TodoListEntry> toAdd =
+                filterEntries(
+                        sortEntries(
+                                loadTodoEntries(context, currentDay - 14, currentDay + 14, groups, null), currentDay));
+        
         long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDay;
         if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
@@ -204,7 +210,7 @@ public class LockScreenBitmapDrawer {
                 timeText.setVisibility(View.GONE);
                 indicator.setVisibility(View.GONE);
             }
-    
+            
             children.add(basicView);
         }
         
@@ -228,25 +234,25 @@ public class LockScreenBitmapDrawer {
             child.findViewById(R.id.background_outline).setBackgroundColor(bgColor);
             child.findViewById(R.id.background_main).setBackgroundColor(
                     todoListEntry.getAdaptiveColor(todoListEntry.bgColor));
-    
+            
             // set text value and harmonize text color to make sure it's visible
             TextView title = child.findViewById(R.id.title_text);
             title.setText(todoListEntry.getTextOnDay(currentDay, context));
             title.setTextColor(MaterialColors.harmonize(todoListEntry.fontColor, bgColor));
             title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, densityScaledFontSize * 1.1F);
-    
+            
             child.setLayoutParams(new LinearLayout.LayoutParams(
                     preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK) ?
                             LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
-    
+            
             rootView.addView(child);
         }
-    
+        
         // lay everything out assigning real sizes
         int measuredWidthSpec = View.MeasureSpec.makeMeasureSpec(displayWidth, View.MeasureSpec.EXACTLY);
         int measuredHeightSpec = View.MeasureSpec.makeMeasureSpec(displayHeight, View.MeasureSpec.EXACTLY);
-    
+        
         // measure and layout the view with the screen dimensions
         rootView.measure(measuredWidthSpec, measuredHeightSpec);
         rootView.layout(0, 0, rootView.getMeasuredWidth(), rootView.getMeasuredHeight());
@@ -254,7 +260,7 @@ public class LockScreenBitmapDrawer {
         rootView.draw(canvas);
     }
     
-    private List<TodoListEntry> filterItems(List<TodoListEntry> entries) {
+    private List<TodoListEntry> filterEntries(List<TodoListEntry> entries) {
         List<TodoListEntry> toAdd = new ArrayList<>();
         for (TodoListEntry entry : entries) {
             if (entry.isVisibleOnLockscreen()) {

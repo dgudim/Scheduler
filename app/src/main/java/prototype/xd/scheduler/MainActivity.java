@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     
         // enable warnings in debug mode
         if (BuildConfig.DEBUG) {
-            StrictMode.enableDefaults();
+            //StrictMode.enableDefaults();
             /* try {
             Class.forName("dalvik.system.CloseGuard")
                     .getMethod("setEnabled", boolean.class)

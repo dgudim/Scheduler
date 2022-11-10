@@ -28,28 +28,26 @@ import java.util.List;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.TodoListEntryStorage;
+import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class TodoListViewAdapter extends BaseAdapter {
     
-    private final TodoListEntryStorage todoListEntryStorage;
+    private final TodoListEntryManager todoListEntryManager;
     
     private List<TodoListEntry> currentTodoListEntries;
     
     private final EntrySettings entrySettings;
     private final SystemCalendarSettings systemCalendarSettings;
     
-    private EventStateListener eventStateListener;
-    
-    public TodoListViewAdapter(final TodoListEntryStorage todoListEntryStorage, final ViewGroup parent) {
-        this.todoListEntryStorage = todoListEntryStorage;
+    public TodoListViewAdapter(final TodoListEntryManager todoListEntryManager, final ViewGroup parent) {
+        this.todoListEntryManager = todoListEntryManager;
         currentTodoListEntries = new ArrayList<>();
-        entrySettings = new EntrySettings(todoListEntryStorage,
+        entrySettings = new EntrySettings(todoListEntryManager,
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
-        systemCalendarSettings = new SystemCalendarSettings(todoListEntryStorage,
+        systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager,
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
     }
     
@@ -68,11 +66,8 @@ public class TodoListViewAdapter extends BaseAdapter {
         return i;
     }
     
-    public void notifyVisibleEntriesUpdated(boolean updateCalendarIndicators) {
-        currentTodoListEntries = todoListEntryStorage.getVisibleTodoListEntries(currentlySelectedDay);
-        if (updateCalendarIndicators) {
-            eventStateListener.onEventStateChanged();
-        }
+    public void notifyVisibleEntriesUpdated() {
+        currentTodoListEntries = todoListEntryManager.getVisibleTodoListEntries(currentlySelectedDay);
         notifyDataSetChanged();
     }
     
@@ -115,10 +110,10 @@ public class TodoListViewAdapter extends BaseAdapter {
                             R.string.delete, R.string.are_you_sure,
                             R.string.no, R.string.yes,
                             view2 -> {
-                                todoListEntryStorage.removeEntry(currentEntry);
-                                todoListEntryStorage.saveEntries();
+                                todoListEntryManager.removeEntry(currentEntry);
+                                todoListEntryManager.saveEntriesAsync();
                                 // deleting a global entry does not change indicators
-                                todoListEntryStorage.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isGlobal());
+                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isGlobal());
                             }));
             
             CheckBox isDone = view.findViewById(R.id.isDone);
@@ -131,13 +126,13 @@ public class TodoListViewAdapter extends BaseAdapter {
                 } else {
                     currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                 }
-                todoListEntryStorage.saveEntries();
-                todoListEntryStorage.updateTodoListAdapter(true, true);
+                todoListEntryManager.saveEntriesAsync();
+                todoListEntryManager.updateTodoListAdapter(true, true);
             });
             
             view.setOnLongClickListener(view1 -> {
                 
-                final List<Group> groupList = todoListEntryStorage.getGroups();
+                final List<Group> groupList = todoListEntryManager.getGroups();
                 int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
                 displayEditTextSpinnerDialogue(view1.getContext(), R.string.edit_event, -1, R.string.event_name_input_hint,
                         R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.getRawTextValue(), groupList,
@@ -146,8 +141,8 @@ public class TodoListViewAdapter extends BaseAdapter {
                                 currentEntry.changeGroup(groupList.get(selectedIndex));
                             }
                             currentEntry.changeParameter(TEXT_VALUE, text);
-                            todoListEntryStorage.saveEntries();
-                            todoListEntryStorage.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), false);
+                            todoListEntryManager.saveEntriesAsync();
+                            todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), false);
                             return true;
                         },
                         !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
@@ -156,9 +151,9 @@ public class TodoListViewAdapter extends BaseAdapter {
                             }
                             currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                             currentEntry.changeParameter(IS_COMPLETED, "false");
-                            todoListEntryStorage.saveEntries();
+                            todoListEntryManager.saveEntriesAsync();
                             // completed -> global = indicators don't change, no need to update
-                            todoListEntryStorage.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isCompleted());
+                            todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isCompleted());
                             return true;
                         } : null);
                 return true;
@@ -179,14 +174,5 @@ public class TodoListViewAdapter extends BaseAdapter {
         todoText.setText(currentEntry.getTextOnDay(currentlySelectedDay, view.getContext()));
         
         return view;
-    }
-    
-    public void setDateUpdateListener(EventStateListener eventStateListener) {
-        this.eventStateListener = eventStateListener;
-    }
-    
-    @FunctionalInterface
-    public interface EventStateListener {
-        void onEventStateChanged();
     }
 }

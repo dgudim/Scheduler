@@ -29,26 +29,26 @@ import java.util.Map;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.TodoListEntryStorage;
+import prototype.xd.scheduler.utilities.TodoListEntryManager;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
     private List<String> calendarSubKeys;
     private TodoListEntry entry;
-    private final TodoListEntryStorage todoListEntryStorage;
+    private final TodoListEntryManager todoListEntryManager;
     
     private TextWatcher currentListener;
     
-    public SystemCalendarSettings(@Nullable final TodoListEntryStorage todoListEntryStorage, final View settingsView) {
+    public SystemCalendarSettings(@Nullable final TodoListEntryManager todoListEntryManager, final View settingsView) {
         super(settingsView);
         
         settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
         
-        this.todoListEntryStorage = todoListEntryStorage;
+        this.todoListEntryManager = todoListEntryManager;
         
         dialog = new AlertDialog.Builder(settingsView.getContext(), R.style.FullScreenDialog).setOnDismissListener(dialog -> {
-            if (todoListEntryStorage != null) {
-                todoListEntryStorage.updateTodoListAdapter(false, true);
+            if (todoListEntryManager != null) {
+                todoListEntryManager.updateTodoListAdapter(false, true);
             }
         }).setView(settingsView).create();
     }
@@ -199,8 +199,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
         } else {
             display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_default));
         }
-        if (todoListEntryStorage != null) {
-            for (TodoListEntry current_entry : todoListEntryStorage.getTodoListEntries()) {
+        if (todoListEntryManager != null) {
+            for (TodoListEntry current_entry : todoListEntryManager.getTodoListEntries()) {
                 if (current_entry.fromSystemCalendar && current_entry.event.subKeys.equals(entry.event.subKeys)) {
                     current_entry.reloadParams();
                 }

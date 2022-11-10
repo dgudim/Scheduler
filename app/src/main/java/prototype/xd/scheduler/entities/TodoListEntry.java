@@ -92,7 +92,7 @@ public class TodoListEntry {
     
     EntryType entryType;
     
-    public String[] params;
+    protected String[] params;
     
     public TodoListEntry(SystemCalendarEvent event) {
         fromSystemCalendar = true;
@@ -111,6 +111,10 @@ public class TodoListEntry {
         }
         this.params = params;
         reloadParams();
+    }
+    
+    public String[] getParams() {
+        return params;
     }
     
     public Group getGroup() {

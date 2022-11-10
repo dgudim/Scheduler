@@ -34,25 +34,24 @@ import java.util.List;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.TodoListEntryStorage;
+import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 
 public class EntrySettings extends PopupSettingsView {
     
-    public final TodoListEntryStorage todoListEntryStorage;
+    public final TodoListEntryManager todoListEntryManager;
     private TodoListEntry todoListEntry;
     
-    public EntrySettings(final TodoListEntryStorage todoListEntryStorage, final View settingsView) {
+    public EntrySettings(final TodoListEntryManager todoListEntryManager, final View settingsView) {
         super(settingsView);
         hide_expired_items_by_time_container.setVisibility(View.GONE);
         hide_by_content_container.setVisibility(View.GONE);
-        this.todoListEntryStorage = todoListEntryStorage;
+        this.todoListEntryManager = todoListEntryManager;
         
         dialog = new AlertDialog.Builder(settingsView.getContext(), R.style.FullScreenDialog)
                 .setOnDismissListener(dialog -> {
-                    todoListEntryStorage.saveEntries();
-                    todoListEntryStorage.saveGroups();
-                    todoListEntryStorage.updateTodoListAdapter(false, true);
+                    todoListEntryManager.saveGroupsAndEntriesAsync();
+                    todoListEntryManager.updateTodoListAdapter(false, true);
                 }).setView(settingsView).create();
     }
     
@@ -70,7 +69,7 @@ public class EntrySettings extends PopupSettingsView {
         updateAllIndicators();
         updatePreviews(todoListEntry.fontColor_original, todoListEntry.bgColor_original, todoListEntry.borderColor_original, todoListEntry.border_thickness_original);
         
-        final List<Group> groupList = todoListEntryStorage.getGroups();
+        final List<Group> groupList = todoListEntryManager.getGroups();
         
         final ArrayAdapter<Group> arrayAdapter = new ArrayAdapter<Group>(context, android.R.layout.simple_spinner_item, groupList) {
             @NonNull
@@ -174,15 +173,15 @@ public class EntrySettings extends PopupSettingsView {
                         }));
         
         fontColor_select.setOnClickListener(view -> invokeColorDialogue(
-                fontColor_view_state, this, todoListEntryStorage,
+                fontColor_view_state, this, todoListEntryManager,
                 entry, FONT_COLOR, entry.fontColor_original));
         
         bgColor_select.setOnClickListener(view -> invokeColorDialogue(
-                bgColor_view_state, this, todoListEntryStorage,
+                bgColor_view_state, this, todoListEntryManager,
                 entry, BG_COLOR, entry.bgColor_original));
         
         borderColor_select.setOnClickListener(view -> invokeColorDialogue(
-                padColor_view_state, this, todoListEntryStorage,
+                padColor_view_state, this, todoListEntryManager,
                 entry, BORDER_COLOR, entry.borderColor_original));
         
         Utilities.addSliderChangeListener(
@@ -218,13 +217,13 @@ public class EntrySettings extends PopupSettingsView {
         addSwitchChangeListener(
                 show_on_lock_switch,
                 show_on_lock_state,
-                todoListEntryStorage, entry,
+                todoListEntryManager, entry,
                 SHOW_ON_LOCK, entry.showOnLock);
         
     }
     
     private void forEachWithGroupMatch(String groupName, TodoListEntryAction action) {
-        List<TodoListEntry> todoListEntries = todoListEntryStorage.getTodoListEntries();
+        List<TodoListEntry> todoListEntries = todoListEntryManager.getTodoListEntries();
         for(TodoListEntry entry: todoListEntries) {
             if (entry.getGroupName().equals(groupName)) {
                 action.accept(entry);

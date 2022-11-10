@@ -1,14 +1,13 @@
 package prototype.xd.scheduler.utilities;
 
-import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
-import static prototype.xd.scheduler.entities.Group.readGroupFile;
-import static prototype.xd.scheduler.entities.Group.saveGroupsFile;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
+import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadObject;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.saveObject;
@@ -20,6 +19,9 @@ import android.graphics.Color;
 import android.view.ViewGroup;
 
 import com.google.android.material.color.MaterialColors;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,26 +35,39 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 
-public class TodoListEntryStorage {
+public class TodoListEntryManager {
+    
+    public enum SaveType {
+        ENTRIES, GROUPS, BOTH, NONE
+    }
     
     private static final String NAME = "TodoListEntryStorage";
-    
-    private List<SystemCalendar> calendars;
     
     private long loadedDay_start;
     private long loadedDay_end;
     
     private final TodoListViewAdapter todoListViewAdapter;
-    private final List<TodoListEntry> todoListEntries;
     
+    private List<SystemCalendar> calendars;
+    private final List<TodoListEntry> todoListEntries;
     private final List<Group> groups;
     
     private Map<Long, List<Integer>> cachedIndicators;
     
-    public TodoListEntryStorage(final ViewGroup parent) {
+    private final Object saveSyncObject = new Object();
+    private volatile SaveType saveType = SaveType.NONE;
+    
+    private volatile boolean initFinished = false;
+    private @Nullable
+    Runnable onInitFinishedRunnable;
+    
+    private CurrentDayIndicatorChangeListener currentDayIndicatorChangeListener;
+    
+    public TodoListEntryManager(final ViewGroup parent) {
         this.todoListViewAdapter = new TodoListViewAdapter(this, parent);
         this.todoListEntries = new ArrayList<>();
-        this.groups = readGroupFile(parent.getContext());
+        this.groups = loadGroups(parent.getContext());
+        
         // load cached indicators immediately (~10ms)
         try {
             cachedIndicators = loadObject("cached_indicators");
@@ -60,8 +75,61 @@ public class TodoListEntryStorage {
             cachedIndicators = new HashMap<>();
             log(INFO, NAME, "No cached indicators file");
         }
-        // lazyload calendars (~300ms)
-        new Thread(() -> calendars = getAllCalendars(parent.getContext(), false), "Cfetch thread").start();
+        
+        // load calendars and static entries in a separate thread (~300ms)
+        new Thread(() -> {
+            long start = System.currentTimeMillis();
+            calendars = getAllCalendars(parent.getContext(), false);
+            todoListEntries.addAll(loadTodoEntries(parent.getContext(), currentDay - 30, currentDay + 30, groups, calendars));
+            initFinished = true;
+            log(INFO, Thread.currentThread().getName(), "TodoListEntryStorage cold start complete in " +
+                    (System.currentTimeMillis() - start) + "ms, loaded " + todoListEntries.size() + " entries");
+            if (onInitFinishedRunnable != null) {
+                onInitFinishedRunnable.run();
+            }
+        }, "CFetch thread").start();
+        
+        new Thread("Async writer") {
+            @Override
+            public void run() {
+                synchronized (saveSyncObject) {
+                    do {
+                        try {
+                            // Calling wait() will block this thread until another thread
+                            // calls notify() on the object.
+                            saveSyncObject.wait();
+                            switch (saveType) {
+                                case ENTRIES:
+                                    Utilities.saveEntries(todoListEntries);
+                                    break;
+                                case GROUPS:
+                                    Utilities.saveGroups(groups);
+                                    break;
+                                case BOTH:
+                                    Utilities.saveEntries(todoListEntries);
+                                    Utilities.saveGroups(groups);
+                                    break;
+                                default:
+                            }
+                            saveType = SaveType.NONE;
+                        } catch (InterruptedException e) {
+                            interrupt();
+                            log(INFO, "Async writer", "Async writer stopped");
+                        }
+                        
+                    } while (!isInterrupted());
+                }
+            }
+        }.start();
+    }
+    
+    public void onInitFinished(@NotNull Runnable onInitFinishedRunnable) {
+        if (initFinished) {
+            // init thread already finished, run from ui
+            onInitFinishedRunnable.run();
+        } else {
+            this.onInitFinishedRunnable = onInitFinishedRunnable;
+        }
     }
     
     public TodoListViewAdapter getTodoListViewAdapter() {
@@ -100,11 +168,11 @@ public class TodoListEntryStorage {
     }
     
     private List<Integer> getIndicatorRawColors(long day) {
-        // try to get from cache
-        List<Integer> colors = cachedIndicators.get(day);
-        if (colors != null) {
-            return colors;
-        }
+        //// try to get from cache
+        //List<Integer> colors = cachedIndicators.get(day);
+        //if (colors != null) {
+        //    return colors;
+        //}
         
         // 5 entries on average
         List<TodoListEntry> filteredTodoListEntries = new ArrayList<>(5);
@@ -117,7 +185,7 @@ public class TodoListEntryStorage {
         // fancy sort
         filteredTodoListEntries = sortEntries(filteredTodoListEntries, day);
         
-        colors = new ArrayList<>(filteredTodoListEntries.size());
+        List<Integer> colors = new ArrayList<>(filteredTodoListEntries.size());
         for (TodoListEntry todoEntry : filteredTodoListEntries) {
             colors.add(todoEntry.bgColor);
         }
@@ -131,11 +199,14 @@ public class TodoListEntryStorage {
         cachedIndicators.remove(day);
     }
     
-    public void updateTodoListAdapter(boolean updateBitmap, boolean updateCurrentCalendarIndicators) {
+    public void updateTodoListAdapter(boolean updateBitmap, boolean updateCurrentDayIndicators) {
         if (updateBitmap) {
             servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
-        todoListViewAdapter.notifyVisibleEntriesUpdated(updateCurrentCalendarIndicators);
+        todoListViewAdapter.notifyVisibleEntriesUpdated();
+        if (updateCurrentDayIndicators && currentDayIndicatorChangeListener != null) {
+            currentDayIndicatorChangeListener.onIndicatorsChanged();
+        }
     }
     
     public List<TodoListEntry> getTodoListEntries() {
@@ -146,13 +217,8 @@ public class TodoListEntryStorage {
         return groups;
     }
     
-    public void lazyLoadEntries(Context context, long toLoadDayStart, long toLoadDayEnd) {
-        if (loadedDay_start == 0) {
-            loadedDay_start = toLoadDayStart;
-            loadedDay_end = toLoadDayEnd;
-            todoListEntries.addAll(loadTodoEntries(context, loadedDay_start, loadedDay_end, groups));
-            log(DEBUG, NAME, "Initial call to 'lazyLoadEntries', loaded " + todoListEntries.size() + " entries");
-        } else {
+    public void loadEntries(long toLoadDayStart, long toLoadDayEnd) {
+        if (initFinished) {
             long dayStart = 0;
             long dayEnd = 0;
             if (toLoadDayEnd > loadedDay_end) {
@@ -164,13 +230,13 @@ public class TodoListEntryStorage {
                 dayEnd = loadedDay_start - 1;
                 loadedDay_start = toLoadDayStart;
             }
-            if (dayStart != 0 && calendars != null) {
+            if (dayStart != 0) {
                 for (SystemCalendar calendar : calendars) {
                     addDistinct(calendar.getVisibleTodoListEntries(dayStart, dayEnd));
                 }
             }
+            updateTodoListAdapter(false, false);
         }
-        updateTodoListAdapter(false, false);
     }
     
     private void addDistinct(List<TodoListEntry> entriesToAdd) {
@@ -181,12 +247,19 @@ public class TodoListEntryStorage {
         }
     }
     
-    public void saveEntries() {
-        Utilities.saveEntries(todoListEntries);
+    private void wakeUpAndSave(SaveType saveType) {
+        this.saveType = saveType;
+        synchronized (saveSyncObject) {
+            saveSyncObject.notifyAll();
+        }
     }
     
-    public void saveGroups() {
-        saveGroupsFile(groups);
+    public void saveEntriesAsync() {
+        wakeUpAndSave(SaveType.ENTRIES);
+    }
+    
+    public void saveGroupsAndEntriesAsync() {
+        wakeUpAndSave(SaveType.BOTH);
     }
     
     public void saveIndicators() {
@@ -203,5 +276,19 @@ public class TodoListEntryStorage {
     
     public void removeEntry(TodoListEntry entry) {
         todoListEntries.remove(entry);
+    }
+    
+    @FunctionalInterface
+    public interface OnInitFinishedListener {
+        void onInitFinished();
+    }
+    
+    public void setCurrentDayIndicatorChangeListener(CurrentDayIndicatorChangeListener currentDayIndicatorChangeListener) {
+        this.currentDayIndicatorChangeListener = currentDayIndicatorChangeListener;
+    }
+    
+    @FunctionalInterface
+    public interface CurrentDayIndicatorChangeListener {
+        void onIndicatorsChanged();
     }
 }

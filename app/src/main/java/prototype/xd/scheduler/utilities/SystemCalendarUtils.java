@@ -12,6 +12,8 @@ import android.provider.CalendarContract;
 import android.text.Spannable;
 import android.text.SpannableString;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +54,7 @@ public class SystemCalendarUtils {
     
     public static List<SystemCalendar> getAllCalendars(Context context, boolean loadMinimal) {
         ContentResolver contentResolver = context.getContentResolver();
-    
+        
         List<SystemCalendar> systemCalendars = new ArrayList<>();
         Cursor cursor = query(contentResolver, CalendarContract.Calendars.CONTENT_URI, calendarColumns.toArray(new String[0]), null);
         int calendars = cursor.getCount();
@@ -65,11 +67,12 @@ public class SystemCalendarUtils {
         return systemCalendars;
     }
     
-    public static List<TodoListEntry> getTodoListEntriesFromCalendars(Context context, long dayStart, long dayEnd) {
+    public static List<TodoListEntry> getTodoListEntriesFromCalendars(Context context, long dayStart, long dayEnd,
+                                                                      @Nullable List<SystemCalendar> calendars) {
         List<TodoListEntry> todoListEntries = new ArrayList<>();
-        List<SystemCalendar> calendars = getAllCalendars(context, false);
-        for (int i = 0; i < calendars.size(); i++) {
-            todoListEntries.addAll(calendars.get(i).getVisibleTodoListEntries(dayStart, dayEnd));
+        List<SystemCalendar> cals = (calendars != null) ? calendars : getAllCalendars(context, false);
+        for (SystemCalendar calendar : cals) {
+            todoListEntries.addAll(calendar.getVisibleTodoListEntries(dayStart, dayEnd));
         }
         log(INFO, "CalendarUtils", "read calendar entries: " + todoListEntries.size());
         return todoListEntries;

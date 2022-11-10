@@ -52,6 +52,7 @@ import java.util.List;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntry;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.EntrySettings;
@@ -90,7 +91,8 @@ public class Utilities {
         }
     }
     
-    public static List<TodoListEntry> loadTodoEntries(Context context, long dayStart, long dayEnd, List<Group> groups) {
+    public static List<TodoListEntry> loadTodoEntries(Context context, long dayStart, long dayEnd, List<Group> groups,
+                                                      @Nullable List<SystemCalendar> calendars) {
         
         List<TodoListEntry> readEntries = new ArrayList<>();
         try {
@@ -110,7 +112,7 @@ public class Utilities {
             log(INFO, NAME, "No todo list");
         }
         
-        readEntries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd));
+        readEntries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd, calendars));
         return readEntries;
     }
     
@@ -122,16 +124,63 @@ public class Utilities {
             for (int i = 0; i < entries.size(); i++) {
                 TodoListEntry entry = entries.get(i);
                 if (!entry.fromSystemCalendar) {
-                    entryParams.add(entry.params);
+                    entryParams.add(entry.getParams());
                     entryGroupNames.add(entry.getGroupName());
                 }
             }
             
             saveObject("list", entryParams);
             saveObject("list_groupData", entryGroupNames);
+            
             log(INFO, NAME, "Saved todo list");
         } catch (Exception e) {
             log(ERROR, NAME, "Missing permission, failed to save todo list");
+        }
+    }
+    
+    public static List<Group> loadGroups(Context context) {
+        List<Group> groups = new ArrayList<>();
+        groups.add(new Group(context)); // add "null" group
+        try {
+            
+            List<String[]> groupParams = loadObject("groups");
+            List<String> groupNames = loadObject("groupNames");
+            
+            if (groupParams.size() != groupNames.size()) {
+                log(WARN, NAME, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
+            }
+            
+            for (int i = 0; i < groupParams.size(); i++) {
+                groups.add(new Group(groupNames.get(i), groupParams.get(i)));
+            }
+            
+            return groups;
+        } catch (IOException | ClassNotFoundException e) {
+            log(INFO, NAME, "No groups file, creating one");
+            saveGroups(groups);
+            return groups;
+        }
+    }
+    
+    public static void saveGroups(List<Group> groups) {
+        try {
+            
+            List<String[]> groupParams = new ArrayList<>();
+            List<String> groupNames = new ArrayList<>();
+            for (Group group: groups) {
+                if (!group.isNullGroup()) {
+                    groupParams.add(group.getParams());
+                    groupNames.add(group.getName());
+                }
+            }
+            
+            saveObject("groups", groupParams);
+            saveObject("groupNames", groupNames);
+            
+            log(INFO, NAME, "Saved group list");
+            
+        } catch (Exception e) {
+            log(ERROR, NAME, "failed saving groups file: " + e.getMessage());
         }
     }
     
@@ -273,7 +322,7 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf((int) slider.getValue()));
-                entrySettings.todoListEntryStorage.saveEntries();
+                entrySettings.todoListEntryManager.saveEntriesAsync();
                 servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
@@ -357,7 +406,7 @@ public class Utilities {
     //switch listener for entry settings
     public static void addSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
-                                               final TodoListEntryStorage todoListEntryStorage,
+                                               final TodoListEntryManager todoListEntryManager,
                                                final TodoListEntry entry,
                                                final String parameter,
                                                final boolean initialValue) {
@@ -365,7 +414,7 @@ public class Utilities {
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.changeParameter(parameter, String.valueOf(isChecked));
             entry.setStateIconColor(stateIcon, parameter);
-            todoListEntryStorage.saveEntries();
+            todoListEntryManager.saveEntriesAsync();
             servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
@@ -417,13 +466,13 @@ public class Utilities {
     //color dialogue for entry settings
     public static void invokeColorDialogue(final TextView stateIcon,
                                            final EntrySettings settings,
-                                           final TodoListEntryStorage todoListEntryStorage,
+                                           final TodoListEntryManager todoListEntryManager,
                                            final TodoListEntry todoListEntry,
                                            final String parameter,
                                            final int initialValue) {
         invokeColorDialogue(stateIcon.getContext(), initialValue, (dialog, selectedColor, allColors) -> {
             todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
-            todoListEntryStorage.saveEntries();
+            todoListEntryManager.saveEntriesAsync();
             switch (parameter) {
                 case FONT_COLOR:
                     settings.updatePreviewFont(selectedColor);

@@ -31,7 +31,7 @@ import java.util.Locale;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.TodoListEntryStorage;
+import prototype.xd.scheduler.utilities.TodoListEntryManager;
 
 public class CalendarView {
     
@@ -70,7 +70,7 @@ public class CalendarView {
             }
         }
         
-        public void bind(CalendarDay elementDay, CalendarView calendarView, TodoListEntryStorage todoListEntryStorage) {
+        public void bind(CalendarDay elementDay, CalendarView calendarView, TodoListEntryManager todoListEntryManager) {
             Context context = calendarView.rootCalendarView.getContext();
             date = elementDay.getDate();
             textView.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
@@ -87,7 +87,7 @@ public class CalendarView {
                 textView.setTextColor(context.getColor(R.color.gray_harmonized));
             }
             
-            setEventIndicators(todoListEntryStorage.getEventIndicators(
+            setEventIndicators(todoListEntryManager.getEventIndicators(
                     date.toEpochDay(),
                     dayPosition != DayPosition.MonthDate,
                     context));
@@ -128,11 +128,12 @@ public class CalendarView {
     }
     
     LocalDate selectedDate;
+    YearMonth selectedMonth;
     com.kizitonwose.calendar.view.CalendarView rootCalendarView;
     DateChangeListener dateChangeListener;
     MonthChangeListener monthPreChangeListener;
     
-    public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoListEntryStorage todoListEntryStorage) {
+    public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoListEntryManager todoListEntryManager) {
         this.rootCalendarView = rootCalendarView;
         
         YearMonth currentMonth = YearMonth.now();
@@ -149,7 +150,7 @@ public class CalendarView {
             
             @Override
             public void bind(@NonNull CalendarDayViewContainer container, CalendarDay calendarDay) {
-                container.bind(calendarDay, CalendarView.this, todoListEntryStorage);
+                container.bind(calendarDay, CalendarView.this, todoListEntryManager);
             }
         });
         
@@ -163,11 +164,11 @@ public class CalendarView {
             @Override
             public void bind(@NonNull CalendarMonthViewContainer container, CalendarMonth calendarMonth) {
                 container.bind(calendarMonth, daysOfWeek);
+                selectedMonth = calendarMonth.getYearMonth();
                 if (monthPreChangeListener != null) {
-                    YearMonth yearMonth = calendarMonth.getYearMonth();
-                    monthPreChangeListener.onMonthChanged(calendarMonth,
-                            yearMonth.atDay(1).toEpochDay(),
-                            yearMonth.atEndOfMonth().toEpochDay(),
+                    monthPreChangeListener.onMonthChanged(
+                            selectedMonth.atDay(1).toEpochDay(),
+                            selectedMonth.atEndOfMonth().toEpochDay(),
                             rootCalendarView.getContext());
                 }
             }
@@ -208,6 +209,10 @@ public class CalendarView {
         rootCalendarView.notifyDateChanged(LocalDate.ofEpochDay(currentlySelectedDay));
     }
     
+    public void notifyCurrentMonthChanged() {
+        rootCalendarView.notifyMonthChanged(selectedMonth);
+    }
+    
     public void setOnMonthPreChangeListener(MonthChangeListener monthPreChangeListener) {
         this.monthPreChangeListener = monthPreChangeListener;
     }
@@ -219,7 +224,7 @@ public class CalendarView {
     
     @FunctionalInterface
     public interface MonthChangeListener {
-        void onMonthChanged(CalendarMonth calendarMonth, long firstVisibleDay, long lastVisibleDay, Context context);
+        void onMonthChanged(long firstVisibleDay, long lastVisibleDay, Context context);
     }
 }
 
