@@ -57,19 +57,25 @@ public class HomeFragment extends Fragment {
         todoListEntryManager.setCurrentDayIndicatorChangeListener(calendarView::notifyCurrentDayChanged);
         
         TextView statusText = view.findViewById(R.id.status_text);
+        // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             updateDate(selectedDate.toEpochDay(), true);
             todoListEntryManager.updateTodoListAdapter(false, false);
             updateStatusText(statusText);
         });
         
-        calendarView.setOnMonthPreChangeListener((firstVisibleDay, lastVisibleDay, context) ->
-                // load current month entries before displaying the data
-                todoListEntryManager.loadEntries(firstVisibleDay, lastVisibleDay)
-        );
-        
         // when all entries are loaded, update current month
-        todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(calendarView::notifyCurrentMonthChanged));
+        todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
+            // setup month listener, first month is loaded differently
+            calendarView.setOnMonthPreChangeListener((firstVisibleDay, lastVisibleDay, context) ->
+                    // load current month entries before displaying the data
+                    todoListEntryManager.loadEntries(firstVisibleDay, lastVisibleDay)
+            );
+            // update adapter showing entries
+            todoListEntryManager.updateTodoListAdapter(false, false);
+            // rebind all views updating indicators
+            calendarView.notifyCurrentMonthChanged();
+        }));
         
         view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> calendarView.selectDay(currentDay));
         
