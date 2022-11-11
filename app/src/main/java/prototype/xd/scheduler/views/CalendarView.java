@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
@@ -164,9 +165,11 @@ public class CalendarView {
             @Override
             public void bind(@NonNull CalendarMonthViewContainer container, CalendarMonth calendarMonth) {
                 container.bind(calendarMonth, daysOfWeek);
+                YearMonth prevMonth = selectedMonth;
                 selectedMonth = calendarMonth.getYearMonth();
                 if (monthPreChangeListener != null) {
                     monthPreChangeListener.onMonthChanged(
+                            prevMonth,
                             selectedMonth.atDay(1).toEpochDay(),
                             selectedMonth.atEndOfMonth().toEpochDay(),
                             rootCalendarView.getContext());
@@ -224,7 +227,7 @@ public class CalendarView {
     
     @FunctionalInterface
     public interface MonthChangeListener {
-        void onMonthChanged(long firstVisibleDay, long lastVisibleDay, Context context);
+        void onMonthChanged(@Nullable YearMonth prevMonth, long firstVisibleDay, long lastVisibleDay, Context context);
     }
 }
 

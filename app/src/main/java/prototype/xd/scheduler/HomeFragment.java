@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -41,16 +42,16 @@ public class HomeFragment extends Fragment {
     }
     
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        todoListEntryManager = new TodoListEntryManager(requireContext(), getLifecycle());
+    }
+    
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         
         View view = inflater.inflate(R.layout.home_fragment, container, false);
-        
-        ListView listView = view.findViewById(R.id.list);
-        listView.setDividerHeight(0);
-        
-        todoListEntryManager = new TodoListEntryManager(container);
-        
-        listView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
+        ((ListView) view.findViewById(R.id.list)).setAdapter(todoListEntryManager.getTodoListViewAdapter());
         
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryManager);
@@ -64,13 +65,17 @@ public class HomeFragment extends Fragment {
             updateStatusText(statusText);
         });
         
+        // setup month listener, first month is loaded differently
+        calendarView.setOnMonthPreChangeListener((prevMonth, firstVisibleDay, lastVisibleDay, context) -> {
+                    // load current month entries before displaying the data, skip first init
+                    if (prevMonth != null) {
+                        todoListEntryManager.loadEntries(firstVisibleDay, lastVisibleDay);
+                    }
+                }
+        );
+        
         // when all entries are loaded, update current month
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
-            // setup month listener, first month is loaded differently
-            calendarView.setOnMonthPreChangeListener((firstVisibleDay, lastVisibleDay, context) ->
-                    // load current month entries before displaying the data
-                    todoListEntryManager.loadEntries(firstVisibleDay, lastVisibleDay)
-            );
             // update adapter showing entries
             todoListEntryManager.updateTodoListAdapter(false, false);
             // rebind all views updating indicators
@@ -128,11 +133,5 @@ public class HomeFragment extends Fragment {
     private void updateStatusText(TextView statusText) {
         statusText.setText(getString(R.string.status, dateFromEpoch(currentlySelectedDay * 86400000),
                 todoListEntryManager.getCurrentlyVisibleEntriesCount()));
-    }
-    
-    @Override
-    public void onDestroy() {
-        todoListEntryManager = null;
-        super.onDestroy();
     }
 }

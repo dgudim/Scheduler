@@ -49,6 +49,7 @@ public class Logger {
             try {
                 logFile.createNewFile();
                 bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
+                logWorker.setDaemon(true);
                 logWorker.start();
             } catch (IOException e) {
                 fileEnabled = false;

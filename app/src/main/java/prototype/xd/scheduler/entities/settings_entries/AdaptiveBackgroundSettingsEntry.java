@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
-import static prototype.xd.scheduler.utilities.DateManager.AVAILABLE_DAYS;
+import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
@@ -44,7 +44,7 @@ public class AdaptiveBackgroundSettingsEntry extends SettingsEntry {
                     displayConfirmationDialogue(view1.getContext(), R.string.delete_all_saved_backgrounds_prompt,
                             R.string.cancel, R.string.delete,
                             view2 -> {
-                                for (String availableDay : AVAILABLE_DAYS) {
+                                for (String availableDay : WEEK_DAYS) {
                                     getFile(availableDay + ".png").delete();
                                     getFile(availableDay + ".png_min.png").delete();
                                 }

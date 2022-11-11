@@ -16,7 +16,11 @@ import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.material.color.MaterialColors;
 
@@ -34,8 +38,9 @@ import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.views.CalendarView;
 
-public class TodoListEntryManager {
+public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     public enum SaveType {
         ENTRIES, GROUPS, BOTH, NONE
@@ -46,6 +51,7 @@ public class TodoListEntryManager {
     private long loadedDay_start;
     private long loadedDay_end;
     
+    private @Nullable CalendarView calendarView;
     private final TodoListViewAdapter todoListViewAdapter;
     
     private List<SystemCalendar> calendars;
@@ -54,6 +60,7 @@ public class TodoListEntryManager {
     
     private Map<Long, List<Integer>> cachedIndicators;
     
+    private final Thread asyncSaver;
     private final Object saveSyncObject = new Object();
     private volatile SaveType saveType = SaveType.NONE;
     
@@ -63,10 +70,12 @@ public class TodoListEntryManager {
     
     private CurrentDayIndicatorChangeListener currentDayIndicatorChangeListener;
     
-    public TodoListEntryManager(final ViewGroup parent) {
-        this.todoListViewAdapter = new TodoListViewAdapter(this, parent);
+    public TodoListEntryManager(final Context context, final Lifecycle lifecycle) {
+        this.todoListViewAdapter = new TodoListViewAdapter(this, context);
         this.todoListEntries = new ArrayList<>();
-        this.groups = loadGroups(parent.getContext());
+        this.groups = loadGroups(context);
+        
+        lifecycle.addObserver(this);
         
         // load cached indicators immediately (~10ms)
         try {
@@ -79,17 +88,19 @@ public class TodoListEntryManager {
         // load calendars and static entries in a separate thread (~300ms)
         new Thread(() -> {
             long start = System.currentTimeMillis();
-            calendars = getAllCalendars(parent.getContext(), false);
-            todoListEntries.addAll(loadTodoEntries(parent.getContext(), currentDay - 30, currentDay + 30, groups, calendars));
+            calendars = getAllCalendars(context, false);
+            todoListEntries.addAll(loadTodoEntries(context, currentDay - 30, currentDay + 30, groups, calendars));
             initFinished = true;
             log(INFO, Thread.currentThread().getName(), "TodoListEntryStorage cold start complete in " +
                     (System.currentTimeMillis() - start) + "ms, loaded " + todoListEntries.size() + " entries");
             if (onInitFinishedRunnable != null) {
                 onInitFinishedRunnable.run();
+                // this runnable is one-shot, cleanup to avoid memory leaks
+                onInitFinishedRunnable = null;
             }
         }, "CFetch thread").start();
-        
-        new Thread("Async writer") {
+    
+        asyncSaver = new Thread("Async writer") {
             @Override
             public void run() {
                 synchronized (saveSyncObject) {
@@ -120,7 +131,13 @@ public class TodoListEntryManager {
                     } while (!isInterrupted());
                 }
             }
-        }.start();
+        };
+        asyncSaver.start();
+    }
+    
+    @Override
+    public void onDestroy(@NonNull LifecycleOwner owner) {
+        asyncSaver.interrupt();
     }
     
     public void onInitFinished(@NotNull Runnable onInitFinishedRunnable) {
@@ -130,6 +147,10 @@ public class TodoListEntryManager {
         } else {
             this.onInitFinishedRunnable = onInitFinishedRunnable;
         }
+    }
+    
+    public void bindToCalendarView() {
+    
     }
     
     public TodoListViewAdapter getTodoListViewAdapter() {
@@ -276,11 +297,6 @@ public class TodoListEntryManager {
     
     public void removeEntry(TodoListEntry entry) {
         todoListEntries.remove(entry);
-    }
-    
-    @FunctionalInterface
-    public interface OnInitFinishedListener {
-        void onInitFinished();
     }
     
     public void setCurrentDayIndicatorChangeListener(CurrentDayIndicatorChangeListener currentDayIndicatorChangeListener) {

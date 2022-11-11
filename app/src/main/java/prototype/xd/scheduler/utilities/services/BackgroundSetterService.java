@@ -30,7 +30,6 @@ import androidx.core.content.ContextCompat;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.LockScreenBitmapDrawer;
 import prototype.xd.scheduler.utilities.PreferencesStore;
 
 public class BackgroundSetterService extends Service {
@@ -63,7 +62,7 @@ public class BackgroundSetterService extends Service {
     
     private NotificationCompat.Builder getForegroundNotification() {
         if (foregroundNotification == null) {
-            foregroundNotification = new NotificationCompat.Builder(getApplicationContext(), getForegroundNotificationChannelId())
+            foregroundNotification = new NotificationCompat.Builder(getApplicationContext(), getNotificationChannelId())
                     .setSmallIcon(R.drawable.ic_settings)
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSound(null)
@@ -76,45 +75,45 @@ public class BackgroundSetterService extends Service {
     }
     
     // Notification channel name
-    private String foregroundNotificationChannelName = null;
+    private String notificationChannelName = null;
     
-    private String getForegroundNotificationChannelName() {
-        if (foregroundNotificationChannelName == null) {
-            foregroundNotificationChannelName = getString(R.string.service_name);
+    private String getNotificationChannelName() {
+        if (notificationChannelName == null) {
+            notificationChannelName = getString(R.string.service_name);
         }
-        return foregroundNotificationChannelName;
+        return notificationChannelName;
     }
     
     
     // Notification channel description
-    private String foregroundNotificationChannelDescription = null;
+    private String notificationChannelDescription = null;
     
-    private String getForegroundNotificationChannelDescription() {
-        if (foregroundNotificationChannelDescription == null) {
-            foregroundNotificationChannelDescription = getString(R.string.service_description);
+    private String getNotificationChannelDescription() {
+        if (notificationChannelDescription == null) {
+            notificationChannelDescription = getString(R.string.service_description);
         }
-        return foregroundNotificationChannelDescription;
+        return notificationChannelDescription;
     }
     
     // Notification channel id
-    private String foregroundNotificationChannelId = null;
+    private String notificationChannelId = null;
     private NotificationManager notificationManager;
     
-    public String getForegroundNotificationChannelId() {
-        if (foregroundNotificationChannelId == null) {
-            foregroundNotificationChannelId = "BackgroundSetterService.NotificationChannel";
+    public String getNotificationChannelId() {
+        if (notificationChannelId == null) {
+            notificationChannelId = "BackgroundSetterService.NotificationChannel";
             
             notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             
-            if (notificationManager.getNotificationChannel(foregroundNotificationChannelId) == null) {
+            if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
                 NotificationChannel nc = new NotificationChannel(
-                        getForegroundNotificationChannelId(),
-                        getForegroundNotificationChannelName(),
+                        getNotificationChannelId(),
+                        getNotificationChannelName(),
                         NotificationManager.IMPORTANCE_MIN
                 );
                 // Discrete notification setup
                 notificationManager.createNotificationChannel(nc);
-                nc.setDescription(getForegroundNotificationChannelDescription());
+                nc.setDescription(getNotificationChannelDescription());
                 nc.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
                 nc.setVibrationPattern(null);
                 nc.setSound(null, null);
@@ -122,7 +121,7 @@ public class BackgroundSetterService extends Service {
             }
             
         }
-        return foregroundNotificationChannelId;
+        return notificationChannelId;
     }
     
     private void updateNotification() {

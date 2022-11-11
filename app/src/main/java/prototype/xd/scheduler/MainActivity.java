@@ -3,7 +3,7 @@ package prototype.xd.scheduler;
 import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
-import static prototype.xd.scheduler.utilities.DateManager.AVAILABLE_DAYS;
+import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                         InputStream stream = getContentResolver().openInputStream(uri);
                         if (stream != null) {
                             fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                                    new File(getRootDir(), AVAILABLE_DAYS[requestCode] + ".png"));
+                                    new File(getRootDir(), WEEK_DAYS[requestCode] + ".png"));
                             stream.close();
                         } else {
                             log(ERROR, NAME, "stream null for uri: " + uri.getPath());

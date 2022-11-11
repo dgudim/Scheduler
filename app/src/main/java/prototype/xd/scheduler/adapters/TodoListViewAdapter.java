@@ -11,6 +11,7 @@ import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,13 +43,15 @@ public class TodoListViewAdapter extends BaseAdapter {
     private final EntrySettings entrySettings;
     private final SystemCalendarSettings systemCalendarSettings;
     
-    public TodoListViewAdapter(final TodoListEntryManager todoListEntryManager, final ViewGroup parent) {
+    // no need to pass parent to vies used by dialogs
+    @SuppressLint("InflateParams")
+    public TodoListViewAdapter(final TodoListEntryManager todoListEntryManager, final Context context) {
         this.todoListEntryManager = todoListEntryManager;
         currentTodoListEntries = new ArrayList<>();
         entrySettings = new EntrySettings(todoListEntryManager,
-                LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
+                LayoutInflater.from(context).inflate(R.layout.entry_settings, null, false));
         systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager,
-                LayoutInflater.from(parent.getContext()).inflate(R.layout.entry_settings, parent, false));
+                LayoutInflater.from(context).inflate(R.layout.entry_settings, null, false));
     }
     
     @Override

@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.utilities;
+package prototype.xd.scheduler.utilities.services;
 
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
@@ -9,8 +9,8 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.makeMutable;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.DEFAULT_BACKGROUND_NAME;
+import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.getBackgroundAccordingToDayAndTime;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_SCALED_DENSITY;
@@ -51,14 +51,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
+import prototype.xd.scheduler.utilities.Keys;
 
-public class LockScreenBitmapDrawer {
+class LockScreenBitmapDrawer {
     
     private static final String NAME = "Lockscreen bitmap drawer";
     
@@ -259,6 +260,24 @@ public class LockScreenBitmapDrawer {
         
         rootView.draw(canvas);
     }
+    
+    private File getBackgroundAccordingToDayAndTime() {
+        
+        if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED)) {
+            return getFile(DEFAULT_BACKGROUND_NAME);
+        }
+        
+        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        CharSequence dayString;
+        if (day == 1) {
+            dayString = WEEK_DAYS[6];
+        } else {
+            dayString = WEEK_DAYS[day - 2];
+        }
+        
+        return getFile(dayString + ".png");
+    }
+    
     
     private List<TodoListEntry> filterEntries(List<TodoListEntry> entries) {
         List<TodoListEntry> toAdd = new ArrayList<>();
