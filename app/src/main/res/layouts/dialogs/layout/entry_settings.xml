@@ -340,7 +340,7 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/backgroundColor"
+                            android:id="@+id/background_color_selector"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_margin="5dp"
@@ -349,7 +349,7 @@
                             app:strokeWidth="0dp"/>
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/fontColor"
+                            android:id="@+id/font_color_selector"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_margin="5dp"
@@ -358,7 +358,7 @@
                             app:strokeWidth="0dp" />
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/borderColor"
+                            android:id="@+id/border_color_selector"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_margin="5dp"
@@ -450,7 +450,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/bevel_size_state"
+                        android:id="@+id/border_thickness_state"
                         android:layout_width="15dp"
                         android:layout_height="match_parent"
                         android:gravity="center"
@@ -466,7 +466,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/bevel_thickness_description"
+                            android:id="@+id/border_thickness_description"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
@@ -474,7 +474,7 @@
                             android:textAppearance="@style/SmallHeading" />
 
                         <com.google.android.material.slider.Slider
-                            android:id="@+id/bevel_thickness_bar"
+                            android:id="@+id/border_thickness_bar"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:stepSize="1.0"
@@ -502,7 +502,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/days_beforehand_state"
+                    android:id="@+id/show_days_upcoming_state"
                     android:layout_width="15dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -518,7 +518,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/show_days_beforehand_description"
+                        android:id="@+id/show_days_upcoming_description"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
@@ -526,7 +526,7 @@
                         android:textAppearance="@style/SmallHeading" />
 
                     <com.google.android.material.slider.Slider
-                        android:id="@+id/show_days_beforehand_bar"
+                        android:id="@+id/show_days_upcoming_bar"
                         style="@style/Widget.AppCompat.SeekBar.Discrete"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -553,7 +553,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/days_after_state"
+                    android:id="@+id/show_days_expired_state"
                     android:layout_width="15dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -569,7 +569,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/show_days_after_description"
+                        android:id="@+id/show_days_expired_description"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
@@ -577,7 +577,7 @@
                         android:textAppearance="@style/SmallHeading" />
 
                     <com.google.android.material.slider.Slider
-                        android:id="@+id/show_days_after_bar"
+                        android:id="@+id/show_days_expired_bar"
                         style="@style/Widget.AppCompat.SeekBar.Discrete"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

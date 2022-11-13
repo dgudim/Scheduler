@@ -15,19 +15,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.List;
 import java.util.Objects;
 
+import prototype.xd.scheduler.databinding.HomeFragmentBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
@@ -36,6 +33,7 @@ import prototype.xd.scheduler.views.CalendarView;
 public class HomeFragment extends Fragment {
     
     private volatile TodoListEntryManager todoListEntryManager;
+    private HomeFragmentBinding binding;
     
     public HomeFragment() {
         super();
@@ -48,21 +46,21 @@ public class HomeFragment extends Fragment {
     }
     
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         
-        View view = inflater.inflate(R.layout.home_fragment, container, false);
-        ((ListView) view.findViewById(R.id.list)).setAdapter(todoListEntryManager.getTodoListViewAdapter());
+        binding = HomeFragmentBinding.inflate(inflater, container, false);
+        
+        binding.list.setAdapter(todoListEntryManager.getTodoListViewAdapter());
         
         // construct custom calendar view
-        CalendarView calendarView = new CalendarView(view.findViewById(R.id.calendar), todoListEntryManager);
-        todoListEntryManager.setCurrentDayIndicatorChangeListener(calendarView::notifyCurrentDayChanged);
+        CalendarView calendarView = new CalendarView(binding.calendar, todoListEntryManager);
+        todoListEntryManager.bindToCalendarView(calendarView);
         
-        TextView statusText = view.findViewById(R.id.status_text);
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             updateDate(selectedDate.toEpochDay(), true);
             todoListEntryManager.updateTodoListAdapter(false, false);
-            updateStatusText(statusText);
+            updateStatusText();
         });
         
         // setup month listener, first month is loaded differently
@@ -82,9 +80,9 @@ public class HomeFragment extends Fragment {
             calendarView.notifyCurrentMonthChanged();
         }));
         
-        view.findViewById(R.id.to_current_date_button).setOnClickListener(v -> calendarView.selectDay(currentDay));
+        binding.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
         
-        view.<FloatingActionButton>findViewById(R.id.fab).setOnClickListener(view1 -> {
+        binding.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoListEntryManager.getGroups();
             displayEditTextSpinnerDialogue(view1.getContext(), R.string.add_event_fab, -1, R.string.event_name_input_hint,
                     R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
@@ -110,7 +108,7 @@ public class HomeFragment extends Fragment {
                     });
         });
         
-        view.findViewById(R.id.openSettingsButton).setOnClickListener(v ->
+        binding.openSettingsButton.setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(
                         requireActivity()
                                 .getSupportFragmentManager()
@@ -118,20 +116,25 @@ public class HomeFragment extends Fragment {
                         .getNavController()
                         .navigate(R.id.action_HomeFragment_to_SettingsFragment));
         
-        return view;
+        return binding.getRoot();
+    }
+    
+    @Override
+    public void onDestroyView() {
+        // remove reference to ui elements
+        todoListEntryManager.unbindCalendarView();
+        super.onDestroyView();
     }
     
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
         updateDate(DAY_FLAG_GLOBAL, true);
-        
-        updateStatusText(view.findViewById(R.id.status_text));
+        updateStatusText();
     }
     
-    private void updateStatusText(TextView statusText) {
-        statusText.setText(getString(R.string.status, dateFromEpoch(currentlySelectedDay * 86400000),
+    private void updateStatusText() {
+        binding.statusText.setText(getString(R.string.status, dateFromEpoch(currentlySelectedDay * 86400000),
                 todoListEntryManager.getCurrentlyVisibleEntriesCount()));
     }
 }

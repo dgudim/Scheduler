@@ -1,10 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
+
     signingConfigs {
         release {
         }
     }
+
     compileSdkVersion 33
     buildToolsVersion "33.0.0"
 
@@ -29,10 +31,16 @@ android {
             jniDebuggable true
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
         sourceCompatibility JavaVersion.VERSION_1_8
     }
+
     namespace 'prototype.xd.scheduler'
     sourceSets {
         main {
@@ -57,7 +65,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.5.3'
     implementation 'androidx.navigation:navigation-ui:2.5.3'
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
-    implementation 'com.kizitonwose.calendar:view:2.0.1'
+    implementation 'com.kizitonwose.calendar:view:2.0.2'
     implementation 'com.github.AppIntro:AppIntro:6.2.0'
     implementation 'org.dmfs:lib-recur:0.12.2'
     implementation 'androidx.appcompat:appcompat:1.5.1'

@@ -5,12 +5,9 @@ import static android.util.Log.INFO;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
-import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
-import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
@@ -19,12 +16,14 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEn
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -53,7 +52,6 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
-import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntry;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
@@ -167,7 +165,7 @@ public class Utilities {
             
             List<String[]> groupParams = new ArrayList<>();
             List<String> groupNames = new ArrayList<>();
-            for (Group group: groups) {
+            for (Group group : groups) {
                 if (!group.isNullGroup()) {
                     groupParams.add(group.getParams());
                     groupNames.add(group.getName());
@@ -241,10 +239,15 @@ public class Utilities {
         return merged;
     }
     
+    @FunctionalInterface
+    public interface SliderOnChangeKeyedListener {
+        void onValueChanged(@NonNull Slider slider, float value, boolean fromUser, String key);
+    }
+    
     //listener for general settings
-    public static void addSliderChangeListener(final TextView displayTo,
+    public static void setSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
-                                               @Nullable final CompoundCustomizationEntry customizationEntry,
+                                               @Nullable final SliderOnChangeKeyedListener onChangeListener,
                                                @StringRes final int stringResource,
                                                final String key,
                                                final int defaultValue,
@@ -257,6 +260,7 @@ public class Utilities {
             displayTo.setText(displayTo.getContext().getString(stringResource, loadedVal));
         }
         slider.setValue(preferences.getInt(key, defaultValue));
+        slider.clearOnChangeListeners();
         slider.addOnChangeListener((listenerSlider, progress, fromUser) -> {
             if (fromUser) {
                 if (progress == 0 && zeroIsOff) {
@@ -264,22 +268,12 @@ public class Utilities {
                 } else {
                     displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
                 }
-                if (customizationEntry != null) {
-                    switch (key) {
-                        case UPCOMING_BORDER_THICKNESS:
-                            customizationEntry.updateUpcomingPreviewBorderThickness((int) progress);
-                            break;
-                        case EXPIRED_BORDER_THICKNESS:
-                            customizationEntry.updateExpiredPreviewBorderThickness((int) progress);
-                            break;
-                        case BORDER_THICKNESS:
-                        default:
-                            customizationEntry.updateCurrentPreviewBorderThickness((int) progress);
-                            break;
-                    }
+                if (onChangeListener != null) {
+                    onChangeListener.onValueChanged(listenerSlider, progress, true, key);
                 }
             }
         });
+        slider.clearOnSliderTouchListeners();
         slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
@@ -295,24 +289,26 @@ public class Utilities {
     }
     
     //listener for entry settings
-    public static void addSliderChangeListener(final TextView displayTo,
+    public static void setSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
                                                final TextView stateIcon,
                                                final EntrySettings entrySettings,
-                                               final boolean mapToBorderPreview,
+                                               @Nullable final View borderView,
                                                @StringRes final int stringResource,
                                                final String parameter,
                                                final int initialValue) {
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
         slider.setValue(initialValue);
+        slider.clearOnChangeListeners();
         slider.addOnChangeListener((slider1, progress, fromUser) -> {
             if (fromUser) {
                 displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
-                if (mapToBorderPreview) {
-                    entrySettings.preview_border.setPadding((int) progress, (int) progress, (int) progress, 0);
+                if (borderView != null) {
+                    borderView.setPadding((int) progress, (int) progress, (int) progress, 0);
                 }
             }
         });
+        slider.clearOnSliderTouchListeners();
         slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
@@ -329,11 +325,11 @@ public class Utilities {
     }
     
     //listener for calendar settings
-    public static void addSliderChangeListener(final TextView displayTo,
+    public static void setSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
                                                final TextView stateIcon,
                                                final SystemCalendarSettings systemCalendarSettings,
-                                               final boolean mapToBorderPreview,
+                                               @Nullable final View borderView,
                                                @StringRes final int stringResource,
                                                final String calendarKey,
                                                final List<String> calendarSubKeys,
@@ -344,16 +340,18 @@ public class Utilities {
         int initialValue = preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue);
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
         slider.setValue(initialValue);
+        slider.clearOnChangeListeners();
         slider.addOnChangeListener((slider1, progress, fromUser) -> {
             if (customProgressListener != null)
                 customProgressListener.onValueChange(slider1, progress, fromUser);
             if (fromUser) {
                 displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
-                if (mapToBorderPreview) {
-                    systemCalendarSettings.preview_border.setPadding((int) progress, (int) progress, (int) progress, 0);
+                if (borderView != null) {
+                    borderView.setPadding((int) progress, (int) progress, (int) progress, 0);
                 }
             }
         });
+        slider.clearOnSliderTouchListeners();
         slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
@@ -370,22 +368,22 @@ public class Utilities {
         });
     }
     
-    public static void addSliderChangeListener(final TextView displayTo,
+    public static void setSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
                                                final TextView stateIcon,
                                                final SystemCalendarSettings systemCalendarSettings,
-                                               final boolean mapToBorderPreview,
+                                               @Nullable final View borderView,
                                                final int stringResource,
                                                final String calendarKey,
                                                final List<String> calendarSubKeys,
                                                final String parameter,
                                                final int defaultValue) {
-        addSliderChangeListener(
+        setSliderChangeListener(
                 displayTo,
                 slider,
                 stateIcon,
                 systemCalendarSettings,
-                mapToBorderPreview,
+                borderView,
                 stringResource,
                 calendarKey,
                 calendarSubKeys,
@@ -395,7 +393,7 @@ public class Utilities {
     }
     
     //switch listener for regular settings
-    public static void addSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue) {
+    public static void setSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue) {
         tSwitch.setCheckedSilent(preferences.getBoolean(key, defaultValue));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             preferences.edit().putBoolean(key, isChecked).apply();
@@ -404,7 +402,7 @@ public class Utilities {
     }
     
     //switch listener for entry settings
-    public static void addSwitchChangeListener(final Switch tSwitch,
+    public static void setSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
                                                final TodoListEntryManager todoListEntryManager,
                                                final TodoListEntry entry,
@@ -420,7 +418,7 @@ public class Utilities {
     }
     
     //switch listener for calendar settings
-    public static void addSwitchChangeListener(final Switch tSwitch,
+    public static void setSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
                                                final SystemCalendarSettings systemCalendarSettings,
                                                final String calendarKey,
@@ -437,30 +435,11 @@ public class Utilities {
     
     //color dialogue for general settings
     public static void invokeColorDialogue(final CardView target,
-                                           final CompoundCustomizationEntry customizationEntry,
+                                           final ColorPickerKeyedClickListener clickListener,
                                            final String key,
                                            final int defaultValue) {
-        invokeColorDialogue(target.getContext(), preferences.getInt(key, defaultValue), (dialog, selectedColor, allColors) -> {
-            preferences.edit().putInt(key, selectedColor).apply();
-            switch (key) {
-                case Keys.UPCOMING_BG_COLOR:
-                case Keys.BG_COLOR:
-                case Keys.EXPIRED_BG_COLOR:
-                    customizationEntry.updatePreviewBgs();
-                    break;
-                case Keys.UPCOMING_FONT_COLOR:
-                case Keys.FONT_COLOR:
-                case Keys.EXPIRED_FONT_COLOR:
-                    customizationEntry.updatePreviewFonts();
-                    break;
-                case Keys.UPCOMING_BORDER_COLOR:
-                case Keys.BORDER_COLOR:
-                case Keys.EXPIRED_BORDER_COLOR:
-                    customizationEntry.updatePreviewBorders();
-                    break;
-            }
-            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-        });
+        invokeColorDialogue(target.getContext(), preferences.getInt(key, defaultValue),
+                (dialogInterface, lastSelectedColor, allColors) -> clickListener.onClick(dialogInterface, lastSelectedColor, key, allColors));
     }
     
     //color dialogue for entry settings
@@ -526,6 +505,11 @@ public class Utilities {
                 .setPositiveButton(context.getString(R.string.apply), listener)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                 }).build().show();
+    }
+    
+    @FunctionalInterface
+    public interface ColorPickerKeyedClickListener {
+        void onClick(DialogInterface dialogInterface, int lastSelectedColor, String colorKey, Integer[] allColors);
     }
     
     public static boolean datesEqual(LocalDate date1, LocalDate date2) {

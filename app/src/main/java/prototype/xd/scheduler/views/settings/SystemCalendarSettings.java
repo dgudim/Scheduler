@@ -9,18 +9,19 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKe
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
-import static prototype.xd.scheduler.utilities.Utilities.addSliderChangeListener;
-import static prototype.xd.scheduler.utilities.Utilities.addSwitchChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.setSliderChangeListener;
+import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.List;
@@ -30,6 +31,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
+import prototype.xd.scheduler.utilities.Utilities;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
@@ -39,18 +41,19 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     private TextWatcher currentListener;
     
-    public SystemCalendarSettings(@Nullable final TodoListEntryManager todoListEntryManager, final View settingsView) {
-        super(settingsView);
+    public SystemCalendarSettings(@Nullable final TodoListEntryManager todoListEntryManager, @NonNull final Context context) {
+        super(context);
         
-        settingsView.findViewById(R.id.group_selector).setVisibility(View.GONE);
+        bnd.groupSelector.setVisibility(View.GONE);
         
         this.todoListEntryManager = todoListEntryManager;
         
-        dialog = new AlertDialog.Builder(settingsView.getContext(), R.style.FullScreenDialog).setOnDismissListener(dialog -> {
-            if (todoListEntryManager != null) {
-                todoListEntryManager.updateTodoListAdapter(false, true);
-            }
-        }).setView(settingsView).create();
+        dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
+                .setOnDismissListener(dialog -> {
+                    if (todoListEntryManager != null) {
+                        todoListEntryManager.updateTodoListAdapter(false, true);
+                    }
+                }).setView(bnd.getRoot()).create();
     }
     
     public void show(final String calendar_key) {
@@ -66,7 +69,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     private void initialise(final String calendarKey) {
         
-        titleText.setText(calendarKeyToReadable(dialog.getContext(), calendarKey));
+        bnd.entrySettingsTitle.setText(calendarKeyToReadable(dialog.getContext(), calendarKey));
         
         calendarSubKeys = generateSubKeysFromKey(calendarKey);
         
@@ -77,7 +80,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         updateAllIndicators();
         
-        settings_reset_button.setOnClickListener(v ->
+        bnd.settingsResetButton.setOnClickListener(v ->
                 displayConfirmationDialogue(v.getContext(),
                         R.string.reset_settings_prompt,
                         R.string.cancel, R.string.reset, v1 -> {
@@ -92,81 +95,81 @@ public class SystemCalendarSettings extends PopupSettingsView {
                             initialise(calendarKey);
                         }));
         
-        fontColor_select.setOnClickListener(view -> invokeColorDialogue(
-                fontColor_view_state, this,
+        bnd.fontColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                bnd.fontColorState, this,
                 calendarKey, calendarSubKeys,
                 Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR));
         
-        bgColor_select.setOnClickListener(view -> invokeColorDialogue(
-                bgColor_view_state, this,
+        bnd.backgroundColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                bnd.backgroundColorState, this,
                 calendarKey, calendarSubKeys,
                 Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR));
         
-        borderColor_select.setOnClickListener(view -> invokeColorDialogue(
-                padColor_view_state, this,
+        bnd.borderColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                bnd.borderColorState, this,
                 calendarKey, calendarSubKeys,
                 Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR));
         
-        addSliderChangeListener(
-                border_thickness_description,
-                border_thickness_bar, border_size_state,
-                this, true, R.string.settings_border_thickness,
+        setSliderChangeListener(
+                bnd.borderThicknessDescription,
+                bnd.borderThicknessBar, bnd.borderThicknessState,
+                this, bnd.previewBorder, R.string.settings_border_thickness,
                 calendarKey, calendarSubKeys,
                 Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
         
-        addSliderChangeListener(
-                priority_description,
-                priority_bar, priority_state,
-                this, false, R.string.settings_priority,
+        setSliderChangeListener(
+                bnd.priorityDescription,
+                bnd.priorityBar, bnd.priorityState,
+                this, null, R.string.settings_priority,
                 calendarKey, calendarSubKeys,
                 Keys.PRIORITY, Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
         
-        addSliderChangeListener(
-                adaptive_color_balance_description,
-                adaptive_color_balance_bar, adaptiveColor_bar_state,
-                this, false, R.string.settings_adaptive_color_balance,
+        setSliderChangeListener(
+                bnd.adaptiveColorBalanceDescription,
+                bnd.adaptiveColorBalanceBar, bnd.adaptiveColorBalanceState,
+                this, null, R.string.settings_adaptive_color_balance,
                 calendarKey, calendarSubKeys,
                 Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
         
-        addSliderChangeListener(
-                show_days_beforehand_description,
-                show_days_beforehand_bar, showDaysUpcoming_bar_state,
-                this, false, R.string.settings_show_days_upcoming,
+        setSliderChangeListener(
+                bnd.showDaysUpcomingDescription,
+                bnd.showDaysUpcomingBar, bnd.showDaysUpcomingState,
+                this, null, R.string.settings_show_days_upcoming,
                 calendarKey, calendarSubKeys,
                 Keys.UPCOMING_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
         
-        addSliderChangeListener(
-                show_days_after_description,
-                show_days_after_bar, showDaysExpired_bar_state,
-                this, false, R.string.settings_show_days_expired,
+        Utilities.setSliderChangeListener(
+                bnd.showDaysExpiredDescription,
+                bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
+                this, null, R.string.settings_show_days_expired,
                 calendarKey, calendarSubKeys,
                 Keys.EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET,
                 (slider, value, fromUser) ->
-                        hide_expired_items_by_time_switch.setTextColor(slider.getValue() == 0 ?
-                                hide_expired_items_by_time_switch_def_colors :
-                                ColorStateList.valueOf(slider.getContext().getColor(R.color.entry_settings_parameter_group_and_personal))), null);
+                        bnd.hideExpiredItemsByTimeSwitch.setTextColor(value == 0 ?
+                                defaultTextColor :
+                                slider.getContext().getColor(R.color.entry_settings_parameter_group_and_personal)), null);
         
-        addSwitchChangeListener(
-                hide_expired_items_by_time_switch,
-                hide_expired_items_by_time_state, this,
+        setSwitchChangeListener(
+                bnd.hideExpiredItemsByTimeSwitch,
+                bnd.hideExpiredItemsByTimeState, this,
                 calendarKey, calendarSubKeys,
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME);
         
-        addSwitchChangeListener(
-                show_on_lock_switch,
-                show_on_lock_state, this,
+        setSwitchChangeListener(
+                bnd.showOnLockSwitch,
+                bnd.showOnLockState, this,
                 calendarKey, calendarSubKeys,
                 Keys.SHOW_ON_LOCK, Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
         
-        addSwitchChangeListener(
-                hide_by_content_switch,
-                hide_by_content_switch_state, this,
+        setSwitchChangeListener(
+                bnd.hideByContentSwitch,
+                bnd.hideByContentSwitchState, this,
                 calendarKey, calendarSubKeys,
                 Keys.HIDE_ENTRIES_BY_CONTENT, Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT);
         
-        hide_by_content_field.setText(preferences.getString(getFirstValidKey(calendarSubKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), ""));
+        bnd.hideByContentField.setText(preferences.getString(getFirstValidKey(calendarSubKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), ""));
         if (currentListener != null) {
-            hide_by_content_field.removeTextChangedListener(currentListener);
+            bnd.hideByContentField.removeTextChangedListener(currentListener);
         }
         currentListener = new TextWatcher() {
             @Override
@@ -177,7 +180,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 preferences.edit().putString(calendarKey + "_" + Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT, s.toString()).apply();
-                setStateIconColor(hide_by_content_field_state, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT);
+                setStateIconColor(bnd.hideByContentFieldState, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT);
                 servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
             
@@ -186,7 +189,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 //ignore
             }
         };
-        hide_by_content_field.addTextChangedListener(currentListener);
+        bnd.hideByContentField.addTextChangedListener(currentListener);
     }
     
     @Override

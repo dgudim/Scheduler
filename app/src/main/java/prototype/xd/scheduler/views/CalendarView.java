@@ -8,13 +8,11 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
 import com.kizitonwose.calendar.core.CalendarDay;
 import com.kizitonwose.calendar.core.CalendarMonth;
@@ -31,6 +29,8 @@ import java.util.List;
 import java.util.Locale;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.databinding.CalendarDayLayoutBinding;
+import prototype.xd.scheduler.databinding.CalendarHeaderBinding;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 
@@ -38,54 +38,45 @@ public class CalendarView {
     
     static class CalendarDayViewContainer extends ViewContainer {
         
-        TextView textView;
-        
         private static final int MAX_INDICATORS = 4;
-        View[] eventIndicators;
         
-        private final MaterialCardView cardView;
+        private final CalendarDayLayoutBinding binding;
         private LocalDate date;
         
-        public CalendarDayViewContainer(@NonNull View view, CalendarView container) {
-            super(view);
-            textView = view.findViewById(R.id.calendarDayText);
-            cardView = view.findViewById(R.id.calendarDayCard);
-            
-            eventIndicators = new View[MAX_INDICATORS];
-            eventIndicators[0] = view.findViewById(R.id.event_indicator1);
-            eventIndicators[1] = view.findViewById(R.id.event_indicator2);
-            eventIndicators[2] = view.findViewById(R.id.event_indicator3);
-            eventIndicators[3] = view.findViewById(R.id.event_indicator4);
-            
-            cardView.setOnClickListener(v -> container.selectDate(date));
+        public CalendarDayViewContainer(@NonNull CalendarDayLayoutBinding bnd, CalendarView container) {
+            super(bnd.getRoot());
+            binding = bnd;
+            bnd.calendarDayCard.setOnClickListener(v -> container.selectDate(date));
         }
         
         private void setEventIndicators(List<ColorStateList> eventIndicatorColors) {
             for (int i = 0; i < MAX_INDICATORS; i++) {
+                // first index is day text itself
+                View eventIndicator = binding.eventIndicatorContainer.getChildAt(i + 1);
                 if (eventIndicatorColors.size() <= i) {
-                    eventIndicators[i].setVisibility(View.INVISIBLE);
+                    eventIndicator.setVisibility(View.INVISIBLE);
                     continue;
                 }
-                eventIndicators[i].setVisibility(View.VISIBLE);
-                eventIndicators[i].setBackgroundTintList(eventIndicatorColors.get(i));
+                eventIndicator.setVisibility(View.VISIBLE);
+                eventIndicator.setBackgroundTintList(eventIndicatorColors.get(i));
             }
         }
         
         public void bind(CalendarDay elementDay, CalendarView calendarView, TodoListEntryManager todoListEntryManager) {
             Context context = calendarView.rootCalendarView.getContext();
             date = elementDay.getDate();
-            textView.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
+            binding.calendarDayText.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
             
             DayPosition dayPosition = elementDay.component2();
             
             if (dayPosition == DayPosition.MonthDate) {
                 if (datesEqual(date, DateManager.currentDate)) {
-                    textView.setTextColor(MaterialColors.getColor(context, R.attr.colorPrimary, Color.WHITE));
+                    binding.calendarDayText.setTextColor(MaterialColors.getColor(context, R.attr.colorPrimary, Color.WHITE));
                 } else {
-                    textView.setTextColor(MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE));
+                    binding.calendarDayText.setTextColor(MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE));
                 }
             } else {
-                textView.setTextColor(context.getColor(R.color.gray_harmonized));
+                binding.calendarDayText.setTextColor(context.getColor(R.color.gray_harmonized));
             }
             
             setEventIndicators(todoListEntryManager.getEventIndicators(
@@ -94,35 +85,33 @@ public class CalendarView {
                     context));
             
             if (datesEqual(date, calendarView.selectedDate) && dayPosition == DayPosition.MonthDate) {
-                cardView.setStrokeColor(MaterialColors.getColor(context, R.attr.colorAccent, Color.WHITE));
-                cardView.setCardBackgroundColor(MaterialColors.getColor(context, R.attr.colorSurfaceVariant, Color.WHITE));
+                binding.calendarDayCard.setStrokeColor(MaterialColors.getColor(context, R.attr.colorAccent, Color.WHITE));
+                binding.calendarDayCard.setCardBackgroundColor(MaterialColors.getColor(context, R.attr.colorSurfaceVariant, Color.WHITE));
             } else {
-                cardView.setStrokeColor(Color.TRANSPARENT);
-                cardView.setCardBackgroundColor(Color.TRANSPARENT);
+                binding.calendarDayCard.setStrokeColor(Color.TRANSPARENT);
+                binding.calendarDayCard.setCardBackgroundColor(Color.TRANSPARENT);
             }
         }
         
     }
     
-    static class CalendarMonthViewContainer extends ViewContainer {
+    static class CalendarHeaderContainer extends ViewContainer {
         
-        ViewGroup weekday_titles;
-        TextView month_title;
+        private final CalendarHeaderBinding binding;
         
-        public CalendarMonthViewContainer(@NonNull View view) {
-            super(view);
-            weekday_titles = view.findViewById(R.id.weekday_titles_container);
-            month_title = view.findViewById(R.id.month_title);
+        public CalendarHeaderContainer(@NonNull CalendarHeaderBinding bnd) {
+            super(bnd.getRoot());
+            binding = bnd;
         }
         
         public void bind(CalendarMonth calendarMonth, List<DayOfWeek> daysOfWeek) {
-            if (weekday_titles.getTag() == null) {
-                weekday_titles.setTag(calendarMonth.getYearMonth());
+            if (binding.weekdayTitlesContainer.getTag() == null) {
+                binding.weekdayTitlesContainer.setTag(calendarMonth.getYearMonth());
                 for (int i = 0; i < daysOfWeek.size(); i++) {
-                    ((TextView) weekday_titles.getChildAt(i)).setText(daysOfWeek.get(i).getDisplayName(TextStyle.SHORT, Locale.getDefault()));
+                    ((TextView) binding.weekdayTitlesContainer.getChildAt(i)).setText(daysOfWeek.get(i).getDisplayName(TextStyle.SHORT, Locale.getDefault()));
                 }
             }
-            month_title.setText(String.format(Locale.getDefault(), "%s %d",
+            binding.monthTitle.setText(String.format(Locale.getDefault(), "%s %d",
                     calendarMonth.getYearMonth().getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()),
                     calendarMonth.getYearMonth().getYear()));
         }
@@ -146,7 +135,7 @@ public class CalendarView {
             @NonNull
             @Override
             public CalendarDayViewContainer create(@NonNull View view) {
-                return new CalendarDayViewContainer(view, CalendarView.this);
+                return new CalendarDayViewContainer(CalendarDayLayoutBinding.bind(view), CalendarView.this);
             }
             
             @Override
@@ -155,15 +144,15 @@ public class CalendarView {
             }
         });
         
-        rootCalendarView.setMonthHeaderBinder(new MonthHeaderFooterBinder<CalendarMonthViewContainer>() {
+        rootCalendarView.setMonthHeaderBinder(new MonthHeaderFooterBinder<CalendarHeaderContainer>() {
             @NonNull
             @Override
-            public CalendarMonthViewContainer create(@NonNull View view) {
-                return new CalendarMonthViewContainer(view);
+            public CalendarHeaderContainer create(@NonNull View view) {
+                return new CalendarHeaderContainer(CalendarHeaderBinding.bind(view));
             }
             
             @Override
-            public void bind(@NonNull CalendarMonthViewContainer container, CalendarMonth calendarMonth) {
+            public void bind(@NonNull CalendarHeaderContainer container, CalendarMonth calendarMonth) {
                 container.bind(calendarMonth, daysOfWeek);
                 YearMonth prevMonth = selectedMonth;
                 selectedMonth = calendarMonth.getYearMonth();

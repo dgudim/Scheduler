@@ -1,0 +1,84 @@
+package prototype.xd.scheduler.entities.settings_entries;
+
+import static prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig.AdaptiveBackgroundViewHolder;
+import static prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig.AppThemeSelectorViewHolder;
+import static prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntryConfig.*;
+import static prototype.xd.scheduler.entities.settings_entries.CalendarSettingsEntryConfig.CalendarViewHolder;
+import static prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig.*;
+import static prototype.xd.scheduler.entities.settings_entries.SeekBarSettingsEntryConfig.SeekBarViewHolder;
+import static prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig.SwitchViewHolder;
+import static prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig.TitleBarViewHolder;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
+
+import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.AppThemeSelectorSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.SeekbarSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
+import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig.ResetButtonViewHolder;
+
+enum SettingsEntryType {
+    CALENDAR_ACCOUNT, CALENDAR, COMPOUND_CUSTOMIZATION,
+    RESET_BUTTON, SEEK_BAR, SWITCH, TITLE_BAR, ADAPTIVE_BACKGROUND_SETTINGS, APP_THEME_SELECTOR
+}
+
+public interface SettingsEntryConfig {
+    int getType();
+    
+    static SettingsViewHolder<?, ? extends SettingsEntryConfig> createViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        // we should make sure to return appropriate holders, otherwise it will crash in @onBindViewHolder
+        switch (SettingsEntryType.values()[viewType]) {
+            case CALENDAR_ACCOUNT:
+                return new CalendarAccountViewHolder(CalendarAccountSettingsEntryBinding.inflate(inflater, parent, false));
+            case CALENDAR:
+                return new CalendarViewHolder(CalendarSettingsEntryBinding.inflate(inflater, parent, false));
+            case COMPOUND_CUSTOMIZATION:
+                return new CompoundCustomizationViewHolder(CompoundCustomizationSettingsEntryBinding.inflate(inflater, parent, false));
+            case RESET_BUTTON:
+                return new ResetButtonViewHolder(ResetButtonSettingsEntryBinding.inflate(inflater, parent, false));
+            case SEEK_BAR:
+                return new SeekBarViewHolder(SeekbarSettingsEntryBinding.inflate(inflater, parent, false));
+            case SWITCH:
+                return new SwitchViewHolder(SwitchSettingsEntryBinding.inflate(inflater, parent, false));
+            case ADAPTIVE_BACKGROUND_SETTINGS:
+                return new AdaptiveBackgroundViewHolder(AdaptiveBackgroundSettingsEntryBinding.inflate(inflater, parent, false));
+            case APP_THEME_SELECTOR:
+                return new AppThemeSelectorViewHolder(AppThemeSelectorSettingsEntryBinding.inflate(inflater, parent, false));
+            case TITLE_BAR:
+            default:
+                return new TitleBarViewHolder(TitleSettingsEntryBinding.inflate(inflater, parent, false));
+        }
+    }
+    
+    abstract class SettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends RecyclerView.ViewHolder {
+        
+        protected V viewBinding;
+        protected Context context;
+        
+        SettingsViewHolder(V viewBinding) {
+            super(viewBinding.getRoot());
+            this.viewBinding = viewBinding;
+            context = viewBinding.getRoot().getContext();
+        }
+    
+        abstract void bind(S config);
+        
+        @SuppressWarnings("unchecked")
+        public void uncheckedBind(SettingsEntryConfig settingsEntryConfig) {
+            bind((S) settingsEntryConfig);
+        }
+    }
+    
+}
+

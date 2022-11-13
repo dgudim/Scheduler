@@ -8,48 +8,50 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
+import prototype.xd.scheduler.databinding.FragmentSettingsBinding;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
-import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntry;
-import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntry;
-import prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntry;
-import prototype.xd.scheduler.entities.settings_entries.CalendarSettingsEntry;
-import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntry;
-import prototype.xd.scheduler.entities.settings_entries.DiscreteSeekBarSettingsEntry;
-import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntry;
-import prototype.xd.scheduler.entities.settings_entries.SettingsEntry;
-import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntry;
-import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.CalendarSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.SeekBarSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class SettingsFragment extends DialogFragment {
     
-    private AdaptiveBackgroundSettingsEntry adaptiveBackgroundSettingsEntry;
+    private AdaptiveBackgroundSettingsEntryConfig adaptiveBackgroundSettingsEntry;
     private SystemCalendarSettings systemCalendarSettings;
+    private FragmentSettingsBinding binding;
     
     // initial window creation
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL,
-                R.style.FullScreenDialog);
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
     }
     
     // view creation begin
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        systemCalendarSettings = new SystemCalendarSettings(null, inflater.inflate(R.layout.entry_settings, container, false));
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        systemCalendarSettings = new SystemCalendarSettings(null, requireContext());
+        binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
     
     // fragment becomes not visible
@@ -76,43 +78,44 @@ public class SettingsFragment extends DialogFragment {
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        List<SettingsEntry> settingsEntries = new ArrayList<>();
+        List<SettingsEntryConfig> settingsEntries = new ArrayList<>();
         
-        adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntry(this);
+        adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(this);
         
-        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_appearance)));
-        settingsEntries.add(new AppThemeSelectorEntry());
+        settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_appearance)));
+        settingsEntries.add(new AppThemeSelectorEntryConfig());
         settingsEntries.add(adaptiveBackgroundSettingsEntry);
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 10, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE, true,
+        settingsEntries.add(new SeekBarSettingsEntryConfig(0, 10, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE, true, true,
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance));
-        settingsEntries.add(new CompoundCustomizationEntry());
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE, false,
+        settingsEntries.add(new CompoundCustomizationEntryConfig());
+        settingsEntries.add(new SeekBarSettingsEntryConfig(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE, true, false,
                 Keys.FONT_SIZE, R.string.settings_font_size));
         
         
-        settingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_visibility)));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET, false,
+        settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_visibility)));
+        settingsEntries.add(new SeekBarSettingsEntryConfig(0, 14, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET, true, false,
                 Keys.UPCOMING_ITEMS_OFFSET, R.string.settings_show_days_upcoming));
-        settingsEntries.add(new DiscreteSeekBarSettingsEntry(0, 14, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET, false,
+        settingsEntries.add(new SeekBarSettingsEntryConfig(0, 14, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET, true, false,
                 Keys.EXPIRED_ITEMS_OFFSET, R.string.settings_show_days_expired));
-        settingsEntries.add(new SwitchSettingsEntry(
+        settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME,
                 getString(R.string.settings_hide_expired_entries_by_time)));
-        settingsEntries.add(new SwitchSettingsEntry(
+        settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK,
                 getString(R.string.settings_show_global_items_lock)));
-        settingsEntries.add(new SwitchSettingsEntry(
+        settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK,
                 getString(R.string.settings_max_rWidth_lock)));
         
-        settingsEntries.add(new ResetButtonSettingsEntry(this, savedInstanceState));
+        settingsEntries.add(new ResetButtonSettingsEntryConfig(this, savedInstanceState));
         
         SettingsListViewAdapter settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries);
-        ((ListView) view.findViewById(R.id.settingsList)).setAdapter(settingsListViewAdapter);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerView.setAdapter(settingsListViewAdapter);
         
-        List<SettingsEntry> additionalSettingsEntries = new ArrayList<>();
+        List<SettingsEntryConfig> additionalSettingsEntries = new ArrayList<>();
         new Thread(() -> {
-            additionalSettingsEntries.add(new TitleBarSettingsEntry(getString(R.string.category_system_calendars)));
+            additionalSettingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_system_calendars)));
             List<SystemCalendar> calendars = getAllCalendars(view.getContext(), true);
             List<List<SystemCalendar>> sortedCalendars = new ArrayList<>();
             List<String> sortedCalendarNames = new ArrayList<>();
@@ -129,17 +132,17 @@ public class SettingsFragment extends DialogFragment {
             }
             
             for (List<SystemCalendar> calendarGroup : sortedCalendars) {
-                SystemCalendar calendar0 = calendarGroup.get(0);
                 
-                additionalSettingsEntries.add(new CalendarAccountSettingsEntry(systemCalendarSettings, calendar0));
+                additionalSettingsEntries.add(new CalendarAccountSettingsEntryConfig(systemCalendarSettings, calendarGroup.get(0)));
                 
                 for (SystemCalendar currentCalendar : calendarGroup) {
-                    additionalSettingsEntries.add(new CalendarSettingsEntry(systemCalendarSettings, currentCalendar));
+                    additionalSettingsEntries.add(new CalendarSettingsEntryConfig(systemCalendarSettings, currentCalendar));
                 }
             }
             requireActivity().runOnUiThread(() -> {
+                int pos = settingsEntries.size();
                 settingsEntries.addAll(additionalSettingsEntries);
-                settingsListViewAdapter.notifyDataSetChanged();
+                settingsListViewAdapter.notifyItemRangeInserted(pos, pos + additionalSettingsEntries.size());
             });
         }, "SSCFetch thread").start();
     }

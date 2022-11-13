@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.callImageFileChooser;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
-import android.app.Activity;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,16 +17,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import prototype.xd.scheduler.MainActivity;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 
 public class BackgroundImagesGridViewAdapter extends BaseAdapter {
     
-    private final Activity rootActivity;
+    private final MainActivity mainActivity;
     private final String[] availableDays_localized;
     
     public BackgroundImagesGridViewAdapter(SettingsFragment fragment) {
-        rootActivity = fragment.requireActivity();
+        mainActivity = (MainActivity) fragment.requireActivity();
         availableDays_localized = new String[]{
                 fragment.getString(R.string.day_monday),
                 fragment.getString(R.string.day_tuesday),
@@ -74,8 +74,8 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
         } catch (IOException e) {
             logException("GridViewAdapter", e);
         }
-        
-        imageView.setOnClickListener(v -> callImageFileChooser(rootActivity, i));
+    
+        convertView.findViewById(R.id.bg_image_container).setOnClickListener(v -> callImageFileChooser(mainActivity, i));
         
         return convertView;
     }

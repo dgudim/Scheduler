@@ -1,19 +1,33 @@
 package prototype.xd.scheduler.adapters;
 
-import android.view.View;
+
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import java.util.List;
 
-import prototype.xd.scheduler.entities.settings_entries.SettingsEntry;
+import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 
-public class SettingsListViewAdapter extends BaseAdapter {
+public class SettingsListViewAdapter extends RecyclerView.Adapter<SettingsEntryConfig.SettingsViewHolder<? extends ViewBinding, ? extends SettingsEntryConfig>> {
     
-    private final List<SettingsEntry> settingsEntries;
+    private final List<? extends SettingsEntryConfig> settingsEntries;
     
-    public SettingsListViewAdapter(List<SettingsEntry> settingsEntries) {
+    public SettingsListViewAdapter(List<? extends SettingsEntryConfig> settingsEntries) {
         this.settingsEntries = settingsEntries;
+    }
+    
+    @NonNull
+    @Override
+    public SettingsEntryConfig.SettingsViewHolder<? extends ViewBinding, ? extends SettingsEntryConfig> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return SettingsEntryConfig.createViewHolder(parent, viewType);
+    }
+    
+    @Override
+    public void onBindViewHolder(@NonNull SettingsEntryConfig.SettingsViewHolder<? extends ViewBinding, ? extends SettingsEntryConfig> holder, int position) {
+        holder.uncheckedBind(settingsEntries.get(position));
     }
     
     @Override
@@ -22,27 +36,12 @@ public class SettingsListViewAdapter extends BaseAdapter {
     }
     
     @Override
-    public int getViewTypeCount() {
-        return SettingsEntry.getTypesCount();
-    }
-    
-    @Override
-    public int getCount() {
-        return settingsEntries.size();
-    }
-    
-    @Override
-    public Object getItem(int i) {
-        return settingsEntries.get(i);
-    }
-    
-    @Override
     public long getItemId(int i) {
         return i;
     }
     
     @Override
-    public View getView(int i, View view, ViewGroup parent) {
-        return settingsEntries.get(i).get(view, parent);
+    public int getItemCount() {
+        return settingsEntries.size();
     }
 }

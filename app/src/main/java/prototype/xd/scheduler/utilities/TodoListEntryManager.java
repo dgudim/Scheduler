@@ -18,14 +18,12 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.material.color.MaterialColors;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +49,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private long loadedDay_start;
     private long loadedDay_end;
     
-    private @Nullable CalendarView calendarView;
+    private @Nullable
+    CalendarView calendarView;
     private final TodoListViewAdapter todoListViewAdapter;
     
     private List<SystemCalendar> calendars;
@@ -67,8 +66,6 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private volatile boolean initFinished = false;
     private @Nullable
     Runnable onInitFinishedRunnable;
-    
-    private CurrentDayIndicatorChangeListener currentDayIndicatorChangeListener;
     
     public TodoListEntryManager(final Context context, final Lifecycle lifecycle) {
         this.todoListViewAdapter = new TodoListViewAdapter(this, context);
@@ -99,7 +96,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                 onInitFinishedRunnable = null;
             }
         }, "CFetch thread").start();
-    
+        
         asyncSaver = new Thread("Async writer") {
             @Override
             public void run() {
@@ -137,10 +134,11 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
+        //stop lingering thread
         asyncSaver.interrupt();
     }
     
-    public void onInitFinished(@NotNull Runnable onInitFinishedRunnable) {
+    public void onInitFinished(@NonNull Runnable onInitFinishedRunnable) {
         if (initFinished) {
             // init thread already finished, run from ui
             onInitFinishedRunnable.run();
@@ -149,8 +147,12 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         }
     }
     
-    public void bindToCalendarView() {
+    public void bindToCalendarView(@NonNull CalendarView calendarView) {
+        this.calendarView = calendarView;
+    }
     
+    public void unbindCalendarView() {
+        calendarView = null;
     }
     
     public TodoListViewAdapter getTodoListViewAdapter() {
@@ -225,8 +227,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
         todoListViewAdapter.notifyVisibleEntriesUpdated();
-        if (updateCurrentDayIndicators && currentDayIndicatorChangeListener != null) {
-            currentDayIndicatorChangeListener.onIndicatorsChanged();
+        if (updateCurrentDayIndicators && calendarView != null) {
+            calendarView.notifyCurrentDayChanged();
         }
     }
     
@@ -297,14 +299,5 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     public void removeEntry(TodoListEntry entry) {
         todoListEntries.remove(entry);
-    }
-    
-    public void setCurrentDayIndicatorChangeListener(CurrentDayIndicatorChangeListener currentDayIndicatorChangeListener) {
-        this.currentDayIndicatorChangeListener = currentDayIndicatorChangeListener;
-    }
-    
-    @FunctionalInterface
-    public interface CurrentDayIndicatorChangeListener {
-        void onIndicatorsChanged();
     }
 }

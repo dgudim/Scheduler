@@ -25,6 +25,8 @@
         android:layout_height="wrap_content"
         android:text="@string/settings_reset_bg" />
 
-    <include layout="@layout/grid_selection_view" />
+    <include
+        android:id="@+id/grid_view_include"
+        layout="@layout/grid_selection_view" />
 
 </LinearLayout>

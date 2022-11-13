@@ -7,7 +7,7 @@
     app:cardCornerRadius="5dp">
 
         <prototype.xd.scheduler.views.Switch
-            android:id="@+id/Switch"
+            android:id="@+id/main_switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"

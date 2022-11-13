@@ -48,10 +48,8 @@ public class TodoListViewAdapter extends BaseAdapter {
     public TodoListViewAdapter(final TodoListEntryManager todoListEntryManager, final Context context) {
         this.todoListEntryManager = todoListEntryManager;
         currentTodoListEntries = new ArrayList<>();
-        entrySettings = new EntrySettings(todoListEntryManager,
-                LayoutInflater.from(context).inflate(R.layout.entry_settings, null, false));
-        systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager,
-                LayoutInflater.from(context).inflate(R.layout.entry_settings, null, false));
+        entrySettings = new EntrySettings(todoListEntryManager, context);
+        systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager, context);
     }
     
     @Override
