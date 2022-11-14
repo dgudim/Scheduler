@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
+
 public class Keys {
     
     private Keys() {
@@ -91,6 +93,9 @@ public class Keys {
     public static final String ITEM_FULL_WIDTH_LOCK = "force_max_RWidth_lock";
     
     public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
+    
+    public static final String TODO_ITEM_VIEW_TYPE = "lockScreenTodoItemViewType";
+    public static final String DEFAULT_TODO_ITEM_VIEW_TYPE = LockScreenTodoItemView.TodoItemViewType.BASIC.name();
     
     public static final byte APP_THEME_LIGHT = MODE_NIGHT_NO;
     public static final byte APP_THEME_DARK = MODE_NIGHT_YES;

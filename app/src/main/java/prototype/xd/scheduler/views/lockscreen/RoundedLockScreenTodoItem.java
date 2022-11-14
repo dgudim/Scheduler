@@ -1,18 +1,16 @@
 package prototype.xd.scheduler.views.lockscreen;
 
-import android.content.SharedPreferences;
 import android.util.TypedValue;
 import android.view.View;
 
 import androidx.cardview.widget.CardView;
 
 import prototype.xd.scheduler.databinding.RoundedEntryBinding;
-import prototype.xd.scheduler.entities.TodoListEntry;
 
 public class RoundedLockScreenTodoItem extends LockScreenTodoItemView<RoundedEntryBinding> {
     
-    public RoundedLockScreenTodoItem(RoundedEntryBinding binding, TodoListEntry entry, SharedPreferences preferences, float fontSizeDP) {
-        super(binding, entry, preferences, fontSizeDP);
+    public RoundedLockScreenTodoItem(RoundedEntryBinding binding) {
+        super(binding);
     }
     
     @Override

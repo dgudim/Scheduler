@@ -8,13 +8,18 @@ import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_W
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.color.MaterialColors;
 
+import prototype.xd.scheduler.databinding.BasicEntryBinding;
+import prototype.xd.scheduler.databinding.RoundedEntryBinding;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
 // base class for lockscreen todolist entries
@@ -24,11 +29,10 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     View root;
     Context context;
     
-    LockScreenTodoItemView(V binding, TodoListEntry entry, SharedPreferences preferences, float fontSizeDP) {
+    LockScreenTodoItemView(V binding) {
         viewBinding = binding;
         root = binding.getRoot();
         context = binding.getRoot().getContext();
-        applyLayoutIndependentParameters(entry, preferences, fontSizeDP);
     }
     
     public View getRoot() {
@@ -96,5 +100,19 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         setBorderColor(entry.getAdaptiveColor(entry.borderColor));
         setBackgroundColor(bgColor);
         setTitleTextColor(MaterialColors.harmonize(entry.fontColor, bgColor));
+    }
+    
+    public enum TodoItemViewType {
+        BASIC, ROUNDED
+    }
+    
+    public static LockScreenTodoItemView<?> inflateViewByType(TodoItemViewType todoItemViewType, @Nullable ViewGroup parent, LayoutInflater layoutInflater) {
+        switch (todoItemViewType) {
+            case ROUNDED:
+                return new RoundedLockScreenTodoItem(RoundedEntryBinding.inflate(layoutInflater, parent, false));
+            case BASIC:
+            default:
+                return new BasicLockScreenTodoItemView(BasicEntryBinding.inflate(layoutInflater, parent, false));
+        }
     }
 }

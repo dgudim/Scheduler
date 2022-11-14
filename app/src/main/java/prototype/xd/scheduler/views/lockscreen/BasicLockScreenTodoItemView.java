@@ -1,16 +1,14 @@
 package prototype.xd.scheduler.views.lockscreen;
 
-import android.content.SharedPreferences;
 import android.util.TypedValue;
 import android.view.View;
 
 import prototype.xd.scheduler.databinding.BasicEntryBinding;
-import prototype.xd.scheduler.entities.TodoListEntry;
 
 public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEntryBinding> {
     
-    public BasicLockScreenTodoItemView(BasicEntryBinding binding, TodoListEntry entry, SharedPreferences preferences, float fontSizeDP) {
-        super(binding, entry, preferences, fontSizeDP);
+    public BasicLockScreenTodoItemView(BasicEntryBinding binding) {
+        super(binding);
     }
     
     @Override

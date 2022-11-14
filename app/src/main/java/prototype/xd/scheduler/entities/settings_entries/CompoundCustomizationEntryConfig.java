@@ -4,17 +4,27 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
+import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
+import android.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.widget.GridView;
+
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.adapters.TodoItemViewListAdapter;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.GridSelectionViewBinding;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
+import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
 public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
     
@@ -25,9 +35,18 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
     
     static class CompoundCustomizationViewHolder extends SettingsViewHolder<CompoundCustomizationSettingsEntryBinding, CompoundCustomizationEntryConfig> {
         
+        LockScreenTodoItemView<?> todayEntryPreview;
+        LockScreenTodoItemView<?> upcomingEntryPreview;
+        LockScreenTodoItemView<?> expiredEntryPreview;
+        
+        TodoItemViewType todoItemViewType;
+        
         CompoundCustomizationViewHolder(CompoundCustomizationSettingsEntryBinding viewBinding) {
             super(viewBinding);
             
+            todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, DEFAULT_TODO_ITEM_VIEW_TYPE));
+            
+            inflatePreviews();
             updatePreviews();
             
             Utilities.ColorPickerKeyedClickListener colorPickerClickListener = (dialog, selectedColor, key, allColors) -> {
@@ -122,6 +141,30 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             // nothing special required, this entry should be the only on of it's kind
         }
         
+        protected void inflatePreviews() {
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            todayEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
+            upcomingEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
+            expiredEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
+            viewBinding.previewContainer.addView(upcomingEntryPreview.getRoot());
+            viewBinding.previewContainer.addView(todayEntryPreview.getRoot());
+            viewBinding.previewContainer.addView(expiredEntryPreview.getRoot());
+    
+            todayEntryPreview.getRoot().setOnClickListener(v -> {
+                final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+        
+                GridSelectionViewBinding gridSelection = GridSelectionViewBinding.inflate(LayoutInflater.from(context));
+                GridView gridView = gridSelection.gridView;
+                gridView.setNumColumns(1);
+                gridView.setHorizontalSpacing(5);
+                gridView.setVerticalSpacing(5);
+                gridView.setAdapter(new TodoItemViewListAdapter());
+        
+                alert.setView(gridSelection.getRoot());
+                alert.show();
+            });
+        }
+        
         protected void updatePreviews() {
             updatePreviewFonts();
             updatePreviewBgs();
@@ -132,18 +175,15 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         }
         
         public void updateUpcomingPreviewBorderThickness(int borderThickness) {
-            viewBinding.previewBorderUpcoming.setPadding(borderThickness,
-                    borderThickness, borderThickness, 0);
+            upcomingEntryPreview.setBorderSize(borderThickness);
         }
         
         public void updateCurrentPreviewBorderThickness(int borderThickness) {
-            viewBinding.previewBorder.setPadding(borderThickness,
-                    borderThickness, borderThickness, 0);
+            todayEntryPreview.setBorderSize(borderThickness);
         }
         
         public void updateExpiredPreviewBorderThickness(int borderThickness) {
-            viewBinding.previewBorderExpired.setPadding(borderThickness,
-                    borderThickness, borderThickness, 0);
+            expiredEntryPreview.setBorderSize(borderThickness);
         }
         
         public void updatePreviewFonts() {
@@ -156,9 +196,9 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.fontColorSelector.setCardBackgroundColor(fontColor);
             viewBinding.fontColorExpiredSelector.setCardBackgroundColor(fontColorExpired);
             
-            viewBinding.previewTextUpcoming.setTextColor(mixTwoColors(fontColor, fontColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
-            viewBinding.previewText.setTextColor(fontColor);
-            viewBinding.previewTextExpired.setTextColor(mixTwoColors(fontColor, fontColorExpired, DEFAULT_COLOR_MIX_FACTOR));
+            upcomingEntryPreview.setTitleTextColor(mixTwoColors(fontColor, fontColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
+            todayEntryPreview.setTitleTextColor(fontColor);
+            expiredEntryPreview.setTitleTextColor(mixTwoColors(fontColor, fontColorExpired, DEFAULT_COLOR_MIX_FACTOR));
         }
         
         public void updatePreviewBgs() {
@@ -171,9 +211,9 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.backgroundColorSelector.setCardBackgroundColor(bgColor);
             viewBinding.backgroundColorExpiredSelector.setCardBackgroundColor(bgColorExpired);
             
-            viewBinding.previewTextUpcoming.setBackgroundColor(mixTwoColors(bgColor, bgColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
-            viewBinding.previewText.setBackgroundColor(bgColor);
-            viewBinding.previewTextExpired.setBackgroundColor(mixTwoColors(bgColor, bgColorExpired, DEFAULT_COLOR_MIX_FACTOR));
+            upcomingEntryPreview.setBackgroundColor(mixTwoColors(bgColor, bgColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
+            todayEntryPreview.setBackgroundColor(bgColor);
+            expiredEntryPreview.setBackgroundColor(mixTwoColors(bgColor, bgColorExpired, DEFAULT_COLOR_MIX_FACTOR));
         }
         
         public void updatePreviewBorders() {
@@ -186,9 +226,9 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.borderColorSelector.setCardBackgroundColor(borderColor);
             viewBinding.borderColorExpiredSelector.setCardBackgroundColor(borderColorExpired);
             
-            viewBinding.previewBorderUpcoming.setBackgroundColor(mixTwoColors(borderColor, borderColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
-            viewBinding.previewBorder.setBackgroundColor(borderColor);
-            viewBinding.previewBorderExpired.setBackgroundColor(mixTwoColors(borderColor, borderColorExpired, DEFAULT_COLOR_MIX_FACTOR));
+            upcomingEntryPreview.setBorderColor(mixTwoColors(borderColor, borderColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
+            todayEntryPreview.setBorderColor(borderColor);
+            expiredEntryPreview.setBorderColor(mixTwoColors(borderColor, borderColorExpired, DEFAULT_COLOR_MIX_FACTOR));
         }
     }
 }

@@ -11,10 +11,12 @@ import static prototype.xd.scheduler.utilities.DateManager.DEFAULT_BACKGROUND_NA
 import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
+import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_SCALED_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
+import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
@@ -48,12 +50,11 @@ import java.util.Calendar;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.databinding.RoundedEntryBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
-import prototype.xd.scheduler.views.lockscreen.RoundedLockScreenTodoItem;
+import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
 class LockScreenBitmapDrawer {
     
@@ -174,7 +175,7 @@ class LockScreenBitmapDrawer {
         
         Canvas canvas = new Canvas(bitmap);
         List<Group> groups = loadGroups(context);
-        
+        TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, DEFAULT_TODO_ITEM_VIEW_TYPE));
         // load user defined entries (from files)
         // add entries from all calendars spanning 4 weeks
         // sort and filter entries
@@ -183,7 +184,7 @@ class LockScreenBitmapDrawer {
                         sortEntries(
                                 loadTodoEntries(context, currentDay - 14, currentDay + 14, groups, null), currentDay));
         
-        long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDay;
+        long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDay + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
         }
@@ -196,16 +197,16 @@ class LockScreenBitmapDrawer {
         
         // first pass, add all views, setup layout independent parameters
         for (TodoListEntry todoListEntry : toAdd) {
-            LockScreenTodoItemView<?> itemView = new RoundedLockScreenTodoItem(RoundedEntryBinding.inflate(layoutInflater),
-                    todoListEntry, preferences, densityScaledFontSize);
+            LockScreenTodoItemView<?> itemView = LockScreenTodoItemView.inflateViewByType(todoItemViewType, rootView, layoutInflater);
+            itemView.applyLayoutIndependentParameters(todoListEntry, preferences, densityScaledFontSize);
             itemViews.add(itemView);
             rootView.addView(itemView.getRoot());
         }
-    
+        
         // get measure specs with screen size
         int measuredWidthSpec = View.MeasureSpec.makeMeasureSpec(displayWidth, View.MeasureSpec.EXACTLY);
         int measuredHeightSpec = View.MeasureSpec.makeMeasureSpec(displayHeight, View.MeasureSpec.EXACTLY);
-    
+        
         // measure and layout the view with the screen dimensions
         rootView.measure(measuredWidthSpec, measuredHeightSpec);
         // lay everything out assigning real sizes
