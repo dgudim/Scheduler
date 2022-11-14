@@ -117,10 +117,14 @@ public class CalendarView {
         }
     }
     
+    @Nullable
     LocalDate selectedDate;
+    @Nullable
     YearMonth selectedMonth;
     com.kizitonwose.calendar.view.CalendarView rootCalendarView;
+    @Nullable
     DateChangeListener dateChangeListener;
+    @Nullable
     MonthChangeListener monthPreChangeListener;
     
     public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoListEntryManager todoListEntryManager) {
@@ -202,7 +206,9 @@ public class CalendarView {
     }
     
     public void notifyCurrentMonthChanged() {
-        rootCalendarView.notifyMonthChanged(selectedMonth);
+        if (selectedMonth != null) {
+            rootCalendarView.notifyMonthChanged(selectedMonth);
+        }
     }
     
     public void setOnMonthPreChangeListener(MonthChangeListener monthPreChangeListener) {

@@ -4,23 +4,25 @@ import android.content.SharedPreferences;
 import android.util.TypedValue;
 import android.view.View;
 
-import prototype.xd.scheduler.databinding.BasicEntryBinding;
+import androidx.cardview.widget.CardView;
+
+import prototype.xd.scheduler.databinding.RoundedEntryBinding;
 import prototype.xd.scheduler.entities.TodoListEntry;
 
-public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEntryBinding> {
+public class RoundedLockScreenTodoItem extends LockScreenTodoItemView<RoundedEntryBinding> {
     
-    public BasicLockScreenTodoItemView(BasicEntryBinding binding, TodoListEntry entry, SharedPreferences preferences, float fontSizeDP) {
+    public RoundedLockScreenTodoItem(RoundedEntryBinding binding, TodoListEntry entry, SharedPreferences preferences, float fontSizeDP) {
         super(binding, entry, preferences, fontSizeDP);
     }
     
     @Override
     public void setBackgroundColor(int color) {
-        viewBinding.backgroundMain.setBackgroundColor(color);
+        viewBinding.backgroundMain.setCardBackgroundColor(color);
     }
     
     @Override
     public void setBorderColor(int color) {
-        viewBinding.backgroundOutline.setBackgroundColor(color);
+        viewBinding.backgroundOutline.setCardBackgroundColor(color);
     }
     
     @Override
@@ -30,12 +32,14 @@ public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEnt
     
     @Override
     public void setIndicatorColor(int color) {
-        viewBinding.indicatorView.setBackgroundColor(color);
+        viewBinding.indicatorView.setCardBackgroundColor(color);
     }
     
     @Override
     public void setBorderSize(int sizePX) {
-        viewBinding.backgroundOutline.setPadding(sizePX, sizePX, sizePX, sizePX);
+        CardView.LayoutParams params = (CardView.LayoutParams) viewBinding.backgroundMain.getLayoutParams();
+        params.setMargins(sizePX, sizePX, sizePX, sizePX);
+        viewBinding.backgroundMain.setLayoutParams(params);
     }
     
     @Override

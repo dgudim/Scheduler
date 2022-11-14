@@ -3,7 +3,6 @@ package prototype.xd.scheduler.utilities.services;
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.makeMutable;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
@@ -15,9 +14,7 @@ import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_SCALED_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
-import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
-import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
@@ -35,16 +32,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.ParcelFileDescriptor;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-
-import com.google.android.material.color.MaterialColors;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,9 +48,12 @@ import java.util.Calendar;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.databinding.RoundedEntryBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
+import prototype.xd.scheduler.views.lockscreen.RoundedLockScreenTodoItem;
 
 class LockScreenBitmapDrawer {
     
@@ -156,6 +152,8 @@ class LockScreenBitmapDrawer {
                     
                     bitmap = makeMutable(bitmap);
                     drawItemsOnBitmap(backgroundSetterService, bitmap);
+                    log(INFO, NAME, "Processed wallpaper in " + (getCurrentTimestamp() - time) + "ms");
+                    time = getCurrentTimestamp();
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
                     log(INFO, NAME, "Set wallpaper in " + (getCurrentTimestamp() - time) / 1000f + "s");
                     
@@ -194,69 +192,29 @@ class LockScreenBitmapDrawer {
         // inflate the root container
         LinearLayout rootView = (LinearLayout) layoutInflater.inflate(R.layout.lockscreen_root_container, null);
         
-        List<View> children = new ArrayList<>();
+        List<LockScreenTodoItemView<?>> itemViews = new ArrayList<>();
         
-        // first pass, inflate all views, hide indicators and time text on not system calendar entries
+        // first pass, add all views, setup layout independent parameters
         for (TodoListEntry todoListEntry : toAdd) {
-            View basicView = layoutInflater.inflate(R.layout.basic_entry, null);
-            
-            TextView timeText = basicView.findViewById(R.id.time_text);
-            View indicator = basicView.findViewById(R.id.indicator_view);
-            
-            if (todoListEntry.fromSystemCalendar) {
-                timeText.setText(todoListEntry.getTimeSpan(context));
-                timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, densityScaledFontSize);
-                indicator.setBackgroundColor(todoListEntry.event.color);
-            } else {
-                timeText.setVisibility(View.GONE);
-                indicator.setVisibility(View.GONE);
-            }
-            
-            children.add(basicView);
+            LockScreenTodoItemView<?> itemView = new RoundedLockScreenTodoItem(RoundedEntryBinding.inflate(layoutInflater),
+                    todoListEntry, preferences, densityScaledFontSize);
+            itemViews.add(itemView);
+            rootView.addView(itemView.getRoot());
         }
-        
-        // second pass, apply common values
-        for (int i = 0; i < children.size(); i++) {
-            TodoListEntry todoListEntry = toAdd.get(i);
-            View child = children.get(i);
-            
-            if (todoListEntry.isAdaptiveColorEnabled()) {
-                int width = child.getWidth();
-                int height = child.getHeight();
-                
-                int[] pixels = new int[width * height];
-                bitmap.getPixels(pixels, 0, width, (int) child.getX(), (int) child.getY(), width, height);
-                todoListEntry.averageBackgroundColor = getAverageColor(pixels);
-            }
-            
-            int bgColor = todoListEntry.getAdaptiveColor(todoListEntry.borderColor);
-            
-            // set border and bg colors
-            child.findViewById(R.id.background_outline).setBackgroundColor(bgColor);
-            child.findViewById(R.id.background_main).setBackgroundColor(
-                    todoListEntry.getAdaptiveColor(todoListEntry.bgColor));
-            
-            // set text value and harmonize text color to make sure it's visible
-            TextView title = child.findViewById(R.id.title_text);
-            title.setText(todoListEntry.getTextOnDay(currentDay, context));
-            title.setTextColor(MaterialColors.harmonize(todoListEntry.fontColor, bgColor));
-            title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, densityScaledFontSize * 1.1F);
-            
-            child.setLayoutParams(new LinearLayout.LayoutParams(
-                    preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK) ?
-                            LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
-            
-            rootView.addView(child);
-        }
-        
-        // lay everything out assigning real sizes
+    
+        // get measure specs with screen size
         int measuredWidthSpec = View.MeasureSpec.makeMeasureSpec(displayWidth, View.MeasureSpec.EXACTLY);
         int measuredHeightSpec = View.MeasureSpec.makeMeasureSpec(displayHeight, View.MeasureSpec.EXACTLY);
-        
+    
         // measure and layout the view with the screen dimensions
         rootView.measure(measuredWidthSpec, measuredHeightSpec);
+        // lay everything out assigning real sizes
         rootView.layout(0, 0, rootView.getMeasuredWidth(), rootView.getMeasuredHeight());
+        
+        // second pass, apply layout dependent parameters
+        for (int i = 0; i < itemViews.size(); i++) {
+            itemViews.get(i).applyLayoutDependentParameters(toAdd.get(i), bitmap);
+        }
         
         rootView.draw(canvas);
     }

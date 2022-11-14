@@ -1,11 +1,14 @@
 package prototype.xd.scheduler.views.lockscreen;
 
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.viewbinding.ViewBinding;
@@ -18,12 +21,18 @@ import prototype.xd.scheduler.entities.TodoListEntry;
 public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
     V viewBinding;
+    View root;
     Context context;
     
-    public LockScreenTodoItemView(V binding, TodoListEntry entry, SharedPreferences preferences, float fontSize) {
+    LockScreenTodoItemView(V binding, TodoListEntry entry, SharedPreferences preferences, float fontSizeDP) {
         viewBinding = binding;
+        root = binding.getRoot();
         context = binding.getRoot().getContext();
-        apply(entry, preferences, fontSize);
+        applyLayoutIndependentParameters(entry, preferences, fontSizeDP);
+    }
+    
+    public View getRoot() {
+        return root;
     }
     
     public abstract void setBackgroundColor(int color);
@@ -34,40 +43,58 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
     public abstract void setIndicatorColor(int color);
     
+    
+    public abstract void setBorderSize(int sizePX);
+    
+    
     public abstract void setTitleText(String text);
     
-    public abstract void setTitleTextSize(float size);
+    public abstract void setTitleTextSize(float sizeDP);
     
     public abstract void setTimeText(String text);
     
-    public abstract void setTimeTextSize(float size);
+    public abstract void setTimeTextSize(float sizeDP);
+    
     
     public abstract void hideIndicatorAndTime();
     
-    public void apply(TodoListEntry entry, SharedPreferences preferences, float fontSize) {
-        int borderColor = entry.getAdaptiveColor(entry.borderColor);
-        int bgColor = entry.getAdaptiveColor(entry.bgColor);
+    public void applyLayoutIndependentParameters(TodoListEntry entry, SharedPreferences preferences, float fontSizeDP) {
         
-        // set border and bg colors
-        setBorderColor(borderColor);
-        setBackgroundColor(bgColor);
+        setBorderSize(entry.borderThickness);
         
-        // set text and harmonize color to make sure it's visible
         setTitleText(entry.getTextOnDay(currentDay, context));
-        setTitleTextColor(MaterialColors.harmonize(entry.fontColor, bgColor));
-        setTitleTextSize(fontSize * 1.1F);
+        setTitleTextSize(fontSizeDP * 1.1F);
         
         if (entry.fromSystemCalendar) {
-            hideIndicatorAndTime();
-        } else {
             setTimeText(entry.getTimeSpan(context));
-            setTimeTextSize(fontSize);
+            setTimeTextSize(fontSizeDP);
             setIndicatorColor(entry.event.color);
+        } else {
+            hideIndicatorAndTime();
         }
         
         viewBinding.getRoot().setLayoutParams(new LinearLayout.LayoutParams(
                 preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK) ?
                         LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
+    }
+    
+    public void applyLayoutDependentParameters(TodoListEntry entry, Bitmap bgBitmap) {
+        
+        if (entry.isAdaptiveColorEnabled()) {
+            int width = root.getWidth();
+            int height = root.getHeight();
+            
+            int[] pixels = new int[width * height];
+            bgBitmap.getPixels(pixels, 0, width, (int) root.getX(), (int) root.getY(), width, height);
+            entry.averageBackgroundColor = getAverageColor(pixels);
+        }
+        
+        int bgColor = entry.getAdaptiveColor(entry.bgColor);
+        
+        // setup colors
+        setBorderColor(entry.getAdaptiveColor(entry.borderColor));
+        setBackgroundColor(bgColor);
+        setTitleTextColor(MaterialColors.harmonize(entry.fontColor, bgColor));
     }
 }
