@@ -198,7 +198,7 @@ class LockScreenBitmapDrawer {
         
         // first pass, inflate all views, hide indicators and time text on not system calendar entries
         for (TodoListEntry todoListEntry : toAdd) {
-            View basicView = layoutInflater.inflate(R.layout.entry_basic, null);
+            View basicView = layoutInflater.inflate(R.layout.basic_entry, null);
             
             TextView timeText = basicView.findViewById(R.id.time_text);
             View indicator = basicView.findViewById(R.id.indicator_view);
