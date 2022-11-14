@@ -20,7 +20,6 @@ public abstract class PopupSettingsView {
     
     PopupSettingsView(Context context) {
         bnd = EntrySettingsBinding.inflate(LayoutInflater.from(context));
-        bnd.closeSettingsButton.setOnClickListener(v -> dialog.dismiss());
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
     }
     
