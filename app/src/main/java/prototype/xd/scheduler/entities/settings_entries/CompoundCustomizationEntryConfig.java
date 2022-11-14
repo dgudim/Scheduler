@@ -16,7 +16,7 @@ import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBind
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class CompoundCustomizationEntryConfig implements SettingsEntryConfig {
+public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
     
     @Override
     public int getType() {

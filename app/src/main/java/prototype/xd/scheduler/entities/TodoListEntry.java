@@ -46,7 +46,7 @@ import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 
-public class TodoListEntry {
+public class TodoListEntry extends RecycleViewEntry {
     
     private static final String NAME = "Todo list entry";
     
@@ -98,10 +98,11 @@ public class TodoListEntry {
         fromSystemCalendar = true;
         this.event = event;
         params = new String[]{};
+        assignId(event.hashCode());
         reloadParams();
     }
     
-    public TodoListEntry(Context context, String[] params, String groupName, List<Group> groups) {
+    public TodoListEntry(Context context, String[] params, String groupName, List<Group> groups, long id) {
         if (!groupName.isEmpty()) {
             group = new Group(context, groupName, groups);
             if (group.isNullGroup()) {
@@ -110,6 +111,7 @@ public class TodoListEntry {
             }
         }
         this.params = params;
+        assignId(id);
         reloadParams();
     }
     
@@ -662,6 +664,11 @@ public class TodoListEntry {
         } else {
             icon.setTextColor(icon.getContext().getColor(R.color.entry_settings_parameter_default));
         }
+    }
+    
+    @Override
+    public int getType() {
+        return fromSystemCalendar ? 1 : 0;
     }
     
     @Override

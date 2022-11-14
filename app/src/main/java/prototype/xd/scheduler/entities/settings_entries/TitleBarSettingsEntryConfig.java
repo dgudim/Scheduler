@@ -4,7 +4,7 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 
 import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
 
-public class TitleBarSettingsEntryConfig implements SettingsEntryConfig {
+public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
     
     private final String text;
     

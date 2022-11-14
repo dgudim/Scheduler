@@ -29,10 +29,12 @@ import androidx.fragment.app.Fragment;
 import com.github.appintro.SlidePolicy;
 import com.google.android.material.color.MaterialColors;
 
+import prototype.xd.scheduler.databinding.PermissionsRequestFragmentBinding;
+
 
 public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     
-    private View rootView;
+    private PermissionsRequestFragmentBinding bnd;
     
     private static final String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -52,10 +54,10 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.permissions_request_fragment, container, false);
+        bnd = PermissionsRequestFragmentBinding.inflate(inflater, container, false);
         refreshPermissionStates(true);
-        rootView.findViewById(R.id.grant_permissions_button).setOnClickListener(v -> requestPermissionLauncher.launch(PERMISSIONS));
-        return rootView;
+        bnd.grantPermissionsButton.setOnClickListener(v -> requestPermissionLauncher.launch(PERMISSIONS));
+        return bnd.getRoot();
     }
     
     private boolean refreshPermissionStates(boolean display) {
@@ -69,19 +71,19 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         
         if (display) {
             setPermissionChipColor(calendarGranted,
-                    rootView.findViewById(R.id.calendar_permission_granted),
-                    rootView.findViewById(R.id.calendar_permission_granted_bg));
+                    bnd.calendarPermissionGranted,
+                    bnd.calendarPermissionGrantedBg);
             
             setPermissionChipColor(storageGranted,
-                    rootView.findViewById(R.id.storage_permission_granted),
-                    rootView.findViewById(R.id.storage_permission_granted_bg));
+                    bnd.storagePermissionGranted,
+                    bnd.storagePermissionGrantedBg);
             
             setPermissionChipColor(batteryGranted,
-                    rootView.findViewById(R.id.battery_permission_granted),
-                    rootView.findViewById(R.id.battery_permission_granted_bg));
+                    bnd.batteryPermissionGranted,
+                    bnd.batteryPermissionGrantedBg);
             
-            rootView.findViewById(R.id.grant_permissions_button).setVisibility(allGranted ? View.GONE : View.VISIBLE);
-            rootView.findViewById(R.id.all_set_text).setVisibility(allGranted ? View.VISIBLE : View.GONE);
+            bnd.grantPermissionsButton.setVisibility(allGranted ? View.GONE : View.VISIBLE);
+            bnd.allSetText.setVisibility(allGranted ? View.VISIBLE : View.GONE);
         }
         
         return essentialGranted;

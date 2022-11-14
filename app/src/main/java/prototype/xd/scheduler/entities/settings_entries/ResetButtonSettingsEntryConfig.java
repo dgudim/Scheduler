@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
 
-public class ResetButtonSettingsEntryConfig implements SettingsEntryConfig {
+public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     
     private final Fragment fragment;
     private final Bundle savedInstanceState;

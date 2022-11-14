@@ -1,12 +1,11 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.SWITCH;
-import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class SwitchSettingsEntryConfig implements SettingsEntryConfig {
+public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     
     private final String key;
     private final String text;

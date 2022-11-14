@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -49,8 +50,10 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         
         binding = HomeFragmentBinding.inflate(inflater, container, false);
-        
-        binding.list.setAdapter(todoListEntryManager.getTodoListViewAdapter());
+    
+        binding.recyclerView.setItemAnimator(null);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
         
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(binding.calendar, todoListEntryManager);
@@ -89,8 +92,8 @@ public class HomeFragment extends Fragment {
                     (view2, text, selectedIndex) -> {
                         TodoListEntry newEntry = new TodoListEntry(view2.getContext(), new String[]{
                                 TEXT_VALUE, text,
-                                ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),
-                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
+                                ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),                   // This is fine here as id because a person can't click 2 times in 1 ms
+                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
                         todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), true);
@@ -99,8 +102,8 @@ public class HomeFragment extends Fragment {
                     (view2, text, selectedIndex) -> {
                         TodoListEntry newEntry = new TodoListEntry(view2.getContext(), new String[]{
                                 TEXT_VALUE, text,
-                                ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,
-                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList);
+                                ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,                                    // This is fine, see note above
+                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
                         todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), false);

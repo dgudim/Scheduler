@@ -107,9 +107,9 @@ public class SettingsFragment extends DialogFragment {
                 }
             }
             requireActivity().runOnUiThread(() -> {
-                int pos = settingsEntries.size();
+                int offset = settingsEntries.size();
                 settingsEntries.addAll(additionalSettingsEntries);
-                settingsListViewAdapter.notifyItemRangeInserted(pos, pos + additionalSettingsEntries.size());
+                settingsListViewAdapter.notifyItemRangeInserted(offset, offset + additionalSettingsEntries.size());
             });
         }, "SSCFetch thread").start();
     }
@@ -122,11 +122,10 @@ public class SettingsFragment extends DialogFragment {
         return binding.getRoot();
     }
     
-    // fragment becomes not visible
     @Override
-    public void onDestroyView() {
+    public void onPause() {
         servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-        super.onDestroyView();
+        super.onPause();
     }
     
     // full destroy
@@ -145,6 +144,7 @@ public class SettingsFragment extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerView.setAdapter(settingsListViewAdapter);
     }

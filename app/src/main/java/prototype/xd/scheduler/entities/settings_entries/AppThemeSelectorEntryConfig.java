@@ -4,7 +4,7 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 
 import prototype.xd.scheduler.databinding.AppThemeSelectorSettingsEntryBinding;
 
-public class AppThemeSelectorEntryConfig implements SettingsEntryConfig {
+public class AppThemeSelectorEntryConfig extends SettingsEntryConfig {
     @Override
     public int getType() {
         return APP_THEME_SELECTOR.ordinal();

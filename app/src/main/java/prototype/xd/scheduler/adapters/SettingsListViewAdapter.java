@@ -36,11 +36,6 @@ public class SettingsListViewAdapter extends RecyclerView.Adapter<SettingsEntryC
     }
     
     @Override
-    public long getItemId(int i) {
-        return i;
-    }
-    
-    @Override
     public int getItemCount() {
         return settingsEntries.size();
     }

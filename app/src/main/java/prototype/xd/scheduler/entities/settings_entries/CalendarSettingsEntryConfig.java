@@ -18,7 +18,7 @@ import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-public class CalendarSettingsEntryConfig implements SettingsEntryConfig {
+public class CalendarSettingsEntryConfig extends SettingsEntryConfig {
     
     private final SystemCalendarSettings systemCalendarSettings;
     private final String calendarName;

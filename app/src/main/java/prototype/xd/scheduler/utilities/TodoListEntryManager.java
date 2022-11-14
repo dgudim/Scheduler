@@ -160,7 +160,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     public int getCurrentlyVisibleEntriesCount() {
-        return todoListViewAdapter.getCount();
+        return todoListViewAdapter.getItemCount();
     }
     
     public List<TodoListEntry> getVisibleTodoListEntries(long day) {

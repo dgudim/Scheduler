@@ -5,7 +5,7 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 import prototype.xd.scheduler.databinding.SeekbarSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class SeekBarSettingsEntryConfig implements SettingsEntryConfig {
+public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
     
     private final int seekMin;
     private final int seekMax;

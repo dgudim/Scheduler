@@ -9,7 +9,7 @@ import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-public class CalendarAccountSettingsEntryConfig implements SettingsEntryConfig {
+public class CalendarAccountSettingsEntryConfig extends SettingsEntryConfig {
     
     private final SystemCalendarSettings systemCalendarSettings;
     private final String accountName;

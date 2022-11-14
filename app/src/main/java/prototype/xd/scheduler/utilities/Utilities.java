@@ -101,8 +101,8 @@ public class Utilities {
                 log(WARN, NAME, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
             }
             
-            for (int i = 0; i < entryParams.size(); i++) {
-                readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups));
+            for (int i = 0; i < entryParams.size(); i++) {                                                  // Initial load, thus index is ok as ID
+                readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups, i));
             }
             
             log(INFO, NAME, "Read todo list: " + readEntries.size());

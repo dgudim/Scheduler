@@ -3,7 +3,6 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
 import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
-import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.app.AlertDialog;
@@ -18,7 +17,7 @@ import prototype.xd.scheduler.databinding.BgGridSelectionViewBinding;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class AdaptiveBackgroundSettingsEntryConfig implements SettingsEntryConfig {
+public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     
     private final BackgroundImagesGridViewAdapter gridViewAdapter;
     

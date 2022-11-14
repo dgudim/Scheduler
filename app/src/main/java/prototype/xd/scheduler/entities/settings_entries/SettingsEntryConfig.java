@@ -2,9 +2,9 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig.AdaptiveBackgroundViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig.AppThemeSelectorViewHolder;
-import static prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntryConfig.*;
+import static prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntryConfig.CalendarAccountViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.CalendarSettingsEntryConfig.CalendarViewHolder;
-import static prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig.*;
+import static prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig.CompoundCustomizationViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.SeekBarSettingsEntryConfig.SeekBarViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig.SwitchViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig.TitleBarViewHolder;
@@ -25,6 +25,7 @@ import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.SeekbarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
+import prototype.xd.scheduler.entities.RecycleViewEntry;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig.ResetButtonViewHolder;
 
 enum SettingsEntryType {
@@ -32,10 +33,9 @@ enum SettingsEntryType {
     RESET_BUTTON, SEEK_BAR, SWITCH, TITLE_BAR, ADAPTIVE_BACKGROUND_SETTINGS, APP_THEME_SELECTOR
 }
 
-public interface SettingsEntryConfig {
-    int getType();
+public abstract class SettingsEntryConfig extends RecycleViewEntry {
     
-    static SettingsViewHolder<?, ? extends SettingsEntryConfig> createViewHolder(ViewGroup parent, int viewType) {
+    public static SettingsViewHolder<?, ? extends SettingsEntryConfig> createViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         // we should make sure to return appropriate holders, otherwise it will crash in @onBindViewHolder
         switch (SettingsEntryType.values()[viewType]) {
@@ -61,7 +61,7 @@ public interface SettingsEntryConfig {
         }
     }
     
-    abstract class SettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends RecyclerView.ViewHolder {
+    public abstract static class SettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends RecyclerView.ViewHolder {
         
         protected V viewBinding;
         protected Context context;
@@ -71,7 +71,7 @@ public interface SettingsEntryConfig {
             this.viewBinding = viewBinding;
             context = viewBinding.getRoot().getContext();
         }
-    
+        
         abstract void bind(S config);
         
         @SuppressWarnings("unchecked")

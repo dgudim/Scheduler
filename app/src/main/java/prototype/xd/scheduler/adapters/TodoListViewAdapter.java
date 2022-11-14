@@ -15,11 +15,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.cardview.widget.CardView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.card.MaterialCardView;
 
@@ -27,14 +27,115 @@ import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
+import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
-import prototype.xd.scheduler.views.CheckBox;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-public class TodoListViewAdapter extends BaseAdapter {
+public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapter.EntryViewHolder<?>> {
+    
+    static class EntryViewHolder<V extends ViewBinding> extends RecyclerView.ViewHolder {
+        
+        protected V viewBinding;
+        protected Context context;
+        
+        EntryViewHolder(V viewBinding) {
+            super(viewBinding.getRoot());
+            this.viewBinding = viewBinding;
+            context = viewBinding.getRoot().getContext();
+        }
+        
+        void bind(TodoListEntry currentEntry,
+                  TodoListEntryManager todoListEntryManager,
+                  EntrySettings entrySettings,
+                  SystemCalendarSettings systemCalendarSettings) {
+            
+            if (currentEntry.fromSystemCalendar) {
+                ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding)viewBinding;
+    
+                bnd.eventColor.setCardBackgroundColor(currentEntry.event.color);
+                bnd.timeText.setText(currentEntry.getTimeSpan(context));
+                bnd.timeText.setTextColor(currentEntry.fontColor);
+                bnd.settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
+            } else {
+                ListSelectionTodoBinding bnd = (ListSelectionTodoBinding)viewBinding;
+                
+                bnd.deletionButton.setOnClickListener(view1 ->
+                        displayConfirmationDialogue(view1.getContext(),
+                                R.string.delete, R.string.are_you_sure,
+                                R.string.no, R.string.yes,
+                                view2 -> {
+                                    todoListEntryManager.removeEntry(currentEntry);
+                                    todoListEntryManager.saveEntriesAsync();
+                                    // deleting a global entry does not change indicators
+                                    todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isGlobal());
+                                }));
+        
+                bnd.isDone.setCheckedSilent(currentEntry.isCompleted());
+    
+                bnd.isDone.setOnClickListener(view12 -> {
+                    if (!currentEntry.isGlobal()) {
+                        currentEntry.changeParameter(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
+                    } else {
+                        currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
+                    }
+                    todoListEntryManager.saveEntriesAsync();
+                    todoListEntryManager.updateTodoListAdapter(true, true);
+                });
+        
+                bnd.getRoot().setOnLongClickListener(view1 -> {
+            
+                    final List<Group> groupList = todoListEntryManager.getGroups();
+                    int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
+                    displayEditTextSpinnerDialogue(context, R.string.edit_event, -1, R.string.event_name_input_hint,
+                            R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.getRawTextValue(), groupList,
+                            currentIndex, (view2, text, selectedIndex) -> {
+                                if (selectedIndex != currentIndex) {
+                                    currentEntry.changeGroup(groupList.get(selectedIndex));
+                                }
+                                currentEntry.changeParameter(TEXT_VALUE, text);
+                                todoListEntryManager.saveEntriesAsync();
+                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), false);
+                                return true;
+                            },
+                            !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
+                                if (selectedIndex != currentIndex) {
+                                    currentEntry.changeGroup(groupList.get(selectedIndex));
+                                }
+                                currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
+                                currentEntry.changeParameter(IS_COMPLETED, "false");
+                                todoListEntryManager.saveEntriesAsync();
+                                // completed -> global = indicators don't change, no need to update
+                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isCompleted());
+                                return true;
+                            } : null);
+                    return true;
+                });
+                bnd.settings.setOnClickListener(v -> entrySettings.show(currentEntry, v.getContext()));
+            }
+    
+            // fallback to get view by id because this part is common and we can't cast to any binding
+            View root = viewBinding.getRoot();
+            
+            TextView todoText = root.findViewById(R.id.todoText);
+            
+            MaterialCardView backgroundLayer = root.findViewById(R.id.backgroundLayer);
+            backgroundLayer.setCardBackgroundColor(currentEntry.bgColor);
+            backgroundLayer.setStrokeColor(currentEntry.borderColor);
+    
+            if (currentEntry.isCompleted() || currentEntry.hideByContent()) {
+                todoText.setTextColor(currentEntry.fontColor_completed);
+            } else {
+                todoText.setTextColor(currentEntry.fontColor);
+            }
+    
+            todoText.setText(currentEntry.getTextOnDay(currentlySelectedDay, context));
+    
+        }
+    }
     
     private final TodoListEntryManager todoListEntryManager;
     
@@ -50,21 +151,17 @@ public class TodoListViewAdapter extends BaseAdapter {
         currentTodoListEntries = new ArrayList<>();
         entrySettings = new EntrySettings(todoListEntryManager, context);
         systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager, context);
-    }
-    
-    @Override
-    public int getCount() {
-        return currentTodoListEntries.size();
-    }
-    
-    @Override
-    public Object getItem(int i) {
-        return currentTodoListEntries.get(i);
+        setHasStableIds(true);
     }
     
     @Override
     public long getItemId(int i) {
-        return i;
+        return currentTodoListEntries.get(i).getId();
+    }
+    
+    @Override
+    public int getItemCount() {
+        return currentTodoListEntries.size();
     }
     
     public void notifyVisibleEntriesUpdated() {
@@ -72,108 +169,25 @@ public class TodoListViewAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
     
+    @NonNull
     @Override
-    public int getViewTypeCount() {
-        return 2;
+    public EntryViewHolder<?> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if(viewType == 1) {
+            // calendar entry
+            return new EntryViewHolder<>(ListSelectionCalendarBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        } else {
+            // regular entry
+            return new EntryViewHolder<>(ListSelectionTodoBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        }
+    }
+    
+    @Override
+    public void onBindViewHolder(@NonNull EntryViewHolder<?> holder, int position) {
+        holder.bind(currentTodoListEntries.get(position), todoListEntryManager, entrySettings, systemCalendarSettings);
     }
     
     @Override
     public int getItemViewType(int i) {
-        return currentTodoListEntries.get(i).fromSystemCalendar ? 1 : 0;
-    }
-    
-    @SuppressLint("SetTextI18n")
-    @Override
-    public View getView(final int i, View view, ViewGroup parent) {
-        
-        final TodoListEntry currentEntry = currentTodoListEntries.get(i);
-        
-        if (view == null) {
-            if (currentEntry.fromSystemCalendar) {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_selection_calendar, parent, false);
-            } else {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_selection_todo, parent, false);
-            }
-        }
-        
-        TextView todoText = view.findViewById(R.id.todoText);
-        ImageView settings = view.findViewById(R.id.settings);
-        
-        if (currentEntry.fromSystemCalendar) {
-            ((CardView) view.findViewById(R.id.event_color)).setCardBackgroundColor(currentEntry.event.color);
-            TextView time = view.findViewById(R.id.time_text);
-            time.setText(currentEntry.getTimeSpan(view.getContext()));
-            time.setTextColor(currentEntry.fontColor);
-            settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
-        } else {
-            view.findViewById(R.id.deletionButton).setOnClickListener(view1 ->
-                    displayConfirmationDialogue(view1.getContext(),
-                            R.string.delete, R.string.are_you_sure,
-                            R.string.no, R.string.yes,
-                            view2 -> {
-                                todoListEntryManager.removeEntry(currentEntry);
-                                todoListEntryManager.saveEntriesAsync();
-                                // deleting a global entry does not change indicators
-                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isGlobal());
-                            }));
-            
-            CheckBox isDone = view.findViewById(R.id.isDone);
-            
-            isDone.setCheckedSilent(currentEntry.isCompleted());
-            
-            isDone.setOnClickListener(view12 -> {
-                if (!currentEntry.isGlobal()) {
-                    currentEntry.changeParameter(IS_COMPLETED, String.valueOf(isDone.isChecked()));
-                } else {
-                    currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
-                }
-                todoListEntryManager.saveEntriesAsync();
-                todoListEntryManager.updateTodoListAdapter(true, true);
-            });
-            
-            view.setOnLongClickListener(view1 -> {
-                
-                final List<Group> groupList = todoListEntryManager.getGroups();
-                int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
-                displayEditTextSpinnerDialogue(view1.getContext(), R.string.edit_event, -1, R.string.event_name_input_hint,
-                        R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.getRawTextValue(), groupList,
-                        currentIndex, (view2, text, selectedIndex) -> {
-                            if (selectedIndex != currentIndex) {
-                                currentEntry.changeGroup(groupList.get(selectedIndex));
-                            }
-                            currentEntry.changeParameter(TEXT_VALUE, text);
-                            todoListEntryManager.saveEntriesAsync();
-                            todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), false);
-                            return true;
-                        },
-                        !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
-                            if (selectedIndex != currentIndex) {
-                                currentEntry.changeGroup(groupList.get(selectedIndex));
-                            }
-                            currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
-                            currentEntry.changeParameter(IS_COMPLETED, "false");
-                            todoListEntryManager.saveEntriesAsync();
-                            // completed -> global = indicators don't change, no need to update
-                            todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isCompleted());
-                            return true;
-                        } : null);
-                return true;
-            });
-            settings.setOnClickListener(v -> entrySettings.show(currentEntry, v.getContext()));
-        }
-        
-        MaterialCardView backgroundLayer = view.findViewById(R.id.backgroundLayer);
-        backgroundLayer.setCardBackgroundColor(currentEntry.bgColor);
-        backgroundLayer.setStrokeColor(currentEntry.borderColor);
-        
-        if (currentEntry.isCompleted() || currentEntry.hideByContent()) {
-            todoText.setTextColor(currentEntry.fontColor_completed);
-        } else {
-            todoText.setTextColor(currentEntry.fontColor);
-        }
-        
-        todoText.setText(currentEntry.getTextOnDay(currentlySelectedDay, view.getContext()));
-        
-        return view;
+        return currentTodoListEntries.get(i).getType();
     }
 }
