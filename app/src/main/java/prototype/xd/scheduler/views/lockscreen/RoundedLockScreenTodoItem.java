@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.views.lockscreen;
 
+import android.content.res.ColorStateList;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -30,11 +31,16 @@ public class RoundedLockScreenTodoItem extends LockScreenTodoItemView<RoundedEnt
     
     @Override
     public void setIndicatorColor(int color) {
-        viewBinding.indicatorView.setCardBackgroundColor(color);
+        viewBinding.indicatorView.setBackgroundTintList(ColorStateList.valueOf(color));
     }
     
     @Override
-    public void setBorderSize(int sizePX) {
+    public void setTimeTextColor(int color) {
+        viewBinding.timeText.setTextColor(color);
+    }
+    
+    @Override
+    public void setBorderSizePX(int sizePX) {
         CardView.LayoutParams params = (CardView.LayoutParams) viewBinding.backgroundMain.getLayoutParams();
         params.setMargins(sizePX, sizePX, sizePX, sizePX);
         viewBinding.backgroundMain.setLayoutParams(params);
@@ -46,18 +52,18 @@ public class RoundedLockScreenTodoItem extends LockScreenTodoItemView<RoundedEnt
     }
     
     @Override
-    public void setTitleTextSize(float sizeDP) {
-        viewBinding.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizeDP);
+    public void setTitleTextSize(float sizeSP) {
+        viewBinding.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizeSP);
     }
     
     @Override
-    public void setTimeText(String text) {
+    public void setTimeSpanText(String text) {
         viewBinding.timeText.setText(text);
     }
     
     @Override
-    public void setTimeTextSize(float sizeDP) {
-        viewBinding.timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizeDP);
+    public void setTimeTextSize(float sizeSP) {
+        viewBinding.timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizeSP);
     }
     
     @Override

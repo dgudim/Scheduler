@@ -4,23 +4,27 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
+import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
-import android.app.AlertDialog;
 import android.view.LayoutInflater;
-import android.widget.GridView;
+import android.view.View;
+import android.widget.LinearLayout;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.adapters.TodoItemViewListAdapter;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
-import prototype.xd.scheduler.databinding.GridSelectionViewBinding;
+import prototype.xd.scheduler.databinding.TodoItemViewSelectionDialogBinding;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
@@ -39,14 +43,37 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         LockScreenTodoItemView<?> upcomingEntryPreview;
         LockScreenTodoItemView<?> expiredEntryPreview;
         
+        @Nullable
+        TodoItemViewType prevTodoItemViewType;
         TodoItemViewType todoItemViewType;
+        AlertDialog viewSelectionDialog;
         
         CompoundCustomizationViewHolder(CompoundCustomizationSettingsEntryBinding viewBinding) {
             super(viewBinding);
             
-            todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, DEFAULT_TODO_ITEM_VIEW_TYPE));
+            todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE));
             
-            inflatePreviews();
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            LinearLayout viewSelectionDialogView = TodoItemViewSelectionDialogBinding.inflate(layoutInflater).getRoot();
+            
+            viewSelectionDialog = new MaterialAlertDialogBuilder(context)
+                    .setView(viewSelectionDialogView)
+                    .create();
+            
+            for (TodoItemViewType viewType : TodoItemViewType.values()) {
+                View view = LockScreenTodoItemView.inflateViewByType(viewType, viewSelectionDialogView, layoutInflater).getRoot();
+                view.setOnClickListener(v -> {
+                    todoItemViewType = viewType;
+                    preferences.edit().putString(TODO_ITEM_VIEW_TYPE, todoItemViewType.name()).apply();
+                    updatePreviews();
+                    viewSelectionDialog.dismiss();
+                });
+                viewSelectionDialogView.addView(view);
+            }
+            
+            viewBinding.previewContainer.setOnClickListener(v ->
+                    viewSelectionDialog.show());
+            
             updatePreviews();
             
             Utilities.ColorPickerKeyedClickListener colorPickerClickListener = (dialog, selectedColor, key, allColors) -> {
@@ -55,12 +82,11 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                     case Keys.UPCOMING_BG_COLOR:
                     case Keys.BG_COLOR:
                     case Keys.EXPIRED_BG_COLOR:
-                        updatePreviewBgs();
-                        break;
+                    
                     case Keys.UPCOMING_FONT_COLOR:
                     case Keys.FONT_COLOR:
                     case Keys.EXPIRED_FONT_COLOR:
-                        updatePreviewFonts();
+                        updatePreviewFontsAndBgs();
                         break;
                     case Keys.UPCOMING_BORDER_COLOR:
                     case Keys.BORDER_COLOR:
@@ -134,6 +160,12 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                     onChangeListener, R.string.settings_expired_border_thickness,
                     Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS, true);
             
+            Utilities.setSliderChangeListener(
+                    viewBinding.fontSizeText,
+                    viewBinding.fontSizeSeekBar,
+                    (slider, value, fromUser, key) -> updatePreviewFontSize((int) value), R.string.settings_font_size,
+                    Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE, false);
+            
         }
         
         @Override
@@ -142,51 +174,56 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         }
         
         protected void inflatePreviews() {
-            LayoutInflater layoutInflater = LayoutInflater.from(context);
-            todayEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
-            upcomingEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
-            expiredEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
-            viewBinding.previewContainer.addView(upcomingEntryPreview.getRoot());
-            viewBinding.previewContainer.addView(todayEntryPreview.getRoot());
-            viewBinding.previewContainer.addView(expiredEntryPreview.getRoot());
-    
-            todayEntryPreview.getRoot().setOnClickListener(v -> {
-                final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-        
-                GridSelectionViewBinding gridSelection = GridSelectionViewBinding.inflate(LayoutInflater.from(context));
-                GridView gridView = gridSelection.gridView;
-                gridView.setNumColumns(1);
-                gridView.setHorizontalSpacing(5);
-                gridView.setVerticalSpacing(5);
-                gridView.setAdapter(new TodoItemViewListAdapter());
-        
-                alert.setView(gridSelection.getRoot());
-                alert.show();
-            });
+            if (prevTodoItemViewType != todoItemViewType) {
+                prevTodoItemViewType = todoItemViewType;
+                
+                LayoutInflater layoutInflater = LayoutInflater.from(context);
+                
+                todayEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
+                upcomingEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
+                expiredEntryPreview = LockScreenTodoItemView.inflateViewByType(todoItemViewType, viewBinding.previewContainer, layoutInflater);
+                
+                viewBinding.previewContainer.removeAllViews();
+                viewBinding.previewContainer.addView(upcomingEntryPreview.getRoot());
+                viewBinding.previewContainer.addView(todayEntryPreview.getRoot());
+                viewBinding.previewContainer.addView(expiredEntryPreview.getRoot());
+            }
         }
         
         protected void updatePreviews() {
-            updatePreviewFonts();
-            updatePreviewBgs();
+            
+            inflatePreviews();
+            updatePreviewFontsAndBgs();
             updatePreviewBorders();
+            
             updateUpcomingPreviewBorderThickness(preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS));
             updateCurrentPreviewBorderThickness(preferences.getInt(Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS));
             updateExpiredPreviewBorderThickness(preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS));
+            
+            updatePreviewFontSize(preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE));
         }
         
+        
         public void updateUpcomingPreviewBorderThickness(int borderThickness) {
-            upcomingEntryPreview.setBorderSize(borderThickness);
+            upcomingEntryPreview.setBorderSizeDP(borderThickness, preferences);
         }
         
         public void updateCurrentPreviewBorderThickness(int borderThickness) {
-            todayEntryPreview.setBorderSize(borderThickness);
+            todayEntryPreview.setBorderSizeDP(borderThickness, preferences);
         }
         
         public void updateExpiredPreviewBorderThickness(int borderThickness) {
-            expiredEntryPreview.setBorderSize(borderThickness);
+            expiredEntryPreview.setBorderSizeDP(borderThickness, preferences);
         }
         
-        public void updatePreviewFonts() {
+        
+        public void updatePreviewFontSize(int fontSizeSP) {
+            todayEntryPreview.setCombinedTextSize(fontSizeSP);
+            upcomingEntryPreview.setCombinedTextSize(fontSizeSP);
+            expiredEntryPreview.setCombinedTextSize(fontSizeSP);
+        }
+        
+        public void updatePreviewFontsAndBgs() {
             
             int fontColor = preferences.getInt(Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR);
             int fontColorUpcoming = preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
@@ -196,12 +233,6 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.fontColorSelector.setCardBackgroundColor(fontColor);
             viewBinding.fontColorExpiredSelector.setCardBackgroundColor(fontColorExpired);
             
-            upcomingEntryPreview.setTitleTextColor(mixTwoColors(fontColor, fontColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
-            todayEntryPreview.setTitleTextColor(fontColor);
-            expiredEntryPreview.setTitleTextColor(mixTwoColors(fontColor, fontColorExpired, DEFAULT_COLOR_MIX_FACTOR));
-        }
-        
-        public void updatePreviewBgs() {
             
             int bgColor = preferences.getInt(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR);
             int bgColorUpcoming = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
@@ -211,9 +242,14 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.backgroundColorSelector.setCardBackgroundColor(bgColor);
             viewBinding.backgroundColorExpiredSelector.setCardBackgroundColor(bgColorExpired);
             
-            upcomingEntryPreview.setBackgroundColor(mixTwoColors(bgColor, bgColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
-            todayEntryPreview.setBackgroundColor(bgColor);
-            expiredEntryPreview.setBackgroundColor(mixTwoColors(bgColor, bgColorExpired, DEFAULT_COLOR_MIX_FACTOR));
+            
+            upcomingEntryPreview.mixAndSetBgAndTextColors(
+                    mixTwoColors(fontColor, fontColorUpcoming, DEFAULT_COLOR_MIX_FACTOR),
+                    mixTwoColors(bgColor, bgColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
+            todayEntryPreview.mixAndSetBgAndTextColors(fontColor, bgColor);
+            expiredEntryPreview.mixAndSetBgAndTextColors(
+                    mixTwoColors(fontColor, fontColorExpired, DEFAULT_COLOR_MIX_FACTOR),
+                    mixTwoColors(bgColor, bgColorExpired, DEFAULT_COLOR_MIX_FACTOR));
         }
         
         public void updatePreviewBorders() {

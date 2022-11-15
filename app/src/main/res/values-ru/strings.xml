@@ -26,6 +26,7 @@
     <string name="item_tomorrow">(Завтра)</string>
     <string name="item_yesterday">(Вчера)</string>
     <string name="add_current_config_as_group_prompt">Добавить текущую конфигурацию как группу?</string>
+    <string name="name">Название</string>
     <string name="title">Название</string>
     <string name="group_with_same_name_exists">Группа с таким именем уже существует</string>
     <string name="overwrite_prompt">Перезаписать?</string>
@@ -61,21 +62,21 @@
     <string name="settings_adaptive_color_balance">Слияние с фоном: %s</string>
     <string name="settings_show_days_expired">Показывать события после %d дня/дней</string>
     <string name="settings_show_days_upcoming">Показывать события за %d дня/дней</string>
-    <string name="settings_border_thickness">Толщина контура: %d</string>
     <string name="settings_bg_color">Фон</string>
     <string name="settings_border_color">Контур</string>
     <string name="settings_text_color">Шрифт</string>
     <string name="settings_add_group">Добавить группу</string>
     <string name="settings_reset_bg">Сбросить фоны</string>
     <string name="settings_reset_to_defaults">Сбросить настройки</string>
-    <string name="settings_upcoming_border_thickness">Толщина контура для будущих событий: %d</string>
-    <string name="settings_current_border_thickness">Толщина контура для текущих событий: %d</string>
+    <string name="settings_border_thickness">Толщина контура: %s</string>
+    <string name="settings_upcoming_border_thickness">Толщина контура для будущих событий: %s</string>
+    <string name="settings_current_border_thickness">Толщина контура для текущих событий: %s</string>
+    <string name="settings_expired_border_thickness">Толщина контура для пропущенных событий: %s</string>
     <string name="settings_show_items_lock">Показывать на экране блокировки</string>
     <string name="settings_show_global_items_lock">Показывать общие события на экране блокировки</string>
     <string name="settings_priority">Приоритет: %d</string>
     <string name="settings_max_rWidth_lock">Растянуть фон события на всю ширину экрана блокировки</string>
     <string name="settings_font_size">Размер шрифта(Экран блокировки): %d</string>
-    <string name="settings_expired_border_thickness">Толщина контура для пропущенных событий: %d</string>
     <string name="delete_all_saved_backgrounds_prompt">Удалить все сохраненные фоны?</string>
     <string name="day_monday">понедельник</string>
     <string name="day_tuesday">вторник</string>
@@ -121,4 +122,6 @@
     <string name="finish">Завершить</string>
     <string name="before_you_continue">Перед тем как продолжить</string>
     <string name="read_and_understood">Я прочитал и понял все вышесказанное</string>
+    <string name="select_view">Выберите вид</string>
+    <string name="choose_how_items_look">выберите, как элементы будут выглядеть на экране блокировки</string>
 </resources>

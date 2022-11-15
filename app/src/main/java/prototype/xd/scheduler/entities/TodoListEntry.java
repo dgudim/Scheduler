@@ -269,15 +269,19 @@ public class TodoListEntry extends RecycleViewEntry {
     }
     
     public String getTimeSpan(Context context) {
+        
         if (event == null) {
             return "";
         }
+        
         if (allDay) {
             return context.getString(R.string.calendar_event_all_day);
         }
+        
         if (recurrenceSet != null) {
             return DateManager.getTimeSpan(timestamp_start, timestamp_start + timestamp_duration);
         }
+        
         if (timestamp_start == timestamp_end) {
             return datetimeFromEpoch(timestamp_start);
         } else {

@@ -11,9 +11,9 @@ import static prototype.xd.scheduler.utilities.DateManager.DEFAULT_BACKGROUND_NA
 import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TODO_ITEM_VIEW_TYPE;
+import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
+import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
-import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_SCALED_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
@@ -62,7 +62,6 @@ class LockScreenBitmapDrawer {
     
     public final int displayWidth;
     public final int displayHeight;
-    private float scaledDensity;
     
     private volatile boolean busy = false;
     
@@ -72,21 +71,18 @@ class LockScreenBitmapDrawer {
     
     private long previous_hash;
     
-    private float densityScaledFontSize = 0;
-    
     public LockScreenBitmapDrawer(Context context) throws IllegalStateException {
         wallpaperManager = WallpaperManager.getInstance(context);
         preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        
-        if ((scaledDensity = preferences.getFloat(DISPLAY_METRICS_SCALED_DENSITY, -1)) == -1) {
+    
+        if (preferences.getFloat(DISPLAY_METRICS_DENSITY, -1) == -1) {
             DisplayMetrics displayMetrics = new DisplayMetrics();
             ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(displayMetrics);
             
             preferences.edit()
                     .putInt(DISPLAY_METRICS_WIDTH, displayMetrics.widthPixels)
                     .putInt(DISPLAY_METRICS_HEIGHT, displayMetrics.heightPixels)
-                    .putFloat(DISPLAY_METRICS_SCALED_DENSITY, displayMetrics.density).apply();
-            scaledDensity = displayMetrics.density;
+                    .putFloat(DISPLAY_METRICS_DENSITY, displayMetrics.density).apply();
             
             log(INFO, NAME, "got display metrics: " + displayMetrics);
         }
@@ -122,8 +118,6 @@ class LockScreenBitmapDrawer {
             log(WARN, NAME, "Not starting bitmap thread, orientation not vertical");
             return false;
         }
-        
-        densityScaledFontSize = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE) / 2.7F * scaledDensity;
         
         if (!busy) {
             busy = true;
@@ -175,7 +169,7 @@ class LockScreenBitmapDrawer {
         
         Canvas canvas = new Canvas(bitmap);
         List<Group> groups = loadGroups(context);
-        TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, DEFAULT_TODO_ITEM_VIEW_TYPE));
+        TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE));
         // load user defined entries (from files)
         // add entries from all calendars spanning 4 weeks
         // sort and filter entries
@@ -198,7 +192,7 @@ class LockScreenBitmapDrawer {
         // first pass, add all views, setup layout independent parameters
         for (TodoListEntry todoListEntry : toAdd) {
             LockScreenTodoItemView<?> itemView = LockScreenTodoItemView.inflateViewByType(todoItemViewType, rootView, layoutInflater);
-            itemView.applyLayoutIndependentParameters(todoListEntry, preferences, densityScaledFontSize);
+            itemView.applyLayoutIndependentParameters(todoListEntry, preferences);
             itemViews.add(itemView);
             rootView.addView(itemView.getRoot());
         }

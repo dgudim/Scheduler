@@ -480,7 +480,7 @@
                             android:stepSize="1.0"
                             android:value="3.0"
                             android:valueFrom="0.0"
-                            android:valueTo="15.0"
+                            android:valueTo="10"
                             tools:ignore="SpeakableTextPresentCheck" />
 
                     </LinearLayout>

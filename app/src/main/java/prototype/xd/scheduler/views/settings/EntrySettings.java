@@ -85,7 +85,7 @@ public class EntrySettings extends PopupSettingsView {
                         view.setOnLongClickListener(view1 -> {
                             
                             displayEditTextDialogue(view1.getContext(),
-                                    R.string.edit, R.string.title,
+                                    R.string.edit, R.string.name,
                                     R.string.cancel, R.string.save, R.string.delete_group,
                                     groupList.get(position).getName(),
                                     (view2, text, selectedIndex) -> {
@@ -151,7 +151,7 @@ public class EntrySettings extends PopupSettingsView {
         });
         
         bnd.addGroup.setOnClickListener(v -> displayEditTextDialogue(v.getContext(), R.string.add_current_config_as_group_prompt,
-                R.string.add_current_config_as_group_message, R.string.title,
+                R.string.add_current_config_as_group_message, R.string.name,
                 R.string.cancel, R.string.add,
                 (view, text, selection) -> {
                     int groupIndex = groupIndexInList(groupList, text);

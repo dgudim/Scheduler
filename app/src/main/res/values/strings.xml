@@ -5,7 +5,6 @@
     <string name="settings_fragment_label">Settings Fragment</string>
     <string name="delete_item">Delete item</string>
     <string name="settings_state_symbol" translatable="false">⬧</string>
-    <string name="settings_current_border_thickness">Current events border thickness: %d</string>
     <string name="calendar_event_all_day">all day</string>
     <string name="permissions_granted">granted</string>
     <string name="service_name">Background updater service</string>
@@ -26,22 +25,24 @@
     <string name="settings_adaptive_color_balance">Blend with background: %s</string>
     <string name="settings_show_days_expired">Show events after %d day/days</string>
     <string name="settings_show_days_upcoming">Show events in %d day/days</string>
-    <string name="settings_border_thickness">Border thickness: %d</string>
     <string name="settings_bg_color">Background</string>
     <string name="settings_border_color">Border</string>
     <string name="settings_text_color">Font</string>
     <string name="settings_add_group">Add group</string>
     <string name="settings_reset_bg">Reset backgrounds</string>
     <string name="settings_reset_to_defaults">Reset settings</string>
-    <string name="title">Name</string>
+    <string name="name">Name</string>
+    <string name="title">Title</string>
     <string name="yes">Yes</string>
     <string name="off">Off</string>
-    <string name="settings_upcoming_border_thickness">Upcoming events border thickness: %d</string>
+    <string name="settings_current_border_thickness">Current events border thickness: %s</string>
+    <string name="settings_border_thickness">Border thickness: %s</string>
+    <string name="settings_upcoming_border_thickness">Upcoming events border thickness: %s</string>
+    <string name="settings_expired_border_thickness">Expired events border thickness: %s</string>
     <string name="settings_show_items_lock">Show on lock screen</string>
     <string name="settings_show_global_items_lock">Show global events on lock screen</string>
     <string name="settings_priority">Priority: %d</string>
     <string name="settings_font_size">Font size (Lock screen): %d</string>
-    <string name="settings_expired_border_thickness">Expired events border thickness: %d</string>
     <string name="save">Save</string>
     <string name="reset_settings_prompt">Reset settings?</string>
     <string name="overwrite_prompt">Overwrite?</string>
@@ -122,5 +123,7 @@
     <string name="finish">Finish</string>
     <string name="before_you_continue">Before you continue</string>
     <string name="read_and_understood">I have read and understood all the things above</string>
+    <string name="select_view">Select view</string>
+    <string name="choose_how_items_look">choose how items will look on your lockscreen</string>
 
 </resources>

@@ -28,18 +28,29 @@
             app:cardCornerRadius="5dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <View
                     android:id="@+id/indicator_view"
-                    android:layout_width="10dp"
+                    android:layout_width="5dp"
                     android:layout_height="0dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="1dp"
                     android:background="@drawable/round_bg"
                     android:backgroundTint="#000000"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@+id/title_text"
+                    app:layout_constraintStart_toEndOf="@+id/time_text_start"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/time_text_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="00:00"
+                    android:textColor="@color/gray_harmonized"
+                    app:layout_constraintBottom_toBottomOf="@+id/indicator_view"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,12 +59,13 @@
                     style="@style/MediumHeading"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="15dp"
                     android:gravity="center"
+                    android:paddingStart="50dp"
+                    android:paddingEnd="50dp"
                     android:text="@string/title"
                     android:textColor="@android:color/black"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/indicator_view"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -61,12 +73,12 @@
                     style="@style/MediumHeadingSubtext"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="15dp"
-                    android:gravity="center"
+                    android:paddingStart="3dp"
+                    android:paddingEnd="3dp"
                     android:text="00:00 - 5:00"
                     android:textColor="@color/gray_harmonized"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/indicator_view"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/title_text"
                     tools:ignore="HardcodedText" />
 

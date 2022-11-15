@@ -24,20 +24,21 @@ public class Keys {
     public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR = 0xff_88FF88;
     public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR = 0xff_FF8888;
     
-    public static final int SETTINGS_DEFAULT_BORDER_THICKNESS = 5;
-    public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS = 5;
-    public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS = 5;
+    public static final int SETTINGS_DEFAULT_BORDER_THICKNESS = 2;
+    public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS = 3;
+    public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS = 3;
     
     public static final int SETTINGS_DEFAULT_FONT_COLOR = 0xff_000000;
     public static final int SETTINGS_DEFAULT_UPCOMING_FONT_COLOR = 0xff_005500;
     public static final int SETTINGS_DEFAULT_EXPIRED_FONT_COLOR = 0xff_990000;
     
-    public static final int SETTINGS_DEFAULT_FONT_SIZE = 19;
+    public static final float DEFAULT_TITLE_FONT_SIZE_MULTIPLIER = 1.1F;
+    public static final int SETTINGS_DEFAULT_FONT_SIZE = 15;
     public static final boolean SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED = false;
-    public static final int SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE = 2;
+    public static final int SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE = 3;
     
-    public static final boolean SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK = false;
-    public static final boolean SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME = false;
+    public static final boolean SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK = true;
+    public static final boolean SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME = true;
     
     public static final boolean SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK = true;
     
@@ -95,7 +96,7 @@ public class Keys {
     public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
     
     public static final String TODO_ITEM_VIEW_TYPE = "lockScreenTodoItemViewType";
-    public static final String DEFAULT_TODO_ITEM_VIEW_TYPE = LockScreenTodoItemView.TodoItemViewType.BASIC.name();
+    public static final String SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE = LockScreenTodoItemView.TodoItemViewType.BASIC.name();
     
     public static final byte APP_THEME_LIGHT = MODE_NIGHT_NO;
     public static final byte APP_THEME_DARK = MODE_NIGHT_YES;
@@ -115,7 +116,7 @@ public class Keys {
     
     public static final String DISPLAY_METRICS_HEIGHT = "metrics_H";
     public static final String DISPLAY_METRICS_WIDTH = "metrics_W";
-    public static final String DISPLAY_METRICS_SCALED_DENSITY = "metrics_SD";
+    public static final String DISPLAY_METRICS_DENSITY = "metrics_D";
     
     public static final String ROOT_DIR = "root_directory";
 }

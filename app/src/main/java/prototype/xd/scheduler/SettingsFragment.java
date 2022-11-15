@@ -57,8 +57,6 @@ public class SettingsFragment extends DialogFragment {
         settingsEntries.add(new SeekBarSettingsEntryConfig(0, 10, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE, true, true,
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance));
         settingsEntries.add(new CompoundCustomizationEntryConfig());
-        settingsEntries.add(new SeekBarSettingsEntryConfig(10, 30, Keys.SETTINGS_DEFAULT_FONT_SIZE, true, false,
-                Keys.FONT_SIZE, R.string.settings_font_size));
     
     
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_visibility)));

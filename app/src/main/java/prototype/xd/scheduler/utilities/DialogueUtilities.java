@@ -169,7 +169,7 @@ public class DialogueUtilities {
                                                       int defaultIndex,
                                                       @NonNull OnClickListenerWithEditText confirmationListener,
                                                       @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {
-        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_spinner_dialogue);
+        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_spinner_dialog);
         ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintStringResource);
         TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
         setupEditText(editText, defaultEditTextValue);

@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:background="@color/gray_harmonized"
         android:orientation="vertical"
-        android:padding="3dp"
+        android:padding="5dp"
         tools:ignore="UselessParent">
         <!-- For easier layouting -->
 
@@ -43,12 +43,11 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="5dp"
                 android:gravity="center"
-                android:text="Title"
+                android:text="@string/title"
                 android:textColor="@android:color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/indicator_view"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="HardcodedText" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/time_text"
