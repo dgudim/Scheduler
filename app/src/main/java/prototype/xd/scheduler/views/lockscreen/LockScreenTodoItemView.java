@@ -1,9 +1,5 @@
 package prototype.xd.scheduler.views.lockscreen;
 
-import static prototype.xd.scheduler.entities.TodoListEntry.ParameterType.BG_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.ParameterType.BORDER_COLOR;
-import static prototype.xd.scheduler.entities.TodoListEntry.ParameterType.BORDER_THICKNESS;
-import static prototype.xd.scheduler.entities.TodoListEntry.ParameterType.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
@@ -98,7 +94,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         setTitleText(entry.getTextOnDay(currentDay, context));
         setTitleTextSize(fontSizeSP * DEFAULT_TITLE_FONT_SIZE_MULTIPLIER);
         
-        if (entry.fromSystemCalendar) {
+        if (entry.isFromSystemCalendar()) {
             String timeSpan = entry.getTimeSpan(context);
             setTimeSpanText(timeSpan);
             setTimeStartText(timeSpan.split(" - ")[0]);
@@ -125,10 +121,8 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             entry.averageBackgroundColor = getAverageColor(pixels);
         }
         
-        mixAndSetBgAndTextColors(
-                entry.<Integer>getParameter(FONT_COLOR).getToday(),
-                entry.getAdaptiveColor(entry.<Integer>getParameter(BG_COLOR).getToday()));
-        setBorderColor(entry.getAdaptiveColor(entry.<Integer>getParameter(BORDER_COLOR).getToday()));
+        mixAndSetBgAndTextColors(entry.fontColor, entry.getAdaptiveColor(entry.bgColor));
+        setBorderColor(entry.getAdaptiveColor(entry.borderColor));
     }
     
     public void mixAndSetBgAndTextColors(int fontColor, int backgroundColor) {

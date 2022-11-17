@@ -60,7 +60,7 @@ public class Keys {
     public static final String IS_COMPLETED = "completed";
     public static final String SHOW_ON_LOCK = "lock";
     public static final String ASSOCIATED_DAY = "associatedDay";
-    public static final int ENTITY_SETTINGS_DEFAULT_PRIORITY = 0;
+    public static final int ENTRY_SETTINGS_DEFAULT_PRIORITY = 0;
     public static final String PRIORITY = "priority";
     
     public static final String BG_COLOR = "bgColor";
