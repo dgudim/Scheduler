@@ -65,11 +65,18 @@ public class SystemCalendar {
         availableEventColors = new ArrayList<>();
         eventCountsForColors = new ArrayList<>();
         
+        //System.out.println("CALENDAR-------------------------------------------------" + name);
+        //Cursor cursor_all = query(contentResolver, Events.CONTENT_EXCEPTION_URI, null,
+        //        Events.CALENDAR_ID + " = " + id);
+        //printTable(cursor_all);
+        //cursor_all.close();
+        
         loadCalendarEvents(contentResolver, loadMinimal);
         if (accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
             loadAvailableEventColors();
         }
     }
+    
     
     void loadAvailableEventColors() {
         availableEventColors.clear();
@@ -101,7 +108,16 @@ public class SystemCalendar {
         int events = cursor.getCount();
         cursor.moveToFirst();
         for (int i = 0; i < events; i++) {
-            systemCalendarEvents.add(new SystemCalendarEvent(cursor, this, loadMinimal));
+            
+            long originalId = getLong(cursor, calendarEventsColumns, Events.ORIGINAL_ID);
+            if (originalId != 0) {
+                // if original id is set this event is an exception to some other event
+                // TODO: find and add exception to appropriate event
+                System.out.println(getLong(cursor, calendarEventsColumns, Events.ORIGINAL_INSTANCE_TIME));
+            } else {
+                systemCalendarEvents.add(new SystemCalendarEvent(cursor, this, loadMinimal));
+            }
+            
             cursor.moveToNext();
         }
         cursor.close();
@@ -111,7 +127,7 @@ public class SystemCalendar {
     public List<TodoListEntry> getVisibleTodoListEntries(long dayStart, long dayEnd) {
         List<TodoListEntry> todoListEntries = new ArrayList<>();
         if (preferences.getBoolean(makeKey(this) + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
-            for (SystemCalendarEvent event: systemCalendarEvents) {
+            for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.fallsInRange(dayStart, dayEnd)) {
                     todoListEntries.add(new TodoListEntry(event));
                 }
@@ -126,7 +142,7 @@ public class SystemCalendar {
         for (int i = 0; i < systemCalendarEvents.size(); i++) {
             SystemCalendarEvent recurrentEvent = systemCalendarEvents.get(i);
             if (recurrentEvent.rSet != null) {
-               
+                
                 for (int i2 = 0; i2 < systemCalendarEvents.size(); i2++) {
                     SystemCalendarEvent staticEvent = systemCalendarEvents.get(i2);
                     if (staticEvent.title.equals(recurrentEvent.title) && staticEvent.rSet == null && !staticEvent.invalidFlag) {

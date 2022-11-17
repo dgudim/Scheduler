@@ -1,5 +1,9 @@
 package prototype.xd.scheduler.views.lockscreen;
 
+import static prototype.xd.scheduler.entities.TodoListEntry.ParameterType.BG_COLOR;
+import static prototype.xd.scheduler.entities.TodoListEntry.ParameterType.BORDER_COLOR;
+import static prototype.xd.scheduler.entities.TodoListEntry.ParameterType.BORDER_THICKNESS;
+import static prototype.xd.scheduler.entities.TodoListEntry.ParameterType.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
@@ -121,8 +125,10 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             entry.averageBackgroundColor = getAverageColor(pixels);
         }
         
-        mixAndSetBgAndTextColors(entry.fontColor, entry.getAdaptiveColor(entry.bgColor));
-        setBorderColor(entry.getAdaptiveColor(entry.borderColor));
+        mixAndSetBgAndTextColors(
+                entry.<Integer>getParameter(FONT_COLOR).getToday(),
+                entry.getAdaptiveColor(entry.<Integer>getParameter(BG_COLOR).getToday()));
+        setBorderColor(entry.getAdaptiveColor(entry.<Integer>getParameter(BORDER_COLOR).getToday()));
     }
     
     public void mixAndSetBgAndTextColors(int fontColor, int backgroundColor) {

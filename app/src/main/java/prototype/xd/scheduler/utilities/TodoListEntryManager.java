@@ -44,7 +44,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         ENTRIES, GROUPS, BOTH, NONE
     }
     
-    private static final String NAME = "TodoListEntryStorage";
+    private static final String NAME = "TodoListEntryManager";
     
     private long loadedDay_start;
     private long loadedDay_end;
@@ -217,17 +217,13 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         return colors;
     }
     
-    // remove indicator cache on day
-    public void invalidateIndicatorCache(long day) {
-        cachedIndicators.remove(day);
-    }
-    
     public void updateTodoListAdapter(boolean updateBitmap, boolean updateCurrentDayIndicators) {
         if (updateBitmap) {
             servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
         todoListViewAdapter.notifyVisibleEntriesUpdated();
         if (updateCurrentDayIndicators && calendarView != null) {
+            cachedIndicators.remove(currentDay);
             calendarView.notifyCurrentDayChanged();
         }
     }

@@ -35,6 +35,8 @@ public class SystemCalendarEvent {
     
     public SystemCalendar associatedCalendar;
     
+    long id;
+    
     public String title;
     public final int color;
     public long start;
@@ -63,6 +65,8 @@ public class SystemCalendarEvent {
         }
         
         this.associatedCalendar = associatedCalendar;
+        
+        id = getLong(cursor, calendarEventsColumns, Events._ID);
         
         title = getString(cursor, calendarEventsColumns, Events.TITLE).trim();
         color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);

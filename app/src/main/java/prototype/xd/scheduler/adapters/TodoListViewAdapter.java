@@ -53,7 +53,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                   EntrySettings entrySettings,
                   SystemCalendarSettings systemCalendarSettings) {
             
-            if (currentEntry.fromSystemCalendar) {
+            if (currentEntry.isFromSystemCalendar()) {
                 ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding)viewBinding;
     
                 bnd.eventColor.setCardBackgroundColor(currentEntry.event.color);

@@ -122,7 +122,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 bnd.priorityBar, bnd.priorityState,
                 this, null, R.string.settings_priority,
                 calendarKey, calendarSubKeys,
-                Keys.PRIORITY, Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
+                Keys.PRIORITY, Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY);
         
         setSliderChangeListener(
                 bnd.adaptiveColorBalanceDescription,
@@ -204,7 +204,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         }
         if (todoListEntryManager != null) {
             for (TodoListEntry current_entry : todoListEntryManager.getTodoListEntries()) {
-                if (current_entry.fromSystemCalendar && current_entry.event.subKeys.equals(entry.event.subKeys)) {
+                if (current_entry.isFromSystemCalendar() && current_entry.event.subKeys.equals(entry.event.subKeys)) {
                     current_entry.reloadParams();
                 }
             }
