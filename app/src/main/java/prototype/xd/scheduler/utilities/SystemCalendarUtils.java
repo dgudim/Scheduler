@@ -60,9 +60,9 @@ public class SystemCalendarUtils {
         
         List<SystemCalendar> systemCalendars = new ArrayList<>();
         Cursor cursor = query(contentResolver, CalendarContract.Calendars.CONTENT_URI, calendarColumns.toArray(new String[0]), null);
-        int calendars = cursor.getCount();
+        int calendarCount = cursor.getCount();
         cursor.moveToFirst();
-        for (int i = 0; i < calendars; i++) {
+        for (int i = 0; i < calendarCount; i++) {
             systemCalendars.add(new SystemCalendar(cursor, contentResolver, loadMinimal));
             cursor.moveToNext();
         }

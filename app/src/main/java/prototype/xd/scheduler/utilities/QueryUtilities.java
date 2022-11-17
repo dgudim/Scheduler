@@ -12,8 +12,12 @@ public class QueryUtilities {
         throw new IllegalStateException("Query utility class");
     }
     
+    private static String nullWrapper(String str) {
+        return str == null ? "" : str.trim();
+    }
+    
     public static String getString(Cursor cursor, List<String> columns, String column){
-        return cursor.getString(columns.indexOf(column));
+        return nullWrapper(cursor.getString(columns.indexOf(column)));
     }
     
     public static long getLong(Cursor cursor, List<String> columns, String column){

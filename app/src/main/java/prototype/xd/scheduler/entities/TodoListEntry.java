@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.entities;
 
 import static android.util.Log.WARN;
-import static org.apache.commons.lang.ArrayUtils.addAll;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
@@ -36,15 +35,16 @@ import com.google.android.material.color.MaterialColors;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.SSMap;
 
 public class TodoListEntry extends RecycleViewEntry {
     
@@ -91,16 +91,15 @@ public class TodoListEntry extends RecycleViewEntry {
     
     EntryType entryType;
     
-    protected String[] params;
+    protected SSMap params = new SSMap();
     
     public TodoListEntry(SystemCalendarEvent event) {
         this.event = event;
-        params = new String[]{};
         assignId(event.hashCode());
         reloadParams();
     }
     
-    public TodoListEntry(Context context, String[] params, String groupName, List<Group> groups, long id) {
+    public TodoListEntry(Context context, SSMap params, String groupName, List<Group> groups, long id) {
         if (!groupName.isEmpty()) {
             group = new Group(context, groupName, groups);
             if (group.isNullGroup()) {
@@ -117,7 +116,7 @@ public class TodoListEntry extends RecycleViewEntry {
         return event != null;
     }
     
-    public String[] getParams() {
+    public SSMap getParams() {
         return params;
     }
     
@@ -291,51 +290,31 @@ public class TodoListEntry extends RecycleViewEntry {
         }
     }
     
-    public String[] getDisplayParams() {
-        List<String> displayParams = new ArrayList<>();
-        for (int i = 0; i < params.length; i += 2) {
-            
-            if (!(params[i].equals(TEXT_VALUE)
-                    || params[i].equals(ASSOCIATED_DAY)
-                    || params[i].equals(IS_COMPLETED))) {
-                displayParams.add(params[i]);
-                displayParams.add(params[i + 1]);
-            }
-        }
-        return displayParams.toArray(new String[0]);
+    public SSMap getDisplayParams() {
+        // shallow copy map
+        SSMap displayParams = new SSMap(params);
+        // remove not display parameters
+        displayParams.removeAll(Arrays.asList(TEXT_VALUE, ASSOCIATED_DAY, IS_COMPLETED));
+        return displayParams;
     }
     
     public void removeDisplayParams() {
-        List<String> displayParams = new ArrayList<>();
-        for (int i = 0; i < params.length; i += 2) {
-            
-            if (params[i].equals(TEXT_VALUE)
-                    || params[i].equals(ASSOCIATED_DAY)
-                    || params[i].equals(IS_COMPLETED)) {
-                displayParams.add(params[i]);
-                displayParams.add(params[i + 1]);
-            }
-        }
-        params = displayParams.toArray(new String[0]);
+        params.retainAll(Arrays.asList(TEXT_VALUE, ASSOCIATED_DAY, IS_COMPLETED));
         reloadParams();
     }
     
     public void reloadParams() {
         if (!isFromSystemCalendar()) {
-            int paramIndex = -1;
-            for (int i = 0; i < params.length; i += 2) {
-                if (params[i].equals(ASSOCIATED_DAY)) {
-                    paramIndex = i;
-                    break;
-                }
-            }
-            if (paramIndex != -1) {
-                long associatedDayLoaded = Long.parseLong(params[paramIndex + 1]);
+            
+            String associatedDayString = params.get(ASSOCIATED_DAY);
+            
+            if (associatedDayString != null) {
+                long associatedDayLoaded = Long.parseLong(associatedDayString);
                 
                 dayOffset_expired = preferences.getInt(EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
                 dayOffset_upcoming = preferences.getInt(UPCOMING_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
                 
-                setParamsWithGroup();
+                setParams();
                 
                 long associatedDay = currentDay;
                 if (associatedDayLoaded != DAY_FLAG_GLOBAL) {
@@ -401,7 +380,7 @@ public class TodoListEntry extends RecycleViewEntry {
             adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
             averageBackgroundColor = 0xff_FFFFFF;
             priority = ENTRY_SETTINGS_DEFAULT_PRIORITY;
-            setParamsWithGroup();
+            setParams();
             
         } else {
             
@@ -448,7 +427,7 @@ public class TodoListEntry extends RecycleViewEntry {
             }
             
             averageBackgroundColor = 0xff_FFFFFF;
-            setParams(params);
+            setParams();
         }
         
         //colors and thickness post update
@@ -570,97 +549,41 @@ public class TodoListEntry extends RecycleViewEntry {
         return dayOffset;
     }
     
-    private void setParamsWithGroup() {
-        if (group != null) {
-            setParams((String[]) addAll(group.params, params));
-        } else {
-            setParams(params);
+    // get parameter from group if it exists, if not, get from current parameters
+    private void setParam(String parameter, Consumer<String> actionIfNotNull) {
+        String paramValue = group != null ? group.params.getOrDefault(parameter, params.get(parameter)) : params.get(parameter);
+        if (paramValue != null) {
+            actionIfNotNull.accept(paramValue);
         }
     }
     
-    private void setParams(String[] params) {
-        for (int i = 0; i < params.length; i += 2) {
-            switch (params[i]) {
-                case (TEXT_VALUE):
-                    textValue = params[i + 1];
-                    break;
-                case (IS_COMPLETED):
-                    completed = Boolean.parseBoolean(params[i + 1]);
-                    break;
-                case (SHOW_ON_LOCK):
-                    showOnLock = Boolean.parseBoolean(params[i + 1]);
-                    break;
-                case (UPCOMING_ITEMS_OFFSET):
-                    dayOffset_upcoming = Integer.parseInt(params[i + 1]);
-                    break;
-                case (EXPIRED_ITEMS_OFFSET):
-                    dayOffset_expired = Integer.parseInt(params[i + 1]);
-                    break;
-                case (BORDER_THICKNESS):
-                    borderThickness = Integer.parseInt(params[i + 1]);
-                    break;
-                case (FONT_COLOR):
-                    setFontColor(Integer.parseInt(params[i + 1]));
-                    break;
-                case (BG_COLOR):
-                    bgColor = Integer.parseInt(params[i + 1]);
-                    break;
-                case (BORDER_COLOR):
-                    borderColor = Integer.parseInt(params[i + 1]);
-                    break;
-                case (PRIORITY):
-                    priority = Integer.parseInt(params[i + 1]);
-                    break;
-                case (ASSOCIATED_DAY):
-                    day_start = Long.parseLong(params[i + 1]);
-                    day_end = day_start;
-                    break;
-                case (ADAPTIVE_COLOR_BALANCE):
-                    adaptiveColorBalance = Integer.parseInt(params[i + 1]);
-                    break;
-                default:
-                    log(WARN, NAME, "unknown parameter: " + params[i] + " entry textValue: " + textValue);
-                    break;
-            }
-        }
+    private void setParams() {
+        setParam(TEXT_VALUE,             param -> textValue = param);
+        setParam(IS_COMPLETED,           param -> completed = Boolean.parseBoolean(param));
+        setParam(SHOW_ON_LOCK,           param -> showOnLock = Boolean.parseBoolean(param));
+        setParam(UPCOMING_ITEMS_OFFSET,  param -> dayOffset_upcoming = Integer.parseInt(param));
+        setParam(EXPIRED_ITEMS_OFFSET,   param -> dayOffset_expired = Integer.parseInt(param));
+        setParam(BORDER_THICKNESS,       param -> borderThickness = Integer.parseInt(param));
+        setParam(FONT_COLOR,             param -> setFontColor(Integer.parseInt(param)));
+        setParam(BG_COLOR,               param -> bgColor = Integer.parseInt(param));
+        setParam(BORDER_COLOR,           param -> borderColor = Integer.parseInt(param));
+        setParam(PRIORITY,               param -> priority = Integer.parseInt(param));
+        setParam(ASSOCIATED_DAY,         param -> {
+            day_start = Long.parseLong(param);
+            day_end = day_start;
+        });
+        setParam(ADAPTIVE_COLOR_BALANCE, param -> adaptiveColorBalance = Integer.parseInt(param));
     }
     
     public void changeParameter(String name, String value) {
-        boolean changed = false;
-        for (int i = 0; i < params.length; i++) {
-            if (params[i].equals(name)) {
-                params[i + 1] = value;
-                changed = true;
-                break;
-            }
-        }
-        if (!changed) {
-            String[] newParams = new String[params.length + 2];
-            System.arraycopy(params, 0, newParams, 0, params.length);
-            newParams[newParams.length - 1] = value;
-            newParams[newParams.length - 2] = name;
-            params = newParams;
-        }
+        params.put(name, value);
         reloadParams();
     }
     
     public void setStateIconColor(TextView icon, String parameter) {
-        boolean containedInGroupParams = false;
-        boolean containedInPersonalParams = false;
-        if (group != null) {
-            for (int i = 0; i < group.params.length; i += 2) {
-                if (group.params[i].equals(parameter)) {
-                    containedInGroupParams = true;
-                    break;
-                }
-            }
-        }
-        for (int i = 0; i < params.length; i += 2) {
-            if (params[i].equals(parameter)) {
-                containedInPersonalParams = true;
-                break;
-            }
-        }
+        boolean containedInGroupParams = group != null && group.params.containsKey(parameter);
+        boolean containedInPersonalParams = params.containsKey(parameter);
+        
         if (containedInGroupParams && containedInPersonalParams) {
             icon.setTextColor(icon.getContext().getColor(R.color.entry_settings_parameter_group_and_personal));
         } else if (containedInGroupParams) {
@@ -679,7 +602,7 @@ public class TodoListEntry extends RecycleViewEntry {
     
     @Override
     public int hashCode() {
-        return Objects.hash(event, Arrays.hashCode(params), showOnLock, group);
+        return Objects.hash(event, params, showOnLock, group);
     }
     
     @Override
@@ -691,7 +614,7 @@ public class TodoListEntry extends RecycleViewEntry {
         } else if (obj instanceof TodoListEntry) {
             TodoListEntry entry = (TodoListEntry) obj;
             return Objects.equals(event, entry.event) &&
-                    Arrays.equals(entry.params, params) && showOnLock == entry.showOnLock
+                    Objects.equals(entry.params, params) && showOnLock == entry.showOnLock
                     && Objects.equals(group, entry.group);
         }
         return super.equals(obj);

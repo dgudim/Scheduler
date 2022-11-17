@@ -28,6 +28,7 @@ import java.util.Objects;
 import prototype.xd.scheduler.databinding.HomeFragmentBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.SSMap;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.views.CalendarView;
 
@@ -50,7 +51,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         
         binding = HomeFragmentBinding.inflate(inflater, container, false);
-    
+        
         binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
@@ -90,20 +91,26 @@ public class HomeFragment extends Fragment {
             displayEditTextSpinnerDialogue(view1.getContext(), R.string.add_event_fab, -1, R.string.event_name_input_hint,
                     R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
                     (view2, text, selectedIndex) -> {
-                        TodoListEntry newEntry = new TodoListEntry(view2.getContext(), new String[]{
-                                TEXT_VALUE, text,
-                                ASSOCIATED_DAY, String.valueOf(currentlySelectedDay),                   // This is fine here as id because a person can't click 2 times in 1 ms
-                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
+                        SSMap values = new SSMap();
+                        values.put(TEXT_VALUE, text);
+                        values.put(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
+                        values.put(IS_COMPLETED, "false");
+                        TodoListEntry newEntry = new TodoListEntry(view2.getContext(), values,
+                                groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
+                        // This is fine here as id because a person can't click 2 times in 1 ms
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
                         todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), true);
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
-                        TodoListEntry newEntry = new TodoListEntry(view2.getContext(), new String[]{
-                                TEXT_VALUE, text,
-                                ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR,                                    // This is fine, see note above
-                                IS_COMPLETED, "false"}, groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
+                        SSMap values = new SSMap();
+                        values.put(TEXT_VALUE, text);
+                        values.put(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
+                        values.put(IS_COMPLETED, "false");
+                        TodoListEntry newEntry = new TodoListEntry(view2.getContext(), values,
+                                groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
+                        // This is fine, see note above
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
                         todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), false);

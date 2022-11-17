@@ -5,10 +5,15 @@ import static android.util.Log.INFO;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
+import static prototype.xd.scheduler.utilities.Keys.ENTRIES_GROUP_NAMES_FILE;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
+import static prototype.xd.scheduler.utilities.Keys.GROUP_NAMES_FILE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
@@ -94,8 +99,8 @@ public class Utilities {
         
         List<TodoListEntry> readEntries = new ArrayList<>();
         try {
-            List<String[]> entryParams = loadObject("list");
-            List<String> entryGroupNames = loadObject("list_groupData");
+            List<SSMap> entryParams = loadObject(ENTRIES_FILE);
+            List<String> entryGroupNames = loadObject(ENTRIES_GROUP_NAMES_FILE);
             
             if (entryParams.size() != entryGroupNames.size()) {
                 log(WARN, NAME, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
@@ -106,8 +111,10 @@ public class Utilities {
             }
             
             log(INFO, NAME, "Read todo list: " + readEntries.size());
-        } catch (Exception e) {
+        } catch (IOException e) {
             log(INFO, NAME, "No todo list");
+        } catch (Exception e) {
+            logException(NAME, e);
         }
         
         readEntries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd, calendars));
@@ -116,7 +123,7 @@ public class Utilities {
     
     public static void saveEntries(List<TodoListEntry> entries) {
         try {
-            List<String[]> entryParams = new ArrayList<>();
+            List<SSMap> entryParams = new ArrayList<>();
             List<String> entryGroupNames = new ArrayList<>();
             
             for (int i = 0; i < entries.size(); i++) {
@@ -127,12 +134,14 @@ public class Utilities {
                 }
             }
             
-            saveObject("list", entryParams);
-            saveObject("list_groupData", entryGroupNames);
+            saveObject(ENTRIES_FILE, entryParams);
+            saveObject(ENTRIES_GROUP_NAMES_FILE, entryGroupNames);
             
             log(INFO, NAME, "Saved todo list");
-        } catch (Exception e) {
+        } catch (IOException e) {
             log(ERROR, NAME, "Missing permission, failed to save todo list");
+        } catch (Exception e) {
+            logException(NAME, e);
         }
     }
     
@@ -141,8 +150,8 @@ public class Utilities {
         groups.add(new Group(context)); // add "null" group
         try {
             
-            List<String[]> groupParams = loadObject("groups");
-            List<String> groupNames = loadObject("groupNames");
+            List<SSMap> groupParams = loadObject(GROUPS_FILE);
+            List<String> groupNames = loadObject(GROUP_NAMES_FILE);
             
             if (groupParams.size() != groupNames.size()) {
                 log(WARN, NAME, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
@@ -163,7 +172,7 @@ public class Utilities {
     public static void saveGroups(List<Group> groups) {
         try {
             
-            List<String[]> groupParams = new ArrayList<>();
+            List<SSMap> groupParams = new ArrayList<>();
             List<String> groupNames = new ArrayList<>();
             for (Group group : groups) {
                 if (!group.isNullGroup()) {
@@ -172,8 +181,8 @@ public class Utilities {
                 }
             }
             
-            saveObject("groups", groupParams);
-            saveObject("groupNames", groupNames);
+            saveObject(GROUPS_FILE, groupParams);
+            saveObject(GROUP_NAMES_FILE, groupNames);
             
             log(INFO, NAME, "Saved group list");
             

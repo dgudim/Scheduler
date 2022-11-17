@@ -9,8 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
-
-import java.util.List;
+import androidx.collection.ArrayMap;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
@@ -20,8 +19,7 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
     
     private final int calendarColor;
     
-    private final List<Integer> colors;
-    private final List<Integer> color_eventCounts;
+    private final ArrayMap<Integer, Integer> eventColorCountMap;
     
     private final SystemCalendarSettings systemCalendarSettings;
     
@@ -29,20 +27,19 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
     
     public CalendarColorsGridViewAdapter(final SystemCalendarSettings systemCalendarSettings, final SystemCalendar calendar) {
         this.systemCalendarSettings = systemCalendarSettings;
-        colors = calendar.availableEventColors;
+        eventColorCountMap = calendar.eventColorCountMap;
         calendarColor = calendar.color;
-        color_eventCounts = calendar.eventCountsForColors;
         this.calendar = calendar;
     }
     
     @Override
     public int getCount() {
-        return colors.size();
+        return eventColorCountMap.size();
     }
     
     @Override
     public Object getItem(int i) {
-        return colors.get(i);
+        return eventColorCountMap.keyAt(i);
     }
     
     @Override
@@ -56,10 +53,14 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         if (view == null) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.calendar_color_entry, parent, false);
         }
-        ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(colors.get(i));
-        view.findViewById(R.id.title_default).setVisibility(calendarColor == colors.get(i) ? View.VISIBLE : View.GONE);
-        ((TextView) view.findViewById(R.id.event_count)).setText(view.getContext().getString(R.string.calendar_events, color_eventCounts.get(i)));
-        view.findViewById(R.id.settings).setOnClickListener(v -> systemCalendarSettings.show(makeKey(calendar, colors.get(i))));
+        
+        int color = eventColorCountMap.keyAt(i);
+        int count = eventColorCountMap.valueAt(i);
+        
+        ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(color);
+        view.findViewById(R.id.title_default).setVisibility(calendarColor == color ? View.VISIBLE : View.GONE);
+        ((TextView) view.findViewById(R.id.event_count)).setText(view.getContext().getString(R.string.calendar_events, count));
+        view.findViewById(R.id.settings).setOnClickListener(v -> systemCalendarSettings.show(makeKey(calendar, color)));
         
         return view;
     }

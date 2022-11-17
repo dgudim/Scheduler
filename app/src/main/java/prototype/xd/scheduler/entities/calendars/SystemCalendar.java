@@ -19,11 +19,12 @@ import android.provider.CalendarContract.Events;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
+import androidx.collection.ArrayMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -46,8 +47,7 @@ public class SystemCalendar {
     public final int color;
     
     public final List<SystemCalendarEvent> systemCalendarEvents;
-    public final List<Integer> availableEventColors;
-    public final List<Integer> eventCountsForColors;
+    public final ArrayMap<Integer, Integer> eventColorCountMap;
     
     public SystemCalendar(Cursor cursor, ContentResolver contentResolver, boolean loadMinimal) {
         account_type = getString(cursor, calendarColumns, Calendars.ACCOUNT_TYPE);
@@ -59,11 +59,10 @@ public class SystemCalendar {
         
         String timeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
         
-        timeZone = TimeZone.getTimeZone(timeZoneId == null ? timeZone_SYSTEM.getID() : timeZoneId);
+        timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? timeZone_SYSTEM.getID() : timeZoneId);
         
         systemCalendarEvents = new ArrayList<>();
-        availableEventColors = new ArrayList<>();
-        eventCountsForColors = new ArrayList<>();
+        eventColorCountMap = new ArrayMap<>();
         
         //System.out.println("CALENDAR-------------------------------------------------" + name);
         //Cursor cursor_all = query(contentResolver, Events.CONTENT_EXCEPTION_URI, null,
@@ -79,22 +78,17 @@ public class SystemCalendar {
     
     
     void loadAvailableEventColors() {
-        availableEventColors.clear();
-        eventCountsForColors.clear();
+        eventColorCountMap.clear();
         
-        for (int i = 0; i < systemCalendarEvents.size(); i++) {
-            int eventColor = systemCalendarEvents.get(i).color;
-            if (!availableEventColors.contains(eventColor)) {
-                availableEventColors.add(eventColor);
-                eventCountsForColors.add(getEventCountWithColor(eventColor));
-            }
+        for (SystemCalendarEvent event: systemCalendarEvents) {
+            eventColorCountMap.computeIfAbsent(event.color, key -> getEventCountWithColor(event.color));
         }
     }
     
     private int getEventCountWithColor(int color) {
         int count = 0;
-        for (int i = 0; i < systemCalendarEvents.size(); i++) {
-            if (systemCalendarEvents.get(i).color == color) {
+        for (SystemCalendarEvent event: systemCalendarEvents) {
+            if (event.color == color) {
                 count++;
             }
         }
@@ -105,23 +99,40 @@ public class SystemCalendar {
         systemCalendarEvents.clear();
         Cursor cursor = query(contentResolver, Events.CONTENT_URI, calendarEventsColumns.toArray(new String[0]),
                 Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0");
-        int events = cursor.getCount();
+        int eventCount = cursor.getCount();
         cursor.moveToFirst();
-        for (int i = 0; i < events; i++) {
+        
+        Map<Long, List<Long>> exceptionLists = new HashMap<>();
+        
+        for (int i = 0; i < eventCount; i++) {
             
-            long originalId = getLong(cursor, calendarEventsColumns, Events.ORIGINAL_ID);
-            if (originalId != 0) {
+            long originalInstanceTime = getLong(cursor, calendarEventsColumns, Events.ORIGINAL_INSTANCE_TIME);
+            if (originalInstanceTime != 0) {
                 // if original id is set this event is an exception to some other event
-                // TODO: find and add exception to appropriate event
-                System.out.println(getLong(cursor, calendarEventsColumns, Events.ORIGINAL_INSTANCE_TIME));
+                exceptionLists.computeIfAbsent(getLong(cursor, calendarEventsColumns, Events.ORIGINAL_ID), k -> new ArrayList<>())
+                        .add(originalInstanceTime);
             } else {
                 systemCalendarEvents.add(new SystemCalendarEvent(cursor, this, loadMinimal));
             }
             
             cursor.moveToNext();
         }
+        
+        for (Map.Entry<Long, List<Long>> exceptionList : exceptionLists.entrySet()) {
+            boolean applied = false;
+            for (SystemCalendarEvent event : systemCalendarEvents) {
+                if (event.id == exceptionList.getKey()) {
+                    event.addExceptions(exceptionList.getValue().toArray(new Long[0]));
+                    applied = true;
+                    break;
+                }
+            }
+            if (!applied) {
+                log(WARN, "System calendar", "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
+            }
+        }
+        
         cursor.close();
-        dropDuplicates();
     }
     
     public List<TodoListEntry> getVisibleTodoListEntries(long dayStart, long dayEnd) {
@@ -134,50 +145,6 @@ public class SystemCalendar {
             }
         }
         return todoListEntries;
-    }
-    
-    public void dropDuplicates() {
-        List<SystemCalendarEvent> filteredSystemCalendarEvents = new ArrayList<>();
-        
-        for (int i = 0; i < systemCalendarEvents.size(); i++) {
-            SystemCalendarEvent recurrentEvent = systemCalendarEvents.get(i);
-            if (recurrentEvent.rSet != null) {
-                
-                for (int i2 = 0; i2 < systemCalendarEvents.size(); i2++) {
-                    SystemCalendarEvent staticEvent = systemCalendarEvents.get(i2);
-                    if (staticEvent.title.equals(recurrentEvent.title) && staticEvent.rSet == null && !staticEvent.invalidFlag) {
-                        
-                        RecurrenceSetIterator it = recurrentEvent.rSet.iterator(recurrentEvent.timeZone, recurrentEvent.start);
-                        long instance = 0;
-                        while (it.hasNext() && instance <= staticEvent.start) {
-                            instance = it.next();
-                            if (instance == staticEvent.start && instance + recurrentEvent.duration == staticEvent.start + staticEvent.duration) {
-                                staticEvent.invalidFlag = true;
-                                log(WARN, "SystemCalendar", "Overlapping duplicate events: " + staticEvent.title + ", dropping");
-                                break;
-                            }
-                        }
-                        
-                    }
-                }
-                
-            }
-        }
-        
-        int filtered = 0;
-        
-        for (SystemCalendarEvent event : systemCalendarEvents) {
-            if (!event.invalidFlag) {
-                filteredSystemCalendarEvents.add(event);
-            } else {
-                filtered++;
-            }
-        }
-        if (filtered > 0) {
-            log(WARN, "SystemCalendar", "Calendar " + name + " is unstable, consider deleting duplicate events, you have " + filtered + " duplicates");
-        }
-        systemCalendarEvents.clear();
-        systemCalendarEvents.addAll(filteredSystemCalendarEvents);
     }
     
     @NonNull

@@ -35,7 +35,7 @@ public class CalendarSettingsEntryConfig extends SettingsEntryConfig {
         this.calendarColor = calendar.color;
         calendarEventsCount = calendar.systemCalendarEvents.size();
         
-        if (calendar.availableEventColors.size() > 0 && calendar.systemCalendarEvents.size() > 0) {
+        if (calendar.eventColorCountMap.size() > 0 && calendarEventsCount > 0) {
             gridViewAdapter = new CalendarColorsGridViewAdapter(systemCalendarSettings, calendar);
         }
     }

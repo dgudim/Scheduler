@@ -5,27 +5,25 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.SSMap;
 
 public class Group {
-    
-    private static final String NAME = "Entry group";
     
     private boolean isNullGroup = false;
     private String groupName;
     
-    protected String[] params = new String[]{};
+    protected SSMap params = new SSMap();
     
     public Group(Context context) {
         groupName = context.getString(R.string.blank_group_name);
         isNullGroup = true;
     }
     
-    public String[] getParams() {
+    public SSMap getParams() {
         return params;
     }
     
@@ -50,7 +48,7 @@ public class Group {
         }
     }
     
-    public Group(String groupName, String[] params) {
+    public Group(String groupName, SSMap params) {
         this.groupName = groupName;
         this.params = params;
     }
@@ -85,7 +83,7 @@ public class Group {
     
     @Override
     public int hashCode() {
-        return Objects.hash(Arrays.hashCode(params), groupName);
+        return Objects.hash(params, groupName);
     }
     
     @Override
@@ -99,7 +97,7 @@ public class Group {
             if (isNullGroup && group.isNullGroup) {
                 return true;
             }
-            return Arrays.equals(params, group.params) && groupName.equals(group.groupName);
+            return params.equals(group.params) && groupName.equals(group.groupName);
         }
         return super.equals(obj);
     }

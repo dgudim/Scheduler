@@ -76,12 +76,12 @@ public class SystemCalendarEvent {
         
         String timeZoneId = getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE);
         
-        timeZone = TimeZone.getTimeZone(timeZoneId == null ? associatedCalendar.timeZone.getID() : timeZoneId);
+        timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? associatedCalendar.timeZone.getID() : timeZoneId);
         
         duration = end - start;
         
-        rRule_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.RRULE));
-        rDate_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.RDATE));
+        rRule_str = getString(cursor, calendarEventsColumns, Events.RRULE);
+        rDate_str = getString(cursor, calendarEventsColumns, Events.RDATE);
         if (rRule_str.length() > 0) {
             try {
                 rSet = new RecurrenceSet();
@@ -97,8 +97,8 @@ public class SystemCalendarEvent {
                     }
                 }
                 
-                exRule_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.EXRULE));
-                exDate_str = nullWrapper(getString(cursor, calendarEventsColumns, Events.EXDATE));
+                exRule_str = getString(cursor, calendarEventsColumns, Events.EXRULE);
+                exDate_str = getString(cursor, calendarEventsColumns, Events.EXDATE);
                 
                 if (exRule_str.length() > 0) {
                     try {
@@ -117,7 +117,7 @@ public class SystemCalendarEvent {
                     }
                 }
                 
-                String durationStr = nullWrapper(getString(cursor, calendarEventsColumns, Events.DURATION));
+                String durationStr = getString(cursor, calendarEventsColumns, Events.DURATION);
                 
                 if (durationStr.length() > 0) {
                     duration = rfc2445ToMilliseconds(durationStr);
@@ -160,10 +160,6 @@ public class SystemCalendarEvent {
         }
     }
     
-    private String nullWrapper(String str) {
-        return str == null ? "" : str.trim();
-    }
-    
     public boolean fallsInRange(long dayStart, long dayEnd) {
         if (rSet != null) {
             RecurrenceSetIterator it = rSet.iterator(timeZone, start);
@@ -181,6 +177,19 @@ public class SystemCalendarEvent {
     
     private boolean rangesOverlap(long start, long end, long dayStart, long dayEnd) {
         return daysFromEpoch(start, timeZone) <= dayEnd && daysFromEpoch(end, timeZone) >= dayStart;
+    }
+    
+    public void addExceptions(Long[] exceptions) {
+        if(rSet != null) {
+            // whyyyyyyy, but ok
+            long[] exceptionsPrimitiveArray = new long[exceptions.length];
+            for(int i = 0; i < exceptions.length; i++) {
+                exceptionsPrimitiveArray[i] = exceptions[i];
+            }
+            rSet.addExceptions(new RecurrenceList(exceptionsPrimitiveArray));
+        } else {
+            log(WARN, NAME, "Couldn't add exceptions to " + title);
+        }
     }
     
     @Override
