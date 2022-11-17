@@ -9,12 +9,12 @@ import static prototype.xd.scheduler.utilities.DateManager.datetimeFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
-import static prototype.xd.scheduler.utilities.Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY;
+import static prototype.xd.scheduler.utilities.Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY;
+import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
@@ -33,76 +33,197 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.color.MaterialColors;
 
-import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.entities.TodoListEntry.EntryType;
+import prototype.xd.scheduler.entities.TodoListEntry.Parameter;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 
-public class TodoListEntry extends RecycleViewEntry {
+class TemporalStorage<T extends Serializable> implements Serializable {
+    
+    T upcoming;
+    T today;
+    T expired;
+    T global;
+    
+    T get(EntryType entryType) {
+        switch (entryType) {
+            case TODAY:
+                return today;
+            case EXPIRED:
+                return expired;
+            case UPCOMING:
+                return upcoming;
+            case GLOBAL:
+            default:
+                return global;
+        }
+    }
+    
+    void set(T newValue, EntryType entryType) {
+        switch (entryType) {
+            case TODAY:
+                today = newValue;
+                break;
+            case EXPIRED:
+                expired = newValue;
+                break;
+            case UPCOMING:
+                upcoming = newValue;
+                break;
+            case GLOBAL:
+            default:
+                global = newValue;
+        }
+    }
+}
+
+@FunctionalInterface
+interface TodoListEntryParameterTemporalAccessor<T extends Serializable> {
+    T get(long day, long timestamp, Parameter<T> parameter, @Nullable Context context);
+}
+
+class ForwardTemporalAccessor<T extends Serializable> implements TodoListEntryParameterTemporalAccessor<T> {
+    // TODO: implement
+    @Override
+    public T get(long day, long timestamp, Parameter<T> parameter, @Nullable Context context) {
+        return null;
+    }
+}
+
+@FunctionalInterface
+interface TemporalGetter<T extends Serializable> {
+    T get(EntryType entryType);
+}
+
+public class TodoListEntry extends RecycleViewEntry implements Serializable {
+    
+    public static class Parameter<T extends Serializable> implements Serializable {
+        
+        transient Map<EntryType, Boolean> validityMap = new EnumMap<>(EntryType.class);
+        
+        transient TemporalStorage<T> cachedValue;
+        transient TemporalGetter<T> getter;
+        TemporalStorage<T> persistentValue;
+        
+        @Nullable
+        transient TodoListEntryParameterTemporalAccessor<T> temporalAccessor;
+        
+        @SuppressWarnings("unchecked")
+        protected Parameter(TemporalGetter<T> getter,
+                            @Nullable TodoListEntryParameterTemporalAccessor<T> temporalAccessor,
+                            @Nullable Parameter<?> copyFrom) {
+            this.getter = getter;
+            this.temporalAccessor = temporalAccessor;
+            if (copyFrom != null) {
+                persistentValue = (TemporalStorage<T>) copyFrom.persistentValue;
+            }
+        }
+        
+        public T getToday() {
+            return get(EntryType.TODAY);
+        }
+        
+        public T getExpired() {
+            return get(EntryType.EXPIRED);
+        }
+        
+        public T getUpcoming() {
+            return get(EntryType.UPCOMING);
+        }
+        
+        public T get(long day, long timestamp, @Nullable Context context) {
+            if (temporalAccessor != null) {
+                return temporalAccessor.get(day, timestamp, this, context);
+            }
+            return getToday();
+        }
+        
+        public T get(long day, long timestamp) {
+            return get(day, timestamp, null);
+        }
+        
+        public void setPersistent(T newValue, EntryType entryType) {
+            persistentValue.set(newValue, entryType);
+        }
+        
+        public void setCached(T newValue, EntryType entryType) {
+            cachedValue.set(newValue, entryType);
+        }
+        
+        public T get(EntryType entryType) {
+            T pValue = persistentValue.get(entryType);
+            if (pValue != null) {
+                return pValue;
+            }
+            Boolean valid = validityMap.get(entryType);
+            if (valid == null || Boolean.FALSE.equals(valid)) {
+                cachedValue.set(getter.get(entryType), entryType);
+                validityMap.put(entryType, true);
+            }
+            return cachedValue.get(entryType);
+        }
+        
+        public void invalidate(EntryType entryType) {
+            validityMap.put(entryType, false);
+        }
+    }
     
     private static final String NAME = "Todo list entry";
     
-    enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING, NEUTRAL}
+    enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING}
     
-    public boolean fromSystemCalendar = false;
     public SystemCalendarEvent event;
     
     private long timestamp_start = 0;
     private long timestamp_end = 0;
     private long timestamp_duration = 0;
     private boolean allDay = false;
-    private RecurrenceSet recurrenceSet;
     
     private long day_start = DAY_FLAG_GLOBAL;
     private long day_end = DAY_FLAG_GLOBAL;
     private long duration_in_days = 0;
-    public int dayOffset_expired = 0;
-    public int dayOffset_upcoming = 0;
-    private boolean completed = false;
     private Group group;
     
-    public int bgColor;
-    public int fontColor;
-    public int fontColor_completed;
-    public int borderColor;
-    public int borderThickness = 0;
+    public Parameter<String> textValue;
+    public Parameter<Boolean> isCompleted;
+    public Parameter<Boolean> showOnLock;
     
-    public int bgColor_original;
-    public int fontColor_original;
-    public int borderColor_original;
-    public int border_thickness_original = 0;
+    public Parameter<Integer> upcomingOffset;
+    public Parameter<Integer> expiredOffset;
     
-    public int priority = 0;
+    public Parameter<Integer> bgColor;
+    public Parameter<Integer> fontColor;
+    public Parameter<Integer> fontColor_completed;
+    public Parameter<Integer> borderColor;
+    public Parameter<Integer> borderThickness;
     
-    public int adaptiveColorBalance;
-    public int averageBackgroundColor;
+    public Parameter<Integer> priority;
+    public Parameter<Integer> associatedDay;
     
-    public boolean showOnLock = false;
+    public int averageBackgroundColor = 0;
+    public Parameter<Integer> adaptiveColorBalance;
+    
     private boolean showInList_ifCompleted = false;
     
-    private String textValue = "";
-    
-    EntryType entryType;
-    
-    protected String[] params;
-    
     public TodoListEntry(SystemCalendarEvent event) {
-        fromSystemCalendar = true;
         this.event = event;
-        params = new String[]{};
         assignId(event.hashCode());
-        reloadParams();
+        initParams();
     }
     
-    public TodoListEntry(Context context, String[] params, String groupName, List<Group> groups, long id) {
+    public TodoListEntry(Context context, String groupName, List<Group> groups, long id) {
         if (!groupName.isEmpty()) {
             group = new Group(context, groupName, groups);
             if (group.isNullGroup()) {
@@ -110,13 +231,151 @@ public class TodoListEntry extends RecycleViewEntry {
                 group = null;
             }
         }
-        this.params = params;
         assignId(id);
         reloadParams();
     }
     
-    public String[] getParams() {
-        return params;
+    private String getProperKey(String key) {
+        if (isFromSystemCalendar()) {
+            key = getFirstValidKey(event.subKeys, key);
+        }
+        return key;
+    }
+    
+    public void postDeserialize(long id, List<Group> groups) {
+        // after deserialization the group only stores it's name so we get the real group
+        if (group != null) {
+            int index = Group.groupIndexInList(groups, group.getName());
+            if (index != -1) {
+                group = groups.get(index);
+            } else {
+                log(WARN, NAME, "Unknown group: " + group.getName());
+            }
+        }
+        assignId(id);
+        initParams();
+    }
+    
+    public void initParams() {
+        
+        textValue = new Parameter<>(
+                entryType -> "",
+                (day, timestamp, parameter, context) -> parameter.getToday() + getDayOffset(day, context),
+                textValue);
+        
+        isCompleted = new Parameter<>(
+                entryType -> false,
+                null,
+                isCompleted);
+        
+        showOnLock = new Parameter<>(entryType -> {
+            if (isFromSystemCalendar()) {
+                if (!hideByContent()) {
+                    boolean showOnLock;
+                    if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
+                        showOnLock = isVisibleExact(currentTimestamp);
+                    } else {
+                        showOnLock = isVisible(currentDay);
+                    }
+                    return showOnLock && preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+                }
+                return false;
+            }
+            return true;
+        }, null, showOnLock);
+        
+        upcomingOffset = new Parameter<>(entryType ->
+                preferences.getInt(getProperKey(UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET), null,
+                upcomingOffset);
+        
+        expiredOffset = new Parameter<>(entryType ->
+                preferences.getInt(getProperKey(EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET), null,
+                expiredOffset);
+        
+        borderThickness = new Parameter<>(entryType -> {
+            switch (entryType) {
+                case EXPIRED:
+                    return preferences.getInt(EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
+                case UPCOMING:
+                    return preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
+                case TODAY:
+                case GLOBAL:
+                default:
+                    return preferences.getInt(getProperKey(Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
+            }
+        }, new ForwardTemporalAccessor<>(), borderThickness);
+        
+        borderColor = new Parameter<>(entryType -> {
+            int borderColor = preferences.getInt(getProperKey(Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
+            switch (entryType) {
+                case EXPIRED:
+                    return mixTwoColors(
+                            borderColor,
+                            preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR),
+                            DEFAULT_COLOR_MIX_FACTOR);
+                case UPCOMING:
+                    return mixTwoColors(
+                            borderColor,
+                            preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR),
+                            DEFAULT_COLOR_MIX_FACTOR);
+                case TODAY:
+                case GLOBAL:
+                default:
+                    return borderColor;
+            }
+        }, new ForwardTemporalAccessor<>(), borderColor);
+        
+        fontColor = new Parameter<>(entryType -> {
+            int fontColor = preferences.getInt(getProperKey(Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR);
+            switch (entryType) {
+                case EXPIRED:
+                    return mixTwoColors(
+                            fontColor,
+                            preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR),
+                            DEFAULT_COLOR_MIX_FACTOR);
+                case UPCOMING:
+                    return mixTwoColors(
+                            fontColor,
+                            preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR),
+                            DEFAULT_COLOR_MIX_FACTOR);
+                case TODAY:
+                case GLOBAL:
+                default:
+                    return fontColor;
+            }
+        }, new ForwardTemporalAccessor<>(), fontColor);
+        
+        bgColor = new Parameter<>(entryType -> {
+            int bgColor = preferences.getInt(getProperKey(Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR);
+            switch (entryType) {
+                case EXPIRED:
+                    return mixTwoColors(
+                            bgColor,
+                            preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR),
+                            DEFAULT_COLOR_MIX_FACTOR);
+                case UPCOMING:
+                    return mixTwoColors(
+                            bgColor,
+                            preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR),
+                            DEFAULT_COLOR_MIX_FACTOR);
+                case TODAY:
+                case GLOBAL:
+                default:
+                    return bgColor;
+            }
+        }, new ForwardTemporalAccessor<>(), bgColor);
+        
+        priority = new Parameter<>(entryType ->
+                preferences.getInt(getProperKey(PRIORITY), Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY), null,
+                priority);
+        
+        associatedDay = new Parameter<>(entryType ->
+                DAY_FLAG_GLOBAL, null,
+                associatedDay);
+        
+        adaptiveColorBalance = new Parameter<>((entryType) ->
+                preferences.getInt(getProperKey(ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE), null,
+                adaptiveColorBalance);
     }
     
     public Group getGroup() {
@@ -149,6 +408,10 @@ public class TodoListEntry extends RecycleViewEntry {
             this.group = group;
             reloadParams();
         }
+    }
+    
+    public boolean isFromSystemCalendar() {
+        return event != null;
     }
     
     public boolean isVisibleOnLockscreen() {
@@ -232,17 +495,15 @@ public class TodoListEntry extends RecycleViewEntry {
     }
     
     public boolean hideByContent() {
-        if (!fromSystemCalendar) return false;
-        boolean hideByContent = false;
+        if (!isFromSystemCalendar()) return false;
         if (preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT), Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT)) {
             String matchString = preferences.getString(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), "");
             String[] split = !matchString.isEmpty() ? matchString.split("\\|\\|") : new String[0];
             for (String str : split) {
-                hideByContent = textValue.contains(str);
-                if (hideByContent) break;
+                if (textValue.contains(str)) return true;
             }
         }
-        return hideByContent;
+        return false;
     }
     
     public long getNearestEventTimestamp(long day) {
@@ -262,7 +523,7 @@ public class TodoListEntry extends RecycleViewEntry {
     }
     
     public long getNearestEventDay(long day) {
-        if (fromSystemCalendar) {
+        if (isFromSystemCalendar()) {
             return daysFromEpoch(getNearestEventTimestamp(day), event.timeZone);
         }
         return day_start;
@@ -300,6 +561,7 @@ public class TodoListEntry extends RecycleViewEntry {
                 displayParams.add(params[i + 1]);
             }
         }
+        
         return displayParams.toArray(new String[0]);
     }
     
@@ -319,7 +581,7 @@ public class TodoListEntry extends RecycleViewEntry {
     }
     
     public void reloadParams() {
-        if (!fromSystemCalendar) {
+        if (!isFromSystemCalendar()) {
             int paramIndex = -1;
             for (int i = 0; i < params.length; i += 2) {
                 if (params[i].equals(ASSOCIATED_DAY)) {
@@ -330,9 +592,6 @@ public class TodoListEntry extends RecycleViewEntry {
             if (paramIndex != -1) {
                 long associatedDayLoaded = Long.parseLong(params[paramIndex + 1]);
                 
-                dayOffset_expired = preferences.getInt(EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
-                dayOffset_upcoming = preferences.getInt(UPCOMING_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
-                
                 setParamsWithGroup();
                 
                 long associatedDay = currentDay;
@@ -341,12 +600,6 @@ public class TodoListEntry extends RecycleViewEntry {
                 }
                 
                 if (associatedDayLoaded == currentDay || associatedDayLoaded == DAY_FLAG_GLOBAL) {
-                    
-                    bgColor = preferences.getInt(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR);
-                    borderColor = preferences.getInt(Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR);
-                    borderThickness = preferences.getInt(Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
-                    
-                    setFontColor(Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR);
                     
                     showOnLock = true;
                     showInList_ifCompleted = true;
@@ -359,12 +612,6 @@ public class TodoListEntry extends RecycleViewEntry {
                     }
                     
                 } else if (associatedDay < currentDay && currentDay - associatedDay <= dayOffset_expired) {
-                    
-                    bgColor = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
-                    borderColor = preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR);
-                    borderThickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
-                    
-                    setFontColor(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
                     
                     showInList_ifCompleted = false;
                     showOnLock = true;
@@ -392,13 +639,12 @@ public class TodoListEntry extends RecycleViewEntry {
                     showInList_ifCompleted = true;
                     showOnLock = false;
                     
-                    setEntryType(EntryType.NEUTRAL);
+                    setEntryType(EntryType.UNKNOWN);
                 }
             }
             
             adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-            averageBackgroundColor = 0xff_FFFFFF;
-            priority = ENTITY_SETTINGS_DEFAULT_PRIORITY;
+            priority = ENTRY_SETTINGS_DEFAULT_PRIORITY;
             setParamsWithGroup();
             
         } else {
@@ -419,7 +665,7 @@ public class TodoListEntry extends RecycleViewEntry {
             
             adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
             
-            priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTITY_SETTINGS_DEFAULT_PRIORITY);
+            priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY);
             
             dayOffset_upcoming = preferences.getInt(getFirstValidKey(calendarSubKeys, UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
             dayOffset_expired = preferences.getInt(getFirstValidKey(calendarSubKeys, EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
@@ -445,7 +691,6 @@ public class TodoListEntry extends RecycleViewEntry {
                 showOnLock = showOnLock && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
             }
             
-            averageBackgroundColor = 0xff_FFFFFF;
             setParams(params);
         }
         
@@ -600,7 +845,7 @@ public class TodoListEntry extends RecycleViewEntry {
                 case (FONT_COLOR):
                     setFontColor(Integer.parseInt(params[i + 1]));
                     break;
-                case (BG_COLOR):
+                case (Keys.BG_COLOR):
                     bgColor = Integer.parseInt(params[i + 1]);
                     break;
                 case (BORDER_COLOR):
@@ -621,6 +866,10 @@ public class TodoListEntry extends RecycleViewEntry {
                     break;
             }
         }
+    }
+    
+    public <T extends Serializable> void setParameterPersistent(ParameterType parameterType, T newValue, EntryType entryType) {
+        Objects.requireNonNull(parameters.get(parameterType)).setPersistent(newValue, entryType);
     }
     
     public void changeParameter(String name, String value) {
@@ -672,12 +921,12 @@ public class TodoListEntry extends RecycleViewEntry {
     
     @Override
     public int getType() {
-        return fromSystemCalendar ? 1 : 0;
+        return isFromSystemCalendar() ? 1 : 0;
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(event, Arrays.hashCode(params), showOnLock, group);
+        return Objects.hash(event, parameters, group);
     }
     
     @Override
@@ -689,7 +938,7 @@ public class TodoListEntry extends RecycleViewEntry {
         } else if (obj instanceof TodoListEntry) {
             TodoListEntry entry = (TodoListEntry) obj;
             return Objects.equals(event, entry.event) &&
-                    Arrays.equals(entry.params, params) && showOnLock == entry.showOnLock
+                    parameters.equals(entry.parameters)
                     && Objects.equals(group, entry.group);
         }
         return super.equals(obj);

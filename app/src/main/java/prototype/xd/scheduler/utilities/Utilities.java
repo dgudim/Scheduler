@@ -92,43 +92,35 @@ public class Utilities {
     public static List<TodoListEntry> loadTodoEntries(Context context, long dayStart, long dayEnd, List<Group> groups,
                                                       @Nullable List<SystemCalendar> calendars) {
         
-        List<TodoListEntry> readEntries = new ArrayList<>();
+        List<TodoListEntry> entries = new ArrayList<>();
         try {
-            List<String[]> entryParams = loadObject("list");
-            List<String> entryGroupNames = loadObject("list_groupData");
+            entries.addAll(loadObject("entries"));
             
-            if (entryParams.size() != entryGroupNames.size()) {
-                log(WARN, NAME, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
+            long id = 0;
+            for (TodoListEntry entry: entries) {
+                entry.postDeserialize(id++, groups); // Initial load, thus index is ok as ID
             }
             
-            for (int i = 0; i < entryParams.size(); i++) {                                                  // Initial load, thus index is ok as ID
-                readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups, i));
-            }
-            
-            log(INFO, NAME, "Read todo list: " + readEntries.size());
+            log(INFO, NAME, "Read todo list: " + entries.size());
         } catch (Exception e) {
             log(INFO, NAME, "No todo list");
         }
-        
-        readEntries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd, calendars));
-        return readEntries;
+    
+        entries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd, calendars));
+        return entries;
     }
     
     public static void saveEntries(List<TodoListEntry> entries) {
         try {
-            List<String[]> entryParams = new ArrayList<>();
-            List<String> entryGroupNames = new ArrayList<>();
+            List<TodoListEntry> entriesToSave = new ArrayList<>();
             
-            for (int i = 0; i < entries.size(); i++) {
-                TodoListEntry entry = entries.get(i);
-                if (!entry.fromSystemCalendar) {
-                    entryParams.add(entry.getParams());
-                    entryGroupNames.add(entry.getGroupName());
+            for (TodoListEntry entry: entries) {
+                if (!entry.isFromSystemCalendar()) {
+                    entriesToSave.add(entry);
                 }
             }
             
-            saveObject("list", entryParams);
-            saveObject("list_groupData", entryGroupNames);
+            saveObject("entries", entriesToSave);
             
             log(INFO, NAME, "Saved todo list");
         } catch (Exception e) {
@@ -141,15 +133,10 @@ public class Utilities {
         groups.add(new Group(context)); // add "null" group
         try {
             
-            List<String[]> groupParams = loadObject("groups");
-            List<String> groupNames = loadObject("groupNames");
+            groups.addAll(loadObject("groups"));
             
-            if (groupParams.size() != groupNames.size()) {
-                log(WARN, NAME, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
-            }
-            
-            for (int i = 0; i < groupParams.size(); i++) {
-                groups.add(new Group(groupNames.get(i), groupParams.get(i)));
+            for (Group group: groups) {
+                group.postDeserialize();
             }
             
             return groups;
@@ -162,18 +149,19 @@ public class Utilities {
     
     public static void saveGroups(List<Group> groups) {
         try {
-            
-            List<String[]> groupParams = new ArrayList<>();
-            List<String> groupNames = new ArrayList<>();
+    
+            List<Group> groupsToSave = new ArrayList<>();
             for (Group group : groups) {
                 if (!group.isNullGroup()) {
-                    groupParams.add(group.getParams());
-                    groupNames.add(group.getName());
+                    groupsToSave.add(group.withParameters());
                 }
             }
             
-            saveObject("groups", groupParams);
-            saveObject("groupNames", groupNames);
+            saveObject("groups", groups);
+    
+            for (Group group : groupsToSave) {
+                group.setTransient();
+            }
             
             log(INFO, NAME, "Saved group list");
             
@@ -631,7 +619,7 @@ class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
     
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
-        if (o1.fromSystemCalendar || o2.fromSystemCalendar) {
+        if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
             return Long.compare(o1.getNearestEventTimestamp(day), o2.getNearestEventTimestamp(day));
         }
         return Integer.compare(o1.getGroupName().hashCode(), o2.getGroupName().hashCode());
