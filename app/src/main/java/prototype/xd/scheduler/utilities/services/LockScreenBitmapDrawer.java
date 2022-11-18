@@ -10,6 +10,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.DEFAULT_BACKGROUND_NAME;
 import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
@@ -235,7 +236,7 @@ class LockScreenBitmapDrawer {
     private List<TodoListEntry> filterEntries(List<TodoListEntry> entries) {
         List<TodoListEntry> toAdd = new ArrayList<>();
         for (TodoListEntry entry : entries) {
-            if (entry.isVisibleOnLockscreen()) {
+            if (entry.isVisibleOnLockscreen(currentDay, currentTimestamp)) {
                 toAdd.add(entry);
             }
         }

@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.utilities.Utilities.nullWrapper;
+
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,10 +12,6 @@ public class QueryUtilities {
     
     private QueryUtilities() {
         throw new IllegalStateException("Query utility class");
-    }
-    
-    private static String nullWrapper(String str) {
-        return str == null ? "" : str.trim();
     }
     
     public static String getString(Cursor cursor, List<String> columns, String column){

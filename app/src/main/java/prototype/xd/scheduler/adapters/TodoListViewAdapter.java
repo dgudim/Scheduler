@@ -2,6 +2,8 @@ package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.groupIndexInList;
+import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
@@ -71,13 +73,13 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                     todoListEntryManager.removeEntry(currentEntry);
                                     todoListEntryManager.saveEntriesAsync();
                                     // deleting a global entry does not change indicators
-                                    todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isGlobal());
+                                    todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), currentEntry.notGlobal());
                                 }));
         
                 bnd.isDone.setCheckedSilent(currentEntry.isCompleted());
     
                 bnd.isDone.setOnClickListener(view12 -> {
-                    if (!currentEntry.isGlobal()) {
+                    if (currentEntry.notGlobal()) {
                         currentEntry.changeParameter(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
                     } else {
                         currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
@@ -98,10 +100,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                 }
                                 currentEntry.changeParameter(TEXT_VALUE, text);
                                 todoListEntryManager.saveEntriesAsync();
-                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), false);
+                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), false);
                                 return true;
                             },
-                            !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
+                            currentEntry.notGlobal() ? (view2, text, selectedIndex) -> {
                                 if (selectedIndex != currentIndex) {
                                     currentEntry.changeGroup(groupList.get(selectedIndex));
                                 }
@@ -109,7 +111,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                 currentEntry.changeParameter(IS_COMPLETED, "false");
                                 todoListEntryManager.saveEntriesAsync();
                                 // completed -> global = indicators don't change, no need to update
-                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(), !currentEntry.isCompleted());
+                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), !currentEntry.isCompleted());
                                 return true;
                             } : null);
                     return true;

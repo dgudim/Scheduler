@@ -2,14 +2,11 @@ package prototype.xd.scheduler.utilities;
 
 import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
-import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
-import static prototype.xd.scheduler.utilities.Keys.ENTRIES_GROUP_NAMES_FILE;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
-import static prototype.xd.scheduler.utilities.Keys.GROUP_NAMES_FILE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.log;
@@ -78,6 +75,10 @@ public class Utilities {
         throw new IllegalStateException("Utility class");
     }
     
+    public static String nullWrapper(String str) {
+        return str == null ? "" : str.trim();
+    }
+    
     public static boolean isVerticalOrientation(Context context) {
         return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
@@ -99,15 +100,10 @@ public class Utilities {
         
         List<TodoListEntry> readEntries = new ArrayList<>();
         try {
-            List<SSMap> entryParams = loadObject(ENTRIES_FILE);
-            List<String> entryGroupNames = loadObject(ENTRIES_GROUP_NAMES_FILE);
-            
-            if (entryParams.size() != entryGroupNames.size()) {
-                log(WARN, NAME, "entryParams length: " + entryParams.size() + " entryGroupNames length: " + entryGroupNames.size());
-            }
-            
-            for (int i = 0; i < entryParams.size(); i++) {                                                  // Initial load, thus index is ok as ID
-                readEntries.add(new TodoListEntry(context, entryParams.get(i), entryGroupNames.get(i), groups, i));
+            readEntries = loadObject(ENTRIES_FILE);
+           
+            for(TodoListEntry entry: readEntries) {
+                entry.initGroup(context, groups);
             }
             
             log(INFO, NAME, "Read todo list: " + readEntries.size());
@@ -123,19 +119,16 @@ public class Utilities {
     
     public static void saveEntries(List<TodoListEntry> entries) {
         try {
-            List<SSMap> entryParams = new ArrayList<>();
-            List<String> entryGroupNames = new ArrayList<>();
+            List<TodoListEntry> entriesToSave = new ArrayList<>();
             
             for (int i = 0; i < entries.size(); i++) {
                 TodoListEntry entry = entries.get(i);
                 if (!entry.isFromSystemCalendar()) {
-                    entryParams.add(entry.getParams());
-                    entryGroupNames.add(entry.getGroupName());
+                    entriesToSave.add(entry);
                 }
             }
             
-            saveObject(ENTRIES_FILE, entryParams);
-            saveObject(ENTRIES_GROUP_NAMES_FILE, entryGroupNames);
+            saveObject(ENTRIES_FILE, entriesToSave);
             
             log(INFO, NAME, "Saved todo list");
         } catch (IOException e) {
@@ -149,45 +142,32 @@ public class Utilities {
         List<Group> groups = new ArrayList<>();
         groups.add(new Group(context)); // add "null" group
         try {
-            
-            List<SSMap> groupParams = loadObject(GROUPS_FILE);
-            List<String> groupNames = loadObject(GROUP_NAMES_FILE);
-            
-            if (groupParams.size() != groupNames.size()) {
-                log(WARN, NAME, "groupParams length: " + groupParams.size() + " groupNames length: " + groupNames.size());
-            }
-            
-            for (int i = 0; i < groupParams.size(); i++) {
-                groups.add(new Group(groupNames.get(i), groupParams.get(i)));
-            }
-            
+            groups.addAll(loadObject(GROUPS_FILE));
             return groups;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             log(INFO, NAME, "No groups file, creating one");
             saveGroups(groups);
-            return groups;
+        } catch (Exception e) {
+            logException(NAME, e);
         }
+        return groups;
     }
     
     public static void saveGroups(List<Group> groups) {
         try {
             
-            List<SSMap> groupParams = new ArrayList<>();
-            List<String> groupNames = new ArrayList<>();
+            List<Group> groupsToSave = new ArrayList<>();
+            
             for (Group group : groups) {
                 if (!group.isNullGroup()) {
-                    groupParams.add(group.getParams());
-                    groupNames.add(group.getName());
+                    groupsToSave.add(group);
                 }
             }
             
-            saveObject(GROUPS_FILE, groupParams);
-            saveObject(GROUP_NAMES_FILE, groupNames);
-            
+            saveObject(GROUPS_FILE, groupsToSave);
             log(INFO, NAME, "Saved group list");
-            
-        } catch (Exception e) {
-            log(ERROR, NAME, "failed saving groups file: " + e.getMessage());
+        } catch (IOException e) {
+            logException(NAME, e);
         }
     }
     
@@ -216,31 +196,38 @@ public class Utilities {
     }
     
     public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long day) {
-        List<TodoListEntry> newEntries = new ArrayList<>();
-        List<TodoListEntry> oldEntries = new ArrayList<>();
+        List<TodoListEntry> upcomingEntries = new ArrayList<>();
+        List<TodoListEntry> expiredEntries = new ArrayList<>();
         List<TodoListEntry> todayEntries = new ArrayList<>();
         List<TodoListEntry> globalEntries = new ArrayList<>();
         List<TodoListEntry> otherEntries = new ArrayList<>();
         
+        
         for (TodoListEntry entry : entries) {
-            if (entry.isToday()) {
-                todayEntries.add(entry);
-            } else if (entry.isExpired()) {
-                oldEntries.add(entry);
-            } else if (entry.isUpcoming()) {
-                newEntries.add(entry);
-            } else if (entry.isGlobal()) {
-                globalEntries.add(entry);
-            } else {
-                otherEntries.add(entry);
+            switch(entry.getEntryType(day)){
+                case TODAY:
+                    todayEntries.add(entry);
+                    break;
+                case EXPIRED:
+                    expiredEntries.add(entry);
+                    break;
+                case UPCOMING:
+                    upcomingEntries.add(entry);
+                    break;
+                case GLOBAL:
+                    globalEntries.add(entry);
+                    break;
+                case UNKNOWN:
+                default:
+                    otherEntries.add(entry);
             }
         }
         
         List<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
-        merged.addAll(newEntries);
-        merged.addAll(oldEntries);
+        merged.addAll(upcomingEntries);
+        merged.addAll(expiredEntries);
         merged.addAll(otherEntries);
         merged.sort(new TodoListEntryGroupComparator(day));
         merged.sort(new TodoListEntryPriorityComparator());

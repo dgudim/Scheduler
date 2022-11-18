@@ -201,7 +201,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         List<TodoListEntry> filteredTodoListEntries = new ArrayList<>(5);
         // get all relevant entries
         for (TodoListEntry todoEntry : todoListEntries) {
-            if (!todoEntry.isGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day)) {
+            if (todoEntry.notGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day)) {
                 filteredTodoListEntries.add(todoEntry);
             }
         }

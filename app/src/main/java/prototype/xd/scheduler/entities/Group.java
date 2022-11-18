@@ -5,13 +5,14 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.SSMap;
 
-public class Group {
+public class Group implements Serializable {
     
     private boolean isNullGroup = false;
     private String groupName;
@@ -21,10 +22,6 @@ public class Group {
     public Group(Context context) {
         groupName = context.getString(R.string.blank_group_name);
         isNullGroup = true;
-    }
-    
-    public SSMap getParams() {
-        return params;
     }
     
     public boolean isNullGroup() {

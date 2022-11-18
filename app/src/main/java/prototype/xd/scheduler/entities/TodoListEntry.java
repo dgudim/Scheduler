@@ -3,7 +3,6 @@ package prototype.xd.scheduler.entities;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.datetimeFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
@@ -12,16 +11,15 @@ import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.Keys.VISIBLE;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
+import static prototype.xd.scheduler.utilities.Utilities.nullWrapper;
 
 import android.content.Context;
 import android.widget.TextView;
@@ -33,6 +31,10 @@ import com.google.android.material.color.MaterialColors;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -44,78 +46,101 @@ import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.SSMap;
 
-public class TodoListEntry extends RecycleViewEntry {
+public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
-    private static final String NAME = "Todo list entry";
+    transient private static final String NAME = "Todo list entry";
     
-    enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING, UNKNOWN}
+    public enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING, UNKNOWN}
     
-    public SystemCalendarEvent event;
+    transient public SystemCalendarEvent event;
     
-    private long timestamp_start = 0;
-    private long timestamp_end = 0;
-    private long timestamp_duration = 0;
-    private boolean allDay = false;
-    private RecurrenceSet recurrenceSet;
+    transient private long startMsUTC = 0;
+    transient private long endMsUTC = 0;
+    transient private long durationMsUTC = 0;
+    transient private boolean allDay = true;
+    transient private RecurrenceSet recurrenceSet;
     
-    private long day_start = DAY_FLAG_GLOBAL;
-    private long day_end = DAY_FLAG_GLOBAL;
-    private long duration_in_days = 0;
-    public int dayOffset_expired = 0;
-    public int dayOffset_upcoming = 0;
-    private boolean completed = false;
-    private Group group;
+    transient private long startDay = DAY_FLAG_GLOBAL;
+    transient private long endDay = DAY_FLAG_GLOBAL;
+    transient private long durationDay = 0;
+    transient public int dayOffset_expired = 0;
+    transient public int dayOffset_upcoming = 0;
+    transient private boolean completed = false;
+    transient private Group group;
+    transient private String tempGroupName;
     
-    public int bgColor;
-    public int fontColor;
-    public int fontColor_completed;
-    public int borderColor;
-    public int borderThickness = 0;
+    transient public int bgColor;
+    transient public int fontColor;
+    transient public int fontColor_completed;
+    transient public int borderColor;
+    transient public int borderThickness = 0;
     
-    public int bgColor_original;
-    public int fontColor_original;
-    public int borderColor_original;
-    public int border_thickness_original = 0;
+    transient public int bgColor_original;
+    transient public int fontColor_original;
+    transient public int borderColor_original;
+    transient public int border_thickness_original = 0;
     
-    public int priority = 0;
+    transient public int priority = 0;
     
-    public int adaptiveColorBalance;
-    public int averageBackgroundColor = 0xff_FFFFFF;
+    transient public int adaptiveColorBalance;
+    transient public int averageBackgroundColor = 0xff_FFFFFF;
     
-    public boolean showOnLock = true;
-    private boolean showInList_ifCompleted = false;
-    
-    private String textValue = "";
-    
-    EntryType entryType;
+    transient private String textValue = "";
     
     protected SSMap params = new SSMap();
     
     public TodoListEntry(SystemCalendarEvent event) {
         this.event = event;
+        
+        startMsUTC = event.start;
+        endMsUTC = event.end;
+        durationMsUTC = event.duration;
+        allDay = event.allDay;
+        recurrenceSet = event.rSet;
+        
+        startDay = daysFromEpoch(startMsUTC, event.timeZone);
+        endDay = daysFromEpoch(endMsUTC, event.timeZone);
+        durationDay = daysFromEpoch(startMsUTC + durationMsUTC, event.timeZone) - startDay;
+        
+        textValue = event.title;
+        
         assignId(event.hashCode());
         reloadParams();
     }
     
     public TodoListEntry(Context context, SSMap params, String groupName, List<Group> groups, long id) {
-        if (!groupName.isEmpty()) {
-            group = new Group(context, groupName, groups);
-            if (group.isNullGroup()) {
-                log(WARN, NAME, "Unknown group: " + groupName);
-                group = null;
-            }
-        }
+        tempGroupName = groupName;
+        initGroup(context, groups);
         this.params = params;
         assignId(id);
         reloadParams();
     }
     
-    public boolean isFromSystemCalendar() {
-        return event != null;
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        tempGroupName = nullWrapper((String) in.readObject());
     }
     
-    public SSMap getParams() {
-        return params;
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        if(group != null) {
+            out.writeObject(group.getName());
+        }
+    }
+    
+    public void initGroup(Context context, List<Group> groups) {
+        if (!tempGroupName.isEmpty()) {
+            group = new Group(context, tempGroupName, groups);
+            if (group.isNullGroup()) {
+                log(WARN, NAME, "Unknown group: " + tempGroupName);
+                group = null;
+            }
+        }
+    }
+    
+    public boolean isFromSystemCalendar() {
+        return event != null;
     }
     
     public Group getGroup() {
@@ -151,19 +176,19 @@ public class TodoListEntry extends RecycleViewEntry {
     }
     
     public boolean isVisibleOnLockscreen(long day, long timestamp) {
-        String visibleOnLockscreen = params.get(SHOW_ON_LOCK);
+        String visibleOnLockscreen = params.getWithNull(SHOW_ON_LOCK);
         if (visibleOnLockscreen != null) {
             return Boolean.parseBoolean(visibleOnLockscreen) && !completed;
         }
         if (isFromSystemCalendar()) {
             if (!hideByContent()) {
+                boolean showOnLock;
                 if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
                     showOnLock = isVisibleExact(timestamp);
                 } else {
                     showOnLock = isVisible(day);
                 }
-                return showOnLock &&
-                        preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+                return showOnLock && preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
             }
             return false;
         } else {
@@ -174,8 +199,8 @@ public class TodoListEntry extends RecycleViewEntry {
         }
     }
     
-    private boolean inRange(long day, long eventStartDay) {
-        return isGlobal() || (day >= eventStartDay - dayOffset_upcoming && day <= eventStartDay + duration_in_days + dayOffset_expired);
+    private boolean inRange(long day, long instanceStartDay) {
+        return getEntryType(day) == EntryType.GLOBAL || (day >= instanceStartDay - dayOffset_upcoming && day <= instanceStartDay + durationDay + dayOffset_expired);
         // | days after the event ended ------ event start |event| event end ------ days before the event starts |
         // | ++++++++++++++++++++++++++       -------------|-----|----------        +++++++++++++++++++++++++++++|
     }
@@ -184,70 +209,52 @@ public class TodoListEntry extends RecycleViewEntry {
         return completed;
     }
     
-    public boolean isGlobal() {
-        return day_start == DAY_FLAG_GLOBAL || day_end == DAY_FLAG_GLOBAL || entryType == EntryType.GLOBAL;
-    }
-    
-    public boolean isExpired() {
-        return entryType == EntryType.EXPIRED;
-    }
-    
-    public boolean isUpcoming() {
-        return entryType == EntryType.UPCOMING;
-    }
-    
-    public boolean isToday() {
-        return entryType == EntryType.TODAY;
-    }
-    
     public boolean visibleInList(long day) {
-        boolean visibilityFlag = !completed || showInList_ifCompleted;
-        boolean show;
-        if (day == currentDay) {
-            show = isUpcoming() || isExpired() || isVisible(day);
-            show = show && visibilityFlag;
+        boolean show = isVisible(day);
+        EntryType entryType = getEntryType(day);
+        if (entryType == EntryType.EXPIRED || entryType == EntryType.UPCOMING) {
+            return show && !completed;
         } else {
-            show = isVisible(day);
+            return show;
         }
-        return show;
     }
     
     public boolean isVisible(long day) {
         if (recurrenceSet != null) {
-            if (day > day_end) {
+            if (day > endDay) {
                 return false;
             }
-            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
-            long instance = 0;
-            while (it.hasNext() && instance <= day) {
-                instance = daysFromEpoch(it.next(), event.timeZone);
-                if (inRange(day, instance)) {
+            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, startMsUTC);
+            long instanceDay = 0;
+            while (it.hasNext() && instanceDay <= day) {
+                instanceDay = daysFromEpoch(it.next(), event.timeZone);
+                if (inRange(day, instanceDay)) {
                     return true;
                 }
             }
             return false;
         }
-        return inRange(day, day_start);
+        return inRange(day, startDay);
     }
     
-    public boolean isVisibleExact(long timestamp) {
+    public boolean isVisibleExact(long targetTimestamp) {
+        long targetDay = daysFromEpoch(targetTimestamp, event.timeZone);
         if (recurrenceSet != null) {
-            if (timestamp > timestamp_end) {
+            if (targetTimestamp > endMsUTC) {
                 return false;
             }
-            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
-            long instance = 0;
-            long day = daysFromEpoch(timestamp, event.timeZone);
-            while (it.hasNext() && instance <= timestamp) {
-                instance = it.next();
-                if (inRange(day, daysFromEpoch(instance, event.timeZone))) {
-                    return isUpcoming() || (instance + timestamp_duration >= timestamp && daysFromEpoch(instance, event.timeZone) <= currentDay);
+            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, startMsUTC);
+            long instanceMsUTC = 0, instanceDay;
+            while (it.hasNext() && instanceMsUTC <= targetTimestamp) {
+                instanceMsUTC = it.next();
+                instanceDay = daysFromEpoch(instanceMsUTC, event.timeZone);
+                if (inRange(targetDay, instanceDay)) {
+                    return isUpcoming(instanceDay) || (instanceMsUTC + durationMsUTC >= targetTimestamp && instanceDay <= currentDay);
                 }
             }
             return false;
         }
-        return inRange(daysFromEpoch(timestamp, event.timeZone), day_start)
-                && (isUpcoming() || (timestamp_start + timestamp_duration >= timestamp && daysFromEpoch(timestamp, event.timeZone) <= currentDay));
+        return inRange(targetDay, startDay) && (isUpcoming(targetDay) || (startMsUTC + durationMsUTC >= targetTimestamp && targetDay <= currentDay));
     }
     
     public boolean hideByContent() {
@@ -266,18 +273,26 @@ public class TodoListEntry extends RecycleViewEntry {
     
     public long getNearestEventTimestamp(long day) {
         if (recurrenceSet != null) {
-            if (day >= day_end) {
-                return timestamp_end;
+            if (day >= endDay) {
+                return endMsUTC;
             }
-            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, timestamp_start);
+            RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, startMsUTC);
+            long instanceTimestamp, instanceDay;
             while (it.hasNext()) {
-                long epoch = it.next();
-                if (inRange(day, daysFromEpoch(epoch, event.timeZone)) || daysFromEpoch(epoch, event.timeZone) >= day) {
-                    return epoch;
+                instanceDay = daysFromEpoch(instanceTimestamp = it.next(), event.timeZone);
+                if (inRange(day, instanceDay) || instanceDay >= day) {
+                    return instanceTimestamp;
                 }
             }
         }
-        return timestamp_start;
+        return startMsUTC;
+    }
+    
+    public long getNearestEventDay(long day) {
+        if (isFromSystemCalendar()) {
+            return daysFromEpoch(getNearestEventTimestamp(day), event.timeZone);
+        }
+        return startDay;
     }
     
     public EntryType getEntryType(long targetDay) {
@@ -288,35 +303,41 @@ public class TodoListEntry extends RecycleViewEntry {
             }
             if (targetDay + dayOffset_upcoming >= nearestDay && targetDay < nearestDay) {
                 return EntryType.UPCOMING;
-            } else if (targetDay - dayOffset_expired <= nearestDay + duration_in_days && targetDay > nearestDay + duration_in_days) {
+            } else if (targetDay - dayOffset_expired <= nearestDay + durationDay && targetDay > nearestDay + durationDay) {
                 return EntryType.EXPIRED;
             }
         } else {
-            // day_start = day_end for not calendar entries, so we can use any
-            if (day_start == targetDay) {
+            // startDay = endDay for not calendar entries, so we can use any
+            if (startDay == targetDay) {
                 return EntryType.TODAY;
             }
             
-            if (day_start == DAY_FLAG_GLOBAL) {
-                return EntryType.GLOBAL;
-            }
-            
-            if (day_start < targetDay && targetDay - day_start <= dayOffset_expired) {
+            if (startDay < targetDay && targetDay - startDay <= dayOffset_expired) {
                 return EntryType.EXPIRED;
             }
             
-            if (day_start > targetDay && day_start - targetDay <= dayOffset_upcoming) {
+            if (startDay > targetDay && startDay - targetDay <= dayOffset_upcoming) {
                 return EntryType.UPCOMING;
             }
         }
         return EntryType.UNKNOWN;
     }
     
-    public long getNearestEventDay(long day) {
-        if (isFromSystemCalendar()) {
-            return daysFromEpoch(getNearestEventTimestamp(day), event.timeZone);
-        }
-        return day_start;
+    public boolean notGlobal() {
+        // startDay = endDay for not calendar entries, so we can use any
+        return startDay != DAY_FLAG_GLOBAL;
+    }
+    
+    public boolean isUpcoming(long day) {
+        return getEntryType(day) == EntryType.UPCOMING;
+    }
+    
+    public boolean isExpired(long day) {
+        return getEntryType(day) == EntryType.EXPIRED;
+    }
+    
+    public boolean isToday(long day) {
+        return getEntryType(day) == EntryType.TODAY;
     }
     
     public String getTimeSpan(Context context) {
@@ -330,13 +351,13 @@ public class TodoListEntry extends RecycleViewEntry {
         }
         
         if (recurrenceSet != null) {
-            return DateManager.getTimeSpan(timestamp_start, timestamp_start + timestamp_duration);
+            return DateManager.getTimeSpan(startMsUTC, startMsUTC + durationMsUTC);
         }
         
-        if (timestamp_start == timestamp_end) {
-            return datetimeFromEpoch(timestamp_start);
+        if (startMsUTC == endMsUTC) {
+            return datetimeFromEpoch(startMsUTC);
         } else {
-            return DateManager.getTimeSpan(timestamp_start, timestamp_end);
+            return DateManager.getTimeSpan(startMsUTC, endMsUTC);
         }
     }
     
@@ -371,87 +392,13 @@ public class TodoListEntry extends RecycleViewEntry {
         borderColor = preferences.getInt(getAppropriateKey(Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
         borderThickness = preferences.getInt(getAppropriateKey(Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
         fontColor = preferences.getInt(getAppropriateKey(Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR);
-        
-        if (!isFromSystemCalendar()) {
-            
-            long associatedDayLoaded = Long.parseLong(Objects.requireNonNull(params.get(ASSOCIATED_DAY)));
-            
-            long associatedDay = currentDay;
-            if (associatedDayLoaded != DAY_FLAG_GLOBAL) {
-                associatedDay = associatedDayLoaded;
-            }
-            
-            if (associatedDayLoaded == currentDay || associatedDayLoaded == DAY_FLAG_GLOBAL) {
-                
-                showOnLock = true;
-                showInList_ifCompleted = true;
-                
-                if (associatedDayLoaded == DAY_FLAG_GLOBAL) {
-                    showOnLock = preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
-                    setEntryType(EntryType.GLOBAL);
-                } else {
-                    setEntryType(EntryType.TODAY);
-                }
-                
-            } else if (associatedDay < currentDay && currentDay - associatedDay <= dayOffset_expired) {
-                
-                showInList_ifCompleted = false;
-                showOnLock = true;
-                
-            } else if (associatedDay > currentDay && associatedDay - currentDay <= dayOffset_upcoming) {
-                
-                showInList_ifCompleted = false;
-                showOnLock = true;
-                
-            }
-            
-            adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-            priority = ENTRY_SETTINGS_DEFAULT_PRIORITY;
-            setParams();
-            
-        } else {
-            
-            timestamp_start = event.start;
-            timestamp_end = event.end;
-            timestamp_duration = event.duration;
-            allDay = event.allDay;
-            recurrenceSet = event.rSet;
-            
-            day_start = daysFromEpoch(timestamp_start, event.timeZone);
-            day_end = daysFromEpoch(timestamp_end, event.timeZone);
-            duration_in_days = daysFromEpoch(timestamp_start + timestamp_duration, event.timeZone) - day_start;
-            
-            textValue = event.title;
-            
-            List<String> calendarSubKeys = event.subKeys;
-            
-            adaptiveColorBalance = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-            
-            priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY);
-            
-            
-            setParams();
-        }
-        
-        //colors and thickness post update
-        
-        fontColor_original = fontColor;
-        bgColor_original = bgColor;
-        borderColor_original = borderColor;
-        border_thickness_original = borderThickness;
-        
-        if (isUpcoming()) {
-            fontColor = mixTwoColors(fontColor, preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR);
-            bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR);
-            borderColor = mixTwoColors(borderColor, preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR);
-            borderThickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
-        } else if (isExpired()) {
-            fontColor = mixTwoColors(fontColor, preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR);
-            bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR);
-            borderColor = mixTwoColors(borderColor, preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR);
-            borderThickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
-        }
         fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
+        
+        adaptiveColorBalance = preferences.getInt(getAppropriateKey(Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
+        
+        priority = isFromSystemCalendar() ? preferences.getInt(getFirstValidKey(event.subKeys, Keys.PRIORITY), Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY) : ENTRY_SETTINGS_DEFAULT_PRIORITY;
+        
+        setParams();
     }
     
     public boolean isAdaptiveColorEnabled() {
@@ -477,15 +424,15 @@ public class TodoListEntry extends RecycleViewEntry {
     
     public String getDayOffset(long day, Context context) {
         String dayOffset = "";
-        if (!isGlobal()) {
+        if (getEntryType(day) != EntryType.GLOBAL) {
             
             int dayShift = 0;
             
             long nearestDay = getNearestEventDay(day);
             if (day < nearestDay) {
                 dayShift = (int) (nearestDay - day);
-            } else if (day > nearestDay + duration_in_days) {
-                dayShift = (int) (nearestDay + duration_in_days - day);
+            } else if (day > nearestDay + durationDay) {
+                dayShift = (int) (nearestDay + durationDay - day);
             }
             
             if (dayShift < 31 && dayShift > -31) {
@@ -542,7 +489,7 @@ public class TodoListEntry extends RecycleViewEntry {
     
     // get parameter from group if it exists, if not, get from current parameters
     private void setParam(String parameter, Consumer<String> actionIfNotNull) {
-        String paramValue = group != null ? group.params.getOrDefault(parameter, params.get(parameter)) : params.get(parameter);
+        String paramValue = group != null ? group.params.getOrDefault(parameter, params.getWithNull(parameter)) : params.getWithNull(parameter);
         if (paramValue != null) {
             actionIfNotNull.accept(paramValue);
         }
@@ -551,7 +498,6 @@ public class TodoListEntry extends RecycleViewEntry {
     private void setParams() {
         setParam(TEXT_VALUE, param -> textValue = param);
         setParam(IS_COMPLETED, param -> completed = Boolean.parseBoolean(param));
-        setParam(SHOW_ON_LOCK, param -> showOnLock = Boolean.parseBoolean(param));
         setParam(Keys.UPCOMING_ITEMS_OFFSET, param -> dayOffset_upcoming = Integer.parseInt(param));
         setParam(Keys.EXPIRED_ITEMS_OFFSET, param -> dayOffset_expired = Integer.parseInt(param));
         setParam(BORDER_THICKNESS, param -> borderThickness = Integer.parseInt(param));
@@ -560,8 +506,8 @@ public class TodoListEntry extends RecycleViewEntry {
         setParam(BORDER_COLOR, param -> borderColor = Integer.parseInt(param));
         setParam(PRIORITY, param -> priority = Integer.parseInt(param));
         setParam(ASSOCIATED_DAY, param -> {
-            day_start = Long.parseLong(param);
-            day_end = day_start;
+            startDay = Long.parseLong(param);
+            endDay = startDay;
         });
         setParam(ADAPTIVE_COLOR_BALANCE, param -> adaptiveColorBalance = Integer.parseInt(param));
     }
@@ -593,7 +539,7 @@ public class TodoListEntry extends RecycleViewEntry {
     
     @Override
     public int hashCode() {
-        return Objects.hash(event, params, showOnLock, group);
+        return Objects.hash(event, params, group);
     }
     
     @Override
@@ -605,7 +551,7 @@ public class TodoListEntry extends RecycleViewEntry {
         } else if (obj instanceof TodoListEntry) {
             TodoListEntry entry = (TodoListEntry) obj;
             return Objects.equals(event, entry.event) &&
-                    Objects.equals(entry.params, params) && showOnLock == entry.showOnLock
+                    Objects.equals(entry.params, params)
                     && Objects.equals(group, entry.group);
         }
         return super.equals(obj);

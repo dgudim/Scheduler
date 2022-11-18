@@ -15,7 +15,6 @@ import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
-import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 import android.app.AlertDialog;
@@ -220,7 +219,8 @@ public class EntrySettings extends PopupSettingsView {
                 bnd.showOnLockSwitch,
                 bnd.showOnLockState,
                 todoListEntryManager, entry,
-                SHOW_ON_LOCK, entry.showOnLock);
+                SHOW_ON_LOCK, false);
+        // TODO: 18.11.2022 replace with real showOnLock
         
     }
     

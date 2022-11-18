@@ -120,7 +120,5 @@ public class Keys {
     
     public static final String ROOT_DIR = "root_directory";
     public static final String ENTRIES_FILE = "entries";
-    public static final String ENTRIES_GROUP_NAMES_FILE = "entries_groupNames";
     public static final String GROUPS_FILE = "groupData";
-    public static final String GROUP_NAMES_FILE = "groupNames";
 }

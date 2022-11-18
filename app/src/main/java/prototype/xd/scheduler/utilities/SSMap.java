@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 
 import java.io.IOException;
@@ -33,5 +35,17 @@ public class SSMap extends ArrayMap<String, String> implements Serializable {
         for(int i = 0; i < keySet.length; i++) {
             put(keySet[i], values[i]);
         }
+    }
+    
+    // return empty string instead of null bu default
+    @Override
+    public @NonNull
+    String get(Object key) {
+        return getOrDefault(key, "");
+    }
+    
+    @Nullable
+    public String getWithNull(Object key) {
+        return super.get(key);
     }
 }

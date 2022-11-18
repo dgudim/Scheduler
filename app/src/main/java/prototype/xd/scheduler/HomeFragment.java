@@ -1,6 +1,7 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
@@ -100,7 +101,7 @@ public class HomeFragment extends Fragment {
                         // This is fine here as id because a person can't click 2 times in 1 ms
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
-                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), true);
+                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), true);
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
@@ -113,7 +114,7 @@ public class HomeFragment extends Fragment {
                         // This is fine, see note above
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
-                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(), false);
+                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), false);
                         return true;
                     });
         });
