@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
 import androidx.collection.ArrayMap;
-import androidx.collection.SimpleArrayMap;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,7 +14,7 @@ public class SSMap extends ArrayMap<String, String> implements Serializable {
         super();
     }
     
-    public SSMap(SimpleArrayMap map) {
+    public SSMap(SSMap map) {
         super(map);
     }
     

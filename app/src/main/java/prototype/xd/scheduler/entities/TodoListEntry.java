@@ -14,13 +14,11 @@ import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY;
-import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
-import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Keys.VISIBLE;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
@@ -50,7 +48,7 @@ public class TodoListEntry extends RecycleViewEntry {
     
     private static final String NAME = "Todo list entry";
     
-    enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING, NEUTRAL}
+    enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING, UNKNOWN}
     
     public SystemCalendarEvent event;
     
@@ -82,9 +80,9 @@ public class TodoListEntry extends RecycleViewEntry {
     public int priority = 0;
     
     public int adaptiveColorBalance;
-    public int averageBackgroundColor;
+    public int averageBackgroundColor = 0xff_FFFFFF;
     
-    public boolean showOnLock = false;
+    public boolean showOnLock = true;
     private boolean showInList_ifCompleted = false;
     
     private String textValue = "";
@@ -152,8 +150,28 @@ public class TodoListEntry extends RecycleViewEntry {
         }
     }
     
-    public boolean isVisibleOnLockscreen() {
-        return (showOnLock && !completed);
+    public boolean isVisibleOnLockscreen(long day, long timestamp) {
+        String visibleOnLockscreen = params.get(SHOW_ON_LOCK);
+        if (visibleOnLockscreen != null) {
+            return Boolean.parseBoolean(visibleOnLockscreen) && !completed;
+        }
+        if (isFromSystemCalendar()) {
+            if (!hideByContent()) {
+                if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
+                    showOnLock = isVisibleExact(timestamp);
+                } else {
+                    showOnLock = isVisible(day);
+                }
+                return showOnLock &&
+                        preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+            }
+            return false;
+        } else {
+            if (getEntryType(day) == EntryType.GLOBAL) {
+                return preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
+            }
+            return !completed;
+        }
     }
     
     private boolean inRange(long day, long eventStartDay) {
@@ -262,6 +280,38 @@ public class TodoListEntry extends RecycleViewEntry {
         return timestamp_start;
     }
     
+    public EntryType getEntryType(long targetDay) {
+        if (isFromSystemCalendar()) {
+            long nearestDay = getNearestEventDay(targetDay);
+            if (nearestDay == targetDay) {
+                return EntryType.TODAY;
+            }
+            if (targetDay + dayOffset_upcoming >= nearestDay && targetDay < nearestDay) {
+                return EntryType.UPCOMING;
+            } else if (targetDay - dayOffset_expired <= nearestDay + duration_in_days && targetDay > nearestDay + duration_in_days) {
+                return EntryType.EXPIRED;
+            }
+        } else {
+            // day_start = day_end for not calendar entries, so we can use any
+            if (day_start == targetDay) {
+                return EntryType.TODAY;
+            }
+            
+            if (day_start == DAY_FLAG_GLOBAL) {
+                return EntryType.GLOBAL;
+            }
+            
+            if (day_start < targetDay && targetDay - day_start <= dayOffset_expired) {
+                return EntryType.EXPIRED;
+            }
+            
+            if (day_start > targetDay && day_start - targetDay <= dayOffset_upcoming) {
+                return EntryType.UPCOMING;
+            }
+        }
+        return EntryType.UNKNOWN;
+    }
+    
     public long getNearestEventDay(long day) {
         if (isFromSystemCalendar()) {
             return daysFromEpoch(getNearestEventTimestamp(day), event.timeZone);
@@ -303,82 +353,59 @@ public class TodoListEntry extends RecycleViewEntry {
         reloadParams();
     }
     
+    // get calendar key for calendar entries and regular key for normal entries
+    private String getAppropriateKey(String key) {
+        if (isFromSystemCalendar()) {
+            return getFirstValidKey(event.subKeys, key);
+        }
+        return key;
+    }
+    
     public void reloadParams() {
+        
+        // load default parameters
+        dayOffset_expired = preferences.getInt(getAppropriateKey(Keys.EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
+        dayOffset_upcoming = preferences.getInt(getAppropriateKey(Keys.UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
+        
+        bgColor = preferences.getInt(getAppropriateKey(Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR);
+        borderColor = preferences.getInt(getAppropriateKey(Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
+        borderThickness = preferences.getInt(getAppropriateKey(Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
+        fontColor = preferences.getInt(getAppropriateKey(Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR);
+        
         if (!isFromSystemCalendar()) {
             
-            String associatedDayString = params.get(ASSOCIATED_DAY);
+            long associatedDayLoaded = Long.parseLong(Objects.requireNonNull(params.get(ASSOCIATED_DAY)));
             
-            if (associatedDayString != null) {
-                long associatedDayLoaded = Long.parseLong(associatedDayString);
+            long associatedDay = currentDay;
+            if (associatedDayLoaded != DAY_FLAG_GLOBAL) {
+                associatedDay = associatedDayLoaded;
+            }
+            
+            if (associatedDayLoaded == currentDay || associatedDayLoaded == DAY_FLAG_GLOBAL) {
                 
-                dayOffset_expired = preferences.getInt(EXPIRED_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
-                dayOffset_upcoming = preferences.getInt(UPCOMING_ITEMS_OFFSET, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
+                showOnLock = true;
+                showInList_ifCompleted = true;
                 
-                setParams();
-                
-                long associatedDay = currentDay;
-                if (associatedDayLoaded != DAY_FLAG_GLOBAL) {
-                    associatedDay = associatedDayLoaded;
-                }
-                
-                if (associatedDayLoaded == currentDay || associatedDayLoaded == DAY_FLAG_GLOBAL) {
-                    
-                    bgColor = preferences.getInt(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR);
-                    borderColor = preferences.getInt(Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR);
-                    borderThickness = preferences.getInt(Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
-                    
-                    setFontColor(Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR);
-                    
-                    showOnLock = true;
-                    showInList_ifCompleted = true;
-                    
-                    if (associatedDayLoaded == DAY_FLAG_GLOBAL) {
-                        showOnLock = preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
-                        setEntryType(EntryType.GLOBAL);
-                    } else {
-                        setEntryType(EntryType.TODAY);
-                    }
-                    
-                } else if (associatedDay < currentDay && currentDay - associatedDay <= dayOffset_expired) {
-                    
-                    bgColor = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
-                    borderColor = preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR);
-                    borderThickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
-                    
-                    setFontColor(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
-                    
-                    showInList_ifCompleted = false;
-                    showOnLock = true;
-                    
-                    setEntryType(EntryType.EXPIRED);
-                } else if (associatedDay > currentDay && associatedDay - currentDay <= dayOffset_upcoming) {
-                    
-                    bgColor = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
-                    borderColor = preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR);
-                    borderThickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
-                    
-                    setFontColor(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
-                    
-                    showInList_ifCompleted = false;
-                    showOnLock = true;
-                    
-                    setEntryType(EntryType.UPCOMING);
+                if (associatedDayLoaded == DAY_FLAG_GLOBAL) {
+                    showOnLock = preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
+                    setEntryType(EntryType.GLOBAL);
                 } else {
-                    setFontColor(Keys.SETTINGS_DEFAULT_FONT_COLOR);
-                    
-                    bgColor = Keys.SETTINGS_DEFAULT_BG_COLOR;
-                    borderColor = Keys.SETTINGS_DEFAULT_BORDER_COLOR;
-                    borderThickness = Keys.SETTINGS_DEFAULT_BORDER_THICKNESS;
-                    
-                    showInList_ifCompleted = true;
-                    showOnLock = false;
-                    
-                    setEntryType(EntryType.NEUTRAL);
+                    setEntryType(EntryType.TODAY);
                 }
+                
+            } else if (associatedDay < currentDay && currentDay - associatedDay <= dayOffset_expired) {
+                
+                showInList_ifCompleted = false;
+                showOnLock = true;
+                
+            } else if (associatedDay > currentDay && associatedDay - currentDay <= dayOffset_upcoming) {
+                
+                showInList_ifCompleted = false;
+                showOnLock = true;
+                
             }
             
             adaptiveColorBalance = preferences.getInt(Keys.ADAPTIVE_COLOR_BALANCE, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-            averageBackgroundColor = 0xff_FFFFFF;
             priority = ENTRY_SETTINGS_DEFAULT_PRIORITY;
             setParams();
             
@@ -402,31 +429,7 @@ public class TodoListEntry extends RecycleViewEntry {
             
             priority = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.PRIORITY), Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY);
             
-            dayOffset_upcoming = preferences.getInt(getFirstValidKey(calendarSubKeys, UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
-            dayOffset_expired = preferences.getInt(getFirstValidKey(calendarSubKeys, EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
             
-            long nearestDay = getNearestEventDay(currentDay);
-            if (currentDay + dayOffset_upcoming >= nearestDay && currentDay < nearestDay) {
-                setEntryType(EntryType.UPCOMING);
-            } else if (currentDay - dayOffset_expired <= nearestDay + duration_in_days && currentDay > nearestDay + duration_in_days) {
-                setEntryType(EntryType.EXPIRED);
-            }
-            
-            setFontColor(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR);
-            bgColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR);
-            borderColor = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
-            borderThickness = preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
-            
-            if (!hideByContent()) {
-                if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
-                    showOnLock = isVisibleExact(currentTimestamp);
-                } else {
-                    showOnLock = isVisible(currentDay);
-                }
-                showOnLock = showOnLock && preferences.getBoolean(getFirstValidKey(calendarSubKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
-            }
-            
-            averageBackgroundColor = 0xff_FFFFFF;
             setParams();
         }
         
@@ -438,29 +441,17 @@ public class TodoListEntry extends RecycleViewEntry {
         border_thickness_original = borderThickness;
         
         if (isUpcoming()) {
-            setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+            fontColor = mixTwoColors(fontColor, preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             borderColor = mixTwoColors(borderColor, preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             borderThickness = preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS);
         } else if (isExpired()) {
-            setFontColor(mixTwoColors(fontColor, preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+            fontColor = mixTwoColors(fontColor, preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             bgColor = mixTwoColors(bgColor, preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             borderColor = mixTwoColors(borderColor, preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR);
             borderThickness = preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS);
         }
-    }
-    
-    private void setEntryType(EntryType entryType) {
-        this.entryType = entryType;
-    }
-    
-    private void setFontColor(int color) {
-        fontColor = color;
         fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
-    }
-    
-    private void setFontColor(String key, int defaultColor) {
-        setFontColor(preferences.getInt(key, defaultColor));
     }
     
     public boolean isAdaptiveColorEnabled() {
@@ -558,17 +549,17 @@ public class TodoListEntry extends RecycleViewEntry {
     }
     
     private void setParams() {
-        setParam(TEXT_VALUE,             param -> textValue = param);
-        setParam(IS_COMPLETED,           param -> completed = Boolean.parseBoolean(param));
-        setParam(SHOW_ON_LOCK,           param -> showOnLock = Boolean.parseBoolean(param));
-        setParam(UPCOMING_ITEMS_OFFSET,  param -> dayOffset_upcoming = Integer.parseInt(param));
-        setParam(EXPIRED_ITEMS_OFFSET,   param -> dayOffset_expired = Integer.parseInt(param));
-        setParam(BORDER_THICKNESS,       param -> borderThickness = Integer.parseInt(param));
-        setParam(FONT_COLOR,             param -> setFontColor(Integer.parseInt(param)));
-        setParam(BG_COLOR,               param -> bgColor = Integer.parseInt(param));
-        setParam(BORDER_COLOR,           param -> borderColor = Integer.parseInt(param));
-        setParam(PRIORITY,               param -> priority = Integer.parseInt(param));
-        setParam(ASSOCIATED_DAY,         param -> {
+        setParam(TEXT_VALUE, param -> textValue = param);
+        setParam(IS_COMPLETED, param -> completed = Boolean.parseBoolean(param));
+        setParam(SHOW_ON_LOCK, param -> showOnLock = Boolean.parseBoolean(param));
+        setParam(Keys.UPCOMING_ITEMS_OFFSET, param -> dayOffset_upcoming = Integer.parseInt(param));
+        setParam(Keys.EXPIRED_ITEMS_OFFSET, param -> dayOffset_expired = Integer.parseInt(param));
+        setParam(BORDER_THICKNESS, param -> borderThickness = Integer.parseInt(param));
+        setParam(Keys.FONT_COLOR, param -> fontColor = Integer.parseInt(param));
+        setParam(BG_COLOR, param -> bgColor = Integer.parseInt(param));
+        setParam(BORDER_COLOR, param -> borderColor = Integer.parseInt(param));
+        setParam(PRIORITY, param -> priority = Integer.parseInt(param));
+        setParam(ASSOCIATED_DAY, param -> {
             day_start = Long.parseLong(param);
             day_end = day_start;
         });
