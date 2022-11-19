@@ -70,7 +70,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     public TodoListEntryManager(final Context context, final Lifecycle lifecycle) {
         this.todoListViewAdapter = new TodoListViewAdapter(this, context);
         this.todoListEntries = new ArrayList<>();
-        this.groups = loadGroups(context);
+        this.groups = loadGroups();
         
         lifecycle.addObserver(this);
         
@@ -201,7 +201,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         List<TodoListEntry> filteredTodoListEntries = new ArrayList<>(5);
         // get all relevant entries
         for (TodoListEntry todoEntry : todoListEntries) {
-            if (todoEntry.notGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day)) {
+            if (!todoEntry.isGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day)) {
                 filteredTodoListEntries.add(todoEntry);
             }
         }
@@ -210,7 +210,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         
         List<Integer> colors = new ArrayList<>(filteredTodoListEntries.size());
         for (TodoListEntry todoEntry : filteredTodoListEntries) {
-            colors.add(todoEntry.bgColor);
+            colors.add(todoEntry.bgColor.get());
         }
         cachedIndicators.put(day, colors);
         

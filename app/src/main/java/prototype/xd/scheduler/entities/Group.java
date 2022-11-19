@@ -2,7 +2,6 @@ package prototype.xd.scheduler.entities;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.Serializable;
@@ -14,35 +13,13 @@ import prototype.xd.scheduler.utilities.SSMap;
 
 public class Group implements Serializable {
     
-    private boolean isNullGroup = false;
-    private String groupName;
+    public static final transient Group NULL_GROUP = new Group();
+    
+    private String groupName = "";
     
     protected SSMap params = new SSMap();
     
-    public Group(Context context) {
-        groupName = context.getString(R.string.blank_group_name);
-        isNullGroup = true;
-    }
-    
-    public boolean isNullGroup() {
-        return isNullGroup;
-    }
-    
-    public Group(Context context, String groupName, List<Group> groups) {
-        boolean foundGroup = false;
-        for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).groupName.equals(groupName)) {
-                params = groups.get(i).params;
-                foundGroup = true;
-                break;
-            }
-        }
-        if (foundGroup) {
-            this.groupName = groupName;
-        } else {
-            this.groupName = context.getString(R.string.blank_group_name);
-            isNullGroup = true;
-        }
+    public Group() {
     }
     
     public Group(String groupName, SSMap params) {
@@ -50,32 +27,35 @@ public class Group implements Serializable {
         this.params = params;
     }
     
-    public String getName() {
-        if (isNullGroup) {
-            return "";
+    public boolean isNullGroup() {
+        return groupName.isEmpty();
+    }
+    
+    public static int groupIndexInList(List<Group> groups, String groupName) {
+        for (int i = 0; i < groups.size(); i++) {
+            if (groups.get(i).groupName.equals(groupName)) {
+                return i;
+            }
         }
+        return -1;
+    }
+    
+    public static @Nullable
+    Group findGroup(List<Group> groups, String groupName) {
+        int index = groupIndexInList(groups, groupName);
+        return index == -1 ? null : groups.get(index);
+    }
+    
+    public String getLocalizedName(Context context) {
+        return isNullGroup() ? context.getString(R.string.blank_group_name) : groupName;
+    }
+    
+    public String getName() {
         return groupName;
     }
     
     public void setName(String newName) {
         groupName = newName;
-    }
-    
-    public static int groupIndexInList(List<Group> groupList, String groupName) {
-        int groupIndex = -1;
-        for (int i = 0; i < groupList.size(); i++) {
-            if (groupList.get(i).getName().equals(groupName)) {
-                groupIndex = i;
-                break;
-            }
-        }
-        return groupIndex;
-    }
-    
-    @NonNull
-    @Override
-    public String toString() {
-        return groupName;
     }
     
     @Override
@@ -86,14 +66,11 @@ public class Group implements Serializable {
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj == null) {
-            return isNullGroup;
+            return false;
         } else if (obj == this) {
             return true;
         } else if (obj instanceof Group) {
             Group group = (Group) obj;
-            if (isNullGroup && group.isNullGroup) {
-                return true;
-            }
             return params.equals(group.params) && groupName.equals(group.groupName);
         }
         return super.equals(obj);

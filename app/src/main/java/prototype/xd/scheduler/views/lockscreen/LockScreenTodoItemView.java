@@ -89,7 +89,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         int fontSizeSP = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
         
         // convert pixels to dp (equivalent of TypedValue.applyDimension(COMPLEX_UNIT_DIP, value, metrics))
-        setBorderSizeDP(entry.borderThickness, preferences);
+        setBorderSizeDP(entry.borderThickness.get(), preferences);
         
         setTitleText(entry.getTextOnDay(currentDay, context));
         setTitleTextSize(fontSizeSP * DEFAULT_TITLE_FONT_SIZE_MULTIPLIER);
@@ -118,11 +118,11 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             
             int[] pixels = new int[width * height];
             bgBitmap.getPixels(pixels, 0, width, (int) root.getX(), (int) root.getY(), width, height);
-            entry.averageBackgroundColor = getAverageColor(pixels);
+            entry.setAverageBackgroundColor(getAverageColor(pixels));
         }
         
-        mixAndSetBgAndTextColors(entry.fontColor, entry.getAdaptiveColor(entry.bgColor));
-        setBorderColor(entry.getAdaptiveColor(entry.borderColor));
+        mixAndSetBgAndTextColors(entry.fontColor.get(), entry.getAdaptiveColor(entry.bgColor.get()));
+        setBorderColor(entry.getAdaptiveColor(entry.borderColor.get()));
     }
     
     public void mixAndSetBgAndTextColors(int fontColor, int backgroundColor) {

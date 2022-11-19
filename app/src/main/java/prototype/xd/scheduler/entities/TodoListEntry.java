@@ -3,23 +3,12 @@ package prototype.xd.scheduler.entities;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.datetimeFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
-import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
-import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
-import static prototype.xd.scheduler.utilities.Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY;
-import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
-import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
-import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
-import static prototype.xd.scheduler.utilities.Utilities.nullWrapper;
 
 import android.content.Context;
 import android.widget.TextView;
@@ -39,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
@@ -48,44 +38,204 @@ import prototype.xd.scheduler.utilities.SSMap;
 
 public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
-    transient private static final String NAME = "Todo list entry";
+    static class CachedGetter<T> {
+        
+        ParameterGetter<T> parameterGetter;
+        
+        T value;
+        boolean valid = false;
+        
+        CachedGetter(ParameterGetter<T> parameterGetter) {
+            this.parameterGetter = parameterGetter;
+        }
+        
+        void invalidate() {
+            valid = false;
+        }
+        
+        T get(T previousValue) {
+            if (!valid) {
+                value = parameterGetter.get(previousValue);
+                valid = true;
+            }
+            return value;
+        }
+    }
     
-    public enum EntryType {GLOBAL, TODAY, EXPIRED, UPCOMING, UNKNOWN}
+    @FunctionalInterface
+    interface ParameterGetter<T> {
+        T get(T previousValue);
+    }
     
-    transient public SystemCalendarEvent event;
+    public static class Parameter<T> {
+        
+        TodoListEntry entry;
+        
+        String parameterKey;
+        
+        boolean invalidateNext;
+        
+        CachedGetter<T> todayValueGetter;
+        Function<String, T> loadedParameterConverter;
+        @Nullable
+        CachedGetter<T> upcomingValueGetter;
+        @Nullable
+        CachedGetter<T> expiredValueGetter;
+        
+        Parameter(TodoListEntry entry,
+                  String parameterKey,
+                  ParameterGetter<T> todayValueGetter,
+                  Function<String, T> loadedParameterConverter,
+                  @Nullable ParameterGetter<T> upcomingValueGetter,
+                  @Nullable ParameterGetter<T> expiredValueGetter,
+                  boolean invalidateNext) {
+            this.entry = entry;
+            this.parameterKey = parameterKey;
+            this.upcomingValueGetter = new CachedGetter<>(upcomingValueGetter);
+            this.todayValueGetter = new CachedGetter<>(todayValueGetter);
+            this.loadedParameterConverter = loadedParameterConverter;
+            this.expiredValueGetter = new CachedGetter<>(expiredValueGetter);
+            this.invalidateNext = invalidateNext;
+        }
+        
+        // get parameter from group if it exists, if not, get from current parameters
+        // TODO: 19.11.2022 also cache map accesses
+        private T getParamFromEntryIfPossible() {
+            String paramValue = entry.group != null ?
+                    entry.group.params.getOrDefault(parameterKey, entry.params.getWithNull(parameterKey)) :
+                    entry.params.getWithNull(parameterKey);
+            return paramValue != null ? loadedParameterConverter.apply(paramValue) : todayValueGetter.get(null);
+        }
+        
+        public T get(EntryType entryType) {
+            T todayValue = getParamFromEntryIfPossible();
+            switch (entryType) {
+                case EXPIRED:
+                    return expiredValueGetter == null ? todayValue : expiredValueGetter.get(todayValue);
+                case UPCOMING:
+                    return upcomingValueGetter == null ? todayValue : upcomingValueGetter.get(todayValue);
+                case TODAY:
+                default:
+                    return todayValue;
+            }
+        }
+        
+        public T get() {
+            return getParamFromEntryIfPossible();
+        }
+        
+        public void invalidate(EntryType entryType) {
+            switch (entryType) {
+                case EXPIRED:
+                    if (expiredValueGetter != null) {
+                        expiredValueGetter.invalidate();
+                    }
+                    break;
+                case UPCOMING:
+                    if (upcomingValueGetter != null) {
+                        upcomingValueGetter.invalidate();
+                    }
+                    break;
+                case TODAY:
+                default:
+                    todayValueGetter.invalidate();
+                    // if upcoming and expired depend on current and we should also invalidate them
+                    if (invalidateNext && upcomingValueGetter != null) {
+                        upcomingValueGetter.invalidate();
+                    }
+                    if (invalidateNext && expiredValueGetter != null) {
+                        expiredValueGetter.invalidate();
+                    }
+            }
+        }
+        
+    }
     
-    transient private long startMsUTC = 0;
-    transient private long endMsUTC = 0;
-    transient private long durationMsUTC = 0;
-    transient private boolean allDay = true;
-    transient private RecurrenceSet recurrenceSet;
+    private static final transient String NAME = "Todo list entry";
     
-    transient private long startDay = DAY_FLAG_GLOBAL;
-    transient private long endDay = DAY_FLAG_GLOBAL;
-    transient private long durationDay = 0;
-    transient public int dayOffset_expired = 0;
-    transient public int dayOffset_upcoming = 0;
-    transient private boolean completed = false;
-    transient private Group group;
-    transient private String tempGroupName;
+    public enum EntryType {TODAY, EXPIRED, UPCOMING, UNKNOWN}
     
-    transient public int bgColor;
-    transient public int fontColor;
-    transient public int fontColor_completed;
-    transient public int borderColor;
-    transient public int borderThickness = 0;
+    public transient SystemCalendarEvent event;
     
-    transient public int bgColor_original;
-    transient public int fontColor_original;
-    transient public int borderColor_original;
-    transient public int border_thickness_original = 0;
+    private transient long startMsUTC = 0;
+    private transient long endMsUTC = 0;
+    private transient long durationMsUTC = 0;
+    private transient boolean isAllDay = true;
+    private transient RecurrenceSet recurrenceSet;
     
-    transient public int priority = 0;
+    private transient long startDay = Keys.DAY_FLAG_GLOBAL;
+    private transient long endDay = Keys.DAY_FLAG_GLOBAL;
+    private transient long durationDays = 0;
     
-    transient public int adaptiveColorBalance;
-    transient public int averageBackgroundColor = 0xff_FFFFFF;
+    @Nullable
+    private transient Group group;
+    // for initializing group after deserialization
+    private transient String tempGroupName;
     
-    transient private String textValue = "";
+    public transient Parameter<Integer> bgColor = new Parameter<>(this, Keys.BG_COLOR,
+            previousValue -> preferences.getInt(getAppropriateKey(Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR),
+            Integer::parseInt,
+            todayValue -> mixTwoColors(todayValue,
+                    preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+            todayValue -> mixTwoColors(todayValue,
+                    preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+            true);
+    
+    public transient Parameter<Integer> fontColor = new Parameter<>(this, Keys.FONT_COLOR,
+            previousValue -> preferences.getInt(getAppropriateKey(Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR),
+            Integer::parseInt,
+            todayValue -> mixTwoColors(todayValue,
+                    preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+            todayValue -> mixTwoColors(todayValue,
+                    preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+            true);
+    
+    public transient Parameter<Integer> borderColor = new Parameter<>(this, Keys.BORDER_COLOR,
+            previousValue -> preferences.getInt(getAppropriateKey(Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR),
+            Integer::parseInt,
+            todayValue -> mixTwoColors(todayValue,
+                    preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+            todayValue -> mixTwoColors(todayValue,
+                    preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+            true);
+    
+    public transient Parameter<Integer> borderThickness = new Parameter<>(this, Keys.BORDER_THICKNESS,
+            previousValue -> preferences.getInt(getAppropriateKey(Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS),
+            Integer::parseInt,
+            todayValue -> preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS),
+            todayValue -> preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS),
+            false);
+    
+    public transient Parameter<Integer> priority = new Parameter<>(this, Keys.PRIORITY,
+            previousValue -> isFromSystemCalendar() ?
+                    preferences.getInt(getFirstValidKey(event.subKeys, Keys.PRIORITY), Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY) :
+                    Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY,
+            Integer::parseInt,
+            null,
+            null,
+            false);
+    
+    public transient Parameter<Integer> expiredDayOffset = new Parameter<>(this, Keys.EXPIRED_ITEMS_OFFSET,
+            previousValue -> preferences.getInt(getAppropriateKey(Keys.EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET),
+            Integer::parseInt,
+            null,
+            null,
+            false);
+    public transient Parameter<Integer> upcomingDayOffset = new Parameter<>(this, Keys.UPCOMING_ITEMS_OFFSET,
+            previousValue -> preferences.getInt(getAppropriateKey(Keys.UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET),
+            Integer::parseInt,
+            null,
+            null,
+            false);
+    
+    public transient Parameter<Integer> adaptiveColorBalance = new Parameter<>(this, Keys.ADAPTIVE_COLOR_BALANCE,
+            previousValue -> preferences.getInt(getAppropriateKey(Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE),
+            Integer::parseInt,
+            null,
+            null,
+            false);
+    
+    private transient int averageBackgroundColor = 0xff_FFFFFF;
     
     protected SSMap params = new SSMap();
     
@@ -95,46 +245,45 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         startMsUTC = event.start;
         endMsUTC = event.end;
         durationMsUTC = event.duration;
-        allDay = event.allDay;
+        isAllDay = event.allDay;
         recurrenceSet = event.rSet;
         
         startDay = daysFromEpoch(startMsUTC, event.timeZone);
         endDay = daysFromEpoch(endMsUTC, event.timeZone);
-        durationDay = daysFromEpoch(startMsUTC + durationMsUTC, event.timeZone) - startDay;
-        
-        textValue = event.title;
+        durationDays = daysFromEpoch(startMsUTC + durationMsUTC, event.timeZone) - startDay;
         
         assignId(event.hashCode());
-        reloadParams();
     }
     
-    public TodoListEntry(Context context, SSMap params, String groupName, List<Group> groups, long id) {
+    // ------------ serialization
+    public TodoListEntry(SSMap params, String groupName, List<Group> groups, long id) {
         tempGroupName = groupName;
-        initGroup(context, groups);
+        initGroup(groups);
         this.params = params;
         assignId(id);
-        reloadParams();
     }
     
     private void readObject(ObjectInputStream in)
             throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        tempGroupName = nullWrapper((String) in.readObject());
+        params = (SSMap) in.readObject();
+        tempGroupName = (String) in.readObject();
     }
+    // ------------
     
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.defaultWriteObject();
-        if(group != null) {
+        out.writeObject(params);
+        if (group == null) {
+            out.writeObject("");
+        } else {
             out.writeObject(group.getName());
         }
     }
     
-    public void initGroup(Context context, List<Group> groups) {
+    public void initGroup(List<Group> groups) {
         if (!tempGroupName.isEmpty()) {
-            group = new Group(context, tempGroupName, groups);
-            if (group.isNullGroup()) {
+            group = Group.findGroup(groups, tempGroupName);
+            if (group == null) {
                 log(WARN, NAME, "Unknown group: " + tempGroupName);
-                group = null;
             }
         }
     }
@@ -143,13 +292,22 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return event != null;
     }
     
+    @Nullable
     public Group getGroup() {
         return group;
     }
     
-    public String getGroupName() {
+    public String getRawGroupName() {
         if (group != null) {
             return group.getName();
+        } else {
+            return "";
+        }
+    }
+    
+    public String getLocalizedGroupName(Context context) {
+        if (group != null) {
+            return group.getLocalizedName(context);
         } else {
             return "";
         }
@@ -163,7 +321,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public void resetGroup() {
         group = null;
-        reloadParams();
+        // TODO: 19.11.2022 invalidate
     }
     
     public void changeGroup(Group group) {
@@ -171,49 +329,58 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             resetGroup();
         } else {
             this.group = group;
-            reloadParams();
+            // TODO: 19.11.2022 invalidate
         }
     }
     
-    public boolean isVisibleOnLockscreen(long day, long timestamp) {
-        String visibleOnLockscreen = params.getWithNull(SHOW_ON_LOCK);
+    public int getAverageBackgroundColor() {
+        return averageBackgroundColor;
+    }
+    
+    public void setAverageBackgroundColor(int averageBackgroundColor) {
+        this.averageBackgroundColor = averageBackgroundColor;
+    }
+    
+    public boolean isVisibleOnLockscreenToday() {
+        String visibleOnLockscreen = params.getWithNull(Keys.SHOW_ON_LOCK);
         if (visibleOnLockscreen != null) {
-            return Boolean.parseBoolean(visibleOnLockscreen) && !completed;
+            return Boolean.parseBoolean(visibleOnLockscreen) && !isCompleted();
         }
         if (isFromSystemCalendar()) {
             if (!hideByContent()) {
                 boolean showOnLock;
-                if (!allDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
-                    showOnLock = isVisibleExact(timestamp);
+                if (!isAllDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
+                    showOnLock = isVisibleExact(currentTimestamp);
                 } else {
-                    showOnLock = isVisible(day);
+                    showOnLock = isVisible(currentDay);
                 }
                 return showOnLock && preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
             }
             return false;
         } else {
-            if (getEntryType(day) == EntryType.GLOBAL) {
+            if (isGlobal()) {
                 return preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
             }
-            return !completed;
+            return !isCompleted();
         }
     }
     
     private boolean inRange(long day, long instanceStartDay) {
-        return getEntryType(day) == EntryType.GLOBAL || (day >= instanceStartDay - dayOffset_upcoming && day <= instanceStartDay + durationDay + dayOffset_expired);
+        return isGlobal() || (day >= instanceStartDay - upcomingDayOffset.get() && day <= instanceStartDay + durationDays + expiredDayOffset.get());
         // | days after the event ended ------ event start |event| event end ------ days before the event starts |
         // | ++++++++++++++++++++++++++       -------------|-----|----------        +++++++++++++++++++++++++++++|
     }
     
     public boolean isCompleted() {
-        return completed;
+        // everything else except "true" is false, so we are fine here
+        return Boolean.parseBoolean(params.getWithNull(Keys.IS_COMPLETED));
     }
     
     public boolean visibleInList(long day) {
         boolean show = isVisible(day);
         EntryType entryType = getEntryType(day);
         if (entryType == EntryType.EXPIRED || entryType == EntryType.UPCOMING) {
-            return show && !completed;
+            return show && !isCompleted();
         } else {
             return show;
         }
@@ -264,7 +431,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             String matchString = preferences.getString(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), "");
             String[] split = !matchString.isEmpty() ? matchString.split("\\|\\|") : new String[0];
             for (String str : split) {
-                hideByContent = textValue.contains(str);
+                hideByContent = getRawTextValue().contains(str);
                 if (hideByContent) break;
             }
         }
@@ -296,36 +463,30 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public EntryType getEntryType(long targetDay) {
-        if (isFromSystemCalendar()) {
-            long nearestDay = getNearestEventDay(targetDay);
-            if (nearestDay == targetDay) {
-                return EntryType.TODAY;
-            }
-            if (targetDay + dayOffset_upcoming >= nearestDay && targetDay < nearestDay) {
-                return EntryType.UPCOMING;
-            } else if (targetDay - dayOffset_expired <= nearestDay + durationDay && targetDay > nearestDay + durationDay) {
-                return EntryType.EXPIRED;
-            }
-        } else {
-            // startDay = endDay for not calendar entries, so we can use any
-            if (startDay == targetDay) {
-                return EntryType.TODAY;
-            }
-            
-            if (startDay < targetDay && targetDay - startDay <= dayOffset_expired) {
-                return EntryType.EXPIRED;
-            }
-            
-            if (startDay > targetDay && startDay - targetDay <= dayOffset_upcoming) {
-                return EntryType.UPCOMING;
-            }
+        // in case of regular entry this will return startDay
+        long nearestDay = getNearestEventDay(targetDay);
+        
+        if (nearestDay == targetDay) {
+            return EntryType.TODAY;
         }
+        
+        if (targetDay + upcomingDayOffset.get() >= nearestDay
+                && targetDay < nearestDay) {
+            return EntryType.UPCOMING;
+        }
+        
+        // for regular entries durationDay = 0
+        if (targetDay - expiredDayOffset.get() <= nearestDay + durationDays
+                && targetDay > nearestDay + durationDays) {
+            return EntryType.EXPIRED;
+        }
+        
         return EntryType.UNKNOWN;
     }
     
-    public boolean notGlobal() {
+    public boolean isGlobal() {
         // startDay = endDay for not calendar entries, so we can use any
-        return startDay != DAY_FLAG_GLOBAL;
+        return startDay == Keys.DAY_FLAG_GLOBAL;
     }
     
     public boolean isUpcoming(long day) {
@@ -346,7 +507,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             return "";
         }
         
-        if (allDay) {
+        if (isAllDay) {
             return context.getString(R.string.calendar_event_all_day);
         }
         
@@ -365,13 +526,13 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         // shallow copy map
         SSMap displayParams = new SSMap(params);
         // remove not display parameters
-        displayParams.removeAll(Arrays.asList(TEXT_VALUE, ASSOCIATED_DAY, IS_COMPLETED));
+        displayParams.removeAll(Arrays.asList(Keys.TEXT_VALUE, Keys.ASSOCIATED_DAY, Keys.IS_COMPLETED));
         return displayParams;
     }
     
     public void removeDisplayParams() {
-        params.retainAll(Arrays.asList(TEXT_VALUE, ASSOCIATED_DAY, IS_COMPLETED));
-        reloadParams();
+        params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.ASSOCIATED_DAY, Keys.IS_COMPLETED));
+        // TODO: 19.11.2022 invalidate
     }
     
     // get calendar key for calendar entries and regular key for normal entries
@@ -382,57 +543,38 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return key;
     }
     
-    public void reloadParams() {
-        
-        // load default parameters
-        dayOffset_expired = preferences.getInt(getAppropriateKey(Keys.EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET);
-        dayOffset_upcoming = preferences.getInt(getAppropriateKey(Keys.UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET);
-        
-        bgColor = preferences.getInt(getAppropriateKey(Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR);
-        borderColor = preferences.getInt(getAppropriateKey(Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR);
-        borderThickness = preferences.getInt(getAppropriateKey(Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS);
-        fontColor = preferences.getInt(getAppropriateKey(Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR);
-        fontColor_completed = mixTwoColors(fontColor, 0xff_FFFFFF, 0.5);
-        
-        adaptiveColorBalance = preferences.getInt(getAppropriateKey(Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE);
-        
-        priority = isFromSystemCalendar() ? preferences.getInt(getFirstValidKey(event.subKeys, Keys.PRIORITY), Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY) : ENTRY_SETTINGS_DEFAULT_PRIORITY;
-        
-        setParams();
-    }
-    
     public boolean isAdaptiveColorEnabled() {
-        return adaptiveColorBalance > 0;
+        return adaptiveColorBalance.get() > 0;
     }
     
     public int getAdaptiveColor(int inputColor) {
-        if (adaptiveColorBalance > 0) {
+        if (isAdaptiveColorEnabled()) {
             return mixTwoColors(MaterialColors.harmonize(inputColor, averageBackgroundColor),
-                    averageBackgroundColor, (adaptiveColorBalance - 1) / 9d);
+                    averageBackgroundColor, (adaptiveColorBalance.get() - 1) / 9d);
             //active adaptiveColorBalance is from 1 to 10, so we make it from 0 to 9
         }
         return inputColor;
     }
     
     public String getRawTextValue() {
-        return textValue;
+        return isFromSystemCalendar() ? event.title : params.get(Keys.TEXT_VALUE);
     }
     
     public String getTextOnDay(long day, Context context) {
-        return textValue + getDayOffset(day, context);
+        return getRawTextValue() + getDayOffset(day, context);
     }
     
     public String getDayOffset(long day, Context context) {
         String dayOffset = "";
-        if (getEntryType(day) != EntryType.GLOBAL) {
+        if (!isGlobal()) {
             
             int dayShift = 0;
             
             long nearestDay = getNearestEventDay(day);
             if (day < nearestDay) {
                 dayShift = (int) (nearestDay - day);
-            } else if (day > nearestDay + durationDay) {
-                dayShift = (int) (nearestDay + durationDay - day);
+            } else if (day > nearestDay + durationDays) {
+                dayShift = (int) (nearestDay + durationDays - day);
             }
             
             if (dayShift < 31 && dayShift > -31) {
@@ -496,25 +638,17 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     private void setParams() {
-        setParam(TEXT_VALUE, param -> textValue = param);
-        setParam(IS_COMPLETED, param -> completed = Boolean.parseBoolean(param));
-        setParam(Keys.UPCOMING_ITEMS_OFFSET, param -> dayOffset_upcoming = Integer.parseInt(param));
-        setParam(Keys.EXPIRED_ITEMS_OFFSET, param -> dayOffset_expired = Integer.parseInt(param));
-        setParam(BORDER_THICKNESS, param -> borderThickness = Integer.parseInt(param));
-        setParam(Keys.FONT_COLOR, param -> fontColor = Integer.parseInt(param));
-        setParam(BG_COLOR, param -> bgColor = Integer.parseInt(param));
-        setParam(BORDER_COLOR, param -> borderColor = Integer.parseInt(param));
-        setParam(PRIORITY, param -> priority = Integer.parseInt(param));
-        setParam(ASSOCIATED_DAY, param -> {
+        // TODO: 19.11.2022 deal with this
+        setParam(Keys.ASSOCIATED_DAY, param -> {
             startDay = Long.parseLong(param);
             endDay = startDay;
         });
-        setParam(ADAPTIVE_COLOR_BALANCE, param -> adaptiveColorBalance = Integer.parseInt(param));
+        
     }
     
     public void changeParameter(String name, String value) {
         params.put(name, value);
-        reloadParams();
+        // TODO: 19.11.2022 invalidate
     }
     
     public void setStateIconColor(TextView icon, String parameter) {

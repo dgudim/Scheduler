@@ -2,8 +2,6 @@ package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.groupIndexInList;
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
@@ -60,7 +58,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
                 bnd.eventColor.setCardBackgroundColor(currentEntry.event.color);
                 bnd.timeText.setText(currentEntry.getTimeSpan(context));
-                bnd.timeText.setTextColor(currentEntry.fontColor);
+                bnd.timeText.setTextColor(currentEntry.fontColor.get());
                 bnd.settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
             } else {
                 ListSelectionTodoBinding bnd = (ListSelectionTodoBinding)viewBinding;
@@ -73,13 +71,13 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                     todoListEntryManager.removeEntry(currentEntry);
                                     todoListEntryManager.saveEntriesAsync();
                                     // deleting a global entry does not change indicators
-                                    todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), currentEntry.notGlobal());
+                                    todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreenToday(), !currentEntry.isGlobal());
                                 }));
         
                 bnd.isDone.setCheckedSilent(currentEntry.isCompleted());
     
                 bnd.isDone.setOnClickListener(view12 -> {
-                    if (currentEntry.notGlobal()) {
+                    if (!currentEntry.isGlobal()) {
                         currentEntry.changeParameter(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
                     } else {
                         currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
@@ -91,7 +89,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                 bnd.getRoot().setOnLongClickListener(view1 -> {
             
                     final List<Group> groupList = todoListEntryManager.getGroups();
-                    int currentIndex = max(groupIndexInList(groupList, currentEntry.getGroupName()), 0);
+                    int currentIndex = max(groupIndexInList(groupList, currentEntry.getRawGroupName()), 0);
                     displayEditTextSpinnerDialogue(context, R.string.edit_event, -1, R.string.event_name_input_hint,
                             R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.getRawTextValue(), groupList,
                             currentIndex, (view2, text, selectedIndex) -> {
@@ -100,10 +98,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                 }
                                 currentEntry.changeParameter(TEXT_VALUE, text);
                                 todoListEntryManager.saveEntriesAsync();
-                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), false);
+                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreenToday(), false);
                                 return true;
                             },
-                            currentEntry.notGlobal() ? (view2, text, selectedIndex) -> {
+                            !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
                                 if (selectedIndex != currentIndex) {
                                     currentEntry.changeGroup(groupList.get(selectedIndex));
                                 }
@@ -111,7 +109,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                 currentEntry.changeParameter(IS_COMPLETED, "false");
                                 todoListEntryManager.saveEntriesAsync();
                                 // completed -> global = indicators don't change, no need to update
-                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), !currentEntry.isCompleted());
+                                todoListEntryManager.updateTodoListAdapter(currentEntry.isVisibleOnLockscreenToday(), !currentEntry.isCompleted());
                                 return true;
                             } : null);
                     return true;
@@ -125,13 +123,13 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             TextView todoText = root.findViewById(R.id.todoText);
             
             MaterialCardView backgroundLayer = root.findViewById(R.id.backgroundLayer);
-            backgroundLayer.setCardBackgroundColor(currentEntry.bgColor);
-            backgroundLayer.setStrokeColor(currentEntry.borderColor);
+            backgroundLayer.setCardBackgroundColor(currentEntry.bgColor.get());
+            backgroundLayer.setStrokeColor(currentEntry.borderColor.get());
     
             if (currentEntry.isCompleted() || currentEntry.hideByContent()) {
-                todoText.setTextColor(currentEntry.fontColor_completed);
+                todoText.setTextColor(currentEntry.fontColor.get());
             } else {
-                todoText.setTextColor(currentEntry.fontColor);
+                todoText.setTextColor(currentEntry.fontColor.get());
             }
     
             todoText.setText(currentEntry.getTextOnDay(currentlySelectedDay, context));

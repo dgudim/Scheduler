@@ -101,9 +101,11 @@ public class Utilities {
         List<TodoListEntry> readEntries = new ArrayList<>();
         try {
             readEntries = loadObject(ENTRIES_FILE);
-           
-            for(TodoListEntry entry: readEntries) {
-                entry.initGroup(context, groups);
+            
+            int id = 0;
+            for (TodoListEntry entry : readEntries) {
+                entry.initGroup(groups);
+                entry.assignId(id++);
             }
             
             log(INFO, NAME, "Read todo list: " + readEntries.size());
@@ -138,9 +140,9 @@ public class Utilities {
         }
     }
     
-    public static List<Group> loadGroups(Context context) {
+    public static List<Group> loadGroups() {
         List<Group> groups = new ArrayList<>();
-        groups.add(new Group(context)); // add "null" group
+        groups.add(Group.NULL_GROUP); // add "null" group
         try {
             groups.addAll(loadObject(GROUPS_FILE));
             return groups;
@@ -204,7 +206,11 @@ public class Utilities {
         
         
         for (TodoListEntry entry : entries) {
-            switch(entry.getEntryType(day)){
+            if (entry.isGlobal()) {
+                globalEntries.add(entry);
+                continue;
+            }
+            switch (entry.getEntryType(day)) {
                 case TODAY:
                     todayEntries.add(entry);
                     break;
@@ -213,9 +219,6 @@ public class Utilities {
                     break;
                 case UPCOMING:
                     upcomingEntries.add(entry);
-                    break;
-                case GLOBAL:
-                    globalEntries.add(entry);
                     break;
                 case UNKNOWN:
                 default:
@@ -613,7 +616,7 @@ public class Utilities {
 class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
-        return Integer.compare(o2.priority, o1.priority);
+        return Integer.compare(o2.priority.get(), o1.priority.get());
     }
 }
 
@@ -630,6 +633,6 @@ class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
         if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
             return Long.compare(o1.getNearestEventTimestamp(day), o2.getNearestEventTimestamp(day));
         }
-        return Integer.compare(o1.getGroupName().hashCode(), o2.getGroupName().hashCode());
+        return Integer.compare(o1.getRawGroupName().hashCode(), o2.getRawGroupName().hashCode());
     }
 }

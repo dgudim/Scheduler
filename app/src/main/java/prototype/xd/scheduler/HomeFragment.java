@@ -1,7 +1,6 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
@@ -96,12 +95,12 @@ public class HomeFragment extends Fragment {
                         values.put(TEXT_VALUE, text);
                         values.put(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                         values.put(IS_COMPLETED, "false");
-                        TodoListEntry newEntry = new TodoListEntry(view2.getContext(), values,
+                        TodoListEntry newEntry = new TodoListEntry(values,
                                 groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
                         // This is fine here as id because a person can't click 2 times in 1 ms
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
-                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), true);
+                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreenToday(), true);
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
@@ -109,12 +108,12 @@ public class HomeFragment extends Fragment {
                         values.put(TEXT_VALUE, text);
                         values.put(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                         values.put(IS_COMPLETED, "false");
-                        TodoListEntry newEntry = new TodoListEntry(view2.getContext(), values,
+                        TodoListEntry newEntry = new TodoListEntry(values,
                                 groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
                         // This is fine, see note above
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
-                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreen(currentDay, currentTimestamp), false);
+                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreenToday(), false);
                         return true;
                     });
         });

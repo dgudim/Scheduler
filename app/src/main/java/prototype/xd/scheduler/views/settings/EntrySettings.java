@@ -68,7 +68,7 @@ public class EntrySettings extends PopupSettingsView {
         todoListEntry = entry;
         
         updateAllIndicators();
-        updatePreviews(todoListEntry.fontColor_original, todoListEntry.bgColor_original, todoListEntry.borderColor_original, todoListEntry.border_thickness_original);
+        updatePreviews(todoListEntry.fontColor.get(), todoListEntry.bgColor.get(), todoListEntry.borderColor.get(), todoListEntry.borderThickness.get());
         
         final List<Group> groupList = todoListEntryManager.getGroups();
         
@@ -132,7 +132,7 @@ public class EntrySettings extends PopupSettingsView {
         };
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         bnd.groupSpinner.setAdapter(arrayAdapter);
-        bnd.groupSpinner.setSelectionSilent(max(groupIndexInList(groupList, entry.getGroupName()), 0));
+        bnd.groupSpinner.setSelectionSilent(max(groupIndexInList(groupList, entry.getRawGroupName()), 0));
     
         bnd.groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -175,45 +175,45 @@ public class EntrySettings extends PopupSettingsView {
         
         bnd.fontColorSelector.setOnClickListener(view -> invokeColorDialogue(
                 bnd.fontColorState, this, todoListEntryManager,
-                entry, FONT_COLOR, entry.fontColor_original));
+                entry, FONT_COLOR, entry.fontColor.get()));
         
         bnd.backgroundColorSelector.setOnClickListener(view -> invokeColorDialogue(
                 bnd.backgroundColorState, this, todoListEntryManager,
-                entry, BG_COLOR, entry.bgColor_original));
+                entry, BG_COLOR, entry.bgColor.get()));
         
         bnd.borderColorSelector.setOnClickListener(view -> invokeColorDialogue(
                 bnd.borderColorState, this, todoListEntryManager,
-                entry, BORDER_COLOR, entry.borderColor_original));
+                entry, BORDER_COLOR, entry.borderColor.get()));
         
         Utilities.setSliderChangeListener(
                 bnd.borderThicknessDescription,
                 bnd.borderThicknessBar, bnd.borderThicknessState,
                 this, bnd.previewBorder, R.string.settings_border_thickness,
-                BORDER_THICKNESS, entry.border_thickness_original);
+                BORDER_THICKNESS, entry.borderThickness.get());
         
         Utilities.setSliderChangeListener(
                 bnd.priorityDescription,
                 bnd.priorityBar, bnd.priorityState,
                 this, null, R.string.settings_priority,
-                PRIORITY, entry.priority);
+                PRIORITY, entry.priority.get());
         
         Utilities.setSliderChangeListener(
                 bnd.adaptiveColorBalanceDescription,
                 bnd.adaptiveColorBalanceBar, bnd.adaptiveColorBalanceState,
                 this, null, R.string.settings_adaptive_color_balance,
-                ADAPTIVE_COLOR_BALANCE, entry.adaptiveColorBalance);
+                ADAPTIVE_COLOR_BALANCE, entry.adaptiveColorBalance.get());
         
         Utilities.setSliderChangeListener(
                 bnd.showDaysUpcomingDescription,
                 bnd.showDaysUpcomingBar, bnd.showDaysUpcomingState,
                 this, null, R.string.settings_show_days_upcoming,
-                UPCOMING_ITEMS_OFFSET, entry.dayOffset_upcoming);
+                UPCOMING_ITEMS_OFFSET, entry.upcomingDayOffset.get());
         
         Utilities.setSliderChangeListener(
                 bnd.showDaysExpiredDescription,
                 bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
                 this, null, R.string.settings_show_days_expired,
-                EXPIRED_ITEMS_OFFSET, entry.dayOffset_expired);
+                EXPIRED_ITEMS_OFFSET, entry.expiredDayOffset.get());
         
         Utilities.setSwitchChangeListener(
                 bnd.showOnLockSwitch,
@@ -227,7 +227,7 @@ public class EntrySettings extends PopupSettingsView {
     private void forEachWithGroupMatch(String groupName, Consumer<TodoListEntry> action) {
         List<TodoListEntry> todoListEntries = todoListEntryManager.getTodoListEntries();
         for(TodoListEntry entry: todoListEntries) {
-            if (entry.getGroupName().equals(groupName)) {
+            if (entry.getRawGroupName().equals(groupName)) {
                 action.accept(entry);
             }
         }

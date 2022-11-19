@@ -10,13 +10,12 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.DEFAULT_BACKGROUND_NAME;
 import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
-import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
+import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
@@ -169,7 +168,7 @@ class LockScreenBitmapDrawer {
     private void drawItemsOnBitmap(@NonNull Context context, @NonNull Bitmap bitmap) throws InterruptedException {
         
         Canvas canvas = new Canvas(bitmap);
-        List<Group> groups = loadGroups(context);
+        List<Group> groups = loadGroups();
         TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE));
         // load user defined entries (from files)
         // add entries from all calendars spanning 4 weeks
@@ -236,7 +235,7 @@ class LockScreenBitmapDrawer {
     private List<TodoListEntry> filterEntries(List<TodoListEntry> entries) {
         List<TodoListEntry> toAdd = new ArrayList<>();
         for (TodoListEntry entry : entries) {
-            if (entry.isVisibleOnLockscreen(currentDay, currentTimestamp)) {
+            if (entry.isVisibleOnLockscreenToday()) {
                 toAdd.add(entry);
             }
         }
