@@ -217,15 +217,30 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         return colors;
     }
     
-    public void updateTodoListAdapter(boolean updateBitmap, boolean updateCurrentDayIndicators) {
+    public void setBitmapUpdateFlag(boolean updateBitmap) {
         if (updateBitmap) {
             servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         }
-        todoListViewAdapter.notifyVisibleEntriesUpdated();
-        if (updateCurrentDayIndicators && calendarView != null) {
-            cachedIndicators.remove(currentDay);
-            calendarView.notifyCurrentDayChanged();
-        }
+    }
+    
+    public void notifyItemChanged(long day) {
+    
+    }
+    
+    public void notifyItemRangeChanged(long startDay, long endDay) {
+    
+    }
+    
+    public void notifyItemsChanged(long... days) {
+    
+    }
+    
+    public void notifyCurrentMonthChanged() {
+    
+    }
+    
+    public void notifyVisibleDatesChanged() {
+    
     }
     
     public List<TodoListEntry> getTodoListEntries() {
@@ -254,7 +269,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                     addDistinct(calendar.getVisibleTodoListEntries(dayStart, dayEnd));
                 }
             }
-            updateTodoListAdapter(false, false);
+            // TODO: 20.11.2022 handle entry updates
+            setBitmapUpdateFlag(false);
         }
     }
     

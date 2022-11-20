@@ -221,10 +221,10 @@
                         android:id="@+id/adaptive_color_balance_bar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:stepSize="1.0"
                         android:value="0.0"
                         android:valueFrom="0.0"
                         android:valueTo="10.0"
-                        android:stepSize="1.0"
                         tools:ignore="SpeakableTextPresentCheck" />
 
                 </LinearLayout>
@@ -346,7 +346,7 @@
                             android:layout_margin="5dp"
                             app:cardCornerRadius="25dp"
                             app:cardElevation="5dp"
-                            app:strokeWidth="0dp"/>
+                            app:strokeWidth="0dp" />
 
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/font_color_selector"
@@ -560,8 +560,8 @@
                     android:text="@string/settings_state_symbol"
                     android:textAlignment="center"
 
-                    android:textStyle="bold"
-                    android:textAppearance="@style/MediumHeading" />
+                    android:textAppearance="@style/MediumHeading"
+                    android:textStyle="bold" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -631,55 +631,47 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginTop="3dp"
-                android:layout_marginEnd="1.5dp"
-                android:layout_marginBottom="1.5dp"
-                android:layout_weight="150"
-                app:cardCornerRadius="5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:text="@string/group"
-                        android:textAppearance="@style/SmallHeading"
-                        tools:ignore="TextContrastCheck" />
-
-                    <prototype.xd.scheduler.views.Spinner
-                        android:id="@+id/groupSpinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_marginStart="1.5dp"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="1.5dp"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                app:cardCornerRadius="5dp">
+                android:hint="@string/group"
+                app:boxBackgroundColor="?colorSurface">
 
-                <ImageView
-                    android:id="@+id/addGroup"
+                <prototype.xd.scheduler.views.SelectableAutoCompleteTextView
+                    android:id="@+id/groupSpinner"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/settings_add_group"
-                    app:srcCompat="@android:drawable/ic_menu_add"
-                    tools:ignore="ImageContrastCheck" />
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    tools:ignore="TextContrastCheck" />
 
-            </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageButton
+                android:id="@+id/addGroupButton"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/round_bg_medium_component"
+                android:backgroundTint="?colorPrimaryContainer"
+                android:contentDescription="@string/add_group"
+                android:minWidth="10dp"
+                app:srcCompat="@drawable/ic_add" />
+
+            <ImageButton
+                android:id="@+id/editGroupButton"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/round_bg_medium_component"
+                android:backgroundTint="?colorPrimaryContainer"
+                android:contentDescription="@string/add_group"
+                android:minWidth="10dp"
+                app:srcCompat="@drawable/ic_edit" />
 
         </LinearLayout>
 
@@ -694,7 +686,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/settings_reset_to_defaults" />
+                android:text="@string/settings_reset_to_defaults"
+                tools:ignore="TextContrastCheck" />
 
         </LinearLayout>
 

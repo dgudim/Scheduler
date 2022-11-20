@@ -5,8 +5,6 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -23,7 +21,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.views.Spinner;
+import prototype.xd.scheduler.entities.Group;
+import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
 
 public class DialogueUtilities {
     
@@ -48,6 +47,8 @@ public class DialogueUtilities {
                 });
     }
     
+    // TODO: 20.11.2022 close dialogs on activity exit? 
+    
     public static void displayConfirmationDialogue(Context context,
                                                    @StringRes int titleStringResource,
                                                    @StringRes int messageStringResource,
@@ -69,7 +70,6 @@ public class DialogueUtilities {
                 confirmationListener, null);
     }
     
-    @SuppressWarnings("ConstantConditions")
     public static void displayEditTextDialogue(@NonNull Context context,
                                                @StringRes int titleStringResource,
                                                @StringRes int messageStringResource,
@@ -89,13 +89,13 @@ public class DialogueUtilities {
         setupButtons(dialog,
                 cancelButtonStringResource, confirmButtonStringResource, secondaryButtonResource,
                 v -> {
-                    if (checkEmptyInput(editText)
-                            && confirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
+                    String text = checkAndGetInput(editText);
+                    if (!text.isEmpty() && confirmationListener.onClick(v, text, 0)) {
                         dialog.dismiss();
                     }
                 }, secondaryConfirmationListener == null ? null : v -> {
-                    if (checkEmptyInput(editText)
-                            && secondaryConfirmationListener.onClick(v, editText.getText().toString().trim(), 0)) {
+                    String text = checkAndGetInput(editText);
+                    if (!text.isEmpty() && secondaryConfirmationListener.onClick(v, text, 0)) {
                         dialog.dismiss();
                     }
                 });
@@ -156,7 +156,6 @@ public class DialogueUtilities {
                 confirmationListener, secondaryConfirmationListener);
     }
     
-    @SuppressWarnings("ConstantConditions")
     public static void displayEditTextSpinnerDialogue(@NonNull Context context,
                                                       @StringRes int titleStringResource,
                                                       @StringRes int messageStringResource,
@@ -165,7 +164,7 @@ public class DialogueUtilities {
                                                       @StringRes int confirmButtonStringResource,
                                                       @StringRes int secondaryButtonStringResource,
                                                       @NonNull String defaultEditTextValue,
-                                                      @NonNull List<?> items,
+                                                      @NonNull List<Group> groups,
                                                       int defaultIndex,
                                                       @NonNull OnClickListenerWithEditText confirmationListener,
                                                       @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {
@@ -173,37 +172,26 @@ public class DialogueUtilities {
         ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintStringResource);
         TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
         setupEditText(editText, defaultEditTextValue);
-        Spinner spinner = dialog.findViewById(R.id.groupSpinner);
         
-        final ArrayAdapter<?> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, items);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(arrayAdapter);
+        String[] items = Group.groupListToNames(groups, context);
+        SelectableAutoCompleteTextView spinner = dialog.findViewById(R.id.groupSpinner);
+        spinner.setSimpleItems(items);
         
         final int[] selectedIndex = {defaultIndex};
-        spinner.setSelectionSilent(defaultIndex);
-        
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedIndex[0] = position;
-            }
-            
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                //ignore
-            }
-        });
+    
+        spinner.setSelectedItem(defaultIndex);
+        spinner.setOnItemClickListener((parent, view, position, id) -> selectedIndex[0] = position);
         
         setupButtons(dialog,
                 cancelButtonStringResource, confirmButtonStringResource, secondaryButtonStringResource,
                 v -> {
-                    if (checkEmptyInput(editText)
-                            && confirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
+                    String text = checkAndGetInput(editText);
+                    if (!text.isEmpty() && confirmationListener.onClick(v, text, selectedIndex[0])) {
                         dialog.dismiss();
                     }
                 }, secondaryConfirmationListener == null ? null : v -> {
-                    if (checkEmptyInput(editText)
-                            && secondaryConfirmationListener.onClick(v, editText.getText().toString().trim(), selectedIndex[0])) {
+                    String text = checkAndGetInput(editText);
+                    if (!text.isEmpty() && secondaryConfirmationListener.onClick(v, text, selectedIndex[0])) {
                         dialog.dismiss();
                     }
                 });
@@ -248,12 +236,12 @@ public class DialogueUtilities {
         }
     }
     
-    private static boolean checkEmptyInput(@NonNull EditText editText) {
-        if (editText.getText() == null || editText.getText().toString().trim().equals("")) {
+    private static String checkAndGetInput(@NonNull EditText editText) {
+        String text = editText.getText() == null ? "" : editText.getText().toString().trim();
+        if (text.isEmpty()) {
             editText.setError(editText.getContext().getString(R.string.input_cant_be_empty));
-            return false;
         }
-        return true;
+        return text;
     }
     
     private static Dialog buildTemplate(@NonNull Context context,

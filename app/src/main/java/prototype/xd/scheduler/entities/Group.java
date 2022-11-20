@@ -41,21 +41,33 @@ public class Group implements Serializable {
     }
     
     public static @Nullable
-    Group findGroup(List<Group> groups, String groupName) {
+    Group findGroupInList(List<Group> groups, String groupName) {
         int index = groupIndexInList(groups, groupName);
         return index == -1 ? null : groups.get(index);
+    }
+    
+    public static String[] groupListToNames(List<Group> groups, Context context) {
+        String[] names = new String[groups.size()];
+        for(int i = 0; i < groups.size(); i++) {
+            names[i] = groups.get(i).getLocalizedName(context);
+        }
+        return names;
     }
     
     public String getLocalizedName(Context context) {
         return isNullGroup() ? context.getString(R.string.blank_group_name) : groupName;
     }
     
-    public String getName() {
+    public String getRawName() {
         return groupName;
     }
     
     public void setName(String newName) {
         groupName = newName;
+    }
+    
+    public void setParams(SSMap newParams) {
+        params = newParams;
     }
     
     @Override

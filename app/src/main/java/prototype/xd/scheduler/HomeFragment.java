@@ -63,7 +63,8 @@ public class HomeFragment extends Fragment {
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             updateDate(selectedDate.toEpochDay(), true);
-            todoListEntryManager.updateTodoListAdapter(false, false);
+            // TODO: 20.11.2022 handle entry updates
+            todoListEntryManager.setBitmapUpdateFlag(false);
             updateStatusText();
         });
         
@@ -79,7 +80,8 @@ public class HomeFragment extends Fragment {
         // when all entries are loaded, update current month
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
             // update adapter showing entries
-            todoListEntryManager.updateTodoListAdapter(false, false);
+            // TODO: 20.11.2022 handle entry updates
+            todoListEntryManager.setBitmapUpdateFlag(false);
             // rebind all views updating indicators
             calendarView.notifyCurrentMonthChanged();
         }));
@@ -96,11 +98,12 @@ public class HomeFragment extends Fragment {
                         values.put(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                         values.put(IS_COMPLETED, "false");
                         TodoListEntry newEntry = new TodoListEntry(values,
-                                groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
+                                groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis());
                         // This is fine here as id because a person can't click 2 times in 1 ms
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
-                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreenToday(), true);
+                        // TODO: 20.11.2022 handle entry updates
+                        todoListEntryManager.setBitmapUpdateFlag(newEntry.isVisibleOnLockscreenToday());
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
@@ -109,11 +112,12 @@ public class HomeFragment extends Fragment {
                         values.put(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                         values.put(IS_COMPLETED, "false");
                         TodoListEntry newEntry = new TodoListEntry(values,
-                                groupList.get(selectedIndex).getName(), groupList, System.currentTimeMillis());
+                                groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis());
                         // This is fine, see note above
                         todoListEntryManager.addEntry(newEntry);
                         todoListEntryManager.saveEntriesAsync();
-                        todoListEntryManager.updateTodoListAdapter(newEntry.isVisibleOnLockscreenToday(), false);
+                        // TODO: 20.11.2022 handle entry updates
+                        todoListEntryManager.setBitmapUpdateFlag(newEntry.isVisibleOnLockscreenToday());
                         return true;
                     });
         });

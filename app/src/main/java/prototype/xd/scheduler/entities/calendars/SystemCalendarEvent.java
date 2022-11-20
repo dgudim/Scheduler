@@ -39,11 +39,13 @@ public class SystemCalendarEvent {
     
     public String title;
     public final int color;
-    public long start;
-    public long end;
-    public boolean allDay;
-    
-    protected boolean invalidFlag = false;
+    public long startMsUTC;
+    public long endMsUTC;
+    public long durationMs;
+    public long startDay;
+    public long endDay;
+    public long durationDays;
+    public boolean isAllDay;
     
     private String rRule_str; // for comparison
     private String rDate_str;
@@ -51,7 +53,6 @@ public class SystemCalendarEvent {
     private String exDate_str;
     
     public RecurrenceSet rSet;
-    public long duration;
     
     public TimeZone timeZone;
     
@@ -70,15 +71,15 @@ public class SystemCalendarEvent {
         
         title = getString(cursor, calendarEventsColumns, Events.TITLE).trim();
         color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
-        start = getLong(cursor, calendarEventsColumns, Events.DTSTART);
-        end = getLong(cursor, calendarEventsColumns, Events.DTEND);
-        allDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
+        startMsUTC = getLong(cursor, calendarEventsColumns, Events.DTSTART);
+        endMsUTC = getLong(cursor, calendarEventsColumns, Events.DTEND);
+        isAllDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
         
         String timeZoneId = getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE);
         
         timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? associatedCalendar.timeZone.getID() : timeZoneId);
         
-        duration = end - start;
+        durationMs = endMsUTC - startMsUTC;
         
         rRule_str = getString(cursor, calendarEventsColumns, Events.RRULE);
         rDate_str = getString(cursor, calendarEventsColumns, Events.RDATE);
@@ -120,22 +121,28 @@ public class SystemCalendarEvent {
                 String durationStr = getString(cursor, calendarEventsColumns, Events.DURATION);
                 
                 if (durationStr.length() > 0) {
-                    duration = rfc2445ToMilliseconds(durationStr);
+                    durationMs = rfc2445ToMilliseconds(durationStr);
                 }
                 
-                end = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, start);
+                endMsUTC = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, startMsUTC);
             } catch (Exception e) {
                 logException(NAME, e);
             }
         }
         
-        if (allDay) {
-            end -= 60 * 1000;
-            start += 60 * 1000;
-            duration -= 2 * 60 * 1000;
+        if (isAllDay) {
+            endMsUTC -= 60 * 1000;
+            startMsUTC += 60 * 1000;
+            durationMs -= 2 * 60 * 1000;
         }
         
         subKeys = generateSubKeysFromKey(makeKey(this));
+    }
+    
+    public void computeDurationInDays() {
+        startDay = daysFromEpoch(startMsUTC, timeZone);
+        endDay = daysFromEpoch(endMsUTC, timeZone);
+        durationDays = daysFromEpoch(startMsUTC + durationMs, timeZone) - startDay;
     }
     
     private DateTimeZonePair checkRDates(String datesToParse){
@@ -162,17 +169,17 @@ public class SystemCalendarEvent {
     
     public boolean fallsInRange(long dayStart, long dayEnd) {
         if (rSet != null) {
-            RecurrenceSetIterator it = rSet.iterator(timeZone, start);
+            RecurrenceSetIterator it = rSet.iterator(timeZone, startMsUTC);
             long instance = 0;
             while (it.hasNext() && daysFromEpoch(instance, timeZone) <= dayEnd) {
                 instance = it.next();
-                if (rangesOverlap(instance, instance + duration, dayStart, dayEnd)) {
+                if (rangesOverlap(instance, instance + durationMs, dayStart, dayEnd)) {
                     return true;
                 }
             }
             return false;
         }
-        return rangesOverlap(start, end, dayStart, dayEnd);
+        return rangesOverlap(startMsUTC, endMsUTC, dayStart, dayEnd);
     }
     
     private boolean rangesOverlap(long start, long end, long dayStart, long dayEnd) {
@@ -194,7 +201,7 @@ public class SystemCalendarEvent {
     
     @Override
     public int hashCode() {
-        return Objects.hash(title, color, start, end, allDay, rRule_str, rDate_str, exRule_str, exDate_str, associatedCalendar);
+        return Objects.hash(title, color, startMsUTC, endMsUTC, isAllDay, rRule_str, rDate_str, exRule_str, exDate_str, associatedCalendar);
     }
     
     @Override
@@ -207,9 +214,9 @@ public class SystemCalendarEvent {
             SystemCalendarEvent calendarEvent = (SystemCalendarEvent) obj;
             return Objects.equals(title, calendarEvent.title) &&
                     Objects.equals(color, calendarEvent.color) &&
-                    Objects.equals(start, calendarEvent.start) &&
-                    Objects.equals(end, calendarEvent.end) &&
-                    Objects.equals(allDay, calendarEvent.allDay) &&
+                    Objects.equals(startMsUTC, calendarEvent.startMsUTC) &&
+                    Objects.equals(endMsUTC, calendarEvent.endMsUTC) &&
+                    Objects.equals(isAllDay, calendarEvent.isAllDay) &&
                     Objects.equals(rRule_str, calendarEvent.rRule_str) &&
                     Objects.equals(rDate_str, calendarEvent.rDate_str) &&
                     Objects.equals(exRule_str, calendarEvent.exRule_str) &&

@@ -51,13 +51,14 @@ public class SystemCalendarSettings extends PopupSettingsView {
         dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
                 .setOnDismissListener(dialog -> {
                     if (todoListEntryManager != null) {
-                        todoListEntryManager.updateTodoListAdapter(false, true);
+                        // TODO: 20.11.2022 handle entry updates
+                        todoListEntryManager.setBitmapUpdateFlag(false);
                     }
                 }).setView(bnd.getRoot()).create();
     }
     
-    public void show(final String calendar_key) {
-        initialise(calendar_key);
+    public void show(final String calendarKey) {
+        initialise(calendarKey);
         dialog.show();
     }
     
@@ -202,10 +203,11 @@ public class SystemCalendarSettings extends PopupSettingsView {
         } else {
             display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_default));
         }
+        // invalidate parameters on entries in the same calendar category / color
         if (todoListEntryManager != null) {
-            for (TodoListEntry current_entry : todoListEntryManager.getTodoListEntries()) {
-                if (current_entry.isFromSystemCalendar() && current_entry.event.subKeys.equals(entry.event.subKeys)) {
-                    current_entry.reloadParams();
+            for (TodoListEntry currentEntry : todoListEntryManager.getTodoListEntries()) {
+                if (currentEntry.isFromSystemCalendar() && currentEntry.event.subKeys.equals(entry.event.subKeys)) {
+                    currentEntry.invalidateParameter(parameter, TodoListEntry.EntryType.TODAY);
                 }
             }
         }

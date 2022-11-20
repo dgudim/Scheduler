@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.views.settings;
 
 import static java.lang.Math.max;
+import static prototype.xd.scheduler.entities.Group.findGroupInList;
 import static prototype.xd.scheduler.entities.Group.groupIndexInList;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextDialogue;
@@ -20,9 +21,6 @@ import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -54,7 +52,8 @@ public class EntrySettings extends PopupSettingsView {
         dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
                 .setOnDismissListener(dialog -> {
                     todoListEntryManager.saveGroupsAndEntriesAsync();
-                    todoListEntryManager.updateTodoListAdapter(false, true);
+                    // TODO: 20.11.2022 handle entry updates
+                    todoListEntryManager.setBitmapUpdateFlag(false);
                 }).setView(bnd.getRoot()).create();
     }
     
@@ -71,94 +70,69 @@ public class EntrySettings extends PopupSettingsView {
         updatePreviews(todoListEntry.fontColor.get(), todoListEntry.bgColor.get(), todoListEntry.borderColor.get(), todoListEntry.borderThickness.get());
         
         final List<Group> groupList = todoListEntryManager.getGroups();
+        bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
+        bnd.groupSpinner.setSelectedItem(max(groupIndexInList(groupList, entry.getRawGroupName()), 0));
         
-        final ArrayAdapter<Group> arrayAdapter = new ArrayAdapter<Group>(context, android.R.layout.simple_spinner_item, groupList) {
-            @NonNull
-            @Override
-            public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                final View view = super.getView(position, convertView, parent);
-                if (convertView == null) {
-                    if (position == 0) {
-                        view.setOnLongClickListener(null);
-                    } else {
-                        view.setOnLongClickListener(view1 -> {
-                            
-                            displayEditTextDialogue(view1.getContext(),
-                                    R.string.edit, R.string.name,
-                                    R.string.cancel, R.string.save, R.string.delete_group,
-                                    groupList.get(position).getName(),
-                                    (view2, text, selectedIndex) -> {
-                                        int groupIndex = groupIndexInList(groupList, text);
-                                        if (groupIndex == 0) {
-                                            text += "(1)";
-                                        } else if (groupIndex > 0) {
-                                            String intermediateText = text;
-                                            int i = 0;
-                                            while (groupIndex > 0) {
-                                                i++;
-                                                intermediateText = text + "(" + i + ")";
-                                                groupIndex = groupIndexInList(groupList, intermediateText);
-                                            }
-                                            text = intermediateText;
-                                        }
-                                        
-                                        String origName = groupList.get(position).getName();
-                                        groupList.get(position).setName(text);
-                                        
-                                        String finalText = text;
-                                        forEachWithGroupMatch(origName, entry -> entry.setGroupName(finalText));
-                                        
-                                        notifyDataSetChanged();
-                                        return true;
-                                    },
-                                    (view2, text, selectedIndex) -> {
-                                        displayConfirmationDialogue(view2.getContext(),
-                                                R.string.delete, R.string.are_you_sure,
-                                                R.string.no, R.string.yes,
-                                                v -> {
-                                                    String origName = groupList.get(bnd.groupSpinner.getSelectedItemPosition()).getName();
-                                                    groupList.remove(bnd.groupSpinner.getSelectedItemPosition());
-                                                    forEachWithGroupMatch(origName, TodoListEntry::resetGroup);
-                                                    rebuild(context);
-                                                });
-                                        return true;
-                                    });
-                            return true;
-                        });
-                    }
-                }
-                return view;
-            }
-        };
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        bnd.groupSpinner.setAdapter(arrayAdapter);
-        bnd.groupSpinner.setSelectionSilent(max(groupIndexInList(groupList, entry.getRawGroupName()), 0));
-    
-        bnd.groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!groupList.get(position).equals(entry.getGroup())) {
-                    entry.changeGroup(groupList.get(position));
-                    rebuild(context);
-                }
+        bnd.editGroupButton.setOnClickListener(v -> {
+            
+            int selection = bnd.groupSpinner.getSelectedItem();
+            
+            if (selection == 0) {
+                return;
             }
             
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                //ignore
+            Group selectedGroup = groupList.get(selection);
+            String selectedGroupName = selectedGroup.getRawName();
+            
+            displayEditTextDialogue(v.getContext(),
+                    R.string.edit, R.string.name,
+                    R.string.cancel, R.string.save, R.string.delete_group,
+                    selectedGroupName,
+                    (view2, name, selectedIndex) -> {
+                        int groupIndex = groupIndexInList(groupList, name);
+                        
+                        String newName = name;
+                        int i = 0;
+                        while (groupIndex > 0) {
+                            i++;
+                            newName = name + "(" + i + ")";
+                            groupIndex = groupIndexInList(groupList, newName);
+                        }
+                        
+                        selectedGroup.setName(newName);
+                        bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, context));
+                        return true;
+                    },
+                    (view2, text, selectedIndex) -> {
+                        displayConfirmationDialogue(view2.getContext(),
+                                R.string.delete, R.string.are_you_sure,
+                                R.string.no, R.string.yes,
+                                v1 -> {
+                                    groupList.remove(selectedGroup);
+                                    forEachWithGroupMatch(selectedGroupName, entry1 -> entry1.changeGroup(null));
+                                    rebuild(context);
+                                });
+                        return true;
+                    });
+        });
+        
+        bnd.groupSpinner.setOnItemClickListener((parent, view, position, id) -> {
+            if (!groupList.get(position).equals(entry.getGroup())) {
+                entry.changeGroup(groupList.get(position));
+                rebuild(context);
             }
         });
         
-        bnd.addGroup.setOnClickListener(v -> displayEditTextDialogue(v.getContext(), R.string.add_current_config_as_group_prompt,
+        bnd.addGroupButton.setOnClickListener(v -> displayEditTextDialogue(v.getContext(), R.string.add_current_config_as_group_prompt,
                 R.string.add_current_config_as_group_message, R.string.name,
                 R.string.cancel, R.string.add,
                 (view, text, selection) -> {
-                    int groupIndex = groupIndexInList(groupList, text);
-                    if (groupIndex >= 0) {
+                    Group existingGroup = findGroupInList(groupList, text);
+                    if (existingGroup != null) {
                         displayConfirmationDialogue(view.getContext(), R.string.group_with_same_name_exists, R.string.overwrite_prompt,
-                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(groupList, text, groupIndex, context, arrayAdapter));
+                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(groupList, text, existingGroup, context));
                     } else {
-                        addGroupToGroupList(groupList, text, groupIndex, context, arrayAdapter);
+                        addGroupToGroupList(groupList, text, null, context);
                     }
                     return true;
                 }));
@@ -169,7 +143,7 @@ public class EntrySettings extends PopupSettingsView {
                         R.string.cancel, R.string.reset,
                         view -> {
                             entry.removeDisplayParams();
-                            entry.resetGroup();
+                            entry.changeGroup(null);
                             rebuild(context);
                         }));
         
@@ -219,14 +193,13 @@ public class EntrySettings extends PopupSettingsView {
                 bnd.showOnLockSwitch,
                 bnd.showOnLockState,
                 todoListEntryManager, entry,
-                SHOW_ON_LOCK, false);
-        // TODO: 18.11.2022 replace with real showOnLock
+                SHOW_ON_LOCK, entry.getRawParameter(SHOW_ON_LOCK, Boolean::parseBoolean));
         
     }
     
     private void forEachWithGroupMatch(String groupName, Consumer<TodoListEntry> action) {
         List<TodoListEntry> todoListEntries = todoListEntryManager.getTodoListEntries();
-        for(TodoListEntry entry: todoListEntries) {
+        for (TodoListEntry entry : todoListEntries) {
             if (entry.getRawGroupName().equals(groupName)) {
                 action.accept(entry);
             }
@@ -235,22 +208,21 @@ public class EntrySettings extends PopupSettingsView {
     
     private void addGroupToGroupList(List<Group> groupList,
                                      String groupName,
-                                     int groupIndex,
-                                     Context context,
-                                     ArrayAdapter<Group> arrayAdapter) {
-        Group createdGroup = new Group(groupName, todoListEntry.getDisplayParams());
-        if (groupIndex >= 0) {
-            groupList.set(groupIndex, createdGroup);
-            forEachWithGroupMatch(groupName, entry -> entry.changeGroup(createdGroup));
+                                     @Nullable Group existingGroup,
+                                     Context context) {
+        Group newGroup;
+        if (existingGroup != null) {
+            // we have overwritten the group, overwrite it on other entries
+            newGroup = existingGroup;
+            existingGroup.setParams(todoListEntry.getDisplayParams());
+            forEachWithGroupMatch(groupName, entry -> entry.changeGroup(existingGroup));
         } else {
-            groupIndex = groupList.size();
-            groupList.add(createdGroup);
+            newGroup = new Group(groupName, todoListEntry.getDisplayParams());
+            groupList.add(newGroup);
         }
         
+        todoListEntry.changeGroup(newGroup);
         todoListEntry.removeDisplayParams();
-        arrayAdapter.notifyDataSetChanged();
-        bnd.groupSpinner.setSelectionSilent(groupIndex);
-        todoListEntry.changeGroup(groupList.get(groupIndex));
         rebuild(context);
     }
     

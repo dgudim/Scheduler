@@ -28,7 +28,6 @@
     <string name="settings_bg_color">Background</string>
     <string name="settings_border_color">Border</string>
     <string name="settings_text_color">Font</string>
-    <string name="settings_add_group">Add group</string>
     <string name="settings_reset_bg">Reset backgrounds</string>
     <string name="settings_reset_to_defaults">Reset settings</string>
     <string name="name">Name</string>
@@ -58,9 +57,10 @@
     <string name="item_in_more_than_in_a_month">(> than in a month)</string>
     <string name="item_global">(Global)</string>
     <string name="group_with_same_name_exists">A group with the same name already exists</string>
-    <string name="group">Group:</string>
+    <string name="group">Group</string>
     <string name="enable">Enable</string>
     <string name="edit">Edit</string>
+    <string name="add_group">Add group</string>
     <string name="delete_group">Delete group</string>
     <string name="delete">Delete</string>
     <string name="choose_color">Choose color</string>
@@ -102,8 +102,8 @@
     <string name="blank_group_name">none</string>
     <string name="input_cant_be_empty">input can\'t be empty</string>
     <string name="edit_event">Edit event</string>
-    <string name="overwrite">overwrite</string>
-    <string name="reset">reset</string>
+    <string name="overwrite">Overwrite</string>
+    <string name="reset">Reset</string>
     <string name="hide_by_content">Hide by content</string>
     <string name="separate_multiple_statements_by">separate multiple statements by ||</string>
     <string name="content">content</string>

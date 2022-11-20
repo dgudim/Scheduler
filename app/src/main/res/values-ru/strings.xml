@@ -16,6 +16,7 @@
     <string name="item_in_more_than_in_a_month">(> чем через месяц)</string>
     <string name="item_more_than_a_month_ago">(> месяца назад)</string>
     <string name="add_current_config_as_group_message">(Параметры, которые были изменены вручную (Зеленые или синие ромбики), будут добавлены в группу)</string>
+    <string name="add_group">Добавить группу</string>
     <string name="delete_group">Удалить группу</string>
     <string name="delete">Удалить</string>
     <string name="are_you_sure">Вы уверены?</string>
@@ -39,7 +40,7 @@
     <string name="add_to_global_list">Добавить в общий список</string>
     <string name="add">Добавить</string>
     <string name="enable">Включить</string>
-    <string name="group">Группа:</string>
+    <string name="group">Группа</string>
     <string name="service_description">Сервис для обновления фона блокировки</string>
     <string name="service_name">Сервис фонового обоновления</string>
     <string name="permissions_grant">Предоставить</string>
@@ -65,7 +66,6 @@
     <string name="settings_bg_color">Фон</string>
     <string name="settings_border_color">Контур</string>
     <string name="settings_text_color">Шрифт</string>
-    <string name="settings_add_group">Добавить группу</string>
     <string name="settings_reset_bg">Сбросить фоны</string>
     <string name="settings_reset_to_defaults">Сбросить настройки</string>
     <string name="settings_border_thickness">Толщина контура: %s</string>
@@ -102,7 +102,7 @@
     <string name="xiaomi_message">Похоже, вы используете телефон xiaomi, некоторые версии miui не позволяют устанавливать обои экрана блокировки без участия пользователя, поэтому приложение, скорее всего, не будет работать. Извините, я ничего не могу с этим сделать.</string>
     <string name="blank_group_name">Нет</string>
     <string name="input_cant_be_empty">ввод не может быть пустым</string>
-    <string name="overwrite">перезаписать</string>
+    <string name="overwrite">Перезаписать</string>
     <string name="reset">Сбросить</string>
     <string name="close">Закрыть</string>
     <string name="hide_by_content">Скрывать по содержимому</string>
