@@ -46,13 +46,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
+import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.EntrySettings;
@@ -95,17 +96,16 @@ public class Utilities {
         }
     }
     
-    public static List<TodoListEntry> loadTodoEntries(Context context, long dayStart, long dayEnd, List<Group> groups,
+    public static TodoListEntryList loadTodoEntries(Context context, long dayStart, long dayEnd, GroupList groups,
                                                       @Nullable List<SystemCalendar> calendars) {
         
-        List<TodoListEntry> readEntries = new ArrayList<>();
+        TodoListEntryList readEntries = new TodoListEntryList();
         try {
             readEntries = loadObject(ENTRIES_FILE);
             
             int id = 0;
             for (TodoListEntry entry : readEntries) {
-                entry.initGroup(groups);
-                entry.assignId(id++);
+                entry.initGroupAndId(groups, id++);
             }
             
             log(INFO, NAME, "Read todo list: " + readEntries.size());
@@ -119,9 +119,9 @@ public class Utilities {
         return readEntries;
     }
     
-    public static void saveEntries(List<TodoListEntry> entries) {
+    public static void saveEntries(TodoListEntryList entries) {
         try {
-            List<TodoListEntry> entriesToSave = new ArrayList<>();
+            TodoListEntryList entriesToSave = new TodoListEntryList();
             
             for (int i = 0; i < entries.size(); i++) {
                 TodoListEntry entry = entries.get(i);
@@ -140,8 +140,8 @@ public class Utilities {
         }
     }
     
-    public static List<Group> loadGroups() {
-        List<Group> groups = new ArrayList<>();
+    public static GroupList loadGroups() {
+        GroupList groups = new GroupList();
         groups.add(Group.NULL_GROUP); // add "null" group
         try {
             groups.addAll(loadObject(GROUPS_FILE));
@@ -155,10 +155,10 @@ public class Utilities {
         return groups;
     }
     
-    public static void saveGroups(List<Group> groups) {
+    public static void saveGroups(GroupList groups) {
         try {
-            
-            List<Group> groupsToSave = new ArrayList<>();
+    
+            GroupList groupsToSave = new GroupList();
             
             for (Group group : groups) {
                 if (!group.isNullGroup()) {
@@ -197,12 +197,12 @@ public class Utilities {
         activity.startActivityForResult(intent, requestCode);
     }
     
-    public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long day) {
-        List<TodoListEntry> upcomingEntries = new ArrayList<>();
-        List<TodoListEntry> expiredEntries = new ArrayList<>();
-        List<TodoListEntry> todayEntries = new ArrayList<>();
-        List<TodoListEntry> globalEntries = new ArrayList<>();
-        List<TodoListEntry> otherEntries = new ArrayList<>();
+    public static TodoListEntryList sortEntries(TodoListEntryList entries, long day) {
+        TodoListEntryList upcomingEntries = new TodoListEntryList();
+        TodoListEntryList expiredEntries = new TodoListEntryList();
+        TodoListEntryList todayEntries = new TodoListEntryList();
+        TodoListEntryList globalEntries = new TodoListEntryList();
+        TodoListEntryList otherEntries = new TodoListEntryList();
         
         
         for (TodoListEntry entry : entries) {
@@ -226,7 +226,7 @@ public class Utilities {
             }
         }
         
-        List<TodoListEntry> merged = new ArrayList<>();
+        TodoListEntryList merged = new TodoListEntryList();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
         merged.addAll(upcomingEntries);

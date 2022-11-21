@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 
@@ -70,9 +70,9 @@ public class SystemCalendarUtils {
         return systemCalendars;
     }
     
-    public static List<TodoListEntry> getTodoListEntriesFromCalendars(Context context, long dayStart, long dayEnd,
+    public static TodoListEntryList getTodoListEntriesFromCalendars(Context context, long dayStart, long dayEnd,
                                                                       @Nullable List<SystemCalendar> calendars) {
-        List<TodoListEntry> todoListEntries = new ArrayList<>();
+        TodoListEntryList todoListEntries = new TodoListEntryList();
         List<SystemCalendar> cals = (calendars != null) ? calendars : getAllCalendars(context, false);
         for (SystemCalendar calendar : cals) {
             todoListEntries.addAll(calendar.getVisibleTodoListEntries(dayStart, dayEnd));

@@ -3,9 +3,9 @@ package prototype.xd.scheduler.entities;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
 
 import prototype.xd.scheduler.R;
@@ -15,11 +15,13 @@ public class Group implements Serializable {
     
     public static final transient Group NULL_GROUP = new Group();
     
-    private String groupName = "";
-    
-    protected SSMap params = new SSMap();
+    private String groupName;
+    private final ArrayMap<Long, TodoListEntry> associatedEntries = new ArrayMap<>();
+    protected SSMap params;
     
     public Group() {
+        groupName = "";
+        params = new SSMap();
     }
     
     public Group(String groupName, SSMap params) {
@@ -27,11 +29,33 @@ public class Group implements Serializable {
         this.params = params;
     }
     
+    // to be called only by TodoListEntry
+    protected void attachEntryInternal(TodoListEntry todoListEntry) {
+        associatedEntries.put(todoListEntry.getId(), todoListEntry);
+    }
+    
+    // to be called only by TodoListEntry
+    protected void detachEntryInternal(TodoListEntry todoListEntry) {
+        associatedEntries.remove(todoListEntry.getId());
+    }
+    
+    public void detachEntry(TodoListEntry todoListEntry) {
+        todoListEntry.unlinkGroupInternal();
+        associatedEntries.remove(todoListEntry.getId());
+    }
+    
+    public void detachAllEntries() {
+        for(TodoListEntry entry: associatedEntries.values()) {
+            entry.unlinkGroupInternal();
+        }
+        associatedEntries.clear();
+    }
+    
     public boolean isNullGroup() {
         return groupName.isEmpty();
     }
     
-    public static int groupIndexInList(List<Group> groups, String groupName) {
+    public static int groupIndexInList(GroupList groups, String groupName) {
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).groupName.equals(groupName)) {
                 return i;
@@ -41,14 +65,14 @@ public class Group implements Serializable {
     }
     
     public static @Nullable
-    Group findGroupInList(List<Group> groups, String groupName) {
+    Group findGroupInList(GroupList groups, String groupName) {
         int index = groupIndexInList(groups, groupName);
         return index == -1 ? null : groups.get(index);
     }
     
-    public static String[] groupListToNames(List<Group> groups, Context context) {
+    public static String[] groupListToNames(GroupList groups, Context context) {
         String[] names = new String[groups.size()];
-        for(int i = 0; i < groups.size(); i++) {
+        for (int i = 0; i < groups.size(); i++) {
             names[i] = groups.get(i).getLocalizedName(context);
         }
         return names;

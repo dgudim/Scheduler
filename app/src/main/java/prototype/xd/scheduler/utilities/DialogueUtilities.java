@@ -18,10 +18,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.List;
-
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
+import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
 
 public class DialogueUtilities {
@@ -164,7 +163,7 @@ public class DialogueUtilities {
                                                       @StringRes int confirmButtonStringResource,
                                                       @StringRes int secondaryButtonStringResource,
                                                       @NonNull String defaultEditTextValue,
-                                                      @NonNull List<Group> groups,
+                                                      @NonNull GroupList groups,
                                                       int defaultIndex,
                                                       @NonNull OnClickListenerWithEditText confirmationListener,
                                                       @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {

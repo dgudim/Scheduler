@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class SystemCalendar {
@@ -135,8 +136,8 @@ public class SystemCalendar {
         cursor.close();
     }
     
-    public List<TodoListEntry> getVisibleTodoListEntries(long dayStart, long dayEnd) {
-        List<TodoListEntry> todoListEntries = new ArrayList<>();
+    public TodoListEntryList getVisibleTodoListEntries(long dayStart, long dayEnd) {
+        TodoListEntryList todoListEntries = new TodoListEntryList();
         if (preferences.getBoolean(makeKey(this) + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.fallsInRange(dayStart, dayEnd)) {

@@ -26,12 +26,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
+import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 
@@ -69,7 +70,7 @@ public class EntrySettings extends PopupSettingsView {
         updateAllIndicators();
         updatePreviews(todoListEntry.fontColor.get(), todoListEntry.bgColor.get(), todoListEntry.borderColor.get(), todoListEntry.borderThickness.get());
         
-        final List<Group> groupList = todoListEntryManager.getGroups();
+        final GroupList groupList = todoListEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
         bnd.groupSpinner.setSelectedItem(max(groupIndexInList(groupList, entry.getRawGroupName()), 0));
         
@@ -198,7 +199,7 @@ public class EntrySettings extends PopupSettingsView {
     }
     
     private void forEachWithGroupMatch(String groupName, Consumer<TodoListEntry> action) {
-        List<TodoListEntry> todoListEntries = todoListEntryManager.getTodoListEntries();
+        TodoListEntryList todoListEntries = todoListEntryManager.getTodoListEntries();
         for (TodoListEntry entry : todoListEntries) {
             if (entry.getRawGroupName().equals(groupName)) {
                 action.accept(entry);
@@ -206,7 +207,7 @@ public class EntrySettings extends PopupSettingsView {
         }
     }
     
-    private void addGroupToGroupList(List<Group> groupList,
+    private void addGroupToGroupList(GroupList groupList,
                                      String groupName,
                                      @Nullable Group existingGroup,
                                      Context context) {

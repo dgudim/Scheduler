@@ -26,7 +26,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -76,7 +75,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public static class Parameter<T> {
-    
+        
         TodoListEntry entry;
         
         boolean invalidateConnected;
@@ -122,7 +121,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                     return todayValue;
             }
         }
-    
+        
         public T get(long day) {
             return get(entry.getEntryType(day));
         }
@@ -226,22 +225,22 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         assignId(event.hashCode());
     }
     
-    // ------------ serialization
-    public TodoListEntry(SSMap params, String groupName, List<Group> groups, long id) {
+    
+    public TodoListEntry(SSMap params, String groupName, GroupList groups, long id) {
         tempGroupName = groupName;
-        initGroup(groups);
+        initGroupAndId(groups, id);
         this.params = params;
         initParameters();
-        assignId(id);
     }
     
+    // ------------ serialization
     private void readObject(ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         params = (SSMap) in.readObject();
         tempGroupName = (String) in.readObject();
         initParameters();
     }
-    // ------------
+    
     
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeObject(params);
@@ -251,12 +250,17 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             out.writeObject(group.getRawName());
         }
     }
+    // ------------
     
-    public void initGroup(List<Group> groups) {
+    public void initGroupAndId(GroupList groups, long id) {
+        // id should be assigned before attaching to group
+        assignId(id);
         if (!tempGroupName.isEmpty()) {
             group = Group.findGroupInList(groups, tempGroupName);
             if (group == null) {
                 log(WARN, NAME, "Unknown group: " + tempGroupName);
+            } else {
+                group.attachEntryInternal(this);
             }
         }
     }
@@ -362,15 +366,29 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
+    protected void unlinkGroupInternal() {
+        invalidateParametersInGroup();
+        this.group = null;
+    }
+    
     public void changeGroup(@Nullable Group group) {
+        if (Objects.equals(group, this.group)) {
+            return;
+        }
         if (group == null || group.isNullGroup()) {
-            invalidateParametersInGroup();
-            this.group = null;
+            if (this.group != null) {
+                this.group.detachEntry(this);
+            }
+            unlinkGroupInternal();
         } else {
             // invalidate parameters from previous group
+            if (this.group != null) {
+                this.group.detachEntryInternal(this);
+            }
             invalidateParametersInGroup();
             this.group = group;
             // invalidate parameters from new group
+            group.attachEntryInternal(this);
             invalidateParametersInGroup();
         }
     }

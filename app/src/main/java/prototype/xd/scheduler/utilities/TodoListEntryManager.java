@@ -33,8 +33,9 @@ import java.util.Map;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
-import prototype.xd.scheduler.entities.Group;
+import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.views.CalendarView;
 
@@ -54,8 +55,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private final TodoListViewAdapter todoListViewAdapter;
     
     private List<SystemCalendar> calendars;
-    private final List<TodoListEntry> todoListEntries;
-    private final List<Group> groups;
+    private final TodoListEntryList todoListEntries;
+    private final GroupList groups;
     
     private Map<Long, List<Integer>> cachedIndicators;
     
@@ -69,7 +70,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     public TodoListEntryManager(final Context context, final Lifecycle lifecycle) {
         this.todoListViewAdapter = new TodoListViewAdapter(this, context);
-        this.todoListEntries = new ArrayList<>();
+        this.todoListEntries = new TodoListEntryList();
         this.groups = loadGroups();
         
         lifecycle.addObserver(this);
@@ -136,6 +137,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     public void onDestroy(@NonNull LifecycleOwner owner) {
         //stop lingering thread
         asyncSaver.interrupt();
+        // remove all entries (unlinks all groups)
+        todoListEntries.clear();
     }
     
     public void onInitFinished(@NonNull Runnable onInitFinishedRunnable) {
@@ -163,8 +166,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         return todoListViewAdapter.getItemCount();
     }
     
-    public List<TodoListEntry> getVisibleTodoListEntries(long day) {
-        List<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
+    public TodoListEntryList getVisibleTodoListEntries(long day) {
+        TodoListEntryList filteredTodoListEntries = new TodoListEntryList();
         // get all entries visible on a particular day
         for (TodoListEntry todoEntry : todoListEntries) {
             if (todoEntry.visibleInList(day)) {
@@ -198,7 +201,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         //}
         
         // 5 entries on average
-        List<TodoListEntry> filteredTodoListEntries = new ArrayList<>(5);
+        TodoListEntryList filteredTodoListEntries = new TodoListEntryList();
         // get all relevant entries
         for (TodoListEntry todoEntry : todoListEntries) {
             if (!todoEntry.isGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day)) {
@@ -243,11 +246,11 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     }
     
-    public List<TodoListEntry> getTodoListEntries() {
+    public TodoListEntryList getTodoListEntries() {
         return todoListEntries;
     }
     
-    public List<Group> getGroups() {
+    public GroupList getGroups() {
         return groups;
     }
     
@@ -274,7 +277,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         }
     }
     
-    private void addDistinct(List<TodoListEntry> entriesToAdd) {
+    private void addDistinct(TodoListEntryList entriesToAdd) {
         for (TodoListEntry entry : entriesToAdd) {
             if (!todoListEntries.contains(entry)) {
                 todoListEntries.add(entry);

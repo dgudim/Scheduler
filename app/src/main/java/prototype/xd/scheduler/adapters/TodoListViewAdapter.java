@@ -30,7 +30,7 @@ import java.util.List;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
 import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
-import prototype.xd.scheduler.entities.Group;
+import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.views.settings.EntrySettings;
@@ -91,7 +91,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         
                 bnd.getRoot().setOnLongClickListener(view1 -> {
             
-                    final List<Group> groupList = todoListEntryManager.getGroups();
+                    final GroupList groupList = todoListEntryManager.getGroups();
                     int currentIndex = max(groupIndexInList(groupList, currentEntry.getRawGroupName()), 0);
                     displayEditTextSpinnerDialogue(context, R.string.edit_event, -1, R.string.event_name_input_hint,
                             R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.rawTextValue.get(), groupList,
