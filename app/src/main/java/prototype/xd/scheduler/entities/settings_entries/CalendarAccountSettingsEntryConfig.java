@@ -6,7 +6,7 @@ import java.util.Locale;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
-import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntryConfig extends SettingsEntryConfig {

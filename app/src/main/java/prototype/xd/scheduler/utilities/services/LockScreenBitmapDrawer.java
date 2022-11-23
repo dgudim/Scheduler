@@ -177,7 +177,7 @@ class LockScreenBitmapDrawer {
         TodoListEntryList toAdd =
                 filterEntries(
                         sortEntries(
-                                loadTodoEntries(context, currentDay - 14, currentDay + 14, groups, null), currentDay));
+                                loadTodoEntries(context, currentDay - 14, currentDay + 14, groups, null, false), currentDay));
         
         long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDay + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {

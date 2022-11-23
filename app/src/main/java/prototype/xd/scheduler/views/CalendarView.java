@@ -26,6 +26,7 @@ import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CalendarDayLayoutBinding;
@@ -170,6 +171,12 @@ public class CalendarView {
                 firstMonthDay = selectedMonth.atDay(1).toEpochDay();
                 lastMonthDay = selectedMonth.atEndOfMonth().toEpochDay();
                 
+                CalendarDay firstVisibleCalendarDay = rootCalendarView.findFirstVisibleDay();
+                CalendarDay lastVisibleCalendarDay = rootCalendarView.findLastVisibleDay();
+
+                firstVisibleDay = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstMonthDay;
+                lastVisibleDay = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastMonthDay;
+                
                 if (monthPreChangeListener != null) {
                     monthPreChangeListener.onMonthChanged(
                             prevMonth,
@@ -211,34 +218,33 @@ public class CalendarView {
         this.dateChangeListener = dateChangeListener;
     }
     
+    public long getFirstVisibleDay() {
+        return firstVisibleDay;
+    }
+    
+    public long getLastVisibleDay() {
+        return lastVisibleDay;
+    }
+    
     public void notifyDayChanged(long day) {
-        rootCalendarView.notifyDateChanged(LocalDate.ofEpochDay(day));
+        DayPosition dayPosition = DayPosition.MonthDate;
+        if (day < firstMonthDay) {
+            dayPosition = DayPosition.InDate;
+        } else if (day > lastMonthDay) {
+            dayPosition = DayPosition.OutDate;
+        }
+        rootCalendarView.notifyDateChanged(LocalDate.ofEpochDay(day), dayPosition);
     }
     
-    public void notifyDayRangeChanged(long startDay, long endDay) {
-    
+    public void notifyDaysChanged(Set<Long> days) {
+        days.forEach(this::notifyDayChanged);
     }
     
-    public void notifyDaysChanged(long... days) {
-    
-    }
-    
-    public void notifyCurrentMonthChanged() {
+    public void notifyVisibleDaysChanged() {
         if (selectedMonth != null) {
+            // internally will rebind all visible dates
             rootCalendarView.notifyMonthChanged(selectedMonth);
         }
-    }
-    
-    public void notifyVisibleDatesChanged() {
-    
-    }
-    
-    public long getFirstMonthDay() {
-        return firstMonthDay;
-    }
-    
-    public long getLastMonthDay() {
-        return lastMonthDay;
     }
     
     public void setOnMonthPreChangeListener(MonthChangeListener monthPreChangeListener) {

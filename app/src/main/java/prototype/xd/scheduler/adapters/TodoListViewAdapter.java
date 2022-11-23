@@ -24,14 +24,12 @@ import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.card.MaterialCardView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
 import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
@@ -68,13 +66,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                         displayConfirmationDialogue(view1.getContext(),
                                 R.string.delete, R.string.are_you_sure,
                                 R.string.no, R.string.yes,
-                                view2 -> {
-                                    todoListEntryManager.removeEntry(currentEntry);
-                                    todoListEntryManager.saveEntriesAsync();
-                                    // deleting a global entry does not change indicators
-                                    // TODO: 20.11.2022 handle entry updates
-                                    todoListEntryManager.setBitmapUpdateFlag(currentEntry.isVisibleOnLockscreenToday());
-                                }));
+                                view2 -> todoListEntryManager.removeEntry(currentEntry)));
         
                 bnd.isDone.setCheckedSilent(currentEntry.isCompleted());
     
@@ -84,9 +76,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                     } else {
                         currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                     }
-                    todoListEntryManager.saveEntriesAsync();
-                    // TODO: 20.11.2022 handle entry updates
-                    todoListEntryManager.setBitmapUpdateFlag(true);
+                    todoListEntryManager.ensureUpToDate();
                 });
         
                 bnd.getRoot().setOnLongClickListener(view1 -> {
@@ -100,9 +90,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                     currentEntry.changeGroup(groupList.get(selectedIndex));
                                 }
                                 currentEntry.changeParameter(TEXT_VALUE, text);
-                                todoListEntryManager.saveEntriesAsync();
-                                // TODO: 20.11.2022 handle entry updates
-                                todoListEntryManager.setBitmapUpdateFlag(currentEntry.isVisibleOnLockscreenToday());
+                                todoListEntryManager.ensureUpToDate();
                                 return true;
                             },
                             !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
@@ -111,10 +99,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                 }
                                 currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                                 currentEntry.changeParameter(IS_COMPLETED, "false");
-                                todoListEntryManager.saveEntriesAsync();
-                                // completed -> global = indicators don't change, no need to update
-                                // TODO: 20.11.2022 handle entry updates
-                                todoListEntryManager.setBitmapUpdateFlag(currentEntry.isVisibleOnLockscreenToday());
+                                todoListEntryManager.ensureUpToDate();
                                 return true;
                             } : null);
                     return true;
@@ -144,14 +129,14 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
     private final TodoListEntryManager todoListEntryManager;
     
-    private List<TodoListEntry> currentTodoListEntries;
+    private TodoListEntryList currentTodoListEntries;
     
     private final EntrySettings entrySettings;
     private final SystemCalendarSettings systemCalendarSettings;
     
     public TodoListViewAdapter(final TodoListEntryManager todoListEntryManager, final Context context) {
         this.todoListEntryManager = todoListEntryManager;
-        currentTodoListEntries = new ArrayList<>();
+        currentTodoListEntries = new TodoListEntryList();
         entrySettings = new EntrySettings(todoListEntryManager, context);
         systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager, context);
         setHasStableIds(true);

@@ -23,7 +23,9 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     protected @Nullable
     TodoListEntry handleOldEntry(@Nullable TodoListEntry oldEntry) {
         if (oldEntry != null) {
-            oldEntry.unlinkGroupInternal();
+            oldEntry.stopListeningToParameterInvalidations();
+            oldEntry.unlinkGroupInternal(false);
+            oldEntry.unlinkFromCalendarEvent();
         }
         return oldEntry;
     }

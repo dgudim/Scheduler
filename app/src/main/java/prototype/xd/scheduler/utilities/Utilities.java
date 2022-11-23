@@ -8,12 +8,9 @@ import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 
 import android.app.Activity;
@@ -48,16 +45,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.TodoListEntryList;
-import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.views.Switch;
-import prototype.xd.scheduler.views.settings.EntrySettings;
-import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
+import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
 @SuppressWarnings({"unchecked"})
 public class Utilities {
@@ -97,7 +94,7 @@ public class Utilities {
     }
     
     public static TodoListEntryList loadTodoEntries(Context context, long dayStart, long dayEnd, GroupList groups,
-                                                      @Nullable List<SystemCalendar> calendars) {
+                                                    @Nullable List<SystemCalendar> calendars, boolean attachGroupToEntry) {
         
         TodoListEntryList readEntries = new TodoListEntryList();
         try {
@@ -105,7 +102,7 @@ public class Utilities {
             
             int id = 0;
             for (TodoListEntry entry : readEntries) {
-                entry.initGroupAndId(groups, id++);
+                entry.initGroupAndId(groups, id++, attachGroupToEntry);
             }
             
             log(INFO, NAME, "Read todo list: " + readEntries.size());
@@ -157,7 +154,7 @@ public class Utilities {
     
     public static void saveGroups(GroupList groups) {
         try {
-    
+            
             GroupList groupsToSave = new GroupList();
             
             for (Group group : groups) {
@@ -258,8 +255,8 @@ public class Utilities {
         } else {
             displayTo.setText(displayTo.getContext().getString(stringResource, loadedVal));
         }
-        slider.setValue(preferences.getInt(key, defaultValue));
         slider.clearOnChangeListeners();
+        slider.setValue(preferences.getInt(key, defaultValue));
         slider.addOnChangeListener((listenerSlider, progress, fromUser) -> {
             if (fromUser) {
                 if (progress == 0 && zeroIsOff) {
@@ -282,64 +279,25 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 preferences.edit().putInt(key, (int) slider.getValue()).apply();
-                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
             }
         });
     }
     
-    //listener for entry settings
+    //listener for entry and calendar settings
     public static void setSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
                                                final TextView stateIcon,
-                                               final EntrySettings entrySettings,
+                                               final PopupSettingsView settingsView,
                                                @Nullable final View borderView,
                                                @StringRes final int stringResource,
-                                               final String parameter,
-                                               final int initialValue) {
-        displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
-        slider.setValue(initialValue);
-        slider.clearOnChangeListeners();
-        slider.addOnChangeListener((slider1, progress, fromUser) -> {
-            if (fromUser) {
-                displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
-                if (borderView != null) {
-                    borderView.setPadding((int) progress, (int) progress, (int) progress, 0);
-                }
-            }
-        });
-        slider.clearOnSliderTouchListeners();
-        slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
-            @Override
-            public void onStartTrackingTouch(@NonNull Slider slider) {
-                // not needed
-            }
-            
-            @Override
-            public void onStopTrackingTouch(@NonNull Slider slider) {
-                entrySettings.changeEntryParameter(stateIcon, parameter, String.valueOf((int) slider.getValue()));
-                entrySettings.todoListEntryManager.saveEntriesAsync();
-                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-            }
-        });
-    }
-    
-    //listener for calendar settings
-    public static void setSliderChangeListener(final TextView displayTo,
-                                               final Slider slider,
-                                               final TextView stateIcon,
-                                               final SystemCalendarSettings systemCalendarSettings,
-                                               @Nullable final View borderView,
-                                               @StringRes final int stringResource,
-                                               final String calendarKey,
-                                               final List<String> calendarSubKeys,
-                                               final String parameter,
-                                               final int defaultValue,
+                                               final String parameterKey,
+                                               final Function<String, Integer> initialValueFactory,
                                                final Slider.OnChangeListener customProgressListener,
                                                final Slider.OnSliderTouchListener customTouchListener) {
-        int initialValue = preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue);
+        int initialValue = initialValueFactory.apply(parameterKey);
         displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
-        slider.setValue(initialValue);
         slider.clearOnChangeListeners();
+        slider.setValue(initialValue);
         slider.addOnChangeListener((slider1, progress, fromUser) -> {
             if (customProgressListener != null)
                 customProgressListener.onValueChange(slider1, progress, fromUser);
@@ -360,76 +318,36 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 if (customTouchListener != null) customTouchListener.onStopTrackingTouch(slider);
-                preferences.edit().putInt(calendarKey + "_" + parameter, (int) slider.getValue()).apply();
-                systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                settingsView.notifyParameterChanged(stateIcon, parameterKey, (int) slider.getValue());
             }
         });
     }
     
-    public static void setSliderChangeListener(final TextView displayTo,
-                                               final Slider slider,
-                                               final TextView stateIcon,
-                                               final SystemCalendarSettings systemCalendarSettings,
-                                               @Nullable final View borderView,
-                                               final int stringResource,
-                                               final String calendarKey,
-                                               final List<String> calendarSubKeys,
-                                               final String parameter,
-                                               final int defaultValue) {
+    // without custom listeners
+    public static void setSliderChangeListener(final TextView displayTo, final Slider slider,
+                                               final TextView stateIcon, final PopupSettingsView systemCalendarSettings,
+                                               @Nullable final View borderView, final int stringResource,
+                                               final String parameterKey, final Function<String, Integer> initialValueFactory) {
         setSliderChangeListener(
-                displayTo,
-                slider,
-                stateIcon,
-                systemCalendarSettings,
-                borderView,
-                stringResource,
-                calendarKey,
-                calendarSubKeys,
-                parameter,
-                defaultValue,
-                null, null);
+                displayTo, slider, stateIcon, systemCalendarSettings, borderView,
+                stringResource, parameterKey, initialValueFactory, null, null);
     }
     
     //switch listener for regular settings
     public static void setSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue) {
         tSwitch.setCheckedSilent(preferences.getBoolean(key, defaultValue));
-        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            preferences.edit().putBoolean(key, isChecked).apply();
-            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-        });
+        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> preferences.edit().putBoolean(key, isChecked).apply());
     }
     
-    //switch listener for entry settings
+    //switch listener for calendar settings and entry settings
     public static void setSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
-                                               final TodoListEntryManager todoListEntryManager,
-                                               final TodoListEntry entry,
-                                               final String parameter,
-                                               final boolean initialValue) {
-        tSwitch.setCheckedSilent(initialValue);
-        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            entry.changeParameter(parameter, String.valueOf(isChecked));
-            entry.setStateIconColor(stateIcon, parameter);
-            todoListEntryManager.saveEntriesAsync();
-            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-        });
-    }
-    
-    //switch listener for calendar settings
-    public static void setSwitchChangeListener(final Switch tSwitch,
-                                               final TextView stateIcon,
-                                               final SystemCalendarSettings systemCalendarSettings,
-                                               final String calendarKey,
-                                               final List<String> calendarSubKeys,
-                                               final String parameter,
-                                               final boolean defaultValue) {
-        tSwitch.setCheckedSilent(preferences.getBoolean(getFirstValidKey(calendarSubKeys, parameter), defaultValue));
-        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            preferences.edit().putBoolean(calendarKey + "_" + parameter, isChecked).apply();
-            systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-        });
+                                               final PopupSettingsView settingsView,
+                                               final String parameterKey,
+                                               final Function<String, Boolean> initialValueFactory) {
+        tSwitch.setCheckedSilent(initialValueFactory.apply(parameterKey));
+        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
+                settingsView.notifyParameterChanged(stateIcon, parameterKey, isChecked));
     }
     
     //color dialogue for general settings
@@ -438,58 +356,29 @@ public class Utilities {
                                            final String key,
                                            final int defaultValue) {
         invokeColorDialogue(target.getContext(), preferences.getInt(key, defaultValue),
-                (dialogInterface, lastSelectedColor, allColors) -> clickListener.onClick(dialogInterface, lastSelectedColor, key, allColors));
+                (dialogInterface, lastSelectedColor, allColors) ->
+                        clickListener.onClick(dialogInterface, lastSelectedColor, key, allColors));
     }
     
     //color dialogue for entry settings
     public static void invokeColorDialogue(final TextView stateIcon,
-                                           final EntrySettings settings,
-                                           final TodoListEntryManager todoListEntryManager,
-                                           final TodoListEntry todoListEntry,
-                                           final String parameter,
-                                           final int initialValue) {
-        invokeColorDialogue(stateIcon.getContext(), initialValue, (dialog, selectedColor, allColors) -> {
-            todoListEntry.changeParameter(parameter, String.valueOf(selectedColor));
-            todoListEntryManager.saveEntriesAsync();
-            switch (parameter) {
+                                           final PopupSettingsView settingsView,
+                                           final String parameterKey,
+                                           final Function<String, Integer> initialValueFactory) {
+        invokeColorDialogue(stateIcon.getContext(), initialValueFactory.apply(parameterKey), (dialog, selectedColor, allColors) -> {
+            settingsView.notifyParameterChanged(stateIcon, parameterKey, selectedColor);
+            switch (parameterKey) {
                 case FONT_COLOR:
-                    settings.updatePreviewFont(selectedColor);
+                    settingsView.updatePreviewFont(selectedColor);
                     break;
                 case BORDER_COLOR:
-                    settings.updatePreviewBorder(selectedColor);
+                    settingsView.updatePreviewBorder(selectedColor);
                     break;
                 case BG_COLOR:
                 default:
-                    settings.updatePreviewBg(selectedColor);
+                    settingsView.updatePreviewBg(selectedColor);
                     break;
             }
-            todoListEntry.setStateIconColor(stateIcon, parameter);
-            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-        });
-    }
-    
-    //color dialogue for calendar settings
-    public static void invokeColorDialogue(final TextView stateIcon,
-                                           final SystemCalendarSettings systemCalendarSettings,
-                                           final String calendarKey,
-                                           final List<String> calendarSubKeys,
-                                           final String parameter,
-                                           final int defaultValue) {
-        invokeColorDialogue(stateIcon.getContext(), preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue), (dialog, selectedColor, allColors) -> {
-            preferences.edit().putInt(calendarKey + "_" + parameter, selectedColor).apply();
-            switch (parameter) {
-                case FONT_COLOR:
-                    systemCalendarSettings.updatePreviewFont(selectedColor);
-                    break;
-                case BG_COLOR:
-                    systemCalendarSettings.updatePreviewBg(selectedColor);
-                    break;
-                case BORDER_COLOR:
-                    systemCalendarSettings.updatePreviewBorder(selectedColor);
-                    break;
-            }
-            systemCalendarSettings.setStateIconColor(stateIcon, parameter);
-            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
         });
     }
     

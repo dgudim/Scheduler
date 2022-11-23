@@ -8,10 +8,10 @@ public class GroupList extends BaseCleanupList<Group> {
     
     @Nullable
     @Override
-    protected Group handleOldEntry(@Nullable Group oldEntry) {
-        if(oldEntry != null) {
-            oldEntry.detachAllEntries();
+    protected Group handleOldEntry(@Nullable Group oldGroup) {
+        if(oldGroup != null) {
+            oldGroup.detachAllEntries();
         }
-        return oldEntry;
+        return oldGroup;
     }
 }

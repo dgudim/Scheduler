@@ -2,7 +2,6 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 
 import android.app.AlertDialog;
 import android.content.res.ColorStateList;
@@ -14,7 +13,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.GridSelectionViewBinding;
-import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
@@ -31,7 +30,7 @@ public class CalendarSettingsEntryConfig extends SettingsEntryConfig {
     public CalendarSettingsEntryConfig(final SystemCalendarSettings systemCalendarSettings, final SystemCalendar calendar) {
         this.systemCalendarSettings = systemCalendarSettings;
         this.calendarName = calendar.name;
-        calendarKey = makeKey(calendar);
+        calendarKey = calendar.getKey();
         this.calendarColor = calendar.color;
         calendarEventsCount = calendar.systemCalendarEvents.size();
         

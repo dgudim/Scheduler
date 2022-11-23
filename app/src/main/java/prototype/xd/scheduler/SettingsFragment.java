@@ -19,7 +19,7 @@ import java.util.List;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.FragmentSettingsBinding;
-import prototype.xd.scheduler.entities.calendars.SystemCalendar;
+import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntryConfig;

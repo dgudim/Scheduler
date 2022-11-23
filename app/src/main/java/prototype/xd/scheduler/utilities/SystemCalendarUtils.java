@@ -19,9 +19,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.entities.SystemCalendarEvent;
+import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.TodoListEntryList;
-import prototype.xd.scheduler.entities.calendars.SystemCalendar;
-import prototype.xd.scheduler.entities.calendars.SystemCalendarEvent;
 
 public class SystemCalendarUtils {
     
@@ -75,7 +76,10 @@ public class SystemCalendarUtils {
         TodoListEntryList todoListEntries = new TodoListEntryList();
         List<SystemCalendar> cals = (calendars != null) ? calendars : getAllCalendars(context, false);
         for (SystemCalendar calendar : cals) {
-            todoListEntries.addAll(calendar.getVisibleTodoListEntries(dayStart, dayEnd));
+            // add all events from all calendars
+            for(SystemCalendarEvent event: calendar.getVisibleTodoListEvents(dayStart, dayEnd)) {
+                todoListEntries.add(new TodoListEntry(event));
+            }
         }
         log(INFO, "CalendarUtils", "read calendar entries: " + todoListEntries.size());
         return todoListEntries;
@@ -128,23 +132,18 @@ public class SystemCalendarUtils {
         return -1;
     }
     
+    public static boolean getFirstValidBooleanValue(List<String> calendarSubKeys, String parameterKey, boolean defaultValue) {
+        return preferences.getBoolean(getFirstValidKey(calendarSubKeys, parameterKey), defaultValue);
+    }
+    
+    public static int getFirstValidIntValue(List<String> calendarSubKeys, String parameter, int defaultValue) {
+        return preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue);
+    }
+    
     public static String getFirstValidKey(List<String> calendarSubKeys, String parameter) {
         int index = getFirstValidKeyIndex(calendarSubKeys, parameter);
         return index == -1 ? parameter : calendarSubKeys.get(index) + "_" + parameter;
     }
-    
-    public static String makeKey(SystemCalendar calendar) {
-        return calendar.account_name + "_" + calendar.name;
-    }
-    
-    public static String makeKey(SystemCalendar calendar, int possibleEventColor) {
-        return makeKey(calendar) + "_" + possibleEventColor;
-    }
-    
-    public static String makeKey(SystemCalendarEvent event) {
-        return makeKey(event.associatedCalendar, event.color);
-    }
-    
     
     //// FOR DEBUGGING
     //public static void printTable(Cursor cursor) {

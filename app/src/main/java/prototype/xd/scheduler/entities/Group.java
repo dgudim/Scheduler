@@ -1,5 +1,8 @@
 package prototype.xd.scheduler.entities;
 
+import static android.util.Log.WARN;
+import static prototype.xd.scheduler.utilities.Logger.log;
+
 import android.content.Context;
 
 import androidx.annotation.Nullable;
@@ -7,6 +10,7 @@ import androidx.collection.ArrayMap;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.SSMap;
@@ -31,23 +35,20 @@ public class Group implements Serializable {
     
     // to be called only by TodoListEntry
     protected void attachEntryInternal(TodoListEntry todoListEntry) {
-        associatedEntries.put(todoListEntry.getId(), todoListEntry);
+        if (associatedEntries.put(todoListEntry.getId(), todoListEntry) != null) {
+            log(WARN, "Group", "attachEntryInternal called with " + todoListEntry.rawTextValue.get() + " but it's already attached");
+        }
     }
     
     // to be called only by TodoListEntry
     protected void detachEntryInternal(TodoListEntry todoListEntry) {
-        associatedEntries.remove(todoListEntry.getId());
-    }
-    
-    public void detachEntry(TodoListEntry todoListEntry) {
-        todoListEntry.unlinkGroupInternal();
-        associatedEntries.remove(todoListEntry.getId());
+        if (associatedEntries.remove(todoListEntry.getId()) == null) {
+            log(WARN, "Group", "detachEntryInternal called with " + todoListEntry.rawTextValue.get() + " but it's not attached");
+        }
     }
     
     public void detachAllEntries() {
-        for(TodoListEntry entry: associatedEntries.values()) {
-            entry.unlinkGroupInternal();
-        }
+        associatedEntries.forEach((aLong, todoListEntry) -> todoListEntry.unlinkGroupInternal(true));
         associatedEntries.clear();
     }
     
@@ -91,6 +92,11 @@ public class Group implements Serializable {
     }
     
     public void setParams(SSMap newParams) {
+        Set<String> keys = params.keySet();
+        keys.addAll(newParams.keySet());
+        // remove parameters that didn't change
+        keys.removeIf(key -> params.get(key).equals(newParams.get(key)));
+        associatedEntries.forEach((aLong, todoListEntry) -> todoListEntry.invalidateParameters(keys));
         params = newParams;
     }
     

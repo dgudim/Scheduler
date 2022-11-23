@@ -23,9 +23,21 @@ public abstract class PopupSettingsView {
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
     }
     
-    protected abstract void setStateIconColor(TextView icon, String parameter);
+    /**
+     * public method that should be called when some parameter changes, for example from a switch listener
+     * should probably call {@link #setStateIconColor}
+     */
+    public abstract <T> void notifyParameterChanged(TextView displayTo, String parameterKey, T value);
     
-    void updateAllIndicators() {
+    /**
+     * internal method for changing state icon color
+     *
+     * @param icon         TextView to colorize
+     * @param parameterKey key of the changed parameter
+     */
+    protected abstract void setStateIconColor(TextView icon, String parameterKey);
+    
+    protected void updateAllIndicators() {
         setStateIconColor(bnd.fontColorState, Keys.FONT_COLOR);
         setStateIconColor(bnd.backgroundColorState, Keys.BG_COLOR);
         setStateIconColor(bnd.borderColorState, Keys.BORDER_COLOR);

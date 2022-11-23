@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.entities.calendars;
+package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Events;
 import static android.util.Log.ERROR;
@@ -12,7 +12,6 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
 
 import android.database.Cursor;
@@ -33,39 +32,40 @@ public class SystemCalendarEvent {
     
     private static final String NAME = "System calendar event";
     
-    public SystemCalendar associatedCalendar;
+    private @Nullable TodoListEntry associatedEntry;
+    protected SystemCalendar associatedCalendar;
     
+    public List<String> subKeys;
+    private String prefKey;
     long id;
     
-    public String title;
+    protected String title;
     public final int color;
-    public long startMsUTC;
-    public long endMsUTC;
-    public long durationMs;
-    public long startDay;
-    public long endDay;
-    public long durationDays;
-    public boolean isAllDay;
+    protected long startMsUTC;
+    protected long endMsUTC;
+    protected long durationMs;
+    protected long startDay;
+    protected long endDay;
+    protected long durationDays;
+    protected boolean isAllDay;
     
     private String rRule_str; // for comparison
     private String rDate_str;
     private String exRule_str;
     private String exDate_str;
     
-    public RecurrenceSet rSet;
+    protected RecurrenceSet rSet;
     
-    public TimeZone timeZone;
-    
-    public List<String> subKeys;
+    protected TimeZone timeZone;
     
     SystemCalendarEvent(Cursor cursor, SystemCalendar associatedCalendar, boolean loadMinimal) {
+    
+        this.associatedCalendar = associatedCalendar;
         
         if (loadMinimal) {
             color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
             return;
         }
-        
-        this.associatedCalendar = associatedCalendar;
         
         id = getLong(cursor, calendarEventsColumns, Events._ID);
         
@@ -74,6 +74,9 @@ public class SystemCalendarEvent {
         startMsUTC = getLong(cursor, calendarEventsColumns, Events.DTSTART);
         endMsUTC = getLong(cursor, calendarEventsColumns, Events.DTEND);
         isAllDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
+    
+        prefKey = associatedCalendar.makeKey(color);
+        subKeys = generateSubKeysFromKey(prefKey);
         
         String timeZoneId = getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE);
         
@@ -135,14 +138,38 @@ public class SystemCalendarEvent {
             startMsUTC += 60 * 1000;
             durationMs -= 2 * 60 * 1000;
         }
-        
-        subKeys = generateSubKeysFromKey(makeKey(this));
     }
     
     public void computeDurationInDays() {
         startDay = daysFromEpoch(startMsUTC, timeZone);
         endDay = daysFromEpoch(endMsUTC, timeZone);
         durationDays = daysFromEpoch(startMsUTC + durationMs, timeZone) - startDay;
+    }
+    
+    public boolean isAssociatedWithEntry() {
+        return associatedEntry != null;
+    }
+    
+    public void linkEntry(TodoListEntry todoListEntry) {
+        if(associatedEntry != null) {
+            log(WARN, NAME, "Calendar event " + title + " already linked to " +
+                    associatedEntry.getId() + " relinking to " + todoListEntry.getId());
+        }
+        associatedEntry = todoListEntry;
+    }
+    
+    public void unlinkEntry() {
+        associatedEntry = null;
+    }
+    
+    protected void invalidateParameter(String parameterKey) {
+        if(associatedEntry != null) {
+            associatedEntry.invalidateParameter(parameterKey, true);
+        }
+    }
+    
+    public void invalidateParametersOfConnectedEntries(String parameterKey) {
+        associatedCalendar.invalidateParametersOnEvents(parameterKey, color);
     }
     
     private DateTimeZonePair checkRDates(String datesToParse){
@@ -154,6 +181,10 @@ public class SystemCalendarEvent {
             datesToParse = split[1];
         }
         return new DateTimeZonePair(datesToParse, newTimeZone);
+    }
+    
+    public String getKey() {
+        return prefKey;
     }
     
     private static class DateTimeZonePair{

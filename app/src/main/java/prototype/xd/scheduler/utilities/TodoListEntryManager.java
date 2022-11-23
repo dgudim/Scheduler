@@ -3,6 +3,9 @@ package prototype.xd.scheduler.utilities;
 import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
+import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
@@ -16,6 +19,7 @@ import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.util.ArraySet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,13 +34,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.GroupList;
+import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.entities.SystemCalendarEvent;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.TodoListEntryList;
-import prototype.xd.scheduler.entities.calendars.SystemCalendar;
 import prototype.xd.scheduler.views.CalendarView;
 
 public class TodoListEntryManager implements DefaultLifecycleObserver {
@@ -68,6 +74,35 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private @Nullable
     Runnable onInitFinishedRunnable;
     
+    private final Set<Long> daysToRebind = new ArraySet<>();
+    private boolean shouldSaveEntries;
+    
+    TodoListEntry.ParameterInvalidationListener parameterInvalidationListener = new TodoListEntry.ParameterInvalidationListener() {
+        @Override
+        public void parametersInvalidated(TodoListEntry entry, Set<String> parameters) {
+            // in case of completed status changes or associated day changes the entry may not be visible on the lockscreen now but was before
+            if (parameters.contains(IS_COMPLETED) ||
+                    parameters.contains(ASSOCIATED_DAY) ||
+                    entry.isVisibleOnLockscreenToday()) {
+                setBitmapUpdateFlag();
+            }
+            
+            if (parameters.contains(BG_COLOR)) {
+                entry.getVisibleDayRanges(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay()).forEach(
+                        visibilityRange -> {
+                            for (long day = visibilityRange.getLower(); day <= visibilityRange.getUpper(); day++) {
+                                daysToRebind.add(day);
+                            }
+                        });
+            }
+            
+            // we should save the entries but now now because sometimes we change parameters frequently
+            // and we don't want to call save function 10 time when we use a slider
+            shouldSaveEntries = true;
+            System.out.println("Parameters invalidated: " + parameters + " for " + entry.rawTextValue.get());
+        }
+    };
+    
     public TodoListEntryManager(final Context context, final Lifecycle lifecycle) {
         this.todoListViewAdapter = new TodoListViewAdapter(this, context);
         this.todoListEntries = new TodoListEntryList();
@@ -87,7 +122,11 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         new Thread(() -> {
             long start = System.currentTimeMillis();
             calendars = getAllCalendars(context, false);
-            todoListEntries.addAll(loadTodoEntries(context, currentDay - 30, currentDay + 30, groups, calendars));
+            todoListEntries.addAll(loadTodoEntries(context, currentDay - 30, currentDay + 30, groups, calendars, true));
+            for (TodoListEntry entry : todoListEntries) {
+                // attach to all entries
+                entry.listenToParameterInvalidations(parameterInvalidationListener);
+            }
             initFinished = true;
             log(INFO, Thread.currentThread().getName(), "TodoListEntryStorage cold start complete in " +
                     (System.currentTimeMillis() - start) + "ms, loaded " + todoListEntries.size() + " entries");
@@ -137,8 +176,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     public void onDestroy(@NonNull LifecycleOwner owner) {
         //stop lingering thread
         asyncSaver.interrupt();
-        // remove all entries (unlinks all groups)
+        // remove all entries (unlinks all groups and events)
         todoListEntries.clear();
+        groups.clear();
     }
     
     public void onInitFinished(@NonNull Runnable onInitFinishedRunnable) {
@@ -150,7 +190,25 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         }
     }
     
-    public void bindToCalendarView(@NonNull CalendarView calendarView) {
+    // perform all deferred tasks
+    public void ensureUpToDate() {
+        if (shouldSaveEntries) {
+            saveEntriesAsync();
+            shouldSaveEntries = false;
+            invalidateArrayAdapter();
+        }
+        if(calendarView != null) {
+            calendarView.notifyDaysChanged(daysToRebind);
+        }
+        daysToRebind.clear();
+    }
+    
+    // tells entry list that all entries changed
+    public void invalidateArrayAdapter() {
+        todoListViewAdapter.notifyVisibleEntriesUpdated();
+    }
+    
+    public void bindCalendarView(@NonNull CalendarView calendarView) {
         this.calendarView = calendarView;
     }
     
@@ -220,32 +278,6 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         return colors;
     }
     
-    public void setBitmapUpdateFlag(boolean updateBitmap) {
-        if (updateBitmap) {
-            servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-        }
-    }
-    
-    public void notifyItemChanged(long day) {
-    
-    }
-    
-    public void notifyItemRangeChanged(long startDay, long endDay) {
-    
-    }
-    
-    public void notifyItemsChanged(long... days) {
-    
-    }
-    
-    public void notifyCurrentMonthChanged() {
-    
-    }
-    
-    public void notifyVisibleDatesChanged() {
-    
-    }
-    
     public TodoListEntryList getTodoListEntries() {
         return todoListEntries;
     }
@@ -269,18 +301,21 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             }
             if (dayStart != 0) {
                 for (SystemCalendar calendar : calendars) {
-                    addDistinct(calendar.getVisibleTodoListEntries(dayStart, dayEnd));
+                    addEvents(calendar.getVisibleTodoListEvents(dayStart, dayEnd));
                 }
             }
             // TODO: 20.11.2022 handle entry updates
-            setBitmapUpdateFlag(false);
+            setBitmapUpdateFlag();
         }
     }
     
-    private void addDistinct(TodoListEntryList entriesToAdd) {
-        for (TodoListEntry entry : entriesToAdd) {
-            if (!todoListEntries.contains(entry)) {
-                todoListEntries.add(entry);
+    private void addEvents(List<SystemCalendarEvent> eventsToAdd) {
+        for (SystemCalendarEvent event : eventsToAdd) {
+            // if the event hasn't been associated to an entry, add it
+            if (!event.isAssociatedWithEntry()) {
+                TodoListEntry newEntry = new TodoListEntry(event);
+                newEntry.listenToParameterInvalidations(parameterInvalidationListener);
+                todoListEntries.add(newEntry);
             }
         }
     }
@@ -308,11 +343,26 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         }
     }
     
+    public void setBitmapUpdateFlag() {
+        servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+    }
+    
+    private void entryListChanged(TodoListEntry entry) {
+        invalidateArrayAdapter();
+        if (entry.isVisibleOnLockscreenToday()) {
+            setBitmapUpdateFlag();
+        }
+        saveEntriesAsync();
+    }
+    
     public void addEntry(TodoListEntry entry) {
+        entry.listenToParameterInvalidations(parameterInvalidationListener);
         todoListEntries.add(entry);
+        entryListChanged(entry);
     }
     
     public void removeEntry(TodoListEntry entry) {
         todoListEntries.remove(entry);
+        saveEntriesAsync();
     }
 }

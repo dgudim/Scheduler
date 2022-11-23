@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.entities.calendars;
+package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
 import static android.util.Log.WARN;
@@ -11,7 +11,6 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarColumns;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.makeKey;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -28,8 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class SystemCalendar {
@@ -37,14 +34,12 @@ public class SystemCalendar {
     public final String account_type;
     public final String account_name;
     
-    public final String name;
-    
-    public final TimeZone timeZone;
-    
+    private final String prefKey;
     public final long id;
-    
     public final int accessLevel;
     
+    public final TimeZone timeZone;
+    public final String name;
     public final int color;
     
     public final List<SystemCalendarEvent> systemCalendarEvents;
@@ -57,6 +52,8 @@ public class SystemCalendar {
         id = getLong(cursor, calendarColumns, Calendars._ID);
         accessLevel = getInt(cursor, calendarColumns, Calendars.CALENDAR_ACCESS_LEVEL);
         color = getInt(cursor, calendarColumns, Calendars.CALENDAR_COLOR);
+    
+        prefKey = account_name + "_" + name;
         
         String timeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
         
@@ -129,23 +126,32 @@ public class SystemCalendar {
                 }
             }
             if (!applied) {
-                log(WARN, "System calendar", "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
+                log(WARN, account_name, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
             }
         }
         
         cursor.close();
     }
     
-    public TodoListEntryList getVisibleTodoListEntries(long dayStart, long dayEnd) {
-        TodoListEntryList todoListEntries = new TodoListEntryList();
-        if (preferences.getBoolean(makeKey(this) + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
+    public List<SystemCalendarEvent> getVisibleTodoListEvents(long dayStart, long dayEnd) {
+        List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
+        String visibilityKey = prefKey + "_" + Keys.VISIBLE;
+        if (preferences.getBoolean(visibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.fallsInRange(dayStart, dayEnd)) {
-                    todoListEntries.add(new TodoListEntry(event));
+                    visibleEvents.add(event);
                 }
             }
         }
-        return todoListEntries;
+        return visibleEvents;
+    }
+    
+    protected void invalidateParametersOnEvents(String parameterKey, int color) {
+        systemCalendarEvents.forEach(event -> {
+            if(event.color == color) {
+                event.invalidateParameter(parameterKey);
+            }
+        });
     }
     
     @NonNull
@@ -175,5 +181,13 @@ public class SystemCalendar {
                     Objects.equals(color, systemCalendar.color);
         }
         return super.equals(obj);
+    }
+    
+    public String getKey() {
+        return prefKey;
+    }
+
+    public String makeKey(int possibleEventColor) {
+        return prefKey + "_" + possibleEventColor;
     }
 }

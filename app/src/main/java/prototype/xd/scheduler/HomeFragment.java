@@ -57,13 +57,12 @@ public class HomeFragment extends Fragment {
         
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(binding.calendar, todoListEntryManager);
-        todoListEntryManager.bindToCalendarView(calendarView);
+        todoListEntryManager.bindCalendarView(calendarView);
         
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             updateDate(selectedDate.toEpochDay(), true);
-            // TODO: 20.11.2022 handle entry updates
-            todoListEntryManager.setBitmapUpdateFlag(false);
+            todoListEntryManager.invalidateArrayAdapter();
             updateStatusText();
         });
         
@@ -79,10 +78,9 @@ public class HomeFragment extends Fragment {
         // when all entries are loaded, update current month
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
             // update adapter showing entries
-            // TODO: 20.11.2022 handle entry updates
-            todoListEntryManager.setBitmapUpdateFlag(false);
+            todoListEntryManager.invalidateArrayAdapter();
             // rebind all views updating indicators
-            calendarView.notifyCurrentMonthChanged();
+            calendarView.notifyVisibleDaysChanged();
         }));
         
         binding.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
@@ -96,13 +94,9 @@ public class HomeFragment extends Fragment {
                         values.put(TEXT_VALUE, text);
                         values.put(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                         values.put(IS_COMPLETED, "false");
-                        TodoListEntry newEntry = new TodoListEntry(values,
-                                groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis());
-                        // This is fine here as id because a person can't click 2 times in 1 ms
-                        todoListEntryManager.addEntry(newEntry);
-                        todoListEntryManager.saveEntriesAsync();
-                        // TODO: 20.11.2022 handle entry updates
-                        todoListEntryManager.setBitmapUpdateFlag(newEntry.isVisibleOnLockscreenToday());
+                        
+                        todoListEntryManager.addEntry(new TodoListEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
+                                groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
@@ -110,13 +104,9 @@ public class HomeFragment extends Fragment {
                         values.put(TEXT_VALUE, text);
                         values.put(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                         values.put(IS_COMPLETED, "false");
-                        TodoListEntry newEntry = new TodoListEntry(values,
-                                groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis());
-                        // This is fine, see note above
-                        todoListEntryManager.addEntry(newEntry);
-                        todoListEntryManager.saveEntriesAsync();
-                        // TODO: 20.11.2022 handle entry updates
-                        todoListEntryManager.setBitmapUpdateFlag(newEntry.isVisibleOnLockscreenToday());
+                        
+                        todoListEntryManager.addEntry(new TodoListEntry(values,       // This is fine, see note above
+                                groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
                         return true;
                     });
         });
