@@ -105,7 +105,6 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             // we should save the entries but now now because sometimes we change parameters frequently
             // and we don't want to call save function 10 time when we use a slider
             shouldSaveEntries = true;
-            System.out.println("Parameters invalidated: " + parameters + " for " + entry.rawTextValue.get());
         }
     };
     
@@ -318,8 +317,6 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                     addEvents(calendar.getVisibleTodoListEvents(dayStart, dayEnd));
                 }
             }
-            // TODO: 20.11.2022 handle entry updates
-            setBitmapUpdateFlag();
         }
     }
     

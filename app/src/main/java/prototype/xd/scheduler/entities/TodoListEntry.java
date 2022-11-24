@@ -49,6 +49,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         
         ParameterGetter<T> parameterGetter;
         
+        T discardedValue;
         T value;
         boolean valid = false;
         
@@ -58,6 +59,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         
         void invalidate() {
             valid = false;
+            discardedValue = value;
         }
         
         T get(T previousValue) {
@@ -72,8 +74,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             return get(null);
         }
         
-        T getCachedValue() {
-            return value;
+        // only makes sense to call after a call to 'invalidate'
+        T getDiscardedValue(T defaultValue) {
+            return discardedValue == null ? defaultValue : discardedValue;
         }
         
     }
@@ -138,8 +141,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             return todayCachedGetter.get();
         }
         
-        public T getCached() {
-            return todayCachedGetter.getCachedValue();
+        public T getDiscarded(T defaultValue) {
+            return todayCachedGetter.getDiscardedValue(defaultValue);
         }
         
         public void invalidate() {
@@ -570,8 +573,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     // NOTE: this function is ONLY to be used from a ParameterInvalidationListener
     public List<Range<Long>> getVisibleDayRangesAfterInvalidation(long minDay, long maxDay) {
         // get max between previous range and current
-        long maxUpcomingDayOffset = max(this.upcomingDayOffset.getCached(), this.upcomingDayOffset.getToday());
-        long maxExpiredDayOffset = max(this.expiredDayOffset.getCached(), this.expiredDayOffset.getToday());
+        long maxUpcomingDayOffset = max(this.upcomingDayOffset.getDiscarded(0), this.upcomingDayOffset.getToday());
+        long maxExpiredDayOffset = max(this.expiredDayOffset.getDiscarded(0), this.expiredDayOffset.getToday());
         
         List<Range<Long>> rangeList = new ArrayList<>();
         if (recurrenceSet != null) {
