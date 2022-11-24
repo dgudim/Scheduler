@@ -50,6 +50,8 @@
     <string name="file_access">Доступ к файлам</string>
     <string name="calendar_access">Доступ к календарю</string>
     <string name="calendar_access_description">Для синхронизации с системными календарями</string>
+    <string name="notification_permission">Уведомления</string>
+    <string name="notification_permission_description">(опционально) Для отображения уведомления со статусом сервиса</string>
     <string name="ignore_battery_optimization">Игнорировать оптимизацию батареи</string>
     <string name="ignore_battery_optimization_description">(опционально) Чтобы фоновый сервис работал надежно, не волнуйтесь, он не будет потреблять много батареи</string>
     <string name="permission_request_description">Пожалуйста, предоставьте разрешения для корректной работы приложения</string>

@@ -4,198 +4,281 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurface"
-    android:gravity="center_vertical"
-    android:orientation="vertical"
-    android:padding="15dp"
-    tools:context=".IntroActivity">
+    android:gravity="center">
 
-    <TextView
-        style="@style/LargeHeading"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/permission_request" />
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
+        <!-- Not useless, used for centering -->
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/permission_request_description"
-        android:textAppearance="@style/LargeHeadingSubtext" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="55dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/calendar_access_description"
-            app:srcCompat="@drawable/ic_calendar" />
-
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="?colorSurface"
+            android:orientation="vertical"
+            android:padding="15dp"
+            tools:context=".IntroActivity">
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/textView12"
+                style="@style/LargeHeading"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/calendar_access"
-                android:textAppearance="@style/MediumHeading" />
+                android:text="@string/permission_request"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_conversion_absoluteHeight="32dp"
+                tools:layout_conversion_absoluteWidth="330dp" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/textView13"
+                style="@style/LargeHeadingSubtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/permission_request_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView12"
+                tools:layout_conversion_absoluteHeight="38dp"
+                tools:layout_conversion_absoluteWidth="330dp" />
+
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:contentDescription="@string/calendar_access_description"
+                app:layout_constraintBottom_toBottomOf="@+id/calendar_permission_granted"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView14"
+                app:srcCompat="@drawable/ic_calendar"
+                tools:layout_conversion_absoluteHeight="55dp"
+                tools:layout_conversion_absoluteWidth="55dp" />
+
+
+            <TextView
+                android:id="@+id/textView14"
+                style="@style/MediumHeading"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/calendar_access"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView4"
+                app:layout_constraintTop_toBottomOf="@+id/textView13"
+                tools:layout_conversion_absoluteHeight="24dp"
+                tools:layout_conversion_absoluteWidth="275dp" />
+
+            <TextView
+                android:id="@+id/textView15"
+                style="@style/MediumHeadingSubtext"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/calendar_access_description"
-                android:textAppearance="@style/MediumHeadingSubtext" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView4"
+                app:layout_constraintTop_toBottomOf="@+id/textView14"
+                tools:layout_conversion_absoluteHeight="19dp"
+                tools:layout_conversion_absoluteWidth="275dp" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/calendar_permission_granted_bg"
+
+            <TextView
+                android:id="@+id/calendar_permission_granted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="?colorErrorContainer"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="0dp">
+                android:background="@drawable/round_bg"
+                android:backgroundTint="?colorErrorContainer"
+                android:padding="3dp"
+                android:text="@string/permissions_not_granted"
+                android:textColor="?colorOnErrorContainer"
+                app:layout_constraintStart_toEndOf="@+id/imageView4"
+                app:layout_constraintTop_toBottomOf="@+id/textView15"
+                tools:layout_conversion_absoluteHeight="19dp"
+                tools:layout_conversion_absoluteWidth="72dp" />
 
-                <TextView
-                    android:id="@+id/calendar_permission_granted"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginBottom="3dp"
-                    android:text="@string/permissions_not_granted"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textColor="?colorOnErrorContainer" />
-            </androidx.cardview.widget.CardView>
 
-        </LinearLayout>
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:contentDescription="@string/file_access_description"
+                app:layout_constraintBottom_toBottomOf="@+id/storage_permission_granted"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView16"
+                app:srcCompat="@drawable/ic_folder"
+                tools:layout_conversion_absoluteHeight="55dp"
+                tools:layout_conversion_absoluteWidth="55dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="55dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/file_access_description"
-            app:srcCompat="@drawable/ic_folder" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/textView16"
+                style="@style/MediumHeading"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="@string/file_access"
-                android:textAppearance="@style/MediumHeading" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView5"
+                app:layout_constraintTop_toBottomOf="@+id/calendar_permission_granted"
+                tools:layout_conversion_absoluteHeight="24dp"
+                tools:layout_conversion_absoluteWidth="275dp" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/textView17"
+                style="@style/MediumHeadingSubtext"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/file_access_description"
-                android:textAppearance="@style/MediumHeadingSubtext" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView5"
+                app:layout_constraintTop_toBottomOf="@+id/textView16"
+                tools:layout_conversion_absoluteHeight="35dp"
+                tools:layout_conversion_absoluteWidth="275dp" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/storage_permission_granted_bg"
+
+            <TextView
+                android:id="@+id/storage_permission_granted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="?colorErrorContainer"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="0dp">
+                android:background="@drawable/round_bg"
+                android:backgroundTint="?colorErrorContainer"
+                android:padding="3dp"
+                android:text="@string/permissions_not_granted"
+                android:textColor="?colorOnErrorContainer"
+                app:layout_constraintStart_toEndOf="@+id/imageView5"
+                app:layout_constraintTop_toBottomOf="@+id/textView17"
+                tools:layout_conversion_absoluteHeight="19dp"
+                tools:layout_conversion_absoluteWidth="72dp" />
 
-                <TextView
-                    android:id="@+id/storage_permission_granted"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginBottom="3dp"
-                    android:text="@string/permissions_not_granted"
-                    android:textColor="?colorOnErrorContainer" />
-            </androidx.cardview.widget.CardView>
 
-        </LinearLayout>
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/imageView6"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:contentDescription="@string/file_access_description"
+                app:layout_constraintBottom_toBottomOf="@+id/battery_permission_granted"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView18"
+                app:srcCompat="@drawable/ic_energy_savings"
+                tools:layout_conversion_absoluteHeight="55dp"
+                tools:layout_conversion_absoluteWidth="55dp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="55dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/file_access_description"
-            app:srcCompat="@drawable/ic_energy_savings" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/textView18"
+                style="@style/MediumHeading"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:text="@string/ignore_battery_optimization"
-                android:textAppearance="@style/MediumHeading" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView6"
+                app:layout_constraintTop_toBottomOf="@+id/storage_permission_granted"
+                tools:layout_conversion_absoluteHeight="24dp"
+                tools:layout_conversion_absoluteWidth="275dp" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/textView19"
+                style="@style/MediumHeadingSubtext"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/ignore_battery_optimization_description"
-                android:textAppearance="@style/MediumHeadingSubtext" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView6"
+                app:layout_constraintTop_toBottomOf="@+id/textView18"
+                tools:layout_conversion_absoluteHeight="51dp"
+                tools:layout_conversion_absoluteWidth="275dp" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/battery_permission_granted_bg"
+
+            <TextView
+                android:id="@+id/battery_permission_granted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="?colorErrorContainer"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="0dp">
+                android:background="@drawable/round_bg"
+                android:backgroundTint="?colorErrorContainer"
+                android:padding="3dp"
+                android:text="@string/permissions_not_granted"
+                android:textColor="?colorOnErrorContainer"
+                app:layout_constraintStart_toEndOf="@+id/imageView6"
+                app:layout_constraintTop_toBottomOf="@+id/textView19"
+                tools:layout_conversion_absoluteHeight="19dp"
+                tools:layout_conversion_absoluteWidth="72dp" />
 
-                <TextView
-                    android:id="@+id/battery_permission_granted"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginBottom="3dp"
-                    android:text="@string/permissions_not_granted"
-                    android:textColor="?colorOnErrorContainer" />
-            </androidx.cardview.widget.CardView>
 
-        </LinearLayout>
-    </LinearLayout>
+            <Button
+                android:id="@+id/grant_permissions_button"
+                style="@style/DefaultButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/permissions_grant"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notification_permission_granted"
+                tools:layout_conversion_absoluteHeight="48dp"
+                tools:layout_conversion_absoluteWidth="324dp" />
 
-    <Button
-        android:id="@+id/grant_permissions_button"
-        style="@style/DefaultButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/permissions_grant" />
+            <TextView
+                android:id="@+id/all_set_text"
+                style="@style/LargeHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/all_set"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notification_permission_granted"
+                tools:layout_conversion_absoluteHeight="0dp"
+                tools:layout_conversion_absoluteWidth="0dp" />
 
-    <TextView
-        android:id="@+id/all_set_text"
-        style="@style/LargeHeading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/all_set"
-        android:visibility="gone" />
+            <TextView
+                android:id="@+id/textView20"
+                style="@style/MediumHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/notification_permission"
+                app:layout_constraintStart_toEndOf="@+id/imageView7"
+                app:layout_constraintTop_toBottomOf="@+id/battery_permission_granted" />
+
+            <TextView
+                android:id="@+id/textView21"
+                style="@style/MediumHeadingSubtext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/notification_permission_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView7"
+                app:layout_constraintTop_toBottomOf="@+id/textView20" />
+
+            <ImageView
+                android:id="@+id/imageView7"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:contentDescription="@string/notification_permission_description"
+                app:layout_constraintBottom_toBottomOf="@+id/notification_permission_granted"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView20"
+                app:srcCompat="@drawable/ic_notifications" />
+
+            <TextView
+                android:id="@+id/notification_permission_granted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_bg"
+                android:backgroundTint="?colorErrorContainer"
+                android:padding="3dp"
+                android:text="@string/permissions_not_granted"
+                android:textColor="?colorOnErrorContainer"
+                app:layout_constraintStart_toEndOf="@+id/imageView7"
+                app:layout_constraintTop_toBottomOf="@+id/textView21" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
 
 </LinearLayout>
