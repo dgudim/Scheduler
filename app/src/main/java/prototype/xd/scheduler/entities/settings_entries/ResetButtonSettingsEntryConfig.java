@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import prototype.xd.scheduler.R;
@@ -16,7 +17,8 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     private final Fragment fragment;
     private final Bundle savedInstanceState;
     
-    public ResetButtonSettingsEntryConfig(Fragment fragment, Bundle savedInstanceState) {
+    public ResetButtonSettingsEntryConfig(@NonNull final Fragment fragment,
+                                          @NonNull final Bundle savedInstanceState) {
         this.fragment = fragment;
         this.savedInstanceState = savedInstanceState;
     }
@@ -35,11 +37,11 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
         @Override
         void bind(ResetButtonSettingsEntryConfig config) {
             viewBinding.resetSettingsButton.setOnClickListener(v ->
-                    displayConfirmationDialogue(v.getContext(),
+                    displayConfirmationDialogue(v.getContext(), config.fragment.getLifecycle(),
                             R.string.reset_settings_prompt,
                             R.string.cancel, R.string.reset,
                             view -> {
-                                preferences.edit().clear().commit();
+                                preferences.edit().clear().apply();
                                 config.fragment.onViewCreated(view, config.savedInstanceState);
                             }));
         }

@@ -22,10 +22,11 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.util.List;
 import java.util.Objects;
 
 import prototype.xd.scheduler.databinding.HomeFragmentBinding;
-import prototype.xd.scheduler.entities.GroupList;
+import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.SSMap;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
@@ -86,8 +87,9 @@ public class HomeFragment extends Fragment {
         binding.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
         
         binding.fab.setOnClickListener(view1 -> {
-            final GroupList groupList = todoListEntryManager.getGroups();
-            displayEditTextSpinnerDialogue(view1.getContext(), R.string.add_event_fab, -1, R.string.event_name_input_hint,
+            final List<Group> groupList = todoListEntryManager.getGroups();
+            displayEditTextSpinnerDialogue(view1.getContext(), getLifecycle(),
+                    R.string.add_event_fab, -1, R.string.event_name_input_hint,
                     R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
                     (view2, text, selectedIndex) -> {
                         SSMap values = new SSMap();
@@ -123,17 +125,17 @@ public class HomeFragment extends Fragment {
     }
     
     @Override
-    public void onDestroyView() {
-        // remove reference to ui elements
-        todoListEntryManager.unbindCalendarView();
-        super.onDestroyView();
-    }
-    
-    @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         updateDate(DAY_FLAG_GLOBAL, true);
         updateStatusText();
+    }
+    
+    @Override
+    public void onDestroyView() {
+        // remove reference to ui elements
+        todoListEntryManager.unbindCalendarView();
+        super.onDestroyView();
     }
     
     private void updateStatusText() {

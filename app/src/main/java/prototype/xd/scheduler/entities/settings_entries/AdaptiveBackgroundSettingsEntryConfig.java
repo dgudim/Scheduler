@@ -9,6 +9,9 @@ import android.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.widget.GridView;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
 import prototype.xd.scheduler.adapters.BackgroundImagesGridViewAdapter;
@@ -19,10 +22,14 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     
+    @NonNull
     private final BackgroundImagesGridViewAdapter gridViewAdapter;
+    @NonNull
+    private final Lifecycle lifecycle;
     
-    public AdaptiveBackgroundSettingsEntryConfig(SettingsFragment fragment) {
+    public AdaptiveBackgroundSettingsEntryConfig(@NonNull final SettingsFragment fragment) {
         gridViewAdapter = new BackgroundImagesGridViewAdapter(fragment);
+        lifecycle = fragment.getLifecycle();
     }
     
     public void notifyBackgroundUpdated() {
@@ -51,7 +58,8 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 Utilities.setSwitchChangeListener(gridSelection.adaptiveBgSwitch, Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED);
                 
                 gridSelection.resetBgButton.setOnClickListener(view1 ->
-                        displayConfirmationDialogue(view1.getContext(), R.string.delete_all_saved_backgrounds_prompt,
+                        displayConfirmationDialogue(view1.getContext(), config.lifecycle,
+                                R.string.delete_all_saved_backgrounds_prompt,
                                 R.string.cancel, R.string.delete,
                                 view2 -> {
                                     for (String availableDay : WEEK_DAYS) {

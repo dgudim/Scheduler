@@ -9,18 +9,39 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
+
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
+import prototype.xd.scheduler.utilities.DialogDismissLifecycleObserver;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.TodoListEntryManager;
 
 public abstract class PopupSettingsView {
     
     protected final EntrySettingsBinding bnd;
     protected AlertDialog dialog;
+    protected final Lifecycle lifecycle;
     protected final int defaultTextColor;
     
-    PopupSettingsView(Context context) {
+    PopupSettingsView(@NonNull final Context context,
+                      @Nullable final TodoListEntryManager todoListEntryManager,
+                      @NonNull final Lifecycle lifecycle) {
+        
         bnd = EntrySettingsBinding.inflate(LayoutInflater.from(context));
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
+    
+        this.lifecycle = lifecycle;
+        
+        dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
+                .setOnDismissListener(dialog -> {
+                    if (todoListEntryManager != null) {
+                        todoListEntryManager.ensureUpToDate();
+                    }
+                }).setView(bnd.getRoot()).create();
+        lifecycle.addObserver(new DialogDismissLifecycleObserver(dialog));
     }
     
     /**

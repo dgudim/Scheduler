@@ -12,7 +12,6 @@ import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.setSliderChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.Editable;
@@ -22,16 +21,16 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.PreferencesStore;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
-import prototype.xd.scheduler.utilities.Utilities;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
@@ -44,21 +43,11 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     private TextWatcher currentListener;
     
-    public SystemCalendarSettings(@Nullable final TodoListEntryManager todoListEntryManager, @NonNull final Context context) {
-        super(context);
-        
+    public SystemCalendarSettings(@Nullable final TodoListEntryManager todoListEntryManager,
+                                  @NonNull final Context context,
+                                  @NonNull final Lifecycle lifecycle) {
+        super(context, todoListEntryManager, lifecycle);
         bnd.groupSelector.setVisibility(View.GONE);
-        
-        dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
-                .setOnDismissListener(dialog -> {
-                    if (todoListEntryManager != null) {
-                        todoListEntryManager.ensureUpToDate();
-                    }
-                }).setView(bnd.getRoot()).create();
-    }
-    
-    public void dismiss() {
-        dialog.dismiss();
     }
     
     public void show(final String calendarKey) {
@@ -88,17 +77,20 @@ public class SystemCalendarSettings extends PopupSettingsView {
         updateAllIndicators();
         
         bnd.settingsResetButton.setOnClickListener(v ->
-                displayConfirmationDialogue(v.getContext(),
+                displayConfirmationDialogue(v.getContext(), lifecycle,
                         R.string.reset_settings_prompt,
                         R.string.cancel, R.string.reset, v1 -> {
-                            Map<String, ?> allPreferences = preferences.getAll();
+                            Set<String> preferenceKeys = preferences.getAll().keySet();
                             SharedPreferences.Editor editor = preferences.edit();
-                            for (Map.Entry<String, ?> preferenceEntry : allPreferences.entrySet()) {
-                                if (preferenceEntry.getKey().startsWith(calendarKey)) {
-                                    editor.remove(preferenceEntry.getKey());
+                            for (String preferenceKey : preferenceKeys) {
+                                if (preferenceKey.startsWith(calendarKey)) {
+                                    editor.remove(preferenceKey);
                                 }
                             }
                             editor.apply();
+                            if (todoListEntry != null) {
+                                todoListEntry.event.invalidateAllParametersOfConnectedEntries();
+                            }
                             initialize(calendarKey);
                         }));
         
@@ -145,7 +137,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 Keys.UPCOMING_ITEMS_OFFSET,
                 parameterKey -> getFirstValidIntValue(calendarSubKeys, parameterKey, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET));
         
-        Utilities.setSliderChangeListener(
+        setSliderChangeListener(
                 bnd.showDaysExpiredDescription,
                 bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
                 this, null, R.string.settings_show_days_expired,
@@ -186,7 +178,10 @@ public class SystemCalendarSettings extends PopupSettingsView {
             
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                notifyParameterChanged(bnd.hideByContentFieldState, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT, s.toString());
+                // sometimes this listener fires just on text field getting focus with count = 0
+                if (count != 0) {
+                    notifyParameterChanged(bnd.hideByContentFieldState, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT, s.toString());
+                }
             }
             
             @Override
@@ -199,8 +194,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     @Override
     public <T> void notifyParameterChanged(TextView displayTo, String parameterKey, T value) {
-        setStateIconColor(displayTo, parameterKey);
         PreferencesStore.putAny(calendarKey + "_" + parameterKey, value);
+        setStateIconColor(displayTo, parameterKey);
         // invalidate parameters on entries in the same calendar category / color
         if (todoListEntry != null) {
             todoListEntry.event.invalidateParametersOfConnectedEntries(parameterKey);

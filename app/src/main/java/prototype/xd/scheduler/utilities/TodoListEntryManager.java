@@ -31,6 +31,7 @@ import com.google.android.material.color.MaterialColors;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
+import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.SystemCalendarEvent;
@@ -48,7 +50,7 @@ import prototype.xd.scheduler.views.CalendarView;
 public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     public enum SaveType {
-        ENTRIES, GROUPS, BOTH, NONE
+        ENTRIES, GROUPS, NONE
     }
     
     private static final String NAME = "TodoListEntryManager";
@@ -103,8 +105,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         }
     };
     
-    public TodoListEntryManager(final Context context, final Lifecycle lifecycle) {
-        this.todoListViewAdapter = new TodoListViewAdapter(this, context);
+    public TodoListEntryManager(@NonNull final Context context,
+                                @NonNull final Lifecycle lifecycle) {
+        this.todoListViewAdapter = new TodoListViewAdapter(this, context, lifecycle);
         this.todoListEntries = new TodoListEntryList();
         this.groups = loadGroups();
         
@@ -153,10 +156,6 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                                 case GROUPS:
                                     Utilities.saveGroups(groups);
                                     break;
-                                case BOTH:
-                                    Utilities.saveEntries(todoListEntries);
-                                    Utilities.saveGroups(groups);
-                                    break;
                                 default:
                             }
                             saveType = SaveType.NONE;
@@ -197,7 +196,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             shouldSaveEntries = false;
             invalidateArrayAdapter();
         }
-        if(calendarView != null) {
+        if (calendarView != null) {
             calendarView.notifyDaysChanged(daysToRebind);
         }
         daysToRebind.clear();
@@ -278,12 +277,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         return colors;
     }
     
-    public TodoListEntryList getTodoListEntries() {
-        return todoListEntries;
-    }
-    
-    public GroupList getGroups() {
-        return groups;
+    public List<Group> getGroups() {
+        return Collections.unmodifiableList(groups);
     }
     
     public void loadEntries(long toLoadDayStart, long toLoadDayEnd) {
@@ -331,8 +326,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         wakeUpAndSave(SaveType.ENTRIES);
     }
     
-    public void saveGroupsAndEntriesAsync() {
-        wakeUpAndSave(SaveType.BOTH);
+    public void saveGroupsAsync() {
+        wakeUpAndSave(SaveType.GROUPS);
     }
     
     public void saveIndicators() {
@@ -364,5 +359,15 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     public void removeEntry(TodoListEntry entry) {
         todoListEntries.remove(entry);
         saveEntriesAsync();
+    }
+    
+    public void addGroup(Group newGroup) {
+        groups.add(newGroup);
+        saveGroupsAsync();
+    }
+    
+    public void removeGroup(int index) {
+        groups.remove(index);
+        saveGroupsAsync();
     }
 }

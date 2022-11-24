@@ -154,6 +154,14 @@ public class SystemCalendar {
         });
     }
     
+    public void invalidateAllParametersOnEvents(int color) {
+        systemCalendarEvents.forEach(event -> {
+            if(event.color == color) {
+                event.invalidateAllParameters();
+            }
+        });
+    }
+    
     @NonNull
     @Override
     public String toString() {

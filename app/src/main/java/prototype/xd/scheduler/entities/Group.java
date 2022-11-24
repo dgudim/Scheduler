@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -56,7 +57,7 @@ public class Group implements Serializable {
         return groupName.isEmpty();
     }
     
-    public static int groupIndexInList(GroupList groups, String groupName) {
+    public static int groupIndexInList(List<Group> groups, String groupName) {
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).groupName.equals(groupName)) {
                 return i;
@@ -66,12 +67,12 @@ public class Group implements Serializable {
     }
     
     public static @Nullable
-    Group findGroupInList(GroupList groups, String groupName) {
+    Group findGroupInList(List<Group> groups, String groupName) {
         int index = groupIndexInList(groups, groupName);
         return index == -1 ? null : groups.get(index);
     }
     
-    public static String[] groupListToNames(GroupList groups, Context context) {
+    public static String[] groupListToNames(List<Group> groups, Context context) {
         String[] names = new String[groups.size()];
         for (int i = 0; i < groups.size(); i++) {
             names[i] = groups.get(i).getLocalizedName(context);

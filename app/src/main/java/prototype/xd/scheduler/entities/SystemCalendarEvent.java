@@ -162,15 +162,44 @@ public class SystemCalendarEvent {
         associatedEntry = null;
     }
     
+    
+    // ------------------------------ METHODS FOR WORKING WITH ENTRY PARAMETERS START
+    
+    /**
+     * Invalidate one parameters of the connected entry
+     * @param parameterKey parameter key to invalidate
+     */
     protected void invalidateParameter(String parameterKey) {
         if(associatedEntry != null) {
             associatedEntry.invalidateParameter(parameterKey, true);
         }
     }
     
+    /**
+     * Invalidate all parameters of the connected entry, useful for settings reset for example
+     */
+    protected void invalidateAllParameters() {
+        if(associatedEntry != null) {
+            associatedEntry.invalidateAllParameters();
+        }
+    }
+    
+    /**
+     * Invalidate one parameter of all connected entries
+     * @param parameterKey parameter key to invalidate
+     */
     public void invalidateParametersOfConnectedEntries(String parameterKey) {
         associatedCalendar.invalidateParametersOnEvents(parameterKey, color);
     }
+    
+    /**
+     * Invalidate all parameters of all connected entries
+     */
+    public void invalidateAllParametersOfConnectedEntries() {
+        associatedCalendar.invalidateAllParametersOnEvents(color);
+    }
+    // ------------------------------ METHODS FOR WORKING WITH ENTRY PARAMETERS END
+    
     
     private DateTimeZonePair checkRDates(String datesToParse){
         TimeZone newTimeZone = timeZone;

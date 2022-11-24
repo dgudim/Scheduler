@@ -221,7 +221,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     
-    public TodoListEntry(SSMap params, String groupName, GroupList groups, long id) {
+    public TodoListEntry(SSMap params, String groupName, List<Group> groups, long id) {
         tempGroupName = groupName;
         initGroupAndId(groups, id, true);
         this.params = params;
@@ -248,7 +248,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     // ------------
     
     // attaching group to entry is unnecessary if called from bitmap drawer as we don't need to propagate parameter invalidations
-    public void initGroupAndId(GroupList groups, long id, boolean attachGroupToEntry) {
+    public void initGroupAndId(List<Group> groups, long id, boolean attachGroupToEntry) {
         // id should be assigned before attaching to group
         assignId(id);
         if (!tempGroupName.isEmpty()) {
@@ -396,18 +396,18 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void invalidateParameter(String parameterKey, boolean reportInvalidated) {
-        if (parameterInvalidationListener != null && reportInvalidated) {
-            parameterInvalidationListener.parametersInvalidated(this, Collections.singleton(parameterKey));
-        }
         Parameter<?> param = parameterMap.get(parameterKey);
         if (param != null) {
             param.invalidate();
         }
+        if (parameterInvalidationListener != null && reportInvalidated) {
+            parameterInvalidationListener.parametersInvalidated(this, Collections.singleton(parameterKey));
+        }
     }
 
     public void invalidateParameters(Set<String> parameterKeys) {
-        parameterInvalidationListener.parametersInvalidated(this, parameterKeys);
         parameterKeys.forEach(parameterKey -> invalidateParameter(parameterKey, false));
+        parameterInvalidationListener.parametersInvalidated(this, parameterKeys);
     }
     
     public void invalidateAllParameters() {

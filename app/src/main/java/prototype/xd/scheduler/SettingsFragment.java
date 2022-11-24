@@ -45,6 +45,8 @@ public class SettingsFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        systemCalendarSettings = new SystemCalendarSettings(null, requireContext(), getLifecycle());
+        
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
     
         List<SettingsEntryConfig> settingsEntries = new ArrayList<>();
@@ -115,7 +117,6 @@ public class SettingsFragment extends DialogFragment {
     // view creation begin
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        systemCalendarSettings = new SystemCalendarSettings(null, requireContext());
         binding = FragmentSettingsBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }

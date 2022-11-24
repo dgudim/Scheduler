@@ -12,20 +12,23 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.lifecycle.Lifecycle;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.List;
+
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
 
 public class DialogueUtilities {
     
-    public static void displayConfirmationDialogue(Context context,
+    public static void displayConfirmationDialogue(@NonNull Context context,
+                                                   @NonNull Lifecycle lifecycle,
                                                    @StringRes int titleStringResource,
                                                    @StringRes int messageStringResource,
                                                    @StringRes int cancelButtonStringResource,
@@ -33,7 +36,7 @@ public class DialogueUtilities {
                                                    @StringRes int secondaryButtonStringResource,
                                                    @NonNull View.OnClickListener confirmationListener,
                                                    @Nullable View.OnClickListener secondaryConfirmationListener) {
-        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.three_buttons);
+        Dialog dialog = buildTemplate(context, lifecycle, titleStringResource, messageStringResource, R.layout.three_buttons);
         
         setupButtons(dialog,
                 cancelButtonStringResource, confirmButtonStringResource, secondaryButtonStringResource,
@@ -49,27 +52,30 @@ public class DialogueUtilities {
     // TODO: 20.11.2022 close dialogs on activity exit? 
     
     public static void displayConfirmationDialogue(Context context,
+                                                   @NonNull Lifecycle lifecycle,
                                                    @StringRes int titleStringResource,
                                                    @StringRes int messageStringResource,
                                                    @StringRes int cancelButtonStringResource,
                                                    @StringRes int confirmButtonStringResource,
                                                    @NonNull View.OnClickListener confirmationListener) {
-        displayConfirmationDialogue(context, titleStringResource, messageStringResource,
+        displayConfirmationDialogue(context, lifecycle, titleStringResource, messageStringResource,
                 cancelButtonStringResource, confirmButtonStringResource, -1,
                 confirmationListener, null);
     }
     
     public static void displayConfirmationDialogue(Context context,
+                                                   @NonNull Lifecycle lifecycle,
                                                    @StringRes int titleStringResource,
                                                    @StringRes int cancelButtonStringResource,
                                                    @StringRes int confirmButtonStringResource,
                                                    @NonNull View.OnClickListener confirmationListener) {
-        displayConfirmationDialogue(context, titleStringResource, -1,
+        displayConfirmationDialogue(context, lifecycle, titleStringResource, -1,
                 cancelButtonStringResource, confirmButtonStringResource, -1,
                 confirmationListener, null);
     }
     
     public static void displayEditTextDialogue(@NonNull Context context,
+                                               @NonNull Lifecycle lifecycle,
                                                @StringRes int titleStringResource,
                                                @StringRes int messageStringResource,
                                                @StringRes int hintStringResource,
@@ -79,7 +85,7 @@ public class DialogueUtilities {
                                                @NonNull String defaultEditTextValue,
                                                @NonNull OnClickListenerWithEditText confirmationListener,
                                                @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {
-        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_dialogue);
+        Dialog dialog = buildTemplate(context, lifecycle, titleStringResource, messageStringResource, R.layout.edit_text_dialogue);
         
         ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintStringResource);
         TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
@@ -101,6 +107,7 @@ public class DialogueUtilities {
     }
     
     public static void displayEditTextDialogue(@NonNull Context context,
+                                               @NonNull Lifecycle lifecycle,
                                                @StringRes int titleStringResource,
                                                @StringRes int messageStringResource,
                                                @StringRes int hintStringResource,
@@ -108,39 +115,42 @@ public class DialogueUtilities {
                                                @StringRes int confirmButtonStringResource,
                                                @NonNull String defaultEditTextValue,
                                                @NonNull OnClickListenerWithEditText confirmationListener) {
-        displayEditTextDialogue(context, titleStringResource, messageStringResource, hintStringResource,
+        displayEditTextDialogue(context, lifecycle, titleStringResource, messageStringResource, hintStringResource,
                 cancelButtonStringResource, confirmButtonStringResource, -1,
                 defaultEditTextValue,
                 confirmationListener, null);
     }
     
     public static void displayEditTextDialogue(@NonNull Context context,
+                                               @NonNull Lifecycle lifecycle,
                                                @StringRes int titleStringResource,
                                                @StringRes int messageStringResource,
                                                @StringRes int hintStringResource,
                                                @StringRes int cancelButtonStringResource,
                                                @StringRes int confirmButtonStringResource,
                                                @NonNull OnClickListenerWithEditText confirmationListener) {
-        displayEditTextDialogue(context, titleStringResource, messageStringResource, hintStringResource,
+        displayEditTextDialogue(context, lifecycle, titleStringResource, messageStringResource, hintStringResource,
                 cancelButtonStringResource, confirmButtonStringResource, -1,
                 "",
                 confirmationListener, null);
     }
     
     public static void displayEditTextDialogue(@NonNull Context context,
+                                               @NonNull Lifecycle lifecycle,
                                                @StringRes int titleStringResource,
                                                @StringRes int hintStringResource,
                                                @StringRes int cancelButtonStringResource,
                                                @StringRes int confirmButtonStringResource,
                                                @NonNull String defaultEditTextValue,
                                                @NonNull OnClickListenerWithEditText confirmationListener) {
-        displayEditTextDialogue(context, titleStringResource, -1, hintStringResource,
+        displayEditTextDialogue(context, lifecycle, titleStringResource, -1, hintStringResource,
                 cancelButtonStringResource, confirmButtonStringResource, -1,
                 defaultEditTextValue,
                 confirmationListener, null);
     }
     
     public static void displayEditTextDialogue(@NonNull Context context,
+                                               @NonNull Lifecycle lifecycle,
                                                @StringRes int titleStringResource,
                                                @StringRes int hintStringResource,
                                                @StringRes int cancelButtonStringResource,
@@ -149,13 +159,14 @@ public class DialogueUtilities {
                                                @NonNull String defaultEditTextValue,
                                                @NonNull OnClickListenerWithEditText confirmationListener,
                                                @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {
-        displayEditTextDialogue(context, titleStringResource, -1, hintStringResource,
+        displayEditTextDialogue(context, lifecycle, titleStringResource, -1, hintStringResource,
                 cancelButtonStringResource, confirmButtonStringResource, secondaryButtonStringResource,
                 defaultEditTextValue,
                 confirmationListener, secondaryConfirmationListener);
     }
     
     public static void displayEditTextSpinnerDialogue(@NonNull Context context,
+                                                      @NonNull Lifecycle lifecycle,
                                                       @StringRes int titleStringResource,
                                                       @StringRes int messageStringResource,
                                                       @StringRes int hintStringResource,
@@ -163,11 +174,11 @@ public class DialogueUtilities {
                                                       @StringRes int confirmButtonStringResource,
                                                       @StringRes int secondaryButtonStringResource,
                                                       @NonNull String defaultEditTextValue,
-                                                      @NonNull GroupList groups,
+                                                      @NonNull List<Group> groups,
                                                       int defaultIndex,
                                                       @NonNull OnClickListenerWithEditText confirmationListener,
                                                       @Nullable OnClickListenerWithEditText secondaryConfirmationListener) {
-        Dialog dialog = buildTemplate(context, titleStringResource, messageStringResource, R.layout.edit_text_spinner_dialog);
+        Dialog dialog = buildTemplate(context, lifecycle, titleStringResource, messageStringResource, R.layout.edit_text_spinner_dialog);
         ((TextInputLayout) dialog.findViewById(R.id.textField)).setHint(hintStringResource);
         TextInputEditText editText = dialog.findViewById(R.id.entryNameEditText);
         setupEditText(editText, defaultEditTextValue);
@@ -177,7 +188,7 @@ public class DialogueUtilities {
         spinner.setSimpleItems(items);
         
         final int[] selectedIndex = {defaultIndex};
-    
+        
         spinner.setSelectedItem(defaultIndex);
         spinner.setOnItemClickListener((parent, view, position, id) -> selectedIndex[0] = position);
         
@@ -244,6 +255,7 @@ public class DialogueUtilities {
     }
     
     private static Dialog buildTemplate(@NonNull Context context,
+                                        @NonNull Lifecycle lifecycle,
                                         @StringRes int titleStringResource,
                                         @StringRes int messageStringResource,
                                         @LayoutRes int layoutRes) {
@@ -253,7 +265,13 @@ public class DialogueUtilities {
             builder.setMessage(messageStringResource);
         }
         builder.setView(layoutRes);
-        return builder.show();
+        Dialog dialog = builder.show();
+        
+        DialogDismissLifecycleObserver dismissLifecycleObserver = new DialogDismissLifecycleObserver(dialog);
+        lifecycle.addObserver(dismissLifecycleObserver);
+        // these dialogs are on-shot, so we remove the observer as soon as the dialog in dismissed
+        dialog.setOnDismissListener(dialog1 -> lifecycle.removeObserver(dismissLifecycleObserver));
+        return dialog;
     }
     
     @FunctionalInterface

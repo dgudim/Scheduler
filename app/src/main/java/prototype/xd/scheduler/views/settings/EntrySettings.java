@@ -2,7 +2,6 @@ package prototype.xd.scheduler.views.settings;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
-import static prototype.xd.scheduler.entities.Group.groupIndexInList;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
@@ -16,17 +15,18 @@ import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Lifecycle;
+
+import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -36,24 +36,16 @@ public class EntrySettings extends PopupSettingsView {
     public final TodoListEntryManager todoListEntryManager;
     private TodoListEntry todoListEntry;
     
-    public EntrySettings(final TodoListEntryManager todoListEntryManager, @NonNull final Context context) {
-        super(context);
+    public EntrySettings(@NonNull final TodoListEntryManager todoListEntryManager,
+                         @NonNull final Context context,
+                         @NonNull final Lifecycle lifecycle) {
+        super(context, todoListEntryManager, lifecycle);
         
         bnd.hideExpiredItemsByTimeContainer.setVisibility(View.GONE);
         bnd.hideByContentContainer.setVisibility(View.GONE);
         bnd.entrySettingsTitle.setVisibility(View.GONE);
         
         this.todoListEntryManager = todoListEntryManager;
-        
-        dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
-                .setOnDismissListener(dialog -> {
-                    todoListEntryManager.saveGroupsAndEntriesAsync();
-                    // TODO: 21.11.2022 apply visual changes?
-                }).setView(bnd.getRoot()).create();
-    }
-    
-    public void dismiss() {
-        dialog.dismiss();
     }
     
     public void show(final TodoListEntry entry, final Context context) {
@@ -68,9 +60,9 @@ public class EntrySettings extends PopupSettingsView {
         updateAllIndicators();
         updatePreviews(todoListEntry.fontColor.get(), todoListEntry.bgColor.get(), todoListEntry.borderColor.get(), todoListEntry.borderThickness.get());
         
-        final GroupList groupList = todoListEntryManager.getGroups();
+        final List<Group> groupList = todoListEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
-        bnd.groupSpinner.setSelectedItem(max(groupIndexInList(groupList, entry.getRawGroupName()), 0));
+        bnd.groupSpinner.setSelectedItem(max(Group.groupIndexInList(groupList, entry.getRawGroupName()), 0));
         
         bnd.editGroupButton.setOnClickListener(v -> {
             
@@ -83,19 +75,19 @@ public class EntrySettings extends PopupSettingsView {
             Group selectedGroup = groupList.get(selection);
             String selectedGroupName = selectedGroup.getRawName();
             
-            displayEditTextDialogue(v.getContext(),
+            displayEditTextDialogue(v.getContext(), lifecycle,
                     R.string.edit, R.string.name,
                     R.string.cancel, R.string.save, R.string.delete_group,
                     selectedGroupName,
                     (view2, name, selectedIndex) -> {
-                        int groupIndex = groupIndexInList(groupList, name);
+                        int groupIndex = Group.groupIndexInList(groupList, name);
                         
                         String newName = name;
                         int i = 0;
                         while (groupIndex > 0) {
                             i++;
                             newName = name + "(" + i + ")";
-                            groupIndex = groupIndexInList(groupList, newName);
+                            groupIndex = Group.groupIndexInList(groupList, newName);
                         }
                         
                         selectedGroup.setName(newName);
@@ -103,11 +95,11 @@ public class EntrySettings extends PopupSettingsView {
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
-                        displayConfirmationDialogue(view2.getContext(),
+                        displayConfirmationDialogue(view2.getContext(), lifecycle,
                                 R.string.delete, R.string.are_you_sure,
                                 R.string.no, R.string.yes,
                                 v1 -> {
-                                    groupList.remove(selection);
+                                    todoListEntryManager.removeGroup(selection);
                                     rebuild(context);
                                 });
                         return true;
@@ -120,22 +112,24 @@ public class EntrySettings extends PopupSettingsView {
             }
         });
         
-        bnd.addGroupButton.setOnClickListener(v -> displayEditTextDialogue(v.getContext(), R.string.add_current_config_as_group_prompt,
+        bnd.addGroupButton.setOnClickListener(v -> displayEditTextDialogue(v.getContext(), lifecycle,
+                R.string.add_current_config_as_group_prompt,
                 R.string.add_current_config_as_group_message, R.string.name,
                 R.string.cancel, R.string.add,
                 (view, text, selection) -> {
                     Group existingGroup = findGroupInList(groupList, text);
                     if (existingGroup != null) {
-                        displayConfirmationDialogue(view.getContext(), R.string.group_with_same_name_exists, R.string.overwrite_prompt,
-                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(groupList, text, existingGroup, context));
+                        displayConfirmationDialogue(view.getContext(), lifecycle,
+                                R.string.group_with_same_name_exists, R.string.overwrite_prompt,
+                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(text, existingGroup, context));
                     } else {
-                        addGroupToGroupList(groupList, text, null, context);
+                        addGroupToGroupList(text, null, context);
                     }
                     return true;
                 }));
         
         bnd.settingsResetButton.setOnClickListener(v ->
-                displayConfirmationDialogue(v.getContext(),
+                displayConfirmationDialogue(v.getContext(), lifecycle,
                         R.string.reset_settings_prompt,
                         R.string.cancel, R.string.reset,
                         view -> {
@@ -203,8 +197,7 @@ public class EntrySettings extends PopupSettingsView {
         
     }
     
-    private void addGroupToGroupList(GroupList groupList,
-                                     String groupName,
+    private void addGroupToGroupList(String groupName,
                                      @Nullable Group existingGroup,
                                      Context context) {
         if (existingGroup != null) {
@@ -212,7 +205,7 @@ public class EntrySettings extends PopupSettingsView {
             existingGroup.setParams(todoListEntry.getDisplayParams());
         } else {
             Group newGroup = new Group(groupName, todoListEntry.getDisplayParams());
-            groupList.add(newGroup);
+            todoListEntryManager.addGroup(newGroup);
             todoListEntry.changeGroup(newGroup);
         }
         
