@@ -5,8 +5,11 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Keys.INDICATORS_FILE;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
+import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
@@ -32,9 +35,7 @@ import com.google.android.material.color.MaterialColors;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import prototype.xd.scheduler.R;
@@ -66,7 +67,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private final TodoListEntryList todoListEntries;
     private final GroupList groups;
     
-    private Map<Long, List<Integer>> cachedIndicators;
+    private SArrayMap<Long, ArrayList<Integer>> cachedIndicators;
     
     private final Thread asyncSaver;
     private final Object saveSyncObject = new Object();
@@ -89,8 +90,11 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                 setBitmapUpdateFlag();
             }
             
-            if (parameters.contains(BG_COLOR)) {
-                entry.getVisibleDayRanges(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay()).forEach(
+            // parameters that change calendar indicators
+            if (parameters.contains(BG_COLOR) ||
+                    parameters.contains(UPCOMING_ITEMS_OFFSET) ||
+                    parameters.contains(EXPIRED_ITEMS_OFFSET)) {
+                entry.getVisibleDayRangesAfterInvalidation(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay()).forEach(
                         visibilityRange -> {
                             for (long day = visibilityRange.getLower(); day <= visibilityRange.getUpper(); day++) {
                                 daysToRebind.add(day);
@@ -115,9 +119,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         
         // load cached indicators immediately (~10ms)
         try {
-            cachedIndicators = loadObject("cached_indicators");
+            cachedIndicators = loadObject(INDICATORS_FILE);
         } catch (IOException | ClassNotFoundException e) {
-            cachedIndicators = new HashMap<>();
+            cachedIndicators = new SArrayMap<>();
             log(INFO, NAME, "No cached indicators file");
         }
         
@@ -131,6 +135,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                 entry.listenToParameterInvalidations(parameterInvalidationListener);
             }
             initFinished = true;
+            // clear cached indicators, fetch current ones later
+            cachedIndicators.clear();
             log(INFO, Thread.currentThread().getName(), "TodoListEntryStorage cold start complete in " +
                     (System.currentTimeMillis() - start) + "ms, loaded " + todoListEntries.size() + " entries");
             if (onInitFinishedRunnable != null) {
@@ -173,9 +179,15 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
+        // save indicators
+        try {
+            saveObject(INDICATORS_FILE, cachedIndicators);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //stop lingering thread
         asyncSaver.interrupt();
-        // remove all entries (unlinks all groups and events)
+        // remove all entries (unlink all groups and events)
         todoListEntries.clear();
         groups.clear();
     }
@@ -196,15 +208,23 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             shouldSaveEntries = false;
             invalidateArrayAdapter();
         }
+        cachedIndicators.removeAll(daysToRebind);
         if (calendarView != null) {
             calendarView.notifyDaysChanged(daysToRebind);
         }
         daysToRebind.clear();
     }
     
-    // tells entry list that all entries changed
+    // tells entry list that all entries have changed
     public void invalidateArrayAdapter() {
         todoListViewAdapter.notifyVisibleEntriesUpdated();
+    }
+    
+    // tells calendar list that all entries have changed
+    public void invalidateCalendar() {
+        if(calendarView != null) {
+            calendarView.notifyVisibleDaysChanged();
+        }
     }
     
     public void bindCalendarView(@NonNull CalendarView calendarView) {
@@ -251,13 +271,12 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     private List<Integer> getIndicatorRawColors(long day) {
-        //// try to get from cache
-        //List<Integer> colors = cachedIndicators.get(day);
-        //if (colors != null) {
-        //    return colors;
-        //}
+        // try to get from cache
+        ArrayList<Integer> colors = cachedIndicators.get(day);
+        if (colors != null) {
+            return colors;
+        }
         
-        // 5 entries on average
         TodoListEntryList filteredTodoListEntries = new TodoListEntryList();
         // get all relevant entries
         for (TodoListEntry todoEntry : todoListEntries) {
@@ -268,9 +287,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         // fancy sort
         filteredTodoListEntries = sortEntries(filteredTodoListEntries, day);
         
-        List<Integer> colors = new ArrayList<>(filteredTodoListEntries.size());
+        colors = new ArrayList<>(filteredTodoListEntries.size());
         for (TodoListEntry todoEntry : filteredTodoListEntries) {
-            colors.add(todoEntry.bgColor.get());
+            colors.add(todoEntry.bgColor.get(day));
         }
         cachedIndicators.put(day, colors);
         
@@ -306,7 +325,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     private void addEvents(List<SystemCalendarEvent> eventsToAdd) {
         for (SystemCalendarEvent event : eventsToAdd) {
-            // if the event hasn't been associated to an entry, add it
+            // if the event hasn't been associated with an entry, add it
             if (!event.isAssociatedWithEntry()) {
                 TodoListEntry newEntry = new TodoListEntry(event);
                 newEntry.listenToParameterInvalidations(parameterInvalidationListener);
@@ -330,19 +349,15 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         wakeUpAndSave(SaveType.GROUPS);
     }
     
-    public void saveIndicators() {
-        try {
-            saveObject("cached_indicators", cachedIndicators);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
     public void setBitmapUpdateFlag() {
         servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
     }
     
+    // entry added / removed
     private void entryListChanged(TodoListEntry entry) {
+        // we don't know what days were changed
+        cachedIndicators.clear();
+        invalidateCalendar();
         invalidateArrayAdapter();
         if (entry.isVisibleOnLockscreenToday()) {
             setBitmapUpdateFlag();
@@ -358,7 +373,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     public void removeEntry(TodoListEntry entry) {
         todoListEntries.remove(entry);
-        saveEntriesAsync();
+        entryListChanged(entry);
     }
     
     public void addGroup(Group newGroup) {

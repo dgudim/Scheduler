@@ -28,7 +28,7 @@ import java.util.Objects;
 import prototype.xd.scheduler.databinding.HomeFragmentBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.utilities.SSMap;
+import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.views.CalendarView;
 
@@ -80,8 +80,8 @@ public class HomeFragment extends Fragment {
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
             // update adapter showing entries
             todoListEntryManager.invalidateArrayAdapter();
-            // rebind all views updating indicators
-            calendarView.notifyVisibleDaysChanged();
+            // update calendar updating indicators
+            todoListEntryManager.invalidateCalendar();
         }));
         
         binding.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
@@ -92,7 +92,7 @@ public class HomeFragment extends Fragment {
                     R.string.add_event_fab, -1, R.string.event_name_input_hint,
                     R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
                     (view2, text, selectedIndex) -> {
-                        SSMap values = new SSMap();
+                        SArrayMap<String, String> values = new SArrayMap<>();
                         values.put(TEXT_VALUE, text);
                         values.put(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                         values.put(IS_COMPLETED, "false");
@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment {
                         return true;
                     },
                     (view2, text, selectedIndex) -> {
-                        SSMap values = new SSMap();
+                        SArrayMap<String, String> values = new SArrayMap<>();
                         values.put(TEXT_VALUE, text);
                         values.put(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                         values.put(IS_COMPLETED, "false");

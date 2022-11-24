@@ -58,7 +58,7 @@ public class EntrySettings extends PopupSettingsView {
         todoListEntry = entry;
         
         updateAllIndicators();
-        updatePreviews(todoListEntry.fontColor.get(), todoListEntry.bgColor.get(), todoListEntry.borderColor.get(), todoListEntry.borderThickness.get());
+        updatePreviews(todoListEntry.fontColor.getToday(), todoListEntry.bgColor.getToday(), todoListEntry.borderColor.getToday(), todoListEntry.borderThickness.getToday());
         
         final List<Group> groupList = todoListEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
@@ -141,52 +141,52 @@ public class EntrySettings extends PopupSettingsView {
         bnd.fontColorSelector.setOnClickListener(view -> invokeColorDialogue(
                 bnd.fontColorState, this,
                 FONT_COLOR,
-                parameterKey -> entry.fontColor.get()));
+                parameterKey -> entry.fontColor.getToday()));
         
         bnd.backgroundColorSelector.setOnClickListener(view -> invokeColorDialogue(
                 bnd.backgroundColorState, this,
                 BG_COLOR,
-                parameterKey -> entry.bgColor.get()));
+                parameterKey -> entry.bgColor.getToday()));
         
         bnd.borderColorSelector.setOnClickListener(view -> invokeColorDialogue(
                 bnd.borderColorState, this,
                 BORDER_COLOR,
-                parameterKey -> entry.borderColor.get()));
+                parameterKey -> entry.borderColor.getToday()));
         
         Utilities.setSliderChangeListener(
                 bnd.borderThicknessDescription,
                 bnd.borderThicknessBar, bnd.borderThicknessState,
                 this, bnd.previewBorder, R.string.settings_border_thickness,
                 BORDER_THICKNESS,
-                parameterKey -> entry.borderThickness.get());
+                parameterKey -> entry.borderThickness.getToday());
         
         Utilities.setSliderChangeListener(
                 bnd.priorityDescription,
                 bnd.priorityBar, bnd.priorityState,
                 this, null, R.string.settings_priority,
                 PRIORITY,
-                parameterKey -> entry.priority.get());
+                parameterKey -> entry.priority.getToday());
         
         Utilities.setSliderChangeListener(
                 bnd.adaptiveColorBalanceDescription,
                 bnd.adaptiveColorBalanceBar, bnd.adaptiveColorBalanceState,
                 this, null, R.string.settings_adaptive_color_balance,
                 ADAPTIVE_COLOR_BALANCE,
-                parameterKey -> entry.adaptiveColorBalance.get());
+                parameterKey -> entry.adaptiveColorBalance.getToday());
         
         Utilities.setSliderChangeListener(
                 bnd.showDaysUpcomingDescription,
                 bnd.showDaysUpcomingBar, bnd.showDaysUpcomingState,
                 this, null, R.string.settings_show_days_upcoming,
                 UPCOMING_ITEMS_OFFSET,
-                parameterKey -> entry.upcomingDayOffset.get());
+                parameterKey -> entry.upcomingDayOffset.getToday());
         
         Utilities.setSliderChangeListener(
                 bnd.showDaysExpiredDescription,
                 bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
                 this, null, R.string.settings_show_days_expired,
                 EXPIRED_ITEMS_OFFSET,
-                parameterKey -> entry.expiredDayOffset.get());
+                parameterKey -> entry.expiredDayOffset.getToday());
         
         Utilities.setSwitchChangeListener(
                 bnd.showOnLockSwitch,

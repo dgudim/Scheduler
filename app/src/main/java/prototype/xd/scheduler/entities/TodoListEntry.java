@@ -2,6 +2,7 @@ package prototype.xd.scheduler.entities;
 
 import static android.util.Log.WARN;
 import static androidx.core.math.MathUtils.clamp;
+import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
@@ -40,7 +41,7 @@ import java.util.function.Function;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.SSMap;
+import prototype.xd.scheduler.utilities.SArrayMap;
 
 public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
@@ -70,6 +71,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         T get() {
             return get(null);
         }
+        
+        T getCachedValue() {
+            return value;
+        }
+        
     }
     
     @FunctionalInterface
@@ -104,8 +110,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             todayCachedGetter = new CachedGetter<>(previousValue -> {
                 // get parameter from group if it exists, if not, get from current parameters, if not, get from specified getter
                 String paramValue = entry.group != null ?
-                        entry.params.getOrDefault(parameterKey, entry.group.params.getWithNull(parameterKey)) :
-                        entry.params.getWithNull(parameterKey);
+                        entry.params.getOrDefault(parameterKey, entry.group.params.get(parameterKey)) :
+                        entry.params.get(parameterKey);
                 return paramValue != null ? loadedParameterConverter.apply(paramValue) : todayValueGetter.get(null);
             });
             this.loadedParameterConverter = loadedParameterConverter;
@@ -128,8 +134,12 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             return get(entry.getEntryType(day));
         }
         
-        public T get() {
+        public T getToday() {
             return todayCachedGetter.get();
+        }
+        
+        public T getCached() {
+            return todayCachedGetter.getCachedValue();
         }
         
         public void invalidate() {
@@ -153,7 +163,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         void parametersInvalidated(TodoListEntry entry, Set<String> parameters);
     }
     
-    protected SSMap params = new SSMap();
+    protected SArrayMap<String, String> params = new SArrayMap<>();
     
     // calendar event values
     public transient SystemCalendarEvent event;
@@ -221,7 +231,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     
-    public TodoListEntry(SSMap params, String groupName, List<Group> groups, long id) {
+    public TodoListEntry(SArrayMap<String, String> params, String groupName, List<Group> groups, long id) {
         tempGroupName = groupName;
         initGroupAndId(groups, id, true);
         this.params = params;
@@ -229,9 +239,10 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     // ------------ serialization
+    @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream in)
             throws IOException, ClassNotFoundException {
-        params = (SSMap) in.readObject();
+        params = (SArrayMap<String, String>) in.readObject();
         tempGroupName = (String) in.readObject();
         initParameters();
     }
@@ -320,7 +331,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         durationDays = previousValue ->
                 isFromSystemCalendar() ? event.durationDays : 0;
         rawTextValue = previousValue ->
-                isFromSystemCalendar() ? event.title : params.get(Keys.TEXT_VALUE);
+                isFromSystemCalendar() ? event.title : params.getOrDefault(Keys.TEXT_VALUE, "");
     }
     
     public void listenToParameterInvalidations(ParameterInvalidationListener parameterInvalidationListener) {
@@ -388,7 +399,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             // invalidate parameters from new group
             parameterKeys.addAll(newGroup.params.keySet());
         }
-    
+        
         invalidateParameters(parameterKeys);
         
         group = newGroup;
@@ -404,7 +415,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             parameterInvalidationListener.parametersInvalidated(this, Collections.singleton(parameterKey));
         }
     }
-
+    
     public void invalidateParameters(Set<String> parameterKeys) {
         parameterKeys.forEach(parameterKey -> invalidateParameter(parameterKey, false));
         parameterInvalidationListener.parametersInvalidated(this, parameterKeys);
@@ -414,9 +425,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         invalidateParameters(params.keySet());
     }
     
-    public SSMap getDisplayParams() {
+    public SArrayMap<String, String> getDisplayParams() {
         // shallow copy map
-        SSMap displayParams = new SSMap(params);
+        SArrayMap<String, String> displayParams = new SArrayMap<>(params);
         // remove not display parameters
         displayParams.removeAll(Arrays.asList(Keys.TEXT_VALUE, Keys.ASSOCIATED_DAY, Keys.IS_COMPLETED));
         return displayParams;
@@ -444,19 +455,19 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     private boolean inRange(long day, long instanceStartDay) {
         return isGlobal() ||
-                (day >= instanceStartDay - upcomingDayOffset.get() &&
-                        day <= instanceStartDay + durationDays.get() + expiredDayOffset.get());
+                (day >= instanceStartDay - upcomingDayOffset.getToday() &&
+                        day <= instanceStartDay + durationDays.get() + expiredDayOffset.getToday());
         // | days after the event ended ------ event start |event| event end ------ days before the event starts |
         // | ++++++++++++++++++++++++++       -------------|-----|----------        +++++++++++++++++++++++++++++|
     }
     
     public boolean isCompleted() {
         // everything else except "true" is false, so we are fine here
-        return Boolean.parseBoolean(params.getWithNull(Keys.IS_COMPLETED));
+        return Boolean.parseBoolean(params.get(Keys.IS_COMPLETED));
     }
     
     public boolean isVisibleOnLockscreenToday() {
-        String visibleOnLockscreen = params.getWithNull(Keys.SHOW_ON_LOCK);
+        String visibleOnLockscreen = params.get(Keys.SHOW_ON_LOCK);
         if (visibleOnLockscreen != null) {
             return Boolean.parseBoolean(visibleOnLockscreen) && !isCompleted();
         }
@@ -526,7 +537,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             }
             return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
                 // we overshot
-                if (instanceStartDay + upcomingDayOffset.get() > targetDay) {
+                if (instanceStartDay + upcomingDayOffset.getToday() > targetDay) {
                     return false;
                 }
                 // check if we fall in range
@@ -555,28 +566,33 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return inRange(targetDay, startDay.get()) && (startMsUTC + durationMsUTC >= targetTimestamp);
     }
     
-    // return on what days from min to max an entry is visible
-    public List<Range<Long>> getVisibleDayRanges(long minDay, long maxDay) {
+    // return on what days from min to max an entry is visible (and was before invalidation)
+    // NOTE: this function is ONLY to be used from a ParameterInvalidationListener
+    public List<Range<Long>> getVisibleDayRangesAfterInvalidation(long minDay, long maxDay) {
+        // get max between previous range and current
+        long maxUpcomingDayOffset = max(this.upcomingDayOffset.getCached(), this.upcomingDayOffset.getToday());
+        long maxExpiredDayOffset = max(this.expiredDayOffset.getCached(), this.expiredDayOffset.getToday());
+        
         List<Range<Long>> rangeList = new ArrayList<>();
         if (recurrenceSet != null) {
             iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
-                long instanceEndDay = instanceStartDay + durationDays.get() + expiredDayOffset.get();
-                instanceStartDay -= upcomingDayOffset.get();
-                // if any of the event days lie between min and max days
+                long instanceEndDay = instanceStartDay + durationDays.get() + maxExpiredDayOffset;
+                instanceStartDay -= maxUpcomingDayOffset;
+                // if any of the event days lies between min and max days
                 if ((minDay <= instanceStartDay && instanceStartDay <= maxDay) ||
                         (minDay <= instanceEndDay && instanceEndDay <= maxDay)) {
                     rangeList.add(Range.create(
                             clamp(instanceStartDay, minDay, maxDay),
                             clamp(instanceEndDay, minDay, maxDay)));
-                } else if (instanceStartDay - upcomingDayOffset.get() >= maxDay) {
+                } else if (instanceStartDay - maxUpcomingDayOffset >= maxDay) {
                     return false;
                 }
                 return null;
             }, false);
         } else {
             rangeList.add(Range.create(
-                    startDay.get() - upcomingDayOffset.get(),
-                    endDay.get() + expiredDayOffset.get()));
+                    startDay.get() - maxUpcomingDayOffset,
+                    endDay.get() + maxExpiredDayOffset));
         }
         return rangeList;
     }
@@ -626,13 +642,13 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             return EntryType.TODAY;
         }
         
-        if (targetDay + upcomingDayOffset.get() >= nearestDay
+        if (targetDay + upcomingDayOffset.getToday() >= nearestDay
                 && targetDay < nearestDay) {
             return EntryType.UPCOMING;
         }
         
         // for regular entries durationDays = 0
-        if (targetDay - expiredDayOffset.get() <= nearestDay + durationDays.get()
+        if (targetDay - expiredDayOffset.getToday() <= nearestDay + durationDays.get()
                 && targetDay > nearestDay + durationDays.get()) {
             return EntryType.EXPIRED;
         }
@@ -687,13 +703,13 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public boolean isAdaptiveColorEnabled() {
-        return adaptiveColorBalance.get() > 0;
+        return adaptiveColorBalance.getToday() > 0;
     }
     
     public int getAdaptiveColor(int inputColor) {
         if (isAdaptiveColorEnabled()) {
             return mixTwoColors(MaterialColors.harmonize(inputColor, averageBackgroundColor),
-                    averageBackgroundColor, (adaptiveColorBalance.get() - 1) / 9d);
+                    averageBackgroundColor, (adaptiveColorBalance.getToday() - 1) / 9d);
             //active adaptiveColorBalance is from 1 to 10, so we make it from 0 to 9
         }
         return inputColor;

@@ -188,8 +188,8 @@ public class SystemCalendarEvent {
      * Invalidate one parameter of all connected entries
      * @param parameterKey parameter key to invalidate
      */
-    public void invalidateParametersOfConnectedEntries(String parameterKey) {
-        associatedCalendar.invalidateParametersOnEvents(parameterKey, color);
+    public void invalidateParameterOfConnectedEntries(String parameterKey) {
+        associatedCalendar.invalidateParameterOnEvents(parameterKey, color);
     }
     
     /**

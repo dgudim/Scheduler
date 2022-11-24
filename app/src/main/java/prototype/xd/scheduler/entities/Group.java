@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.SSMap;
+import prototype.xd.scheduler.utilities.SArrayMap;
 
 public class Group implements Serializable {
     
@@ -22,14 +22,14 @@ public class Group implements Serializable {
     
     private String groupName;
     private final ArrayMap<Long, TodoListEntry> associatedEntries = new ArrayMap<>();
-    protected SSMap params;
+    protected SArrayMap<String, String> params;
     
     public Group() {
         groupName = "";
-        params = new SSMap();
+        params = new SArrayMap<>();
     }
     
-    public Group(String groupName, SSMap params) {
+    public Group(String groupName, SArrayMap<String, String> params) {
         this.groupName = groupName;
         this.params = params;
     }
@@ -92,11 +92,11 @@ public class Group implements Serializable {
         groupName = newName;
     }
     
-    public void setParams(SSMap newParams) {
+    public void setParams(SArrayMap<String, String> newParams) {
         Set<String> keys = params.keySet();
         keys.addAll(newParams.keySet());
         // remove parameters that didn't change
-        keys.removeIf(key -> params.get(key).equals(newParams.get(key)));
+        keys.removeIf(key -> Objects.equals(params.get(key), newParams.get(key)));
         associatedEntries.forEach((aLong, todoListEntry) -> todoListEntry.invalidateParameters(keys));
         params = newParams;
     }

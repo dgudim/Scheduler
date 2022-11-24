@@ -505,7 +505,7 @@ public class Utilities {
 class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
-        return Integer.compare(o2.priority.get(), o1.priority.get());
+        return Integer.compare(o2.priority.getToday(), o1.priority.getToday());
     }
 }
 

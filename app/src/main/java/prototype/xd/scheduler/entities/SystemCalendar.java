@@ -146,7 +146,7 @@ public class SystemCalendar {
         return visibleEvents;
     }
     
-    protected void invalidateParametersOnEvents(String parameterKey, int color) {
+    protected void invalidateParameterOnEvents(String parameterKey, int color) {
         systemCalendarEvents.forEach(event -> {
             if(event.color == color) {
                 event.invalidateParameter(parameterKey);

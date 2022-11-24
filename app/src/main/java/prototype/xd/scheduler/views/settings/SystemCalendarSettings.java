@@ -198,7 +198,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         setStateIconColor(displayTo, parameterKey);
         // invalidate parameters on entries in the same calendar category / color
         if (todoListEntry != null) {
-            todoListEntry.event.invalidateParametersOfConnectedEntries(parameterKey);
+            todoListEntry.event.invalidateParameterOfConnectedEntries(parameterKey);
         }
     }
     
