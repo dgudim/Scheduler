@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // enable warnings in debug mode
-        if (BuildConfig.DEBUG) {
+        //if (BuildConfig.DEBUG) {
             //StrictMode.enableDefaults();
             /* try {
             Class.forName("dalvik.system.CloseGuard")
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }*/
-        }
+        //}
         
         PreferencesStore.init(this);
         
@@ -110,8 +110,12 @@ public class MainActivity extends AppCompatActivity {
                             log(ERROR, NAME, "stream null for uri: " + uri.getPath());
                         }
                         
-                        runOnUiThread(() -> ((SettingsFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
-                                .getChildFragmentManager().getFragments().get(0)).notifyBgSelected());
+                        runOnUiThread(() -> Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
+                                .getChildFragmentManager().getFragments().forEach(fragment -> {
+                                    if (fragment instanceof SettingsFragment) {
+                                        ((SettingsFragment) fragment).notifyBgSelected();
+                                    }
+                                }));
                     } catch (Exception e) {
                         logException("LBCP thread", e);
                     }
