@@ -60,11 +60,13 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         
         // android 13 and higher
         if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+            // new granular permissions for android 13
             bnd.grantPermissionsButton.setOnClickListener(v -> requestPermissionLauncher.launch(new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.READ_CALENDAR,
                     Manifest.permission.POST_NOTIFICATIONS}));
         } else {
+            // normal permissions
             bnd.grantPermissionsButton.setOnClickListener(v -> requestPermissionLauncher.launch(new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.READ_CALENDAR}));
@@ -74,6 +76,7 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     }
     
     private boolean refreshPermissionStates(boolean display) {
+
         boolean storageGranted = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED;
         
