@@ -45,14 +45,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
+import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.entities.TodoListEntryList;
-import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
@@ -181,6 +182,12 @@ public class Utilities {
     public static void saveObject(String fileName, Object object) throws IOException {
         try (ObjectOutputStream s = new ObjectOutputStream(new FileOutputStream(getFile(fileName)))) {
             s.writeObject(object);
+        }
+    }
+    
+    public static void addDayRangeToSet(final long from, final long to, Set<Long> daySet) {
+        for (long day = from; day <= to; day++) {
+            daySet.add(day);
         }
     }
     

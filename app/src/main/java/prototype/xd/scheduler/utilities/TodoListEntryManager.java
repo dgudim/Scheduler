@@ -94,12 +94,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             if (parameters.contains(BG_COLOR) ||
                     parameters.contains(UPCOMING_ITEMS_OFFSET) ||
                     parameters.contains(EXPIRED_ITEMS_OFFSET)) {
-                entry.getVisibleDayRangesAfterInvalidation(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay()).forEach(
-                        visibilityRange -> {
-                            for (long day = visibilityRange.getLower(); day <= visibilityRange.getUpper(); day++) {
-                                daysToRebind.add(day);
-                            }
-                        });
+                entry.addVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(), daysToRebind);
             }
             
             // we should save the entries but now now because sometimes we change parameters frequently
@@ -207,11 +202,15 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             shouldSaveEntries = false;
             invalidateArrayAdapter();
         }
-        cachedIndicators.removeAll(daysToRebind);
-        if (calendarView != null) {
-            calendarView.notifyDaysChanged(daysToRebind);
-        }
+        notifyDaysChanged(daysToRebind);
         daysToRebind.clear();
+    }
+    
+    private void notifyDaysChanged(Set<Long> days) {
+        cachedIndicators.removeAll(days);
+        if (calendarView != null) {
+            calendarView.notifyDaysChanged(days);
+        }
     }
     
     // tells entry list that all entries have changed
@@ -352,9 +351,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     // entry added / removed
     private void entryListChanged(TodoListEntry entry) {
-        // we don't know what days were changed
-        cachedIndicators.clear();
-        invalidateCalendar();
+        if(calendarView != null) {
+            notifyDaysChanged(entry.getVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay()));
+        }
         invalidateArrayAdapter();
         if (entry.isVisibleOnLockscreenToday()) {
             setBitmapUpdateFlag();

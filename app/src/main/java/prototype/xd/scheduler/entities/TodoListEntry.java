@@ -11,11 +11,11 @@ import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
+import static prototype.xd.scheduler.utilities.Utilities.addDayRangeToSet;
 
 import android.content.Context;
 import android.util.ArrayMap;
 import android.util.ArraySet;
-import android.util.Range;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -560,6 +559,10 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 return false;
             }
             return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
+                // we overshot
+                if (instanceStartDay + upcomingDayOffset.getToday() > targetDay) {
+                    return false;
+                }
                 if (inRange(targetDay, instanceStartDay)) {
                     return instanceStartMsUTC + durationMsUTC >= targetTimestamp;
                 }
@@ -569,14 +572,12 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return inRange(targetDay, startDay.get()) && (startMsUTC + durationMsUTC >= targetTimestamp);
     }
     
-    // return on what days from min to max an entry is visible (and was before invalidation)
-    // NOTE: this function is ONLY to be used from a ParameterInvalidationListener
-    public List<Range<Long>> getVisibleDayRangesAfterInvalidation(long minDay, long maxDay) {
+    // get on what days from min to max an entry is visible (and was before invalidation)
+    public void addVisibleDays(long minDay, long maxDay, Set<Long> daySet) {
         // get max between previous range and current
         long maxUpcomingDayOffset = max(this.upcomingDayOffset.getDiscarded(0), this.upcomingDayOffset.getToday());
         long maxExpiredDayOffset = max(this.expiredDayOffset.getDiscarded(0), this.expiredDayOffset.getToday());
         
-        List<Range<Long>> rangeList = new ArrayList<>();
         if (recurrenceSet != null) {
             iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
                 long instanceEndDay = instanceStartDay + durationDays.get() + maxExpiredDayOffset;
@@ -584,20 +585,23 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 // if any of the event days lies between min and max days
                 if ((minDay <= instanceStartDay && instanceStartDay <= maxDay) ||
                         (minDay <= instanceEndDay && instanceEndDay <= maxDay)) {
-                    rangeList.add(Range.create(
-                            clamp(instanceStartDay, minDay, maxDay),
-                            clamp(instanceEndDay, minDay, maxDay)));
+                    
+                    addDayRangeToSet(clamp(instanceStartDay, minDay, maxDay), clamp(instanceEndDay, minDay, maxDay), daySet);
                 } else if (instanceStartDay - maxUpcomingDayOffset >= maxDay) {
                     return false;
                 }
                 return null;
             }, false);
         } else {
-            rangeList.add(Range.create(
-                    startDay.get() - maxUpcomingDayOffset,
-                    endDay.get() + maxExpiredDayOffset));
+            addDayRangeToSet(startDay.get() - maxUpcomingDayOffset, endDay.get() + maxExpiredDayOffset, daySet);
         }
-        return rangeList;
+    }
+    
+    // return on what days from min to max an entry is visible (and was before invalidation)
+    public Set<Long> getVisibleDays(long minDay, long maxDay) {
+        Set<Long> daySet = new ArraySet<>();
+        addVisibleDays(minDay, maxDay, daySet);
+        return daySet;
     }
     
     public boolean hideByContent() {
