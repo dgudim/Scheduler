@@ -29,6 +29,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
@@ -45,6 +47,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -189,6 +192,19 @@ public class Utilities {
         for (long day = from; day <= to; day++) {
             daySet.add(day);
         }
+    }
+    
+    public static <T extends Fragment> T findFragmentInNavHost(FragmentActivity activity, Class<T> targetFragmentClass) {
+        List<Fragment> fragments = Objects.requireNonNull(activity.getSupportFragmentManager()
+                        .findFragmentById(R.id.nav_host_fragment))
+                .getChildFragmentManager()
+                .getFragments();
+        for (Fragment fragment : fragments) {
+            if (targetFragmentClass.isInstance(fragment)) {
+                return (T) fragment;
+            }
+        }
+        throw new NullPointerException("Fragment " + targetFragmentClass + " not found");
     }
     
     public static void callImageFileChooser(Activity activity, int requestCode) {

@@ -7,6 +7,7 @@ import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import prototype.xd.scheduler.R;
@@ -18,7 +19,7 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     private final Bundle savedInstanceState;
     
     public ResetButtonSettingsEntryConfig(@NonNull final Fragment fragment,
-                                          @NonNull final Bundle savedInstanceState) {
+                                          @Nullable final Bundle savedInstanceState) {
         this.fragment = fragment;
         this.savedInstanceState = savedInstanceState;
     }

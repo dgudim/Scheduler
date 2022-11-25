@@ -8,6 +8,7 @@ import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
+import static prototype.xd.scheduler.utilities.Utilities.findFragmentInNavHost;
 import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
 
 import android.content.Intent;
@@ -25,7 +26,6 @@ import com.google.android.material.color.HarmonizedColorsOptions;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Objects;
 
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.PreferencesStore;
@@ -110,12 +110,7 @@ public class MainActivity extends AppCompatActivity {
                             log(ERROR, NAME, "stream null for uri: " + uri.getPath());
                         }
                         
-                        runOnUiThread(() -> Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
-                                .getChildFragmentManager().getFragments().forEach(fragment -> {
-                                    if (fragment instanceof SettingsFragment) {
-                                        ((SettingsFragment) fragment).notifyBgSelected();
-                                    }
-                                }));
+                        runOnUiThread(() -> findFragmentInNavHost(this, SettingsFragment.class).notifyBgSelected());
                     } catch (Exception e) {
                         logException("LBCP thread", e);
                     }

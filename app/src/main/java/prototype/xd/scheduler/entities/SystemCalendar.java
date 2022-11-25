@@ -52,7 +52,7 @@ public class SystemCalendar {
         id = getLong(cursor, calendarColumns, Calendars._ID);
         accessLevel = getInt(cursor, calendarColumns, Calendars.CALENDAR_ACCESS_LEVEL);
         color = getInt(cursor, calendarColumns, Calendars.CALENDAR_COLOR);
-    
+        
         prefKey = account_name + "_" + name;
         
         String timeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
@@ -78,14 +78,14 @@ public class SystemCalendar {
     void loadAvailableEventColors() {
         eventColorCountMap.clear();
         
-        for (SystemCalendarEvent event: systemCalendarEvents) {
+        for (SystemCalendarEvent event : systemCalendarEvents) {
             eventColorCountMap.computeIfAbsent(event.color, key -> getEventCountWithColor(event.color));
         }
     }
     
     private int getEventCountWithColor(int color) {
         int count = 0;
-        for (SystemCalendarEvent event: systemCalendarEvents) {
+        for (SystemCalendarEvent event : systemCalendarEvents) {
             if (event.color == color) {
                 count++;
             }
@@ -116,17 +116,19 @@ public class SystemCalendar {
             cursor.moveToNext();
         }
         
-        for (Map.Entry<Long, List<Long>> exceptionList : exceptionLists.entrySet()) {
-            boolean applied = false;
-            for (SystemCalendarEvent event : systemCalendarEvents) {
-                if (event.id == exceptionList.getKey()) {
-                    event.addExceptions(exceptionList.getValue().toArray(new Long[0]));
-                    applied = true;
-                    break;
+        if (!loadMinimal) {
+            for (Map.Entry<Long, List<Long>> exceptionList : exceptionLists.entrySet()) {
+                boolean applied = false;
+                for (SystemCalendarEvent event : systemCalendarEvents) {
+                    if (event.id == exceptionList.getKey()) {
+                        event.addExceptions(exceptionList.getValue().toArray(new Long[0]));
+                        applied = true;
+                        break;
+                    }
                 }
-            }
-            if (!applied) {
-                log(WARN, account_name, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
+                if (!applied) {
+                    log(WARN, account_name, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
+                }
             }
         }
         
@@ -148,7 +150,7 @@ public class SystemCalendar {
     
     protected void invalidateParameterOnEvents(String parameterKey, int color) {
         systemCalendarEvents.forEach(event -> {
-            if(event.color == color) {
+            if (event.color == color) {
                 event.invalidateParameter(parameterKey);
             }
         });
@@ -156,7 +158,7 @@ public class SystemCalendar {
     
     public void invalidateAllParametersOnEvents(int color) {
         systemCalendarEvents.forEach(event -> {
-            if(event.color == color) {
+            if (event.color == color) {
                 event.invalidateAllParameters();
             }
         });
@@ -194,7 +196,7 @@ public class SystemCalendar {
     public String getKey() {
         return prefKey;
     }
-
+    
     public String makeKey(int possibleEventColor) {
         return prefKey + "_" + possibleEventColor;
     }

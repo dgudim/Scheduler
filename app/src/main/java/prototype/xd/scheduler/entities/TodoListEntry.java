@@ -423,8 +423,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         parameterInvalidationListener.parametersInvalidated(this, parameterKeys);
     }
     
-    public void invalidateAllParameters() {
-        invalidateParameters(params.keySet());
+    public void invalidateAllParameters(boolean reportInvalidated) {
+        parameterMap.forEach((key, parameter) -> parameter.invalidate());
+        if(reportInvalidated) {
+            parameterInvalidationListener.parametersInvalidated(this, parameterMap.keySet());
+        }
     }
     
     public SArrayMap<String, String> getDisplayParams() {
@@ -436,7 +439,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void removeDisplayParams() {
-        invalidateAllParameters();
+        invalidateAllParameters(true);
         params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.ASSOCIATED_DAY, Keys.IS_COMPLETED));
     }
     

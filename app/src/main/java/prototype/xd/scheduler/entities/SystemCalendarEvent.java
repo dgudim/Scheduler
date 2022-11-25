@@ -180,7 +180,7 @@ public class SystemCalendarEvent {
      */
     protected void invalidateAllParameters() {
         if(associatedEntry != null) {
-            associatedEntry.invalidateAllParameters();
+            associatedEntry.invalidateAllParameters(true);
         }
     }
     

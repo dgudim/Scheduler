@@ -124,6 +124,10 @@ public class HomeFragment extends Fragment {
         return binding.getRoot();
     }
     
+    public void invalidateAll() {
+        todoListEntryManager.invalidateAll();
+    }
+    
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

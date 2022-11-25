@@ -220,9 +220,19 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     // tells calendar list that all entries have changed
     public void invalidateCalendar() {
-        if(calendarView != null) {
+        if (calendarView != null) {
             calendarView.notifyVisibleDaysChanged();
         }
+    }
+    
+    // tells all entries that their parameters have changed and refresh all ui stuff
+    public void invalidateAll() {
+        cachedIndicators.clear();
+        for (TodoListEntry todoListEntry : todoListEntries) {
+            todoListEntry.invalidateAllParameters(false);
+        }
+        invalidateCalendar();
+        invalidateArrayAdapter();
     }
     
     public void bindCalendarView(@NonNull CalendarView calendarView) {
@@ -351,7 +361,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     // entry added / removed
     private void entryListChanged(TodoListEntry entry) {
-        if(calendarView != null) {
+        if (calendarView != null) {
             notifyDaysChanged(entry.getVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay()));
         }
         invalidateArrayAdapter();
