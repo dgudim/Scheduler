@@ -251,8 +251,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         return todoListViewAdapter.getItemCount();
     }
     
-    public TodoListEntryList getVisibleTodoListEntries(long day) {
-        TodoListEntryList filteredTodoListEntries = new TodoListEntryList();
+    public List<TodoListEntry> getVisibleTodoListEntries(long day) {
+        List<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
         // get all entries visible on a particular day
         for (TodoListEntry todoEntry : todoListEntries) {
             if (todoEntry.visibleInList(day)) {
@@ -284,8 +284,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         if (colors != null) {
             return colors;
         }
-        
-        TodoListEntryList filteredTodoListEntries = new TodoListEntryList();
+    
+        List<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
         // get all relevant entries
         for (TodoListEntry todoEntry : todoListEntries) {
             if (!todoEntry.isGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day)) {

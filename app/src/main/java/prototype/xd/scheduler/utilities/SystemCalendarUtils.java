@@ -22,7 +22,6 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.SystemCalendarEvent;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.TodoListEntryList;
 
 public class SystemCalendarUtils {
     
@@ -71,9 +70,9 @@ public class SystemCalendarUtils {
         return systemCalendars;
     }
     
-    public static TodoListEntryList getTodoListEntriesFromCalendars(Context context, long dayStart, long dayEnd,
+    public static List<TodoListEntry> getTodoListEntriesFromCalendars(Context context, long dayStart, long dayEnd,
                                                                       @Nullable List<SystemCalendar> calendars) {
-        TodoListEntryList todoListEntries = new TodoListEntryList();
+        List<TodoListEntry> todoListEntries = new ArrayList<>();
         List<SystemCalendar> cals = (calendars != null) ? calendars : getAllCalendars(context, false);
         for (SystemCalendar calendar : cals) {
             // add all events from all calendars

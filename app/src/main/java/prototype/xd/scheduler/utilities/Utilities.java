@@ -45,6 +45,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -56,7 +57,6 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
@@ -97,10 +97,10 @@ public class Utilities {
         }
     }
     
-    public static TodoListEntryList loadTodoEntries(Context context, long dayStart, long dayEnd, GroupList groups,
+    public static List<TodoListEntry> loadTodoEntries(Context context, long dayStart, long dayEnd, GroupList groups,
                                                     @Nullable List<SystemCalendar> calendars, boolean attachGroupToEntry) {
-        
-        TodoListEntryList readEntries = new TodoListEntryList();
+    
+        List<TodoListEntry> readEntries = new ArrayList<>();
         try {
             readEntries = loadObject(ENTRIES_FILE);
             
@@ -120,9 +120,9 @@ public class Utilities {
         return readEntries;
     }
     
-    public static void saveEntries(TodoListEntryList entries) {
+    public static void saveEntries(List<TodoListEntry> entries) {
         try {
-            TodoListEntryList entriesToSave = new TodoListEntryList();
+            List<TodoListEntry> entriesToSave = new ArrayList();
             
             for (int i = 0; i < entries.size(); i++) {
                 TodoListEntry entry = entries.get(i);
@@ -145,7 +145,9 @@ public class Utilities {
         GroupList groups = new GroupList();
         groups.add(Group.NULL_GROUP); // add "null" group
         try {
+            System.out.println("------------------ GROUPS: " + groups);
             groups.addAll(loadObject(GROUPS_FILE));
+            System.out.println("------------------ GROUPS: " + groups);
             return groups;
         } catch (IOException e) {
             log(INFO, NAME, "No groups file, creating one");
@@ -217,12 +219,12 @@ public class Utilities {
         activity.startActivityForResult(intent, requestCode);
     }
     
-    public static TodoListEntryList sortEntries(TodoListEntryList entries, long day) {
-        TodoListEntryList upcomingEntries = new TodoListEntryList();
-        TodoListEntryList expiredEntries = new TodoListEntryList();
-        TodoListEntryList todayEntries = new TodoListEntryList();
-        TodoListEntryList globalEntries = new TodoListEntryList();
-        TodoListEntryList otherEntries = new TodoListEntryList();
+    public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long day) {
+        List<TodoListEntry> upcomingEntries = new ArrayList<>();
+        List<TodoListEntry> expiredEntries = new ArrayList<>();
+        List<TodoListEntry> todayEntries = new ArrayList<>();
+        List<TodoListEntry> globalEntries = new ArrayList<>();
+        List<TodoListEntry> otherEntries = new ArrayList<>();
         
         
         for (TodoListEntry entry : entries) {
@@ -245,8 +247,8 @@ public class Utilities {
                     otherEntries.add(entry);
             }
         }
-        
-        TodoListEntryList merged = new TodoListEntryList();
+    
+        List<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);
         merged.addAll(upcomingEntries);

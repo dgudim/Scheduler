@@ -25,6 +25,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
@@ -32,7 +33,6 @@ import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
 import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
@@ -140,7 +140,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     @NonNull
     private final TodoListEntryManager todoListEntryManager;
     @NonNull
-    private TodoListEntryList currentTodoListEntries;
+    private List<TodoListEntry> currentTodoListEntries;
     
     @NonNull
     private final EntrySettings entrySettings;
@@ -155,7 +155,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         
         this.todoListEntryManager = todoListEntryManager;
         this.lifecycle = lifecycle;
-        currentTodoListEntries = new TodoListEntryList();
+        currentTodoListEntries = new ArrayList<>();
         entrySettings = new EntrySettings(todoListEntryManager, context, lifecycle);
         systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager, context, lifecycle);
         setHasStableIds(true);

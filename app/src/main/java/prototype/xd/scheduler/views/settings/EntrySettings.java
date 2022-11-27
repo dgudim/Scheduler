@@ -203,6 +203,8 @@ public class EntrySettings extends PopupSettingsView {
         if (existingGroup != null) {
             // setParams automatically handles parameter invalidation on other entries
             existingGroup.setParams(todoListEntry.getDisplayParams());
+            // save groups manually
+            todoListEntryManager.saveGroupsAsync();
         } else {
             Group newGroup = new Group(groupName, todoListEntry.getDisplayParams());
             todoListEntryManager.addGroup(newGroup);

@@ -52,7 +52,6 @@ import java.util.List;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.TodoListEntryList;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
@@ -174,7 +173,7 @@ class LockScreenBitmapDrawer {
         // load user defined entries (from files)
         // add entries from all calendars spanning 4 weeks
         // sort and filter entries
-        TodoListEntryList toAdd =
+        List<TodoListEntry> toAdd =
                 filterEntries(
                         sortEntries(
                                 loadTodoEntries(context, currentDay - 14, currentDay + 14, groups, null, false), currentDay));
@@ -233,8 +232,8 @@ class LockScreenBitmapDrawer {
     }
     
     
-    private TodoListEntryList filterEntries(TodoListEntryList entries) {
-        TodoListEntryList toAdd = new TodoListEntryList();
+    private List<TodoListEntry> filterEntries(List<TodoListEntry> entries) {
+        List<TodoListEntry> toAdd = new ArrayList<>();
         for (TodoListEntry entry : entries) {
             if (entry.isVisibleOnLockscreenToday()) {
                 toAdd.add(entry);

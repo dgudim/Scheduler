@@ -7,7 +7,10 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
+import androidx.collection.ArraySet;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -21,17 +24,25 @@ public class Group implements Serializable {
     public static final transient Group NULL_GROUP = new Group();
     
     private String groupName;
-    private final ArrayMap<Long, TodoListEntry> associatedEntries = new ArrayMap<>();
+    private transient ArrayMap<Long, TodoListEntry> associatedEntries;
     protected SArrayMap<String, String> params;
     
     public Group() {
         groupName = "";
         params = new SArrayMap<>();
+        associatedEntries = new ArrayMap<>();
     }
     
     public Group(String groupName, SArrayMap<String, String> params) {
         this.groupName = groupName;
         this.params = params;
+        associatedEntries = new ArrayMap<>();
+    }
+    
+    private void readObject(ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        associatedEntries = new ArrayMap<>();
     }
     
     // to be called only by TodoListEntry
@@ -93,7 +104,8 @@ public class Group implements Serializable {
     }
     
     public void setParams(SArrayMap<String, String> newParams) {
-        Set<String> keys = params.keySet();
+        Set<String> keys = new ArraySet<>();
+        keys.addAll(params.keySet());
         keys.addAll(newParams.keySet());
         // remove parameters that didn't change
         keys.removeIf(key -> Objects.equals(params.get(key), newParams.get(key)));

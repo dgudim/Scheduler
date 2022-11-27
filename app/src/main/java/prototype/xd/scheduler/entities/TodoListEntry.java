@@ -491,7 +491,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             if (isGlobal()) {
                 return preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
             }
-            return !isCompleted();
+            return !isCompleted() && isVisible(currentDay);
         }
     }
     
