@@ -2,8 +2,6 @@ package prototype.xd.scheduler;
 
 import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
-import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
@@ -27,6 +25,7 @@ import com.google.android.material.color.HarmonizedColorsOptions;
 import java.io.File;
 import java.io.InputStream;
 
+import prototype.xd.scheduler.utilities.BitmapUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.PreferencesStore;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
@@ -103,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
                         
                         InputStream stream = getContentResolver().openInputStream(uri);
                         if (stream != null) {
-                            fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                                    new File(getRootDir(), WEEK_DAYS[requestCode] + ".png"));
+                            BitmapUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
+                                    new File(getRootDir(), Keys.WEEK_DAYS.get(requestCode) + ".png"));
                             stream.close();
                         } else {
                             log(ERROR, NAME, "stream null for uri: " + uri.getPath());

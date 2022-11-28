@@ -7,8 +7,6 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.makeMutable;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
-import static prototype.xd.scheduler.utilities.DateManager.DEFAULT_BACKGROUND_NAME;
-import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
@@ -136,7 +134,7 @@ class LockScreenBitmapDrawer {
                         if (bg.exists()) {
                             bitmap = readStream(new FileInputStream(bg));
                         } else {
-                            File defFile = getFile(DEFAULT_BACKGROUND_NAME);
+                            File defFile = getFile(Keys.DEFAULT_BACKGROUND_NAME);
                             if (defFile.exists()) {
                                 bitmap = readStream(new FileInputStream(defFile));
                             } else {
@@ -217,15 +215,16 @@ class LockScreenBitmapDrawer {
     private File getBackgroundAccordingToDayAndTime() {
         
         if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED)) {
-            return getFile(DEFAULT_BACKGROUND_NAME);
+            return getFile(Keys.DEFAULT_BACKGROUND_NAME);
         }
         
         int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
         CharSequence dayString;
+        // Calendar.SUNDAY is one
         if (day == 1) {
-            dayString = WEEK_DAYS[6];
+            dayString = Keys.WEEK_DAYS.get(6);
         } else {
-            dayString = WEEK_DAYS[day - 2];
+            dayString = Keys.WEEK_DAYS.get(day - 2);
         }
         
         return getFile(dayString + ".png");

@@ -1,6 +1,5 @@
 package prototype.xd.scheduler.adapters;
 
-import static prototype.xd.scheduler.utilities.DateManager.WEEK_DAYS;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.callImageFileChooser;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import prototype.xd.scheduler.MainActivity;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.SettingsFragment;
+import prototype.xd.scheduler.utilities.Keys;
 
 public class BackgroundImagesGridViewAdapter extends BaseAdapter {
     
@@ -42,12 +42,12 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
     
     @Override
     public int getCount() {
-        return WEEK_DAYS.length;
+        return Keys.WEEK_DAYS.size();
     }
     
     @Override
     public Object getItem(int i) {
-        return WEEK_DAYS[i];
+        return Keys.WEEK_DAYS.get(i);
     }
     
     @Override
@@ -66,7 +66,7 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
         ImageView imageView = convertView.findViewById(R.id.bg_image);
         
         try {
-            FileInputStream inputStream = new FileInputStream(getFile(WEEK_DAYS[i] + ".png_min.png"));
+            FileInputStream inputStream = new FileInputStream(getFile(Keys.WEEK_DAYS.get(i) + ".png_min.png"));
             imageView.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             inputStream.close();
         } catch (FileNotFoundException e) {
