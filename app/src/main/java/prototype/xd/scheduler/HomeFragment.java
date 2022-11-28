@@ -2,7 +2,7 @@ package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
-import static prototype.xd.scheduler.utilities.DateManager.dateFromEpoch;
+import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
@@ -78,6 +78,8 @@ public class HomeFragment extends Fragment {
         
         // when all entries are loaded, update current month
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
+            updateDate(DAY_FLAG_GLOBAL, true);
+            updateStatusText();
             // update adapter showing entries
             todoListEntryManager.invalidateArrayAdapter();
             // update calendar updating indicators
@@ -129,13 +131,6 @@ public class HomeFragment extends Fragment {
     }
     
     @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        updateDate(DAY_FLAG_GLOBAL, true);
-        updateStatusText();
-    }
-    
-    @Override
     public void onDestroyView() {
         // remove reference to ui elements
         todoListEntryManager.unbindCalendarView();
@@ -143,7 +138,7 @@ public class HomeFragment extends Fragment {
     }
     
     private void updateStatusText() {
-        binding.statusText.setText(getString(R.string.status, dateFromEpoch(currentlySelectedDay * 86400000),
+        binding.statusText.setText(getString(R.string.status, dateStringFromMsUTC(currentlySelectedDay * 86400000),
                 todoListEntryManager.getCurrentlyVisibleEntriesCount()));
     }
 }

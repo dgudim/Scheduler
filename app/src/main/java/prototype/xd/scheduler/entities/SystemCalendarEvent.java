@@ -3,7 +3,7 @@ package prototype.xd.scheduler.entities;
 import static android.provider.CalendarContract.Events;
 import static android.util.Log.ERROR;
 import static android.util.Log.WARN;
-import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
+import static prototype.xd.scheduler.utilities.DateManager.daysFromMsUTC;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
@@ -141,9 +141,9 @@ public class SystemCalendarEvent {
     }
     
     public void computeDurationInDays() {
-        startDay = daysFromEpoch(startMsUTC, timeZone);
-        endDay = daysFromEpoch(endMsUTC, timeZone);
-        durationDays = daysFromEpoch(startMsUTC + durationMs, timeZone) - startDay;
+        startDay = daysFromMsUTC(startMsUTC, timeZone);
+        endDay = daysFromMsUTC(endMsUTC, timeZone);
+        durationDays = daysFromMsUTC(startMsUTC + durationMs, timeZone) - startDay;
     }
     
     public boolean isAssociatedWithEntry() {
@@ -231,7 +231,7 @@ public class SystemCalendarEvent {
         if (rSet != null) {
             RecurrenceSetIterator it = rSet.iterator(timeZone, startMsUTC);
             long instance = 0;
-            while (it.hasNext() && daysFromEpoch(instance, timeZone) <= dayEnd) {
+            while (it.hasNext() && daysFromMsUTC(instance, timeZone) <= dayEnd) {
                 instance = it.next();
                 if (rangesOverlap(instance, instance + durationMs, dayStart, dayEnd)) {
                     return true;
@@ -243,7 +243,7 @@ public class SystemCalendarEvent {
     }
     
     private boolean rangesOverlap(long start, long end, long dayStart, long dayEnd) {
-        return daysFromEpoch(start, timeZone) <= dayEnd && daysFromEpoch(end, timeZone) >= dayStart;
+        return daysFromMsUTC(start, timeZone) <= dayEnd && daysFromMsUTC(end, timeZone) >= dayStart;
     }
     
     public void addExceptions(Long[] exceptions) {

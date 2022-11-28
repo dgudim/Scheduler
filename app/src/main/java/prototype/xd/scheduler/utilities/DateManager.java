@@ -24,10 +24,9 @@ public class DateManager {
     public static long currentTimestamp = DAY_FLAG_GLOBAL;
     public static long currentlySelectedDay = DAY_FLAG_GLOBAL;
     
-    private static final DateFormat dateFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.ROOT);
-    
-    public static final String[] WEEK_DAYS = new String[]{"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"};
-    public static final String DEFAULT_BACKGROUND_NAME = "default.png";
+    private static final DateFormat dateTimeFormat = new SimpleDateFormat("dd/MM HH:mm", Locale.ROOT);
+    private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.ROOT);
+    private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ROOT);
     
     public static void updateDate(long day, boolean updateCurrentlySelected) {
         currentTimestamp = getCurrentTimestamp();
@@ -42,43 +41,61 @@ public class DateManager {
         }
     }
     
-    public static String getTimeSpan(long timeFrom, long timeTo) {
-        String dateFrom = datetimeFromEpoch(timeFrom);
-        String dateTo = datetimeFromEpoch(timeTo);
+    public static String getTimeSpan(long timeFromMsUTC, long timeToMsUTC) {
+        String dateFrom = datetimeFromMsUTC(timeFromMsUTC);
+        String dateTo = datetimeFromMsUTC(timeToMsUTC);
         String[] dateFromSplit = dateFrom.split(" ");
         String[] dateToSplit = dateTo.split(" ");
-        if (dateFrom.equals(dateTo) || dateFromSplit[0].equals(dateToSplit[0])) {
-            return dateFromSplit[1] + " - " + dateToSplit[1];
+        
+        String dateFromDayMonth = dateFromSplit[0];
+        String dateFromHourMinute = dateFromSplit[1];
+    
+        String dateToDayMonth = dateToSplit[0];
+        String dateToHourMinute = dateToSplit[1];
+        
+        // month and day is the same
+        if (dateFrom.equals(dateTo) || dateFromDayMonth.equals(dateToDayMonth)) {
+            // 20:30 - 23:10
+            return dateFromHourMinute + " - " + dateToHourMinute;
         } else {
-            String[] dateFromMonthDay = dateFromSplit[0].split("/");
-            String[] dateToMonthDay = dateToSplit[0].split("/");
+            String[] dateFromDayMonthSplit = dateFromDayMonth.split("/");
+            String[] dateToDayMonthSplit = dateToDayMonth.split("/");
+            
+            String dateFromDay = dateFromDayMonthSplit[0];
+            String dateFromMonth = dateFromDayMonthSplit[1];
+            
+            String dateToDay = dateToDayMonthSplit[0];
+            String dateToMonth = dateToDayMonthSplit[1];
+            
             //month is the same
-            if (dateFromMonthDay[0].equals(dateToMonthDay[0])) {
-                return dateFromMonthDay[1] + " " + dateFromSplit[1] + " - " + dateToMonthDay[1] + " " + dateToSplit[1];
+            if (dateFromMonth.equals(dateToMonth)) {
+                //24 20:40 - 30 21:30
+                return dateFromDay + " " + dateFromHourMinute + " - " + dateToDay + " " + dateToHourMinute;
             } else {
+                //24/10 10:40 - 10/11 12:30
                 return dateFrom + " - " + dateTo;
             }
         }
     }
     
-    public static long daysFromEpoch(long epoch, TimeZone timezone) {
-        return TimeUnit.DAYS.convert(addTimeZoneOffset(epoch, timezone), TimeUnit.MILLISECONDS);
+    public static long daysFromMsUTC(long msUTC, TimeZone timezone) {
+        return TimeUnit.DAYS.convert(addTimeZoneOffset(msUTC, timezone), TimeUnit.MILLISECONDS);
     }
     
-    public static String datetimeFromEpoch(long epoch) {
-        return dateFormat.format(new Date(epoch));
+    public static String datetimeFromMsUTC(long msUTC) {
+        return dateTimeFormat.format(new Date(msUTC));
     }
     
-    public static String dateFromEpoch(long epoch) {
-        return dateFormat.format(new Date(epoch)).split(" ")[0];
+    public static String dateStringFromMsUTC(long msUTC) {
+        return dateFormat.format(new Date(msUTC));
     }
     
     public static String getCurrentTimeString() {
-        return dateFormat.format(new Date()).split(" ")[1];
+        return timeFormat.format(new Date());
     }
     
     public static String getCurrentDateTimeString() {
-        return dateFormat.format(new Date());
+        return dateTimeFormat.format(new Date());
     }
     
     public static long addTimeZoneOffset(long epoch, TimeZone timeZone) {

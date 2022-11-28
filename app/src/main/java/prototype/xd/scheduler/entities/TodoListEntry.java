@@ -6,8 +6,8 @@ import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestamp;
-import static prototype.xd.scheduler.utilities.DateManager.datetimeFromEpoch;
-import static prototype.xd.scheduler.utilities.DateManager.daysFromEpoch;
+import static prototype.xd.scheduler.utilities.DateManager.datetimeFromMsUTC;
+import static prototype.xd.scheduler.utilities.DateManager.daysFromMsUTC;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
@@ -371,10 +371,16 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     protected void unlinkGroupInternal(boolean invalidate) {
-        if (invalidate && group != null) {
-            invalidateParameters(group.params.keySet());
+        Set<String> parameters = null;
+        invalidate = invalidate && group != null;
+        if(invalidate) {
+            parameters = group.params.keySet();
         }
         group = null;
+        // invalidate only after group change to avoid weird settings from cache
+        if (invalidate) {
+            invalidateParameters(parameters);
+        }
     }
     
     /**
@@ -402,9 +408,10 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             parameterKeys.addAll(newGroup.params.keySet());
         }
         
+        group = newGroup;
+        // invalidate only after group change to avoid weird settings from cache
         invalidateParameters(parameterKeys);
         
-        group = newGroup;
         return true;
     }
     
@@ -525,7 +532,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         T val;
         while (it.hasNext()) {
             instanceMsUTC = it.next();
-            instanceDay = daysFromEpoch(instanceMsUTC, event.timeZone);
+            instanceDay = daysFromMsUTC(instanceMsUTC, event.timeZone);
             val = recurrenceSetConsumer.processInstance(instanceMsUTC, instanceDay);
             if (val != null) {
                 return val;
@@ -556,7 +563,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public boolean isVisibleExact(long targetTimestamp) {
-        long targetDay = daysFromEpoch(targetTimestamp, event.timeZone);
+        long targetDay = daysFromMsUTC(targetTimestamp, event.timeZone);
         if (recurrenceSet != null) {
             if (targetTimestamp > endMsUTC + durationMsUTC) {
                 return false;
@@ -639,7 +646,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public long getNearestEventDay(long day) {
         if (isFromSystemCalendar()) {
-            return daysFromEpoch(getNearestEventTimestamp(day), event.timeZone);
+            return daysFromMsUTC(getNearestEventTimestamp(day), event.timeZone);
         }
         return startDay.get();
     }
@@ -698,7 +705,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
         
         if (startMsUTC == endMsUTC) {
-            return datetimeFromEpoch(startMsUTC);
+            return datetimeFromMsUTC(startMsUTC);
         } else {
             return DateManager.getTimeSpan(startMsUTC, endMsUTC);
         }

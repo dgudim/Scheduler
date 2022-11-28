@@ -145,9 +145,7 @@ public class Utilities {
         GroupList groups = new GroupList();
         groups.add(Group.NULL_GROUP); // add "null" group
         try {
-            System.out.println("------------------ GROUPS: " + groups);
             groups.addAll(loadObject(GROUPS_FILE));
-            System.out.println("------------------ GROUPS: " + groups);
             return groups;
         } catch (IOException e) {
             log(INFO, NAME, "No groups file, creating one");

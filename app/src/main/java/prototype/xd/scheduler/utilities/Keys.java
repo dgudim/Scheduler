@@ -122,4 +122,7 @@ public class Keys {
     public static final String ENTRIES_FILE = "entries";
     public static final String GROUPS_FILE = "groupData";
     public static final String INDICATORS_FILE = "cachedIndicators";
+    
+    public static final List<String> WEEK_DAYS = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
+    public static final String DEFAULT_BACKGROUND_NAME = "default.png";
 }

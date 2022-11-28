@@ -179,7 +179,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //stop lingering thread
+        //stop IO thread
         asyncSaver.interrupt();
         // remove all entries (unlink all groups and events)
         todoListEntries.clear();
