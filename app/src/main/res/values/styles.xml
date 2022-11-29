@@ -3,7 +3,10 @@
     <style name="Theme.App" parent="Theme.Material3.DayNight">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor">@color/transparent</item>
+
+        <item name="android:statusBarColor">?colorSurface</item>
+        <item name="android:navigationBarColor">?colorSurface</item>
+
         <item name="materialAlertDialogTheme">@style/DefaultAlertDialogTheme</item>
         <item name="materialButtonStyle">@style/DefaultButtonStyle</item>
     </style>

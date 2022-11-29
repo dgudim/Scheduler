@@ -26,7 +26,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.List;
 import java.util.Objects;
 
-import prototype.xd.scheduler.databinding.HomeFragmentBinding;
+import prototype.xd.scheduler.databinding.HomeFragmentContentBinding;
+import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.SArrayMap;
@@ -36,7 +37,7 @@ import prototype.xd.scheduler.views.CalendarView;
 public class HomeFragment extends Fragment {
     
     private volatile TodoListEntryManager todoListEntryManager;
-    private HomeFragmentBinding binding;
+    private HomeFragmentContentBinding contentBnd;
     
     public HomeFragment() {
         super();
@@ -50,15 +51,17 @@ public class HomeFragment extends Fragment {
     
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    
+        HomeFragmentWrapperBinding wrapperBnd = HomeFragmentWrapperBinding.inflate(inflater, container, false);
+        contentBnd = wrapperBnd.contentWrapper.content;
         
-        binding = HomeFragmentBinding.inflate(inflater, container, false);
         
-        binding.recyclerView.setItemAnimator(null);
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
+        contentBnd.recyclerView.setItemAnimator(null);
+        contentBnd.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        contentBnd.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
         
         // construct custom calendar view
-        CalendarView calendarView = new CalendarView(binding.calendar, todoListEntryManager);
+        CalendarView calendarView = new CalendarView(contentBnd.calendar, todoListEntryManager);
         todoListEntryManager.bindCalendarView(calendarView);
         
         // not called on initial startup
@@ -86,15 +89,15 @@ public class HomeFragment extends Fragment {
             // update calendar updating indicators
             todoListEntryManager.invalidateCalendar();
         }));
-        
-        binding.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
+    
+        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
     
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                requireActivity(), binding.getRoot(), binding.toolbar, R.string.app_intro_next_button, R.string.permission_request);
-        binding.getRoot().addDrawerListener(toggle);
+                requireActivity(), wrapperBnd.getRoot(), wrapperBnd.contentWrapper.toolbar, R.string.app_intro_next_button, R.string.permission_request);
+        wrapperBnd.getRoot().addDrawerListener(toggle);
         toggle.syncState();
         
-        binding.fab.setOnClickListener(view1 -> {
+        wrapperBnd.contentWrapper.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoListEntryManager.getGroups();
             displayEditTextSpinnerDialogue(view1.getContext(), getLifecycle(),
                     R.string.add_event_fab, -1, R.string.event_name_input_hint,
@@ -121,7 +124,7 @@ public class HomeFragment extends Fragment {
                     });
         });
         
-        binding.openSettingsButton.setOnClickListener(v ->
+        wrapperBnd.navView.openSettingsButton.setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(
                         requireActivity()
                                 .getSupportFragmentManager()
@@ -129,7 +132,7 @@ public class HomeFragment extends Fragment {
                         .getNavController()
                         .navigate(R.id.action_HomeFragment_to_SettingsFragment));
         
-        return binding.getRoot();
+        return wrapperBnd.getRoot();
     }
     
     public void invalidateAll() {
@@ -144,7 +147,7 @@ public class HomeFragment extends Fragment {
     }
     
     private void updateStatusText() {
-        binding.statusText.setText(getString(R.string.status, dateStringFromMsUTC(currentlySelectedDay * 86400000),
+        contentBnd.statusText.setText(getString(R.string.status, dateStringFromMsUTC(currentlySelectedDay * 86400000),
                 todoListEntryManager.getCurrentlyVisibleEntriesCount()));
     }
 }
