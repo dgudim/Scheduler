@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -87,6 +88,11 @@ public class HomeFragment extends Fragment {
         }));
         
         binding.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
+    
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                requireActivity(), binding.getRoot(), binding.toolbar, R.string.app_intro_next_button, R.string.permission_request);
+        binding.getRoot().addDrawerListener(toggle);
+        toggle.syncState();
         
         binding.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoListEntryManager.getGroups();

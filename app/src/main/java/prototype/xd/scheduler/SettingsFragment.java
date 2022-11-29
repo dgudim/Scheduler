@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
-import prototype.xd.scheduler.databinding.FragmentSettingsBinding;
+import prototype.xd.scheduler.databinding.SettingsFragmentBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
@@ -41,7 +41,7 @@ public class SettingsFragment extends DialogFragment {
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBackgroundSettingsEntry;
     private SystemCalendarSettings systemCalendarSettings;
-    private FragmentSettingsBinding binding;
+    private SettingsFragmentBinding binding;
     
     private SettingsListViewAdapter settingsListViewAdapter;
     
@@ -123,7 +123,7 @@ public class SettingsFragment extends DialogFragment {
     // view creation begin
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        binding = SettingsFragmentBinding.inflate(inflater, container, false);
         preferenceStateBefore = preferences.getAll();
         return binding.getRoot();
     }
