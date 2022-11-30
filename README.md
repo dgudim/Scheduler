@@ -2,8 +2,9 @@
 
 <img src="https://user-images.githubusercontent.com/34401005/196503825-82b715a6-21ea-4f02-829a-e4109a37b4a9.png" height=150 id="icon"></img>
 
-
 A small app that shows your todo list on your lockscreen
+
+![IzzyBadge](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/prototype.xd.scheduler)
 
 ## Features
 - Your todo list on the lockscreen
@@ -19,6 +20,8 @@ Clone this repository and import into **Android Studio**
 git clone https://github.com/dgudim/Scheduler
 ```
 Or just download [latest build](https://github.com/dgudim/Scheduler/releases/latest)
+
+<a href="https://apt.izzysoft.de/fdroid/index/apk/prototype.xd.scheduler"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height=100></img></a>
 
 ## Screenshots
 
