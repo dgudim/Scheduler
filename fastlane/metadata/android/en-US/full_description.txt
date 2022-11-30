@@ -1,0 +1,11 @@
+<i>Scheduler</i> is a small app that shows your todo list on your lockscreen.
+
+<br><b>Features:</b>
+
+* Your todo list on the lockscreen
+* Sync with your system calendars (google, samsung, local)
+* Configurable per-day wallpapers
+* Material you theming support
+* Plethora of settings
+* Low memory and cpu consumption
+
