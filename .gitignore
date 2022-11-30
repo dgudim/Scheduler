@@ -106,6 +106,9 @@ gradle-app.setting
 .DS_Store
 Thumbs.db
 
+## Keystore
+key.jks
+
 ## iOS
 /ios/xcode/*.xcodeproj/*
 !/ios/xcode/*.xcodeproj/xcshareddata
