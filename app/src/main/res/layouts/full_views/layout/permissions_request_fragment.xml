@@ -54,7 +54,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/calendar_permission_granted"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView14"
-                app:srcCompat="@drawable/ic_calendar"
+                app:srcCompat="@drawable/ic_calendar_month"
                 tools:layout_conversion_absoluteHeight="55dp"
                 tools:layout_conversion_absoluteWidth="55dp" />
 

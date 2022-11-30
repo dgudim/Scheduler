@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.List;
 import java.util.Objects;
 
-import prototype.xd.scheduler.databinding.HomeFragmentContentBinding;
+import prototype.xd.scheduler.databinding.ContentWrapperBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
@@ -37,7 +37,7 @@ import prototype.xd.scheduler.views.CalendarView;
 public class HomeFragment extends Fragment {
     
     private volatile TodoListEntryManager todoListEntryManager;
-    private HomeFragmentContentBinding contentBnd;
+    private ContentWrapperBinding contentBnd;
     
     public HomeFragment() {
         super();
@@ -53,15 +53,15 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     
         HomeFragmentWrapperBinding wrapperBnd = HomeFragmentWrapperBinding.inflate(inflater, container, false);
-        contentBnd = wrapperBnd.contentWrapper.content;
+        contentBnd = wrapperBnd.contentWrapper;
         
         
-        contentBnd.recyclerView.setItemAnimator(null);
-        contentBnd.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        contentBnd.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
+        contentBnd.content.recyclerView.setItemAnimator(null);
+        contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        contentBnd.content.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
         
         // construct custom calendar view
-        CalendarView calendarView = new CalendarView(contentBnd.calendar, todoListEntryManager);
+        CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoListEntryManager);
         todoListEntryManager.bindCalendarView(calendarView);
         
         // not called on initial startup
@@ -93,11 +93,11 @@ public class HomeFragment extends Fragment {
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
     
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                requireActivity(), wrapperBnd.getRoot(), wrapperBnd.contentWrapper.toolbar, R.string.app_intro_next_button, R.string.permission_request);
+                requireActivity(), wrapperBnd.getRoot(), contentBnd.toolbar, R.string.app_intro_next_button, R.string.permission_request);
         wrapperBnd.getRoot().addDrawerListener(toggle);
         toggle.syncState();
-        
-        wrapperBnd.contentWrapper.fab.setOnClickListener(view1 -> {
+    
+        contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoListEntryManager.getGroups();
             displayEditTextSpinnerDialogue(view1.getContext(), getLifecycle(),
                     R.string.add_event_fab, -1, R.string.event_name_input_hint,
