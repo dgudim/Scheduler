@@ -1,0 +1,1 @@
+Basically 0.5.0 with several bugs fixed and a semi-functional navigation view

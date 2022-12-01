@@ -1,0 +1,15 @@
+Many under the hood changes:
+
+- Improved how calendar refreshing works, now supports per-day refresh
+- Improved how entry parameters work, made the cached
+- Fixed deleted events in a recurring sequence being duplicated instead of deleted
+- Simplified permission request xml
+- Added notification permission to the request screen for the future support of android 13
+- Fixed `android.view.WindowLeaked` on dialogs
+- Replaced list view with recycler view on the main screen
+> And more...
+
+Some UI and UX changes:
+
+- Custom view support for lockscreen
+- Removed close button on entry settings dialog
