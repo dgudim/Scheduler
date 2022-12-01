@@ -10,5 +10,5 @@ if [[ "$GITHUB_EVENT_NAME" == schedule ||
       "$GITHUB_EVENT_NAME" == workflow_dispatch ||
       "$COMMIT_MSG" =~ \[fastlane\] ||
       "$COMMIT_MSG" =~ \[metadata\] ]]; then
-    echo "::set-output name=build::true"
+    echo "::set-output name=validate::true"
 fi
