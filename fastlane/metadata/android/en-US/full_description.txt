@@ -1,7 +1,7 @@
 <i>Scheduler</i> is a small app that shows your todo list on your lockscreen.
 
 <p>
-Do you <b>always forget things</b> to do or <b>have a lot of them</b> to remeber? 
+Do you <b>always forget things</b> to do or <b>have a lot of them</b> to remember? 
 Want to <b>easily keep track</b> of them?
 Then this app is for you, take <b>full advantage of your lockscreen real estate</b> and view your todo list right on it! 
 <b>No need to unlock the phone</b>, it's all there! 
