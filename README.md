@@ -1,6 +1,6 @@
 <h1 id="title">Scheduler</h1>
 
-<img src="https://user-images.githubusercontent.com/34401005/196503825-82b715a6-21ea-4f02-829a-e4109a37b4a9.png" height=150 id="icon"></img>
+<img src="https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/icon.png?raw=true" height=150 id="icon"></img>
 
 A small app that shows your todo list on your lockscreen
 
