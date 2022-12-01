@@ -32,12 +32,12 @@ Or just download [latest build](https://github.com/dgudim/Scheduler/releases/lat
 
 | Lock screen               | Main app menu              |
 | ------------------------- | -------------------------- |
-| ![](https://user-images.githubusercontent.com/34401005/196048503-c2671dff-2b91-487c-a6cb-89b8fd81d559.jpg) | <img id="thumb" src="https://user-images.githubusercontent.com/34401005/198995164-62ef0c89-a3c9-4f28-bef1-8806cea6a9f8.jpg"> |
+| ![](https://raw.githubusercontent.com/dgudim/Scheduler/master/fastlane/metadata/android/en-US/images/phoneScreenshots/01.jpg) | <img id="thumb" src="https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/02.jpg?raw=true"> |
 
 | Global settings           | Event settings             |
 | ------------------------- | -------------------------- |
-| ![](https://user-images.githubusercontent.com/34401005/198278507-29dd6cac-8f63-49bb-adbb-803271715ffe.jpg) | ![](https://user-images.githubusercontent.com/34401005/198276799-bb35598c-6e4e-43e0-87fe-5ebb1ad66123.jpg) |
+| ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/03.jpg?raw=true) | ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/04.jpg?raw=true) |
 
 | Per-day wallpapers        | Material you theming       |
 | ------------------------- | -------------------------- |
-| ![](https://user-images.githubusercontent.com/34401005/198276952-9ad2f75a-d8d5-45d5-a83a-d7ce6d6b7b77.jpg) | ![](https://user-images.githubusercontent.com/34401005/198277522-14dc58c7-1ab8-4713-bd3c-58071fa4cf3a.gif) |
+| ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/05.jpg?raw=true) | ![](https://user-images.githubusercontent.com/34401005/205037183-94a75dc1-0d35-40d5-bfbb-e34913ff457b.gif) |
