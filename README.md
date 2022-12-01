@@ -40,4 +40,4 @@ Or just download [latest build](https://github.com/dgudim/Scheduler/releases/lat
 
 | Per-day wallpapers        | Material you theming       |
 | ------------------------- | -------------------------- |
-| ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/05.jpg?raw=true) | ![](https://user-images.githubusercontent.com/34401005/198277522-14dc58c7-1ab8-4713-bd3c-58071fa4cf3a.gif) |
+| ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/05.jpg?raw=true) | ![](https://user-images.githubusercontent.com/34401005/205037183-94a75dc1-0d35-40d5-bfbb-e34913ff457b.gif) |
