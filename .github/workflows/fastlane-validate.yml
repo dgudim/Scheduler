@@ -1,0 +1,39 @@
+name: Fastlane validator
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  # Manual run
+  workflow_dispatch:
+  
+jobs:
+
+  check_trigger:
+    name: Check trigger
+    runs-on: ubuntu-latest
+    if: github.repository == 'dgudim/Scheduler'
+    outputs:
+      validate: ${{ steps.check_trigger.outputs.validate }}
+
+    steps:
+      - name: Checkout Scheduler
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - id: check_trigger
+        name: Check trigger
+        run: bash scripts/check_trigger.sh
+        
+  validate_structure:
+    runs-on: ubuntu-latest
+    needs: check_trigger
+    if: needs.check_trigger.outputs.validate
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ashutoshgngwr/validate-fastlane-supply-metadata@v2
+    
