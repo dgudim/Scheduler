@@ -1,9 +1,25 @@
 apply plugin: 'com.android.application'
 
+def versionMajor = 0
+def versionMinor = 5
+def versionPatch = 1
+
+ext.getVersionCode = { ->
+    return versionMajor * 10000 + versionMinor * 100 + versionPatch
+}
+
+ext.getVersionName = { ->
+    return "${versionMajor}.${versionMinor}.${versionPatch}"
+}
+
 android {
 
     signingConfigs {
         release {
+
+        }
+        debug {
+
         }
     }
 
@@ -14,22 +30,23 @@ android {
         applicationId "prototype.xd.scheduler"
         minSdkVersion 26
         targetSdkVersion 32
-        versionCode 51
-        versionName "0.5.1"
-        signingConfig signingConfigs.debug
+        versionCode getVersionCode()
+        resValue "string", "app_version_combined", "${defaultConfig.versionName} (${defaultConfig.versionCode})"
+        signingConfigs.debug
     }
 
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
+            defaultConfig.versionName getVersionName()
         }
         debug {
-            signingConfig signingConfigs.debug
             renderscriptDebuggable true
             jniDebuggable true
+            defaultConfig.versionName "${getVersionName()}.debug"
         }
+
     }
 
     buildFeatures {
@@ -71,3 +88,18 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 }
+
+task getVersionCode() {
+    // only run during execution, not evaluation
+    doLast {
+        println getVersionCode()
+    }
+}
+
+task getVersionName() {
+    // only run during execution, not evaluation
+    doLast {
+        println getVersionName()
+    }
+}
+
