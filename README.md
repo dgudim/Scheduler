@@ -6,11 +6,16 @@ A small app that shows your todo list on your lockscreen
 
 ![IzzyBadge](https://img.shields.io/endpoint?url=https://apt.izzysoft.de/fdroid/api/v1/shield/prototype.xd.scheduler)
 
+Do you **always forget things** to do or **have a lot of them** to remeber? <br>
+Want to **easily keep track** of them? <br>
+Then this app is for you, take **full advantage of your lockscreen real estate** and view your todo list right on it! <br>
+**No need to unlock the phone**, it's all there! <br>
+
 ## Features
 - Your todo list on the lockscreen
 - Sync with your system calendars (google, samsung, local)
 - Configurable per-day wallpapers
-- Material you theming support
+- Material you theming
 - Plethora of settings
 - Low memory and cpu consumption
 
