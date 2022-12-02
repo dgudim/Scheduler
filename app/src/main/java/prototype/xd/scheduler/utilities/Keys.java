@@ -16,11 +16,11 @@ public class Keys {
         throw new IllegalStateException("Utility key storage class");
     }
     
-    public static final int SETTINGS_DEFAULT_BG_COLOR = 0xff_FFFFFF;
+    public static final int SETTINGS_DEFAULT_BG_COLOR = 0xff_999999;
     public static final int SETTINGS_DEFAULT_UPCOMING_BG_COLOR = 0xff_CCFFCC;
     public static final int SETTINGS_DEFAULT_EXPIRED_BG_COLOR = 0xff_FFCCCC;
     
-    public static final int SETTINGS_DEFAULT_BORDER_COLOR = 0xff_888888;
+    public static final int SETTINGS_DEFAULT_BORDER_COLOR = 0xff_777777;
     public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR = 0xff_88FF88;
     public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR = 0xff_FF8888;
     
@@ -47,7 +47,8 @@ public class Keys {
     
     public static final boolean SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT = false;
     
-    public static final float DEFAULT_COLOR_MIX_FACTOR = 0.85f;
+    public static final float DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR = 0.75f;
+    public static final float DEFAULT_CALENDAR_EVENT_COLOR_MIX_FACTOR = 0.50f;
     
     public static final int DAY_FLAG_GLOBAL = -1;
     public static final String DAY_FLAG_GLOBAL_STR = "-1";

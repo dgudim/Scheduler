@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.views.settings;
 
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.app.AlertDialog;
@@ -93,27 +93,27 @@ public abstract class PopupSettingsView {
         bnd.fontColorSelector.setCardBackgroundColor(fontColor);
         bnd.previewText.setTextColor(fontColor);
         bnd.previewTextUpcoming.setTextColor(mixTwoColors(fontColor,
-                preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+                preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         bnd.previewTextExpired.setTextColor(mixTwoColors(fontColor,
-                preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+                preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
     }
     
     public void updatePreviewBg(int bgColor) {
         bnd.backgroundColorSelector.setCardBackgroundColor(bgColor);
         bnd.previewText.setBackgroundColor(bgColor);
         bnd.previewTextUpcoming.setBackgroundColor(mixTwoColors(bgColor,
-                preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+                preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         bnd.previewTextExpired.setBackgroundColor(mixTwoColors(bgColor,
-                preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+                preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
     }
     
     public void updatePreviewBorder(int borderColor) {
         bnd.borderColorSelector.setCardBackgroundColor(borderColor);
         bnd.previewBorder.setBackgroundColor(borderColor);
         bnd.previewBorderUpcoming.setBackgroundColor(mixTwoColors(borderColor,
-                preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+                preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         bnd.previewBorderExpired.setBackgroundColor(mixTwoColors(borderColor,
-                preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_COLOR_MIX_FACTOR));
+                preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
     }
     
 }

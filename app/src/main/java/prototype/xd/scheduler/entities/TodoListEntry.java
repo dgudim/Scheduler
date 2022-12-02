@@ -14,6 +14,7 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValid
 import static prototype.xd.scheduler.utilities.Utilities.addDayRangeToSet;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.ArrayMap;
 import android.util.ArraySet;
 import android.widget.TextView;
@@ -276,26 +277,32 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public void initParameters() {
         bgColor = new Parameter<>(this, Keys.BG_COLOR,
-                previousValue -> preferences.getInt(getAppropriateKey(Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR),
+                previousValue -> {
+                    int defaultColor = Keys.SETTINGS_DEFAULT_BG_COLOR;
+                    if (isFromSystemCalendar()) {
+                        defaultColor = mixTwoColors(Color.WHITE, event.color, Keys.DEFAULT_CALENDAR_EVENT_COLOR_MIX_FACTOR);
+                    }
+                    return preferences.getInt(getAppropriateKey(Keys.BG_COLOR), defaultColor);
+                },
                 Integer::parseInt,
                 todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+                        preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
                 todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR));
+                        preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         fontColor = new Parameter<>(this, Keys.FONT_COLOR,
                 previousValue -> preferences.getInt(getAppropriateKey(Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR),
                 Integer::parseInt,
                 todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+                        preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
                 todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR));
+                        preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         borderColor = new Parameter<>(this, Keys.BORDER_COLOR,
                 previousValue -> preferences.getInt(getAppropriateKey(Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR),
                 Integer::parseInt,
                 todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR),
+                        preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
                 todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), Keys.DEFAULT_COLOR_MIX_FACTOR));
+                        preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         borderThickness = new Parameter<>(this, Keys.BORDER_THICKNESS,
                 previousValue -> preferences.getInt(getAppropriateKey(Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS),
                 Integer::parseInt,
@@ -373,7 +380,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     protected void unlinkGroupInternal(boolean invalidate) {
         Set<String> parameters = null;
         invalidate = invalidate && group != null;
-        if(invalidate) {
+        if (invalidate) {
             parameters = group.params.keySet();
         }
         group = null;
@@ -432,7 +439,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public void invalidateAllParameters(boolean reportInvalidated) {
         parameterMap.forEach((key, parameter) -> parameter.invalidate());
-        if(reportInvalidated) {
+        if (reportInvalidated) {
             parameterInvalidationListener.parametersInvalidated(this, parameterMap.keySet());
         }
     }

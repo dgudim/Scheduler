@@ -3,7 +3,7 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
@@ -244,12 +244,12 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             
             
             upcomingEntryPreview.mixAndSetBgAndTextColors(
-                    mixTwoColors(fontColor, fontColorUpcoming, DEFAULT_COLOR_MIX_FACTOR),
-                    mixTwoColors(bgColor, bgColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
+                    mixTwoColors(fontColor, fontColorUpcoming, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
+                    mixTwoColors(bgColor, bgColorUpcoming, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
             todayEntryPreview.mixAndSetBgAndTextColors(fontColor, bgColor);
             expiredEntryPreview.mixAndSetBgAndTextColors(
-                    mixTwoColors(fontColor, fontColorExpired, DEFAULT_COLOR_MIX_FACTOR),
-                    mixTwoColors(bgColor, bgColorExpired, DEFAULT_COLOR_MIX_FACTOR));
+                    mixTwoColors(fontColor, fontColorExpired, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
+                    mixTwoColors(bgColor, bgColorExpired, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         }
         
         public void updatePreviewBorders() {
@@ -262,9 +262,9 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.borderColorSelector.setCardBackgroundColor(borderColor);
             viewBinding.borderColorExpiredSelector.setCardBackgroundColor(borderColorExpired);
             
-            upcomingEntryPreview.setBorderColor(mixTwoColors(borderColor, borderColorUpcoming, DEFAULT_COLOR_MIX_FACTOR));
+            upcomingEntryPreview.setBorderColor(mixTwoColors(borderColor, borderColorUpcoming, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
             todayEntryPreview.setBorderColor(borderColor);
-            expiredEntryPreview.setBorderColor(mixTwoColors(borderColor, borderColorExpired, DEFAULT_COLOR_MIX_FACTOR));
+            expiredEntryPreview.setBorderColor(mixTwoColors(borderColor, borderColorExpired, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         }
     }
 }
