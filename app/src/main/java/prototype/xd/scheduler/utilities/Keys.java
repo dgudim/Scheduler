@@ -48,7 +48,7 @@ public class Keys {
     public static final boolean SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT = false;
     
     public static final float DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR = 0.75f;
-    public static final float DEFAULT_CALENDAR_EVENT_COLOR_MIX_FACTOR = 0.50f;
+    public static final float DEFAULT_CALENDAR_EVENT_COLOR_MIX_FACTOR = 0.85f;
     
     public static final int DAY_FLAG_GLOBAL = -1;
     public static final String DAY_FLAG_GLOBAL_STR = "-1";
