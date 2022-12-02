@@ -16,10 +16,6 @@ android {
 
     signingConfigs {
         release {
-
-        }
-        debug {
-
         }
     }
 
@@ -31,8 +27,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 32
         versionCode getVersionCode()
-        resValue "string", "app_version_combined", "${defaultConfig.versionName} (${defaultConfig.versionCode})"
-        signingConfigs.debug
+        signingConfig signingConfigs.debug
     }
 
     buildTypes {
@@ -40,11 +35,13 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             defaultConfig.versionName getVersionName()
+            resValue "string", "app_version_combined", "Scheduler v${getVersionName()} (${getVersionCode()})"
         }
         debug {
             renderscriptDebuggable true
             jniDebuggable true
             defaultConfig.versionName "${getVersionName()}.debug"
+            resValue "string", "app_version_combined", "Scheduler v${getVersionName()}.debug (${getVersionCode()})"
         }
 
     }
