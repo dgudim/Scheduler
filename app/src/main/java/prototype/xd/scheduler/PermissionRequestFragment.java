@@ -65,7 +65,6 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.READ_CALENDAR,
                     Manifest.permission.POST_NOTIFICATIONS}));
-            // TODO: 01.12.2022 investigate
         } else {
             // normal permissions
             bnd.grantPermissionsButton.setOnClickListener(v -> requestPermissionLauncher.launch(new String[]{

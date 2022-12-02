@@ -5,6 +5,7 @@
     <string name="settings_fragment_label">Settings Fragment</string>
     <string name="nav_drawer_open">Open drawer</string>
     <string name="nav_drawer_close">Close drawer</string>
+    <string name="please_read_the_notes" type="id">Please read the notes</string>
     <string name="delete_item">Delete item</string>
     <string name="settings_state_symbol" translatable="false">⬧</string>
     <string name="calendar_event_all_day">all day</string>

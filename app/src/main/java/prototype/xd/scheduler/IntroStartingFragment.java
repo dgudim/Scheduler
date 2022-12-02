@@ -36,8 +36,7 @@ public class IntroStartingFragment extends Fragment implements SlidePolicy {
     
     @Override
     public void onUserIllegallyRequestedNextPage() {
-        // TODO: 01.12.2022 russian
-        Toast.makeText(getActivity(), "Please read the notes",
+        Toast.makeText(getActivity(), getString(R.string.please_read_the_notes),
                 Toast.LENGTH_LONG).show();
     }
 }

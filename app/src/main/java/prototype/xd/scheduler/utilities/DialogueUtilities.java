@@ -49,8 +49,6 @@ public class DialogueUtilities {
                 });
     }
     
-    // TODO: 20.11.2022 close dialogs on activity exit? 
-    
     public static void displayConfirmationDialogue(Context context,
                                                    @NonNull Lifecycle lifecycle,
                                                    @StringRes int titleStringResource,
