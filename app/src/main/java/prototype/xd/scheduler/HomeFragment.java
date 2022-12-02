@@ -93,7 +93,17 @@ public class HomeFragment extends Fragment {
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
     
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                requireActivity(), wrapperBnd.getRoot(), contentBnd.toolbar, R.string.app_intro_next_button, R.string.permission_request);
+                requireActivity(), wrapperBnd.getRoot(), contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+                // move all content to the right when drawer opens
+                float moveFactor = wrapperBnd.navViewWrapper.getWidth() * slideOffset / 3;
+                contentBnd.getRoot().setTranslationX(moveFactor);
+                contentBnd.getRoot().setScaleX(1 - slideOffset / 20);
+                contentBnd.getRoot().setScaleY(1 - slideOffset / 20);
+            }
+        };
         wrapperBnd.getRoot().addDrawerListener(toggle);
         toggle.syncState();
     

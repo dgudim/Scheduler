@@ -126,4 +126,6 @@
     <string name="read_and_understood">Я прочитал и понял все вышесказанное</string>
     <string name="select_view">Выберите вид</string>
     <string name="choose_how_items_look">выберите, как элементы будут выглядеть на экране блокировки</string>
+    <string name="nav_drawer_open">Открыть боковое меню</string>
+    <string name="nav_drawer_close">Закрыть боковое меню</string>
 </resources>

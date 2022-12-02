@@ -3,6 +3,8 @@
     <string name="action_settings">Settings</string>
     <string name="home_fragment_label">Home Fragment</string>
     <string name="settings_fragment_label">Settings Fragment</string>
+    <string name="nav_drawer_open">Open drawer</string>
+    <string name="nav_drawer_close">Close drawer</string>
     <string name="delete_item">Delete item</string>
     <string name="settings_state_symbol" translatable="false">⬧</string>
     <string name="calendar_event_all_day">all day</string>
