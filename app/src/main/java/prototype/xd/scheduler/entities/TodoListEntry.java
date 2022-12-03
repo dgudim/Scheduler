@@ -205,6 +205,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     // for listening to parameter changes
     private transient ParameterInvalidationListener parameterInvalidationListener;
     
+    private transient TodoListEntryList associatedList;
+    
     private static ArrayMap<String, Parameter<?>> mapParameters(TodoListEntry entry) {
         ArrayMap<String, Parameter<?>> parameterMap = new ArrayMap<>(8);
         parameterMap.put(Keys.BG_COLOR, entry.bgColor);
@@ -218,7 +220,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return parameterMap;
     }
     
-    public TodoListEntry(SystemCalendarEvent event) {
+    public TodoListEntry(SystemCalendarEvent event, @Nullable ParameterInvalidationListener parameterInvalidationListener) {
         this.event = event;
         event.computeDurationInDays();
         
@@ -230,7 +232,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         
         initParameters();
         assignId(event.hashCode());
+        
         event.linkEntry(this);
+        listenToParameterInvalidations(parameterInvalidationListener);
     }
     
     
@@ -354,9 +358,30 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         parameterInvalidationListener = null;
     }
     
+    protected void linkToContainer(TodoListEntryList todoListEntryList) {
+        if (associatedList != null) {
+            log(WARN, NAME, rawTextValue.get() + " already has a container, double linking");
+        }
+        associatedList = todoListEntryList;
+    }
+    
+    protected void unlinkFromContainer() {
+        associatedList = null;
+    }
+    
     protected void unlinkFromCalendarEvent() {
         if (isFromSystemCalendar()) {
             event.unlinkEntry();
+        }
+    }
+    
+    protected void removeFromContainer() {
+        if (associatedList == null) {
+            log(WARN, NAME, rawTextValue.get() + " is not in a container, can't remove");
+        } else {
+            if (!associatedList.remove(this)) {
+                log(WARN, NAME, rawTextValue.get() + " error removing from the container");
+            }
         }
     }
     
@@ -474,10 +499,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     private boolean inRange(long day, long instanceStartDay) {
         return isGlobal() ||
-                (day >= instanceStartDay - upcomingDayOffset.getToday() &&
+                (instanceStartDay - upcomingDayOffset.getToday() <= day &&
                         day <= instanceStartDay + durationDays.get() + expiredDayOffset.getToday());
-        // | days after the event ended ------ event start |event| event end ------ days before the event starts |
-        // | ++++++++++++++++++++++++++       -------------|-----|----------        +++++++++++++++++++++++++++++|
     }
     
     public boolean isCompleted() {
@@ -509,11 +532,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    public boolean visibleInList(long day) {
+    public boolean visibleInList(long day, boolean fetchUpcomingExpired) {
         boolean show = isVisible(day);
         EntryType entryType = getEntryType(day);
         if (entryType == EntryType.EXPIRED || entryType == EntryType.UPCOMING) {
-            return show && !isCompleted();
+            return fetchUpcomingExpired && show && !isCompleted();
         } else {
             return show;
         }
@@ -556,7 +579,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             }
             return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
                 // we overshot
-                if (instanceStartDay + upcomingDayOffset.getToday() > targetDay) {
+                if (instanceStartDay - upcomingDayOffset.getToday() > targetDay) {
                     return false;
                 }
                 // check if we fall in range
@@ -590,10 +613,10 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     // get on what days from min to max an entry is visible (and was before invalidation)
-    public void addVisibleDays(long minDay, long maxDay, Set<Long> daySet) {
+    public void addVisibleDays(long minDay, long maxDay, Set<Long> daySet, boolean updateUpcomingExpired) {
         // get max between previous range and current
-        long maxUpcomingDayOffset = max(this.upcomingDayOffset.getDiscarded(0), this.upcomingDayOffset.getToday());
-        long maxExpiredDayOffset = max(this.expiredDayOffset.getDiscarded(0), this.expiredDayOffset.getToday());
+        long maxUpcomingDayOffset = updateUpcomingExpired ? max(this.upcomingDayOffset.getDiscarded(0), this.upcomingDayOffset.getToday()) : 0;
+        long maxExpiredDayOffset = updateUpcomingExpired ? max(this.expiredDayOffset.getDiscarded(0), this.expiredDayOffset.getToday()) : 0;
         
         if (recurrenceSet != null) {
             iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
@@ -615,9 +638,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     // return on what days from min to max an entry is visible (and was before invalidation)
-    public Set<Long> getVisibleDays(long minDay, long maxDay) {
+    public Set<Long> getVisibleDays(long minDay, long maxDay, boolean updateUpcomingExpired) {
         Set<Long> daySet = new ArraySet<>();
-        addVisibleDays(minDay, maxDay, daySet);
+        addVisibleDays(minDay, maxDay, daySet, updateUpcomingExpired);
         return daySet;
     }
     

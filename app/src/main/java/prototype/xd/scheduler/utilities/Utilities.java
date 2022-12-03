@@ -11,6 +11,7 @@ import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 
 import android.app.Activity;
@@ -57,6 +58,7 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoListEntry.ParameterInvalidationListener;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
@@ -97,16 +99,22 @@ public class Utilities {
         }
     }
     
-    public static List<TodoListEntry> loadTodoEntries(Context context, long dayStart, long dayEnd, GroupList groups,
-                                                    @Nullable List<SystemCalendar> calendars, boolean attachGroupToEntry) {
-    
+    public static List<TodoListEntry> loadTodoEntries(Context context,
+                                                      long dayStart, long dayEnd,
+                                                      GroupList groups,
+                                                      @Nullable List<SystemCalendar> calendars,
+                                                      boolean attachGroupToEntry,
+                                                      @Nullable ParameterInvalidationListener parameterInvalidationListener) {
+        
         List<TodoListEntry> readEntries = new ArrayList<>();
         try {
             readEntries = loadObject(ENTRIES_FILE);
             
             int id = 0;
             for (TodoListEntry entry : readEntries) {
+                // post deserialize
                 entry.initGroupAndId(groups, id++, attachGroupToEntry);
+                entry.listenToParameterInvalidations(parameterInvalidationListener);
             }
             
             log(INFO, NAME, "Read todo list: " + readEntries.size());
@@ -116,7 +124,10 @@ public class Utilities {
             logException(NAME, e);
         }
         
-        readEntries.addAll(getTodoListEntriesFromCalendars(context, dayStart, dayEnd, calendars));
+        readEntries.addAll(getTodoListEntriesFromCalendars(
+                dayStart, dayEnd,
+                calendars == null ? getAllCalendars(context, false) : calendars,
+                parameterInvalidationListener));
         return readEntries;
     }
     
@@ -245,7 +256,7 @@ public class Utilities {
                     otherEntries.add(entry);
             }
         }
-    
+        
         List<TodoListEntry> merged = new ArrayList<>();
         merged.addAll(todayEntries);
         merged.addAll(globalEntries);

@@ -65,7 +65,9 @@ public class SettingsFragment extends DialogFragment {
         settingsEntries.add(new SeekBarSettingsEntryConfig(0, 10, Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE, true, true,
                 Keys.ADAPTIVE_COLOR_BALANCE, R.string.settings_adaptive_color_balance));
         settingsEntries.add(new CompoundCustomizationEntryConfig());
-        
+        settingsEntries.add(new SwitchSettingsEntryConfig(
+                Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK,
+                getString(R.string.settings_max_rWidth_lock)));
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_visibility)));
         settingsEntries.add(new SeekBarSettingsEntryConfig(0, 14, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET, true, false,
@@ -76,11 +78,11 @@ public class SettingsFragment extends DialogFragment {
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME,
                 getString(R.string.settings_hide_expired_entries_by_time)));
         settingsEntries.add(new SwitchSettingsEntryConfig(
+                Keys.SHOW_UPCOMING_EXPIRED_INDICATORS, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_INDICATORS,
+                getString(R.string.show_upcoming_and_expired_event_indicators)));
+        settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK,
                 getString(R.string.settings_show_global_items_lock)));
-        settingsEntries.add(new SwitchSettingsEntryConfig(
-                Keys.ITEM_FULL_WIDTH_LOCK, Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK,
-                getString(R.string.settings_max_rWidth_lock)));
         
         settingsEntries.add(new ResetButtonSettingsEntryConfig(this, savedInstanceState));
         

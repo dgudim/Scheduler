@@ -130,5 +130,6 @@
     <string name="read_and_understood">I have read and understood all the things above</string>
     <string name="select_view">Select view</string>
     <string name="choose_how_items_look">choose how items will look on your lockscreen</string>
+    <string name="show_upcoming_and_expired_event_indicators">Show upcoming and expired event inidcators in calendar</string>
 
 </resources>

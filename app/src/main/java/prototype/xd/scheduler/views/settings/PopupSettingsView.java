@@ -38,7 +38,7 @@ public abstract class PopupSettingsView {
         dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
                 .setOnDismissListener(dialog -> {
                     if (todoListEntryManager != null) {
-                        todoListEntryManager.ensureUpToDate();
+                        todoListEntryManager.performDeferredTasks();
                     }
                 }).setView(bnd.getRoot()).create();
         lifecycle.addObserver(new DialogDismissLifecycleObserver(dialog));

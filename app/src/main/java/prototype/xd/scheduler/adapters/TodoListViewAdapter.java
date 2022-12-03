@@ -85,7 +85,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                     } else {
                         currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                     }
-                    todoListEntryManager.ensureUpToDate();
+                    todoListEntryManager.performDeferredTasks();
                 });
                 
                 bnd.getRoot().setOnLongClickListener(view1 -> {
@@ -100,7 +100,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                     currentEntry.changeGroup(groupList.get(selectedIndex));
                                 }
                                 currentEntry.changeParameter(TEXT_VALUE, text);
-                                todoListEntryManager.ensureUpToDate();
+                                todoListEntryManager.performDeferredTasks();
                                 return true;
                             },
                             !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
@@ -109,7 +109,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                 }
                                 currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
                                 currentEntry.changeParameter(IS_COMPLETED, "false");
-                                todoListEntryManager.ensureUpToDate();
+                                todoListEntryManager.performDeferredTasks();
                                 return true;
                             } : null);
                     return true;

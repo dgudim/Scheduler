@@ -168,21 +168,25 @@ public class CalendarView {
                 YearMonth prevMonth = selectedMonth;
                 selectedMonth = calendarMonth.getYearMonth();
                 
-                firstMonthDay = selectedMonth.atDay(1).toEpochDay();
-                lastMonthDay = selectedMonth.atEndOfMonth().toEpochDay();
-                
-                CalendarDay firstVisibleCalendarDay = rootCalendarView.findFirstVisibleDay();
-                CalendarDay lastVisibleCalendarDay = rootCalendarView.findLastVisibleDay();
-
-                firstVisibleDay = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstMonthDay;
-                lastVisibleDay = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastMonthDay;
-                
-                if (monthPreChangeListener != null) {
-                    monthPreChangeListener.onMonthChanged(
-                            prevMonth,
-                            firstMonthDay,
-                            lastMonthDay,
-                            rootCalendarView.getContext());
+                // prevMonth = selectedMonth when we call notifyMonthChanged, so we ignore those ones
+                if (prevMonth != selectedMonth) {
+                    
+                    firstMonthDay = selectedMonth.atDay(1).toEpochDay();
+                    lastMonthDay = selectedMonth.atEndOfMonth().toEpochDay();
+                    
+                    CalendarDay firstVisibleCalendarDay = rootCalendarView.findFirstVisibleDay();
+                    CalendarDay lastVisibleCalendarDay = rootCalendarView.findLastVisibleDay();
+                    
+                    firstVisibleDay = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstMonthDay;
+                    lastVisibleDay = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastMonthDay;
+                    
+                    if (monthPreChangeListener != null) {
+                        monthPreChangeListener.onMonthChanged(
+                                prevMonth,
+                                firstMonthDay,
+                                lastMonthDay,
+                                rootCalendarView.getContext());
+                    }
                 }
             }
         });
@@ -243,6 +247,7 @@ public class CalendarView {
     public void notifyVisibleDaysChanged() {
         if (selectedMonth != null) {
             // internally will rebind all visible dates
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++++" + selectedMonth);
             rootCalendarView.notifyMonthChanged(selectedMonth);
         }
     }

@@ -32,7 +32,7 @@ public class SystemCalendarEvent {
     
     private static final String NAME = "System calendar event";
     
-    private @Nullable TodoListEntry associatedEntry;
+    protected @Nullable TodoListEntry associatedEntry;
     protected SystemCalendar associatedCalendar;
     
     public List<String> subKeys;

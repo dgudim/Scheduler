@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class SystemCalendar {
     public final String account_name;
     
     private final String prefKey;
+    private final String visibilityKey;
     public final long id;
     public final int accessLevel;
     
@@ -54,6 +56,7 @@ public class SystemCalendar {
         color = getInt(cursor, calendarColumns, Calendars.CALENDAR_COLOR);
         
         prefKey = account_name + "_" + name;
+        visibilityKey = prefKey + "_" + Keys.VISIBLE;
         
         String timeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
         
@@ -135,17 +138,21 @@ public class SystemCalendar {
         cursor.close();
     }
     
+    public boolean isVisible() {
+        return preferences.getBoolean(visibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE);
+    }
+    
     public List<SystemCalendarEvent> getVisibleTodoListEvents(long dayStart, long dayEnd) {
-        List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
-        String visibilityKey = prefKey + "_" + Keys.VISIBLE;
-        if (preferences.getBoolean(visibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE)) {
+        if(isVisible()) {
+            List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.fallsInRange(dayStart, dayEnd)) {
                     visibleEvents.add(event);
                 }
             }
+            return visibleEvents;
         }
-        return visibleEvents;
+        return Collections.emptyList();
     }
     
     protected void invalidateParameterOnEvents(String parameterKey, int color) {
@@ -160,6 +167,14 @@ public class SystemCalendar {
         systemCalendarEvents.forEach(event -> {
             if (event.color == color) {
                 event.invalidateAllParameters();
+            }
+        });
+    }
+    
+    public void unlinkAllTodoListEntries() {
+        systemCalendarEvents.forEach(event -> {
+            if (event.associatedEntry != null) {
+                event.associatedEntry.removeFromContainer();
             }
         });
     }

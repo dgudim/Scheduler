@@ -72,7 +72,7 @@ class LockScreenBitmapDrawer {
     public LockScreenBitmapDrawer(Context context) throws IllegalStateException {
         wallpaperManager = WallpaperManager.getInstance(context);
         preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-    
+        
         if (preferences.getFloat(DISPLAY_METRICS_DENSITY, -1) == -1) {
             DisplayMetrics displayMetrics = new DisplayMetrics();
             ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(displayMetrics);
@@ -138,6 +138,7 @@ class LockScreenBitmapDrawer {
                             if (defFile.exists()) {
                                 bitmap = readStream(new FileInputStream(defFile));
                             } else {
+                                // TODO: 03.12.2022 display a warning to the user
                                 throw new FileNotFoundException("No available background to load");
                             }
                         }
@@ -171,10 +172,12 @@ class LockScreenBitmapDrawer {
         // load user defined entries (from files)
         // add entries from all calendars spanning 4 weeks
         // sort and filter entries
-        List<TodoListEntry> toAdd =
-                filterEntries(
-                        sortEntries(
-                                loadTodoEntries(context, currentDay - 14, currentDay + 14, groups, null, false), currentDay));
+        List<TodoListEntry> toAdd = filterEntries(sortEntries(loadTodoEntries(
+                context,
+                currentDay - 14,
+                currentDay + 14,
+                groups, null,
+                false, null), currentDay));
         
         long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDay + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {
