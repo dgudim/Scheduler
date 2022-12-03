@@ -26,7 +26,8 @@ android {
         applicationId "prototype.xd.scheduler"
         minSdkVersion 26
         targetSdkVersion 32
-        versionCode getVersionCode()
+        versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         signingConfig signingConfigs.debug
     }
 
@@ -34,14 +35,15 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            defaultConfig.versionName getVersionName()
-            resValue "string", "app_version_combined", "Scheduler v${getVersionName()} (${getVersionCode()})"
+            versionNameSuffix '.release'
+            resValue "string", "app_version_combined", "Scheduler v${defaultConfig.versionName}.release (${defaultConfig.versionCode})"
         }
         debug {
             renderscriptDebuggable true
             jniDebuggable true
-            defaultConfig.versionName "${getVersionName()}.debug"
-            resValue "string", "app_version_combined", "Scheduler v${getVersionName()}.debug (${getVersionCode()})"
+            debuggable true
+            versionNameSuffix '.debug'
+            resValue "string", "app_version_combined", "Scheduler v${defaultConfig.versionName}.debug (${defaultConfig.versionCode})"
         }
 
     }
