@@ -14,9 +14,9 @@ $text =~ s/[\x00-\x20]+/ /g;
 $text =~ s/\A //;
 $text =~ s/ \z//;
 
-$text =~ s/\/(p|div)> /\/$1>/g;
+$text =~ s/(p|div|ol|ul|li|blockquote|cite|dd|dl|dt)\>\s/$1>/gi;
 $text =~ s/br> /br>/g;
-$text =~ s/ <(p|br|div)/<$1/g;
+$text =~ s/\s<\/(p|br|div|ol|ul|li|blockquote|cite|dd|dl|dt)/<\/$1/gi;
 
 open(my $fh,">:utf8",$file) or die "$file $!";
 say $fh $text;
