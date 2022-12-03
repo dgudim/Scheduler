@@ -1,0 +1,5 @@
+Several bugs fixed:
+Event indicators behaving weird
+Events not respecting upcoming/expired sliders
+Calendars not hiding when their show checkbox is unchecked
+General bugs
