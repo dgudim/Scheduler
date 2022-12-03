@@ -29,8 +29,8 @@ else
   git commit --all
 
   git tag "$TAG"
-  gh release create "$TAG" -F "$CHANGELOG" ./app/build/outputs/apk/*/*.apk
   git push --tags
+  gh release create "$TAG" -F "$CHANGELOG" ./app/build/outputs/apk/*/*.apk
 
 fi
 
