@@ -16,9 +16,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,7 +53,7 @@ public class HomeFragment extends Fragment {
     
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    
+        
         HomeFragmentWrapperBinding wrapperBnd = HomeFragmentWrapperBinding.inflate(inflater, container, false);
         contentBnd = wrapperBnd.contentWrapper;
         
@@ -89,11 +91,13 @@ public class HomeFragment extends Fragment {
             // update calendar updating indicators
             todoListEntryManager.invalidateCalendar();
         }));
-    
+        
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
-    
+        
+        DrawerLayout drawerLayout = wrapperBnd.getRoot();
+        
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                requireActivity(), wrapperBnd.getRoot(), contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
+                requireActivity(), drawerLayout, contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
@@ -104,9 +108,23 @@ public class HomeFragment extends Fragment {
                 contentBnd.getRoot().setScaleY(1 - slideOffset / 20);
             }
         };
-        wrapperBnd.getRoot().addDrawerListener(toggle);
+        drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-    
+        
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(wrapperBnd.navViewWrapper)) {
+                    drawerLayout.closeDrawer(wrapperBnd.navViewWrapper);
+                } else {
+                    // prevent stack overflow
+                    setEnabled(false);
+                    requireActivity().onBackPressed();
+                    setEnabled(true);
+                }
+            }
+        });
+        
         contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoListEntryManager.getGroups();
             displayEditTextSpinnerDialogue(view1.getContext(), getLifecycle(),
