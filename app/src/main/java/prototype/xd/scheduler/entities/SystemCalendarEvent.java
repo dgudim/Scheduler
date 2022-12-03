@@ -216,7 +216,7 @@ public class SystemCalendarEvent {
         return prefKey;
     }
     
-    private static class DateTimeZonePair{
+    private static class DateTimeZonePair {
     
         String date;
         TimeZone timeZone;
@@ -242,8 +242,8 @@ public class SystemCalendarEvent {
         return rangesOverlap(startMsUTC, endMsUTC, dayStart, dayEnd);
     }
     
-    private boolean rangesOverlap(long start, long end, long dayStart, long dayEnd) {
-        return daysFromMsUTC(start, timeZone) <= dayEnd && daysFromMsUTC(end, timeZone) >= dayStart;
+    private boolean rangesOverlap(long startMsUTC, long endMsUTC, long dayStart, long dayEnd) {
+        return daysFromMsUTC(startMsUTC, timeZone) <= dayEnd && daysFromMsUTC(endMsUTC, timeZone) >= dayStart;
     }
     
     public void addExceptions(Long[] exceptions) {

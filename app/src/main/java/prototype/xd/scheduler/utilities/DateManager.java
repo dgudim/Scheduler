@@ -28,17 +28,20 @@ public class DateManager {
     private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.ROOT);
     private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ROOT);
     
-    public static void updateDate(long day, boolean updateCurrentlySelected) {
+    public static void updateDate() {
         currentTimestamp = getCurrentTimestamp();
         currentDate = LocalDate.now();
         currentDay = currentDate.toEpochDay();
-        if (updateCurrentlySelected) {
-            if (day == DAY_FLAG_GLOBAL) {
-                currentlySelectedDay = currentDay;
-            } else {
-                currentlySelectedDay = day;
-            }
-        }
+    }
+    
+    public static void selectDay(long day) {
+        updateDate();
+        currentlySelectedDay = day;
+    }
+    
+    public static void selectCurrentDay() {
+        updateDate();
+        currentlySelectedDay = currentDay;
     }
     
     public static String getTimeSpan(long timeFromMsUTC, long timeToMsUTC) {

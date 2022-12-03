@@ -3,10 +3,10 @@ package prototype.xd.scheduler;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
-import static prototype.xd.scheduler.utilities.DateManager.updateDate;
+import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
+import static prototype.xd.scheduler.utilities.DateManager.selectDay;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
@@ -57,10 +57,12 @@ public class HomeFragment extends Fragment {
         HomeFragmentWrapperBinding wrapperBnd = HomeFragmentWrapperBinding.inflate(inflater, container, false);
         contentBnd = wrapperBnd.contentWrapper;
         
-        
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         contentBnd.content.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
+    
+        // init date manager
+        selectCurrentDay();
         
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoListEntryManager);
@@ -68,7 +70,7 @@ public class HomeFragment extends Fragment {
         
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
-            updateDate(selectedDate.toEpochDay(), true);
+            selectDay(selectedDate.toEpochDay());
             todoListEntryManager.invalidateArrayAdapter();
             updateStatusText();
         });
@@ -84,7 +86,6 @@ public class HomeFragment extends Fragment {
         
         // when all entries are loaded, update current month
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
-            updateDate(DAY_FLAG_GLOBAL, true);
             updateStatusText();
             // update adapter showing entries
             todoListEntryManager.invalidateArrayAdapter();

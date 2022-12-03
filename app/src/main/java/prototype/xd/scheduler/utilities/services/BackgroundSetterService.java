@@ -5,7 +5,6 @@ import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimeString;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
@@ -146,7 +145,7 @@ public class BackgroundSetterService extends Service {
                 log(DEBUG, NAME, "received ping (keep alive job)");
             } else {
                 log(DEBUG, NAME, "received general ping");
-                updateDate(DAY_FLAG_GLOBAL, false);
+                updateDate();
                 lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
                 updateNotification();
             }

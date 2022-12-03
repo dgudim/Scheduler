@@ -266,6 +266,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     public List<ColorStateList> getEventIndicators(long day, boolean offTheCalendar, Context context) {
         
         List<Integer> colors = getIndicatorRawColors(day);
+        
         List<ColorStateList> entryIndicators = new ArrayList<>(colors.size());
         
         for (int color : colors) {

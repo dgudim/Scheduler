@@ -25,6 +25,8 @@ import prototype.xd.scheduler.entities.TodoListEntry;
 
 public class SystemCalendarUtils {
     
+    private static final String NAME = "CalendarUtils";
+    
     private SystemCalendarUtils() {
         throw new IllegalStateException("System calendar utility class");
     }
@@ -67,6 +69,7 @@ public class SystemCalendarUtils {
             cursor.moveToNext();
         }
         cursor.close();
+        log(INFO, NAME, "Loaded " + systemCalendars.size() + " calendars");
         return systemCalendars;
     }
     
@@ -80,7 +83,7 @@ public class SystemCalendarUtils {
                 todoListEntries.add(new TodoListEntry(event));
             }
         }
-        log(INFO, "CalendarUtils", "read calendar entries: " + todoListEntries.size());
+        log(INFO, NAME, "Read calendar entries: " + todoListEntries.size());
         return todoListEntries;
     }
     
