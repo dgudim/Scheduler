@@ -13,7 +13,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,13 +74,12 @@ public class SystemCalendarUtils {
     }
     
     public static List<TodoListEntry> getTodoListEntriesFromCalendars(long dayStart, long dayEnd,
-                                                                      @NonNull List<SystemCalendar> calendars,
-                                                                      @Nullable TodoListEntry.ParameterInvalidationListener parameterInvalidationListener) {
+                                                                      @NonNull List<SystemCalendar> calendars) {
         List<TodoListEntry> todoListEntries = new ArrayList<>();
         for (SystemCalendar calendar : calendars) {
             // add all events from all calendars
             for (SystemCalendarEvent event : calendar.getVisibleTodoListEvents(dayStart, dayEnd)) {
-                todoListEntries.add(new TodoListEntry(event, parameterInvalidationListener));
+                todoListEntries.add(new TodoListEntry(event));
             }
         }
         log(INFO, NAME, "Read calendar entries: " + todoListEntries.size());

@@ -45,7 +45,7 @@ public class Keys {
     public static final int SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET = 0;
     public static final int SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET = 0;
     
-    public static final boolean SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_INDICATORS = true;
+    public static final boolean SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST = true;
     
     public static final boolean SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT = false;
     
@@ -92,7 +92,7 @@ public class Keys {
     public static final String UPCOMING_ITEMS_OFFSET = "dayOffset_upcoming";
     public static final String EXPIRED_ITEMS_OFFSET = "dayOffset_expired";
     
-    public static final String SHOW_UPCOMING_EXPIRED_INDICATORS = "upcomingExpiredIndicatorsVisible";
+    public static final String SHOW_UPCOMING_EXPIRED_IN_LIST = "upcomingExpiredVisibleInList";
     
     public static final String SHOW_GLOBAL_ITEMS_LOCK = "show_global_tasks_lock";
     

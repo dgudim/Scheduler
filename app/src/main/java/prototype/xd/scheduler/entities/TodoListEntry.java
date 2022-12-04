@@ -220,7 +220,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return parameterMap;
     }
     
-    public TodoListEntry(SystemCalendarEvent event, @Nullable ParameterInvalidationListener parameterInvalidationListener) {
+    public TodoListEntry(SystemCalendarEvent event) {
         this.event = event;
         event.computeDurationInDays();
         
@@ -234,7 +234,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         assignId(event.hashCode());
         
         event.linkEntry(this);
-        listenToParameterInvalidations(parameterInvalidationListener);
     }
     
     

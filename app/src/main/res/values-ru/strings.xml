@@ -129,5 +129,5 @@
     <string name="nav_drawer_open">Открыть боковое меню</string>
     <string name="nav_drawer_close">Закрыть боковое меню</string>
     <string name="please_read_the_notes">Пожалуйста прочитайте информацию</string>
-    <string name="show_upcoming_and_expired_event_indicators">Показывать индикаторы для прошедших и будущих событий в календаре</string>
+    <string name="show_upcoming_and_expired_event_indicators">Показывать прошедшие и будущие события в календаре</string>
 </resources>

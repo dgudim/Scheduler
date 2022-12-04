@@ -58,7 +58,6 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.TodoListEntry.ParameterInvalidationListener;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
@@ -103,8 +102,7 @@ public class Utilities {
                                                       long dayStart, long dayEnd,
                                                       GroupList groups,
                                                       @Nullable List<SystemCalendar> calendars,
-                                                      boolean attachGroupToEntry,
-                                                      @Nullable ParameterInvalidationListener parameterInvalidationListener) {
+                                                      boolean attachGroupToEntry) {
         
         List<TodoListEntry> readEntries = new ArrayList<>();
         try {
@@ -114,7 +112,6 @@ public class Utilities {
             for (TodoListEntry entry : readEntries) {
                 // post deserialize
                 entry.initGroupAndId(groups, id++, attachGroupToEntry);
-                entry.listenToParameterInvalidations(parameterInvalidationListener);
             }
             
             log(INFO, NAME, "Read todo list: " + readEntries.size());
@@ -126,8 +123,7 @@ public class Utilities {
         
         readEntries.addAll(getTodoListEntriesFromCalendars(
                 dayStart, dayEnd,
-                calendars == null ? getAllCalendars(context, false) : calendars,
-                parameterInvalidationListener));
+                calendars == null ? getAllCalendars(context, false) : calendars));
         return readEntries;
     }
     

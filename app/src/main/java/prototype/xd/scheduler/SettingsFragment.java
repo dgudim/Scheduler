@@ -78,7 +78,7 @@ public class SettingsFragment extends DialogFragment {
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME,
                 getString(R.string.settings_hide_expired_entries_by_time)));
         settingsEntries.add(new SwitchSettingsEntryConfig(
-                Keys.SHOW_UPCOMING_EXPIRED_INDICATORS, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_INDICATORS,
+                Keys.SHOW_UPCOMING_EXPIRED_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST,
                 getString(R.string.show_upcoming_and_expired_event_indicators)));
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK,

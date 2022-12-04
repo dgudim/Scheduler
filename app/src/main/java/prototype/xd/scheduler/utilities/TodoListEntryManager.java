@@ -79,8 +79,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private @Nullable
     Runnable onInitFinishedRunnable;
     
-    private boolean displayUpcomingExpiredIndicators;
-    private ArrayMap<SystemCalendar, Boolean> calendarVisibilityMap;
+    private boolean displayUpcomingExpired;
+    private final ArrayMap<SystemCalendar, Boolean> calendarVisibilityMap;
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
     
@@ -98,7 +98,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             if (parameters.contains(BG_COLOR) ||
                     parameters.contains(UPCOMING_ITEMS_OFFSET) ||
                     parameters.contains(EXPIRED_ITEMS_OFFSET)) {
-                entry.addVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(), daysToRebind, displayUpcomingExpiredIndicators);
+                entry.addVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(), daysToRebind, displayUpcomingExpired);
             }
             
             // we should save the entries but now now because sometimes we change parameters frequently
@@ -135,13 +135,15 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                 calendarVisibilityMap.put(calendar, calendar.isVisible());
             }
             
-            todoListEntries.addAll(loadTodoEntries(context,
-                    currentDay - 30,
-                    currentDay + 30,
-                    groups, calendars,
-                    true, parameterInvalidationListener));
             loadedDay_start = currentDay - 30;
             loadedDay_end = currentDay + 30;
+            
+            todoListEntries.addAll(loadTodoEntries(context,
+                    loadedDay_start,
+                    loadedDay_end,
+                    groups, calendars,
+                    true), parameterInvalidationListener);
+            
             
             initFinished = true;
             // clear cached indicators, fetch current ones later
@@ -211,9 +213,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     public void updateStaticVarsAndCalendarVisibility() {
-        displayUpcomingExpiredIndicators = preferences.getBoolean(
-                Keys.SHOW_UPCOMING_EXPIRED_INDICATORS,
-                Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_INDICATORS);
+        displayUpcomingExpired = preferences.getBoolean(
+                Keys.SHOW_UPCOMING_EXPIRED_IN_LIST,
+                Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST);
         
         if (!calendarVisibilityMap.isEmpty()) {
             for (SystemCalendar calendar : calendars) {
@@ -293,7 +295,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         List<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
         // get all entries visible on a particular day
         for (TodoListEntry todoEntry : todoListEntries) {
-            if (todoEntry.visibleInList(day, true)) {
+            if (todoEntry.visibleInList(day, displayUpcomingExpired)) {
                 filteredTodoListEntries.add(todoEntry);
             }
         }
@@ -327,7 +329,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         List<TodoListEntry> filteredTodoListEntries = new ArrayList<>();
         // get all relevant entries
         for (TodoListEntry todoEntry : todoListEntries) {
-            if (!todoEntry.isGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day, displayUpcomingExpiredIndicators)) {
+            if (!todoEntry.isGlobal() && !todoEntry.isCompleted() && todoEntry.visibleInList(day, displayUpcomingExpired)) {
                 filteredTodoListEntries.add(todoEntry);
             }
         }
@@ -373,7 +375,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         for (SystemCalendarEvent event : eventsToAdd) {
             // if the event hasn't been associated with an entry, add it
             if (!event.isAssociatedWithEntry()) {
-                todoListEntries.add(new TodoListEntry(event, parameterInvalidationListener));
+                todoListEntries.add(new TodoListEntry(event), parameterInvalidationListener);
             }
         }
     }
@@ -400,7 +402,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     // entry added / removed
     private void entryListChanged(TodoListEntry entry) {
         if (calendarView != null) {
-            notifyDaysChanged(entry.getVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(), displayUpcomingExpiredIndicators));
+            notifyDaysChanged(entry.getVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(), displayUpcomingExpired));
         }
         invalidateArrayAdapter();
         if (entry.isVisibleOnLockscreenToday()) {
