@@ -71,7 +71,7 @@ public class HomeFragment extends Fragment {
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             selectDay(selectedDate.toEpochDay());
-            todoListEntryManager.invalidateArrayAdapter();
+            todoListEntryManager.invalidateEntryList();
             updateStatusText();
         });
         
@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment {
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
             updateStatusText();
             // update adapter showing entries
-            todoListEntryManager.invalidateArrayAdapter();
+            todoListEntryManager.invalidateEntryList();
             // update calendar updating indicators
             todoListEntryManager.invalidateCalendar();
         }));

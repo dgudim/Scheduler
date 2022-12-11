@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
@@ -195,12 +194,6 @@ public class Utilities {
         }
     }
     
-    public static void addDayRangeToSet(final long from, final long to, Set<Long> daySet) {
-        for (long day = from; day <= to; day++) {
-            daySet.add(day);
-        }
-    }
-    
     public static <T extends Fragment> T findFragmentInNavHost(FragmentActivity activity, Class<T> targetFragmentClass) {
         List<Fragment> fragments = Objects.requireNonNull(activity.getSupportFragmentManager()
                         .findFragmentById(R.id.nav_host_fragment))
@@ -230,7 +223,6 @@ public class Utilities {
         List<TodoListEntry> todayEntries = new ArrayList<>();
         List<TodoListEntry> globalEntries = new ArrayList<>();
         List<TodoListEntry> otherEntries = new ArrayList<>();
-        
         
         for (TodoListEntry entry : entries) {
             if (entry.isGlobal()) {

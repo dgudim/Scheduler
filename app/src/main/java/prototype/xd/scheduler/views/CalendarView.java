@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.views;
 
 import static com.kizitonwose.calendar.core.ExtensionsKt.daysOfWeek;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.Utilities.datesEqual;
 
 import android.content.Context;
@@ -41,49 +42,70 @@ public class CalendarView {
         private static final int MAX_INDICATORS = 4;
         
         private final CalendarDayLayoutBinding binding;
+        private final Context context;
         private LocalDate date;
         
         public CalendarDayViewContainer(@NonNull CalendarDayLayoutBinding bnd, CalendarView container) {
             super(bnd.getRoot());
             binding = bnd;
+            context = bnd.getRoot().getContext();
             bnd.calendarDayCard.setOnClickListener(v -> container.selectDate(date));
         }
         
-        private void setEventIndicators(List<ColorStateList> eventIndicatorColors) {
-            for (int i = 0; i < MAX_INDICATORS; i++) {
-                // first index is day text itself
-                View eventIndicator = binding.eventIndicatorContainer.getChildAt(i + 1);
-                if (eventIndicatorColors.size() <= i) {
-                    eventIndicator.setVisibility(View.INVISIBLE);
-                    continue;
-                }
-                eventIndicator.setVisibility(View.VISIBLE);
-                eventIndicator.setBackgroundTintList(eventIndicatorColors.get(i));
+        private void setEventIndicator(int color, int index, boolean visiblePosition, boolean inCalendar) {
+            // first index is day text itself
+            View eventIndicator = binding.eventIndicatorContainer.getChildAt(index + 1);
+            eventIndicator.setVisibility(visiblePosition ? View.VISIBLE : View.INVISIBLE);
+            if (!visiblePosition) {
+                return;
             }
+            
+            if (!inCalendar) {
+                // wix with the surface color dimming the color
+                color = mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), 0.8);
+            }
+            eventIndicator.setBackgroundTintList(ColorStateList.valueOf(color));
+        }
+        
+        // for month dates
+        private void setEventIndicatorInCalendar(int color, int index, boolean visiblePosition) {
+            setEventIndicator(color, index, visiblePosition, true);
+        }
+        
+        // for in and out dates
+        private void setEventIndicatorOffCalendar(int color, int index, boolean visiblePosition) {
+            setEventIndicator(color, index, visiblePosition, false);
         }
         
         public void bind(CalendarDay elementDay, CalendarView calendarView, TodoListEntryManager todoListEntryManager) {
-            Context context = calendarView.rootCalendarView.getContext();
             date = elementDay.getDate();
             binding.calendarDayText.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
             
             DayPosition dayPosition = elementDay.component2();
             
+            int textColor;
+            
             if (dayPosition == DayPosition.MonthDate) {
                 if (datesEqual(date, DateManager.currentDate)) {
-                    binding.calendarDayText.setTextColor(MaterialColors.getColor(context, R.attr.colorPrimary, Color.WHITE));
+                    textColor = MaterialColors.getColor(context, R.attr.colorPrimary, Color.WHITE);
                 } else {
-                    binding.calendarDayText.setTextColor(MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE));
+                    textColor = MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE);
                 }
             } else {
-                binding.calendarDayText.setTextColor(context.getColor(R.color.gray_harmonized));
+                textColor = context.getColor(R.color.gray_harmonized);
             }
             
-            setEventIndicators(todoListEntryManager.getEventIndicators(
-                    date.toEpochDay(),
-                    dayPosition != DayPosition.MonthDate,
-                    context));
+            binding.calendarDayText.setTextColor(textColor);
             
+            if (dayPosition == DayPosition.MonthDate) {
+                todoListEntryManager.processEventIndicators(date.toEpochDay(),
+                        MAX_INDICATORS, this::setEventIndicatorInCalendar);
+            } else {
+                todoListEntryManager.processEventIndicators(date.toEpochDay(),
+                        MAX_INDICATORS, this::setEventIndicatorOffCalendar);
+            }
+            
+            // highlight current date
             if (datesEqual(date, calendarView.selectedDate) && dayPosition == DayPosition.MonthDate) {
                 binding.calendarDayCard.setStrokeColor(MaterialColors.getColor(context, R.attr.colorAccent, Color.WHITE));
                 binding.calendarDayCard.setCardBackgroundColor(MaterialColors.getColor(context, R.attr.colorSurfaceVariant, Color.WHITE));
@@ -247,7 +269,6 @@ public class CalendarView {
     public void notifyVisibleDaysChanged() {
         if (selectedMonth != null) {
             // internally will rebind all visible dates
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++" + selectedMonth);
             rootCalendarView.notifyMonthChanged(selectedMonth);
         }
     }

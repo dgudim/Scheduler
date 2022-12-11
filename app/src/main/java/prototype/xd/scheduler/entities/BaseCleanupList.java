@@ -11,16 +11,8 @@ import java.util.function.UnaryOperator;
 // a list that has a method for cleaning up after removing an entry, useful for TodoListEntries and Groups
 public abstract class BaseCleanupList<T> extends ArrayList<T> {
     
-    protected BaseCleanupList(int initialCapacity) {
-        super(initialCapacity);
-    }
-    
     protected BaseCleanupList() {
         super();
-    }
-    
-    protected BaseCleanupList(@NonNull Collection<? extends T> c) {
-        super(c);
     }
     
     protected abstract @Nullable

@@ -177,7 +177,7 @@ class LockScreenBitmapDrawer {
                 currentDay - 14,
                 currentDay + 14,
                 groups, null,
-                false, null), currentDay));
+                false), currentDay));
         
         long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDay + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {

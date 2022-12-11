@@ -11,7 +11,6 @@ import static prototype.xd.scheduler.utilities.DateManager.daysFromMsUTC;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
-import static prototype.xd.scheduler.utilities.Utilities.addDayRangeToSet;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -531,16 +530,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    public boolean visibleInList(long day, boolean fetchUpcomingExpired) {
-        boolean show = isVisible(day);
-        EntryType entryType = getEntryType(day);
-        if (entryType == EntryType.EXPIRED || entryType == EntryType.UPCOMING) {
-            return fetchUpcomingExpired && show && !isCompleted();
-        } else {
-            return show;
-        }
-    }
-    
     @FunctionalInterface
     interface RecurrenceSetConsumer<T> {
         /**
@@ -611,36 +600,131 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return inRange(targetDay, startDay.get()) && (startMsUTC + durationMsUTC >= targetTimestamp);
     }
     
+    
+    
+    private boolean dayInRange(long day, long from, long to) {
+        return from <= day && day <= to;
+    }
+    
+    private void addDayRangeToSet(long dayFrom, long dayTo,
+                                  final long minDay, final long maxDay,
+                                  @Nullable Set<Long> daySet) {
+        if (daySet != null && (
+                dayInRange(dayFrom, minDay, maxDay) ||
+                        dayInRange(dayTo, minDay, maxDay))) {
+            dayFrom = clamp(dayFrom, minDay, maxDay);
+            dayTo = clamp(dayTo, minDay, maxDay);
+            for (long day = dayFrom; day <= dayTo; day++) {
+                daySet.add(day);
+            }
+        }
+    }
+    
+    private void addDayRangeToSets(long startDay, long endDay,
+                                   long minDay, long maxDay,
+                                   long currentExpiredDayOffset, long currentUpcomingDayOffset,
+                                   long maxExpiredDayOffset, long maxUpcomingDayOffset,
+                                   @Nullable Set<Long> coreDaySet,                   // without any expired/upcoming days
+                                   @Nullable Set<Long> currentUpcomingExpiredSet,    // without old expired/upcoming days
+                                   @Nullable Set<Long> extendedUpcomingExpiredSet) { // with old expired/upcoming days, used for updating
+        addDayRangeToSet(
+                startDay, endDay,
+                minDay, maxDay,
+                coreDaySet);
+        
+        addDayRangeToSet(
+                startDay + currentExpiredDayOffset, endDay - currentUpcomingDayOffset,
+                minDay, maxDay,
+                currentUpcomingExpiredSet);
+        
+        addDayRangeToSet(
+                startDay + maxExpiredDayOffset, endDay - maxUpcomingDayOffset,
+                minDay, maxDay,
+                extendedUpcomingExpiredSet);
+    }
+    
     // get on what days from min to max an entry is visible (and was before invalidation)
-    public void addVisibleDays(long minDay, long maxDay, Set<Long> daySet, boolean updateUpcomingExpired) {
+    public void getVisibleDays(long minDay, long maxDay,
+                               @Nullable Set<Long> coreDaySet,                   // without any expired/upcoming days
+                               @Nullable Set<Long> currentUpcomingExpiredSet,    // without old expired/upcoming days
+                               @Nullable Set<Long> extendedUpcomingExpiredSet) { // with old expired/upcoming days, used for updating
         // get max between previous range and current
-        long maxUpcomingDayOffset = updateUpcomingExpired ? max(this.upcomingDayOffset.getDiscarded(0), this.upcomingDayOffset.getToday()) : 0;
-        long maxExpiredDayOffset = updateUpcomingExpired ? max(this.expiredDayOffset.getDiscarded(0), this.expiredDayOffset.getToday()) : 0;
+        
+        long previousUpcomingDayOffset = this.upcomingDayOffset.getDiscarded(0);
+        long previousExpiredDayOffset = this.expiredDayOffset.getDiscarded(0);
+        
+        long currentUpcomingDayOffset = this.upcomingDayOffset.getToday();
+        long currentExpiredDayOffset = this.expiredDayOffset.getToday();
+        
+        long maxUpcomingDayOffset = max(previousUpcomingDayOffset, currentUpcomingDayOffset);
+        long maxExpiredDayOffset = max(previousExpiredDayOffset, currentExpiredDayOffset);
         
         if (recurrenceSet != null) {
             iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
-                long instanceEndDay = instanceStartDay + durationDays.get() + maxExpiredDayOffset;
-                instanceStartDay -= maxUpcomingDayOffset;
-                // if any of the event days lies between min and max days
-                if ((minDay <= instanceStartDay && instanceStartDay <= maxDay) ||
-                        (minDay <= instanceEndDay && instanceEndDay <= maxDay)) {
-                    
-                    addDayRangeToSet(clamp(instanceStartDay, minDay, maxDay), clamp(instanceEndDay, minDay, maxDay), daySet);
-                } else if (instanceStartDay - maxUpcomingDayOffset >= maxDay) {
+                long instanceEndDay = instanceStartDay + durationDays.get();
+                
+                addDayRangeToSets(instanceStartDay, instanceEndDay,
+                        minDay, maxDay,
+                        currentExpiredDayOffset, currentUpcomingDayOffset,
+                        maxExpiredDayOffset, maxUpcomingDayOffset,
+                        coreDaySet, currentUpcomingExpiredSet, extendedUpcomingExpiredSet);
+                
+                if (instanceStartDay + maxExpiredDayOffset >= maxDay) {
                     return false;
                 }
                 return null;
             }, false);
         } else {
-            addDayRangeToSet(startDay.get() - maxUpcomingDayOffset, endDay.get() + maxExpiredDayOffset, daySet);
+            addDayRangeToSets(startDay.get(), endDay.get(),
+                    minDay, maxDay,
+                    currentExpiredDayOffset, currentUpcomingDayOffset,
+                    maxExpiredDayOffset, maxUpcomingDayOffset,
+                    coreDaySet, currentUpcomingExpiredSet, extendedUpcomingExpiredSet);
         }
     }
     
+    public enum RangeType {
+        CORE, EXPIRED_UPCOMING, EXTENDED_EXPIRED_UPCOMING
+    }
+    
+    public void getVisibleDays(long minDay, long maxDay, Set<Long> daySet, RangeType rangeType) {
+        getVisibleDays(minDay, maxDay,
+                rangeType == RangeType.CORE ? daySet : null,
+                rangeType == RangeType.EXPIRED_UPCOMING ? daySet : null,
+                rangeType == RangeType.EXTENDED_EXPIRED_UPCOMING ? daySet : null);
+    }
+    
     // return on what days from min to max an entry is visible (and was before invalidation)
-    public Set<Long> getVisibleDays(long minDay, long maxDay, boolean updateUpcomingExpired) {
+    public Set<Long> getVisibleDays(long minDay, long maxDay,
+                                    RangeType rangeType) {
         Set<Long> daySet = new ArraySet<>();
-        addVisibleDays(minDay, maxDay, daySet, updateUpcomingExpired);
+        getVisibleDays(minDay, maxDay, daySet, rangeType);
         return daySet;
+    }
+    
+    public FullDaySet getFullDaySet(long minDay, long maxDay) {
+        return new FullDaySet(this, minDay, maxDay);
+    }
+    
+    static class FullDaySet {
+        
+        private final Set<Long> upcomingExpiredDaySet = new androidx.collection.ArraySet<>();
+        private final Set<Long> coreDaySet = new androidx.collection.ArraySet<>();
+        
+        FullDaySet (TodoListEntry entry, long dayStart, long dayEnd) {
+            entry.getVisibleDays(dayStart, dayEnd,
+                    coreDaySet,             // core
+                    upcomingExpiredDaySet,  // basic expired / upcoming
+                    null);                  // extended expired / upcoming
+        }
+    
+        public Set<Long> getUpcomingExpiredDaySet() {
+            return upcomingExpiredDaySet;
+        }
+    
+        public Set<Long> getCoreDaySet() {
+            return coreDaySet;
+        }
     }
     
     public boolean hideByContent() {
@@ -705,18 +789,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     public boolean isGlobal() {
         // startDay = endDay for not calendar entries, so we can use any
         return startDay.get() == Keys.DAY_FLAG_GLOBAL;
-    }
-    
-    public boolean isUpcoming(long day) {
-        return getEntryType(day) == EntryType.UPCOMING;
-    }
-    
-    public boolean isExpired(long day) {
-        return getEntryType(day) == EntryType.EXPIRED;
-    }
-    
-    public boolean isToday(long day) {
-        return getEntryType(day) == EntryType.TODAY;
     }
     
     public String getTimeSpan(Context context) {
