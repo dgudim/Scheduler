@@ -84,15 +84,6 @@ public class HomeFragment extends Fragment {
                 }
         );
         
-        // when all entries are loaded, update current month
-        todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
-            updateStatusText();
-            // update adapter showing entries
-            todoListEntryManager.invalidateEntryList();
-            // update calendar updating indicators
-            todoListEntryManager.invalidateCalendar();
-        }));
-        
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
         
         DrawerLayout drawerLayout = wrapperBnd.getRoot();
@@ -162,6 +153,20 @@ public class HomeFragment extends Fragment {
                         .navigate(R.id.action_HomeFragment_to_SettingsFragment));
         
         return wrapperBnd.getRoot();
+    }
+    
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // update the ui only after it's fully inflated
+        
+        // when all entries are loaded, update current month
+        todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
+            updateStatusText();
+            // update adapter showing entries
+            todoListEntryManager.invalidateEntryList();
+            // update calendar updating indicators
+            todoListEntryManager.invalidateCalendar();
+        }));
     }
     
     public void invalidateAll() {

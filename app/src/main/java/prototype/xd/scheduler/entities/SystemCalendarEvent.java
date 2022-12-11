@@ -25,7 +25,6 @@ import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.TimeZone;
 
 public class SystemCalendarEvent {
@@ -257,32 +256,5 @@ public class SystemCalendarEvent {
         } else {
             log(WARN, NAME, "Couldn't add exceptions to " + title);
         }
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(title, color, startMsUTC, endMsUTC, isAllDay, rRule_str, rDate_str, exRule_str, exDate_str, associatedCalendar);
-    }
-    
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        if (obj == null) {
-            return false;
-        } else if (obj == this) {
-            return true;
-        } else if (obj instanceof SystemCalendarEvent) {
-            SystemCalendarEvent calendarEvent = (SystemCalendarEvent) obj;
-            return Objects.equals(title, calendarEvent.title) &&
-                    Objects.equals(color, calendarEvent.color) &&
-                    Objects.equals(startMsUTC, calendarEvent.startMsUTC) &&
-                    Objects.equals(endMsUTC, calendarEvent.endMsUTC) &&
-                    Objects.equals(isAllDay, calendarEvent.isAllDay) &&
-                    Objects.equals(rRule_str, calendarEvent.rRule_str) &&
-                    Objects.equals(rDate_str, calendarEvent.rDate_str) &&
-                    Objects.equals(exRule_str, calendarEvent.exRule_str) &&
-                    Objects.equals(exDate_str, calendarEvent.exDate_str) &&
-                    Objects.equals(associatedCalendar, calendarEvent.associatedCalendar);
-        }
-        return super.equals(obj);
     }
 }

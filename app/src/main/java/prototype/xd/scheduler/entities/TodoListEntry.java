@@ -922,24 +922,4 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     public int getType() {
         return isFromSystemCalendar() ? 1 : 0;
     }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(event, params, group);
-    }
-    
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        if (obj == null) {
-            return false;
-        } else if (obj == this) {
-            return true;
-        } else if (obj instanceof TodoListEntry) {
-            TodoListEntry entry = (TodoListEntry) obj;
-            return Objects.equals(event, entry.event) &&
-                    Objects.equals(entry.params, params)
-                    && Objects.equals(group, entry.group);
-        }
-        return super.equals(obj);
-    }
 }
