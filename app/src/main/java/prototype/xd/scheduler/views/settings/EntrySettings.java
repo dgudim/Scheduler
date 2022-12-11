@@ -4,6 +4,7 @@ import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextDialogue;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
@@ -13,7 +14,6 @@ import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
-import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 import android.content.Context;
 import android.view.View;
@@ -139,16 +139,19 @@ public class EntrySettings extends PopupSettingsView {
                         }));
         
         bnd.fontColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                context, lifecycle,
                 bnd.fontColorState, this,
                 FONT_COLOR,
                 parameterKey -> entry.fontColor.getToday()));
         
         bnd.backgroundColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                context, lifecycle,
                 bnd.backgroundColorState, this,
                 BG_COLOR,
                 parameterKey -> entry.bgColor.getToday()));
         
         bnd.borderColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                context, lifecycle,
                 bnd.borderColorState, this,
                 BORDER_COLOR,
                 parameterKey -> entry.borderColor.getToday()));

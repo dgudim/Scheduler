@@ -13,6 +13,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
@@ -35,7 +36,7 @@ enum SettingsEntryType {
 
 public abstract class SettingsEntryConfig extends RecycleViewEntry {
     
-    public static SettingsViewHolder<?, ? extends SettingsEntryConfig> createViewHolder(ViewGroup parent, int viewType) {
+    public static SettingsViewHolder<?, ? extends SettingsEntryConfig> createViewHolder(ViewGroup parent, int viewType, Lifecycle lifecycle) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         // we should make sure to return appropriate holders, otherwise it will crash in @onBindViewHolder
         switch (SettingsEntryType.values()[viewType]) {
@@ -44,7 +45,8 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
             case CALENDAR:
                 return new CalendarViewHolder(CalendarSettingsEntryBinding.inflate(inflater, parent, false));
             case COMPOUND_CUSTOMIZATION:
-                return new CompoundCustomizationViewHolder(CompoundCustomizationSettingsEntryBinding.inflate(inflater, parent, false));
+                return new CompoundCustomizationViewHolder(
+                        CompoundCustomizationSettingsEntryBinding.inflate(inflater, parent, false), lifecycle);
             case RESET_BUTTON:
                 return new ResetButtonViewHolder(ResetButtonSettingsEntryBinding.inflate(inflater, parent, false));
             case SEEK_BAR:

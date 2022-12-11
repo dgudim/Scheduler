@@ -44,6 +44,14 @@
     <!-- end -->
 
 
+    <!-- additional dialog styles -->
+    <style name="ErrorAlertDialogTheme" parent="DefaultAlertDialogTheme">
+        <item name="colorPrimary">?colorError</item>
+        <item name="colorSecondary">?colorError</item>
+        <item name="colorSurface">?colorErrorContainer</item>
+        <item name="colorOnSurface">?colorOnErrorContainer</item>
+    </style>
+
     <style name="FullScreenDialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">false</item>
@@ -53,6 +61,8 @@
         <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
+    <!-- end -->
+
 
     <!-- default styles -->
     <style name="DefaultButtonStyle" parent="Widget.Material3.Button">

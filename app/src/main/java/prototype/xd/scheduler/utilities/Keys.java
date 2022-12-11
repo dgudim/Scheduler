@@ -118,6 +118,7 @@ public class Keys {
     public static final String LAST_UPDATE_TIME = "last_update_time";
     public static final String SERVICE_UPDATE_SIGNAL = "update";
     public static final String SERVICE_KEEP_ALIVE_SIGNAL = "keep_alive";
+    public static final String SERVICE_FAILED = "service_failed";
     
     public static final String DISPLAY_METRICS_HEIGHT = "metrics_H";
     public static final String DISPLAY_METRICS_WIDTH = "metrics_W";
@@ -126,8 +127,7 @@ public class Keys {
     public static final String ROOT_DIR = "root_directory";
     public static final String ENTRIES_FILE = "entries";
     public static final String GROUPS_FILE = "groupData";
-    public static final String INDICATORS_FILE = "cachedIndicators";
-    
+
     public static final List<String> WEEK_DAYS = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
     public static final String DEFAULT_BACKGROUND_NAME = "default.png";
 }

@@ -2,10 +2,7 @@ package prototype.xd.scheduler.utilities;
 
 import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
-import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
-import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
@@ -16,7 +13,6 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEn
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.text.Spannable;
@@ -29,13 +25,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.material.slider.Slider;
 
 import java.io.File;
@@ -370,56 +362,6 @@ public class Utilities {
         tSwitch.setCheckedSilent(initialValueFactory.apply(parameterKey));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
                 settingsView.notifyParameterChanged(stateIcon, parameterKey, isChecked));
-    }
-    
-    //color dialogue for general settings
-    public static void invokeColorDialogue(final CardView target,
-                                           final ColorPickerKeyedClickListener clickListener,
-                                           final String key,
-                                           final int defaultValue) {
-        invokeColorDialogue(target.getContext(), preferences.getInt(key, defaultValue),
-                (dialogInterface, lastSelectedColor, allColors) ->
-                        clickListener.onClick(dialogInterface, lastSelectedColor, key, allColors));
-    }
-    
-    //color dialogue for entry settings
-    public static void invokeColorDialogue(final TextView stateIcon,
-                                           final PopupSettingsView settingsView,
-                                           final String parameterKey,
-                                           final Function<String, Integer> initialValueFactory) {
-        invokeColorDialogue(stateIcon.getContext(), initialValueFactory.apply(parameterKey), (dialog, selectedColor, allColors) -> {
-            settingsView.notifyParameterChanged(stateIcon, parameterKey, selectedColor);
-            switch (parameterKey) {
-                case FONT_COLOR:
-                    settingsView.updatePreviewFont(selectedColor);
-                    break;
-                case BORDER_COLOR:
-                    settingsView.updatePreviewBorder(selectedColor);
-                    break;
-                case BG_COLOR:
-                default:
-                    settingsView.updatePreviewBg(selectedColor);
-                    break;
-            }
-        });
-    }
-    
-    public static void invokeColorDialogue(final Context context, final int initialValue, ColorPickerClickListener listener) {
-        ColorPickerDialogBuilder
-                .with(context)
-                .setTitle(context.getString(R.string.choose_color))
-                .initialColor(initialValue)
-                .showAlphaSlider(false)
-                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                .density(12)
-                .setPositiveButton(context.getString(R.string.apply), listener)
-                .setNegativeButton(R.string.cancel, (dialog, which) -> {
-                }).build().show();
-    }
-    
-    @FunctionalInterface
-    public interface ColorPickerKeyedClickListener {
-        void onClick(DialogInterface dialogInterface, int lastSelectedColor, String colorKey, Integer[] allColors);
     }
     
     public static boolean datesEqual(LocalDate date1, LocalDate date2) {

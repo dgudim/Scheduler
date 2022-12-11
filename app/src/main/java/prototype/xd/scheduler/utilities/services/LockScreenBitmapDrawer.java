@@ -13,6 +13,7 @@ import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Logger.log;
@@ -138,7 +139,7 @@ class LockScreenBitmapDrawer {
                             if (defFile.exists()) {
                                 bitmap = readStream(new FileInputStream(defFile));
                             } else {
-                                // TODO: 03.12.2022 display a warning to the user
+                                preferences.edit().putBoolean(SERVICE_FAILED, true).apply();
                                 throw new FileNotFoundException("No available background to load");
                             }
                         }

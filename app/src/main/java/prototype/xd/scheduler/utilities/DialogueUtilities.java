@@ -1,29 +1,42 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
+
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.lifecycle.Lifecycle;
 
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
+import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
+import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
 public class DialogueUtilities {
     
@@ -252,8 +265,8 @@ public class DialogueUtilities {
         return text;
     }
     
-    private static Dialog buildTemplate(@NonNull Context context,
-                                        @NonNull Lifecycle lifecycle,
+    private static Dialog buildTemplate(@NonNull final Context context,
+                                        @NonNull final Lifecycle lifecycle,
                                         @StringRes int titleStringResource,
                                         @StringRes int messageStringResource,
                                         @LayoutRes int layoutRes) {
@@ -263,18 +276,99 @@ public class DialogueUtilities {
             builder.setMessage(messageStringResource);
         }
         builder.setView(layoutRes);
-        Dialog dialog = builder.show();
-        
+        return attachDialogToLifecycle(builder.show(), lifecycle, null);
+    }
+    
+    private static Dialog attachDialogToLifecycle(@NonNull final Dialog dialog,
+                                                  @NonNull final Lifecycle lifecycle,
+                                                  @Nullable DialogInterface.OnDismissListener dismissListener) {
+        // make sure the dialog is dismissed on activity destroy
         DialogDismissLifecycleObserver dismissLifecycleObserver = new DialogDismissLifecycleObserver(dialog);
         lifecycle.addObserver(dismissLifecycleObserver);
-        // these dialogs are on-shot, so we remove the observer as soon as the dialog in dismissed
-        dialog.setOnDismissListener(dialog1 -> lifecycle.removeObserver(dismissLifecycleObserver));
+        // remove the observer as soon as the dialog in dismissed
+        dialog.setOnDismissListener(dialog1 -> {
+            if(dismissListener != null) {
+                dismissListener.onDismiss(dialog1);
+            }
+            lifecycle.removeObserver(dismissLifecycleObserver);
+        });
         return dialog;
     }
     
     @FunctionalInterface
     public interface OnClickListenerWithEditText {
         boolean onClick(View view, String text, int selectedIndex);
+    }
+    
+    public static void displayErrorMessage(@NonNull final Context context,
+                                           @NonNull final Lifecycle lifecycle,
+                                           @StringRes int titleStringResource,
+                                           @StringRes int messageStringResource,
+                                           @DrawableRes int iconResource,
+                                           DialogInterface.OnDismissListener dismissListener) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ErrorAlertDialogTheme);
+        builder.setTitle(titleStringResource);
+        builder.setMessage(messageStringResource);
+        builder.setIcon(iconResource);
+        builder.setPositiveButton(R.string.ignore, null);
+        attachDialogToLifecycle(builder.show(), lifecycle, dismissListener);
+    }
+    
+    //color dialogue for general settings
+    public static void invokeColorDialogue(@NonNull final Context context,
+                                           @NonNull final Lifecycle lifecycle,
+                                           final ColorPickerKeyedClickListener clickListener,
+                                           final String key,
+                                           final int defaultValue) {
+        invokeColorDialogue(context, lifecycle, preferences.getInt(key, defaultValue),
+                (dialogInterface, lastSelectedColor, allColors) ->
+                        clickListener.onClick(dialogInterface, lastSelectedColor, key, allColors));
+    }
+    
+    //color dialogue for entry settings
+    public static void invokeColorDialogue(@NonNull final Context context,
+                                           @NonNull final Lifecycle lifecycle,
+                                           final TextView stateIcon,
+                                           final PopupSettingsView settingsView,
+                                           final String parameterKey,
+                                           final Function<String, Integer> initialValueFactory) {
+        invokeColorDialogue(context, lifecycle,
+                initialValueFactory.apply(parameterKey), (dialog, selectedColor, allColors) -> {
+                    settingsView.notifyParameterChanged(stateIcon, parameterKey, selectedColor);
+                    switch (parameterKey) {
+                        case FONT_COLOR:
+                            settingsView.updatePreviewFont(selectedColor);
+                            break;
+                        case BORDER_COLOR:
+                            settingsView.updatePreviewBorder(selectedColor);
+                            break;
+                        case BG_COLOR:
+                        default:
+                            settingsView.updatePreviewBg(selectedColor);
+                            break;
+                    }
+                });
+    }
+    
+    public static void invokeColorDialogue(@NonNull final Context context,
+                                           @NonNull Lifecycle lifecycle,
+                                           final int initialValue,
+                                           @NonNull ColorPickerClickListener listener) {
+        attachDialogToLifecycle(ColorPickerDialogBuilder
+                .with(context)
+                .setTitle(context.getString(R.string.choose_color))
+                .initialColor(initialValue)
+                .showAlphaSlider(false)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setPositiveButton(context.getString(R.string.apply), listener)
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                }).build(), lifecycle, null).show();
+    }
+    
+    @FunctionalInterface
+    public interface ColorPickerKeyedClickListener {
+        void onClick(DialogInterface dialogInterface, int lastSelectedColor, String colorKey, Integer[] allColors);
     }
     
 }

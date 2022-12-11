@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.views.settings;
 
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarKeyToReadable;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
@@ -8,7 +9,6 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValid
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidIntValue;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKeyIndex;
-import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Utilities.setSliderChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 
@@ -95,16 +95,19 @@ public class SystemCalendarSettings extends PopupSettingsView {
                         }));
         
         bnd.fontColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                context, lifecycle,
                 bnd.fontColorState, this,
                 Keys.FONT_COLOR,
                 parameterKey -> getFirstValidIntValue(calendarSubKeys, parameterKey, Keys.SETTINGS_DEFAULT_FONT_COLOR)));
         
         bnd.backgroundColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                context, lifecycle,
                 bnd.backgroundColorState, this,
                 Keys.BG_COLOR,
                 parameterKey -> getFirstValidIntValue(calendarSubKeys, parameterKey, Keys.SETTINGS_DEFAULT_BG_COLOR)));
         
         bnd.borderColorSelector.setOnClickListener(view -> invokeColorDialogue(
+                context, lifecycle,
                 bnd.borderColorState, this,
                 Keys.BORDER_COLOR,
                 parameterKey -> getFirstValidIntValue(calendarSubKeys, parameterKey, Keys.SETTINGS_DEFAULT_BORDER_COLOR)));

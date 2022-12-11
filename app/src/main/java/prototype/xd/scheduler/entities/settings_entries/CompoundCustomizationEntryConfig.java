@@ -2,6 +2,7 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
@@ -11,7 +12,6 @@ import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
-import static prototype.xd.scheduler.utilities.Utilities.invokeColorDialogue;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,12 +19,14 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Lifecycle;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.TodoItemViewSelectionDialogBinding;
+import prototype.xd.scheduler.utilities.DialogueUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
@@ -48,7 +50,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         TodoItemViewType todoItemViewType;
         AlertDialog viewSelectionDialog;
         
-        CompoundCustomizationViewHolder(CompoundCustomizationSettingsEntryBinding viewBinding) {
+        CompoundCustomizationViewHolder(CompoundCustomizationSettingsEntryBinding viewBinding, Lifecycle lifecycle) {
             super(viewBinding);
             
             todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE));
@@ -76,7 +78,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             
             updatePreviews();
             
-            Utilities.ColorPickerKeyedClickListener colorPickerClickListener = (dialog, selectedColor, key, allColors) -> {
+            DialogueUtilities.ColorPickerKeyedClickListener colorPickerClickListener = (dialog, selectedColor, key, allColors) -> {
                 preferences.edit().putInt(key, selectedColor).apply();
                 switch (key) {
                     case Keys.UPCOMING_BG_COLOR:
@@ -98,33 +100,42 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             };
             
             viewBinding.backgroundColorSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.backgroundColorSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR));
             viewBinding.backgroundColorUpcomingSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.backgroundColorUpcomingSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR));
             viewBinding.backgroundColorExpiredSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.backgroundColorExpiredSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR));
             
             viewBinding.fontColorSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.fontColorSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR));
             viewBinding.fontColorUpcomingSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.fontColorUpcomingSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR));
             viewBinding.fontColorExpiredSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.fontColorExpiredSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR));
             
             viewBinding.borderColorSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.borderColorSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR));
             viewBinding.borderColorUpcomingSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.borderColorUpcomingSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR));
             viewBinding.borderColorExpiredSelector.setOnClickListener(v ->
-                    invokeColorDialogue(viewBinding.borderColorExpiredSelector, colorPickerClickListener,
+                    invokeColorDialogue(context, lifecycle,
+                            colorPickerClickListener,
                             Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR));
             
             Utilities.SliderOnChangeKeyedListener onChangeListener = (slider, progress, fromUser, key) -> {
@@ -170,7 +181,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         
         @Override
         void bind(CompoundCustomizationEntryConfig config) {
-            // nothing special required, this entry should be the only on of it's kind
+            // nothing special required, this entry should be the only one of it's kind
         }
         
         protected void inflatePreviews() {

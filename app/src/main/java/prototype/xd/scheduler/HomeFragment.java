@@ -6,10 +6,13 @@ import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
 import static prototype.xd.scheduler.utilities.DateManager.selectDay;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.displayErrorMessage;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -60,7 +63,7 @@ public class HomeFragment extends Fragment {
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         contentBnd.content.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
-    
+        
         // init date manager
         selectCurrentDay();
         
@@ -167,6 +170,13 @@ public class HomeFragment extends Fragment {
             // update calendar updating indicators
             todoListEntryManager.invalidateCalendar();
         }));
+        
+        // display warning if the background service failed
+        if (preferences.getBoolean(SERVICE_FAILED, false)) {
+            displayErrorMessage(requireContext(), getLifecycle(),
+                    R.string.service_error, R.string.service_error_description, R.drawable.ic_warning,
+                    dialog -> preferences.edit().putBoolean(SERVICE_FAILED, false).apply());
+        }
     }
     
     public void invalidateAll() {
@@ -175,7 +185,7 @@ public class HomeFragment extends Fragment {
     
     @Override
     public void onDestroyView() {
-        // remove reference to ui elements
+        // remove reference to ui element
         todoListEntryManager.unbindCalendarView();
         super.onDestroyView();
     }

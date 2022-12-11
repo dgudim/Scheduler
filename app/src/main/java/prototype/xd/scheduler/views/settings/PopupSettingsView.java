@@ -22,6 +22,7 @@ import prototype.xd.scheduler.utilities.TodoListEntryManager;
 public abstract class PopupSettingsView {
     
     protected final EntrySettingsBinding bnd;
+    protected final Context context;
     protected AlertDialog dialog;
     protected final Lifecycle lifecycle;
     protected final int defaultTextColor;
@@ -33,6 +34,7 @@ public abstract class PopupSettingsView {
         bnd = EntrySettingsBinding.inflate(LayoutInflater.from(context));
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
     
+        this.context = context;
         this.lifecycle = lifecycle;
         
         dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)

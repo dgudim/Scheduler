@@ -131,5 +131,7 @@
     <string name="select_view">Select view</string>
     <string name="choose_how_items_look">choose how items will look on your lockscreen</string>
     <string name="show_upcoming_and_expired_event_indicators">Show upcoming and expired events in calendar</string>
-
+    <string name="service_error">Background service error</string>
+    <string name="service_error_description">There was an error in the background wallpaper service :( Try restarting the application, if the problem persists, open an issue on the github.</string>
+    <string name="ignore">Ignore</string>
 </resources>

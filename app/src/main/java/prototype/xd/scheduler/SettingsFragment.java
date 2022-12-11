@@ -86,7 +86,7 @@ public class SettingsFragment extends DialogFragment {
         
         settingsEntries.add(new ResetButtonSettingsEntryConfig(this, savedInstanceState));
         
-        settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries);
+        settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries, getLifecycle());
         
         List<SettingsEntryConfig> additionalSettingsEntries = new ArrayList<>();
         new Thread(() -> {
