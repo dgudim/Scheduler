@@ -130,7 +130,9 @@
     <string name="nav_drawer_close">Закрыть боковое меню</string>
     <string name="please_read_the_notes">Пожалуйста прочитайте информацию</string>
     <string name="service_error">Ошибка фонового сервиса</string>
-    <string name="service_error_description">Произошла ошибка в фоновом сервисе установки обоев :( Попробуйте перезапустить приложение, если проблема не устранится, напишите мне.</string>
+    <string name="wallpaper_obtain_error">Ошибка получения фона</string>
+    <string name="wallpaper_obtain_error_description">Произошла ошибка при попытке получить обои экрана блокировки :( Попробуйте установить обои вручную и перезапустить приложение. Если проблема не устранится, возможно, ваше устройство ограничивает доступ к фону или вы удалили и переустановили приложение, но вы можете написать мне, возможно я помогу.</string>
+    <string name="service_error_description">Произошла ошибка в фоновом сервисе установки обоев :( Попробуйте перезапустить приложение. Если проблема не устранится, напишите мне.</string>
     <string name="show_upcoming_and_expired_event_indicators">Показывать прошедшие и будущие события в календаре</string>
     <string name="ignore">Игнорировать</string>
 </resources>

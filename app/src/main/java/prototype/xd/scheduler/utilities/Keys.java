@@ -119,6 +119,7 @@ public class Keys {
     public static final String SERVICE_UPDATE_SIGNAL = "update";
     public static final String SERVICE_KEEP_ALIVE_SIGNAL = "keep_alive";
     public static final String SERVICE_FAILED = "service_failed";
+    public static final String WALLPAPER_OBTAIN_FAILED = "wallpaper_obtain_failed";
     
     public static final String DISPLAY_METRICS_HEIGHT = "metrics_H";
     public static final String DISPLAY_METRICS_WIDTH = "metrics_W";

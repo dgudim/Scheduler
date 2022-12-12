@@ -12,6 +12,7 @@ import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
+import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.os.Bundle;
@@ -171,11 +172,16 @@ public class HomeFragment extends Fragment {
             todoListEntryManager.invalidateCalendar();
         }));
         
-        // display warning if the background service failed
         if (preferences.getBoolean(SERVICE_FAILED, false)) {
+            // display warning if the background service failed
             displayErrorMessage(requireContext(), getLifecycle(),
                     R.string.service_error, R.string.service_error_description, R.drawable.ic_warning,
                     dialog -> preferences.edit().putBoolean(SERVICE_FAILED, false).apply());
+        } else if (preferences.getBoolean(WALLPAPER_OBTAIN_FAILED, false)) {
+            // display warning if there wan an error getting the wallpaper
+            displayErrorMessage(requireContext(), getLifecycle(),
+                    R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description, R.drawable.ic_warning,
+                    dialog -> preferences.edit().putBoolean(WALLPAPER_OBTAIN_FAILED, false).apply());
         }
     }
     

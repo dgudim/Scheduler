@@ -9,6 +9,7 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.currentDay;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
+import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
@@ -139,7 +140,7 @@ class LockScreenBitmapDrawer {
                             if (defFile.exists()) {
                                 bitmap = readStream(new FileInputStream(defFile));
                             } else {
-                                preferences.edit().putBoolean(SERVICE_FAILED, true).apply();
+                                preferences.edit().putBoolean(WALLPAPER_OBTAIN_FAILED, true).apply();
                                 throw new FileNotFoundException("No available background to load");
                             }
                         }
@@ -154,7 +155,10 @@ class LockScreenBitmapDrawer {
                     
                 } catch (InterruptedException e) {
                     log(INFO, NAME, e.getMessage());
+                    // relay
+                    Thread.currentThread().interrupt();
                 } catch (Exception e) {
+                    preferences.edit().putBoolean(SERVICE_FAILED, true).apply();
                     logException(NAME, e);
                 }
                 busy = false;
