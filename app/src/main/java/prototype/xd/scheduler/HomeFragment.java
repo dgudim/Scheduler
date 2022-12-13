@@ -177,7 +177,9 @@ public class HomeFragment extends Fragment {
             displayErrorMessage(requireContext(), getLifecycle(),
                     R.string.service_error, R.string.service_error_description, R.drawable.ic_warning,
                     dialog -> preferences.edit().putBoolean(SERVICE_FAILED, false).apply());
-        } else if (preferences.getBoolean(WALLPAPER_OBTAIN_FAILED, false)) {
+        }
+        
+        if (preferences.getBoolean(WALLPAPER_OBTAIN_FAILED, false)) {
             // display warning if there wan an error getting the wallpaper
             displayErrorMessage(requireContext(), getLifecycle(),
                     R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description, R.drawable.ic_warning,

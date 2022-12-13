@@ -588,7 +588,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             }
             return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
                 // we overshot
-                if (instanceStartDay + upcomingDayOffset.getToday() > targetDay) {
+                if (instanceStartDay - upcomingDayOffset.getToday() > targetDay) {
                     return false;
                 }
                 if (inRange(targetDay, instanceStartDay)) {
@@ -633,12 +633,12 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 coreDaySet);
         
         addDayRangeToSet(
-                startDay + currentExpiredDayOffset, endDay - currentUpcomingDayOffset,
+                startDay - currentUpcomingDayOffset, endDay + currentExpiredDayOffset,
                 minDay, maxDay,
                 currentUpcomingExpiredSet);
         
         addDayRangeToSet(
-                startDay + maxExpiredDayOffset, endDay - maxUpcomingDayOffset,
+                startDay - maxUpcomingDayOffset, endDay + maxExpiredDayOffset,
                 minDay, maxDay,
                 extendedUpcomingExpiredSet);
     }
@@ -661,17 +661,22 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         
         if (recurrenceSet != null) {
             iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
-                long instanceEndDay = instanceStartDay + durationDays.get();
                 
-                addDayRangeToSets(instanceStartDay, instanceEndDay,
-                        minDay, maxDay,
-                        currentExpiredDayOffset, currentUpcomingDayOffset,
-                        maxExpiredDayOffset, maxUpcomingDayOffset,
-                        coreDaySet, currentUpcomingExpiredSet, extendedUpcomingExpiredSet);
-                
-                if (instanceStartDay + maxExpiredDayOffset >= maxDay) {
+                // overshot
+                if (instanceStartDay + maxUpcomingDayOffset > maxDay) {
                     return false;
                 }
+                
+                addDayRangeToSets(instanceStartDay,  instanceStartDay + durationDays.get(),
+                        minDay, maxDay,
+                        // offsets
+                        currentExpiredDayOffset, currentUpcomingDayOffset,
+                        maxExpiredDayOffset, maxUpcomingDayOffset,
+                        // sets
+                        coreDaySet,
+                        currentUpcomingExpiredSet,
+                        extendedUpcomingExpiredSet);
+                
                 return null;
             }, false);
         } else {

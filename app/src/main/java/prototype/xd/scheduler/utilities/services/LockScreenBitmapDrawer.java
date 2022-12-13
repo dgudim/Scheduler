@@ -140,7 +140,6 @@ class LockScreenBitmapDrawer {
                             if (defFile.exists()) {
                                 bitmap = readStream(new FileInputStream(defFile));
                             } else {
-                                preferences.edit().putBoolean(WALLPAPER_OBTAIN_FAILED, true).apply();
                                 throw new FileNotFoundException("No available background to load");
                             }
                         }
@@ -157,6 +156,9 @@ class LockScreenBitmapDrawer {
                     log(INFO, NAME, e.getMessage());
                     // relay
                     Thread.currentThread().interrupt();
+                } catch (FileNotFoundException e) {
+                    preferences.edit().putBoolean(WALLPAPER_OBTAIN_FAILED, true).apply();
+                    logException(NAME, e);
                 } catch (Exception e) {
                     preferences.edit().putBoolean(SERVICE_FAILED, true).apply();
                     logException(NAME, e);
