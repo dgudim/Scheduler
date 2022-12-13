@@ -49,12 +49,12 @@ public class CalendarView {
             super(bnd.getRoot());
             binding = bnd;
             context = bnd.getRoot().getContext();
-            bnd.calendarDayCard.setOnClickListener(v -> container.selectDate(date));
+            bnd.root.setOnClickListener(v -> container.selectDate(date));
         }
         
         private void setEventIndicator(int color, int index, boolean visiblePosition, boolean inCalendar) {
             // first index is day text itself
-            View eventIndicator = binding.eventIndicatorContainer.getChildAt(index + 1);
+            View eventIndicator = binding.root.getChildAt(index + 1);
             eventIndicator.setVisibility(visiblePosition ? View.VISIBLE : View.INVISIBLE);
             if (!visiblePosition) {
                 return;
@@ -107,11 +107,9 @@ public class CalendarView {
             
             // highlight current date
             if (datesEqual(date, calendarView.selectedDate) && dayPosition == DayPosition.MonthDate) {
-                binding.calendarDayCard.setStrokeColor(MaterialColors.getColor(context, R.attr.colorAccent, Color.WHITE));
-                binding.calendarDayCard.setCardBackgroundColor(MaterialColors.getColor(context, R.attr.colorSurfaceVariant, Color.WHITE));
+                binding.root.setBackgroundResource(R.drawable.round_bg_calendar_selection);
             } else {
-                binding.calendarDayCard.setStrokeColor(Color.TRANSPARENT);
-                binding.calendarDayCard.setCardBackgroundColor(Color.TRANSPARENT);
+                binding.root.setBackgroundResource(0);
             }
         }
         

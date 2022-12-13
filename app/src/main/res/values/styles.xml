@@ -112,7 +112,7 @@
         <item name="android:padding">3dp</item>
         <item name="android:layout_margin">3dp</item>
         <item name="android:drawablePadding">3dp</item>
-        <item name="android:background">@drawable/round_bg_medium_component</item>
+        <item name="android:background">@drawable/round_bg_8dp</item>
         <item name="android:textColor">?colorOnSecondaryContainer</item>
         <item name="backgroundTint">?colorSecondaryContainer</item>
     </style>
@@ -120,7 +120,7 @@
     <style name="PrimaryAccentedCheckboxStyle" parent="Widget.Material3.CompoundButton.CheckBox">
         <item name="android:padding">3dp</item>
         <item name="android:layout_margin">3dp</item>
-        <item name="android:background">@drawable/round_bg</item>
+        <item name="android:background">@drawable/round_bg_10dp</item>
         <item name="backgroundTint">?colorPrimaryContainer</item>
         <item name="android:textColor">?colorOnPrimaryContainer</item>
     </style>
