@@ -262,6 +262,6 @@ public class SystemCalendarEvent {
     @NonNull
     @Override
     public String toString() {
-        return "SystemCalendarEvent" + title + " " + subKeys;
+        return "SystemCalendarEvent " + prefKey;
     }
 }

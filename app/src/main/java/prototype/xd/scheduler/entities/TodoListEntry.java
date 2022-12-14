@@ -684,11 +684,18 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 return null;
             }, false);
         } else {
+            System.out.println(" ------------- addDayRangeToSets: " + rawTextValue.get() + " from " + startDay.get() + " to " + endDay.get());
+            System.out.println("currentExpiredDayOffset: " + currentExpiredDayOffset);
+            System.out.println("currentUpcomingDayOffset: " + currentUpcomingDayOffset);
+            System.out.println("maxExpiredDayOffset: " + maxExpiredDayOffset);
+            System.out.println("maxUpcomingDayOffset: " + maxUpcomingDayOffset);
+            System.out.println("Len before: " + currentUpcomingExpiredSet.size());
             addDayRangeToSets(startDay.get(), endDay.get(),
                     minDay, maxDay,
                     currentExpiredDayOffset, currentUpcomingDayOffset,
                     maxExpiredDayOffset, maxUpcomingDayOffset,
                     coreDaySet, currentUpcomingExpiredSet, extendedUpcomingExpiredSet);
+            System.out.println("Len after: " + currentUpcomingExpiredSet.size());
         }
     }
     
@@ -717,8 +724,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     static class FullDaySet {
         
-        private final Set<Long> upcomingExpiredDaySet = new androidx.collection.ArraySet<>();
-        private final Set<Long> coreDaySet = new androidx.collection.ArraySet<>();
+        private final Set<Long> upcomingExpiredDaySet = new ArraySet<>();
+        private final Set<Long> coreDaySet = new ArraySet<>();
         
         FullDaySet (TodoListEntry entry, long dayStart, long dayEnd) {
             entry.getVisibleDays(dayStart, dayEnd,

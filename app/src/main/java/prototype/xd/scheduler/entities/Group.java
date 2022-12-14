@@ -4,10 +4,10 @@ import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.content.Context;
+import android.util.ArrayMap;
+import android.util.ArraySet;
 
 import androidx.annotation.Nullable;
-import androidx.collection.ArrayMap;
-import androidx.collection.ArraySet;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

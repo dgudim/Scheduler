@@ -120,6 +120,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
                     .computeIfAbsent(day, k -> new HashSet<>())
                     .add(entry);
         }
+        
     }
     
     // handle linking to container and assigning an invalidation listener

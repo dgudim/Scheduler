@@ -81,8 +81,8 @@ public class HomeFragment extends Fragment {
         
         // setup month listener, called when a new month is loaded (first month is loaded differently)
         calendarView.setNewMonthBindListener((firstVisibleDay, lastVisibleDay, context) ->
-                // load current month entries before displaying the data
-                todoListEntryManager.loadEntries(firstVisibleDay, lastVisibleDay)
+                // load current month entries (with overlap of 15 days) before displaying the data
+                todoListEntryManager.loadEntries(firstVisibleDay - 15, lastVisibleDay + 15)
         );
         
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
