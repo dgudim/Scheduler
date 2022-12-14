@@ -191,8 +191,11 @@ public class CalendarView {
             public void bind(@NonNull CalendarHeaderContainer container, CalendarMonth calendarMonth) {
                 container.bindTo(calendarMonth, daysOfWeek);
                 
+                YearMonth calendarYearMonth = calendarMonth.getYearMonth();
+                
                 // new month was loaded
-                if (loadedMonths.contains(calendarMonth.getYearMonth()) && newMonthBindListener != null) {
+                if (!loadedMonths.contains(calendarYearMonth) && newMonthBindListener != null) {
+                    loadedMonths.add(calendarYearMonth);
                     newMonthBindListener.onMonthLoaded(
                             calendarMonth.getYearMonth().atDay(1).toEpochDay(),
                             calendarMonth.getYearMonth().atEndOfMonth().toEpochDay(),
