@@ -26,12 +26,13 @@ else
 
   read -r
 
-  git commit --all
+  git commit --all -m "Version $VERSION_NAME ($VERSION_CODE)"
 
   git tag "$TAG"
   git push --tags
   gh release create "$TAG" -F "$CHANGELOG" ./app/build/outputs/apk/*/*.apk
 
+  git push
 fi
 
 
