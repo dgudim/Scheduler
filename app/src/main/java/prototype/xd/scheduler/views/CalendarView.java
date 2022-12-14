@@ -25,6 +25,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -142,6 +143,8 @@ public class CalendarView {
     @Nullable
     YearMonth selectedMonth;
     
+    private final Set<YearMonth> loadedMonths;
+    
     long firstMonthDay;
     long lastMonthDay;
     
@@ -152,14 +155,16 @@ public class CalendarView {
     @Nullable
     DateChangeListener dateChangeListener;
     @Nullable
-    MonthChangeListener monthPreChangeListener;
+    MonthBindListener newMonthBindListener;
     
     public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoListEntryManager todoListEntryManager) {
         this.rootCalendarView = rootCalendarView;
         
+        loadedMonths = new HashSet<>();
+        
         YearMonth currentMonth = YearMonth.now();
-        YearMonth startMonth = currentMonth.minusMonths(100);
-        YearMonth endMonth = currentMonth.plusMonths(100);
+        loadedMonths.add(currentMonth);
+        
         List<DayOfWeek> daysOfWeek = daysOfWeek(DayOfWeek.MONDAY);
         
         rootCalendarView.setDayBinder(new MonthDayBinder<CalendarDayViewContainer>() {
@@ -185,33 +190,36 @@ public class CalendarView {
             @Override
             public void bind(@NonNull CalendarHeaderContainer container, CalendarMonth calendarMonth) {
                 container.bind(calendarMonth, daysOfWeek);
-                YearMonth prevMonth = selectedMonth;
-                selectedMonth = calendarMonth.getYearMonth();
                 
-                // prevMonth = selectedMonth when we call notifyMonthChanged, so we ignore those ones
-                if (prevMonth != selectedMonth) {
-                    
-                    firstMonthDay = selectedMonth.atDay(1).toEpochDay();
-                    lastMonthDay = selectedMonth.atEndOfMonth().toEpochDay();
-                    
-                    CalendarDay firstVisibleCalendarDay = rootCalendarView.findFirstVisibleDay();
-                    CalendarDay lastVisibleCalendarDay = rootCalendarView.findLastVisibleDay();
-                    
-                    firstVisibleDay = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstMonthDay;
-                    lastVisibleDay = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastMonthDay;
-                    
-                    if (monthPreChangeListener != null) {
-                        monthPreChangeListener.onMonthChanged(
-                                prevMonth,
-                                firstMonthDay,
-                                lastMonthDay,
-                                rootCalendarView.getContext());
-                    }
+                // new month was loaded
+                if (loadedMonths.contains(calendarMonth.getYearMonth()) && newMonthBindListener != null) {
+                    newMonthBindListener.onMonthLoaded(
+                            calendarMonth.getYearMonth().atDay(1).toEpochDay(),
+                            calendarMonth.getYearMonth().atEndOfMonth().toEpochDay(),
+                            rootCalendarView.getContext());
                 }
             }
         });
         
-        rootCalendarView.setup(startMonth, endMonth, daysOfWeek.get(0));
+        rootCalendarView.setMonthScrollListener(calendarMonth -> {
+            
+            // update currently visible day range and selected month
+            
+            selectedMonth = calendarMonth.getYearMonth();
+            
+            firstMonthDay = selectedMonth.atDay(1).toEpochDay();
+            lastMonthDay = selectedMonth.atEndOfMonth().toEpochDay();
+            
+            CalendarDay firstVisibleCalendarDay = rootCalendarView.findFirstVisibleDay();
+            CalendarDay lastVisibleCalendarDay = rootCalendarView.findLastVisibleDay();
+            
+            firstVisibleDay = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstMonthDay;
+            lastVisibleDay = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastMonthDay;
+            
+            return null;
+        });
+        
+        rootCalendarView.setup(currentMonth.minusMonths(100), currentMonth.plusMonths(100), daysOfWeek.get(0));
         selectDate(DateManager.currentDate);
         rootCalendarView.scrollToMonth(currentMonth);
     }
@@ -271,8 +279,8 @@ public class CalendarView {
         }
     }
     
-    public void setOnMonthPreChangeListener(MonthChangeListener monthPreChangeListener) {
-        this.monthPreChangeListener = monthPreChangeListener;
+    public void setNewMonthBindListener(@Nullable MonthBindListener newMonthBindListener) {
+        this.newMonthBindListener = newMonthBindListener;
     }
     
     @FunctionalInterface
@@ -281,8 +289,8 @@ public class CalendarView {
     }
     
     @FunctionalInterface
-    public interface MonthChangeListener {
-        void onMonthChanged(@Nullable YearMonth prevMonth, long firstVisibleDay, long lastVisibleDay, Context context);
+    public interface MonthBindListener {
+        void onMonthLoaded(long firstVisibleDay, long lastVisibleDay, Context context);
     }
 }
 

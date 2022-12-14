@@ -15,6 +15,10 @@ public abstract class BaseCleanupList<T> extends ArrayList<T> {
         super();
     }
     
+    protected BaseCleanupList(int initialCapacity) {
+        super(initialCapacity);
+    }
+    
     protected abstract @Nullable
     T handleOldEntry(@Nullable T oldEntry);
     

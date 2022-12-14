@@ -32,12 +32,12 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     private long loadedDay_start;
     private long loadedDay_end;
     
-    public TodoListEntryList() {
-        super();
-        entriesPerDayUpcomingExpired = new HashMap<>();
-        daysPerEntryUpcomingExpired = new HashMap<>();
-        entriesPerDayCore = new HashMap<>();
-        daysPerEntryCore = new HashMap<>();
+    public TodoListEntryList(int initialCapacity) {
+        super(initialCapacity);
+        entriesPerDayUpcomingExpired = new HashMap<>(initialCapacity);
+        daysPerEntryUpcomingExpired = new HashMap<>(initialCapacity);
+        entriesPerDayCore = new HashMap<>(initialCapacity);
+        daysPerEntryCore = new HashMap<>(initialCapacity);
     }
     
     public void initLoadingRange(long dayStart, long dayEnd) {

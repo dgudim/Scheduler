@@ -109,7 +109,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         calendarVisibilityMap = new ArrayMap<>();
         groups = loadGroups();
         
-        todoListEntries = new TodoListEntryList();
+        todoListEntries = new TodoListEntryList(Keys.TODO_LIST_INITIAL_CAPACITY);
         updateStaticVarsAndCalendarVisibility();
         
         lifecycle.addObserver(this);
@@ -256,11 +256,11 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         invalidateEntryList();
     }
     
-    public void bindCalendarView(@NonNull CalendarView calendarView) {
+    public void attachCalendarView(@NonNull CalendarView calendarView) {
         this.calendarView = calendarView;
     }
     
-    public void unbindCalendarView() {
+    public void detachCalendarView() {
         calendarView = null;
     }
     

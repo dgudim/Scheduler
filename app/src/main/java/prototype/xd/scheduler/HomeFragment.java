@@ -70,7 +70,7 @@ public class HomeFragment extends Fragment {
         
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoListEntryManager);
-        todoListEntryManager.bindCalendarView(calendarView);
+        todoListEntryManager.attachCalendarView(calendarView);
         
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
@@ -79,13 +79,10 @@ public class HomeFragment extends Fragment {
             updateStatusText();
         });
         
-        // setup month listener, first month is loaded differently
-        calendarView.setOnMonthPreChangeListener((prevMonth, firstVisibleDay, lastVisibleDay, context) -> {
-                    // load current month entries before displaying the data, skip first init
-                    if (prevMonth != null) {
-                        todoListEntryManager.loadEntries(firstVisibleDay, lastVisibleDay);
-                    }
-                }
+        // setup month listener, called when a new month is loaded (first month is loaded differently)
+        calendarView.setNewMonthBindListener((firstVisibleDay, lastVisibleDay, context) ->
+                // load current month entries before displaying the data
+                todoListEntryManager.loadEntries(firstVisibleDay, lastVisibleDay)
         );
         
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
@@ -194,7 +191,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         // remove reference to ui element
-        todoListEntryManager.unbindCalendarView();
+        todoListEntryManager.detachCalendarView();
         super.onDestroyView();
     }
     

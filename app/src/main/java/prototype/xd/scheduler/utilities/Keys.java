@@ -131,4 +131,5 @@ public class Keys {
 
     public static final List<String> WEEK_DAYS = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
     public static final String DEFAULT_BACKGROUND_NAME = "default.png";
+    public static final int TODO_LIST_INITIAL_CAPACITY = 75;
 }
