@@ -1,0 +1,7 @@
+Bugfixes and performance improvements:
+- Fixed event indicators not updating when they should
+- Improved scrolling performance
+
+Internal changes:
+- Added event per day caching
+- Removed card view from day container
