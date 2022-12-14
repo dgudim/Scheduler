@@ -19,6 +19,10 @@ Then this app is for you, take **full advantage of your lockscreen real estate**
 - Plethora of settings
 - Low memory and cpu consumption
 
+## Requirements
+- Device running at least android 8.0 (Sdk 26)
+- A rom that does not restrict usage of `wallpaperManager` api (some versions of miui restrict that)
+
 ## Installation
 Clone this repository and import into **Android Studio**
 ```bash
