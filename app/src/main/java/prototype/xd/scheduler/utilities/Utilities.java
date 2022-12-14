@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -364,6 +365,14 @@ public class Utilities {
                 settingsView.notifyParameterChanged(stateIcon, parameterKey, isChecked));
     }
     
+    public static void openUrl(Context context, String url) {
+        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+    }
+    
+    public static void openUrl(Fragment fragment, String url) {
+        openUrl(fragment.requireContext(), url);
+    }
+    
     public static boolean datesEqual(LocalDate date1, LocalDate date2) {
         if (date1 == null || date2 == null) {
             return false;
@@ -384,7 +393,7 @@ public class Utilities {
      * @param argb Color
      * @return Spannable
      */
-    public static Spannable colorize(final String text, final String word, final int argb) {
+    public static Spannable colorizeText(final String text, final String word, final int argb) {
         final Spannable spannable = new SpannableString(text);
         int substringStart = 0;
         int start;

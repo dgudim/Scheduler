@@ -108,7 +108,7 @@ public class SystemCalendarUtils {
                 if (splitKey[0].equals(splitKey[1])) {
                     splitKey[1] = context.getString(R.string.calendar_main);
                 }
-                return Utilities.colorize(context.getString(R.string.editing_system_calendar_color, splitKey[1], splitKey[0]),
+                return Utilities.colorizeText(context.getString(R.string.editing_system_calendar_color, splitKey[1], splitKey[0]),
                         "■", Integer.parseInt(splitKey[2]));
             case 2:
                 if (splitKey[0].equals(splitKey[1])) {

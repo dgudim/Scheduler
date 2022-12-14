@@ -282,6 +282,10 @@ public class CalendarView {
         }
     }
     
+    public void notifyCalendarChanged() {
+        rootCalendarView.notifyCalendarChanged();
+    }
+    
     public void setNewMonthBindListener(@Nullable MonthBindListener newMonthBindListener) {
         this.newMonthBindListener = newMonthBindListener;
     }

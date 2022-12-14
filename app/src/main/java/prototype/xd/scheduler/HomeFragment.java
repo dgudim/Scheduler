@@ -6,9 +6,12 @@ import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
 import static prototype.xd.scheduler.utilities.DateManager.selectDay;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
-import static prototype.xd.scheduler.utilities.DialogueUtilities.displayErrorMessage;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
+import static prototype.xd.scheduler.utilities.Keys.GITHUB_RELEASES;
+import static prototype.xd.scheduler.utilities.Keys.GITHUB_REPO;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
@@ -19,6 +22,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -38,6 +42,7 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
+import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
 
 public class HomeFragment extends Fragment {
@@ -75,7 +80,7 @@ public class HomeFragment extends Fragment {
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             selectDay(selectedDate.toEpochDay());
-            todoListEntryManager.invalidateEntryList();
+            todoListEntryManager.notifyEntryListChanged();
             updateStatusText();
         });
         
@@ -144,8 +149,23 @@ public class HomeFragment extends Fragment {
                         return true;
                     });
         });
+    
+        wrapperBnd.navView.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_REPO));
+        wrapperBnd.navView.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_ISSUES));
+        wrapperBnd.navView.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_RELEASES));
+    
+        wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> Toast.makeText(getActivity(), getString(R.string.work_in_progress),
+                Toast.LENGTH_LONG).show());
+    
+        wrapperBnd.navView.perCalendarSettingsClickView.setOnClickListener(v -> Toast.makeText(getActivity(), getString(R.string.work_in_progress),
+                Toast.LENGTH_LONG).show());
         
-        wrapperBnd.navView.openSettingsButton.setOnClickListener(v ->
+        wrapperBnd.navView.logo.setOnClickListener(v -> displayMessageDialog(requireContext(), getLifecycle(),
+                R.string.easter_egg, R.string.easter_egg_description, R.drawable.ic_egg,
+                R.style.DefaultAlertDialogTheme,
+                null));
+        
+        wrapperBnd.navView.globalSettingsClickView.setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(
                         requireActivity()
                                 .getSupportFragmentManager()
@@ -164,22 +184,24 @@ public class HomeFragment extends Fragment {
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
             updateStatusText();
             // update adapter showing entries
-            todoListEntryManager.invalidateEntryList();
+            todoListEntryManager.notifyEntryListChanged();
             // update calendar updating indicators
-            todoListEntryManager.invalidateCalendar();
+            todoListEntryManager.notifyVisibleDaysChanged();
         }));
         
         if (preferences.getBoolean(SERVICE_FAILED, false)) {
             // display warning if the background service failed
-            displayErrorMessage(requireContext(), getLifecycle(),
+            displayMessageDialog(requireContext(), getLifecycle(),
                     R.string.service_error, R.string.service_error_description, R.drawable.ic_warning,
+                    R.style.ErrorAlertDialogTheme,
                     dialog -> preferences.edit().putBoolean(SERVICE_FAILED, false).apply());
         }
         
         if (preferences.getBoolean(WALLPAPER_OBTAIN_FAILED, false)) {
             // display warning if there wan an error getting the wallpaper
-            displayErrorMessage(requireContext(), getLifecycle(),
+            displayMessageDialog(requireContext(), getLifecycle(),
                     R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description, R.drawable.ic_warning,
+                    R.style.ErrorAlertDialogTheme,
                     dialog -> preferences.edit().putBoolean(WALLPAPER_OBTAIN_FAILED, false).apply());
         }
     }

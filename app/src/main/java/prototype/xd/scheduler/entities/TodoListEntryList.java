@@ -162,7 +162,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         Set<TodoListEntry> extendedEntries = entriesPerDayUpcomingExpired.get(day);
         Set<TodoListEntry> coreEntries = entriesPerDayCore.get(day);
         if (extendedEntries == null || coreEntries == null) {
-            log(ERROR, NAME, "Can't determine if '" + entry + "' is expired or upcoming. Day not loaded?");
+            log(ERROR, NAME, "Can't determine if '" + entry + "' is expired or upcoming on " + day + ". Day not loaded?");
             return false;
         }
         // in extended set but not in core set

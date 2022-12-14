@@ -129,6 +129,10 @@ public class Keys {
     public static final String ENTRIES_FILE = "entries";
     public static final String GROUPS_FILE = "groupData";
 
+    public static final String GITHUB_ISSUES = "https://github.com/dgudim/Scheduler/issues";
+    public static final String GITHUB_REPO = "https://github.com/dgudim/Scheduler";
+    public static final String GITHUB_RELEASES = "https://github.com/dgudim/Scheduler/releases";
+    
     public static final List<String> WEEK_DAYS = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
     public static final String DEFAULT_BACKGROUND_NAME = "default.png";
     public static final int TODO_LIST_INITIAL_CAPACITY = 75;

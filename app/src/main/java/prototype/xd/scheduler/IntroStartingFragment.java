@@ -1,7 +1,7 @@
 package prototype.xd.scheduler;
 
-import android.content.Intent;
-import android.net.Uri;
+import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.appintro.SlidePolicy;
 
+import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CheckBox;
 
 public class IntroStartingFragment extends Fragment implements SlidePolicy {
@@ -23,8 +24,7 @@ public class IntroStartingFragment extends Fragment implements SlidePolicy {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.intro_starting_fragment, container, false);
-        view.findViewById(R.id.github_button).setOnClickListener(v ->
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/dgudim/Scheduler/issues"))));
+        view.findViewById(R.id.github_button).setOnClickListener(v -> Utilities.openUrl(this, GITHUB_ISSUES));
         understoodCheckbox = view.findViewById(R.id.understood_checkbox);
         return view;
     }

@@ -684,18 +684,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 return null;
             }, false);
         } else {
-            System.out.println(" ------------- addDayRangeToSets: " + rawTextValue.get() + " from " + startDay.get() + " to " + endDay.get());
-            System.out.println("currentExpiredDayOffset: " + currentExpiredDayOffset);
-            System.out.println("currentUpcomingDayOffset: " + currentUpcomingDayOffset);
-            System.out.println("maxExpiredDayOffset: " + maxExpiredDayOffset);
-            System.out.println("maxUpcomingDayOffset: " + maxUpcomingDayOffset);
-            System.out.println("Len before: " + currentUpcomingExpiredSet.size());
             addDayRangeToSets(startDay.get(), endDay.get(),
                     minDay, maxDay,
                     currentExpiredDayOffset, currentUpcomingDayOffset,
                     maxExpiredDayOffset, maxUpcomingDayOffset,
                     coreDaySet, currentUpcomingExpiredSet, extendedUpcomingExpiredSet);
-            System.out.println("Len after: " + currentUpcomingExpiredSet.size());
         }
     }
     

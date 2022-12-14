@@ -4,44 +4,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp">
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <TextView
-        android:id="@+id/cal_event_title"
+        android:id="@+id/app_title"
         style="@style/MediumHeading"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="3 Calendars / 28 events"
+        android:layout_marginStart="8dp"
+        android:text="@string/app_name"
         app:layout_constraintBottom_toTopOf="@+id/view"
-        app:layout_constraintEnd_toStartOf="@+id/open_settings_button"
+        app:layout_constraintEnd_toStartOf="@+id/logo"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/open_settings_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/logo"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="8dp"
+        android:adjustViewBounds="true"
         android:background="@color/transparent"
-        android:contentDescription="@string/action_settings"
-        android:foreground="?android:attr/actionBarItemBackground"
-        android:minWidth="48dp"
-        android:minHeight="48dp"
-        app:tint="?colorTertiary"
+        android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_settings_outline" />
+        tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
     <View
         android:id="@+id/view"
         android:layout_width="0dp"
         android:layout_height="3dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:background="@color/light_gray_bg_tint"
         android:paddingTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/open_settings_button" />
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
 
     <TextView
         android:id="@+id/textView4"
@@ -50,7 +51,6 @@
         android:drawablePadding="3dp"
         android:gravity="center_vertical"
         android:text="@string/app_version_combined"
-        android:textAlignment="viewStart"
         app:drawableStartCompat="@drawable/ic_info"
         app:drawableTint="?colorTertiary"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -58,53 +58,61 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/source_title"
         style="@style/MediumHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="16dp"
-        android:text="Source"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/view" />
+        android:text="@string/source_code_title"
+        app:layout_constraintStart_toEndOf="@+id/source_code_image"
+        app:layout_constraintTop_toBottomOf="@+id/user_guide_click_view" />
 
     <TextView
         android:id="@+id/textView6"
         style="@style/MediumHeadingSubtext"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Check out the github repository"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/source_code_description"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintStart_toEndOf="@+id/source_code_image"
+        app:layout_constraintTop_toBottomOf="@+id/source_title" />
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingEnd="5dp"
+        android:id="@+id/source_code_image"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/textView6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView5"
-        app:srcCompat="@drawable/ic_source" />
+        app:layout_constraintTop_toTopOf="@+id/source_title"
+        app:srcCompat="@drawable/ic_source"
+        app:tint="?colorPrimary"
+        tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingEnd="5dp"
+        android:id="@+id/github_issue_image"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/textView8"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView7"
-        app:srcCompat="@drawable/ic_send" />
+        app:layout_constraintTop_toTopOf="@+id/github_issue_title"
+        app:srcCompat="@drawable/ic_send"
+        app:tint="?colorPrimary"
+        tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/github_issue_title"
         style="@style/MediumHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="16dp"
-        android:text="Github issue"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        android:text="@string/github_issue_title"
+        app:layout_constraintStart_toEndOf="@+id/github_issue_image"
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     <TextView
@@ -112,29 +120,34 @@
         style="@style/MediumHeadingSubtext"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Submit a github issue for a bug report or a feature request"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/github_issue_description"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintStart_toEndOf="@+id/github_issue_image"
+        app:layout_constraintTop_toBottomOf="@+id/github_issue_title" />
 
     <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingEnd="5dp"
+        android:id="@+id/latest_release_image"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/textView10"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView9"
-        app:srcCompat="@drawable/ic_get_app" />
+        app:layout_constraintTop_toTopOf="@+id/latest_release_title"
+        app:srcCompat="@drawable/ic_get_app"
+        app:tint="?colorPrimary"
+        tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/textView9"
+        android:id="@+id/latest_release_title"
         style="@style/MediumHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="16dp"
-        android:text="Latest release"
-        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        android:text="@string/latest_release_title"
+        app:layout_constraintStart_toEndOf="@+id/latest_release_image"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
     <TextView
@@ -142,9 +155,200 @@
         style="@style/MediumHeadingSubtext"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Look for new version and changelog"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/latest_release_description"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+        app:layout_constraintStart_toEndOf="@+id/latest_release_image"
+        app:layout_constraintTop_toBottomOf="@+id/latest_release_title" />
+
+    <ImageView
+        android:id="@+id/per_calendar_settings_image"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView22"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/calendar_settings_title"
+        app:srcCompat="@drawable/ic_calendar_month"
+        app:tint="?colorPrimary"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/calendar_settings_title"
+        style="@style/MediumHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/per_calendar_settings_title"
+        app:layout_constraintStart_toEndOf="@+id/per_calendar_settings_image"
+        app:layout_constraintTop_toBottomOf="@+id/textView24" />
+
+    <TextView
+        android:id="@+id/textView22"
+        style="@style/MediumHeadingSubtext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/per_calendar_settings_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/per_calendar_settings_image"
+        app:layout_constraintTop_toBottomOf="@+id/calendar_settings_title" />
+
+    <ImageView
+        android:id="@+id/global_settings_image"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/global_settings_title"
+        app:srcCompat="@drawable/ic_settings_outline"
+        app:tint="?colorPrimary"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/global_settings_title"
+        style="@style/MediumHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/global_settings_title"
+        app:layout_constraintStart_toEndOf="@+id/global_settings_image"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
+
+    <TextView
+        android:id="@+id/textView24"
+        style="@style/MediumHeadingSubtext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/global_settings_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/global_settings_image"
+        app:layout_constraintTop_toBottomOf="@+id/global_settings_title" />
+
+    <ImageView
+        android:id="@+id/user_guide_image"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView26"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/user_guide_title"
+        app:srcCompat="@drawable/ic_supervised_user"
+        app:tint="?colorPrimary"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/user_guide_title"
+        style="@style/MediumHeading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/user_guide_title"
+        app:layout_constraintStart_toEndOf="@+id/user_guide_image"
+        app:layout_constraintTop_toBottomOf="@+id/textView22" />
+
+    <TextView
+        android:id="@+id/textView26"
+        style="@style/MediumHeadingSubtext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/user_guide_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/user_guide_image"
+        app:layout_constraintTop_toBottomOf="@+id/user_guide_title" />
+
+    <View
+        android:id="@+id/user_guide_click_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginBottom="-8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/textView26"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/user_guide_title"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <View
+        android:id="@+id/global_settings_click_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginBottom="-8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/textView24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/global_settings_title"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <View
+        android:id="@+id/per_calendar_settings_click_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginBottom="-8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/textView22"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/calendar_settings_title"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <View
+        android:id="@+id/latest_release_click_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginBottom="-8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/textView10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/latest_release_title"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <View
+        android:id="@+id/github_issue_click_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginBottom="-8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/textView8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/github_issue_title"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <View
+        android:id="@+id/source_code_click_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
+        android:layout_marginBottom="-8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/textView6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/source_title"
+        tools:ignore="SpeakableTextPresentCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -222,7 +222,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         if (shouldSaveEntries) {
             saveEntriesAsync();
             shouldSaveEntries = false;
-            invalidateEntryList();
+            notifyEntryListChanged();
         }
         notifyDaysChanged(daysToRebind);
         daysToRebind.clear();
@@ -235,14 +235,21 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     // tells entry list that all entries have changed
-    public void invalidateEntryList() {
+    public void notifyEntryListChanged() {
         todoListViewAdapter.notifyVisibleEntriesUpdated();
     }
     
-    // tells calendar list that all entries have changed
-    public void invalidateCalendar() {
+    // tells calendar list that all visible entries have changed
+    public void notifyVisibleDaysChanged() {
         if (calendarView != null) {
             calendarView.notifyVisibleDaysChanged();
+        }
+    }
+    
+    // tells calendar list that all visible entries have changed
+    public void notifyCalendarChanged() {
+        if (calendarView != null) {
+            calendarView.notifyCalendarChanged();
         }
     }
     
@@ -252,8 +259,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             todoListEntry.invalidateAllParameters(false);
         }
         updateStaticVarsAndCalendarVisibility();
-        invalidateCalendar();
-        invalidateEntryList();
+        notifyCalendarChanged();
+        notifyEntryListChanged();
     }
     
     public void attachCalendarView(@NonNull CalendarView calendarView) {
@@ -373,7 +380,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                     entry.getVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(),
                             displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE));
         }
-        invalidateEntryList();
+        notifyEntryListChanged();
         if (entry.isVisibleOnLockscreenToday()) {
             setBitmapUpdateFlag();
         }

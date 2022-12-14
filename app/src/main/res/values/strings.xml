@@ -136,4 +136,19 @@
     <string name="wallpaper_obtain_error">Error getting wallpaper</string>
     <string name="wallpaper_obtain_error_description">An error occurred while trying to get lockscreen wallpaper :( Try setting wallpaper manually and restarting the app. If the problem persists, your device probably restricts access to background or you uninstalled and reinstalled the app, but you can open an issue on github, maybe i will help.</string>
     <string name="ignore">Ignore</string>
+    <string name="work_in_progress">Work in progress</string>
+    <string name="easter_egg">Hey, you found an easter egg!</string>
+    <string name="easter_egg_description">There is not much more to say, good job i guess :)</string>
+    <string name="global_settings_title">Global settings</string>
+    <string name="global_settings_description">Global appearance settings</string>
+    <string name="per_calendar_settings_title">Сalendar settings</string>
+    <string name="per_calendar_settings_description">Configure parameters for each calendar individually</string>
+    <string name="user_guide_title">User guide</string>
+    <string name="user_guide_description">View tutorial</string>
+    <string name="latest_release_title">Latest release</string>
+    <string name="latest_release_description">Look for new version and changelog</string>
+    <string name="github_issue_title">Github issue</string>
+    <string name="github_issue_description">Submit a github issue for a bug report or a feature request</string>
+    <string name="source_code_title">Source</string>
+    <string name="source_code_description">Check out the github repository</string>
 </resources>

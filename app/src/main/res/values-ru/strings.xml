@@ -135,4 +135,19 @@
     <string name="service_error_description">Произошла ошибка в фоновом сервисе установки обоев :( Попробуйте перезапустить приложение. Если проблема не устранится, напишите мне.</string>
     <string name="show_upcoming_and_expired_event_indicators">Показывать прошедшие и будущие события в календаре</string>
     <string name="ignore">Игнорировать</string>
+    <string name="work_in_progress">В процессе</string>
+    <string name="easter_egg">Хэй, ты нашел пасхалку!</string>
+    <string name="easter_egg_description">Ну, больше сказать нечего, хорошая работа :)</string>
+    <string name="global_settings_title">Глобальные настройки</string>
+    <string name="global_settings_description">Глобальные настройки внешнего вида</string>
+    <string name="per_calendar_settings_title">Настройки календарей</string>
+    <string name="per_calendar_settings_description">Настройте параметры для каждого календаря индивидуально</string>
+    <string name="user_guide_title">Гид пользователя</string>
+    <string name="user_guide_description">Посмотреть туториал</string>
+    <string name="latest_release_title">Последний релиз</string>
+    <string name="latest_release_description">Посмотреть новую версию и журнал изменений</string>
+    <string name="github_issue_title">Issue на гитхабе</string>
+    <string name="github_issue_description">Запостить issue на гитабе для баг репорта или запроса новых функций</string>
+    <string name="source_code_title">Исходник</string>
+    <string name="source_code_description">Посмотреть гитхаб репозиторий</string>
 </resources>

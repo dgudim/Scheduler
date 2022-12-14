@@ -20,6 +20,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.annotation.StyleRes;
 import androidx.lifecycle.Lifecycle;
 
 import com.flask.colorpicker.ColorPickerView;
@@ -300,13 +301,14 @@ public class DialogueUtilities {
         boolean onClick(View view, String text, int selectedIndex);
     }
     
-    public static void displayErrorMessage(@NonNull final Context context,
-                                           @NonNull final Lifecycle lifecycle,
-                                           @StringRes int titleStringResource,
-                                           @StringRes int messageStringResource,
-                                           @DrawableRes int iconResource,
-                                           DialogInterface.OnDismissListener dismissListener) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ErrorAlertDialogTheme);
+    public static void displayMessageDialog(@NonNull final Context context,
+                                            @NonNull final Lifecycle lifecycle,
+                                            @StringRes int titleStringResource,
+                                            @StringRes int messageStringResource,
+                                            @DrawableRes int iconResource,
+                                            @StyleRes int theme,
+                                            DialogInterface.OnDismissListener dismissListener) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, theme);
         builder.setTitle(titleStringResource);
         builder.setMessage(messageStringResource);
         builder.setIcon(iconResource);
