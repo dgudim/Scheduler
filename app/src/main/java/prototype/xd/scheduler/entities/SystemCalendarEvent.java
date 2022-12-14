@@ -16,6 +16,7 @@ import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
 
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.dmfs.rfc5545.recur.RecurrenceRule;
@@ -256,5 +257,11 @@ public class SystemCalendarEvent {
         } else {
             log(WARN, NAME, "Couldn't add exceptions to " + title);
         }
+    }
+    
+    @NonNull
+    @Override
+    public String toString() {
+        return "SystemCalendarEvent" + title + " " + subKeys;
     }
 }

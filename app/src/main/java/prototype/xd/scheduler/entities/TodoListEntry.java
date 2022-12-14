@@ -936,8 +936,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     @Override
     public String toString() {
         if(isFromSystemCalendar()) {
-            return "TodoListEntry: " + rawTextValue.get() + " [" + event + "] (" + startDay + " - " + endDay + ")";
+            return "TodoListEntry: " + rawTextValue.get() + " [" + event + "] (" + startDay.get() + " - " + endDay.get() + ")";
         }
-        return "TodoListEntry: " + rawTextValue.get() + " " + "(" + startDay + " - " + endDay + ")";
+        return "TodoListEntry: " + rawTextValue.get() + " " + "(" + startDay.get() + " - " + endDay.get() + ")";
     }
 }
