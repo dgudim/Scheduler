@@ -89,12 +89,12 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
                                                  Map<Long, Set<TodoListEntry>> entriesPerDay) {
         Set<Long> daysForEntry = daysPerEntry.remove(entry);
         if (daysForEntry == null) {
-            log(ERROR, NAME, "Can't remove associations for '" + entry.rawTextValue.get() + "', entry not managed by current container");
+            log(ERROR, NAME, "Can't remove associations for '" + entry + "', entry not managed by current container");
         } else {
             for (Long day : daysForEntry) {
                 Set<TodoListEntry> entriesOnDay = entriesPerDay.get(day);
                 if (entriesOnDay == null) {
-                    log(ERROR, NAME, "Can't remove associations for '" + entry.rawTextValue.get() + "' on day " + day);
+                    log(ERROR, NAME, "Can't remove associations for '" + entry + "' on day " + day);
                     continue;
                 }
                 entriesOnDay.remove(entry);
@@ -161,7 +161,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         Set<TodoListEntry> extendedEntries = entriesPerDayUpcomingExpired.get(day);
         Set<TodoListEntry> coreEntries = entriesPerDayCore.get(day);
         if (extendedEntries == null || coreEntries == null) {
-            log(ERROR, NAME, "Can't determine if '" + entry.rawTextValue.get() + "' is expired or upcoming. Day not loaded?");
+            log(ERROR, NAME, "Can't determine if '" + entry + "' is expired or upcoming. Day not loaded?");
             return false;
         }
         // in extended set but not in core set

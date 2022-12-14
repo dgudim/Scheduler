@@ -18,6 +18,7 @@ import android.util.ArrayMap;
 import android.util.ArraySet;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.color.MaterialColors;
@@ -179,7 +180,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     private transient ParameterGetter<Long> endDay;
     private transient ParameterGetter<Long> durationDays;
     
-    public ParameterGetter<String> rawTextValue;
+    private ParameterGetter<String> rawTextValue;
     
     @Nullable
     private transient Group group;
@@ -234,7 +235,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         
         event.linkEntry(this);
     }
-    
     
     public TodoListEntry(SArrayMap<String, String> params, String groupName, List<Group> groups, long id) {
         tempGroupName = groupName;
@@ -398,6 +398,10 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         } else {
             return "";
         }
+    }
+    
+    public String getRawTextValue() {
+        return rawTextValue.get();
     }
     
     protected void unlinkGroupInternal(boolean invalidate) {
@@ -926,5 +930,14 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     @Override
     public int getType() {
         return isFromSystemCalendar() ? 1 : 0;
+    }
+    
+    @NonNull
+    @Override
+    public String toString() {
+        if(isFromSystemCalendar()) {
+            return "TodoListEntry: " + rawTextValue.get() + " [" + event + "] (" + startDay + " - " + endDay + ")";
+        }
+        return "TodoListEntry: " + rawTextValue.get() + " " + "(" + startDay + " - " + endDay + ")";
     }
 }

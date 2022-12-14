@@ -14,8 +14,8 @@ public class PreferencesStore {
         throw new IllegalStateException("Preferences storage class");
     }
     
-    public volatile static SharedPreferences preferences;
-    public volatile static SharedPreferences servicePreferences;
+    public static volatile SharedPreferences preferences;
+    public static volatile SharedPreferences servicePreferences;
     
     public static void init(Context context) {
         if (preferences == null) {

@@ -56,84 +56,105 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             context = viewBinding.getRoot().getContext();
         }
         
-        void bind(@NonNull final TodoListEntry currentEntry,
-                  @NonNull final TodoListEntryManager todoListEntryManager,
-                  @NonNull final EntrySettings entrySettings,
-                  @NonNull final SystemCalendarSettings systemCalendarSettings) {
-            
-            if (currentEntry.isFromSystemCalendar()) {
-                ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding) viewBinding;
-                
-                bnd.eventColor.setCardBackgroundColor(currentEntry.event.color);
-                bnd.timeText.setText(currentEntry.getTimeSpan(context));
-                bnd.timeText.setTextColor(currentEntry.fontColor.get(currentlySelectedDay));
-                bnd.settings.setOnClickListener(v -> systemCalendarSettings.show(currentEntry));
-            } else {
-                ListSelectionTodoBinding bnd = (ListSelectionTodoBinding) viewBinding;
-                
-                bnd.deletionButton.setOnClickListener(view1 ->
-                        displayConfirmationDialogue(view1.getContext(), lifecycle,
-                                R.string.delete, R.string.are_you_sure,
-                                R.string.no, R.string.yes,
-                                view2 -> todoListEntryManager.removeEntry(currentEntry)));
-                
-                bnd.isDone.setCheckedSilent(currentEntry.isCompleted());
-                
-                bnd.isDone.setOnClickListener(view12 -> {
-                    if (!currentEntry.isGlobal()) {
-                        currentEntry.changeParameter(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
-                    } else {
-                        currentEntry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
-                    }
-                    todoListEntryManager.performDeferredTasks();
-                });
-                
-                bnd.getRoot().setOnLongClickListener(view1 -> {
-                    
-                    final List<Group> groupList = todoListEntryManager.getGroups();
-                    int currentIndex = max(groupIndexInList(groupList, currentEntry.getRawGroupName()), 0);
-                    displayEditTextSpinnerDialogue(context, lifecycle,
-                            R.string.edit_event, -1, R.string.event_name_input_hint,
-                            R.string.cancel, R.string.save, R.string.move_to_global_list, currentEntry.rawTextValue.get(), groupList,
-                            currentIndex, (view2, text, selectedIndex) -> {
-                                if (selectedIndex != currentIndex) {
-                                    currentEntry.changeGroup(groupList.get(selectedIndex));
-                                }
-                                currentEntry.changeParameter(TEXT_VALUE, text);
-                                todoListEntryManager.performDeferredTasks();
-                                return true;
-                            },
-                            !currentEntry.isGlobal() ? (view2, text, selectedIndex) -> {
-                                if (selectedIndex != currentIndex) {
-                                    currentEntry.changeGroup(groupList.get(selectedIndex));
-                                }
-                                currentEntry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
-                                currentEntry.changeParameter(IS_COMPLETED, "false");
-                                todoListEntryManager.performDeferredTasks();
-                                return true;
-                            } : null);
-                    return true;
-                });
-                bnd.settings.setOnClickListener(v -> entrySettings.show(currentEntry, v.getContext()));
-            }
-            
+        private void displayDeletionDialog(@NonNull final TodoListEntry entry,
+                                           @NonNull final TodoListEntryManager todoListEntryManager) {
+            displayConfirmationDialogue(context, lifecycle,
+                    R.string.delete, R.string.are_you_sure,
+                    R.string.no, R.string.yes,
+                    view2 -> todoListEntryManager.removeEntry(entry));
+        }
+        
+        private void displayEditDialog(@NonNull final TodoListEntry entry,
+                                       @NonNull final TodoListEntryManager todoListEntryManager) {
+            final List<Group> groupList = todoListEntryManager.getGroups();
+            int currentIndex = max(groupIndexInList(groupList, entry.getRawGroupName()), 0);
+            displayEditTextSpinnerDialogue(context, lifecycle,
+                    R.string.edit_event, -1, R.string.event_name_input_hint,
+                    R.string.cancel, R.string.save, R.string.move_to_global_list, entry.getRawTextValue(), groupList,
+                    currentIndex, (view2, text, selectedIndex) -> {
+                        if (selectedIndex != currentIndex) {
+                            entry.changeGroup(groupList.get(selectedIndex));
+                        }
+                        entry.changeParameter(TEXT_VALUE, text);
+                        todoListEntryManager.performDeferredTasks();
+                        return true;
+                    },
+                    !entry.isGlobal() ? (view2, text, selectedIndex) -> {
+                        if (selectedIndex != currentIndex) {
+                            entry.changeGroup(groupList.get(selectedIndex));
+                        }
+                        entry.changeParameter(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
+                        entry.changeParameter(IS_COMPLETED, "false");
+                        todoListEntryManager.performDeferredTasks();
+                        return true;
+                    } : null);
+        }
+        
+        private void bindToSystemCalendarEntry(@NonNull final TodoListEntry entry,
+                                               @NonNull final SystemCalendarSettings systemCalendarSettings) {
+            ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding) viewBinding;
+    
+            bnd.eventColor.setCardBackgroundColor(entry.event.color);
+            bnd.timeText.setText(entry.getTimeSpan(context));
+            bnd.timeText.setTextColor(entry.fontColor.get(currentlySelectedDay));
+            bnd.settings.setOnClickListener(v -> systemCalendarSettings.show(entry));
+        }
+    
+        private void bindToRegularEntry(@NonNull final TodoListEntry entry,
+                                        @NonNull final TodoListEntryManager todoListEntryManager,
+                                        @NonNull final EntrySettings entrySettings) {
+            ListSelectionTodoBinding bnd = (ListSelectionTodoBinding) viewBinding;
+    
+            bnd.deletionButton.setOnClickListener(view1 -> displayDeletionDialog(entry, todoListEntryManager));
+    
+            bnd.isDone.setCheckedSilent(entry.isCompleted());
+    
+            bnd.isDone.setOnClickListener(view12 -> {
+                if (!entry.isGlobal()) {
+                    entry.changeParameter(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
+                } else {
+                    entry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
+                }
+                todoListEntryManager.performDeferredTasks();
+            });
+    
+            bnd.getRoot().setOnLongClickListener(view1 -> {
+                displayEditDialog(entry, todoListEntryManager);
+                return true;
+            });
+            bnd.settings.setOnClickListener(v -> entrySettings.show(entry, v.getContext()));
+        }
+        
+        private void bindToCommonPart(@NonNull final TodoListEntry entry) {
             // fallback to get view by id because this part is common and we can't cast to any binding
             View root = viewBinding.getRoot();
-            
             TextView todoText = root.findViewById(R.id.todoText);
-            
             MaterialCardView backgroundLayer = root.findViewById(R.id.backgroundLayer);
-            backgroundLayer.setCardBackgroundColor(currentEntry.bgColor.get(currentlySelectedDay));
-            backgroundLayer.setStrokeColor(currentEntry.borderColor.get(currentlySelectedDay));
-            
-            if (currentEntry.isCompleted() || currentEntry.hideByContent()) {
-                todoText.setTextColor(mixTwoColors(currentEntry.fontColor.get(currentlySelectedDay), Color.WHITE, 0.5));
+    
+            backgroundLayer.setCardBackgroundColor(entry.bgColor.get(currentlySelectedDay));
+            backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDay));
+    
+            if (entry.isCompleted() || entry.hideByContent()) {
+                todoText.setTextColor(mixTwoColors(entry.fontColor.get(currentlySelectedDay), Color.WHITE, 0.5));
             } else {
-                todoText.setTextColor(currentEntry.fontColor.get(currentlySelectedDay));
+                todoText.setTextColor(entry.fontColor.get(currentlySelectedDay));
             }
+    
+            todoText.setText(entry.getTextOnDay(currentlySelectedDay, context));
+        }
+        
+        void bindTo(@NonNull final TodoListEntry currentEntry,
+                    @NonNull final TodoListEntryManager todoListEntryManager,
+                    @NonNull final EntrySettings entrySettings,
+                    @NonNull final SystemCalendarSettings systemCalendarSettings) {
             
-            todoText.setText(currentEntry.getTextOnDay(currentlySelectedDay, context));
-            
+            if (currentEntry.isFromSystemCalendar()) {
+                bindToSystemCalendarEntry(currentEntry, systemCalendarSettings);
+            } else {
+                bindToRegularEntry(currentEntry, todoListEntryManager, entrySettings);
+            }
+    
+            bindToCommonPart(currentEntry);
         }
     }
     
@@ -191,7 +212,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
     @Override
     public void onBindViewHolder(@NonNull EntryViewHolder<?> holder, int position) {
-        holder.bind(currentTodoListEntries.get(position), todoListEntryManager, entrySettings, systemCalendarSettings);
+        holder.bindTo(currentTodoListEntries.get(position), todoListEntryManager, entrySettings, systemCalendarSettings);
     }
     
     @Override

@@ -120,7 +120,7 @@ public class Utilities {
     
     public static void saveEntries(List<TodoListEntry> entries) {
         try {
-            List<TodoListEntry> entriesToSave = new ArrayList();
+            List<TodoListEntry> entriesToSave = new ArrayList<>();
             
             for (int i = 0; i < entries.size(); i++) {
                 TodoListEntry entry = entries.get(i);

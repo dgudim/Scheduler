@@ -112,6 +112,27 @@ class LockScreenBitmapDrawer {
         }
     }
     
+    private Bitmap getBitmapToDrawOn() throws IOException {
+        Bitmap bitmap = getBitmapFromLockScreen();
+        File bg = getBackgroundAccordingToDayAndTime();
+    
+        if (noFingerPrint(bitmap)) {
+            bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
+        } else {
+            if (bg.exists()) {
+                bitmap = readStream(new FileInputStream(bg));
+            } else {
+                File defFile = getFile(Keys.DEFAULT_BACKGROUND_NAME);
+                if (defFile.exists()) {
+                    bitmap = readStream(new FileInputStream(defFile));
+                } else {
+                    throw new FileNotFoundException("No available background to load");
+                }
+            }
+        }
+        return makeMutable(bitmap);
+    }
+    
     public boolean constructBitmap(BackgroundSetterService backgroundSetterService) {
         
         if (!isVerticalOrientation(backgroundSetterService)) {
@@ -127,27 +148,11 @@ class LockScreenBitmapDrawer {
                     long time = getCurrentTimestamp();
                     log(INFO, NAME, "Setting wallpaper");
                     
-                    Bitmap bitmap = getBitmapFromLockScreen();
-                    File bg = getBackgroundAccordingToDayAndTime();
+                    Bitmap bitmap = getBitmapToDrawOn();
                     
-                    if (noFingerPrint(bitmap)) {
-                        bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
-                    } else {
-                        if (bg.exists()) {
-                            bitmap = readStream(new FileInputStream(bg));
-                        } else {
-                            File defFile = getFile(Keys.DEFAULT_BACKGROUND_NAME);
-                            if (defFile.exists()) {
-                                bitmap = readStream(new FileInputStream(defFile));
-                            } else {
-                                throw new FileNotFoundException("No available background to load");
-                            }
-                        }
-                    }
-                    
-                    bitmap = makeMutable(bitmap);
                     drawItemsOnBitmap(backgroundSetterService, bitmap);
                     log(INFO, NAME, "Processed wallpaper in " + (getCurrentTimestamp() - time) + "ms");
+                    
                     time = getCurrentTimestamp();
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
                     log(INFO, NAME, "Set wallpaper in " + (getCurrentTimestamp() - time) / 1000f + "s");

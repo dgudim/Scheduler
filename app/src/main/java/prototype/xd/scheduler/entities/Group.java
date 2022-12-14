@@ -48,14 +48,14 @@ public class Group implements Serializable {
     // to be called only by TodoListEntry
     protected void attachEntryInternal(TodoListEntry todoListEntry) {
         if (associatedEntries.put(todoListEntry.getId(), todoListEntry) != null) {
-            log(WARN, "Group", "attachEntryInternal called with " + todoListEntry.rawTextValue.get() + " but it's already attached");
+            log(WARN, "Group", "attachEntryInternal called with " + todoListEntry + " but it's already attached");
         }
     }
     
     // to be called only by TodoListEntry
     protected void detachEntryInternal(TodoListEntry todoListEntry) {
         if (associatedEntries.remove(todoListEntry.getId()) == null) {
-            log(WARN, "Group", "detachEntryInternal called with " + todoListEntry.rawTextValue.get() + " but it's not attached");
+            log(WARN, "Group", "detachEntryInternal called with " + todoListEntry + " but it's not attached");
         }
     }
     

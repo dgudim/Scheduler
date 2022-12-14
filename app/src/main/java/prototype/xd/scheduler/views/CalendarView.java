@@ -78,7 +78,7 @@ public class CalendarView {
             setEventIndicator(color, index, visiblePosition, false);
         }
         
-        public void bind(CalendarDay elementDay, CalendarView calendarView, TodoListEntryManager todoListEntryManager) {
+        public void bindTo(CalendarDay elementDay, CalendarView calendarView, TodoListEntryManager todoListEntryManager) {
             date = elementDay.getDate();
             binding.calendarDayText.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
             
@@ -125,7 +125,7 @@ public class CalendarView {
             binding = bnd;
         }
         
-        public void bind(CalendarMonth calendarMonth, List<DayOfWeek> daysOfWeek) {
+        public void bindTo(CalendarMonth calendarMonth, List<DayOfWeek> daysOfWeek) {
             if (binding.weekdayTitlesContainer.getTag() == null) {
                 binding.weekdayTitlesContainer.setTag(calendarMonth.getYearMonth());
                 for (int i = 0; i < daysOfWeek.size(); i++) {
@@ -176,7 +176,7 @@ public class CalendarView {
             
             @Override
             public void bind(@NonNull CalendarDayViewContainer container, CalendarDay calendarDay) {
-                container.bind(calendarDay, CalendarView.this, todoListEntryManager);
+                container.bindTo(calendarDay, CalendarView.this, todoListEntryManager);
             }
         });
         
@@ -189,7 +189,7 @@ public class CalendarView {
             
             @Override
             public void bind(@NonNull CalendarHeaderContainer container, CalendarMonth calendarMonth) {
-                container.bind(calendarMonth, daysOfWeek);
+                container.bindTo(calendarMonth, daysOfWeek);
                 
                 // new month was loaded
                 if (loadedMonths.contains(calendarMonth.getYearMonth()) && newMonthBindListener != null) {

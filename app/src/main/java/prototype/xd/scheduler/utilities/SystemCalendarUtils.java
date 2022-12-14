@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
@@ -31,7 +32,7 @@ public class SystemCalendarUtils {
         throw new IllegalStateException("System calendar utility class");
     }
     
-    public static final List<String> calendarColumns = new ArrayList<>(Arrays.asList(
+    public static final List<String> calendarColumns = Collections.unmodifiableList(Arrays.asList(
             CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
             CalendarContract.Calendars.ACCOUNT_NAME,
             CalendarContract.Calendars.ACCOUNT_TYPE,
@@ -40,7 +41,7 @@ public class SystemCalendarUtils {
             CalendarContract.Calendars.CALENDAR_COLOR,
             CalendarContract.Calendars.CALENDAR_TIME_ZONE));
     
-    public static final List<String> calendarEventsColumns = new ArrayList<>(Arrays.asList(
+    public static final List<String> calendarEventsColumns =  Collections.unmodifiableList(Arrays.asList(
             CalendarContract.Events.TITLE,
             CalendarContract.Events.DISPLAY_COLOR,
             CalendarContract.Events.DTSTART,
