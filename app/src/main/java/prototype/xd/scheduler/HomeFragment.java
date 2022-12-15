@@ -156,9 +156,6 @@ public class HomeFragment extends Fragment {
     
         wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> Toast.makeText(getActivity(), getString(R.string.work_in_progress),
                 Toast.LENGTH_LONG).show());
-    
-        wrapperBnd.navView.perCalendarSettingsClickView.setOnClickListener(v -> Toast.makeText(getActivity(), getString(R.string.work_in_progress),
-                Toast.LENGTH_LONG).show());
         
         wrapperBnd.navView.logo.setOnClickListener(v -> displayMessageDialog(requireContext(), getLifecycle(),
                 R.string.easter_egg, R.string.easter_egg_description, R.drawable.ic_egg,
@@ -171,7 +168,15 @@ public class HomeFragment extends Fragment {
                                 .getSupportFragmentManager()
                                 .findFragmentById(R.id.nav_host_fragment)))
                         .getNavController()
-                        .navigate(R.id.action_HomeFragment_to_SettingsFragment));
+                        .navigate(R.id.action_HomeFragment_to_GlobalSettingsFragment));
+    
+        wrapperBnd.navView.calendarSettingsClickView.setOnClickListener(v ->
+                ((NavHostFragment) Objects.requireNonNull(
+                        requireActivity()
+                                .getSupportFragmentManager()
+                                .findFragmentById(R.id.nav_host_fragment)))
+                        .getNavController()
+                        .navigate(R.id.action_HomeFragment_to_CalendarSettingsFragment));
         
         return wrapperBnd.getRoot();
     }

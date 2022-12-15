@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                             log(ERROR, NAME, "stream null for uri: " + uri.getPath());
                         }
                         
-                        runOnUiThread(() -> findFragmentInNavHost(this, SettingsFragment.class).notifyBgSelected());
+                        runOnUiThread(() -> findFragmentInNavHost(this, GlobalSettingsFragment.class).notifyBgSelected());
                     } catch (Exception e) {
                         logException("LBCP thread", e);
                     }

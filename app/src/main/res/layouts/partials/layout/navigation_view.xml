@@ -296,7 +296,7 @@
         tools:ignore="SpeakableTextPresentCheck" />
 
     <View
-        android:id="@+id/per_calendar_settings_click_view"
+        android:id="@+id/calendar_settings_click_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="-8dp"

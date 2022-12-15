@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.SettingsFragment;
+import prototype.xd.scheduler.GlobalSettingsFragment;
 import prototype.xd.scheduler.adapters.BackgroundImagesGridViewAdapter;
 import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.BgGridSelectionViewBinding;
@@ -26,7 +26,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     @NonNull
     private final Lifecycle lifecycle;
     
-    public AdaptiveBackgroundSettingsEntryConfig(@NonNull final SettingsFragment fragment) {
+    public AdaptiveBackgroundSettingsEntryConfig(@NonNull final GlobalSettingsFragment fragment) {
         gridViewAdapter = new BackgroundImagesGridViewAdapter(fragment);
         lifecycle = fragment.getLifecycle();
     }

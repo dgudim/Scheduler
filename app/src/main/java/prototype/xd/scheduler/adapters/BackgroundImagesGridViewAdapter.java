@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import prototype.xd.scheduler.MainActivity;
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.SettingsFragment;
+import prototype.xd.scheduler.GlobalSettingsFragment;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class BackgroundImagesGridViewAdapter extends BaseAdapter {
@@ -26,7 +26,7 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
     private final MainActivity mainActivity;
     private final String[] availableDays_localized;
     
-    public BackgroundImagesGridViewAdapter(SettingsFragment fragment) {
+    public BackgroundImagesGridViewAdapter(GlobalSettingsFragment fragment) {
         mainActivity = (MainActivity) fragment.requireActivity();
         availableDays_localized = new String[]{
                 fragment.getString(R.string.day_monday),

@@ -39,7 +39,7 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
         void bind(ResetButtonSettingsEntryConfig config) {
             viewBinding.resetSettingsButton.setOnClickListener(v ->
                     displayConfirmationDialogue(v.getContext(), config.fragment.getLifecycle(),
-                            R.string.reset_settings_prompt,
+                            R.string.reset_settings_prompt, R.string.reset_settings_description,
                             R.string.cancel, R.string.reset,
                             view -> {
                                 preferences.edit().clear().apply();
