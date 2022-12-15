@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.adapters;
 
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Utilities.callImageFileChooser;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
+import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,31 +12,33 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.function.Consumer;
 
-import prototype.xd.scheduler.MainActivity;
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.GlobalSettingsFragment;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class BackgroundImagesGridViewAdapter extends BaseAdapter {
     
-    private final MainActivity mainActivity;
+    private final Consumer<Integer> bgSelectionClickedCallback;
     private final String[] availableDays_localized;
     
-    public BackgroundImagesGridViewAdapter(GlobalSettingsFragment fragment) {
-        mainActivity = (MainActivity) fragment.requireActivity();
+    public BackgroundImagesGridViewAdapter(@NonNull final Context context,
+                                           @NonNull final Consumer<Integer> bgSelectionClickedCallback) {
+        this.bgSelectionClickedCallback = bgSelectionClickedCallback;
         availableDays_localized = new String[]{
-                fragment.getString(R.string.day_monday),
-                fragment.getString(R.string.day_tuesday),
-                fragment.getString(R.string.day_wednesday),
-                fragment.getString(R.string.day_thursday),
-                fragment.getString(R.string.day_friday),
-                fragment.getString(R.string.day_saturday),
-                fragment.getString(R.string.day_sunday),
-                fragment.getString(R.string.day_default)
+                context.getString(R.string.day_monday),
+                context.getString(R.string.day_tuesday),
+                context.getString(R.string.day_wednesday),
+                context.getString(R.string.day_thursday),
+                context.getString(R.string.day_friday),
+                context.getString(R.string.day_saturday),
+                context.getString(R.string.day_sunday),
+                context.getString(R.string.day_default)
         };
     }
     
@@ -74,11 +76,9 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
         } catch (IOException e) {
             logException("GridViewAdapter", e);
         }
-    
-        convertView.findViewById(R.id.bg_image_container).setOnClickListener(v -> callImageFileChooser(mainActivity, i));
+        
+        convertView.findViewById(R.id.bg_image_container).setOnClickListener(v -> bgSelectionClickedCallback.accept(i));
         
         return convertView;
     }
-    
-    
 }

@@ -1,17 +1,11 @@
 package prototype.xd.scheduler;
 
-import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.Utilities.findFragmentInNavHost;
-import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
 
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -23,9 +17,7 @@ import com.google.android.material.color.HarmonizedColors;
 import com.google.android.material.color.HarmonizedColorsOptions;
 
 import java.io.File;
-import java.io.InputStream;
 
-import prototype.xd.scheduler.utilities.BitmapUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.PreferencesStore;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
@@ -87,34 +79,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             BackgroundSetterService.ping(getApplicationContext());
             setContentView(R.layout.activity_main);
-        }
-    }
-    
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        if (resultCode != RESULT_OK) return;
-        if (requestCode >= 0 && requestCode <= 7) {
-            Uri uri = intent.getData();
-            if (uri != null) {
-                new Thread(() -> {
-                    try {
-                        
-                        InputStream stream = getContentResolver().openInputStream(uri);
-                        if (stream != null) {
-                            BitmapUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                                    new File(getRootDir(), Keys.WEEK_DAYS.get(requestCode) + ".png"));
-                            stream.close();
-                        } else {
-                            log(ERROR, NAME, "stream null for uri: " + uri.getPath());
-                        }
-                        
-                        runOnUiThread(() -> findFragmentInNavHost(this, GlobalSettingsFragment.class).notifyBgSelected());
-                    } catch (Exception e) {
-                        logException("LBCP thread", e);
-                    }
-                }, "LBCP thread").start();
-            }
         }
     }
 }

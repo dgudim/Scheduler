@@ -5,14 +5,16 @@ import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirma
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
+import java.util.function.Consumer;
+
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.GlobalSettingsFragment;
 import prototype.xd.scheduler.adapters.BackgroundImagesGridViewAdapter;
 import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.BgGridSelectionViewBinding;
@@ -25,10 +27,20 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     private final BackgroundImagesGridViewAdapter gridViewAdapter;
     @NonNull
     private final Lifecycle lifecycle;
+    private Integer lastClickedBgIndex;
     
-    public AdaptiveBackgroundSettingsEntryConfig(@NonNull final GlobalSettingsFragment fragment) {
-        gridViewAdapter = new BackgroundImagesGridViewAdapter(fragment);
-        lifecycle = fragment.getLifecycle();
+    public AdaptiveBackgroundSettingsEntryConfig(@NonNull final Context context,
+                                                 @NonNull final Lifecycle lifecycle,
+                                                 @NonNull final Consumer<Integer> bgSelectionClickedCallback) {
+        gridViewAdapter = new BackgroundImagesGridViewAdapter(context, bgIndex -> {
+            lastClickedBgIndex = bgIndex;
+            bgSelectionClickedCallback.accept(bgIndex);
+        });
+        this.lifecycle = lifecycle;
+    }
+    
+    public Integer getLastClickedBgIndex() {
+        return lastClickedBgIndex;
     }
     
     public void notifyBackgroundUpdated() {

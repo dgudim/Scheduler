@@ -11,7 +11,6 @@ import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -23,6 +22,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -200,14 +200,11 @@ public class Utilities {
         throw new NullPointerException("Fragment " + targetFragmentClass + " not found");
     }
     
-    public static void callImageFileChooser(Activity activity, int requestCode) {
-        Intent chooseFile;
-        Intent intent;
-        chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
-        chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
-        chooseFile.setType("image/*");
-        intent = Intent.createChooser(chooseFile, "Choose an image");
-        activity.startActivityForResult(intent, requestCode);
+    public static void callImageFileChooser(ActivityResultLauncher<Intent> callback) {
+        Intent chooseImage = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseImage.addCategory(Intent.CATEGORY_OPENABLE);
+        chooseImage.setType("image/*");
+        callback.launch(Intent.createChooser(chooseImage, "Choose an image"));
     }
     
     public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long day) {
