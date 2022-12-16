@@ -14,13 +14,20 @@ import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 
 public class SettingsListViewAdapter extends RecyclerView.Adapter<SettingsEntryConfig.SettingsViewHolder<? extends ViewBinding, ? extends SettingsEntryConfig>> {
     
+    private boolean collapsed;
     private final List<? extends SettingsEntryConfig> settingsEntries;
     private final Lifecycle lifecycle;
     
     public SettingsListViewAdapter(@NonNull List<? extends SettingsEntryConfig> settingsEntries,
-                                   @NonNull Lifecycle lifecycle) {
+                                   @NonNull Lifecycle lifecycle, boolean collapsed) {
         this.settingsEntries = settingsEntries;
         this.lifecycle = lifecycle;
+        this.collapsed = collapsed;
+    }
+    
+    public SettingsListViewAdapter(@NonNull List<? extends SettingsEntryConfig> settingsEntries,
+                                   @NonNull Lifecycle lifecycle) {
+        this(settingsEntries, lifecycle, false);
     }
     
     @NonNull
@@ -41,6 +48,26 @@ public class SettingsListViewAdapter extends RecyclerView.Adapter<SettingsEntryC
     
     @Override
     public int getItemCount() {
-        return settingsEntries.size();
+        return collapsed ? 1 : settingsEntries.size();
+    }
+    
+    public void setCollapsed(boolean collapsed) {
+        boolean prevCollapsed = this.collapsed;
+        this.collapsed = collapsed;
+        if(prevCollapsed != collapsed) {
+            if (prevCollapsed) {
+                notifyItemRangeInserted(1, settingsEntries.size() - 1);
+            } else {
+                notifyItemRangeRemoved(1, settingsEntries.size() - 1);
+            }
+        }
+    }
+    
+    public void toggleCollapsed() {
+        setCollapsed(!collapsed);
+    }
+    
+    public boolean isCollapsed() {
+        return collapsed;
     }
 }

@@ -147,4 +147,6 @@
     <string name="source_code_title">Исходник</string>
     <string name="source_code_description">Посмотреть гитхаб репозиторий и внести свой вклад</string>
     <string name="reset_settings_description">Это сбросит ВСЕ ваши настройки, включая настройки календарей</string>
+    <string name="settings_show_global_items_label_lock">Показывать надпись \"Глобальный\" возле глобальных событий на экране блокировки</string>
+    <string name="settings_allow_global_calendar_account_settings">Разрешить изменение настроек целых календарей и аккаунтов</string>
 </resources>

@@ -1,50 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@color/light_gray_bg_tint"
-    android:orientation="horizontal">
+    android:animateLayoutChanges="true"
+    android:background="@color/light_gray_bg_tint">
 
     <ImageView
         android:id="@+id/account_icon"
-        android:layout_width="60dp"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_account_circle" />
 
-    <LinearLayout
+
+    <TextView
+        android:id="@+id/calendar_name"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="5"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:gravity="center|start"
+        android:text="account_name"
+        android:textAppearance="@style/SmallHeading"
+        app:layout_constraintEnd_toStartOf="@+id/settings_button"
+        app:layout_constraintStart_toEndOf="@+id/account_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
 
-        <TextView
-            android:id="@+id/calendar_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center|start"
-            android:text="account_name"
-            android:textAppearance="@style/SmallHeading"
-            tools:ignore="HardcodedText" />
+    <TextView
+        android:id="@+id/account_type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:text="account_type"
+        android:textAppearance="@style/SmallHeadingSubtext"
+        app:layout_constraintEnd_toStartOf="@+id/settings_button"
+        app:layout_constraintStart_toEndOf="@+id/account_icon"
+        app:layout_constraintTop_toBottomOf="@+id/calendar_name"
+        tools:ignore="HardcodedText" />
 
-        <TextView
-            android:id="@+id/account_type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="start"
-            android:text="account_type"
-            android:textAppearance="@style/SmallHeadingSubtext"
-            tools:ignore="HardcodedText" />
-    </LinearLayout>
 
     <ImageButton
-        android:id="@+id/edit_button"
+        android:id="@+id/settings_button"
         style="@style/Widget.AppCompat.ImageButton"
-        android:layout_width="50dp"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         android:background="@color/transparent"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/expand_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/ic_settings"
-        tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck" />
+        tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck"
+        tools:visibility="visible" />
 
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/expand_button"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow_left" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,89 +16,81 @@ public class Keys {
         throw new IllegalStateException("Utility key storage class");
     }
     
-    public static final int SETTINGS_DEFAULT_BG_COLOR = 0xff_999999;
-    public static final int SETTINGS_DEFAULT_UPCOMING_BG_COLOR = 0xff_CCFFCC;
-    public static final int SETTINGS_DEFAULT_EXPIRED_BG_COLOR = 0xff_FFCCCC;
-    
-    public static final int SETTINGS_DEFAULT_BORDER_COLOR = 0xff_777777;
-    public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR = 0xff_88FF88;
-    public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR = 0xff_FF8888;
-    
-    public static final int SETTINGS_DEFAULT_BORDER_THICKNESS = 2;
-    public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS = 3;
-    public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS = 3;
-    
-    public static final int SETTINGS_DEFAULT_FONT_COLOR = 0xff_000000;
-    public static final int SETTINGS_DEFAULT_UPCOMING_FONT_COLOR = 0xff_005500;
-    public static final int SETTINGS_DEFAULT_EXPIRED_FONT_COLOR = 0xff_990000;
-    
-    public static final float DEFAULT_TITLE_FONT_SIZE_MULTIPLIER = 1.1F;
-    public static final int SETTINGS_DEFAULT_FONT_SIZE = 15;
-    public static final boolean SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED = false;
-    public static final int SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE = 3;
-    
-    public static final boolean SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK = true;
-    public static final boolean SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME = true;
-    
-    public static final boolean SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK = true;
-    
-    public static final int SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET = 0;
-    public static final int SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET = 0;
-    
-    public static final boolean SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST = true;
-    
-    public static final boolean SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT = false;
-    
     public static final float DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR = 0.75f;
     public static final float DEFAULT_CALENDAR_EVENT_COLOR_MIX_FACTOR = 0.85f;
+    public static final float DEFAULT_TITLE_FONT_SIZE_MULTIPLIER = 1.1F;
     
     public static final int DAY_FLAG_GLOBAL = -1;
     public static final String DAY_FLAG_GLOBAL_STR = "-1";
     
-    public static final boolean CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK = true;
-    public static final boolean CALENDAR_SETTINGS_DEFAULT_VISIBLE = true;
     public static final String VISIBLE = "visible";
-    
+    public static final boolean CALENDAR_SETTINGS_DEFAULT_VISIBLE = true;
     public static final String TEXT_VALUE = "value";
     public static final String IS_COMPLETED = "completed";
     public static final String SHOW_ON_LOCK = "lock";
+    public static final boolean CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK = true;
     public static final String ASSOCIATED_DAY = "associatedDay";
-    public static final int ENTRY_SETTINGS_DEFAULT_PRIORITY = 0;
     public static final String PRIORITY = "priority";
+    public static final int ENTRY_SETTINGS_DEFAULT_PRIORITY = 0;
     
     public static final String BG_COLOR = "bgColor";
+    public static final int SETTINGS_DEFAULT_BG_COLOR = 0xff_999999;
     public static final String UPCOMING_BG_COLOR = "upcomingBgColor";
+    public static final int SETTINGS_DEFAULT_UPCOMING_BG_COLOR = 0xff_CCFFCC;
     public static final String EXPIRED_BG_COLOR = "expiredBgColor";
+    public static final int SETTINGS_DEFAULT_EXPIRED_BG_COLOR = 0xff_FFCCCC;
     
     public static final String BORDER_COLOR = "bevelColor";
+    public static final int SETTINGS_DEFAULT_BORDER_COLOR = 0xff_777777;
     public static final String UPCOMING_BORDER_COLOR = "upcomingBevelColor";
+    public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR = 0xff_88FF88;
     public static final String EXPIRED_BORDER_COLOR = "expiredBevelColor";
+    public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR = 0xff_FF8888;
     
     public static final String BORDER_THICKNESS = "bevelThickness";
+    public static final int SETTINGS_DEFAULT_BORDER_THICKNESS = 2;
     public static final String UPCOMING_BORDER_THICKNESS = "upcomingBevelThickness";
+    public static final int SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS = 3;
     public static final String EXPIRED_BORDER_THICKNESS = "expiredBevelThickness";
+    public static final int SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS = 3;
     
     public static final String FONT_COLOR = "fontColor";
+    public static final int SETTINGS_DEFAULT_FONT_COLOR = 0xff_000000;
     public static final String UPCOMING_FONT_COLOR = "upcomingFontColor";
+    public static final int SETTINGS_DEFAULT_UPCOMING_FONT_COLOR = 0xff_005500;
     public static final String EXPIRED_FONT_COLOR = "expiredFontColor";
+    public static final int SETTINGS_DEFAULT_EXPIRED_FONT_COLOR = 0xff_990000;
     
     public static final String FONT_SIZE = "fontSize";
+    public static final int SETTINGS_DEFAULT_FONT_SIZE = 15;
     public static final String ADAPTIVE_BACKGROUND_ENABLED = "adaptive_background_enabled";
+    public static final boolean SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED = false;
     public static final String ADAPTIVE_COLOR_BALANCE = "adaptive_color_balance";
+    public static final int SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE = 3;
     
     public static final String HIDE_ENTRIES_BY_CONTENT = "hide_entries_by_content";
+    public static final boolean SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT = false;
     public static final String HIDE_ENTRIES_BY_CONTENT_CONTENT = "hide_entries_by_content_content";
     
     public static final String UPCOMING_ITEMS_OFFSET = "dayOffset_upcoming";
+    public static final int SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET = 0;
     public static final String EXPIRED_ITEMS_OFFSET = "dayOffset_expired";
+    public static final int SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET = 0;
     
     public static final String SHOW_UPCOMING_EXPIRED_IN_LIST = "upcomingExpiredVisibleInList";
+    public static final boolean SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST = true;
+    public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
+    public static final boolean SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME = true;
+    public static final String ITEM_FULL_WIDTH_LOCK = "force_max_RWidth_lock";
+    public static final boolean SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK = true;
     
     public static final String SHOW_GLOBAL_ITEMS_LOCK = "show_global_tasks_lock";
+    public static final boolean SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK = true;
+    public static final String SHOW_GLOBAL_ITEMS_LABEL_LOCK = "show_global_tasks_label_lock";
+    public static final boolean SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LABEL_LOCK = true;
     
-    public static final String ITEM_FULL_WIDTH_LOCK = "force_max_RWidth_lock";
-    
-    public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
+    public static final String ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS = "allow_global_calendar_settings";
+    public static final boolean SETTINGS_DEFAULT_ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS = false;
     
     public static final String TODO_ITEM_VIEW_TYPE = "lockScreenTodoItemViewType";
     public static final String SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE = LockScreenTodoItemView.TodoItemViewType.BASIC.name();

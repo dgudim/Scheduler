@@ -17,7 +17,7 @@ import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-public class CalendarSettingsEntryConfig extends SettingsEntryConfig {
+public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
     
     private final SystemCalendarSettings systemCalendarSettings;
     private final String calendarName;
@@ -27,7 +27,10 @@ public class CalendarSettingsEntryConfig extends SettingsEntryConfig {
     
     private CalendarColorsGridViewAdapter gridViewAdapter;
     
-    public CalendarSettingsEntryConfig(final SystemCalendarSettings systemCalendarSettings, final SystemCalendar calendar) {
+    public CalendarSettingsEntryConfig(final SystemCalendarSettings systemCalendarSettings,
+                                       final SystemCalendar calendar,
+                                       boolean showSettings) {
+        super(showSettings);
         this.systemCalendarSettings = systemCalendarSettings;
         this.calendarName = calendar.name;
         calendarKey = calendar.getKey();
@@ -60,7 +63,8 @@ public class CalendarSettingsEntryConfig extends SettingsEntryConfig {
             viewBinding.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                     preferences.edit().putBoolean(config.calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
             
-            viewBinding.editButton.setOnClickListener(view -> config.systemCalendarSettings.show(config.calendarKey));
+            viewBinding.settingsButton.setOnClickListener(view -> config.systemCalendarSettings.show(config.calendarKey));
+            config.updateSettingsButtonVisibility(viewBinding.settingsButton);
             
             if (config.gridViewAdapter != null) {
                 viewBinding.colorSelectButton.setVisibility(View.VISIBLE);

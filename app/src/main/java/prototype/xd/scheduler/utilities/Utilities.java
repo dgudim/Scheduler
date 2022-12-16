@@ -20,6 +20,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -346,9 +347,15 @@ public class Utilities {
     }
     
     //switch listener for regular settings
-    public static void setSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue) {
+    public static void setSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue,
+                                               @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
         tSwitch.setCheckedSilent(preferences.getBoolean(key, defaultValue));
-        tSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> preferences.edit().putBoolean(key, isChecked).apply());
+        tSwitch.setOnCheckedChangeListener((switchView, isChecked) -> {
+            preferences.edit().putBoolean(key, isChecked).apply();
+            if(onCheckedChangeListener != null) {
+                onCheckedChangeListener.onCheckedChanged(switchView, isChecked);
+            }
+        });
     }
     
     //switch listener for calendar settings and entry settings

@@ -15,17 +15,17 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Map;
 
-import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.SettingsFragmentBinding;
 
-public class BaseSettingsFragment extends DialogFragment {
+public class BaseSettingsFragment <T extends RecyclerView.Adapter<?>> extends DialogFragment {
     
     protected SettingsFragmentBinding binding;
     
-    protected SettingsListViewAdapter settingsListViewAdapter;
+    protected T listViewAdapter;
     
     private Map<String, ?> preferenceStateBefore;
     
@@ -56,7 +56,7 @@ public class BaseSettingsFragment extends DialogFragment {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.recyclerView.getContext(), DividerItemDecoration.VERTICAL);
         binding.recyclerView.addItemDecoration(dividerItemDecoration);
-        binding.recyclerView.setAdapter(settingsListViewAdapter);
+        binding.recyclerView.setAdapter(listViewAdapter);
     }
     
 }

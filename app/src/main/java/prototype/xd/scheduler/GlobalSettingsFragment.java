@@ -1,8 +1,10 @@
 package prototype.xd.scheduler;
 
 import static android.util.Log.ERROR;
+import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.getRootDir;
 
 import android.content.Intent;
@@ -15,10 +17,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.ConcatAdapter;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
@@ -34,7 +38,7 @@ import prototype.xd.scheduler.utilities.BitmapUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class GlobalSettingsFragment extends BaseSettingsFragment {
+public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> {
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBackgroundSettingsEntry;
     
@@ -70,16 +74,33 @@ public class GlobalSettingsFragment extends BaseSettingsFragment {
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME,
                 getString(R.string.settings_hide_expired_entries_by_time)));
+        
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.SHOW_UPCOMING_EXPIRED_IN_LIST, Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST,
                 getString(R.string.show_upcoming_and_expired_event_indicators)));
-        settingsEntries.add(new SwitchSettingsEntryConfig(
+        
+        List<SettingsEntryConfig> globalSwitchSettingsEntries = new ArrayList<>();
+        SettingsListViewAdapter globalSwitchSettingsListViewAdapter = new SettingsListViewAdapter(globalSwitchSettingsEntries, getLifecycle(),
+                !preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK));
+        
+        globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK,
-                getString(R.string.settings_show_global_items_lock)));
+                getString(R.string.settings_show_global_items_lock),
+                (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked)));
         
-        settingsEntries.add(new ResetButtonSettingsEntryConfig(this, savedInstanceState));
+        globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
+                Keys.SHOW_GLOBAL_ITEMS_LABEL_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LABEL_LOCK,
+                getString(R.string.settings_show_global_items_label_lock)));
         
-        settingsListViewAdapter = new SettingsListViewAdapter(settingsEntries, getLifecycle());
+        listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
+                .setIsolateViewTypes(false)
+                .setStableIdMode(NO_STABLE_IDS).build(),
+                new SettingsListViewAdapter(settingsEntries, getLifecycle()),
+                globalSwitchSettingsListViewAdapter,
+                new SettingsListViewAdapter(
+                        Collections.singletonList(
+                                new ResetButtonSettingsEntryConfig(this, savedInstanceState)), getLifecycle()));
+        
     }
     
     // full destroy
