@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.ConcatAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.SystemCalendar;
@@ -51,24 +53,18 @@ public class CalendarSettingsFragment extends BaseSettingsFragment<ConcatAdapter
         
         new Thread(() -> {
             List<SystemCalendar> calendars = getAllCalendars(requireContext(), true);
-            List<List<SystemCalendar>> sortedCalendars = new ArrayList<>();
-            List<String> sortedCalendarNames = new ArrayList<>();
+            Map<String, List<SystemCalendar>> sortedCalendars = new TreeMap<>();
             
             for (SystemCalendar calendar : calendars) {
-                if (sortedCalendarNames.contains(calendar.account_name)) {
-                    sortedCalendars.get(sortedCalendarNames.indexOf(calendar.account_name)).add(calendar);
-                } else {
-                    List<SystemCalendar> calendarGroup = new ArrayList<>();
-                    calendarGroup.add(calendar);
-                    sortedCalendars.add(calendarGroup);
-                    sortedCalendarNames.add(calendar.account_name);
-                }
+                sortedCalendars.computeIfAbsent(calendar.account_name,
+                                s -> new ArrayList<>())
+                        .add(calendar);
             }
             
             boolean showSettings =
                     preferences.getBoolean(Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS, Keys.SETTINGS_DEFAULT_ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS);
             
-            for (List<SystemCalendar> calendarGroup : sortedCalendars) {
+            for (List<SystemCalendar> calendarGroup : sortedCalendars.values()) {
                 
                 ArrayList<GenericCalendarSettingsEntryConfig> calendarEntryList = new ArrayList<>();
                 SettingsListViewAdapter calendarEntryListAdapter = new SettingsListViewAdapter(calendarEntryList, getLifecycle(), true);
