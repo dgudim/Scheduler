@@ -56,7 +56,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        todoListEntryManager = new TodoListEntryManager(requireContext(), getLifecycle());
+        todoListEntryManager = new TodoListEntryManager(requireContext(), getLifecycle(), getParentFragmentManager());
     }
     
     @Override
@@ -124,7 +124,7 @@ public class HomeFragment extends Fragment {
         
         contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoListEntryManager.getGroups();
-            displayEntryAdditionEditDialog(view1.getContext(), getLifecycle(),
+            displayEntryAdditionEditDialog(getChildFragmentManager(), view1.getContext(), getLifecycle(),
                     R.string.add_event_fab, R.string.add, "", groupList, 0,
                     (view2, text, dialogBinding, selectedIndex) -> {
                         SArrayMap<String, String> values = new SArrayMap<>();
@@ -154,16 +154,14 @@ public class HomeFragment extends Fragment {
         
         wrapperBnd.navView.globalSettingsClickView.setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(
-                        requireActivity()
-                                .getSupportFragmentManager()
+                        getParentFragmentManager()
                                 .findFragmentById(R.id.nav_host_fragment)))
                         .getNavController()
                         .navigate(R.id.action_HomeFragment_to_GlobalSettingsFragment));
         
         wrapperBnd.navView.calendarSettingsClickView.setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(
-                        requireActivity()
-                                .getSupportFragmentManager()
+                        getParentFragmentManager()
                                 .findFragmentById(R.id.nav_host_fragment)))
                         .getNavController()
                         .navigate(R.id.action_HomeFragment_to_CalendarSettingsFragment));

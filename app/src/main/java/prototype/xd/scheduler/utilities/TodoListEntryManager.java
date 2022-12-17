@@ -22,6 +22,7 @@ import android.util.ArraySet;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
@@ -104,8 +105,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     };
     
     public TodoListEntryManager(@NonNull final Context context,
-                                @NonNull final Lifecycle lifecycle) {
-        todoListViewAdapter = new TodoListViewAdapter(this, context, lifecycle);
+                                @NonNull final Lifecycle lifecycle,
+                                @NonNull final FragmentManager fragmentManager) {
+        todoListViewAdapter = new TodoListViewAdapter(this, context, lifecycle, fragmentManager);
         calendarVisibilityMap = new ArrayMap<>();
         groups = loadGroups();
         

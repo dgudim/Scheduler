@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
@@ -46,12 +47,16 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         private final Context context;
         @NonNull
         private final Lifecycle lifecycle;
+        @NonNull
+        private final FragmentManager fragmentManager;
         
         EntryViewHolder(@NonNull final V viewBinding,
-                        @NonNull final Lifecycle lifecycle) {
+                        @NonNull final Lifecycle lifecycle,
+                        @NonNull FragmentManager fragmentManager) {
             super(viewBinding.getRoot());
             this.viewBinding = viewBinding;
             this.lifecycle = lifecycle;
+            this.fragmentManager = fragmentManager;
             context = viewBinding.getRoot().getContext();
         }
         
@@ -67,7 +72,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                        @NonNull final TodoListEntryManager todoListEntryManager) {
             final List<Group> groupList = todoListEntryManager.getGroups();
             int currentIndex = max(groupIndexInList(groupList, entry.getRawGroupName()), 0);
-            displayEntryAdditionEditDialog(context, lifecycle,
+            
+            displayEntryAdditionEditDialog(fragmentManager, context, lifecycle,
                     R.string.edit_event, R.string.save, entry.getRawTextValue(), groupList,
                     currentIndex, (view2, text, dialogBinding, selectedIndex) -> {
                         entry.changeGroup(groupList.get(selectedIndex));
@@ -161,13 +167,17 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     private final SystemCalendarSettings systemCalendarSettings;
     @NonNull
     private final Lifecycle lifecycle;
+    @NonNull
+    private final FragmentManager fragmentManager;
     
     public TodoListViewAdapter(@NonNull final TodoListEntryManager todoListEntryManager,
                                @NonNull final Context context,
-                               @NonNull final Lifecycle lifecycle) {
+                               @NonNull final Lifecycle lifecycle,
+                               @NonNull FragmentManager fragmentManager) {
         
         this.todoListEntryManager = todoListEntryManager;
         this.lifecycle = lifecycle;
+        this.fragmentManager = fragmentManager;
         currentTodoListEntries = new ArrayList<>();
         entrySettings = new EntrySettings(todoListEntryManager, context, lifecycle);
         systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager, context, lifecycle);
@@ -195,10 +205,12 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     public EntryViewHolder<?> onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         if (viewType == 1) {
             // calendar entry
-            return new EntryViewHolder<>(ListSelectionCalendarBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), lifecycle);
+            return new EntryViewHolder<>(ListSelectionCalendarBinding.inflate(
+                    LayoutInflater.from(parent.getContext()), parent, false), lifecycle, fragmentManager);
         } else {
             // regular entry
-            return new EntryViewHolder<>(ListSelectionTodoBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), lifecycle);
+            return new EntryViewHolder<>(ListSelectionTodoBinding.inflate(
+                    LayoutInflater.from(parent.getContext()), parent, false), lifecycle, fragmentManager);
         }
     }
     
