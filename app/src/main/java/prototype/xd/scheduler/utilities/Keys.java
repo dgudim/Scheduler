@@ -80,7 +80,7 @@ public class Keys {
     public static final String SHOW_UPCOMING_EXPIRED_IN_LIST = "upcomingExpiredVisibleInList";
     public static final boolean SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST = true;
     public static final String HIDE_EXPIRED_ENTRIES_BY_TIME = "hide_entries_strict";
-    public static final boolean SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME = true;
+    public static final boolean SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME = false;
     public static final String ITEM_FULL_WIDTH_LOCK = "force_max_RWidth_lock";
     public static final boolean SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK = true;
     
