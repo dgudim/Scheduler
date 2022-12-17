@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities;
 
 import static android.util.Log.ERROR;
+import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import prototype.xd.scheduler.entities.TodoListEntry.ParameterInvalidationListener;
 
@@ -28,6 +30,8 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     Map<Long, Set<TodoListEntry>> entriesPerDayUpcomingExpired;
     Map<TodoListEntry, Set<Long>> daysPerEntryUpcomingExpired;
     
+    Set<TodoListEntry> globalEntries;
+    
     private boolean displayUpcomingExpired;
     private long loadedDay_start;
     private long loadedDay_end;
@@ -38,6 +42,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         daysPerEntryUpcomingExpired = new HashMap<>(initialCapacity);
         entriesPerDayCore = new HashMap<>(initialCapacity);
         daysPerEntryCore = new HashMap<>(initialCapacity);
+        globalEntries = new HashSet<>();
     }
     
     public void initLoadingRange(long dayStart, long dayEnd) {
@@ -73,6 +78,11 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
             oldEntry.unlinkFromCalendarEvent();
             oldEntry.unlinkFromContainer();
             
+            // if the entry is global, only unlink from global entry list
+            if(globalEntries.remove(oldEntry)) {
+                return oldEntry;
+            }
+            
             // remove all the associations from entriesPerDay and daysPerEntry
             
             // unlink from core days
@@ -103,6 +113,9 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     private void linkEntryToLookupContainers(TodoListEntry entry, long minDay, long maxDay) {
+        if(entry.isGlobal()) {
+            return;
+        }
         TodoListEntry.FullDaySet fullDaySet = entry.getFullDaySet(minDay, maxDay);
         // link to core days
         linkEntryToLookupContainers(entry, fullDaySet.getCoreDaySet(), daysPerEntryCore, entriesPerDayCore);
@@ -120,7 +133,6 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
                     .computeIfAbsent(day, k -> new HashSet<>())
                     .add(entry);
         }
-        
     }
     
     // handle linking to container and assigning an invalidation listener
@@ -131,6 +143,13 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
             newEntry.linkToContainer(this);
             // setup listener
             newEntry.listenToParameterInvalidations(parameterInvalidationListener);
+            
+            // if the entry is global only link to global entries list
+            if(newEntry.isGlobal()) {
+                globalEntries.add(newEntry);
+                return;
+            }
+            
             // add all the associations to entriesPerDay and daysPerEntry
             linkEntryToLookupContainers(newEntry, loadedDay_start, loadedDay_end);
         }
@@ -162,7 +181,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         Set<TodoListEntry> extendedEntries = entriesPerDayUpcomingExpired.get(day);
         Set<TodoListEntry> coreEntries = entriesPerDayCore.get(day);
         if (extendedEntries == null || coreEntries == null) {
-            log(ERROR, NAME, "Can't determine if '" + entry + "' is expired or upcoming on " + day + ". Day not loaded?");
+            log(ERROR, NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day + ". Day not loaded?");
             return false;
         }
         // in extended set but not in core set
@@ -176,17 +195,23 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         if(notFiltered == null) {
             return new ArrayList<>();
         }
-        notFiltered.forEach(entry -> {
+        Consumer<TodoListEntry> consumer = entry -> {
             if (filter.filter(entry, isEntryExpiredOrUpcoming(entry, day))) {
                 filtered.add(entry);
             }
-        });
+        };
+        notFiltered.forEach(consumer);
+        globalEntries.forEach(consumer);
         return sortEntries(filtered, day);
     }
     
     public void notifyEntryVisibilityRangeChanged(TodoListEntry entry,
                                                   long minDay, long maxDay,
                                                   Set<Long> invalidatedDaySet) {
+        if(entry.isGlobal()) {
+            log(WARN, NAME, "Trying to change visibility range of a global entry");
+            return;
+        }
         Set<Long> upcomingExpiredDaySet = new HashSet<>();
         
         entry.getVisibleDays(minDay, maxDay,

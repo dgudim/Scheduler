@@ -53,7 +53,6 @@
     <string name="reset_settings_prompt">Reset settings?</string>
     <string name="overwrite_prompt">Overwrite?</string>
     <string name="no">No</string>
-    <string name="move_to_global_list">Move to global list</string>
     <string name="item_yesterday">(Yesterday)</string>
     <string name="item_tomorrow">(Tomorrow)</string>
     <string name="item_N_days_ago_double">(%d days ago)</string>
@@ -78,7 +77,6 @@
     <string name="close">Close</string>
     <string name="are_you_sure">Are you sure?</string>
     <string name="apply">Apply</string>
-    <string name="add_to_global_list">Add to global list</string>
     <string name="event_name_input_hint">Event</string>
     <string name="add">Add</string>
     <string name="add_current_config_as_group_prompt">Add current configuration as a group?</string>
@@ -141,7 +139,7 @@
     <string name="easter_egg_description">There is not much more to say, good job i guess :)</string>
     <string name="global_settings_title">Global settings</string>
     <string name="global_settings_description">Global appearance settings</string>
-    <string name="per_calendar_settings_title">Сalendar settings</string>
+    <string name="per_calendar_settings_title">Calendar settings</string>
     <string name="per_calendar_settings_description">Configure parameters for each calendar individually</string>
     <string name="user_guide_title">User guide</string>
     <string name="user_guide_description">View tutorial</string>
@@ -153,6 +151,10 @@
     <string name="source_code_description">Check out the github repository and contribute</string>
     <string name="calendar_settings_fragment_label" translatable="false">Calendar settings fragment</string>
     <string name="reset_settings_description">This will reset ALL your settings, including calendar ones</string>
+    <string name="reset_calendar_settings_description">This will reset current calendar settings</string>
     <string name="settings_show_global_items_label_lock">Show \"Global\" label near global items on the lockscreen</string>
     <string name="settings_allow_global_calendar_account_settings">Allow changing settings of whole calendars and accounts</string>
+    <string name="global">Global</string>
+    <string name="date_from_to">Date from to</string>
+    <string name="delete_all_saved_backgrounds_description">This will reset all custom per-day wallpapers</string>
 </resources>

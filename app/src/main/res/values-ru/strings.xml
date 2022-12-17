@@ -32,8 +32,6 @@
     <string name="off">Выключено</string>
     <string name="reset_settings_prompt">Сбросить настройки?</string>
     <string name="cancel">Отмена</string>
-    <string name="move_to_global_list">Переместить в общий список</string>
-    <string name="add_to_global_list">Добавить в общий список</string>
     <string name="add">Добавить</string>
     <string name="enable">Включить</string>
     <string name="group">Группа</string>
@@ -149,4 +147,8 @@
     <string name="reset_settings_description">Это сбросит ВСЕ ваши настройки, включая настройки календарей</string>
     <string name="settings_show_global_items_label_lock">Показывать надпись \"Глобальный\" возле глобальных событий на экране блокировки</string>
     <string name="settings_allow_global_calendar_account_settings">Разрешить изменение настроек целых календарей и аккаунтов</string>
+    <string name="global">Глобальный</string>
+    <string name="date_from_to">Дата от до</string>
+    <string name="reset_calendar_settings_description">Это сбросит настройки текущего календаря</string>
+    <string name="delete_all_saved_backgrounds_description">Это сбросит все кастомные фоны по дням</string>
 </resources>

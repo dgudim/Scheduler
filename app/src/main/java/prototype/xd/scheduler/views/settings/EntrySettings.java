@@ -3,7 +3,7 @@ package prototype.xd.scheduler.views.settings;
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
-import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextDialogue;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.displayGroupAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
@@ -12,7 +12,6 @@ import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
-import static prototype.xd.scheduler.utilities.Keys.SHOW_ON_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 
 import android.content.Context;
@@ -44,6 +43,7 @@ public class EntrySettings extends PopupSettingsView {
         bnd.hideExpiredItemsByTimeContainer.setVisibility(View.GONE);
         bnd.hideByContentContainer.setVisibility(View.GONE);
         bnd.entrySettingsTitle.setVisibility(View.GONE);
+        bnd.showOnLockContainer.setVisibility(View.GONE);
         
         this.todoListEntryManager = todoListEntryManager;
     }
@@ -75,13 +75,13 @@ public class EntrySettings extends PopupSettingsView {
             Group selectedGroup = groupList.get(selection);
             String selectedGroupName = selectedGroup.getRawName();
             
-            displayEditTextDialogue(v.getContext(), lifecycle,
+            displayGroupAdditionEditDialog(v.getContext(), lifecycle,
                     R.string.edit, R.string.name,
-                    R.string.cancel, R.string.save, R.string.delete_group,
+                    R.string.cancel, R.string.save,
                     selectedGroupName,
-                    (view2, name, selectedIndex) -> {
+                    (view2, name, dialogBinding, selectedIndex) -> {
                         int groupIndex = Group.groupIndexInList(groupList, name);
-                        
+    
                         String newName = name;
                         int i = 0;
                         while (groupIndex > 0) {
@@ -89,21 +89,19 @@ public class EntrySettings extends PopupSettingsView {
                             newName = name + "(" + i + ")";
                             groupIndex = Group.groupIndexInList(groupList, newName);
                         }
-                        
+    
                         selectedGroup.setName(newName);
                         bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, context));
                         return true;
-                    },
-                    (view2, text, selectedIndex) -> {
-                        displayConfirmationDialogue(view2.getContext(), lifecycle,
-                                R.string.delete, R.string.are_you_sure,
-                                R.string.no, R.string.yes,
-                                v1 -> {
-                                    todoListEntryManager.removeGroup(selection);
-                                    rebuild(context);
-                                });
-                        return true;
-                    });
+                    }, (v2, dialog) -> displayConfirmationDialogue(v2.getContext(), lifecycle,
+                            R.string.delete, R.string.are_you_sure,
+                            R.string.no, R.string.yes,
+                            v1 -> {
+                                dialog.dismiss();
+                                todoListEntryManager.removeGroup(selection);
+                                rebuild(context);
+                            }));
+            
         });
         
         bnd.groupSpinner.setOnItemClickListener((parent, view, position, id) -> {
@@ -112,11 +110,11 @@ public class EntrySettings extends PopupSettingsView {
             }
         });
         
-        bnd.addGroupButton.setOnClickListener(v -> displayEditTextDialogue(v.getContext(), lifecycle,
+        bnd.addGroupButton.setOnClickListener(v -> displayGroupAdditionEditDialog(v.getContext(), lifecycle,
                 R.string.add_current_config_as_group_prompt,
-                R.string.add_current_config_as_group_message, R.string.name,
-                R.string.cancel, R.string.add,
-                (view, text, selection) -> {
+                R.string.add_current_config_as_group_message,
+                R.string.cancel, R.string.add, "",
+                (view, text, dialogueBinding, selection) -> {
                     Group existingGroup = findGroupInList(groupList, text);
                     if (existingGroup != null) {
                         displayConfirmationDialogue(view.getContext(), lifecycle,
@@ -126,11 +124,11 @@ public class EntrySettings extends PopupSettingsView {
                         addGroupToGroupList(text, null, context);
                     }
                     return true;
-                }));
+                }, null));
         
         bnd.settingsResetButton.setOnClickListener(v ->
                 displayConfirmationDialogue(v.getContext(), lifecycle,
-                        R.string.reset_settings_prompt,
+                        R.string.reset_settings_prompt, R.string.reset_calendar_settings_description,
                         R.string.cancel, R.string.reset,
                         view -> {
                             entry.removeDisplayParams();
@@ -177,27 +175,27 @@ public class EntrySettings extends PopupSettingsView {
                 ADAPTIVE_COLOR_BALANCE,
                 parameterKey -> entry.adaptiveColorBalance.getToday());
         
-        Utilities.setSliderChangeListener(
-                bnd.showDaysUpcomingDescription,
-                bnd.showDaysUpcomingBar, bnd.showDaysUpcomingState,
-                this, null, R.string.settings_show_days_upcoming,
-                UPCOMING_ITEMS_OFFSET,
-                parameterKey -> entry.upcomingDayOffset.getToday());
-        
-        Utilities.setSliderChangeListener(
-                bnd.showDaysExpiredDescription,
-                bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
-                this, null, R.string.settings_show_days_expired,
-                EXPIRED_ITEMS_OFFSET,
-                parameterKey -> entry.expiredDayOffset.getToday());
-        
-        Utilities.setSwitchChangeListener(
-                bnd.showOnLockSwitch,
-                bnd.showOnLockState,
-                this,
-                SHOW_ON_LOCK,
-                parameterKey -> entry.getRawParameter(parameterKey, Boolean::parseBoolean));
-        
+        if (todoListEntry.isGlobal()) {
+            bnd.showDaysUpcomingContainer.setVisibility(View.GONE);
+            bnd.showDaysExpiredContainer.setVisibility(View.GONE);
+        } else {
+            bnd.showDaysUpcomingContainer.setVisibility(View.VISIBLE);
+            bnd.showDaysExpiredContainer.setVisibility(View.VISIBLE);
+            
+            Utilities.setSliderChangeListener(
+                    bnd.showDaysUpcomingDescription,
+                    bnd.showDaysUpcomingBar, bnd.showDaysUpcomingState,
+                    this, null, R.string.settings_show_days_upcoming,
+                    UPCOMING_ITEMS_OFFSET,
+                    parameterKey -> entry.upcomingDayOffset.getToday());
+            
+            Utilities.setSliderChangeListener(
+                    bnd.showDaysExpiredDescription,
+                    bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
+                    this, null, R.string.settings_show_days_expired,
+                    EXPIRED_ITEMS_OFFSET,
+                    parameterKey -> entry.expiredDayOffset.getToday());
+        }
     }
     
     private void addGroupToGroupList(String groupName,

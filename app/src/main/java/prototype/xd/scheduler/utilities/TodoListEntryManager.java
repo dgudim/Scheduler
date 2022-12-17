@@ -377,7 +377,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private void entryListChanged(TodoListEntry entry) {
         if (calendarView != null) {
             notifyDaysChanged(
-                    entry.getVisibleDays(calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(),
+                    entry.getVisibleDays(loadedDay_start, loadedDay_end,
                             displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE));
         }
         notifyEntryListChanged();

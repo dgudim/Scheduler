@@ -5,10 +5,9 @@ import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
 import static prototype.xd.scheduler.utilities.DateManager.selectDay;
-import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEditTextSpinnerDialogue;
+import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_RELEASES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_REPO;
@@ -125,35 +124,26 @@ public class HomeFragment extends Fragment {
         
         contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoListEntryManager.getGroups();
-            displayEditTextSpinnerDialogue(view1.getContext(), getLifecycle(),
-                    R.string.add_event_fab, -1, R.string.event_name_input_hint,
-                    R.string.cancel, R.string.add, R.string.add_to_global_list, "", groupList, 0,
-                    (view2, text, selectedIndex) -> {
+            displayEntryAdditionEditDialog(view1.getContext(), getLifecycle(),
+                    R.string.add_event_fab, R.string.add, "", groupList, 0,
+                    (view2, text, dialogBinding, selectedIndex) -> {
                         SArrayMap<String, String> values = new SArrayMap<>();
                         values.put(TEXT_VALUE, text);
+                        boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();
+                        // TODO: 17.12.2022 set start and end day
                         values.put(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
                         values.put(IS_COMPLETED, "false");
                         
                         todoListEntryManager.addEntry(new TodoListEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
                                 groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
                         return true;
-                    },
-                    (view2, text, selectedIndex) -> {
-                        SArrayMap<String, String> values = new SArrayMap<>();
-                        values.put(TEXT_VALUE, text);
-                        values.put(ASSOCIATED_DAY, DAY_FLAG_GLOBAL_STR);
-                        values.put(IS_COMPLETED, "false");
-                        
-                        todoListEntryManager.addEntry(new TodoListEntry(values,       // This is fine, see note above
-                                groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
-                        return true;
                     });
         });
-    
+        
         wrapperBnd.navView.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_REPO));
         wrapperBnd.navView.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_ISSUES));
         wrapperBnd.navView.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_RELEASES));
-    
+        
         wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> Toast.makeText(getActivity(), getString(R.string.work_in_progress),
                 Toast.LENGTH_LONG).show());
         
@@ -169,7 +159,7 @@ public class HomeFragment extends Fragment {
                                 .findFragmentById(R.id.nav_host_fragment)))
                         .getNavController()
                         .navigate(R.id.action_HomeFragment_to_GlobalSettingsFragment));
-    
+        
         wrapperBnd.navView.calendarSettingsClickView.setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(
                         requireActivity()

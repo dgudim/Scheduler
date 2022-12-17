@@ -511,10 +511,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public boolean isVisibleOnLockscreenToday() {
-        String visibleOnLockscreen = params.get(Keys.SHOW_ON_LOCK);
-        if (visibleOnLockscreen != null) {
-            return Boolean.parseBoolean(visibleOnLockscreen) && !isCompleted();
-        }
         if (isFromSystemCalendar()) {
             if (!hideByContent()) {
                 boolean showOnLock;
@@ -652,6 +648,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                                @Nullable Set<Long> coreDaySet,                   // without any expired/upcoming days
                                @Nullable Set<Long> currentUpcomingExpiredSet,    // without old expired/upcoming days
                                @Nullable Set<Long> extendedUpcomingExpiredSet) { // with old expired/upcoming days, used for updating
+        // we don't care about global entries, they are handled differently
+        if(isGlobal()) {
+            return;
+        }
+        
         // get max between previous range and current
         
         long previousUpcomingDayOffset = this.upcomingDayOffset.getDiscarded(0);

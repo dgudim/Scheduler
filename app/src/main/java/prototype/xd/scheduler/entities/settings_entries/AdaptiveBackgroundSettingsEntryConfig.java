@@ -73,9 +73,11 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 gridSelection.resetBgButton.setOnClickListener(view1 ->
                         displayConfirmationDialogue(view1.getContext(), config.lifecycle,
                                 R.string.delete_all_saved_backgrounds_prompt,
+                                R.string.delete_all_saved_backgrounds_description,
                                 R.string.cancel, R.string.delete,
                                 view2 -> {
-                                    for (String availableDay : Keys.WEEK_DAYS) {
+                                    for (int dayIndex = 0; dayIndex < Keys.WEEK_DAYS.size() - 1; dayIndex++) {
+                                        String availableDay = Keys.WEEK_DAYS.get(dayIndex);
                                         getFile(availableDay + ".png").delete();
                                         getFile(availableDay + ".png_min.png").delete();
                                     }

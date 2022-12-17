@@ -78,7 +78,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         bnd.settingsResetButton.setOnClickListener(v ->
                 displayConfirmationDialogue(v.getContext(), lifecycle,
-                        R.string.reset_settings_prompt,
+                        R.string.reset_settings_prompt, R.string.reset_calendar_settings_description,
                         R.string.cancel, R.string.reset, v1 -> {
                             Set<String> preferenceKeys = preferences.getAll().keySet();
                             SharedPreferences.Editor editor = preferences.edit();

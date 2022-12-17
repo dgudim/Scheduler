@@ -94,6 +94,12 @@
         <item name="minWidth">60dp</item>
     </style>
 
+    <style name="SecondaryButtonStyleRoundCompact" parent="SecondaryButtonStyleRound">
+        <item name="android:minHeight">30dip</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
     <style name="SecondaryButtonStyleNormal" parent="SecondaryButtonStyleRound">
         <item name="shapeAppearance">?attr/shapeAppearanceMediumComponent</item>
         <item name="android:padding">3dp</item>
