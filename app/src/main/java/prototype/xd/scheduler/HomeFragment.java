@@ -1,18 +1,20 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
-import static prototype.xd.scheduler.utilities.DateManager.selectDay;
+import static prototype.xd.scheduler.utilities.DateManager.selectDate;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayMessageDialog;
-import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.END_DAY;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_RELEASES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_REPO;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
+import static prototype.xd.scheduler.utilities.Keys.START_DAY;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
@@ -56,6 +58,8 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // init date manager
+        selectCurrentDay();
         todoListEntryManager = new TodoListEntryManager(requireContext(), getLifecycle(), getParentFragmentManager());
     }
     
@@ -69,16 +73,13 @@ public class HomeFragment extends Fragment {
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         contentBnd.content.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
         
-        // init date manager
-        selectCurrentDay();
-        
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoListEntryManager);
         todoListEntryManager.attachCalendarView(calendarView);
         
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
-            selectDay(selectedDate.toEpochDay());
+            selectDate(selectedDate);
             todoListEntryManager.notifyEntryListChanged();
             updateStatusText();
         });
@@ -89,7 +90,7 @@ public class HomeFragment extends Fragment {
                 todoListEntryManager.loadEntries(firstVisibleDay - 15, lastVisibleDay + 15)
         );
         
-        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDay));
+        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDayUTC));
         
         DrawerLayout drawerLayout = wrapperBnd.getRoot();
         
@@ -130,8 +131,10 @@ public class HomeFragment extends Fragment {
                         SArrayMap<String, String> values = new SArrayMap<>();
                         values.put(TEXT_VALUE, text);
                         boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();
-                        // TODO: 17.12.2022 set start and end day
-                        values.put(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
+                        values.put(START_DAY, isGlobal ? DAY_FLAG_GLOBAL_STR :
+                                dialogBinding.dayFromButton.getSelectedDateMsUTCStr());
+                        values.put(END_DAY, isGlobal ? DAY_FLAG_GLOBAL_STR :
+                                dialogBinding.dayToButton.getSelectedDateMsUTCStr());
                         values.put(IS_COMPLETED, "false");
                         
                         todoListEntryManager.addEntry(new TodoListEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
@@ -154,14 +157,14 @@ public class HomeFragment extends Fragment {
         
         wrapperBnd.navView.globalSettingsClickView.setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(
-                        getParentFragmentManager()
+                        requireActivity().getSupportFragmentManager()
                                 .findFragmentById(R.id.nav_host_fragment)))
                         .getNavController()
                         .navigate(R.id.action_HomeFragment_to_GlobalSettingsFragment));
         
         wrapperBnd.navView.calendarSettingsClickView.setOnClickListener(v ->
                 ((NavHostFragment) Objects.requireNonNull(
-                        getParentFragmentManager()
+                        requireActivity().getSupportFragmentManager()
                                 .findFragmentById(R.id.nav_host_fragment)))
                         .getNavController()
                         .navigate(R.id.action_HomeFragment_to_CalendarSettingsFragment));
@@ -211,7 +214,8 @@ public class HomeFragment extends Fragment {
     }
     
     private void updateStatusText() {
-        contentBnd.statusText.setText(getString(R.string.status, dateStringFromMsUTC(currentlySelectedDay * 86400000),
-                todoListEntryManager.getCurrentlyVisibleEntriesCount()));
+        contentBnd.statusText.setText(
+                getString(R.string.status, dateStringFromMsUTC(currentlySelectedTimestampUTC),
+                        todoListEntryManager.getCurrentlyVisibleEntriesCount()));
     }
 }

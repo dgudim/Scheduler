@@ -3,11 +3,13 @@ package prototype.xd.scheduler.adapters;
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.groupIndexInList;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEntryAdditionEditDialog;
-import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
+import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Keys.END_DAY;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Keys.START_DAY;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 
 import android.content.Context;
@@ -77,12 +79,19 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                     R.string.edit_event, R.string.save, entry.getRawTextValue(), groupList,
                     currentIndex, (view2, text, dialogBinding, selectedIndex) -> {
                         entry.changeGroup(groupList.get(selectedIndex));
-                        entry.changeParameter(TEXT_VALUE, text);
                         boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();
                         if (isGlobal) {
-                            entry.changeParameter(IS_COMPLETED, "false");
+                            entry.changeParameters(
+                                    TEXT_VALUE, text,
+                                    IS_COMPLETED, "false",
+                                    START_DAY, DAY_FLAG_GLOBAL_STR,
+                                    END_DAY, DAY_FLAG_GLOBAL_STR);
+                        } else {
+                            entry.changeParameters(
+                                    TEXT_VALUE, text,
+                                    START_DAY, dialogBinding.dayFromButton.getSelectedDateMsUTCStr(),
+                                    END_DAY, dialogBinding.dayToButton.getSelectedDateMsUTCStr());
                         }
-                        // TODO: 17.12.2022 change start and end day
                         todoListEntryManager.performDeferredTasks();
                         return true;
                     });
@@ -94,7 +103,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             
             bnd.eventColor.setCardBackgroundColor(entry.event.color);
             bnd.timeText.setText(entry.getTimeSpan(context));
-            bnd.timeText.setTextColor(entry.fontColor.get(currentlySelectedDay));
+            bnd.timeText.setTextColor(entry.fontColor.get(currentlySelectedDayUTC));
             bnd.settings.setOnClickListener(v -> systemCalendarSettings.show(entry));
         }
         
@@ -111,7 +120,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                 if (!entry.isGlobal()) {
                     entry.changeParameter(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
                 } else {
-                    entry.changeParameter(ASSOCIATED_DAY, String.valueOf(currentlySelectedDay));
+                    String selectedDay = String.valueOf(currentlySelectedDayUTC);
+                    entry.changeParameters(
+                            START_DAY, selectedDay,
+                            END_DAY, selectedDay);
                 }
                 todoListEntryManager.performDeferredTasks();
             });
@@ -129,16 +141,16 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             TextView todoText = root.findViewById(R.id.todoText);
             MaterialCardView backgroundLayer = root.findViewById(R.id.backgroundLayer);
             
-            backgroundLayer.setCardBackgroundColor(entry.bgColor.get(currentlySelectedDay));
-            backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDay));
+            backgroundLayer.setCardBackgroundColor(entry.bgColor.get(currentlySelectedDayUTC));
+            backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDayUTC));
             
             if (entry.isCompleted() || entry.hideByContent()) {
-                todoText.setTextColor(mixTwoColors(entry.fontColor.get(currentlySelectedDay), Color.WHITE, 0.5));
+                todoText.setTextColor(mixTwoColors(entry.fontColor.get(currentlySelectedDayUTC), Color.WHITE, 0.5));
             } else {
-                todoText.setTextColor(entry.fontColor.get(currentlySelectedDay));
+                todoText.setTextColor(entry.fontColor.get(currentlySelectedDayUTC));
             }
             
-            todoText.setText(entry.getTextOnDay(currentlySelectedDay, context));
+            todoText.setText(entry.getTextOnDay(currentlySelectedDayUTC, context));
         }
         
         void bindTo(@NonNull final TodoListEntry currentEntry,
@@ -196,7 +208,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
     public void notifyVisibleEntriesUpdated() {
         int itemsCount = currentTodoListEntries.size();
-        currentTodoListEntries = todoListEntryManager.getVisibleTodoListEntries(currentlySelectedDay);
+        currentTodoListEntries = todoListEntryManager.getVisibleTodoListEntries(currentlySelectedDayUTC);
         notifyItemRangeChanged(0, max(itemsCount, currentTodoListEntries.size()));
     }
     

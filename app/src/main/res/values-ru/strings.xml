@@ -151,4 +151,5 @@
     <string name="date_from_to">Дата от до</string>
     <string name="reset_calendar_settings_description">Это сбросит настройки текущего календаря</string>
     <string name="delete_all_saved_backgrounds_description">Это сбросит все кастомные фоны по дням</string>
+    <string name="select_date">Выберите дату</string>
 </resources>

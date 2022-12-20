@@ -2,7 +2,7 @@ package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
 import static android.util.Log.WARN;
-import static prototype.xd.scheduler.utilities.DateManager.timeZone_SYSTEM;
+import static prototype.xd.scheduler.utilities.DateManager.systemTimeZone;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
@@ -60,7 +60,12 @@ public class SystemCalendar {
         
         String timeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
         
-        timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? timeZone_SYSTEM.getID() : timeZoneId);
+        if(timeZoneId.isEmpty()) {
+            log(WARN, "SystemCalendar", "Calendar " + prefKey + " has no timezone, defaulting to system timezone");
+            timeZone = systemTimeZone;
+        } else {
+            timeZone = TimeZone.getTimeZone(timeZoneId);
+        }
         
         systemCalendarEvents = new ArrayList<>();
         eventColorCountMap = new ArrayMap<>();
@@ -110,8 +115,10 @@ public class SystemCalendar {
             long originalInstanceTime = getLong(cursor, calendarEventsColumns, Events.ORIGINAL_INSTANCE_TIME);
             if (originalInstanceTime != 0) {
                 // if original id is set this event is an exception to some other event
-                exceptionLists.computeIfAbsent(getLong(cursor, calendarEventsColumns, Events.ORIGINAL_ID), k -> new ArrayList<>())
-                        .add(originalInstanceTime);
+                if(!loadMinimal) {
+                    exceptionLists.computeIfAbsent(getLong(cursor, calendarEventsColumns, Events.ORIGINAL_ID), k -> new ArrayList<>())
+                            .add(originalInstanceTime);
+                }
             } else {
                 systemCalendarEvents.add(new SystemCalendarEvent(cursor, this, loadMinimal));
             }
@@ -120,22 +127,26 @@ public class SystemCalendar {
         }
         
         if (!loadMinimal) {
-            for (Map.Entry<Long, List<Long>> exceptionList : exceptionLists.entrySet()) {
-                boolean applied = false;
-                for (SystemCalendarEvent event : systemCalendarEvents) {
-                    if (event.id == exceptionList.getKey()) {
-                        event.addExceptions(exceptionList.getValue().toArray(new Long[0]));
-                        applied = true;
-                        break;
-                    }
-                }
-                if (!applied) {
-                    log(WARN, account_name, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
-                }
-            }
+            addExceptions(exceptionLists);
         }
         
         cursor.close();
+    }
+    
+    void addExceptions(final Map<Long, List<Long>> exceptionLists) {
+        for (Map.Entry<Long, List<Long>> exceptionList : exceptionLists.entrySet()) {
+            boolean applied = false;
+            for (SystemCalendarEvent event : systemCalendarEvents) {
+                if (event.id == exceptionList.getKey()) {
+                    event.addExceptions(exceptionList.getValue().toArray(new Long[0]));
+                    applied = true;
+                    break;
+                }
+            }
+            if (!applied) {
+                log(WARN, account_name, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
+            }
+        }
     }
     
     public boolean isVisible() {

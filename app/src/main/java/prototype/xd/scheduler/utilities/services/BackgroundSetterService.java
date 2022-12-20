@@ -3,7 +3,7 @@ package prototype.xd.scheduler.utilities.services;
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimeString;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
@@ -124,7 +124,7 @@ public class BackgroundSetterService extends Service {
     }
     
     private void updateNotification() {
-        servicePreferences.edit().putLong(Keys.LAST_UPDATE_TIME, getCurrentTimestamp()).apply();
+        servicePreferences.edit().putLong(Keys.LAST_UPDATE_TIME, getCurrentTimestampUTC()).apply();
         getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTimeString()));
         notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
     }

@@ -2,7 +2,7 @@ package prototype.xd.scheduler.views.lockscreen;
 
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
+import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
@@ -89,9 +89,9 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         int fontSizeSP = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
         
         // convert pixels to dp (equivalent of TypedValue.applyDimension(COMPLEX_UNIT_DIP, value, metrics))
-        setBorderSizeDP(entry.borderThickness.get(currentDay), preferences);
+        setBorderSizeDP(entry.borderThickness.get(currentDayUTC), preferences);
         
-        setTitleText(entry.getTextOnDay(currentDay, context));
+        setTitleText(entry.getTextOnDay(currentDayUTC, context));
         setTitleTextSize(fontSizeSP * DEFAULT_TITLE_FONT_SIZE_MULTIPLIER);
         
         if (entry.isFromSystemCalendar()) {
@@ -121,8 +121,8 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             entry.setAverageBackgroundColor(getAverageColor(pixels));
         }
         
-        mixAndSetBgAndTextColors(entry.fontColor.get(currentDay), entry.getAdaptiveColor(entry.bgColor.get(currentDay)));
-        setBorderColor(entry.getAdaptiveColor(entry.borderColor.get(currentDay)));
+        mixAndSetBgAndTextColors(entry.fontColor.get(currentDayUTC), entry.getAdaptiveColor(entry.bgColor.get(currentDayUTC)));
+        setBorderColor(entry.getAdaptiveColor(entry.borderColor.get(currentDayUTC)));
     }
     
     public void mixAndSetBgAndTextColors(int fontColor, int backgroundColor) {

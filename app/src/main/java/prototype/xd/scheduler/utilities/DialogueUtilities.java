@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
@@ -27,7 +28,6 @@ import androidx.viewbinding.ViewBinding;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
@@ -115,11 +115,9 @@ public class DialogueUtilities {
         
         spinner.setSelectedItem(defaultIndex);
         spinner.setOnItemClickListener((parent, view, position, id) -> selectedIndex[0] = position);
-    
-        // TODO: 17.12.2022 implement date pickers
-        dialogBinding.dayFromButton.setOnClickListener(v -> MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select date")
-                .build().show(fragmentManager, "dayFromDatePicker"));
+        
+        dialogBinding.dayFromButton.setup(fragmentManager, currentlySelectedTimestampUTC);
+        dialogBinding.dayToButton.setup(fragmentManager, currentlySelectedTimestampUTC);
         
         setupButtons(dialog, dialogBinding.twoButtons,
                 R.string.cancel, confirmButtonStringResource,

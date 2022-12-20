@@ -29,7 +29,8 @@ public class Keys {
     public static final String IS_COMPLETED = "completed";
     public static final String SHOW_ON_LOCK = "lock";
     public static final boolean CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK = true;
-    public static final String ASSOCIATED_DAY = "associatedDay";
+    public static final String START_DAY = "startDay";
+    public static final String END_DAY = "endDay";
     public static final String PRIORITY = "priority";
     public static final int ENTRY_SETTINGS_DEFAULT_PRIORITY = 0;
     

@@ -2,12 +2,13 @@ package prototype.xd.scheduler.utilities;
 
 import static android.util.Log.INFO;
 import static java.lang.Math.min;
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.Keys.ASSOCIATED_DAY;
+import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Keys.END_DAY;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
+import static prototype.xd.scheduler.utilities.Keys.START_DAY;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
@@ -76,7 +77,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         public void parametersInvalidated(TodoListEntry entry, Set<String> parameters) {
             // in case of completed status changes or associated day changes the entry may not be visible on the lockscreen now but was before
             if (parameters.contains(IS_COMPLETED) ||
-                    parameters.contains(ASSOCIATED_DAY) ||
+                    parameters.contains(START_DAY) ||
+                    parameters.contains(END_DAY) ||
                     entry.isVisibleOnLockscreenToday()) {
                 setBitmapUpdateFlag();
             }
@@ -125,8 +127,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                 calendarVisibilityMap.put(calendar, calendar.isVisible());
             }
             
-            loadedDay_start = currentDay - 30;
-            loadedDay_end = currentDay + 30;
+            loadedDay_start = currentDayUTC - 30;
+            loadedDay_end = currentDayUTC + 30;
             
             todoListEntries.initLoadingRange(loadedDay_start, loadedDay_end);
             todoListEntries.addAll(loadTodoEntries(context,

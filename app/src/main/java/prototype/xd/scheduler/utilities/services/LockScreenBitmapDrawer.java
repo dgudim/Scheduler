@@ -7,8 +7,8 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.makeMutable;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
-import static prototype.xd.scheduler.utilities.DateManager.currentDay;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestamp;
+import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
@@ -145,17 +145,17 @@ class LockScreenBitmapDrawer {
             new Thread(() -> {
                 try {
                     
-                    long time = getCurrentTimestamp();
+                    long time = getCurrentTimestampUTC();
                     log(INFO, NAME, "Setting wallpaper");
                     
                     Bitmap bitmap = getBitmapToDrawOn();
                     
                     drawItemsOnBitmap(backgroundSetterService, bitmap);
-                    log(INFO, NAME, "Processed wallpaper in " + (getCurrentTimestamp() - time) + "ms");
+                    log(INFO, NAME, "Processed wallpaper in " + (getCurrentTimestampUTC() - time) + "ms");
                     
-                    time = getCurrentTimestamp();
+                    time = getCurrentTimestampUTC();
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    log(INFO, NAME, "Set wallpaper in " + (getCurrentTimestamp() - time) / 1000f + "s");
+                    log(INFO, NAME, "Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000f + "s");
                     
                 } catch (InterruptedException e) {
                     log(INFO, NAME, e.getMessage());
@@ -186,12 +186,12 @@ class LockScreenBitmapDrawer {
         // sort and filter entries
         List<TodoListEntry> toAdd = filterEntries(sortEntries(loadTodoEntries(
                 context,
-                currentDay - 14,
-                currentDay + 14,
+                currentDayUTC - 14,
+                currentDayUTC + 14,
                 groups, null,
-                false), currentDay));
+                false), currentDayUTC));
         
-        long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDay + todoItemViewType.ordinal();
+        long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
         }

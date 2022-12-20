@@ -45,6 +45,15 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <include
+        android:id="@+id/two_buttons"
+        layout="@layout/two_buttons"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
     <prototype.xd.scheduler.views.Switch
         android:id="@+id/global_entry_switch"
         android:layout_width="0dp"
@@ -54,6 +63,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
         tools:ignore="TextContrastCheck" />
+
+    <prototype.xd.scheduler.views.DateSelectButton
+        android:id="@+id/day_from_button"
+        style="@style/SecondaryButtonStyleRoundCompact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        app:layout_constraintEnd_toStartOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider"
+        tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -66,29 +86,16 @@
         app:layout_constraintTop_toBottomOf="@+id/divider"
         app:srcCompat="@drawable/ic_arrow_right" />
 
-    <Button
-        android:id="@+id/day_from_button"
-        style="@style/SecondaryButtonStyleRoundCompact"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="Dec 14"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider"
-        tools:ignore="HardcodedText,TouchTargetSizeCheck,TextContrastCheck" />
-
-    <Button
+    <prototype.xd.scheduler.views.DateSelectButton
         android:id="@+id/day_to_button"
         style="@style/SecondaryButtonStyleRoundCompact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="Dec 15"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/divider"
-        tools:ignore="HardcodedText,TouchTargetSizeCheck,TextContrastCheck" />
+        tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
 
     <View
         android:id="@+id/divider"
@@ -108,14 +115,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/day_to_button" />
-
-    <include
-        android:id="@+id/two_buttons"
-        layout="@layout/two_buttons"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
