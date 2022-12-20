@@ -91,6 +91,10 @@ public class DateManager {
         return TimeUnit.DAYS.convert(msUTC, TimeUnit.MILLISECONDS);
     }
     
+    public static long msUTCFromDaysUTC(long daysUTC) {
+        return TimeUnit.MILLISECONDS.convert(daysUTC, TimeUnit.DAYS);
+    }
+    
     // return date and time given a UTC timestamp
     public static String datetimeStringFromMsUTC(long msUTC) {
         return dateTimeFormat.format(new Date(msUTC));

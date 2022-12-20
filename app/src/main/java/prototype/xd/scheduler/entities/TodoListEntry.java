@@ -176,8 +176,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     private transient boolean isAllDay = true;
     private transient RecurrenceSet recurrenceSet;
     
-    private transient ParameterGetter<Long> startDayUTC;
-    private transient ParameterGetter<Long> endDayUTC;
+    public transient ParameterGetter<Long> startDayUTC;
+    public transient ParameterGetter<Long> endDayUTC;
     private transient ParameterGetter<Long> durationDays;
     
     private ParameterGetter<String> rawTextValue;
@@ -336,11 +336,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         parameterMap = mapParameters(this);
         
         startDayUTC = previousValue ->
-                isFromSystemCalendar() ? event.startDayUTC : Long.parseLong(params.getOrDefault(Keys.START_DAY, Keys.DAY_FLAG_GLOBAL_STR));
+                isFromSystemCalendar() ? event.startDayUTC : Long.parseLong(params.getOrDefault(Keys.START_DAY_UTC, Keys.DAY_FLAG_GLOBAL_STR));
         endDayUTC = previousValue ->
-                isFromSystemCalendar() ? event.endDayUTC : Long.parseLong(params.getOrDefault(Keys.END_DAY, Keys.DAY_FLAG_GLOBAL_STR));
+                isFromSystemCalendar() ? event.endDayUTC : Long.parseLong(params.getOrDefault(Keys.END_DAY_UTC, Keys.DAY_FLAG_GLOBAL_STR));
         durationDays = previousValue ->
-                isFromSystemCalendar() ? event.durationDays : 0;
+                isFromSystemCalendar() ? event.durationDays : (endDayUTC.get() - startDayUTC.get());
         rawTextValue = previousValue ->
                 isFromSystemCalendar() ? event.title : params.getOrDefault(Keys.TEXT_VALUE, "");
     }
@@ -475,13 +475,13 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         // shallow copy map
         SArrayMap<String, String> displayParams = new SArrayMap<>(params);
         // remove not display parameters
-        displayParams.removeAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY, Keys.END_DAY, Keys.IS_COMPLETED));
+        displayParams.removeAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
         return displayParams;
     }
     
     public void removeDisplayParams() {
         invalidateAllParameters(true);
-        params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY, Keys.END_DAY, Keys.IS_COMPLETED));
+        params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
     }
     
     public void changeParameter(String name, String value) {

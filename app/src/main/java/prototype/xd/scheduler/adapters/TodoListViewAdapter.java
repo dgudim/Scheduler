@@ -1,15 +1,14 @@
 package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.entities.Group.groupIndexInList;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
-import static prototype.xd.scheduler.utilities.Keys.END_DAY;
+import static prototype.xd.scheduler.utilities.Keys.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.START_DAY;
+import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 
 import android.content.Context;
@@ -73,24 +72,23 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         private void displayEditDialog(@NonNull final TodoListEntry entry,
                                        @NonNull final TodoListEntryManager todoListEntryManager) {
             final List<Group> groupList = todoListEntryManager.getGroups();
-            int currentIndex = max(groupIndexInList(groupList, entry.getRawGroupName()), 0);
             
             displayEntryAdditionEditDialog(fragmentManager, context, lifecycle,
-                    R.string.edit_event, R.string.save, entry.getRawTextValue(), groupList,
-                    currentIndex, (view2, text, dialogBinding, selectedIndex) -> {
+                    entry, groupList,
+                    (view2, text, dialogBinding, selectedIndex) -> {
                         entry.changeGroup(groupList.get(selectedIndex));
                         boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();
                         if (isGlobal) {
                             entry.changeParameters(
                                     TEXT_VALUE, text,
                                     IS_COMPLETED, "false",
-                                    START_DAY, DAY_FLAG_GLOBAL_STR,
-                                    END_DAY, DAY_FLAG_GLOBAL_STR);
+                                    START_DAY_UTC, DAY_FLAG_GLOBAL_STR,
+                                    END_DAY_UTC, DAY_FLAG_GLOBAL_STR);
                         } else {
                             entry.changeParameters(
                                     TEXT_VALUE, text,
-                                    START_DAY, dialogBinding.dayFromButton.getSelectedDateMsUTCStr(),
-                                    END_DAY, dialogBinding.dayToButton.getSelectedDateMsUTCStr());
+                                    START_DAY_UTC, dialogBinding.dayFromButton.getSelectedDayUTCStr(),
+                                    END_DAY_UTC, dialogBinding.dayToButton.getSelectedDayUTCStr());
                         }
                         todoListEntryManager.performDeferredTasks();
                         return true;
@@ -122,8 +120,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                 } else {
                     String selectedDay = String.valueOf(currentlySelectedDayUTC);
                     entry.changeParameters(
-                            START_DAY, selectedDay,
-                            END_DAY, selectedDay);
+                            START_DAY_UTC, selectedDay,
+                            END_DAY_UTC, selectedDay);
                 }
                 todoListEntryManager.performDeferredTasks();
             });

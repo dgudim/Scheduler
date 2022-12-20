@@ -22,6 +22,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
@@ -352,7 +353,7 @@ public class Utilities {
         tSwitch.setCheckedSilent(preferences.getBoolean(key, defaultValue));
         tSwitch.setOnCheckedChangeListener((switchView, isChecked) -> {
             preferences.edit().putBoolean(key, isChecked).apply();
-            if(onCheckedChangeListener != null) {
+            if (onCheckedChangeListener != null) {
                 onCheckedChangeListener.onCheckedChanged(switchView, isChecked);
             }
         });
@@ -382,6 +383,20 @@ public class Utilities {
             return false;
         }
         return date1.isEqual(date2);
+    }
+    
+    public static void displayToast(Context context, @StringRes int textId) {
+        Toast.makeText(context, context.getString(textId), Toast.LENGTH_LONG).show();
+    }
+    
+    public static void fancyHideUnhideView(View view, boolean visible, boolean animate) {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if(animate) {
+            int initialHeight = view.getMeasuredHeight();
+            view.animate()
+                    .scaleY(visible ? 1 : 0)
+                    .translationY(visible ? 0 : -initialHeight / 2f).start();
+        }
     }
     
     /**

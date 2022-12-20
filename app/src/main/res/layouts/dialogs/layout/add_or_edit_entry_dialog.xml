@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:paddingStart="3dp"
     android:paddingEnd="3dp">
 
@@ -70,13 +71,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
+        app:layout_constraintEnd_toStartOf="@+id/date_from_to_arrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider"
-        tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
+        tools:ignore="TouchTargetSizeCheck,TextContrastCheck,DuplicateSpeakableTextCheck" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/date_from_to_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/date_from_to"
@@ -93,7 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/date_from_to_arrow"
         app:layout_constraintTop_toBottomOf="@+id/divider"
         tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
 

@@ -1,10 +1,13 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
+import static java.lang.Math.max;
+import static prototype.xd.scheduler.entities.Group.groupIndexInList;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
+import static prototype.xd.scheduler.utilities.Utilities.fancyHideUnhideView;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -38,6 +41,8 @@ import prototype.xd.scheduler.databinding.AddOrEditEntryDialogBinding;
 import prototype.xd.scheduler.databinding.AddOrEditGroupDialogBinding;
 import prototype.xd.scheduler.databinding.TwoButtonsBinding;
 import prototype.xd.scheduler.entities.Group;
+import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.views.DateSelectButton;
 import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
@@ -95,32 +100,45 @@ public class DialogueUtilities {
     public static void displayEntryAdditionEditDialog(@NonNull FragmentManager fragmentManager,
                                                       @NonNull Context context,
                                                       @NonNull Lifecycle lifecycle,
-                                                      @StringRes int titleStringResource,
-                                                      @StringRes int confirmButtonStringResource,
-                                                      @NonNull String defaultEditTextValue,
-                                                      @NonNull List<Group> groups,
-                                                      int defaultIndex,
+                                                      @Nullable TodoListEntry entry,
+                                                      @NonNull List<Group> groupList,
                                                       @NonNull OnClickListenerWithViewAccess<AddOrEditEntryDialogBinding> confirmationListener) {
         
         AddOrEditEntryDialogBinding dialogBinding = AddOrEditEntryDialogBinding.inflate(LayoutInflater.from(context));
         
-        Dialog dialog = buildTemplate(context, lifecycle, titleStringResource, -1, dialogBinding);
-        setupEditText(dialogBinding.entryNameEditText, defaultEditTextValue);
+        Dialog dialog = buildTemplate(context, lifecycle,
+                entry == null ? R.string.add_event_fab : R.string.edit_event,
+                -1, dialogBinding);
+        setupEditText(dialogBinding.entryNameEditText, entry == null ? "" : entry.getRawTextValue());
         
-        String[] items = Group.groupListToNames(groups, context);
-        SelectableAutoCompleteTextView spinner = dialogBinding.groupSpinner;
-        spinner.setSimpleItems(items);
+        String[] items = Group.groupListToNames(groupList, context);
+        SelectableAutoCompleteTextView groupSpinner = dialogBinding.groupSpinner;
+        groupSpinner.setSimpleItems(items);
         
-        final int[] selectedIndex = {defaultIndex};
+        int initialGroupIndex = entry == null ? 0 : max(groupIndexInList(groupList, entry.getRawGroupName()), 0);
         
-        spinner.setSelectedItem(defaultIndex);
-        spinner.setOnItemClickListener((parent, view, position, id) -> selectedIndex[0] = position);
+        final int[] selectedIndex = {initialGroupIndex};
         
-        dialogBinding.dayFromButton.setup(fragmentManager, currentlySelectedTimestampUTC);
-        dialogBinding.dayToButton.setup(fragmentManager, currentlySelectedTimestampUTC);
+        groupSpinner.setSelectedItem(initialGroupIndex);
+        groupSpinner.setOnItemClickListener((parent, view, position, id) -> selectedIndex[0] = position);
+        
+        dialogBinding.dayFromButton.setup(fragmentManager, entry == null ? currentlySelectedDayUTC : entry.startDayUTC.get());
+        dialogBinding.dayToButton.setup(fragmentManager, entry == null ? currentlySelectedDayUTC : entry.endDayUTC.get());
+        
+        // for date validation
+        dialogBinding.dayFromButton.setRole(DateSelectButton.Role.START_DAY, dialogBinding.dayToButton);
+        dialogBinding.dayToButton.setRole(DateSelectButton.Role.END_DAY, dialogBinding.dayFromButton);
+        
+        dialogBinding.globalEntrySwitch.setOnCheckedChangeListener((buttonView, isChecked, fromUser) -> {
+            fancyHideUnhideView(dialogBinding.dayFromButton, !isChecked, fromUser);
+            fancyHideUnhideView(dialogBinding.dayToButton, !isChecked, fromUser);
+            fancyHideUnhideView(dialogBinding.dateFromToArrow, !isChecked, fromUser);
+            fancyHideUnhideView(dialogBinding.divider2, !isChecked, fromUser);
+        });
+        dialogBinding.globalEntrySwitch.setChecked(entry != null && entry.isGlobal());
         
         setupButtons(dialog, dialogBinding.twoButtons,
-                R.string.cancel, confirmButtonStringResource,
+                R.string.cancel, entry == null ? R.string.add : R.string.save,
                 v -> {
                     String text = checkAndGetInput(dialogBinding.entryNameEditText);
                     if (!text.isEmpty() && confirmationListener.onClick(v, text, dialogBinding, selectedIndex[0])) {

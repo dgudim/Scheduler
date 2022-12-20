@@ -1,7 +1,9 @@
 package prototype.xd.scheduler;
 
-import static android.os.Build.*;
+import static android.os.Build.VERSION;
+import static android.os.Build.VERSION_CODES;
 import static prototype.xd.scheduler.MainActivity.PACKAGE_NAME;
+import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -18,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -45,7 +46,7 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     private final ActivityResultLauncher<String[]> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(), result -> {
                 if (!refreshPermissionStates(true)) {
-                    displayGrantToast();
+                    displayGrantPermissionsToast();
                 } else {
                     batteryOptimizationLauncher.launch(
                             new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + PACKAGE_NAME)));
@@ -126,11 +127,10 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     
     @Override
     public void onUserIllegallyRequestedNextPage() {
-        displayGrantToast();
+        displayGrantPermissionsToast();
     }
     
-    private void displayGrantToast() {
-        Toast.makeText(getActivity(), requireContext().getString(R.string.permission_request_description),
-                Toast.LENGTH_LONG).show();
+    private void displayGrantPermissionsToast() {
+        displayToast(requireContext(), R.string.permission_request_description);
     }
 }
