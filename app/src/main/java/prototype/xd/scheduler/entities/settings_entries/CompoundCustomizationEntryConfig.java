@@ -2,7 +2,7 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
-import static prototype.xd.scheduler.utilities.DialogueUtilities.invokeColorDialogue;
+import static prototype.xd.scheduler.utilities.DialogUtilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
@@ -26,7 +26,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.TodoItemViewSelectionDialogBinding;
-import prototype.xd.scheduler.utilities.DialogueUtilities;
+import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
@@ -78,7 +78,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             
             updatePreviews();
             
-            DialogueUtilities.ColorPickerKeyedClickListener colorPickerClickListener = (dialog, selectedColor, key, allColors) -> {
+            DialogUtilities.ColorPickerKeyedClickListener colorPickerClickListener = (dialog, selectedColor, key, allColors) -> {
                 preferences.edit().putInt(key, selectedColor).apply();
                 switch (key) {
                     case Keys.UPCOMING_BG_COLOR:

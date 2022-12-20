@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.views;
 
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringMonthNamesFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.daysUTCFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCFromDaysUTC;
@@ -49,6 +50,9 @@ public class DateSelectButton extends MaterialButton {
     }
     
     public void setup(@NonNull FragmentManager fragmentManager, long initialDay) {
+        if(initialDay == -1) {
+            initialDay = currentlySelectedDayUTC;
+        }
         long initialMsUTC = msUTCFromDaysUTC(initialDay);
         selectedDayUTC = initialDay;
         selectedMsUTC = initialMsUTC;

@@ -46,7 +46,7 @@ import prototype.xd.scheduler.views.DateSelectButton;
 import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
-public class DialogueUtilities {
+public class DialogUtilities {
     
     public static void displayConfirmationDialogue(@NonNull Context context,
                                                    @NonNull Lifecycle lifecycle,

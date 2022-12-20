@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.views.settings;
 
-import static prototype.xd.scheduler.utilities.DialogueUtilities.displayConfirmationDialogue;
-import static prototype.xd.scheduler.utilities.DialogueUtilities.invokeColorDialogue;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
+import static prototype.xd.scheduler.utilities.DialogUtilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarKeyToReadable;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;

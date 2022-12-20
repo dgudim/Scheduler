@@ -148,7 +148,6 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
             // if the entry is global only link to global entries list
             if (newEntry.isGlobal()) {
                 globalEntries.add(newEntry);
-                System.out.println("====--=-=-=-=-==-=-=-==-=-= Added " + newEntry);
                 return;
             }
             
@@ -179,7 +178,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         boolean filter(TodoListEntry entry, TodoListEntry.EntryType entryType);
     }
     
-    TodoListEntry.EntryType getEntryType(TodoListEntry entry, long day) {
+    public TodoListEntry.EntryType getEntryType(TodoListEntry entry, long day) {
         if (globalEntries.contains(entry)) {
             return TodoListEntry.EntryType.GLOBAL;
         }

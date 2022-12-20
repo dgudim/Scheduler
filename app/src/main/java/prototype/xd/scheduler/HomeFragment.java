@@ -5,8 +5,8 @@ import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTime
 import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
-import static prototype.xd.scheduler.utilities.DialogueUtilities.displayEntryAdditionEditDialog;
-import static prototype.xd.scheduler.utilities.DialogueUtilities.displayMessageDialog;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
