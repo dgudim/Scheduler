@@ -67,9 +67,11 @@ public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> 
                 getString(R.string.settings_max_rWidth_lock)));
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_visibility)));
-        settingsEntries.add(new SeekBarSettingsEntryConfig(0, 14, Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET, true, false,
+        settingsEntries.add(new SeekBarSettingsEntryConfig(0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
+                Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET, true, false,
                 Keys.UPCOMING_ITEMS_OFFSET, R.string.settings_show_days_upcoming));
-        settingsEntries.add(new SeekBarSettingsEntryConfig(0, 14, Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET, true, false,
+        settingsEntries.add(new SeekBarSettingsEntryConfig(0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
+                Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET, true, false,
                 Keys.EXPIRED_ITEMS_OFFSET, R.string.settings_show_days_expired));
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME,

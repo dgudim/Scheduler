@@ -34,6 +34,9 @@ public abstract class PopupSettingsView {
         bnd = EntrySettingsBinding.inflate(LayoutInflater.from(context));
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
     
+        bnd.showDaysUpcomingBar.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
+        bnd.showDaysExpiredBar.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
+        
         this.context = context;
         this.lifecycle = lifecycle;
         

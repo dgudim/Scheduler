@@ -77,6 +77,7 @@ public class Keys {
     public static final int SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET = 0;
     public static final String EXPIRED_ITEMS_OFFSET = "dayOffset_expired";
     public static final int SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET = 0;
+    public static final int SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET = 14;
     
     public static final String SHOW_UPCOMING_EXPIRED_IN_LIST = "upcomingExpiredVisibleInList";
     public static final boolean SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST = true;

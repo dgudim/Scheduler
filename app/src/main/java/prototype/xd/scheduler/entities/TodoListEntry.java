@@ -128,6 +128,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 case UPCOMING:
                     return upcomingCachedGetter == null ? todayValue : upcomingCachedGetter.get(todayValue);
                 case TODAY:
+                case GLOBAL:
                 default:
                     return todayValue;
             }
@@ -159,7 +160,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     private static final transient String NAME = "Todo list entry";
     
-    public enum EntryType {TODAY, EXPIRED, UPCOMING, UNKNOWN}
+    public enum EntryType {TODAY, EXPIRED, UPCOMING, GLOBAL, UNKNOWN}
     
     @FunctionalInterface
     public interface ParameterInvalidationListener {
@@ -788,6 +789,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public EntryType getEntryType(long targetDay) {
+        
+        if(isGlobal()) {
+            return EntryType.GLOBAL;
+        }
+        
         // in case of regular entry this will return startDay
         long nearestDay = getNearestEventDay(targetDay);
         

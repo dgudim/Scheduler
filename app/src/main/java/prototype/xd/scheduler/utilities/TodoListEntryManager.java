@@ -284,8 +284,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     public List<TodoListEntry> getVisibleTodoListEntries(long day) {
-        return todoListEntries.getOnDay(day, (entry, upcomingExpired) -> {
-            if (upcomingExpired) {
+        return todoListEntries.getOnDay(day, (entry, entryType) -> {
+            if (entryType == TodoListEntry.EntryType.UPCOMING ||
+                    entryType == TodoListEntry.EntryType.EXPIRED) {
                 return !entry.isCompleted();
             } else {
                 return true;
@@ -300,13 +301,13 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     public void processEventIndicators(long day, int maxIndicators, EventIndicatorConsumer eventIndicatorConsumer) {
         
-        List<TodoListEntry> todoListEntriesOnDay = todoListEntries.getOnDay(day, (entry, upcomingExpired) ->
-                !entry.isGlobal() && !entry.isCompleted());
+        List<TodoListEntry> todoListEntriesOnDay = todoListEntries.getOnDay(day, (entry, entryType) ->
+                entryType != TodoListEntry.EntryType.GLOBAL && !entry.isCompleted());
         
         int index = 0;
         
         // show visible indicators
-        for (int ind = 0; ind < min(todoListEntriesOnDay.size(), maxIndicators); ind ++) {
+        for (int ind = 0; ind < min(todoListEntriesOnDay.size(), maxIndicators); ind++) {
             if (displayUpcomingExpired) {
                 eventIndicatorConsumer.submit(todoListEntriesOnDay.get(ind).bgColor.get(day), index, true);
             } else {

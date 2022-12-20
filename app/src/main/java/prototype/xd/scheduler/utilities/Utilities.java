@@ -217,11 +217,10 @@ public class Utilities {
         List<TodoListEntry> otherEntries = new ArrayList<>();
         
         for (TodoListEntry entry : entries) {
-            if (entry.isGlobal()) {
-                globalEntries.add(entry);
-                continue;
-            }
             switch (entry.getEntryType(day)) {
+                case GLOBAL:
+                    globalEntries.add(entry);
+                    break;
                 case TODAY:
                     todayEntries.add(entry);
                     break;

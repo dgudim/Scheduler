@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import prototype.xd.scheduler.entities.TodoListEntry.ParameterInvalidationListener;
+import prototype.xd.scheduler.utilities.Keys;
 
 // a list specifically for storing TodoListEntries, automatically unlinks groups on remove to avoid memory leaks
 public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
@@ -79,7 +80,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
             oldEntry.unlinkFromContainer();
             
             // if the entry is global, only unlink from global entry list
-            if(globalEntries.remove(oldEntry)) {
+            if (globalEntries.remove(oldEntry)) {
                 return oldEntry;
             }
             
@@ -113,7 +114,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     private void linkEntryToLookupContainers(TodoListEntry entry, long minDay, long maxDay) {
-        if(entry.isGlobal()) {
+        if (entry.isGlobal()) {
             return;
         }
         TodoListEntry.FullDaySet fullDaySet = entry.getFullDaySet(minDay, maxDay);
@@ -145,8 +146,9 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
             newEntry.listenToParameterInvalidations(parameterInvalidationListener);
             
             // if the entry is global only link to global entries list
-            if(newEntry.isGlobal()) {
+            if (newEntry.isGlobal()) {
                 globalEntries.add(newEntry);
+                System.out.println("====--=-=-=-=-==-=-=-==-=-= Added " + newEntry);
                 return;
             }
             
@@ -174,33 +176,52 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     @FunctionalInterface
     public
     interface TodoListEntryFilter {
-        boolean filter(TodoListEntry entry, boolean upcomingExpired);
+        boolean filter(TodoListEntry entry, TodoListEntry.EntryType entryType);
     }
     
-    boolean isEntryExpiredOrUpcoming(TodoListEntry entry, long day) {
-        Set<TodoListEntry> extendedEntries = entriesPerDayUpcomingExpired.get(day);
-        Set<TodoListEntry> coreEntries = entriesPerDayCore.get(day);
-        if (extendedEntries == null || coreEntries == null) {
-            log(ERROR, NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day + ". Day not loaded?");
-            return false;
+    TodoListEntry.EntryType getEntryType(TodoListEntry entry, long day) {
+        if (globalEntries.contains(entry)) {
+            return TodoListEntry.EntryType.GLOBAL;
         }
-        // in extended set but not in core set
-        return extendedEntries.contains(entry) && !coreEntries.contains(entry);
+        Set<Long> extendedDays = daysPerEntryUpcomingExpired.get(entry);
+        Set<Long> coreDays = daysPerEntryCore.get(entry);
+        if (extendedDays == null || coreDays == null) {
+            log(ERROR, NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day + ". Entry not managed by current container");
+            return TodoListEntry.EntryType.UNKNOWN;
+        }
+        
+        if (coreDays.contains(day)) {
+            return TodoListEntry.EntryType.TODAY;
+        }
+        
+        // our event is not today's, we need to check SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET to the left and to the right
+        for (long day_offset = 1; day_offset < Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET; day_offset++) {
+            // + + + event + + +
+            //       event     we are here
+            if (extendedDays.contains(day - day_offset)) {
+                return TodoListEntry.EntryType.EXPIRED;
+                //           + + + event + + +
+                // we are here     event
+            } else if (extendedDays.contains(day + day_offset)) {
+                return TodoListEntry.EntryType.UPCOMING;
+            }
+        }
+        log(WARN, NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day);
+        return TodoListEntry.EntryType.UNKNOWN;
     }
     
     // get all entries visible on a particular day
     public List<TodoListEntry> getOnDay(long day, TodoListEntryFilter filter) {
         List<TodoListEntry> filtered = new ArrayList<>();
         Set<TodoListEntry> notFiltered = displayUpcomingExpired ? entriesPerDayUpcomingExpired.get(day) : entriesPerDayCore.get(day);
-        if(notFiltered == null) {
-            return new ArrayList<>();
-        }
         Consumer<TodoListEntry> consumer = entry -> {
-            if (filter.filter(entry, isEntryExpiredOrUpcoming(entry, day))) {
+            if (filter.filter(entry, getEntryType(entry, day))) {
                 filtered.add(entry);
             }
         };
-        notFiltered.forEach(consumer);
+        if (notFiltered != null) {
+            notFiltered.forEach(consumer);
+        }
         globalEntries.forEach(consumer);
         return sortEntries(filtered, day);
     }
@@ -208,7 +229,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     public void notifyEntryVisibilityRangeChanged(TodoListEntry entry,
                                                   long minDay, long maxDay,
                                                   Set<Long> invalidatedDaySet) {
-        if(entry.isGlobal()) {
+        if (entry.isGlobal()) {
             log(WARN, NAME, "Trying to change visibility range of a global entry");
             return;
         }
