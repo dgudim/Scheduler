@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
             System.exit(0);
         } else if (preferences.getString(ROOT_DIR, null) == null) {
             preferences.edit().putString(ROOT_DIR, rootDir.getAbsolutePath()).apply();
-            log(INFO, NAME, "root dir: " + rootDir);
+            log(INFO, NAME, "Root dir: " + rootDir);
             if (!rootDir.exists()) {
-                log(INFO, NAME, "created folder structure: " + rootDir.mkdirs());
+                log(INFO, NAME, "Created folder structure: " + rootDir.mkdirs());
             }
         }
         

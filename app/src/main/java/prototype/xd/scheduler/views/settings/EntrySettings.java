@@ -176,6 +176,7 @@ public class EntrySettings extends PopupSettingsView {
                 parameterKey -> entry.adaptiveColorBalance.getToday());
         
         if (todoListEntry.isGlobal()) {
+            // global entries can't have upcoming / expired days
             bnd.showDaysUpcomingContainer.setVisibility(View.GONE);
             bnd.showDaysExpiredContainer.setVisibility(View.GONE);
         } else {

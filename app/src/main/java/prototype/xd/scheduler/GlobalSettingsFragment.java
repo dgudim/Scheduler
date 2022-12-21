@@ -40,6 +40,8 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> {
     
+    private static final String NAME = "BackgroundImagesGridViewAdapter";
+    
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBackgroundSettingsEntry;
     
     ActivityResultLauncher<Intent> pickBg =
@@ -136,7 +138,7 @@ public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> 
                     stream.close();
                     requireActivity().runOnUiThread(() -> adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated());
                 } else {
-                    log(ERROR, "BackgroundImagesGridViewAdapter", "stream null for uri: " + uri.getPath());
+                    log(ERROR, NAME, "Stream null for uri: " + uri.getPath());
                 }
                 
             } catch (Exception e) {

@@ -21,6 +21,8 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public class Group implements Serializable {
     
+    private static final String NAME = "Group";
+    
     public static final transient Group NULL_GROUP = new Group();
     
     private String groupName;
@@ -48,14 +50,14 @@ public class Group implements Serializable {
     // to be called only by TodoListEntry
     protected void attachEntryInternal(TodoListEntry todoListEntry) {
         if (associatedEntries.put(todoListEntry.getId(), todoListEntry) != null) {
-            log(WARN, "Group", "attachEntryInternal called with " + todoListEntry + " but it's already attached");
+            log(WARN, NAME, "attachEntryInternal called with " + todoListEntry + " but it's already attached");
         }
     }
     
     // to be called only by TodoListEntry
     protected void detachEntryInternal(TodoListEntry todoListEntry) {
         if (associatedEntries.remove(todoListEntry.getId()) == null) {
-            log(WARN, "Group", "detachEntryInternal called with " + todoListEntry + " but it's not attached");
+            log(WARN, NAME, "detachEntryInternal called with " + todoListEntry + " but it's not attached");
         }
     }
     

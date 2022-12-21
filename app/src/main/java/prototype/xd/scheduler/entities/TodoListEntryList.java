@@ -59,9 +59,6 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     // extend to the left
     public void extendLoadingRangeStartDay(long newDayStart) {
         for (TodoListEntry entry : this) {
-            if (entry.isGlobal()) {
-                continue;
-            }
             // we know that newDayStart is smaller than previous loadedDay_start
             linkEntryToLookupContainers(entry, newDayStart, loadedDay_start - 1);
         }
@@ -71,9 +68,6 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     // extend to the right
     public void extendLoadingRangeEndDay(long newDayEnd) {
         for (TodoListEntry entry : this) {
-            if (entry.isGlobal()) {
-                continue;
-            }
             // we know that newDayStart is bigger than previous loadedDay_start
             linkEntryToLookupContainers(entry, loadedDay_end + 1, newDayEnd);
         }
@@ -127,6 +121,10 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     private void linkEntryToLookupContainers(TodoListEntry entry, long minDay, long maxDay) {
+        if(entry.isGlobal()) {
+            // don't link global entries
+            return;
+        }
         TodoListEntry.FullDaySet fullDaySet = entry.getFullDaySet(minDay, maxDay);
         linkEntryToLookupContainers(entry, fullDaySet);
     }

@@ -32,7 +32,7 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
                                        boolean showSettings) {
         super(showSettings);
         this.systemCalendarSettings = systemCalendarSettings;
-        this.calendarName = calendar.name;
+        this.calendarName = calendar.displayName;
         calendarKey = calendar.getKey();
         this.calendarColor = calendar.color;
         calendarEventsCount = calendar.systemCalendarEvents.size();

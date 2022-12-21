@@ -97,7 +97,7 @@ public class Logger {
                 Files.delete(logFileOld.toPath());
                 throwOnFalse(logFile.renameTo(logFileOld), "Error renaming to old file", IOException.class);
                 throwOnFalse(logFile.createNewFile(), "Error creating new file", IOException.class);
-                log(INFO, NAME, "moved to log_old");
+                log(INFO, NAME, "Moved to log_old");
             }
         } catch (IOException e) {
             fileEnabled = false;

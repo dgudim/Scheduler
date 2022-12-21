@@ -708,6 +708,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     // return on what days from min to max an entry is visible (and was before invalidation)
     public Set<Long> getVisibleDaysOnCalendar(@NonNull final CalendarView calendarView,
                                               RangeType rangeType) {
+        // we don't care about global entries, they are handled differently
         if(isGlobal()) {
             return Collections.emptySet();
         }

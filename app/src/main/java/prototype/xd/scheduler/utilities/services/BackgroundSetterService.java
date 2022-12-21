@@ -142,16 +142,16 @@ public class BackgroundSetterService extends Service {
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
-                log(DEBUG, NAME, "received ping (keep alive job)");
+                log(DEBUG, NAME, "Received ping (keep alive job)");
             } else {
-                log(DEBUG, NAME, "received general ping");
+                log(DEBUG, NAME, "Received general ping");
                 updateDate();
                 lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
                 updateNotification();
             }
         } else {
             initialized = true;
-            log(DEBUG, NAME, "received ping (initial)");
+            log(DEBUG, NAME, "Received ping (initial)");
             
             servicePreferences = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
             
@@ -161,16 +161,16 @@ public class BackgroundSetterService extends Service {
                     if (!lastUpdateSucceeded || servicePreferences.getBoolean(SERVICE_UPDATE_SIGNAL, false)) {
                         ping(context);
                         servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
-                        log(DEBUG, NAME, "sent ping (on - off receiver)");
+                        log(DEBUG, NAME, "Sent ping (on - off receiver)");
                     }
-                    log(DEBUG, NAME, "receiver state: " + intent.getAction());
+                    log(DEBUG, NAME, "Receiver state: " + intent.getAction());
                 }
             };
             pingReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     ping(context);
-                    log(DEBUG, NAME, "sent ping (date changed receiver)");
+                    log(DEBUG, NAME, "Sent ping (date changed receiver)");
                 }
             };
             

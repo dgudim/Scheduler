@@ -346,10 +346,12 @@ public class Utilities {
                 settingsView.notifyParameterChanged(stateIcon, parameterKey, isChecked));
     }
     
+    // opens a url in default browser (context)
     public static void openUrl(Context context, String url) {
         context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
     
+    // opens a url in default browser (fragment)
     public static void openUrl(Fragment fragment, String url) {
         openUrl(fragment.requireContext(), url);
     }
@@ -361,6 +363,7 @@ public class Utilities {
         return date1.isEqual(date2);
     }
     
+    // computes symmetric difference between 2 maps
     public static <K, V> Set<K> symmetricDifference(@NonNull final Map<K, ? extends V> map1,
                                                     @NonNull final Map<K, ? extends V> map2) {
         Set<K> keys = new ArraySet<>(map1.size() + map2.size());
@@ -371,6 +374,7 @@ public class Utilities {
         return keys;
     }
     
+    // computes symmetric difference between 2 sets
     public static <K> Set<K> symmetricDifference(final Set<? extends K> set1,
                                                  final Set<? extends K> set2) {
         
@@ -388,6 +392,7 @@ public class Utilities {
         return combined;
     }
     
+    // display long toast with a message
     public static void displayToast(Context context, @StringRes int textId) {
         Toast.makeText(context, context.getString(textId), Toast.LENGTH_LONG).show();
     }

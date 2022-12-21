@@ -32,6 +32,8 @@ import prototype.xd.scheduler.utilities.Keys;
 
 public class SystemCalendar {
     
+    private static final String NAME = "SystemCalendar";
+    
     public final String account_type;
     public final String account_name;
     
@@ -41,7 +43,7 @@ public class SystemCalendar {
     public final int accessLevel;
     
     public final TimeZone timeZone;
-    public final String name;
+    public final String displayName;
     public final int color;
     
     public final List<SystemCalendarEvent> systemCalendarEvents;
@@ -50,18 +52,18 @@ public class SystemCalendar {
     public SystemCalendar(Cursor cursor, ContentResolver contentResolver, boolean loadMinimal) {
         account_type = getString(cursor, calendarColumns, Calendars.ACCOUNT_TYPE);
         account_name = getString(cursor, calendarColumns, Calendars.ACCOUNT_NAME);
-        name = getString(cursor, calendarColumns, Calendars.CALENDAR_DISPLAY_NAME);
+        displayName = getString(cursor, calendarColumns, Calendars.CALENDAR_DISPLAY_NAME);
         id = getLong(cursor, calendarColumns, Calendars._ID);
         accessLevel = getInt(cursor, calendarColumns, Calendars.CALENDAR_ACCESS_LEVEL);
         color = getInt(cursor, calendarColumns, Calendars.CALENDAR_COLOR);
         
-        prefKey = account_name + "_" + name;
+        prefKey = account_name + "_" + displayName;
         visibilityKey = prefKey + "_" + Keys.VISIBLE;
         
         String timeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
         
         if(timeZoneId.isEmpty()) {
-            log(WARN, "SystemCalendar", "Calendar " + prefKey + " has no timezone, defaulting to system timezone");
+            log(WARN, NAME, "Calendar " + prefKey + " has no timezone, defaulting to system timezone");
             timeZone = systemTimeZone;
         } else {
             timeZone = TimeZone.getTimeZone(timeZoneId);
@@ -195,12 +197,12 @@ public class SystemCalendar {
     @NonNull
     @Override
     public String toString() {
-        return account_name + ": " + name;
+        return account_name + ": " + displayName;
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(account_type, account_name, name, id, accessLevel, color);
+        return Objects.hash(account_type, account_name, displayName, id, accessLevel, color);
     }
     
     @Override
@@ -213,7 +215,7 @@ public class SystemCalendar {
             SystemCalendar systemCalendar = (SystemCalendar) obj;
             return Objects.equals(account_type, systemCalendar.account_type) &&
                     Objects.equals(account_name, systemCalendar.account_name) &&
-                    Objects.equals(name, systemCalendar.name) &&
+                    Objects.equals(displayName, systemCalendar.displayName) &&
                     Objects.equals(id, systemCalendar.id) &&
                     Objects.equals(accessLevel, systemCalendar.accessLevel) &&
                     Objects.equals(color, systemCalendar.color);

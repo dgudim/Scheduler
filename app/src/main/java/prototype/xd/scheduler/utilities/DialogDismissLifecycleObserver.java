@@ -17,6 +17,8 @@ import androidx.lifecycle.LifecycleOwner;
  */
 public class DialogDismissLifecycleObserver implements DefaultLifecycleObserver {
     
+    private static final String NAME = "DialogLifecycle";
+    
     private @Nullable
     Dialog dialog;
     
@@ -27,12 +29,12 @@ public class DialogDismissLifecycleObserver implements DefaultLifecycleObserver 
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
         if(dialog == null) {
-            log(WARN, "DialogLifecycle", "Something is not right, onDestroy was called but observer already fired");
+            log(WARN, NAME, "Something is not right, onDestroy was called but observer already fired");
         }
         if (dialog != null && dialog.isShowing()) {
             // dismiss the dialog to avoid android.view.WindowLeaked
             dialog.dismiss();
-            log(DEBUG, "DialogLifecycle", "Activity destroyed, closed lingering dialog " + dialog);
+            log(DEBUG, NAME, "Activity destroyed, closed lingering dialog " + dialog);
             dialog = null;
         }
     }
