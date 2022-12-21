@@ -152,7 +152,7 @@
     <string name="calendar_settings_fragment_label" translatable="false">Calendar settings fragment</string>
     <string name="reset_settings_description">This will reset ALL your settings, including calendar ones</string>
     <string name="reset_calendar_settings_description">This will reset current calendar settings</string>
-    <string name="settings_show_global_items_label_lock">Show \"Global\" label near global items on the lockscreen</string>
+    <string name="settings_show_global_items_label_lock">Show \"Global\" label near global events on the lockscreen</string>
     <string name="settings_allow_global_calendar_account_settings">Allow changing settings of whole calendars and accounts</string>
     <string name="global">Global</string>
     <string name="date_from_to">Date from to</string>

@@ -19,6 +19,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.ArraySet;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -44,7 +45,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
@@ -210,42 +213,16 @@ public class Utilities {
     }
     
     public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long day) {
-        List<TodoListEntry> upcomingEntries = new ArrayList<>();
-        List<TodoListEntry> expiredEntries = new ArrayList<>();
-        List<TodoListEntry> todayEntries = new ArrayList<>();
-        List<TodoListEntry> globalEntries = new ArrayList<>();
-        List<TodoListEntry> otherEntries = new ArrayList<>();
         
         for (TodoListEntry entry : entries) {
-            switch (entry.getEntryType(day)) {
-                case GLOBAL:
-                    globalEntries.add(entry);
-                    break;
-                case TODAY:
-                    todayEntries.add(entry);
-                    break;
-                case EXPIRED:
-                    expiredEntries.add(entry);
-                    break;
-                case UPCOMING:
-                    upcomingEntries.add(entry);
-                    break;
-                case UNKNOWN:
-                default:
-                    otherEntries.add(entry);
-            }
+            // Look at {@link prototype.xd.scheduler.entities.TodoListEntry.EntryType}
+            entry.setSortingIndex(entry.getEntryType(day).ordinal());
         }
         
-        List<TodoListEntry> merged = new ArrayList<>();
-        merged.addAll(todayEntries);
-        merged.addAll(globalEntries);
-        merged.addAll(upcomingEntries);
-        merged.addAll(expiredEntries);
-        merged.addAll(otherEntries);
-        merged.sort(new TodoListEntryGroupComparator(day));
-        merged.sort(new TodoListEntryPriorityComparator());
-        
-        return merged;
+        entries.sort(new TodoListEntryEntryTypeComparator());
+        entries.sort(new TodoListEntryGroupComparator(day));
+        entries.sort(new TodoListEntryPriorityComparator());
+        return entries;
     }
     
     @FunctionalInterface
@@ -384,13 +361,40 @@ public class Utilities {
         return date1.isEqual(date2);
     }
     
+    public static <K, V> Set<K> symmetricDifference(@NonNull final Map<K, ? extends V> map1,
+                                                    @NonNull final Map<K, ? extends V> map2) {
+        Set<K> keys = new ArraySet<>(map1.size() + map2.size());
+        keys.addAll(map1.keySet());
+        keys.addAll(map2.keySet());
+        // remove equal values
+        keys.removeIf(key -> Objects.equals(map1.get(key), map2.get(key)));
+        return keys;
+    }
+    
+    public static <K> Set<K> symmetricDifference(final Set<? extends K> set1,
+                                                 final Set<? extends K> set2) {
+        
+        Set<K> combined = new ArraySet<>(set1.size() + set2.size());
+        combined.addAll(set1);
+        combined.addAll(set2);
+        
+        // intersection contains keys both in set1 and set2
+        Set<K> intersection = new ArraySet<>(set1.size());
+        intersection.addAll(set1);
+        intersection.retainAll(set2); // leave keys that are the same
+        
+        combined.removeAll(intersection); // remove equal keys
+        
+        return combined;
+    }
+    
     public static void displayToast(Context context, @StringRes int textId) {
         Toast.makeText(context, context.getString(textId), Toast.LENGTH_LONG).show();
     }
     
     public static void fancyHideUnhideView(View view, boolean visible, boolean animate) {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
-        if(animate) {
+        if (animate) {
             int initialHeight = view.getMeasuredHeight();
             view.animate()
                     .scaleY(visible ? 1 : 0)
@@ -490,6 +494,13 @@ public class Utilities {
                 + (60L * 60 * hours)
                 + (60L * minutes)
                 + seconds);
+    }
+}
+
+class TodoListEntryEntryTypeComparator implements Comparator<TodoListEntry> {
+    @Override
+    public int compare(TodoListEntry o1, TodoListEntry o2) {
+        return Integer.compare(o1.getSortingIndex(), o2.getSortingIndex());
     }
 }
 

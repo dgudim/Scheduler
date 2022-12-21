@@ -9,14 +9,15 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
-import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
+import static prototype.xd.scheduler.utilities.Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
+import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
@@ -115,7 +116,7 @@ class LockScreenBitmapDrawer {
     private Bitmap getBitmapToDrawOn() throws IOException {
         Bitmap bitmap = getBitmapFromLockScreen();
         File bg = getBackgroundAccordingToDayAndTime();
-    
+        
         if (noFingerPrint(bitmap)) {
             bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
         } else {
@@ -182,14 +183,15 @@ class LockScreenBitmapDrawer {
         GroupList groups = loadGroups();
         TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE));
         // load user defined entries (from files)
-        // add entries from all calendars spanning 4 weeks
+        // add entries from all calendars
         // sort and filter entries
-        List<TodoListEntry> toAdd = filterEntries(sortEntries(loadTodoEntries(
+        List<TodoListEntry> toAdd = sortEntries(loadTodoEntries(
                 context,
-                currentDayUTC - 14,
-                currentDayUTC + 14,
+                currentDayUTC - SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
+                currentDayUTC + SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
                 groups, null,
-                false), currentDayUTC));
+                false), currentDayUTC);
+        toAdd.removeIf(todoListEntry -> !todoListEntry.isVisibleOnLockscreenToday());
         
         long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {
@@ -243,16 +245,5 @@ class LockScreenBitmapDrawer {
         }
         
         return getFile(dayString + ".png");
-    }
-    
-    
-    private List<TodoListEntry> filterEntries(List<TodoListEntry> entries) {
-        List<TodoListEntry> toAdd = new ArrayList<>();
-        for (TodoListEntry entry : entries) {
-            if (entry.isVisibleOnLockscreenToday()) {
-                toAdd.add(entry);
-            }
-        }
-        return toAdd;
     }
 }

@@ -1,6 +1,6 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
+import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
@@ -90,7 +90,7 @@ public class HomeFragment extends Fragment {
                 todoListEntryManager.loadEntries(firstVisibleDay - 15, lastVisibleDay + 15)
         );
         
-        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDay(currentDayUTC));
+        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(currentDate));
         
         DrawerLayout drawerLayout = wrapperBnd.getRoot();
         

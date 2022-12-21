@@ -36,7 +36,7 @@ public class DateManager {
     
     public static void updateDate() {
         currentTimestampUTC = getCurrentTimestampUTC();
-        currentDate = LocalDate.now();
+        currentDate = LocalDate.now(ZoneOffset.UTC);
         currentDayUTC = currentDate.toEpochDay();
     }
     

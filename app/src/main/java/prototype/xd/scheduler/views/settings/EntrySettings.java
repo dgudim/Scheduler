@@ -222,7 +222,7 @@ public class EntrySettings extends PopupSettingsView {
     
     @Override
     public <T> void notifyParameterChanged(TextView displayTo, String parameterKey, T value) {
-        todoListEntry.changeParameter(parameterKey, String.valueOf(value));
+        todoListEntry.changeParameters(parameterKey, String.valueOf(value));
         setStateIconColor(displayTo, parameterKey);
     }
     

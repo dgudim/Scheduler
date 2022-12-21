@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.content.Context;
 import android.util.ArrayMap;
-import android.util.ArraySet;
 
 import androidx.annotation.Nullable;
 
@@ -18,6 +17,7 @@ import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.SArrayMap;
+import prototype.xd.scheduler.utilities.Utilities;
 
 public class Group implements Serializable {
     
@@ -104,12 +104,8 @@ public class Group implements Serializable {
     }
     
     public void setParams(SArrayMap<String, String> newParams) {
-        Set<String> keys = new ArraySet<>();
-        keys.addAll(params.keySet());
-        keys.addAll(newParams.keySet());
-        // remove parameters that didn't change
-        keys.removeIf(key -> Objects.equals(params.get(key), newParams.get(key)));
-        associatedEntries.forEach((aLong, todoListEntry) -> todoListEntry.invalidateParameters(keys));
+        Set<String> changedKeys = Utilities.symmetricDifference(params, newParams);
+        associatedEntries.forEach((aLong, todoListEntry) -> todoListEntry.invalidateParameters(changedKeys));
         params = newParams;
     }
     

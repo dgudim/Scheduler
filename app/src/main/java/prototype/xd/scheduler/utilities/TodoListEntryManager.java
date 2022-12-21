@@ -16,6 +16,7 @@ import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferenc
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
+import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
 import android.content.Context;
 import android.util.ArraySet;
@@ -76,28 +77,31 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         @Override
         public void parametersInvalidated(TodoListEntry entry, Set<String> parameters) {
             // in case of completed status changes or associated day changes the entry may not be visible on the lockscreen now but was before
-            if (parameters.contains(IS_COMPLETED) ||
-                    parameters.contains(START_DAY_UTC) ||
-                    parameters.contains(END_DAY_UTC) ||
-                    entry.isVisibleOnLockscreenToday()) {
+            if (entry.isVisibleOnLockscreenToday()) {
                 setBitmapUpdateFlag();
             }
             
+            boolean coreDaysChanged = parameters.contains(START_DAY_UTC) ||
+                    parameters.contains(END_DAY_UTC);
+            
             // parameters that change event range
             if (parameters.contains(UPCOMING_ITEMS_OFFSET) ||
-                    parameters.contains(EXPIRED_ITEMS_OFFSET)) {
+                    parameters.contains(EXPIRED_ITEMS_OFFSET) ||
+                    coreDaysChanged) {
                 
-                todoListEntries.notifyEntryVisibilityRangeChanged(
+                setBitmapUpdateFlag();
+                
+                todoListEntries.notifyEntryVisibilityChanged(
                         entry,
-                        calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(),
+                        calendarView,
+                        coreDaysChanged,
                         daysToRebind);
                 
                 // changes indicators
-            } else if (parameters.contains(BG_COLOR)) {
-                entry.getVisibleDays(
-                        calendarView.getFirstVisibleDay(), calendarView.getLastVisibleDay(),
-                        daysToRebind,
-                        displayUpcomingExpired ? RangeType.EXTENDED_EXPIRED_UPCOMING : RangeType.CORE);
+            } else if (parameters.contains(BG_COLOR) || parameters.contains(IS_COMPLETED)) {
+                entry.getVisibleDaysOnCalendar(
+                        calendarView, daysToRebind,
+                        displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE);
             }
             
             // we should save the entries but now now because sometimes we change parameters frequently
@@ -127,8 +131,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                 calendarVisibilityMap.put(calendar, calendar.isVisible());
             }
             
-            loadedDay_start = currentDayUTC - 30;
-            loadedDay_end = currentDayUTC + 30;
+            // load one panel to the right and to the left
+            loadedDay_start = currentDayUTC - DAYS_ON_ONE_PANEL;
+            loadedDay_end = currentDayUTC + DAYS_ON_ONE_PANEL;
             
             todoListEntries.initLoadingRange(loadedDay_start, loadedDay_end);
             todoListEntries.addAll(loadTodoEntries(context,
@@ -382,7 +387,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private void entryListChanged(TodoListEntry entry) {
         if (calendarView != null) {
             notifyDaysChanged(
-                    entry.getVisibleDays(loadedDay_start, loadedDay_end,
+                    entry.getVisibleDaysOnCalendar(calendarView,
                             displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE));
         }
         notifyEntryListChanged();

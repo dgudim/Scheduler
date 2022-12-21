@@ -116,7 +116,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             
             bnd.isDone.setOnClickListener(view12 -> {
                 if (!entry.isGlobal()) {
-                    entry.changeParameter(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
+                    entry.changeParameters(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
                 } else {
                     String selectedDay = String.valueOf(currentlySelectedDayUTC);
                     entry.changeParameters(
@@ -148,7 +148,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                 todoText.setTextColor(entry.fontColor.get(currentlySelectedDayUTC));
             }
             
-            todoText.setText(entry.getTextOnDay(currentlySelectedDayUTC, context));
+            todoText.setText(entry.getTextOnDay(currentlySelectedDayUTC, context, true));
         }
         
         void bindTo(@NonNull final TodoListEntry currentEntry,

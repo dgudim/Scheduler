@@ -2,7 +2,6 @@ package prototype.xd.scheduler.entities;
 
 import static android.util.Log.WARN;
 import static androidx.core.math.MathUtils.clamp;
-import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
@@ -42,6 +41,8 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.SArrayMap;
+import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.views.CalendarView;
 
 public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
@@ -49,7 +50,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         
         ParameterGetter<T> parameterGetter;
         
-        T discardedValue;
         T value;
         boolean valid = false;
         
@@ -59,7 +59,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         
         void invalidate() {
             valid = false;
-            discardedValue = value;
         }
         
         T get(T previousValue) {
@@ -72,11 +71,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         
         T get() {
             return get(null);
-        }
-        
-        // only makes sense to call after a call to 'invalidate'
-        T getDiscardedValue(T defaultValue) {
-            return discardedValue == null ? defaultValue : discardedValue;
         }
         
     }
@@ -142,10 +136,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             return todayCachedGetter.get();
         }
         
-        public T getDiscarded(T defaultValue) {
-            return todayCachedGetter.getDiscardedValue(defaultValue);
-        }
-        
         public void invalidate() {
             todayCachedGetter.invalidate();
             if (upcomingCachedGetter != null) {
@@ -160,7 +150,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     private static final transient String NAME = "Todo list entry";
     
-    public enum EntryType {TODAY, EXPIRED, UPCOMING, GLOBAL, UNKNOWN}
+    // don't rearrange, entry sorting is based on this
+    public enum EntryType {TODAY, GLOBAL, UPCOMING, EXPIRED, UNKNOWN}
     
     @FunctionalInterface
     public interface ParameterInvalidationListener {
@@ -207,6 +198,17 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     private transient ParameterInvalidationListener parameterInvalidationListener;
     
     private transient TodoListEntryList associatedList;
+    
+    // supplementary stuff for sorting
+    int sortingIndex = 0;
+    
+    public int getSortingIndex() {
+        return sortingIndex;
+    }
+    
+    public void setSortingIndex(int sortingIndex) {
+        this.sortingIndex = sortingIndex;
+    }
     
     private static ArrayMap<String, Parameter<?>> mapParameters(TodoListEntry entry) {
         ArrayMap<String, Parameter<?>> parameterMap = new ArrayMap<>(8);
@@ -429,28 +431,34 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             return false;
         }
         
-        Set<String> parameterKeys = new ArraySet<>();
+        Set<String> changedKeys = null;
         
         if (group != null) {
             group.detachEntryInternal(this);
-            // invalidate parameters from previous group
-            parameterKeys.addAll(group.params.keySet());
+            if (newGroup == null) {
+                changedKeys = group.params.keySet();
+            }
         }
         
         if (newGroup != null) {
             newGroup.attachEntryInternal(this);
-            // invalidate parameters from new group
-            parameterKeys.addAll(newGroup.params.keySet());
+            if (group == null) {
+                changedKeys = newGroup.params.keySet();
+            }
+        }
+        
+        if (group != null && newGroup != null) {
+            changedKeys = Utilities.symmetricDifference(group.params, newGroup.params);
         }
         
         group = newGroup;
         // invalidate only after group change to avoid weird settings from cache
-        invalidateParameters(parameterKeys);
+        invalidateParameters(changedKeys);
         
         return true;
     }
     
-    public void invalidateParameter(String parameterKey, boolean reportInvalidated) {
+    protected void invalidateParameter(String parameterKey, boolean reportInvalidated) {
         Parameter<?> param = parameterMap.get(parameterKey);
         if (param != null) {
             param.invalidate();
@@ -460,7 +468,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    public void invalidateParameters(Set<String> parameterKeys) {
+    protected void invalidateParameters(Set<String> parameterKeys) {
         parameterKeys.forEach(parameterKey -> invalidateParameter(parameterKey, false));
         parameterInvalidationListener.parametersInvalidated(this, parameterKeys);
     }
@@ -485,27 +493,27 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
     }
     
-    public void changeParameter(String name, String value) {
-        changeParameter(name, value, true);
+    // changes parameter and returns true if it was changed
+    private boolean changeParameterInternal(String key, String value) {
+        return !Objects.equals(params.put(key, value), key);
     }
     
-    // not safe to expose, need to always reportInvalidated except for when changeParameters is called
-    private void changeParameter(String name, String value, boolean reportInvalidated) {
-        // if previous value does not equal new one
-        if (!Objects.equals(params.put(name, value), value)) {
-            invalidateParameter(name, reportInvalidated);
-        }
-    }
-    
-    // same as changeParameter but changes any number of parameters
-    // should use this one not to call invalidation listener too often
+    // change any number of parameters
     public void changeParameters(String... keyValuePairs) {
         if (keyValuePairs.length % 2 != 0) {
             throw new IllegalArgumentException("Can't call changeParameters with event number of arguments");
         }
+        if (keyValuePairs.length == 2) { // just one parameter
+            if (changeParameterInternal(keyValuePairs[0], keyValuePairs[1])) {
+                invalidateParameter(keyValuePairs[0], true);
+            }
+            return;
+        }
         Set<String> parameterKeys = new ArraySet<>();
         for (int i = 0; i < keyValuePairs.length; i += 2) {
-            changeParameter(keyValuePairs[i], keyValuePairs[i + 1], false);
+            if (changeParameterInternal(keyValuePairs[i], keyValuePairs[i + 1])) {
+                parameterKeys.add(keyValuePairs[i]);
+            }
         }
         invalidateParameters(parameterKeys);
     }
@@ -615,17 +623,14 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return inRange(targetDay, startDayUTC.get()) && (startMsUTC + durationMsUTC >= targetTimestamp);
     }
     
-    
-    private boolean dayInRange(long day, long from, long to) {
-        return from <= day && day <= to;
+    boolean rangesOverlap(long x1, long x2, long y1, long y2) {
+        return x2 >= y1 && x1 <= y2;
     }
     
     private void addDayRangeToSet(long dayFrom, long dayTo,
                                   final long minDay, final long maxDay,
                                   @Nullable Set<Long> daySet) {
-        if (daySet != null && (
-                dayInRange(dayFrom, minDay, maxDay) ||
-                        dayInRange(dayTo, minDay, maxDay))) {
+        if (daySet != null && rangesOverlap(dayFrom, dayTo, minDay, maxDay)) {
             dayFrom = clamp(dayFrom, minDay, maxDay);
             dayTo = clamp(dayTo, minDay, maxDay);
             for (long day = dayFrom; day <= dayTo; day++) {
@@ -637,10 +642,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     private void addDayRangeToSets(long startDay, long endDay,
                                    long minDay, long maxDay,
                                    long currentExpiredDayOffset, long currentUpcomingDayOffset,
-                                   long maxExpiredDayOffset, long maxUpcomingDayOffset,
                                    @Nullable Set<Long> coreDaySet,                   // without any expired/upcoming days
-                                   @Nullable Set<Long> currentUpcomingExpiredSet,    // without old expired/upcoming days
-                                   @Nullable Set<Long> extendedUpcomingExpiredSet) { // with old expired/upcoming days, used for updating
+                                   @Nullable Set<Long> currentUpcomingExpiredSet) {  // without old expired/upcoming days
+        
         addDayRangeToSet(
                 startDay, endDay,
                 minDay, maxDay,
@@ -650,39 +654,26 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 startDay - currentUpcomingDayOffset, endDay + currentExpiredDayOffset,
                 minDay, maxDay,
                 currentUpcomingExpiredSet);
-        
-        addDayRangeToSet(
-                startDay - maxUpcomingDayOffset, endDay + maxExpiredDayOffset,
-                minDay, maxDay,
-                extendedUpcomingExpiredSet);
     }
     
     // get on what days from min to max an entry is visible (and was before invalidation)
-    public void getVisibleDays(long minDay, long maxDay,
-                               @Nullable Set<Long> coreDaySet,                   // without any expired/upcoming days
-                               @Nullable Set<Long> currentUpcomingExpiredSet,    // without old expired/upcoming days
-                               @Nullable Set<Long> extendedUpcomingExpiredSet) { // with old expired/upcoming days, used for updating
+    private void getVisibleDays(long minDay, long maxDay,
+                                @Nullable Set<Long> coreDaySet,                  // without any expired/upcoming days
+                                @Nullable Set<Long> currentUpcomingExpiredSet) { // with old expired/upcoming days
+        
         // we don't care about global entries, they are handled differently
         if (isGlobal()) {
             return;
         }
         
-        // get max between previous range and current
-        
-        long previousUpcomingDayOffset = this.upcomingDayOffset.getDiscarded(0);
-        long previousExpiredDayOffset = this.expiredDayOffset.getDiscarded(0);
-        
         long currentUpcomingDayOffset = this.upcomingDayOffset.getToday();
         long currentExpiredDayOffset = this.expiredDayOffset.getToday();
-        
-        long maxUpcomingDayOffset = max(previousUpcomingDayOffset, currentUpcomingDayOffset);
-        long maxExpiredDayOffset = max(previousExpiredDayOffset, currentExpiredDayOffset);
         
         if (recurrenceSet != null) {
             iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
                 
                 // overshot
-                if (instanceStartDay + maxUpcomingDayOffset > maxDay) {
+                if (instanceStartDay + currentUpcomingDayOffset > maxDay) {
                     return false;
                 }
                 
@@ -690,11 +681,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                         minDay, maxDay,
                         // offsets
                         currentExpiredDayOffset, currentUpcomingDayOffset,
-                        maxExpiredDayOffset, maxUpcomingDayOffset,
                         // sets
                         coreDaySet,
-                        currentUpcomingExpiredSet,
-                        extendedUpcomingExpiredSet);
+                        currentUpcomingExpiredSet);
                 
                 return null;
             }, false);
@@ -702,27 +691,25 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             addDayRangeToSets(startDayUTC.get(), endDayUTC.get(),
                     minDay, maxDay,
                     currentExpiredDayOffset, currentUpcomingDayOffset,
-                    maxExpiredDayOffset, maxUpcomingDayOffset,
-                    coreDaySet, currentUpcomingExpiredSet, extendedUpcomingExpiredSet);
+                    coreDaySet, currentUpcomingExpiredSet);
         }
     }
     
     public enum RangeType {
-        CORE, EXPIRED_UPCOMING, EXTENDED_EXPIRED_UPCOMING
+        CORE, EXPIRED_UPCOMING
     }
     
-    public void getVisibleDays(long minDay, long maxDay, Set<Long> daySet, RangeType rangeType) {
-        getVisibleDays(minDay, maxDay,
+    public void getVisibleDaysOnCalendar(CalendarView calendarView, Set<Long> daySet, RangeType rangeType) {
+        getVisibleDays(calendarView.getFirstLoadedDay(), calendarView.getLastLoadedDay(),
                 rangeType == RangeType.CORE ? daySet : null,
-                rangeType == RangeType.EXPIRED_UPCOMING ? daySet : null,
-                rangeType == RangeType.EXTENDED_EXPIRED_UPCOMING ? daySet : null);
+                rangeType == RangeType.EXPIRED_UPCOMING ? daySet : null);
     }
     
     // return on what days from min to max an entry is visible (and was before invalidation)
-    public Set<Long> getVisibleDays(long minDay, long maxDay,
-                                    RangeType rangeType) {
+    public Set<Long> getVisibleDaysOnCalendar(CalendarView calendarView,
+                                              RangeType rangeType) {
         Set<Long> daySet = new ArraySet<>();
-        getVisibleDays(minDay, maxDay, daySet, rangeType);
+        getVisibleDaysOnCalendar(calendarView, daySet, rangeType);
         return daySet;
     }
     
@@ -738,8 +725,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         FullDaySet(TodoListEntry entry, long dayStart, long dayEnd) {
             entry.getVisibleDays(dayStart, dayEnd,
                     coreDaySet,             // core
-                    upcomingExpiredDaySet,  // basic expired / upcoming
-                    null);                  // extended expired / upcoming
+                    upcomingExpiredDaySet); // basic expired / upcoming
         }
         
         public Set<Long> getUpcomingExpiredDaySet() {
@@ -790,7 +776,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public EntryType getEntryType(long targetDay) {
         
-        if(isGlobal()) {
+        if (isGlobal()) {
             return EntryType.GLOBAL;
         }
         
@@ -862,11 +848,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return inputColor;
     }
     
-    public String getTextOnDay(long day, Context context) {
-        return rawTextValue.get() + getDayOffset(day, context);
+    public String getTextOnDay(long day, Context context, boolean displayGlobalLabel) {
+        return rawTextValue.get() + getDayOffset(day, context, displayGlobalLabel);
     }
     
-    public String getDayOffset(long day, Context context) {
+    public String getDayOffset(long day, Context context, boolean displayGlobalLabel) {
         String dayOffset = "";
         if (!isGlobal()) {
             
@@ -922,7 +908,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                     dayOffset = context.getString(R.string.item_in_more_than_in_a_month);
                 }
             }
-        } else {
+        } else if (displayGlobalLabel) {
             dayOffset = context.getString(R.string.item_global);
         }
         if (!dayOffset.equals("")) {

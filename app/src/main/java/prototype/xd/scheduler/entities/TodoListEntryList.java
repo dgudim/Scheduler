@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,18 +20,22 @@ import java.util.function.Consumer;
 
 import prototype.xd.scheduler.entities.TodoListEntry.ParameterInvalidationListener;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.views.CalendarView;
 
 // a list specifically for storing TodoListEntries, automatically unlinks groups on remove to avoid memory leaks
 public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     
     private static final String NAME = "TodoListEntryList";
     
+    // 4 mappings for normal events
     Map<Long, Set<TodoListEntry>> entriesPerDayCore;
     Map<TodoListEntry, Set<Long>> daysPerEntryCore;
     
     Map<Long, Set<TodoListEntry>> entriesPerDayUpcomingExpired;
     Map<TodoListEntry, Set<Long>> daysPerEntryUpcomingExpired;
     
+    // container for global entries
     Set<TodoListEntry> globalEntries;
     
     private boolean displayUpcomingExpired;
@@ -54,6 +59,9 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     // extend to the left
     public void extendLoadingRangeStartDay(long newDayStart) {
         for (TodoListEntry entry : this) {
+            if (entry.isGlobal()) {
+                continue;
+            }
             // we know that newDayStart is smaller than previous loadedDay_start
             linkEntryToLookupContainers(entry, newDayStart, loadedDay_start - 1);
         }
@@ -63,6 +71,9 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     // extend to the right
     public void extendLoadingRangeEndDay(long newDayEnd) {
         for (TodoListEntry entry : this) {
+            if (entry.isGlobal()) {
+                continue;
+            }
             // we know that newDayStart is bigger than previous loadedDay_start
             linkEntryToLookupContainers(entry, loadedDay_end + 1, newDayEnd);
         }
@@ -95,12 +106,13 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         return null;
     }
     
-    private void unlinkEntryFromLookupContainers(TodoListEntry entry,
-                                                 Map<TodoListEntry, Set<Long>> daysPerEntry,
-                                                 Map<Long, Set<TodoListEntry>> entriesPerDay) {
+    private Set<Long> unlinkEntryFromLookupContainers(TodoListEntry entry,
+                                                      Map<TodoListEntry, Set<Long>> daysPerEntry,
+                                                      Map<Long, Set<TodoListEntry>> entriesPerDay) {
         Set<Long> daysForEntry = daysPerEntry.remove(entry);
         if (daysForEntry == null) {
             log(ERROR, NAME, "Can't remove associations for '" + entry + "', entry not managed by current container");
+            return Collections.emptySet();
         } else {
             for (Long day : daysForEntry) {
                 Set<TodoListEntry> entriesOnDay = entriesPerDay.get(day);
@@ -110,25 +122,32 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
                 }
                 entriesOnDay.remove(entry);
             }
+            return daysForEntry;
         }
     }
     
     private void linkEntryToLookupContainers(TodoListEntry entry, long minDay, long maxDay) {
-        if (entry.isGlobal()) {
-            return;
-        }
         TodoListEntry.FullDaySet fullDaySet = entry.getFullDaySet(minDay, maxDay);
+        linkEntryToLookupContainers(entry, fullDaySet);
+    }
+    
+    // link entry to 4 maps (core and extended)
+    private void linkEntryToLookupContainers(TodoListEntry entry,
+                                             TodoListEntry.FullDaySet fullDaySet) {
         // link to core days
         linkEntryToLookupContainers(entry, fullDaySet.getCoreDaySet(), daysPerEntryCore, entriesPerDayCore);
         // link to extended days
         linkEntryToLookupContainers(entry, fullDaySet.getUpcomingExpiredDaySet(), daysPerEntryUpcomingExpired, entriesPerDayUpcomingExpired);
     }
     
+    // link entry to both maps
     private void linkEntryToLookupContainers(TodoListEntry entry,
                                              Set<Long> eventDays,
                                              Map<TodoListEntry, Set<Long>> daysPerEntry,
                                              Map<Long, Set<TodoListEntry>> entriesPerDay) {
-        daysPerEntry.put(entry, eventDays);
+        daysPerEntry
+                .computeIfAbsent(entry, k -> new HashSet<>())
+                .addAll(eventDays);
         for (Long day : eventDays) {
             entriesPerDay
                     .computeIfAbsent(day, k -> new HashSet<>())
@@ -205,7 +224,6 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
                 return TodoListEntry.EntryType.UPCOMING;
             }
         }
-        log(WARN, NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day);
         return TodoListEntry.EntryType.UNKNOWN;
     }
     
@@ -225,23 +243,46 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         return sortEntries(filtered, day);
     }
     
-    public void notifyEntryVisibilityRangeChanged(TodoListEntry entry,
-                                                  long minDay, long maxDay,
-                                                  Set<Long> invalidatedDaySet) {
-        if (entry.isGlobal()) {
+    public void notifyEntryVisibilityChanged(TodoListEntry entry,
+                                             CalendarView calendarView,
+                                             boolean coreDaysChanged,
+                                             Set<Long> invalidatedDaySet) {
+        // if the entry is currently marked as global in the list and is global now
+        if (globalEntries.contains(entry) && entry.isGlobal() && !coreDaysChanged) {
             log(WARN, NAME, "Trying to change visibility range of a global entry");
             return;
         }
-        Set<Long> upcomingExpiredDaySet = new HashSet<>();
         
-        entry.getVisibleDays(minDay, maxDay,
-                displayUpcomingExpired ? null : invalidatedDaySet,  // core
-                upcomingExpiredDaySet,                              // basic expired / upcoming
-                displayUpcomingExpired ? invalidatedDaySet : null); // extended expired / upcoming
+        // entry was global and now it's normal we unlink it from global container and link to normal container
+        if (globalEntries.remove(entry)) {
+            TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(calendarView.getFirstLoadedDay(), calendarView.getLastLoadedDay());
+            linkEntryToLookupContainers(entry, newDaySet);
+            invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
+            return;
+        }
         
-        // refresh associations
-        unlinkEntryFromLookupContainers(entry, daysPerEntryUpcomingExpired, entriesPerDayUpcomingExpired);
-        linkEntryToLookupContainers(entry, upcomingExpiredDaySet, daysPerEntryUpcomingExpired, entriesPerDayUpcomingExpired);
+        Set<Long> prevCoreDays = unlinkEntryFromLookupContainers(entry, daysPerEntryCore, entriesPerDayCore);
+        Set<Long> prevExpiredUpcomingDays = unlinkEntryFromLookupContainers(entry, daysPerEntryUpcomingExpired, entriesPerDayUpcomingExpired);
+        
+        // entry became global
+        if (entry.isGlobal()) {
+            globalEntries.add(entry);
+            invalidatedDaySet.addAll(displayUpcomingExpired ? prevExpiredUpcomingDays : prevCoreDays);
+            return;
+        }
+        
+        // all the other cases (not global entries)
+        TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(calendarView.getFirstLoadedDay(), calendarView.getLastLoadedDay());
+        
+        invalidatedDaySet.addAll(displayUpcomingExpired ?
+                // update changed days
+                Utilities.symmetricDifference(
+                        prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()) :
+                Utilities.symmetricDifference(
+                        prevCoreDays, newDaySet.getCoreDaySet()));
+        
+        
+        linkEntryToLookupContainers(entry, newDaySet);
     }
     
     public void setUpcomingExpiredVisibility(boolean displayUpcomingExpired) {

@@ -46,6 +46,7 @@ public class Logger {
             init = true;
             logFile = new File(preferences.getString(ROOT_DIR, ""), "log.txt");
             logFileOld = new File(preferences.getString(ROOT_DIR, ""), "log.old.txt");
+            logQueue = new LinkedBlockingQueue<>();
             try {
                 logFile.createNewFile();
                 bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
@@ -56,7 +57,6 @@ public class Logger {
                 e.printStackTrace();
                 Log.e(NAME, "Error initializing logger, proceeding without file support");
             }
-            logQueue = new LinkedBlockingQueue<>();
         }
     }
     
