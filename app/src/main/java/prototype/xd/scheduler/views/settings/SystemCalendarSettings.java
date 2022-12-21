@@ -50,18 +50,18 @@ public class SystemCalendarSettings extends PopupSettingsView {
         bnd.groupSelector.setVisibility(View.GONE);
     }
     
-    public void show(final String calendarKey) {
-        initialize(calendarKey);
+    public void show(final String calendarKey, int eventColor) {
+        initialize(calendarKey, eventColor);
         dialog.show();
     }
     
     public void show(final TodoListEntry entry) {
         this.todoListEntry = entry;
-        initialize(entry.event.getKey());
+        initialize(entry.event.getKey(), entry.event.color);
         dialog.show();
     }
     
-    private void initialize(final String calendarKey) {
+    private void initialize(final String calendarKey, int eventColor) {
         
         bnd.entrySettingsTitle.setText(calendarKeyToReadable(dialog.getContext(), calendarKey));
         
@@ -70,7 +70,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         updatePreviews(
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR),
-                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_BG_COLOR),
+                preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BG_COLOR), Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor)),
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR),
                 preferences.getInt(getFirstValidKey(calendarSubKeys, Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS));
         
@@ -91,7 +91,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                             if (todoListEntry != null) {
                                 todoListEntry.event.invalidateAllParametersOfConnectedEntries();
                             }
-                            initialize(calendarKey);
+                            initialize(calendarKey, eventColor);
                         }));
         
         bnd.fontColorSelector.setOnClickListener(view -> invokeColorDialogue(
@@ -104,7 +104,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 context, lifecycle,
                 bnd.backgroundColorState, this,
                 Keys.BG_COLOR,
-                parameterKey -> getFirstValidIntValue(calendarSubKeys, parameterKey, Keys.SETTINGS_DEFAULT_BG_COLOR)));
+                parameterKey -> getFirstValidIntValue(calendarSubKeys, parameterKey, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
         
         bnd.borderColorSelector.setOnClickListener(view -> invokeColorDialogue(
                 context, lifecycle,

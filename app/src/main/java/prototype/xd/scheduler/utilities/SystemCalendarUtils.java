@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
 import static android.util.Log.INFO;
+import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
@@ -147,50 +148,50 @@ public class SystemCalendarUtils {
         return index == -1 ? parameter : calendarSubKeys.get(index) + "_" + parameter;
     }
     
-    //// FOR DEBUGGING
-    //public static void printTable(Cursor cursor) {
-    //    cursor.moveToFirst();
-    //
-    //    ArrayList<ArrayList<String>> table = new ArrayList<>();
-    //    ArrayList<Integer> column_sizes = new ArrayList<>();
-    //    String[] column_names = cursor.getColumnNames();
-    //    table.add(new ArrayList<>(Arrays.asList(column_names)));
-    //
-    //    for (String column_name : column_names) {
-    //        column_sizes.add(column_name.length());
-    //    }
-    //
-    //    for (int row = 0; row < cursor.getCount(); row++) {
-    //        ArrayList<String> record = new ArrayList<>();
-    //        for (int column = 0; column < column_names.length; column++) {
-    //            String column_val = cursor.getString(column) + "";
-    //            record.add(column_val);
-    //            column_sizes.set(column, max(column_sizes.get(column), column_val.length()));
-    //        }
-    //        table.add(record);
-    //        cursor.moveToNext();
-    //    }
-    //
-    //    System.out.println("TABLE DIMENSIONS: " + table.size() + " x " + column_names.length);
-    //    System.out.println("TABLE DIMENSIONS_RAW: " + cursor.getCount() + " x " + cursor.getColumnNames().length);
-    //
-    //    for (int row = 0; row < table.size(); row++) {
-    //        for (int column = 0; column < column_names.length; column++) {
-    //            System.out.print(addSpaces(table.get(row).get(column), column_sizes.get(column) + 1));
-    //        }
-    //        System.out.println();
-    //    }
-    //
-    //    cursor.moveToFirst();
-    //}
-    //
-    //public static String addSpaces(String input, int len) {
-    //    StringBuilder out = new StringBuilder(input);
-    //    for (int i = input.length(); i < len; i++) {
-    //        out.append(" ");
-    //    }
-    //    return out.toString();
-    //}
+    // FOR DEBUGGING
+    public static void printTable(Cursor cursor) {
+        cursor.moveToFirst();
+    
+        ArrayList<ArrayList<String>> table = new ArrayList<>();
+        ArrayList<Integer> column_sizes = new ArrayList<>();
+        String[] column_names = cursor.getColumnNames();
+        table.add(new ArrayList<>(Arrays.asList(column_names)));
+    
+        for (String column_name : column_names) {
+            column_sizes.add(column_name.length());
+        }
+    
+        for (int row = 0; row < cursor.getCount(); row++) {
+            ArrayList<String> record = new ArrayList<>();
+            for (int column = 0; column < column_names.length; column++) {
+                String column_val = cursor.getString(column) + "";
+                record.add(column_val);
+                column_sizes.set(column, max(column_sizes.get(column), column_val.length()));
+            }
+            table.add(record);
+            cursor.moveToNext();
+        }
+    
+        System.out.println("TABLE DIMENSIONS: " + table.size() + " x " + column_names.length);
+        System.out.println("TABLE DIMENSIONS_RAW: " + cursor.getCount() + " x " + cursor.getColumnNames().length);
+    
+        for (int row = 0; row < table.size(); row++) {
+            for (int column = 0; column < column_names.length; column++) {
+                System.out.print(addSpaces(table.get(row).get(column), column_sizes.get(column) + 1));
+            }
+            System.out.println();
+        }
+    
+        cursor.moveToFirst();
+    }
+    
+    public static String addSpaces(String input, int len) {
+        StringBuilder out = new StringBuilder(input);
+        for (int i = input.length(); i < len; i++) {
+            out.append(" ");
+        }
+        return out.toString();
+    }
     
     
 }

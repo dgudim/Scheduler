@@ -2,6 +2,8 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR_ACCOUNT;
 
+import android.graphics.Color;
+
 import androidx.annotation.NonNull;
 
 import java.util.Locale;
@@ -10,6 +12,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.utilities.BitmapUtilities;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
@@ -17,6 +20,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
     private final SystemCalendarSettings systemCalendarSettings;
     private final String accountName;
     private final String accountType;
+    private final int calendarColor;
     
     private final SettingsListViewAdapter containerAdapter;
     
@@ -30,6 +34,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         this.systemCalendarSettings = systemCalendarSettings;
         this.accountName = calendar.account_name;
         this.accountType = calendar.account_type;
+        this.calendarColor = calendar.color;
         this.containerAdapter = containerAdapter;
     }
     
@@ -47,9 +52,10 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         @Override
         void bind(CalendarAccountSettingsEntryConfig config) {
             viewBinding.accountIcon.setImageResource(getIconFromAccountType(config.accountType));
+            viewBinding.root.setBackgroundColor(BitmapUtilities.mixTwoColors(config.calendarColor, Color.TRANSPARENT, 0.65));
             viewBinding.calendarName.setText(config.accountName);
             viewBinding.accountType.setText(config.accountType);
-            viewBinding.settingsButton.setOnClickListener(v -> config.systemCalendarSettings.show(config.accountName));
+            viewBinding.settingsButton.setOnClickListener(v -> config.systemCalendarSettings.show(config.accountName, config.calendarColor));
             config.updateSettingsButtonVisibility(viewBinding.settingsButton);
             viewBinding.expandButton.setOnClickListener(v -> {
                 config.containerAdapter.toggleCollapsed();

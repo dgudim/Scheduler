@@ -12,7 +12,6 @@ import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.ArrayMap;
 import android.util.ArraySet;
 import android.widget.TextView;
@@ -283,9 +282,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     public void initParameters() {
         bgColor = new Parameter<>(this, Keys.BG_COLOR,
                 previousValue -> {
-                    int defaultColor = Keys.SETTINGS_DEFAULT_BG_COLOR;
+                    int defaultColor = Keys.SETTINGS_DEFAULT_REGULAR_EVENT_BG_COLOR;
                     if (isFromSystemCalendar()) {
-                        defaultColor = mixTwoColors(Color.WHITE, event.color, Keys.DEFAULT_CALENDAR_EVENT_COLOR_MIX_FACTOR);
+                        defaultColor = Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(event.color);
                     }
                     return preferences.getInt(getAppropriateKey(Keys.BG_COLOR), defaultColor);
                 },
@@ -699,15 +698,19 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         CORE, EXPIRED_UPCOMING
     }
     
-    public void getVisibleDaysOnCalendar(CalendarView calendarView, Set<Long> daySet, RangeType rangeType) {
+    public void getVisibleDaysOnCalendar(@NonNull final CalendarView calendarView,
+                                         @NonNull final Set<Long> daySet, RangeType rangeType) {
         getVisibleDays(calendarView.getFirstLoadedDay(), calendarView.getLastLoadedDay(),
                 rangeType == RangeType.CORE ? daySet : null,
                 rangeType == RangeType.EXPIRED_UPCOMING ? daySet : null);
     }
     
     // return on what days from min to max an entry is visible (and was before invalidation)
-    public Set<Long> getVisibleDaysOnCalendar(CalendarView calendarView,
+    public Set<Long> getVisibleDaysOnCalendar(@NonNull final CalendarView calendarView,
                                               RangeType rangeType) {
+        if(isGlobal()) {
+            return Collections.emptySet();
+        }
         Set<Long> daySet = new ArraySet<>();
         getVisibleDaysOnCalendar(calendarView, daySet, rangeType);
         return daySet;

@@ -2,6 +2,8 @@ package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 
+import androidx.core.os.LocaleListCompat;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -29,10 +31,11 @@ public class DateManager {
     public static long currentlySelectedDayUTC = DAY_FLAG_GLOBAL;
     public static long currentlySelectedTimestampUTC = DAY_FLAG_GLOBAL;
     
-    private static final DateFormat dateTimeFormat = new SimpleDateFormat("dd/MM HH:mm", Locale.ROOT);
-    private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.ROOT);
-    private static final DateFormat dateFormatMonthNames = new SimpleDateFormat("MMM d", Locale.ROOT);
-    private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ROOT);
+    private static final Locale systemLocale = LocaleListCompat.getDefault().get(0);
+    private static final DateFormat dateTimeFormat = new SimpleDateFormat("dd/MM HH:mm", systemLocale);
+    private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM", systemLocale);
+    private static final DateFormat dateFormatMonthNames = new SimpleDateFormat("MMM d", systemLocale);
+    private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm", systemLocale);
     
     public static void updateDate() {
         currentTimestampUTC = getCurrentTimestampUTC();
@@ -42,7 +45,7 @@ public class DateManager {
     
     public static void selectDate(LocalDate date) {
         updateDate();
-        currentlySelectedTimestampUTC = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli() + ONE_MINUTE_MS; // add one minute because so stuff breaks at midnight
+        currentlySelectedTimestampUTC = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli() + ONE_MINUTE_MS; // add one minute because some stuff breaks at midnight
         currentlySelectedDayUTC = date.toEpochDay();
     }
     

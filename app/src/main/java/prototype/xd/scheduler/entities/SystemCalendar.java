@@ -77,18 +77,20 @@ public class SystemCalendar {
         //cursor_all.close();
         
         loadCalendarEvents(contentResolver, loadMinimal);
-        if (accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
-            loadAvailableEventColors();
-        }
+        loadAvailableEventColors();
     }
     
     
     void loadAvailableEventColors() {
         eventColorCountMap.clear();
-        
-        for (SystemCalendarEvent event : systemCalendarEvents) {
-            eventColorCountMap.computeIfAbsent(event.color, key -> getEventCountWithColor(event.color));
+        if(accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
+            for (SystemCalendarEvent event : systemCalendarEvents) {
+                eventColorCountMap.computeIfAbsent(event.color, key -> getEventCountWithColor(event.color));
+            }
+        } else {
+            eventColorCountMap.put(color, systemCalendarEvents.size());
         }
+        
     }
     
     private int getEventCountWithColor(int color) {

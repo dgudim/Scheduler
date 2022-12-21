@@ -4,9 +4,14 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 
+import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+
+import android.graphics.Color;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 
@@ -17,7 +22,7 @@ public class Keys {
     }
     
     public static final float DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR = 0.75f;
-    public static final float DEFAULT_CALENDAR_EVENT_COLOR_MIX_FACTOR = 0.85f;
+    public static final float DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR = 0.85f;
     public static final float DEFAULT_TITLE_FONT_SIZE_MULTIPLIER = 1.1F;
     
     public static final int DAY_FLAG_GLOBAL = -1;
@@ -35,7 +40,11 @@ public class Keys {
     public static final int ENTRY_SETTINGS_DEFAULT_PRIORITY = 0;
     
     public static final String BG_COLOR = "bgColor";
-    public static final int SETTINGS_DEFAULT_BG_COLOR = 0xff_999999;
+    public static final int SETTINGS_DEFAULT_REGULAR_EVENT_BG_COLOR = 0xff_999999;
+    
+    public static final Function<Integer, Integer> SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR = eventColor ->
+            mixTwoColors(Color.WHITE, eventColor, Keys.DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR);
+    
     public static final String UPCOMING_BG_COLOR = "upcomingBgColor";
     public static final int SETTINGS_DEFAULT_UPCOMING_BG_COLOR = 0xff_CCFFCC;
     public static final String EXPIRED_BG_COLOR = "expiredBgColor";

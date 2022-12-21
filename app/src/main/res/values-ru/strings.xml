@@ -152,4 +152,9 @@
     <string name="reset_calendar_settings_description">Это сбросит настройки текущего календаря</string>
     <string name="delete_all_saved_backgrounds_description">Это сбросит все кастомные фоны по дням</string>
     <string name="select_date">Выберите дату</string>
+    <string name="attention">Внимание</string>
+    <string name="whole_calendar_settings_on_warning">Вы включили глобальные настройки аккаунтов и календарей, т.к. они переопределяют локальные, это может вас запутать.</string>
+    <string name="whole_calendar_settings_off_warning">Вы отключили глобальные настройки аккаунтов и календарей, те, которые вы уже изменили, остались.</string>
+    <string name="yay">Вуху!</string>
+    <string name="i_understand">Я понял</string>
 </resources>

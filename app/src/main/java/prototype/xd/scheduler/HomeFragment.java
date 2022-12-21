@@ -150,7 +150,8 @@ public class HomeFragment extends Fragment {
         wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> displayToast(requireContext(), R.string.work_in_progress));
         
         wrapperBnd.navView.logo.setOnClickListener(v -> displayMessageDialog(requireContext(), getLifecycle(),
-                R.string.easter_egg, R.string.easter_egg_description, R.drawable.ic_egg,
+                R.string.easter_egg, R.string.easter_egg_description,
+                R.drawable.ic_egg, R.string.yay,
                 R.style.DefaultAlertDialogTheme,
                 null));
         
@@ -187,7 +188,8 @@ public class HomeFragment extends Fragment {
         if (preferences.getBoolean(SERVICE_FAILED, false)) {
             // display warning if the background service failed
             displayMessageDialog(requireContext(), getLifecycle(),
-                    R.string.service_error, R.string.service_error_description, R.drawable.ic_warning,
+                    R.string.service_error, R.string.service_error_description,
+                    R.drawable.ic_warning, R.string.close,
                     R.style.ErrorAlertDialogTheme,
                     dialog -> preferences.edit().putBoolean(SERVICE_FAILED, false).apply());
         }
@@ -195,14 +197,15 @@ public class HomeFragment extends Fragment {
         if (preferences.getBoolean(WALLPAPER_OBTAIN_FAILED, false)) {
             // display warning if there wan an error getting the wallpaper
             displayMessageDialog(requireContext(), getLifecycle(),
-                    R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description, R.drawable.ic_warning,
+                    R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description,
+                    R.drawable.ic_warning, R.string.close,
                     R.style.ErrorAlertDialogTheme,
                     dialog -> preferences.edit().putBoolean(WALLPAPER_OBTAIN_FAILED, false).apply());
         }
     }
     
     public void invalidateAll() {
-        todoListEntryManager.invalidateAll();
+        todoListEntryManager.notifyDatasetChanged();
     }
     
     @Override

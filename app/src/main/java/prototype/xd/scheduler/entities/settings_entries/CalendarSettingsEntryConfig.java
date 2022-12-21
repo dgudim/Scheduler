@@ -63,7 +63,7 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
             viewBinding.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                     preferences.edit().putBoolean(config.calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
             
-            viewBinding.settingsButton.setOnClickListener(view -> config.systemCalendarSettings.show(config.calendarKey));
+            viewBinding.settingsButton.setOnClickListener(view -> config.systemCalendarSettings.show(config.calendarKey, config.calendarColor));
             config.updateSettingsButtonVisibility(viewBinding.settingsButton);
             
             if (config.gridViewAdapter != null) {

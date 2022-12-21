@@ -1,6 +1,7 @@
 package prototype.xd.scheduler;
 
 import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 
@@ -91,11 +92,23 @@ public class CalendarSettingsFragment extends BaseSettingsFragment<ConcatAdapter
         staticEntries.add(new SwitchSettingsEntryConfig(
                 Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS, Keys.SETTINGS_DEFAULT_ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
                 getString(R.string.settings_allow_global_calendar_account_settings), (buttonView, isChecked) -> {
+            if (isChecked) {
+                displayMessageDialog(requireContext(), getLifecycle(),
+                        R.string.attention, R.string.whole_calendar_settings_on_warning,
+                        R.drawable.ic_warning, R.string.i_understand,
+                        R.style.DefaultAlertDialogTheme,
+                        null);
+            } else {
+                displayMessageDialog(requireContext(), getLifecycle(),
+                        R.string.attention, R.string.whole_calendar_settings_off_warning,
+                        R.drawable.ic_warning, R.string.i_understand,
+                        R.style.DefaultAlertDialogTheme,
+                        null);
+            }
             for (GenericCalendarSettingsEntryConfig calendarEntryConfig : calendarConfigEntries) {
-                // TODO: 16.12.2022 display warning about complexity / possible confusion
                 calendarEntryConfig.setShowSettings(isChecked);
             }
-            // almost all the list is updated (except first 2 entries)
+            // almost all the list is updated (except first entry)
             listViewAdapter.notifyItemRangeChanged(staticEntries.size(), calendarConfigEntries.size());
         }));
         staticEntriesListViewAdapter.notifyItemInserted(staticEntries.size());

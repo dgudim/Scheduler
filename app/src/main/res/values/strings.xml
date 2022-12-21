@@ -158,4 +158,9 @@
     <string name="date_from_to">Date from to</string>
     <string name="delete_all_saved_backgrounds_description">This will reset all custom per-day wallpapers</string>
     <string name="select_date">Select date</string>
+    <string name="attention">Attention</string>
+    <string name="whole_calendar_settings_on_warning">Your turned on global account and calendar settings, because they override local ones, it may be confusing for you.</string>
+    <string name="whole_calendar_settings_off_warning">You turned off global account and calendar settings, the ones you have already changed have stayed.</string>
+    <string name="yay">Yay!</string>
+    <string name="i_understand">I understand</string>
 </resources>

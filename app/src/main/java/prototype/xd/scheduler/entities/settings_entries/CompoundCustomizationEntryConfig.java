@@ -102,7 +102,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.backgroundColorSelector.setOnClickListener(v ->
                     invokeColorDialogue(context, lifecycle,
                             colorPickerClickListener,
-                            Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR));
+                            Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_REGULAR_EVENT_BG_COLOR));
             viewBinding.backgroundColorUpcomingSelector.setOnClickListener(v ->
                     invokeColorDialogue(context, lifecycle,
                             colorPickerClickListener,
@@ -245,7 +245,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.fontColorExpiredSelector.setCardBackgroundColor(fontColorExpired);
             
             
-            int bgColor = preferences.getInt(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_BG_COLOR);
+            int bgColor = preferences.getInt(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_REGULAR_EVENT_BG_COLOR);
             int bgColorUpcoming = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
             int bgColorExpired = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
             

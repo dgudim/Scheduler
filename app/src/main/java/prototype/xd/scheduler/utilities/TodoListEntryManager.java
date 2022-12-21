@@ -263,7 +263,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     // tells all entries that their parameters have changed and refreshes all ui stuff
-    public void invalidateAll() {
+    public void notifyDatasetChanged() {
         for (TodoListEntry todoListEntry : todoListEntries) {
             todoListEntry.invalidateAllParameters(false);
         }
@@ -384,7 +384,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     // entry added / removed
-    private void entryListChanged(TodoListEntry entry) {
+    private void notifyEntryRemovedAdded(@NonNull final TodoListEntry entry) {
         if (calendarView != null) {
             notifyDaysChanged(
                     entry.getVisibleDaysOnCalendar(calendarView,
@@ -397,14 +397,14 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         saveEntriesAsync();
     }
     
-    public void addEntry(TodoListEntry entry) {
+    public void addEntry(@NonNull final TodoListEntry entry) {
         todoListEntries.add(entry, parameterInvalidationListener);
-        entryListChanged(entry);
+        notifyEntryRemovedAdded(entry);
     }
     
-    public void removeEntry(TodoListEntry entry) {
+    public void removeEntry(@NonNull final TodoListEntry entry) {
         todoListEntries.remove(entry);
-        entryListChanged(entry);
+        notifyEntryRemovedAdded(entry);
     }
     
     public void addGroup(Group newGroup) {

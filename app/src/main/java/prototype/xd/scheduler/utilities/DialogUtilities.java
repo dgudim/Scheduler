@@ -226,13 +226,14 @@ public class DialogUtilities {
                                             @StringRes int titleStringResource,
                                             @StringRes int messageStringResource,
                                             @DrawableRes int iconResource,
+                                            @StringRes int positiveButton,
                                             @StyleRes int theme,
                                             DialogInterface.OnDismissListener dismissListener) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, theme);
         builder.setTitle(titleStringResource);
         builder.setMessage(messageStringResource);
         builder.setIcon(iconResource);
-        builder.setPositiveButton(R.string.close, null);
+        builder.setPositiveButton(positiveButton, null);
         attachDialogToLifecycle(builder.show(), lifecycle, dismissListener);
     }
     
