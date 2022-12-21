@@ -1,0 +1,12 @@
+New features:
+- Added an ability to hide "global" label on the lockscreen
+- Added an ability to set start and end day for a todo event
+
+Bugfixes and performance improvements:
+- Fixed global events not showing in the list (issue #6)
+- Under the hood bugfixes and tweaks
+
+Internal changes:
+- Event sorting improvements
+- All time related stuff is now in UTC
+- Calendar color loading logic changed

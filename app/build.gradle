@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 def versionMajor = 0
 def versionMinor = 5
-def versionPatch = 3
+def versionPatch = 4
 
 ext.getVersionCode = { ->
     return versionMajor * 10000 + versionMinor * 100 + versionPatch
