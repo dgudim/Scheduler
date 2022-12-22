@@ -114,7 +114,7 @@
     <string name="a_few_notes">Несколько замечаний перед тем как продолжить</string>
     <string name="note_animated_wallpapers">Приложение не работает с анимированными обоями, так что если вы используете такой, смените на обычный</string>
     <string name="note_bugs">Приложение находится в ранней стадии разработки, так что скорее всего будут баги.</string>
-    <string name="note_contribute">Если у вас есть предложения или вы хотите внести вклад, прошу на мой гитхаб  (тык)</string>
+    <string name="note_contribute">Если у вас есть предложения или вы хотите внести вклад, прошу на мой гитхаб</string>
     <string name="finish">Завершить</string>
     <string name="before_you_continue">Перед тем как продолжить</string>
     <string name="read_and_understood">Я прочитал и понял все вышесказанное</string>

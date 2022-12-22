@@ -24,9 +24,10 @@
             android:layout_weight="1" />
 
         <prototype.xd.scheduler.views.ThemeSelectButton
-            style="@style/SecondaryButtonStyleRound"
+            style="@style/PrimaryButtonStyleRound"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="3dp" />
 
     </LinearLayout>
 

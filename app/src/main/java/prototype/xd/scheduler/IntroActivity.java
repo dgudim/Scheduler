@@ -33,7 +33,10 @@ public class IntroActivity extends AppIntro {
                         .setColorResourceIds(new int[]{
                                 R.color.gray_harmonized,
                                 R.color.green_harmonized,
-                                R.color.yellow_harmonized})
+                                R.color.yellow_harmonized,
+                                R.color.green_outline_harmonized,
+                                R.color.yellow_outline_harmonized
+                        })
                         .build());
         DynamicColors.applyToActivityIfAvailable(this);
         
@@ -54,7 +57,11 @@ public class IntroActivity extends AppIntro {
         
         setSystemBackButtonLocked(true);
         setSkipButtonEnabled(false);
+        
         setNextArrowColor(primaryColor);
+        setSeparatorColor(primaryColor);
+        setBarColor(surfaceColor);
+        
         setDoneTextAppearance(R.style.MediumHeading);
         setColorDoneText(primaryColor);
         setDoneText(R.string.finish);

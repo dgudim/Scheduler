@@ -1,109 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface"
-    android:orientation="vertical"
     tools:context=".IntroActivity">
 
-    <TextView
-        style="@style/LargeBoldHeading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="10dp"
-        android:text="@string/thanks_for_installing"
-        app:drawableBottomCompat="@drawable/ic_launcher_foreground" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        app:srcCompat="@drawable/intro_logo"
-        tools:ignore="ContentDescription" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
         android:orientation="vertical"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp">
+        android:paddingBottom="@dimen/appintro_bottombar_height">
 
         <TextView
-            style="@style/MediumHeading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="3dp"
-            android:paddingBottom="3dp"
-            android:text="@string/choose_application_theme" />
-
-        <TextView
-            style="@style/MediumHeadingSubtext"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="1dp"
-            android:paddingBottom="1dp"
-            android:text="@string/change_theme_later" />
-
-        <prototype.xd.scheduler.views.ThemeSelectButton
-            style="@style/SecondaryButtonStyleRound"
+            style="@style/LargeBoldHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="10dp"
+            android:text="@string/thanks_for_installing"
+            app:drawableBottomCompat="@drawable/ic_launcher_foreground" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            app:srcCompat="@drawable/intro_logo"
+            tools:ignore="ContentDescription" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                style="@style/MediumHeading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:text="@string/choose_application_theme" />
+
+            <TextView
+                style="@style/MediumHeadingSubtext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="1dp"
+                android:paddingBottom="1dp"
+                android:text="@string/change_theme_later" />
+
+            <prototype.xd.scheduler.views.ThemeSelectButton
+                style="@style/PrimaryButtonStyleRound"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteY="413dp">
+
+            <TextView
+                style="@style/MediumHeading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/a_few_notes" />
+
+            <TextView
+                style="@style/SecondaryAccentedTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/note_animated_wallpapers"
+                app:drawableStartCompat="@drawable/ic_animation" />
+
+            <TextView
+                style="@style/SecondaryAccentedTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/note_bugs"
+                app:drawableStartCompat="@drawable/ic_bug" />
+
+            <TextView
+                style="@style/SecondaryAccentedTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/note_contribute"
+                app:drawableStartCompat="@drawable/ic_github" />
+
+            <prototype.xd.scheduler.views.CheckBox
+                android:id="@+id/understood_checkbox"
+                style="@style/PrimaryAccentedCheckboxStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/read_and_understood" />
+
+        </LinearLayout>
 
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteY="413dp">
-
-        <TextView
-            style="@style/MediumHeading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/a_few_notes" />
-
-        <TextView
-            style="@style/SecondaryAccentedTextStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/note_animated_wallpapers"
-            app:drawableStartCompat="@drawable/ic_animation" />
-
-        <TextView
-            style="@style/SecondaryAccentedTextStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/note_bugs"
-            app:drawableStartCompat="@drawable/ic_bug" />
-
-        <Button
-            android:id="@+id/github_button"
-            style="@style/SecondaryButtonStyleNormal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/note_contribute"
-            android:textAlignment="viewStart"
-            app:icon="@drawable/ic_github"
-            app:iconSize="24dp" />
-
-        <prototype.xd.scheduler.views.CheckBox
-            android:id="@+id/understood_checkbox"
-            style="@style/PrimaryAccentedCheckboxStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/read_and_understood" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</ScrollView>

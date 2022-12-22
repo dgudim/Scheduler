@@ -77,7 +77,7 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     }
     
     private boolean refreshPermissionStates(boolean display) {
-
+        
         boolean storageGranted = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED;
         
@@ -110,14 +110,24 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         return essentialGranted;
     }
     
+    private int swapRedAndGreenChannels(int color) {
+        Color col = Color.valueOf(color);
+        return Color.rgb(col.green(), col.red(), col.blue());
+    }
+    
     private void setPermissionChipColor(boolean permissionGranted, TextView permissionText) {
         permissionText.setText(permissionGranted ? R.string.permissions_granted : R.string.permissions_not_granted);
-        permissionText.setTextColor(MaterialColors.getColor(permissionText,
-                permissionGranted ? R.attr.colorOnSecondaryContainer : R.attr.colorOnErrorContainer,
-                permissionGranted ? Color.GREEN : Color.RED));
-        permissionText.setBackgroundTintList(ColorStateList.valueOf(MaterialColors.getColor(permissionText,
-                permissionGranted ? R.attr.colorSecondaryContainer : R.attr.colorErrorContainer,
-                Color.LTGRAY)));
+        
+        int containerColor = MaterialColors.getColor(permissionText, R.attr.colorErrorContainer, Color.LTGRAY);
+        int onContainerColor = MaterialColors.getColor(permissionText, R.attr.colorOnErrorContainer, Color.RED);
+        
+        if(permissionGranted) {
+            containerColor = swapRedAndGreenChannels(containerColor);
+            onContainerColor = swapRedAndGreenChannels(onContainerColor);
+        }
+        
+        permissionText.setTextColor(onContainerColor);
+        permissionText.setBackgroundTintList(ColorStateList.valueOf(containerColor));
     }
     
     @Override

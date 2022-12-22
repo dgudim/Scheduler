@@ -84,9 +84,8 @@
 
 
     <!-- secondary button styles -->
-    <style name="SecondaryButtonStyleRound" parent="Widget.Material3.Button">
+    <style name="ButtonStyleRound" parent="Widget.Material3.Button">
         <item name="backgroundColor">?colorSecondaryContainer</item>
-        <item name="materialThemeOverlay">@style/SecondaryButtonThemeOverlay</item>
         <item name="android:paddingLeft">10dp</item>
         <item name="android:paddingRight">10dp</item>
         <item name="iconPadding">3dp</item>
@@ -94,23 +93,29 @@
         <item name="minWidth">60dp</item>
     </style>
 
-    <style name="SecondaryButtonStyleRoundCompact" parent="SecondaryButtonStyleRound">
+    <style name="PrimaryButtonStyleRound" parent="ButtonStyleRound">
+        <item name="materialThemeOverlay">@style/PrimaryButtonThemeOverlay</item>
+    </style>
+
+    <style name="ButtonStyleRoundCompact" parent="ButtonStyleRound">
         <item name="android:minHeight">30dip</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
     </style>
 
-    <style name="SecondaryButtonStyleNormal" parent="SecondaryButtonStyleRound">
-        <item name="shapeAppearance">?attr/shapeAppearanceMediumComponent</item>
-        <item name="android:padding">3dp</item>
-        <item name="android:insetTop">0dp</item>
-        <item name="android:insetBottom">0dp</item>
-        <item name="android:layout_margin">3dp</item>
+    <style name="SecondaryButtonStyleRoundCompact" parent="ButtonStyleRoundCompact">
+        <item name="materialThemeOverlay">@style/SecondaryButtonThemeOverlay</item>
     </style>
 
+    <!-- overlays -->
     <style name="SecondaryButtonThemeOverlay" parent="ThemeOverlay.Material3.Button">
         <item name="colorOnContainer">?colorOnSecondaryContainer</item>
         <item name="colorContainer">?colorSecondaryContainer</item>
+    </style>
+
+    <style name="PrimaryButtonThemeOverlay" parent="ThemeOverlay.Material3.Button">
+        <item name="colorOnContainer">?colorOnPrimaryContainer</item>
+        <item name="colorContainer">?colorPrimaryContainer</item>
     </style>
     <!-- end -->
 

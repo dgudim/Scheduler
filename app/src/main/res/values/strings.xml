@@ -122,7 +122,7 @@
     <string name="a_few_notes">A few notes before you go</string>
     <string name="note_animated_wallpapers">The app doesn\'t work with animated wallpapers, so if you have one consider either not using the app or setting a regular wallpaper</string>
     <string name="note_bugs">The app is still in it\'s early development so bugs are to be expected</string>
-    <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on my github (click me)</string>
+    <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on my github</string>
     <string name="finish">Finish</string>
     <string name="before_you_continue">Before you continue</string>
     <string name="read_and_understood">I have read and understood all the things above</string>
