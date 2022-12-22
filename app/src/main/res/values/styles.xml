@@ -46,7 +46,7 @@
 
     <!-- additional dialog styles -->
     <style name="ErrorAlertDialogTheme" parent="DefaultAlertDialogTheme">
-        <item name="colorPrimary">?colorError</item>
+        <item name="colorPrimary">?colorOnErrorContainer</item>
         <item name="colorSecondary">?colorError</item>
         <item name="colorSurface">?colorErrorContainer</item>
         <item name="colorOnSurface">?colorOnErrorContainer</item>

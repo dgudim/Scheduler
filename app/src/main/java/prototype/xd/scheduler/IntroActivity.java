@@ -49,7 +49,9 @@ public class IntroActivity extends AppIntro {
     
         View rootView = findViewById(android.R.id.content).getRootView();
         int surfaceColor = MaterialColors.getColor(rootView, R.attr.colorSurface);
+        int surfaceColorVariant = MaterialColors.getColor(rootView, R.attr.colorSurfaceVariant);
         int primaryColor = MaterialColors.getColor(rootView, R.attr.colorPrimary);
+        int secondaryColor = MaterialColors.getColor(rootView, R.attr.colorSecondary);
         
         setNavBarColor(surfaceColor);
         showStatusBar(true);
@@ -59,13 +61,13 @@ public class IntroActivity extends AppIntro {
         setSkipButtonEnabled(false);
         
         setNextArrowColor(primaryColor);
-        setSeparatorColor(primaryColor);
+        setSeparatorColor(secondaryColor);
         setBarColor(surfaceColor);
         
         setDoneTextAppearance(R.style.MediumHeading);
         setColorDoneText(primaryColor);
         setDoneText(R.string.finish);
-        setIndicatorColor(primaryColor, MaterialColors.getColor(rootView, R.attr.colorSurfaceVariant));
+        setIndicatorColor(primaryColor, surfaceColorVariant);
     }
     
     private boolean isXiaomiPhone() {
