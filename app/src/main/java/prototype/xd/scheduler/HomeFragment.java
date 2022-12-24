@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTime
 import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
-import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
@@ -37,6 +36,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,7 +62,8 @@ public class HomeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // init date manager
-        selectCurrentDay();
+        // select current day
+        selectDate(LocalDate.now());
         todoListEntryManager = new TodoListEntryManager(requireContext(), getLifecycle(), getParentFragmentManager());
     }
     

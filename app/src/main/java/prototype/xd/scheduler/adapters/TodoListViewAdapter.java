@@ -1,6 +1,8 @@
 package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getFontColor;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getTimeTextColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
@@ -12,7 +14,6 @@ import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,8 +101,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding) viewBinding;
             
             bnd.eventColor.setCardBackgroundColor(entry.event.color);
-            bnd.timeText.setText(entry.getTimeSpan(context));
-            bnd.timeText.setTextColor(entry.fontColor.get(currentlySelectedDayUTC));
+            bnd.timeText.setText(entry.getTimeSpan(context, currentlySelectedDayUTC));
+            bnd.timeText.setTextColor(getTimeTextColor(
+                    entry.fontColor.get(currentlySelectedDayUTC),
+                    entry.bgColor.get(currentlySelectedDayUTC)));
             bnd.settings.setOnClickListener(v -> systemCalendarSettings.show(entry));
         }
         
@@ -139,13 +142,16 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             TextView todoText = root.findViewById(R.id.todoText);
             MaterialCardView backgroundLayer = root.findViewById(R.id.backgroundLayer);
             
-            backgroundLayer.setCardBackgroundColor(entry.bgColor.get(currentlySelectedDayUTC));
+            int bgColor = entry.bgColor.get(currentlySelectedDayUTC);
+            int fontColor = getFontColor(entry.fontColor.get(currentlySelectedDayUTC), bgColor);
+            
+            backgroundLayer.setCardBackgroundColor(bgColor);
             backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDayUTC));
             
             if (entry.isCompleted() || entry.hideByContent()) {
-                todoText.setTextColor(mixTwoColors(entry.fontColor.get(currentlySelectedDayUTC), Color.WHITE, 0.5));
+                todoText.setTextColor(mixTwoColors(fontColor, bgColor, 0.5));
             } else {
-                todoText.setTextColor(entry.fontColor.get(currentlySelectedDayUTC));
+                todoText.setTextColor(fontColor);
             }
             
             todoText.setText(entry.getTextOnDay(currentlySelectedDayUTC, context, true));

@@ -12,6 +12,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import com.google.android.material.color.MaterialColors;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -147,12 +149,6 @@ public class BitmapUtilities {
         }
     }
     
-    public static Paint createNewPaint(int color) {
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
-        paint.setColor(color);
-        return paint;
-    }
-    
     public static int mixTwoColors(int color1, int color2, double balance) {
         Color c1 = Color.valueOf(color1);
         Color c2 = Color.valueOf(color2);
@@ -161,6 +157,16 @@ public class BitmapUtilities {
         float g = (float) (c1.green() * (1 - balance) + c2.green() * balance);
         float b = (float) (c1.blue() * (1 - balance) + c2.blue() * balance);
         return Color.argb(a, r, g, b);
+    }
+    
+    // get harmonized font color
+    public static int getFontColor(int fontColor, int backgroundColor) {
+        return MaterialColors.harmonize(fontColor, backgroundColor);
+    }
+    
+    // mix and harmonize (25% gray, 75% font color + harmonized with background);
+    public static int getTimeTextColor(int fontColor, int backgroundColor) {
+        return MaterialColors.harmonize(mixTwoColors(fontColor, Color.DKGRAY, Keys.DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR), backgroundColor);
     }
     
     public static int getAverageColor(int[] pixels) {

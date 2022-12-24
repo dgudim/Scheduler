@@ -23,6 +23,7 @@ public class Keys {
     
     public static final float DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR = 0.75f;
     public static final float DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR = 0.85f;
+    public static final float DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR = 0.25f;
     public static final float DEFAULT_TITLE_FONT_SIZE_MULTIPLIER = 1.1F;
     
     public static final int DAY_FLAG_GLOBAL = -1;

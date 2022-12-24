@@ -254,11 +254,11 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.backgroundColorExpiredSelector.setCardBackgroundColor(bgColorExpired);
             
             
-            upcomingEntryPreview.mixAndSetBgAndTextColors(
+            upcomingEntryPreview.mixAndSetBgAndTextColors(true,
                     mixTwoColors(fontColor, fontColorUpcoming, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
                     mixTwoColors(bgColor, bgColorUpcoming, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
-            todayEntryPreview.mixAndSetBgAndTextColors(fontColor, bgColor);
-            expiredEntryPreview.mixAndSetBgAndTextColors(
+            todayEntryPreview.mixAndSetBgAndTextColors(true, fontColor, bgColor);
+            expiredEntryPreview.mixAndSetBgAndTextColors(true,
                     mixTwoColors(fontColor, fontColorExpired, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
                     mixTwoColors(bgColor, bgColorExpired, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
         }

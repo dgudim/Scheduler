@@ -54,11 +54,6 @@ public class SystemCalendarEvent {
     
     protected boolean isAllDay;
     
-    private String rRule_str; // for comparison
-    private String rDate_str;
-    private String exRule_str;
-    private String exDate_str;
-    
     protected RecurrenceSet rSet;
     
     protected TimeZone timeZone;
@@ -89,12 +84,8 @@ public class SystemCalendarEvent {
         
         durationMs = endMsUTC - startMsUTC;
         
-        rRule_str = getString(cursor, calendarEventsColumns, Events.RRULE);
-        rDate_str = getString(cursor, calendarEventsColumns, Events.RDATE);
-        if (rRule_str.length() > 0) {
-            loadRecurrenceRules(cursor);
-        }
-    
+        loadRecurrenceRules(cursor);
+        
         // shorten the event a little because it's bounds are on midnight and that breaks stuff
         if (isAllDay) {
             endMsUTC -= ONE_MINUTE_MS;
@@ -104,49 +95,55 @@ public class SystemCalendarEvent {
     }
     
     private void loadRecurrenceRules(Cursor cursor) {
-        try {
-            rSet = new RecurrenceSet();
         
-            rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
+        String rRuleStr = getString(cursor, calendarEventsColumns, Events.RRULE);
+        String rDateStr = getString(cursor, calendarEventsColumns, Events.RDATE);
         
-            if (rDate_str.length() > 0) {
-                try {
-                    DateTimeZonePair pair = checkRDates(rDate_str);
-                    rSet.addInstances(new RecurrenceList(pair.date, pair.timeZone));
-                } catch (IllegalArgumentException e) {
-                    log(ERROR, NAME, "Error adding rDate: " + e.getMessage());
+        if (rRuleStr.length() > 0) {
+            try {
+                rSet = new RecurrenceSet();
+        
+                rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRuleStr)));
+        
+                if (rDateStr.length() > 0) {
+                    try {
+                        DateTimeZonePair pair = checkRDates(rDateStr);
+                        rSet.addInstances(new RecurrenceList(pair.date, pair.timeZone));
+                    } catch (IllegalArgumentException e) {
+                        log(ERROR, NAME, "Error adding rDate: " + e.getMessage());
+                    }
                 }
-            }
         
-            exRule_str = getString(cursor, calendarEventsColumns, Events.EXRULE);
-            exDate_str = getString(cursor, calendarEventsColumns, Events.EXDATE);
+                String exRuleStr = getString(cursor, calendarEventsColumns, Events.EXRULE);
+                String exDateStr = getString(cursor, calendarEventsColumns, Events.EXDATE);
         
-            if (exRule_str.length() > 0) {
-                try {
-                    rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule_str)));
-                } catch (IllegalArgumentException e) {
-                    log(ERROR, NAME, "Error adding exRule: " + e.getMessage());
+                if (exRuleStr.length() > 0) {
+                    try {
+                        rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRuleStr)));
+                    } catch (IllegalArgumentException e) {
+                        log(ERROR, NAME, "Error adding exRule: " + e.getMessage());
+                    }
                 }
-            }
         
-            if (exDate_str.length() > 0) {
-                try {
-                    DateTimeZonePair pair = checkRDates(exDate_str);
-                    rSet.addExceptions(new RecurrenceList(pair.date, pair.timeZone));
-                } catch (IllegalArgumentException e) {
-                    log(ERROR, NAME, "Error adding exDate: " + e.getMessage());
+                if (exDateStr.length() > 0) {
+                    try {
+                        DateTimeZonePair pair = checkRDates(exDateStr);
+                        rSet.addExceptions(new RecurrenceList(pair.date, pair.timeZone));
+                    } catch (IllegalArgumentException e) {
+                        log(ERROR, NAME, "Error adding exDate: " + e.getMessage());
+                    }
                 }
+        
+                String durationStr = getString(cursor, calendarEventsColumns, Events.DURATION);
+        
+                if (durationStr.length() > 0) {
+                    durationMs = rfc2445ToMilliseconds(durationStr);
+                }
+        
+                endMsUTC = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, startMsUTC);
+            } catch (Exception e) {
+                logException(NAME, e);
             }
-        
-            String durationStr = getString(cursor, calendarEventsColumns, Events.DURATION);
-        
-            if (durationStr.length() > 0) {
-                durationMs = rfc2445ToMilliseconds(durationStr);
-            }
-        
-            endMsUTC = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, startMsUTC);
-        } catch (Exception e) {
-            logException(NAME, e);
         }
     }
     

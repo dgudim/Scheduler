@@ -7,6 +7,7 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.datetimeStringFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.daysUTCFromMsUTC;
+import static prototype.xd.scheduler.utilities.DateManager.msUTCFromDaysUTC;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
@@ -34,7 +35,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
@@ -578,8 +578,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         T processInstance(long instanceStartMsUTC, long instanceStartDay);
     }
     
-    private <T> T iterateRecurrenceSet(long startMs, TimeZone startTimezone, RecurrenceSetConsumer<T> recurrenceSetConsumer, T defaultValue) {
-        RecurrenceSetIterator it = recurrenceSet.iterator(startTimezone, startMs);
+    private <T> T iterateRecurrenceSet(long startMs, long firstDayUTC, RecurrenceSetConsumer<T> recurrenceSetConsumer, T defaultValue) {
+        RecurrenceSetIterator it = recurrenceSet.iterator(event.timeZone, startMs);
+        it.fastForward(msUTCFromDaysUTC(firstDayUTC - 1));
         long instanceMsUTC;
         long instanceDay;
         T val;
@@ -679,7 +680,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         long currentExpiredDayOffset = this.expiredDayOffset.getToday();
         
         if (recurrenceSet != null) {
-            iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDayUTC) -> {
+            iterateRecurrenceSet(startMsUTC, minDay, (instanceStartMsUTC, instanceStartDayUTC) -> {
                 
                 // overshot
                 if (instanceStartDayUTC + currentUpcomingDayOffset > maxDay) {
@@ -771,7 +772,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             return endMsUTC;
         }
         if (recurrenceSet != null) {
-            return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDayUTC) -> {
+            return iterateRecurrenceSet(startMsUTC, targetDayUTC, (instanceStartMsUTC, instanceStartDayUTC) -> {
                 // if in range or overshoot
                 if (inRange(targetDayUTC, instanceStartDayUTC) || instanceStartDayUTC >= targetDayUTC) {
                     return instanceStartMsUTC;
@@ -822,7 +823,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return startDayUTC.get() == Keys.DAY_FLAG_GLOBAL;
     }
     
-    public String getTimeSpan(Context context) {
+    public String getTimeSpan(Context context, long targetDayUTC) {
         
         if (!isFromSystemCalendar()) {
             return "";
@@ -833,7 +834,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
         
         if (recurrenceSet != null) {
-            return DateManager.getTimeSpan(startMsUTC, startMsUTC + durationMsUTC);
+            long nearestMsUTC = getNearestCalendarEventMsUTC(targetDayUTC);
+            return DateManager.getTimeSpan(nearestMsUTC, nearestMsUTC + durationMsUTC);
         }
         
         if (startMsUTC == endMsUTC) {

@@ -11,6 +11,7 @@ import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class DateManager {
@@ -22,6 +23,8 @@ public class DateManager {
     public static final long ONE_MINUTE_MS = 60000L;
     
     public static LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
+    public static final TimeZone systemTimeZone = TimeZone.getDefault();
+    public static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     
     public static long currentDayUTC = DAY_FLAG_GLOBAL;
     public static long currentTimestampUTC = DAY_FLAG_GLOBAL;
@@ -31,6 +34,7 @@ public class DateManager {
     
     private static final Locale systemLocale = LocaleListCompat.getDefault().get(0);
     private static final DateFormat dateTimeFormat = new SimpleDateFormat("dd/MM HH:mm", systemLocale);
+    
     private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM", systemLocale);
     private static final DateFormat dateFormatMonthNames = new SimpleDateFormat("MMM d", systemLocale);
     private static final DateFormat timeFormat = new SimpleDateFormat("HH:mm", systemLocale);
@@ -45,10 +49,6 @@ public class DateManager {
         updateDate();
         currentlySelectedTimestampUTC = date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli() + ONE_MINUTE_MS; // add one minute because some stuff breaks at midnight
         currentlySelectedDayUTC = date.toEpochDay();
-    }
-    
-    public static void selectCurrentDay() {
-        selectDate(LocalDate.now());
     }
     
     public static long getStartOfMonthDayUTC(YearMonth month) {

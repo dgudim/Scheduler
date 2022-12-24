@@ -1,7 +1,8 @@
 package prototype.xd.scheduler.views.lockscreen;
 
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getFontColor;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getTimeTextColor;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
@@ -13,7 +14,6 @@ import static prototype.xd.scheduler.utilities.Keys.SHOW_GLOBAL_ITEMS_LABEL_LOCK
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +21,6 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
-
-import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.databinding.BasicEntryBinding;
 import prototype.xd.scheduler.databinding.RoundedEntryBinding;
@@ -98,7 +96,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         setTitleTextSize(fontSizeSP * DEFAULT_TITLE_FONT_SIZE_MULTIPLIER);
         
         if (entry.isFromSystemCalendar()) {
-            String timeSpan = entry.getTimeSpan(context);
+            String timeSpan = entry.getTimeSpan(context, currentDayUTC);
             setTimeSpanText(timeSpan);
             setTimeStartText(timeSpan.split(" - ")[0]);
             setTimeTextSize(fontSizeSP);
@@ -124,16 +122,19 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             entry.setAverageBackgroundColor(getAverageColor(pixels));
         }
         
-        mixAndSetBgAndTextColors(entry.fontColor.get(currentDayUTC), entry.getAdaptiveColor(entry.bgColor.get(currentDayUTC)));
+        mixAndSetBgAndTextColors(entry.isFromSystemCalendar(),
+                entry.fontColor.get(currentDayUTC),
+                entry.getAdaptiveColor(entry.bgColor.get(currentDayUTC)));
         setBorderColor(entry.getAdaptiveColor(entry.borderColor.get(currentDayUTC)));
     }
     
-    public void mixAndSetBgAndTextColors(int fontColor, int backgroundColor) {
+    public void mixAndSetBgAndTextColors(boolean setTimeTextColor, int fontColor, int backgroundColor) {
         // setup colors
         setBackgroundColor(backgroundColor);
-        setTitleTextColor(MaterialColors.harmonize(fontColor, backgroundColor));
-        // mix and harmonize (85% gray, 15% font color + harmonized with background);
-        setTimeTextColor(MaterialColors.harmonize(mixTwoColors(fontColor, Color.DKGRAY, .85), backgroundColor));
+        setTitleTextColor(getFontColor(fontColor, backgroundColor));
+        if (setTimeTextColor) {
+            setTimeTextColor(getTimeTextColor(fontColor, backgroundColor));
+        }
     }
     
     public enum TodoItemViewType {
