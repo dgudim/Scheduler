@@ -3,6 +3,8 @@ package prototype.xd.scheduler;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectCurrentDay;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
@@ -19,6 +21,7 @@ import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
+import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -85,9 +88,11 @@ public class HomeFragment extends Fragment {
         });
         
         // setup month listener, called when a new month is loaded (first month is loaded differently)
-        calendarView.setNewMonthBindListener((firstVisibleDay, lastVisibleDay, context) ->
-                // load current month entries (with overlap of 15 days) before displaying the data
-                todoListEntryManager.loadEntries(firstVisibleDay - 15, lastVisibleDay + 15)
+        calendarView.setNewMonthBindListener(month ->
+                // load current month entries (with overlap of one panel) before displaying the data
+                todoListEntryManager.loadEntries(
+                        getStartOfMonthDayUTC(month) - DAYS_ON_ONE_PANEL,
+                        getEndOfMonthDayUTC(month) + DAYS_ON_ONE_PANEL)
         );
         
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(currentDate));

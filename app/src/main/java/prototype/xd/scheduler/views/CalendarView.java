@@ -4,6 +4,8 @@ import static com.kizitonwose.calendar.core.ExtensionsKt.daysOfWeek;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.Utilities.datesEqual;
 
 import android.content.Context;
@@ -151,14 +153,14 @@ public class CalendarView {
     
     private final Set<YearMonth> loadedMonths;
     
-    private long firstSelectedMonthDay = 0;
-    private long lastSelectedMonthDay = 0;
+    private long firstSelectedMonthDayUTC = 0;
+    private long lastSelectedMonthDayUTC = 0;
     
-    private long firstVisibleDay = 0;
-    private long lastVisibleDay = 0;
+    private long firstVisibleDayUTC = 0;
+    private long lastVisibleDayUTC = 0;
     
-    private long firstBoundDay = 0;
-    private long lastBoundDay = 0;
+    private long firstBoundDayUTC = 0;
+    private long lastBoundDayUTC = 0;
     
     com.kizitonwose.calendar.view.CalendarView rootCalendarView;
     @Nullable
@@ -205,10 +207,7 @@ public class CalendarView {
                 // new month was loaded
                 if (!loadedMonths.contains(calendarYearMonth) && newMonthBindListener != null) {
                     addLoadedMonth(calendarYearMonth, true);
-                    newMonthBindListener.onMonthLoaded(
-                            calendarMonth.getYearMonth().atDay(1).toEpochDay(),
-                            calendarMonth.getYearMonth().atEndOfMonth().toEpochDay(),
-                            rootCalendarView.getContext());
+                    newMonthBindListener.onMonthLoaded(calendarYearMonth);
                 }
             }
         });
@@ -219,14 +218,14 @@ public class CalendarView {
             
             selectedMonth = calendarMonth.getYearMonth();
             
-            firstSelectedMonthDay = selectedMonth.atDay(1).toEpochDay();
-            lastSelectedMonthDay = selectedMonth.atEndOfMonth().toEpochDay();
+            firstSelectedMonthDayUTC = getStartOfMonthDayUTC(selectedMonth);
+            lastSelectedMonthDayUTC = getEndOfMonthDayUTC(selectedMonth);
             
             CalendarDay firstVisibleCalendarDay = rootCalendarView.findFirstVisibleDay();
             CalendarDay lastVisibleCalendarDay = rootCalendarView.findLastVisibleDay();
             
-            firstVisibleDay = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstSelectedMonthDay;
-            lastVisibleDay = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastSelectedMonthDay;
+            firstVisibleDayUTC = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstSelectedMonthDayUTC;
+            lastVisibleDayUTC = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastSelectedMonthDayUTC;
             
             return null;
         });
@@ -239,20 +238,20 @@ public class CalendarView {
     private void addLoadedMonth(YearMonth month, boolean extend) {
         loadedMonths.add(month);
         if (extend) {
-            firstBoundDay = min(firstBoundDay, month.atDay(1).toEpochDay());
-            lastBoundDay = max(lastBoundDay, month.atEndOfMonth().toEpochDay());
+            firstBoundDayUTC = min(firstBoundDayUTC, getStartOfMonthDayUTC(month));
+            lastBoundDayUTC = max(lastBoundDayUTC, getEndOfMonthDayUTC(month));
         } else {
-            firstBoundDay = month.atDay(1).toEpochDay();
-            lastBoundDay = month.atEndOfMonth().toEpochDay();
+            firstBoundDayUTC = getStartOfMonthDayUTC(month);
+            lastBoundDayUTC = getEndOfMonthDayUTC(month);
         }
     }
     
-    public long getFirstLoadedDay() {
-        return min(firstVisibleDay - POTENTIALLY_VISIBLE_DAYS, firstBoundDay);
+    public long getFirstLoadedDayUTC() {
+        return min(firstVisibleDayUTC - POTENTIALLY_VISIBLE_DAYS, firstBoundDayUTC);
     }
     
-    public long getLastLoadedDay() {
-        return min(lastVisibleDay + POTENTIALLY_VISIBLE_DAYS, lastBoundDay);
+    public long getLastLoadedDayUTC() {
+        return min(lastVisibleDayUTC + POTENTIALLY_VISIBLE_DAYS, lastBoundDayUTC);
     }
     
     public void selectDate(LocalDate targetDate) {
@@ -277,14 +276,14 @@ public class CalendarView {
         this.dateChangeListener = dateChangeListener;
     }
     
-    public void notifyDayChanged(long day) {
+    public void notifyDayChanged(long targetDayUTC) {
         DayPosition dayPosition = DayPosition.MonthDate;
-        if (day < firstSelectedMonthDay) {
+        if (targetDayUTC < firstSelectedMonthDayUTC) {
             dayPosition = DayPosition.InDate;
-        } else if (day > lastSelectedMonthDay) {
+        } else if (targetDayUTC > lastSelectedMonthDayUTC) {
             dayPosition = DayPosition.OutDate;
         }
-        LocalDate date = LocalDate.ofEpochDay(day);
+        LocalDate date = LocalDate.ofEpochDay(targetDayUTC);
         if (dayPosition != DayPosition.MonthDate) {
             rootCalendarView.notifyDateChanged(date, dayPosition);
         } else {
@@ -320,7 +319,7 @@ public class CalendarView {
     
     @FunctionalInterface
     public interface MonthBindListener {
-        void onMonthLoaded(long firstVisibleDay, long lastVisibleDay, Context context);
+        void onMonthLoaded(YearMonth yearMonth);
     }
 }
 

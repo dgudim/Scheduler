@@ -7,10 +7,10 @@ import androidx.core.os.LocaleListCompat;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class DateManager {
@@ -20,8 +20,6 @@ public class DateManager {
     }
     
     public static final long ONE_MINUTE_MS = 60000L;
-    
-    public static final TimeZone systemTimeZone = TimeZone.getDefault();
     
     public static LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
     
@@ -53,6 +51,14 @@ public class DateManager {
         selectDate(LocalDate.now());
     }
     
+    public static long getStartOfMonthDayUTC(YearMonth month) {
+        return month.atDay(1).toEpochDay();
+    }
+    
+    public static long getEndOfMonthDayUTC(YearMonth month) {
+        return month.atEndOfMonth().toEpochDay();
+    }
+    
     public static String getTimeSpan(long timeFromMsUTC, long timeToMsUTC) {
         String dateFrom = datetimeStringFromMsUTC(timeFromMsUTC);
         String dateTo = datetimeStringFromMsUTC(timeToMsUTC);
@@ -61,15 +67,15 @@ public class DateManager {
         
         String dateFromDayMonth = dateFromSplit[0];
         String dateFromHourMinute = dateFromSplit[1];
-    
+        
         String dateToDayMonth = dateToSplit[0];
         String dateToHourMinute = dateToSplit[1];
         
         // month and day is the same
         if (dateFrom.equals(dateTo) || dateFromDayMonth.equals(dateToDayMonth)) {
-                // 20:30 - 23:10
-                return dateFromHourMinute + " - " + dateToHourMinute;
-            } else {
+            // 20:30 - 23:10
+            return dateFromHourMinute + " - " + dateToHourMinute;
+        } else {
             String[] dateFromDayMonthSplit = dateFromDayMonth.split("/");
             String[] dateToDayMonthSplit = dateToDayMonth.split("/");
             

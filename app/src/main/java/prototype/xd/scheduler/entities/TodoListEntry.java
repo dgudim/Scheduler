@@ -10,6 +10,7 @@ import static prototype.xd.scheduler.utilities.DateManager.daysUTCFromMsUTC;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
+import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
 
 import android.content.Context;
 import android.util.ArrayMap;
@@ -196,9 +197,9 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     // for listening to parameter changes
     private transient ParameterInvalidationListener parameterInvalidationListener;
     
-    private transient TodoListEntryList associatedList;
+    private transient TodoListEntryList container;
     
-    // supplementary stuff for sorting
+    // ----------- supplementary stuff for sorting START
     int sortingIndex = 0;
     
     public int getSortingIndex() {
@@ -208,6 +209,18 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     public void setSortingIndex(int sortingIndex) {
         this.sortingIndex = sortingIndex;
     }
+    
+    long cachedNearestStartMsUTC = 0;
+    
+    public long getCachedNearestStartMsUTC() {
+        return cachedNearestStartMsUTC;
+    }
+    
+    // obtain nearest start ms near a particular day for use in sorting later
+    public void cacheNearestStartMsUTC(long targetDayLocal) {
+        cachedNearestStartMsUTC = getNearestCalendarEventMsUTC(targetDayLocal);
+    }
+    // ----------- supplementary stuff for sorting END
     
     private static ArrayMap<String, Parameter<?>> mapParameters(TodoListEntry entry) {
         ArrayMap<String, Parameter<?>> parameterMap = new ArrayMap<>(8);
@@ -359,14 +372,14 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     protected void linkToContainer(TodoListEntryList todoListEntryList) {
-        if (associatedList != null) {
+        if (container != null) {
             log(WARN, NAME, rawTextValue.get() + " already has a container, double linking");
         }
-        associatedList = todoListEntryList;
+        container = todoListEntryList;
     }
     
     protected void unlinkFromContainer() {
-        associatedList = null;
+        container = null;
     }
     
     protected void unlinkFromCalendarEvent() {
@@ -376,10 +389,10 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     protected void removeFromContainer() {
-        if (associatedList == null) {
+        if (container == null) {
             log(WARN, NAME, rawTextValue.get() + " is not in a container, can't remove");
         } else {
-            if (!associatedList.remove(this)) {
+            if (!container.remove(this)) {
                 log(WARN, NAME, rawTextValue.get() + " error removing from the container");
             }
         }
@@ -581,49 +594,46 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return defaultValue;
     }
     
-    public boolean isVisible(long targetDay) {
-        if (recurrenceSet != null) {
-            // already overshot
-            if (targetDay > endDayUTC.get()) {
-                return false;
-            }
-            return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
-                // we overshot
-                if (instanceStartDay - upcomingDayOffset.getToday() > targetDay) {
-                    return false;
-                }
-                // check if we fall in range
-                if (inRange(targetDay, instanceStartDay)) {
-                    return true;
-                }
-                return null;
-            }, false);
+    private boolean isVisible(long targetDay) {
+        // global entries are visible everywhere, no need to do anything more
+        if (isGlobal()) {
+            return true;
         }
-        return inRange(targetDay, startDayUTC.get());
+        if (container != null) {
+            return container.notGlobalEntryVisibleOnDay(this, targetDay);
+        }
+        // fallback to iterating the recurrence set
+        return inRange(targetDay, getNearestEventDay(targetDay));
     }
     
-    public boolean isVisibleExact(long targetTimestamp) {
-        long targetDay = daysUTCFromMsUTC(targetTimestamp);
-        if (recurrenceSet != null) {
-            if (targetTimestamp > endMsUTC + durationMsUTC) {
+    private boolean isVisibleExact(long targetMsUTC) {
+        // global entries are visible everywhere, no need to do anything more
+        if (isGlobal()) {
+            return true;
+        }
+        long targetDayUTC = daysUTCFromMsUTC(targetMsUTC);
+        
+        if (container != null) {
+            EntryType entryType = container.getEntryType(this, targetDayUTC);
+            if (entryType == EntryType.EXPIRED) {
+                // expired are always hidden
                 return false;
             }
-            return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
-                // we overshot
-                if (instanceStartDay - upcomingDayOffset.getToday() > targetDay) {
-                    return false;
-                }
-                if (inRange(targetDay, instanceStartDay)) {
-                    return instanceStartMsUTC + durationMsUTC >= targetTimestamp;
-                }
-                return null;
-            }, false);
+            if (entryType == EntryType.UPCOMING) {
+                // upcoming are always visible
+                return true;
+            }
         }
-        return inRange(targetDay, startDayUTC.get()) && (startMsUTC + durationMsUTC >= targetTimestamp);
-    }
-    
-    boolean rangesOverlap(long x1, long x2, long y1, long y2) {
-        return x2 >= y1 && x1 <= y2;
+        
+        if (!isFromSystemCalendar()) {
+            // local events don't have timestamps, just check one range
+            return inRange(targetDayUTC, startDayUTC.get()) && startMsUTC + durationMsUTC >= targetMsUTC;
+        }
+        
+        long nearestStartMsUTC = getNearestCalendarEventMsUTC(targetDayUTC);
+        long nearestDayUTC = daysUTCFromMsUTC(nearestStartMsUTC);
+        
+        return inRange(targetDayUTC, nearestDayUTC) && nearestStartMsUTC + durationMsUTC >= targetMsUTC;
     }
     
     private void addDayRangeToSet(long dayFrom, long dayTo,
@@ -669,14 +679,14 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         long currentExpiredDayOffset = this.expiredDayOffset.getToday();
         
         if (recurrenceSet != null) {
-            iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
+            iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDayUTC) -> {
                 
                 // overshot
-                if (instanceStartDay + currentUpcomingDayOffset > maxDay) {
+                if (instanceStartDayUTC + currentUpcomingDayOffset > maxDay) {
                     return false;
                 }
                 
-                addDayRangeToSets(instanceStartDay, instanceStartDay + durationDays.get(),
+                addDayRangeToSets(instanceStartDayUTC, instanceStartDayUTC + durationDays.get(),
                         minDay, maxDay,
                         // offsets
                         currentExpiredDayOffset, currentUpcomingDayOffset,
@@ -700,7 +710,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public void getVisibleDaysOnCalendar(@NonNull final CalendarView calendarView,
                                          @NonNull final Set<Long> daySet, RangeType rangeType) {
-        getVisibleDays(calendarView.getFirstLoadedDay(), calendarView.getLastLoadedDay(),
+        getVisibleDays(calendarView.getFirstLoadedDayUTC(), calendarView.getLastLoadedDayUTC(),
                 rangeType == RangeType.CORE ? daySet : null,
                 rangeType == RangeType.EXPIRED_UPCOMING ? daySet : null);
     }
@@ -709,7 +719,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     public Set<Long> getVisibleDaysOnCalendar(@NonNull final CalendarView calendarView,
                                               RangeType rangeType) {
         // we don't care about global entries, they are handled differently
-        if(isGlobal()) {
+        if (isGlobal()) {
             return Collections.emptySet();
         }
         Set<Long> daySet = new ArraySet<>();
@@ -755,14 +765,15 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return hideByContent;
     }
     
-    public long getNearestEventTimestamp(long targetDay) {
+    public long getNearestCalendarEventMsUTC(long targetDayUTC) {
+        if (targetDayUTC >= endDayUTC.get()) {
+            // no need to iterate, we already overshot
+            return endMsUTC;
+        }
         if (recurrenceSet != null) {
-            if (targetDay >= endDayUTC.get()) {
-                return endMsUTC;
-            }
-            return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDay) -> {
+            return iterateRecurrenceSet(startMsUTC, event.timeZone, (instanceStartMsUTC, instanceStartDayUTC) -> {
                 // if in range or overshoot
-                if (inRange(targetDay, instanceStartDay) || instanceStartDay >= targetDay) {
+                if (inRange(targetDayUTC, instanceStartDayUTC) || instanceStartDayUTC >= targetDayUTC) {
                     return instanceStartMsUTC;
                 }
                 return null;
@@ -773,32 +784,34 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public long getNearestEventDay(long day) {
         if (isFromSystemCalendar()) {
-            return daysUTCFromMsUTC(getNearestEventTimestamp(day));
+            return daysUTCFromMsUTC(getNearestCalendarEventMsUTC(day));
         }
         return startDayUTC.get();
     }
     
-    public EntryType getEntryType(long targetDay) {
+    public EntryType getEntryType(long targetDayUTC) {
         
         if (isGlobal()) {
             return EntryType.GLOBAL;
         }
         
         // in case of regular entry this will return startDay
-        long nearestDay = getNearestEventDay(targetDay);
+        long nearestDayLocal = getNearestEventDay(targetDayUTC);
         
-        if (nearestDay == targetDay) {
+        if (nearestDayLocal == targetDayUTC) {
             return EntryType.TODAY;
         }
         
-        if (targetDay + upcomingDayOffset.getToday() >= nearestDay
-                && targetDay < nearestDay) {
+        // extended range covers but still less that nearestDayLocal
+        if (targetDayUTC + upcomingDayOffset.getToday() >= nearestDayLocal
+                && targetDayUTC < nearestDayLocal) {
             return EntryType.UPCOMING;
         }
         
-        // for regular entries durationDays = 0
-        if (targetDay - expiredDayOffset.getToday() <= nearestDay + durationDays.get()
-                && targetDay > nearestDay + durationDays.get()) {
+        // NOTE: for regular entries durationDays = 0
+        // extended range covers but more that nearestDayLocal
+        if (targetDayUTC - expiredDayOffset.getToday() <= nearestDayLocal + durationDays.get()
+                && targetDayUTC > nearestDayLocal + durationDays.get()) {
             return EntryType.EXPIRED;
         }
         
@@ -806,13 +819,12 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public boolean isGlobal() {
-        // startDay = endDay for not calendar entries, so we can use any
         return startDayUTC.get() == Keys.DAY_FLAG_GLOBAL;
     }
     
     public String getTimeSpan(Context context) {
         
-        if (event == null) {
+        if (!isFromSystemCalendar()) {
             return "";
         }
         

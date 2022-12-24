@@ -2,7 +2,6 @@ package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
 import static android.util.Log.WARN;
-import static prototype.xd.scheduler.utilities.DateManager.systemTimeZone;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
@@ -26,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import prototype.xd.scheduler.utilities.Keys;
 
@@ -42,7 +40,7 @@ public class SystemCalendar {
     public final long id;
     public final int accessLevel;
     
-    public final TimeZone timeZone;
+    public final String timeZoneId;
     public final String displayName;
     public final int color;
     
@@ -60,13 +58,13 @@ public class SystemCalendar {
         prefKey = account_name + "_" + displayName;
         visibilityKey = prefKey + "_" + Keys.VISIBLE;
         
-        String timeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
+        String calTimeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
         
-        if(timeZoneId.isEmpty()) {
-            log(WARN, NAME, "Calendar " + prefKey + " has no timezone, defaulting to system timezone");
-            timeZone = systemTimeZone;
+        if(calTimeZoneId.isEmpty()) {
+            log(WARN, NAME, "Calendar " + prefKey + " has no timezone, defaulting to UTC");
+            this.timeZoneId = "UTC";
         } else {
-            timeZone = TimeZone.getTimeZone(timeZoneId);
+            this.timeZoneId = calTimeZoneId;
         }
         
         systemCalendarEvents = new ArrayList<>();

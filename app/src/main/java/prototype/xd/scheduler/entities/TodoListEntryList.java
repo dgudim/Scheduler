@@ -121,7 +121,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     private void linkEntryToLookupContainers(TodoListEntry entry, long minDay, long maxDay) {
-        if(entry.isGlobal()) {
+        if (entry.isGlobal()) {
             // don't link global entries
             return;
         }
@@ -196,7 +196,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     public TodoListEntry.EntryType getEntryType(TodoListEntry entry, long day) {
-        if (globalEntries.contains(entry)) {
+        if (entry.isGlobal()) {
             return TodoListEntry.EntryType.GLOBAL;
         }
         Set<Long> extendedDays = daysPerEntryUpcomingExpired.get(entry);
@@ -241,6 +241,12 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         return sortEntries(filtered, day);
     }
     
+    // fast lookup instead of iterating the recurrence set (does not check for global entries)
+    public boolean notGlobalEntryVisibleOnDay(TodoListEntry entry, long targetDayLocal) {
+        Set<Long> extendedDays = daysPerEntryUpcomingExpired.get(entry);
+        return extendedDays != null && extendedDays.contains(targetDayLocal);
+    }
+    
     public void notifyEntryVisibilityChanged(TodoListEntry entry,
                                              CalendarView calendarView,
                                              boolean coreDaysChanged,
@@ -253,7 +259,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         
         // entry was global and now it's normal we unlink it from global container and link to normal container
         if (globalEntries.remove(entry)) {
-            TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(calendarView.getFirstLoadedDay(), calendarView.getLastLoadedDay());
+            TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(calendarView.getFirstLoadedDayUTC(), calendarView.getLastLoadedDayUTC());
             linkEntryToLookupContainers(entry, newDaySet);
             invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
             return;
@@ -270,7 +276,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         }
         
         // all the other cases (not global entries)
-        TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(calendarView.getFirstLoadedDay(), calendarView.getLastLoadedDay());
+        TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(calendarView.getFirstLoadedDayUTC(), calendarView.getLastLoadedDayUTC());
         
         invalidatedDaySet.addAll(displayUpcomingExpired ?
                 // update changed days

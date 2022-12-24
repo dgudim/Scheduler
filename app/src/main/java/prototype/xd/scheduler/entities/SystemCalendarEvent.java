@@ -85,64 +85,68 @@ public class SystemCalendarEvent {
         
         String timeZoneId = getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE);
         
-        timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? associatedCalendar.timeZone.getID() : timeZoneId);
+        timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? associatedCalendar.timeZoneId : timeZoneId);
         
         durationMs = endMsUTC - startMsUTC;
         
         rRule_str = getString(cursor, calendarEventsColumns, Events.RRULE);
         rDate_str = getString(cursor, calendarEventsColumns, Events.RDATE);
         if (rRule_str.length() > 0) {
-            try {
-                rSet = new RecurrenceSet();
-                
-                rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
-                
-                if (rDate_str.length() > 0) {
-                    try {
-                        DateTimeZonePair pair = checkRDates(rDate_str);
-                        rSet.addInstances(new RecurrenceList(pair.date, pair.timeZone));
-                    } catch (IllegalArgumentException e) {
-                        log(ERROR, NAME, "Error adding rDate: " + e.getMessage());
-                    }
-                }
-                
-                exRule_str = getString(cursor, calendarEventsColumns, Events.EXRULE);
-                exDate_str = getString(cursor, calendarEventsColumns, Events.EXDATE);
-                
-                if (exRule_str.length() > 0) {
-                    try {
-                        rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule_str)));
-                    } catch (IllegalArgumentException e) {
-                        log(ERROR, NAME, "Error adding exRule: " + e.getMessage());
-                    }
-                }
-                
-                if (exDate_str.length() > 0) {
-                    try {
-                        DateTimeZonePair pair = checkRDates(exDate_str);
-                        rSet.addExceptions(new RecurrenceList(pair.date, pair.timeZone));
-                    } catch (IllegalArgumentException e) {
-                        log(ERROR, NAME, "Error adding exDate: " + e.getMessage());
-                    }
-                }
-                
-                String durationStr = getString(cursor, calendarEventsColumns, Events.DURATION);
-                
-                if (durationStr.length() > 0) {
-                    durationMs = rfc2445ToMilliseconds(durationStr);
-                }
-                
-                endMsUTC = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, startMsUTC);
-            } catch (Exception e) {
-                logException(NAME, e);
-            }
+            loadRecurrenceRules(cursor);
         }
-        
+    
         // shorten the event a little because it's bounds are on midnight and that breaks stuff
         if (isAllDay) {
             endMsUTC -= ONE_MINUTE_MS;
             startMsUTC += ONE_MINUTE_MS;
             durationMs -= 2 * ONE_MINUTE_MS;
+        }
+    }
+    
+    private void loadRecurrenceRules(Cursor cursor) {
+        try {
+            rSet = new RecurrenceSet();
+        
+            rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRule_str)));
+        
+            if (rDate_str.length() > 0) {
+                try {
+                    DateTimeZonePair pair = checkRDates(rDate_str);
+                    rSet.addInstances(new RecurrenceList(pair.date, pair.timeZone));
+                } catch (IllegalArgumentException e) {
+                    log(ERROR, NAME, "Error adding rDate: " + e.getMessage());
+                }
+            }
+        
+            exRule_str = getString(cursor, calendarEventsColumns, Events.EXRULE);
+            exDate_str = getString(cursor, calendarEventsColumns, Events.EXDATE);
+        
+            if (exRule_str.length() > 0) {
+                try {
+                    rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRule_str)));
+                } catch (IllegalArgumentException e) {
+                    log(ERROR, NAME, "Error adding exRule: " + e.getMessage());
+                }
+            }
+        
+            if (exDate_str.length() > 0) {
+                try {
+                    DateTimeZonePair pair = checkRDates(exDate_str);
+                    rSet.addExceptions(new RecurrenceList(pair.date, pair.timeZone));
+                } catch (IllegalArgumentException e) {
+                    log(ERROR, NAME, "Error adding exDate: " + e.getMessage());
+                }
+            }
+        
+            String durationStr = getString(cursor, calendarEventsColumns, Events.DURATION);
+        
+            if (durationStr.length() > 0) {
+                durationMs = rfc2445ToMilliseconds(durationStr);
+            }
+        
+            endMsUTC = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, startMsUTC);
+        } catch (Exception e) {
+            logException(NAME, e);
         }
     }
     
@@ -238,19 +242,19 @@ public class SystemCalendarEvent {
     public boolean fallsInRange(long dayStart, long dayEnd) {
         if (rSet != null) {
             RecurrenceSetIterator it = rSet.iterator(timeZone, startMsUTC);
-            long instance = 0;
-            while (it.hasNext() && daysUTCFromMsUTC(instance) <= dayEnd) {
-                instance = it.next();
-                if (rangesOverlap(instance, instance + durationMs, dayStart, dayEnd)) {
+            long instanceMsUTC = 0;
+            while (it.hasNext() && daysUTCFromMsUTC(instanceMsUTC) <= dayEnd) {
+                instanceMsUTC = it.next();
+                if (instanceVisible(instanceMsUTC, instanceMsUTC + durationMs, dayStart, dayEnd)) {
                     return true;
                 }
             }
             return false;
         }
-        return rangesOverlap(startMsUTC, endMsUTC, dayStart, dayEnd);
+        return instanceVisible(startMsUTC, endMsUTC, dayStart, dayEnd);
     }
     
-    private boolean rangesOverlap(long startMsUTC, long endMsUTC, long dayStart, long dayEnd) {
+    private boolean instanceVisible(long startMsUTC, long endMsUTC, long dayStart, long dayEnd) {
         return daysUTCFromMsUTC(startMsUTC) <= dayEnd &&
                 daysUTCFromMsUTC(endMsUTC) >= dayStart;
     }

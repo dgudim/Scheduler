@@ -212,15 +212,19 @@ public class Utilities {
         callback.launch(Intent.createChooser(chooseImage, "Choose an image"));
     }
     
-    public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long day) {
+    public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long targetDay) {
         
         for (TodoListEntry entry : entries) {
             // Look at {@link prototype.xd.scheduler.entities.TodoListEntry.EntryType}
-            entry.setSortingIndex(entry.getEntryType(day).ordinal());
+            entry.setSortingIndex(entry.getEntryType(targetDay).ordinal());
+            if(entry.isFromSystemCalendar()) {
+                // obtain nearest start ms near a particular day for use in sorting later
+                entry.cacheNearestStartMsUTC(targetDay);
+            }
         }
         
         entries.sort(new TodoListEntryEntryTypeComparator());
-        entries.sort(new TodoListEntryGroupComparator(day));
+        entries.sort(new TodoListEntryGroupComparator());
         entries.sort(new TodoListEntryPriorityComparator());
         return entries;
     }
@@ -407,6 +411,10 @@ public class Utilities {
         }
     }
     
+    public static boolean rangesOverlap(long x1, long x2, long y1, long y2) {
+        return x2 >= y1 && x1 <= y2;
+    }
+    
     /**
      * Colorize a specific substring in a string for TextView. Use it like this: <pre>
      * textView.setText(
@@ -517,17 +525,10 @@ class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
 }
 
 class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
-    
-    final long day;
-    
-    public TodoListEntryGroupComparator(long day) {
-        this.day = day;
-    }
-    
     @Override
     public int compare(TodoListEntry o1, TodoListEntry o2) {
         if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
-            return Long.compare(o1.getNearestEventTimestamp(day), o2.getNearestEventTimestamp(day));
+            return Long.compare(o1.getCachedNearestStartMsUTC(), o2.getCachedNearestStartMsUTC());
         }
         return Integer.compare(o1.getRawGroupName().hashCode(), o2.getRawGroupName().hashCode());
     }
