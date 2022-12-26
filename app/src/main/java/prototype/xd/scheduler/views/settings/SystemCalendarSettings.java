@@ -99,7 +99,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 context, lifecycle,
                 bnd.backgroundColorState, this,
                 Keys.BG_COLOR,
-                value -> value.get(calendarSubKeys)));
+                value -> value.get(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
         
         bnd.borderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,

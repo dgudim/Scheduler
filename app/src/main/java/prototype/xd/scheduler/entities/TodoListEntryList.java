@@ -39,8 +39,8 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     final Set<TodoListEntry> globalEntries;
     
     private boolean displayUpcomingExpired;
-    private long loadedDay_start;
-    private long loadedDay_end;
+    private long firstLoadedDay;
+    private long lastLoadedDay;
     
     public TodoListEntryList(int initialCapacity) {
         super(initialCapacity);
@@ -52,26 +52,26 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     public void initLoadingRange(long dayStart, long dayEnd) {
-        loadedDay_start = dayStart;
-        loadedDay_end = dayEnd;
+        firstLoadedDay = dayStart;
+        lastLoadedDay = dayEnd;
     }
     
     // extend to the left
     public void extendLoadingRangeStartDay(long newDayStart) {
         for (TodoListEntry entry : this) {
             // we know that newDayStart is smaller than previous loadedDay_start
-            linkEntryToLookupContainers(entry, newDayStart, loadedDay_start - 1);
+            linkEntryToLookupContainers(entry, newDayStart, firstLoadedDay - 1);
         }
-        loadedDay_start = newDayStart;
+        firstLoadedDay = newDayStart;
     }
     
     // extend to the right
     public void extendLoadingRangeEndDay(long newDayEnd) {
         for (TodoListEntry entry : this) {
             // we know that newDayStart is bigger than previous loadedDay_start
-            linkEntryToLookupContainers(entry, loadedDay_end + 1, newDayEnd);
+            linkEntryToLookupContainers(entry, lastLoadedDay + 1, newDayEnd);
         }
-        loadedDay_end = newDayEnd;
+        lastLoadedDay = newDayEnd;
     }
     
     // handle unlinking
@@ -169,7 +169,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
             }
             
             // add all the associations to entriesPerDay and daysPerEntry
-            linkEntryToLookupContainers(newEntry, loadedDay_start, loadedDay_end);
+            linkEntryToLookupContainers(newEntry, firstLoadedDay, lastLoadedDay);
         }
     }
     
@@ -259,7 +259,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         
         // entry was global and now it's normal we unlink it from global container and link to normal container
         if (globalEntries.remove(entry)) {
-            TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(calendarView.getFirstLoadedDayUTC(), calendarView.getLastLoadedDayUTC());
+            TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
             linkEntryToLookupContainers(entry, newDaySet);
             invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
             return;
@@ -276,7 +276,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         }
         
         // all the other cases (not global entries)
-        TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(calendarView.getFirstLoadedDayUTC(), calendarView.getLastLoadedDayUTC());
+        TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
         
         invalidatedDaySet.addAll(displayUpcomingExpired ?
                 // update changed days

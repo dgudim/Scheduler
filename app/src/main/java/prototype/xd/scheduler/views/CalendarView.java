@@ -278,6 +278,10 @@ public class CalendarView {
     }
     
     public void notifyDayChanged(long targetDayUTC) {
+        if(targetDayUTC < getFirstLoadedDayUTC() || targetDayUTC > getLastLoadedDayUTC()) {
+            // day is not loaded, skip it
+            return;
+        }
         DayPosition dayPosition = DayPosition.MonthDate;
         if (targetDayUTC < firstSelectedMonthDayUTC) {
             dayPosition = DayPosition.InDate;
