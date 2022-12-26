@@ -3,10 +3,6 @@ package prototype.xd.scheduler.utilities;
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.groupIndexInList;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
-import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.fancyHideUnhideView;
 
 import android.app.Dialog;
@@ -237,46 +233,34 @@ public class DialogUtilities {
         attachDialogToLifecycle(builder.show(), lifecycle, dismissListener);
     }
     
-    //color dialogue for general settings
-    public static void invokeColorDialogue(@NonNull final Context context,
-                                           @NonNull final Lifecycle lifecycle,
-                                           final ColorPickerKeyedClickListener clickListener,
-                                           final String key,
-                                           final int defaultValue) {
-        invokeColorDialogue(context, lifecycle, preferences.getInt(key, defaultValue),
-                (dialogInterface, lastSelectedColor, allColors) ->
-                        clickListener.onClick(dialogInterface, lastSelectedColor, key, allColors));
+    //color dialog for general settings
+    public static void invokeColorDialog(@NonNull final Context context,
+                                         @NonNull final Lifecycle lifecycle,
+                                         final ColorPickerColorSelectionListener clickListener,
+                                         final Keys.DefaultedInteger defaultedInteger) {
+        invokeColorDialog(context, lifecycle, defaultedInteger.get(),
+                (dialog, selectedColor, allColors) ->
+                        clickListener.onClick(defaultedInteger, selectedColor));
     }
     
-    //color dialogue for entry settings
-    public static void invokeColorDialogue(@NonNull final Context context,
-                                           @NonNull final Lifecycle lifecycle,
-                                           final TextView stateIcon,
-                                           final PopupSettingsView settingsView,
-                                           final String parameterKey,
-                                           final Function<String, Integer> initialValueFactory) {
-        invokeColorDialogue(context, lifecycle,
-                initialValueFactory.apply(parameterKey), (dialog, selectedColor, allColors) -> {
-                    settingsView.notifyParameterChanged(stateIcon, parameterKey, selectedColor);
-                    switch (parameterKey) {
-                        case FONT_COLOR:
-                            settingsView.updatePreviewFont(selectedColor);
-                            break;
-                        case BORDER_COLOR:
-                            settingsView.updatePreviewBorder(selectedColor);
-                            break;
-                        case BG_COLOR:
-                        default:
-                            settingsView.updatePreviewBg(selectedColor);
-                            break;
-                    }
+    //color dialog for entry settings
+    public static void invokeColorDialog(@NonNull final Context context,
+                                         @NonNull final Lifecycle lifecycle,
+                                         final TextView stateIcon,
+                                         final PopupSettingsView settingsView,
+                                         final Keys.DefaultedInteger defaultedInteger,
+                                         final Function<Keys.DefaultedInteger, Integer> initialValueFactory) {
+        invokeColorDialog(context, lifecycle,
+                initialValueFactory.apply(defaultedInteger), (dialog, selectedColor, allColors) -> {
+                    settingsView.notifyParameterChanged(stateIcon, defaultedInteger.key, selectedColor);
+                    settingsView.notifyColorChanged(defaultedInteger, selectedColor);
                 });
     }
     
-    public static void invokeColorDialogue(@NonNull final Context context,
-                                           @NonNull Lifecycle lifecycle,
-                                           final int initialValue,
-                                           @NonNull ColorPickerClickListener listener) {
+    public static void invokeColorDialog(@NonNull final Context context,
+                                         @NonNull Lifecycle lifecycle,
+                                         final int initialValue,
+                                         @NonNull ColorPickerClickListener listener) {
         attachDialogToLifecycle(ColorPickerDialogBuilder
                 .with(context)
                 .setTitle(context.getString(R.string.choose_color))
@@ -290,8 +274,8 @@ public class DialogUtilities {
     }
     
     @FunctionalInterface
-    public interface ColorPickerKeyedClickListener {
-        void onClick(DialogInterface dialogInterface, int lastSelectedColor, String colorKey, Integer[] allColors);
+    public interface ColorPickerColorSelectionListener {
+        void onClick(Keys.DefaultedInteger defaultedInteger, int selectedColor);
     }
     
 }

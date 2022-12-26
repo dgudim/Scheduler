@@ -18,7 +18,6 @@ import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
@@ -184,29 +183,30 @@ public class HomeFragment extends Fragment {
         
         // when all entries are loaded, update current month
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
-            updateStatusText();
             // update adapter showing entries
             todoListEntryManager.notifyEntryListChanged();
             // update calendar updating indicators
             todoListEntryManager.notifyVisibleDaysChanged();
+            // finally, update the status text with entry count
+            updateStatusText();
         }));
         
-        if (preferences.getBoolean(SERVICE_FAILED, false)) {
+        if (SERVICE_FAILED.get()) {
             // display warning if the background service failed
             displayMessageDialog(requireContext(), getLifecycle(),
                     R.string.service_error, R.string.service_error_description,
                     R.drawable.ic_warning, R.string.close,
                     R.style.ErrorAlertDialogTheme,
-                    dialog -> preferences.edit().putBoolean(SERVICE_FAILED, false).apply());
+                    dialog -> SERVICE_FAILED.put(false));
         }
         
-        if (preferences.getBoolean(WALLPAPER_OBTAIN_FAILED, false)) {
+        if (WALLPAPER_OBTAIN_FAILED.get()) {
             // display warning if there wan an error getting the wallpaper
             displayMessageDialog(requireContext(), getLifecycle(),
                     R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description,
                     R.drawable.ic_warning, R.string.close,
                     R.style.ErrorAlertDialogTheme,
-                    dialog -> preferences.edit().putBoolean(WALLPAPER_OBTAIN_FAILED, false).apply());
+                    dialog -> WALLPAPER_OBTAIN_FAILED.put(false));
         }
     }
     

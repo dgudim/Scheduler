@@ -2,6 +2,7 @@ package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
 
+import androidx.annotation.NonNull;
 import androidx.core.os.LocaleListCompat;
 
 import java.text.DateFormat;
@@ -11,6 +12,7 @@ import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +34,8 @@ public class DateManager {
     public static long currentlySelectedDayUTC = DAY_FLAG_GLOBAL;
     public static long currentlySelectedTimestampUTC = DAY_FLAG_GLOBAL;
     
-    private static final Locale systemLocale = LocaleListCompat.getDefault().get(0);
+    @NonNull
+    public static final Locale systemLocale = Objects.requireNonNull(LocaleListCompat.getDefault().get(0));
     private static final DateFormat dateTimeFormat = new SimpleDateFormat("dd/MM HH:mm", systemLocale);
     
     private static final DateFormat dateFormat = new SimpleDateFormat("dd/MM", systemLocale);

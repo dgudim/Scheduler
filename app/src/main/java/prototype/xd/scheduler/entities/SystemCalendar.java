@@ -3,7 +3,6 @@ package prototype.xd.scheduler.entities;
 import static android.provider.CalendarContract.Calendars;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
@@ -152,7 +151,7 @@ public class SystemCalendar {
     }
     
     public boolean isVisible() {
-        return preferences.getBoolean(visibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE);
+        return Keys.getBoolean(visibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE);
     }
     
     public List<SystemCalendarEvent> getVisibleTodoListEvents(long dayStart, long dayEnd) {

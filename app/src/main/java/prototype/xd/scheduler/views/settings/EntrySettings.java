@@ -4,7 +4,6 @@ import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayGroupAdditionEditDialog;
-import static prototype.xd.scheduler.utilities.DialogUtilities.invokeColorDialogue;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
@@ -27,6 +26,7 @@ import java.util.List;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 
@@ -58,7 +58,11 @@ public class EntrySettings extends PopupSettingsView {
         todoListEntry = entry;
         
         updateAllIndicators();
-        updatePreviews(todoListEntry.fontColor.getToday(), todoListEntry.bgColor.getToday(), todoListEntry.borderColor.getToday(), todoListEntry.borderThickness.getToday());
+        updatePreviews(
+                todoListEntry.fontColor.getToday(),
+                todoListEntry.bgColor.getToday(),
+                todoListEntry.borderColor.getToday(),
+                todoListEntry.borderThickness.getToday());
         
         final List<Group> groupList = todoListEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
@@ -136,19 +140,19 @@ public class EntrySettings extends PopupSettingsView {
                             rebuild(context);
                         }));
         
-        bnd.fontColorSelector.setOnClickListener(view -> invokeColorDialogue(
+        bnd.fontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.fontColorState, this,
                 FONT_COLOR,
                 parameterKey -> entry.fontColor.getToday()));
         
-        bnd.backgroundColorSelector.setOnClickListener(view -> invokeColorDialogue(
+        bnd.backgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.backgroundColorState, this,
                 BG_COLOR,
                 parameterKey -> entry.bgColor.getToday()));
         
-        bnd.borderColorSelector.setOnClickListener(view -> invokeColorDialogue(
+        bnd.borderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.borderColorState, this,
                 BORDER_COLOR,
@@ -186,14 +190,14 @@ public class EntrySettings extends PopupSettingsView {
             Utilities.setSliderChangeListener(
                     bnd.showDaysUpcomingDescription,
                     bnd.showDaysUpcomingBar, bnd.showDaysUpcomingState,
-                    this, null, R.string.settings_show_days_upcoming,
+                    this, null, R.plurals.settings_show_days_upcoming,
                     UPCOMING_ITEMS_OFFSET,
                     parameterKey -> entry.upcomingDayOffset.getToday());
             
             Utilities.setSliderChangeListener(
                     bnd.showDaysExpiredDescription,
                     bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
-                    this, null, R.string.settings_show_days_expired,
+                    this, null, R.plurals.settings_show_days_expired,
                     EXPIRED_ITEMS_OFFSET,
                     parameterKey -> entry.expiredDayOffset.getToday());
         }

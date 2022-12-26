@@ -2,7 +2,6 @@ package prototype.xd.scheduler;
 
 import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 
 import android.annotation.SuppressLint;
@@ -62,8 +61,7 @@ public class CalendarSettingsFragment extends BaseSettingsFragment<ConcatAdapter
                         .add(calendar);
             }
             
-            boolean showSettings =
-                    preferences.getBoolean(Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS, Keys.SETTINGS_DEFAULT_ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS);
+            boolean showSettings = Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS.get();
             
             for (List<SystemCalendar> calendarGroup : sortedCalendars.values()) {
                 
@@ -90,7 +88,7 @@ public class CalendarSettingsFragment extends BaseSettingsFragment<ConcatAdapter
         }, "SSCFetch thread").start();
         
         staticEntries.add(new SwitchSettingsEntryConfig(
-                Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS, Keys.SETTINGS_DEFAULT_ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
+                Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
                 getString(R.string.settings_allow_global_calendar_account_settings), (buttonView, isChecked) -> {
             if (isChecked) {
                 displayMessageDialog(requireContext(), getLifecycle(),

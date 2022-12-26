@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="category_appearance">Внешний вид</string>
     <string name="category_visibility">Видимость</string>
     <string name="category_system_calendars">Интеграция с системным календарём</string>
     <string name="apply">Применить</string>
     <string name="choose_color">Выберите цвет</string>
-    <string name="item_N_days_ago_double">(%d дней назад)</string>
-    <string name="item_N_days_ago_single">(%d дня назад)</string>
-    <string name="item_in_N_days_double">(Через %d дней)</string>
-    <string name="item_in_N_days_single">(Через %d дня)</string>
-    <string name="item_in_more_than_in_a_month">(> чем через месяц)</string>
-    <string name="item_more_than_a_month_ago">(> месяца назад)</string>
     <string name="add_current_config_as_group_message">(Параметры, которые были изменены вручную (Зеленые или синие ромбики), будут добавлены в группу)</string>
     <string name="add_group">Добавить группу</string>
-    <string name="delete_group">Удалить группу</string>
     <string name="delete">Удалить</string>
     <string name="are_you_sure">Вы уверены?</string>
     <string name="save">Сохранить</string>
     <string name="edit">Изменить</string>
     <string name="edit_event">Изменить событие</string>
     <string name="item_global">(Общее)</string>
-    <string name="item_tomorrow">(Завтра)</string>
+    <plurals name="item_N_days_ago">
+        <item quantity="many">(%d дней назад)</item>
+        <item quantity="one">(%d день назад)</item>
+        <item quantity="few">(%d дня назад)</item>
+        <item quantity="other">(%d дня назад)</item>
+    </plurals>
+    <string name="item_in_more_than_in_a_month">(> чем через месяц)</string>
+    <string name="item_more_than_a_month_ago">(> месяца назад)</string>
     <string name="item_yesterday">(Вчера)</string>
+    <string name="item_tomorrow">(Завтра)</string>
+    <plurals name="item_in_N_days">
+        <item quantity="many">(через %d дней)</item>
+        <item quantity="one">(через %d день)</item>
+        <item quantity="few">(через %d дня)</item>
+        <item quantity="other">(через %d дня)</item>
+    </plurals>
     <string name="add_current_config_as_group_prompt">Добавить текущую конфигурацию как группу?</string>
     <string name="name">Название</string>
     <string name="title">Название</string>
@@ -51,14 +58,28 @@
     <string name="permission_request_description">Пожалуйста, предоставьте разрешения для корректной работы приложения</string>
     <string name="permission_request">Запрос разрешений</string>
     <string name="calendar_event_all_day">весь день</string>
-    <string name="calendar_events_full">%d событий</string>
-    <string name="calendar_events">%d соб.</string>
+    <plurals name="calendar_event_count">
+        <item quantity="few">%d события</item>
+        <item quantity="one">%d событие</item>
+        <item quantity="many">%d событий</item>
+        <item quantity="other">%d событий</item>
+    </plurals>
     <string name="title_color_default">дефолт</string>
     <string name="add_event_fab">Добавить событие</string>
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
     <string name="settings_adaptive_color_balance">Слияние с фоном: %s</string>
-    <string name="settings_show_days_expired">Показывать события после %d дня/дней</string>
-    <string name="settings_show_days_upcoming">Показывать события за %d дня/дней</string>
+    <plurals name="settings_show_days_expired">
+        <item quantity="many">Показывать события после %d дней</item>
+        <item quantity="one">Показывать события после %d день</item>
+        <item quantity="few">Показывать события после %d дня</item>
+        <item quantity="other">Показывать события после %d дня</item>
+    </plurals>
+    <plurals name="settings_show_days_upcoming">
+        <item quantity="many">Показывать события за %d дней</item>
+        <item quantity="one">Показывать события за %d день</item>
+        <item quantity="few">Показывать события за %d дня</item>
+        <item quantity="other">Показывать события за %d дня</item>
+    </plurals>
     <string name="settings_bg_color">Фон</string>
     <string name="settings_border_color">Контур</string>
     <string name="settings_text_color">Шрифт</string>
@@ -128,7 +149,6 @@
     <string name="wallpaper_obtain_error_description">Произошла ошибка при попытке получить обои экрана блокировки :( Попробуйте установить обои вручную и перезапустить приложение. Если проблема не устранится, возможно, ваше устройство ограничивает доступ к фону или вы удалили и переустановили приложение, но вы можете написать мне, возможно я помогу.</string>
     <string name="service_error_description">Произошла ошибка в фоновом сервисе установки обоев :( Попробуйте перезапустить приложение. Если проблема не устранится, напишите мне.</string>
     <string name="show_upcoming_and_expired_event_indicators">Показывать прошедшие и будущие события в календаре</string>
-    <string name="ignore">Игнорировать</string>
     <string name="work_in_progress">В процессе</string>
     <string name="easter_egg">Хэй, ты нашел пасхалку!</string>
     <string name="easter_egg_description">Ну, больше сказать нечего, хорошая работа :)</string>

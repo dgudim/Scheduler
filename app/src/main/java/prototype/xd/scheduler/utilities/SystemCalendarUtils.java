@@ -2,7 +2,6 @@ package prototype.xd.scheduler.utilities;
 
 import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;
@@ -87,7 +86,7 @@ public class SystemCalendarUtils {
         return todoListEntries;
     }
     
-    public static List<String> generateSubKeysFromKey(String calendarKey) {
+    public static List<String> generateSubKeysFromCalendarKey(String calendarKey) {
         List<String> calendarSubKeys = new ArrayList<>();
         String[] splitKey = calendarKey.split("_");
         StringBuilder buffer = new StringBuilder();
@@ -119,32 +118,6 @@ public class SystemCalendarUtils {
             default:
                 return new SpannableString(calendarKey);
         }
-    }
-    
-    public static int getFirstValidKeyIndex(List<String> calendarSubKeys, String parameter) {
-        for (int i = calendarSubKeys.size() - 1; i >= 0; i--) {
-            try {
-                if (preferences.getString(calendarSubKeys.get(i) + "_" + parameter, null) != null) {
-                    return i;
-                }
-            } catch (ClassCastException e) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
-    public static boolean getFirstValidBooleanValue(List<String> calendarSubKeys, String parameterKey, boolean defaultValue) {
-        return preferences.getBoolean(getFirstValidKey(calendarSubKeys, parameterKey), defaultValue);
-    }
-    
-    public static int getFirstValidIntValue(List<String> calendarSubKeys, String parameter, int defaultValue) {
-        return preferences.getInt(getFirstValidKey(calendarSubKeys, parameter), defaultValue);
-    }
-    
-    public static String getFirstValidKey(List<String> calendarSubKeys, String parameter) {
-        int index = getFirstValidKeyIndex(calendarSubKeys, parameter);
-        return index == -1 ? parameter : calendarSubKeys.get(index) + "_" + parameter;
     }
     
     // FOR DEBUGGING
@@ -184,13 +157,13 @@ public class SystemCalendarUtils {
     //    cursor.moveToFirst();
     //}
     
-    public static String addSpaces(String input, int len) {
-        StringBuilder out = new StringBuilder(input);
-        for (int i = input.length(); i < len; i++) {
-            out.append(" ");
-        }
-        return out.toString();
-    }
+    //public static String addSpaces(String input, int len) {
+    //    StringBuilder out = new StringBuilder(input);
+    //    for (int i = input.length(); i < len; i++) {
+    //        out.append(" ");
+    //    }
+    //    return out.toString();
+    //}
     
     
 }

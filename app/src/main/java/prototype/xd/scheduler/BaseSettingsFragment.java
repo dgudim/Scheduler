@@ -1,8 +1,6 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
+import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Utilities.findFragmentInNavHost;
 
 import android.content.DialogInterface;
@@ -20,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.Map;
 
 import prototype.xd.scheduler.databinding.SettingsFragmentBinding;
+import prototype.xd.scheduler.utilities.Keys;
 
 public class BaseSettingsFragment <T extends RecyclerView.Adapter<?>> extends DialogFragment {
     
@@ -33,17 +32,15 @@ public class BaseSettingsFragment <T extends RecyclerView.Adapter<?>> extends Di
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = SettingsFragmentBinding.inflate(inflater, container, false);
-        preferenceStateBefore = preferences.getAll();
+        preferenceStateBefore = Keys.getAll();
         return binding.getRoot();
     }
     
     // dialog dismissed (user pressed back button)
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
-        servicePreferences.edit()
-                .putBoolean(SERVICE_UPDATE_SIGNAL, true)
-                .apply();
-        if(!preferenceStateBefore.equals(preferences.getAll())) {
+        setBitmapUpdateFlag();
+        if(!preferenceStateBefore.equals(Keys.getAll())) {
             findFragmentInNavHost(requireActivity(), HomeFragment.class).invalidateAll();
         }
         super.onDismiss(dialog);

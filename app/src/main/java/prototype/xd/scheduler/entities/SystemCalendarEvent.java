@@ -12,7 +12,7 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromKey;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromCalendarKey;
 import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
 
 import android.database.Cursor;
@@ -35,7 +35,7 @@ public class SystemCalendarEvent {
     
     protected @Nullable
     TodoListEntry associatedEntry;
-    protected SystemCalendar associatedCalendar;
+    protected final SystemCalendar associatedCalendar;
     
     public List<String> subKeys;
     private String prefKey;
@@ -76,7 +76,7 @@ public class SystemCalendarEvent {
         isAllDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
         
         prefKey = associatedCalendar.makeKey(color);
-        subKeys = generateSubKeysFromKey(prefKey);
+        subKeys = generateSubKeysFromCalendarKey(prefKey);
         
         String timeZoneId = getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE);
         
@@ -227,8 +227,8 @@ public class SystemCalendarEvent {
     
     private static class DateTimeZonePair {
         
-        String date;
-        TimeZone timeZone;
+        final String date;
+        final TimeZone timeZone;
         
         DateTimeZonePair(String date, TimeZone timeZone) {
             this.date = date;

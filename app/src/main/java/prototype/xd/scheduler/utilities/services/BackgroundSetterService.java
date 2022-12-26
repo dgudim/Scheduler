@@ -2,14 +2,13 @@ package prototype.xd.scheduler.utilities.services;
 
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
+import static prototype.xd.scheduler.utilities.Keys.clearBitmapUpdateFlag;
+import static prototype.xd.scheduler.utilities.Keys.getBitmapUpdateFlag;
+import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimeString;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.Keys.PREFERENCES_SERVICE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -29,7 +28,6 @@ import androidx.core.content.ContextCompat;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.PreferencesStore;
 
 public class BackgroundSetterService extends Service {
     
@@ -124,7 +122,6 @@ public class BackgroundSetterService extends Service {
     }
     
     private void updateNotification() {
-        servicePreferences.edit().putLong(Keys.LAST_UPDATE_TIME, getCurrentTimestampUTC()).apply();
         getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTimeString()));
         notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
     }
@@ -138,10 +135,10 @@ public class BackgroundSetterService extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        PreferencesStore.init(this);
+        Keys.initPrefs(this);
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
-                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                setBitmapUpdateFlag();
                 log(DEBUG, NAME, "Received ping (keep alive job)");
             } else {
                 log(DEBUG, NAME, "Received general ping");
@@ -153,14 +150,12 @@ public class BackgroundSetterService extends Service {
             initialized = true;
             log(DEBUG, NAME, "Received ping (initial)");
             
-            servicePreferences = getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
-            
             screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    if (!lastUpdateSucceeded || servicePreferences.getBoolean(SERVICE_UPDATE_SIGNAL, false)) {
+                    if (!lastUpdateSucceeded || getBitmapUpdateFlag()) {
                         ping(context);
-                        servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, false).apply();
+                        clearBitmapUpdateFlag();
                         log(DEBUG, NAME, "Sent ping (on - off receiver)");
                     }
                     log(DEBUG, NAME, "Receiver state: " + intent.getAction());

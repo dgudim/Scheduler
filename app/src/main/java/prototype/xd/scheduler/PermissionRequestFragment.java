@@ -38,7 +38,7 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     
     private PermissionsRequestFragmentBinding bnd;
     
-    ActivityResultLauncher<Intent> batteryOptimizationLauncher = registerForActivityResult(
+    final ActivityResultLauncher<Intent> batteryOptimizationLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> refreshPermissionStates(true));
     

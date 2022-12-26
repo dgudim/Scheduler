@@ -7,13 +7,13 @@ import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -28,6 +28,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -63,12 +64,8 @@ public class Utilities {
     
     private static final String NAME = "Utilities";
     
-    public static String getRootDir() {
-        return preferences.getString(ROOT_DIR, "");
-    }
-    
     public static File getFile(String filename) {
-        return new File(getRootDir(), filename);
+        return new File(ROOT_DIR.get(), filename);
     }
     
     private Utilities() {
@@ -217,7 +214,7 @@ public class Utilities {
         for (TodoListEntry entry : entries) {
             // Look at {@link prototype.xd.scheduler.entities.TodoListEntry.EntryType}
             entry.setSortingIndex(entry.getEntryType(targetDay).ordinal());
-            if(entry.isFromSystemCalendar()) {
+            if (entry.isFromSystemCalendar()) {
                 // obtain nearest start ms near a particular day for use in sorting later
                 entry.cacheNearestStartMsUTC(targetDay);
             }
@@ -231,35 +228,34 @@ public class Utilities {
     
     @FunctionalInterface
     public interface SliderOnChangeKeyedListener {
-        void onValueChanged(@NonNull Slider slider, float value, boolean fromUser, String key);
+        void onValueChanged(@NonNull Slider slider, int sliderValue, boolean fromUser, Keys.DefaultedInteger value);
     }
     
     //listener for general settings
     public static void setSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
                                                @Nullable final SliderOnChangeKeyedListener onChangeListener,
-                                               @StringRes final int stringResource,
-                                               final String key,
-                                               final int defaultValue,
+                                               @StringRes @PluralsRes final int stringResource,
+                                               Keys.DefaultedInteger value,
                                                boolean zeroIsOff) {
-        int loadedVal = preferences.getInt(key, defaultValue);
+        int loadedVal = value.get();
         Context context = displayTo.getContext();
         if (loadedVal == 0 && zeroIsOff) {
             displayTo.setText(context.getString(stringResource, context.getString(R.string.off)));
         } else {
-            displayTo.setText(displayTo.getContext().getString(stringResource, loadedVal));
+            displayTo.setText(getQuantityString(context, stringResource, loadedVal));
         }
         slider.clearOnChangeListeners();
-        slider.setValue(preferences.getInt(key, defaultValue));
+        slider.setValue(loadedVal);
         slider.addOnChangeListener((listenerSlider, progress, fromUser) -> {
             if (fromUser) {
                 if (progress == 0 && zeroIsOff) {
                     displayTo.setText(context.getString(stringResource, context.getString(R.string.off)));
                 } else {
-                    displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
+                    displayTo.setText(getQuantityString(context, stringResource, (int) progress));
                 }
                 if (onChangeListener != null) {
-                    onChangeListener.onValueChanged(listenerSlider, progress, true, key);
+                    onChangeListener.onValueChanged(listenerSlider, (int) progress, true, value);
                 }
             }
         });
@@ -272,7 +268,7 @@ public class Utilities {
             
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
-                preferences.edit().putInt(key, (int) slider.getValue()).apply();
+                value.put((int) slider.getValue());
             }
         });
     }
@@ -283,20 +279,20 @@ public class Utilities {
                                                final TextView stateIcon,
                                                final PopupSettingsView settingsView,
                                                @Nullable final View borderView,
-                                               @StringRes final int stringResource,
-                                               final String parameterKey,
-                                               final Function<String, Integer> initialValueFactory,
+                                               @StringRes @PluralsRes final int stringResource,
+                                               final Keys.DefaultedInteger value,
+                                               final Function<Keys.DefaultedInteger, Integer> initialValueFactory,
                                                final Slider.OnChangeListener customProgressListener,
                                                final Slider.OnSliderTouchListener customTouchListener) {
-        int initialValue = initialValueFactory.apply(parameterKey);
-        displayTo.setText(displayTo.getContext().getString(stringResource, initialValue));
+        int initialValue = initialValueFactory.apply(value);
+        displayTo.setText(getQuantityString(displayTo.getContext(), stringResource, initialValue));
         slider.clearOnChangeListeners();
         slider.setValue(initialValue);
         slider.addOnChangeListener((slider1, progress, fromUser) -> {
             if (customProgressListener != null)
                 customProgressListener.onValueChange(slider1, progress, fromUser);
             if (fromUser) {
-                displayTo.setText(displayTo.getContext().getString(stringResource, (int) progress));
+                displayTo.setText(getQuantityString(displayTo.getContext(), stringResource, (int) progress));
                 if (borderView != null) {
                     borderView.setPadding((int) progress, (int) progress, (int) progress, 0);
                 }
@@ -312,27 +308,32 @@ public class Utilities {
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 if (customTouchListener != null) customTouchListener.onStopTrackingTouch(slider);
-                settingsView.notifyParameterChanged(stateIcon, parameterKey, (int) slider.getValue());
+                settingsView.notifyParameterChanged(stateIcon, value.key, (int) slider.getValue());
             }
         });
     }
     
     // without custom listeners
-    public static void setSliderChangeListener(final TextView displayTo, final Slider slider,
-                                               final TextView stateIcon, final PopupSettingsView systemCalendarSettings,
-                                               @Nullable final View borderView, final int stringResource,
-                                               final String parameterKey, final Function<String, Integer> initialValueFactory) {
+    public static void setSliderChangeListener(final TextView displayTo,
+                                               final Slider slider,
+                                               final TextView stateIcon,
+                                               final PopupSettingsView systemCalendarSettings,
+                                               @Nullable final View borderView,
+                                               @StringRes @PluralsRes final int stringResource,
+                                               final Keys.DefaultedInteger value,
+                                               final Function<Keys.DefaultedInteger, Integer> initialValueFactory) {
         setSliderChangeListener(
                 displayTo, slider, stateIcon, systemCalendarSettings, borderView,
-                stringResource, parameterKey, initialValueFactory, null, null);
+                stringResource, value, initialValueFactory, null, null);
     }
     
     //switch listener for regular settings
-    public static void setSwitchChangeListener(final Switch tSwitch, final String key, boolean defaultValue,
+    public static void setSwitchChangeListener(final Switch tSwitch,
+                                               final Keys.DefaultedBoolean defaultedBoolean,
                                                @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
-        tSwitch.setCheckedSilent(preferences.getBoolean(key, defaultValue));
+        tSwitch.setCheckedSilent(defaultedBoolean.get());
         tSwitch.setOnCheckedChangeListener((switchView, isChecked) -> {
-            preferences.edit().putBoolean(key, isChecked).apply();
+            defaultedBoolean.put(isChecked);
             if (onCheckedChangeListener != null) {
                 onCheckedChangeListener.onCheckedChanged(switchView, isChecked);
             }
@@ -343,15 +344,29 @@ public class Utilities {
     public static void setSwitchChangeListener(final Switch tSwitch,
                                                final TextView stateIcon,
                                                final PopupSettingsView settingsView,
-                                               final String parameterKey,
-                                               final Function<String, Boolean> initialValueFactory) {
-        tSwitch.setCheckedSilent(initialValueFactory.apply(parameterKey));
+                                               final Keys.DefaultedBoolean value,
+                                               final Function<Keys.DefaultedBoolean, Boolean> initialValueFactory) {
+        tSwitch.setCheckedSilent(initialValueFactory.apply(value));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
-                settingsView.notifyParameterChanged(stateIcon, parameterKey, isChecked));
+                settingsView.notifyParameterChanged(stateIcon, value.key, isChecked));
+    }
+    
+    // accept normal and plural single arg strings
+    public static String getQuantityString(@NonNull Context context, @StringRes @PluralsRes int resId, int quantity) {
+        Resources res = context.getResources();
+        if(res.getResourceTypeName(resId).equals("plurals")) {
+            return res.getQuantityString(resId, quantity, quantity);
+        }
+        return res.getString(resId, quantity);
+    }
+    
+    // utility method for getting plural string
+    public static String getPluralString(@NonNull Context context, @PluralsRes int resId, int quantity) {
+        return context.getResources().getQuantityString(resId, quantity, quantity);
     }
     
     // opens a url in default browser (context)
-    public static void openUrl(Context context, String url) {
+    public static void openUrl(@NonNull Context context, String url) {
         context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
     

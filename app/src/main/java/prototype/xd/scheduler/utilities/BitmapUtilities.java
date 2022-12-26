@@ -3,7 +3,6 @@ package prototype.xd.scheduler.utilities;
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,8 +25,8 @@ public class BitmapUtilities {
     public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output) throws IOException {
         bitmap = makeMutable(bitmap);
         Bitmap cutBitmap = createScaledBitmap(bitmap,
-                preferences.getInt(DISPLAY_METRICS_WIDTH, 100),
-                preferences.getInt(DISPLAY_METRICS_HEIGHT, 100),
+                DISPLAY_METRICS_WIDTH.get(),
+                DISPLAY_METRICS_HEIGHT.get(),
                 ScalingLogic.CROP);
         fingerPrintBitmap(cutBitmap);
         
@@ -176,7 +175,7 @@ public class BitmapUtilities {
         int blueBucket = 0;
         
         int nonBlackPixelCount = 0;
-    
+        
         for (int color : pixels) {
             int red = (color >> 16) & 0xFF;
             int green = (color >> 8) & 0xFF;

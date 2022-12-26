@@ -2,25 +2,30 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.SEEK_BAR;
 
+import androidx.annotation.PluralsRes;
+import androidx.annotation.StringRes;
+
 import prototype.xd.scheduler.databinding.SeekbarSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 
 public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
     
     private final int seekMin;
     private final int seekMax;
-    private final int defaultValue;
     private final boolean zeroIsOff;
-    private final String key;
+    private final Keys.DefaultedInteger value;
+    @PluralsRes @StringRes
     private final int stringResource;
     private final boolean discrete;
     
-    public SeekBarSettingsEntryConfig(int seekMin, int seekMax, int defaultValue, boolean discrete, boolean zeroIfOff, String key, int stringResource) {
+    public SeekBarSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax,
+                                      boolean discrete, boolean zeroIfOff,
+                                      @StringRes @PluralsRes int stringResource) {
         this.seekMin = seekMin;
         this.seekMax = seekMax;
-        this.defaultValue = defaultValue;
         this.zeroIsOff = zeroIfOff;
-        this.key = key;
+        this.value = value;
         this.stringResource = stringResource;
         this.discrete = discrete;
     }
@@ -44,8 +49,9 @@ public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
             Utilities.setSliderChangeListener(
                     viewBinding.seekBarDescription, viewBinding.slider,
                     null,
-                    config.stringResource, config.key,
-                    config.defaultValue, config.zeroIsOff);
+                    config.stringResource,
+                    config.value,
+                    config.zeroIsOff);
         }
     }
 }

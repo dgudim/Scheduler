@@ -6,6 +6,7 @@ import static java.lang.Math.min;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
+import static prototype.xd.scheduler.utilities.DateManager.systemLocale;
 import static prototype.xd.scheduler.utilities.Utilities.datesEqual;
 
 import android.content.Context;
@@ -133,11 +134,11 @@ public class CalendarView {
             if (binding.weekdayTitlesContainer.getTag() == null) {
                 binding.weekdayTitlesContainer.setTag(calendarMonth.getYearMonth());
                 for (int i = 0; i < daysOfWeek.size(); i++) {
-                    ((TextView) binding.weekdayTitlesContainer.getChildAt(i)).setText(daysOfWeek.get(i).getDisplayName(TextStyle.SHORT, Locale.getDefault()));
+                    ((TextView) binding.weekdayTitlesContainer.getChildAt(i)).setText(daysOfWeek.get(i).getDisplayName(TextStyle.SHORT, systemLocale));
                 }
             }
-            binding.monthTitle.setText(String.format(Locale.getDefault(), "%s %d",
-                    calendarMonth.getYearMonth().getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()),
+            binding.monthTitle.setText(String.format(systemLocale, "%s %d",
+                    calendarMonth.getYearMonth().getMonth().getDisplayName(TextStyle.FULL_STANDALONE, systemLocale),
                     calendarMonth.getYearMonth().getYear()));
         }
     }
@@ -162,7 +163,7 @@ public class CalendarView {
     private long firstBoundDayUTC = 0;
     private long lastBoundDayUTC = 0;
     
-    com.kizitonwose.calendar.view.CalendarView rootCalendarView;
+    final com.kizitonwose.calendar.view.CalendarView rootCalendarView;
     @Nullable
     DateChangeListener dateChangeListener;
     @Nullable

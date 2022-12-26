@@ -7,12 +7,10 @@ import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
@@ -73,23 +71,17 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
     
-    TodoListEntry.ParameterInvalidationListener parameterInvalidationListener = new TodoListEntry.ParameterInvalidationListener() {
+    final TodoListEntry.ParameterInvalidationListener parameterInvalidationListener = new TodoListEntry.ParameterInvalidationListener() {
         @Override
         public void parametersInvalidated(TodoListEntry entry, Set<String> parameters) {
-            // in case of completed status changes or associated day changes the entry may not be visible on the lockscreen now but was before
-            if (entry.isVisibleOnLockscreenToday()) {
-                setBitmapUpdateFlag();
-            }
             
             boolean coreDaysChanged = parameters.contains(START_DAY_UTC) ||
                     parameters.contains(END_DAY_UTC);
             
             // parameters that change event range
-            if (parameters.contains(UPCOMING_ITEMS_OFFSET) ||
-                    parameters.contains(EXPIRED_ITEMS_OFFSET) ||
+            if (parameters.contains(UPCOMING_ITEMS_OFFSET.key) ||
+                    parameters.contains(EXPIRED_ITEMS_OFFSET.key) ||
                     coreDaysChanged) {
-                
-                setBitmapUpdateFlag();
                 
                 todoListEntries.notifyEntryVisibilityChanged(
                         entry,
@@ -98,7 +90,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                         daysToRebind);
                 
                 // changes indicators
-            } else if (parameters.contains(BG_COLOR) || parameters.contains(IS_COMPLETED)) {
+            } else if (parameters.contains(BG_COLOR.key) || parameters.contains(IS_COMPLETED)) {
                 entry.getVisibleDaysOnCalendar(
                         calendarView, daysToRebind,
                         displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE);
@@ -107,6 +99,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             // we should save the entries but now now because sometimes we change parameters frequently
             // and we don't want to call save function 10 time when we use a slider
             shouldSaveEntries = true;
+            setBitmapUpdateFlag();
         }
     };
     
@@ -203,9 +196,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     public void updateStaticVarsAndCalendarVisibility() {
-        displayUpcomingExpired = preferences.getBoolean(
-                Keys.SHOW_UPCOMING_EXPIRED_IN_LIST,
-                Keys.SETTINGS_DEFAULT_SHOW_UPCOMING_EXPIRED_IN_LIST);
+        displayUpcomingExpired = Keys.SHOW_UPCOMING_EXPIRED_IN_LIST.get();
         
         todoListEntries.setUpcomingExpiredVisibility(displayUpcomingExpired);
         
@@ -377,10 +368,6 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     public void saveGroupsAsync() {
         wakeUpAndSave(SaveType.GROUPS);
-    }
-    
-    public void setBitmapUpdateFlag() {
-        servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
     }
     
     // entry added / removed

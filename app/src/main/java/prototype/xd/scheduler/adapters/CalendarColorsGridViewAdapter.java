@@ -1,5 +1,7 @@
 package prototype.xd.scheduler.adapters;
 
+import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +59,7 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         
         ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(color);
         view.findViewById(R.id.title_default).setVisibility(calendarColor == color ? View.VISIBLE : View.GONE);
-        ((TextView) view.findViewById(R.id.event_count)).setText(view.getContext().getString(R.string.calendar_events, count));
+        ((TextView) view.findViewById(R.id.event_count)).setText(getPluralString(view.getContext(), R.plurals.calendar_event_count, count));
         view.findViewById(R.id.settings).setOnClickListener(v -> systemCalendarSettings.show(calendar.makeKey(color), color));
         
         return view;

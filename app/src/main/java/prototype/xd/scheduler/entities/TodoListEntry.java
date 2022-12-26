@@ -9,8 +9,7 @@ import static prototype.xd.scheduler.utilities.DateManager.datetimeStringFromMsU
 import static prototype.xd.scheduler.utilities.DateManager.daysUTCFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCFromDaysUTC;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getFirstValidKey;
+import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
 
 import android.content.Context;
@@ -48,7 +47,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     static class CachedGetter<T> {
         
-        ParameterGetter<T> parameterGetter;
+        final ParameterGetter<T> parameterGetter;
         
         T value;
         boolean valid = false;
@@ -86,13 +85,15 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public static class Parameter<T> {
         
-        TodoListEntry entry;
+        final TodoListEntry entry;
         
-        CachedGetter<T> todayCachedGetter;
-        Function<String, T> loadedParameterConverter;
+        final CachedGetter<T> todayCachedGetter;
+        final Function<String, T> loadedParameterConverter;
         @Nullable
+        final
         CachedGetter<T> upcomingCachedGetter;
         @Nullable
+        final
         CachedGetter<T> expiredCachedGetter;
         
         Parameter(TodoListEntry entry,
@@ -224,14 +225,14 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     private static ArrayMap<String, Parameter<?>> mapParameters(TodoListEntry entry) {
         ArrayMap<String, Parameter<?>> parameterMap = new ArrayMap<>(8);
-        parameterMap.put(Keys.BG_COLOR, entry.bgColor);
-        parameterMap.put(Keys.FONT_COLOR, entry.fontColor);
-        parameterMap.put(Keys.BORDER_COLOR, entry.borderColor);
-        parameterMap.put(Keys.BORDER_THICKNESS, entry.borderThickness);
-        parameterMap.put(Keys.PRIORITY, entry.priority);
-        parameterMap.put(Keys.EXPIRED_ITEMS_OFFSET, entry.expiredDayOffset);
-        parameterMap.put(Keys.UPCOMING_ITEMS_OFFSET, entry.upcomingDayOffset);
-        parameterMap.put(Keys.ADAPTIVE_COLOR_BALANCE, entry.adaptiveColorBalance);
+        parameterMap.put(Keys.BG_COLOR.key, entry.bgColor);
+        parameterMap.put(Keys.FONT_COLOR.key, entry.fontColor);
+        parameterMap.put(Keys.BORDER_COLOR.key, entry.borderColor);
+        parameterMap.put(Keys.BORDER_THICKNESS.key, entry.borderThickness);
+        parameterMap.put(Keys.PRIORITY.key, entry.priority);
+        parameterMap.put(Keys.EXPIRED_ITEMS_OFFSET.key, entry.expiredDayOffset);
+        parameterMap.put(Keys.UPCOMING_ITEMS_OFFSET.key, entry.upcomingDayOffset);
+        parameterMap.put(Keys.ADAPTIVE_COLOR_BALANCE.key, entry.adaptiveColorBalance);
         return parameterMap;
     }
     
@@ -293,57 +294,50 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void initParameters() {
-        bgColor = new Parameter<>(this, Keys.BG_COLOR,
+        bgColor = new Parameter<>(this, Keys.BG_COLOR.key,
                 previousValue -> {
-                    int defaultColor = Keys.SETTINGS_DEFAULT_REGULAR_EVENT_BG_COLOR;
                     if (isFromSystemCalendar()) {
-                        defaultColor = Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(event.color);
+                        return Keys.BG_COLOR.get(event.subKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(event.color));
                     }
-                    return preferences.getInt(getAppropriateKey(Keys.BG_COLOR), defaultColor);
+                    return Keys.BG_COLOR.get();
                 },
                 Integer::parseInt,
-                todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
-                todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
-        fontColor = new Parameter<>(this, Keys.FONT_COLOR,
-                previousValue -> preferences.getInt(getAppropriateKey(Keys.FONT_COLOR), Keys.SETTINGS_DEFAULT_FONT_COLOR),
+                todayValue -> mixTwoColors(todayValue, Keys.UPCOMING_BG_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
+                todayValue -> mixTwoColors(todayValue, Keys.EXPIRED_BG_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+        fontColor = new Parameter<>(this, Keys.FONT_COLOR.key,
+                previousValue -> Keys.FONT_COLOR.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
-                todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
-        borderColor = new Parameter<>(this, Keys.BORDER_COLOR,
-                previousValue -> preferences.getInt(getAppropriateKey(Keys.BORDER_COLOR), Keys.SETTINGS_DEFAULT_BORDER_COLOR),
+                todayValue -> mixTwoColors(todayValue, Keys.UPCOMING_FONT_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
+                todayValue -> mixTwoColors(todayValue, Keys.EXPIRED_FONT_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+        borderColor = new Parameter<>(this, Keys.BORDER_COLOR.key,
+                previousValue -> Keys.BORDER_COLOR.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
-                todayValue -> mixTwoColors(todayValue,
-                        preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
-        borderThickness = new Parameter<>(this, Keys.BORDER_THICKNESS,
-                previousValue -> preferences.getInt(getAppropriateKey(Keys.BORDER_THICKNESS), Keys.SETTINGS_DEFAULT_BORDER_THICKNESS),
+                todayValue -> mixTwoColors(todayValue, Keys.UPCOMING_BORDER_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
+                todayValue -> mixTwoColors(todayValue, Keys.EXPIRED_BORDER_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+        borderThickness = new Parameter<>(this, Keys.BORDER_THICKNESS.key,
+                previousValue -> Keys.BORDER_THICKNESS.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS),
-                todayValue -> preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS));
-        priority = new Parameter<>(this, Keys.PRIORITY,
+                todayValue -> Keys.UPCOMING_BORDER_THICKNESS.get(),
+                todayValue -> Keys.EXPIRED_BORDER_THICKNESS.get());
+        priority = new Parameter<>(this, Keys.PRIORITY.key,
                 previousValue -> isFromSystemCalendar() ?
-                        preferences.getInt(getFirstValidKey(event.subKeys, Keys.PRIORITY), Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY) :
-                        Keys.ENTRY_SETTINGS_DEFAULT_PRIORITY,
+                        Keys.PRIORITY.get(event.subKeys) :
+                        Keys.PRIORITY.defaultValue, // there is no default setting for priority
                 Integer::parseInt,
                 null,
                 null);
-        expiredDayOffset = new Parameter<>(this, Keys.EXPIRED_ITEMS_OFFSET,
-                previousValue -> preferences.getInt(getAppropriateKey(Keys.EXPIRED_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_EXPIRED_ITEMS_OFFSET),
+        expiredDayOffset = new Parameter<>(this, Keys.EXPIRED_ITEMS_OFFSET.key,
+                previousValue -> Keys.EXPIRED_ITEMS_OFFSET.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
-        upcomingDayOffset = new Parameter<>(this, Keys.UPCOMING_ITEMS_OFFSET,
-                previousValue -> preferences.getInt(getAppropriateKey(Keys.UPCOMING_ITEMS_OFFSET), Keys.SETTINGS_DEFAULT_UPCOMING_ITEMS_OFFSET),
+        upcomingDayOffset = new Parameter<>(this, Keys.UPCOMING_ITEMS_OFFSET.key,
+                previousValue -> Keys.UPCOMING_ITEMS_OFFSET.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
-        adaptiveColorBalance = new Parameter<>(this, Keys.ADAPTIVE_COLOR_BALANCE,
-                previousValue -> preferences.getInt(getAppropriateKey(Keys.ADAPTIVE_COLOR_BALANCE), Keys.SETTINGS_DEFAULT_ADAPTIVE_COLOR_BALANCE),
+        adaptiveColorBalance = new Parameter<>(this, Keys.ADAPTIVE_COLOR_BALANCE.key,
+                previousValue -> Keys.ADAPTIVE_COLOR_BALANCE.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
@@ -547,19 +541,22 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public boolean isVisibleOnLockscreenToday() {
         if (isFromSystemCalendar()) {
-            if (!hideByContent()) {
-                boolean showOnLock;
-                if (!isAllDay && preferences.getBoolean(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, Keys.SETTINGS_DEFAULT_HIDE_EXPIRED_ENTRIES_BY_TIME)) {
-                    showOnLock = isVisibleExact(currentTimestampUTC);
-                } else {
-                    showOnLock = isVisible(currentDayUTC);
-                }
-                return showOnLock && preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.SHOW_ON_LOCK), Keys.CALENDAR_SETTINGS_DEFAULT_SHOW_ON_LOCK);
+            if (hideByContent()) {
+                return true;
             }
-            return false;
+            
+            if(!Keys.CALENDAR_SHOW_ON_LOCK.get(event.subKeys)) {
+                return false;
+            }
+            
+            if (!isAllDay && Keys.HIDE_EXPIRED_ENTRIES_BY_TIME.get()) {
+                return isVisibleExact(currentTimestampUTC);
+            } else {
+                return isVisible(currentDayUTC);
+            }
         } else {
             if (isGlobal()) {
-                return preferences.getBoolean(Keys.SHOW_GLOBAL_ITEMS_LOCK, Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LOCK);
+                return Keys.SHOW_GLOBAL_ITEMS_LOCK.get();
             }
             return !isCompleted() && isVisible(currentDayUTC);
         }
@@ -755,8 +752,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     public boolean hideByContent() {
         if (!isFromSystemCalendar()) return false;
         boolean hideByContent = false;
-        if (preferences.getBoolean(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT), Keys.SETTINGS_DEFAULT_HIDE_ENTRIES_BY_CONTENT)) {
-            String matchString = preferences.getString(getFirstValidKey(event.subKeys, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT), "");
+        if (Keys.HIDE_ENTRIES_BY_CONTENT.get(event.subKeys)) {
+            String matchString = Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT.get(event.subKeys);
             String[] split = !matchString.isEmpty() ? matchString.split("\\|\\|") : new String[0];
             for (String str : split) {
                 hideByContent = rawTextValue.get().contains(str);
@@ -845,12 +842,13 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    // get calendar key for calendar entries and regular key for normal entries
-    private String getAppropriateKey(String key) {
+    // get calendar key for calendar entries and null for normal entries
+    @Nullable
+    private List<String> getSubKeys() {
         if (isFromSystemCalendar()) {
-            return getFirstValidKey(event.subKeys, key);
+            return event.subKeys;
         }
-        return key;
+        return null;
     }
     
     public boolean isAdaptiveColorEnabled() {
@@ -885,38 +883,16 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
             
             if (dayShift < 31 && dayShift > -31) {
                 if (dayShift > 0) {
-                    switch (dayShift) {
-                        case (1):
-                            dayOffset = context.getString(R.string.item_tomorrow);
-                            break;
-                        case (2):
-                        case (3):
-                        case (4):
-                        case (22):
-                        case (23):
-                        case (24):
-                            dayOffset = context.getString(R.string.item_in_N_days_single, dayShift);
-                            break;
-                        default:
-                            dayOffset = context.getString(R.string.item_in_N_days_double, dayShift);
-                            break;
+                    if (dayShift == 1) {
+                        dayOffset = context.getString(R.string.item_tomorrow);
+                    } else {
+                        dayOffset = getPluralString(context, R.plurals.item_in_N_days, dayShift - 1);
                     }
                 } else if (dayShift < 0) {
-                    switch (dayShift) {
-                        case (-1):
-                            dayOffset = context.getString(R.string.item_yesterday);
-                            break;
-                        case (-2):
-                        case (-3):
-                        case (-4):
-                        case (-22):
-                        case (-23):
-                        case (-24):
-                            dayOffset = context.getString(R.string.item_N_days_ago_single, -dayShift);
-                            break;
-                        default:
-                            dayOffset = context.getString(R.string.item_N_days_ago_double, -dayShift);
-                            break;
+                    if (dayShift == -1) {
+                        dayOffset = context.getString(R.string.item_yesterday);
+                    } else {
+                        dayOffset = getPluralString(context, R.plurals.item_N_days_ago, -dayShift + 1);
                     }
                 }
             } else {

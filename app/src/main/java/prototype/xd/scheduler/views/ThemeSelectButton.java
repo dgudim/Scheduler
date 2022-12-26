@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.Keys.APP_THEME_LIGHT;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_SYSTEM;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_APP_THEME;
 import static prototype.xd.scheduler.utilities.Keys.appThemes;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -27,17 +26,17 @@ public class ThemeSelectButton extends MaterialButton {
         super(context, attrs);
         
         AtomicReference<Integer> themeIndex = new AtomicReference<>(0);
-        AtomicReference<Byte> themeId = new AtomicReference<>(DEFAULT_APP_THEME);
+        AtomicReference<Integer> themeId = new AtomicReference<>(DEFAULT_APP_THEME);
         
         if (!isInEditMode()) {
-            themeId.set((byte) preferences.getInt(Keys.APP_THEME, DEFAULT_APP_THEME));
+            themeId.set(Keys.APP_THEME.get());
             themeIndex.set(appThemes.indexOf(themeId.get()));
             
             setOnClickListener(v -> {
                 themeIndex.set((themeIndex.get() + 1) % appThemes.size());
                 themeId.set(appThemes.get(themeIndex.get()));
                 AppCompatDelegate.setDefaultNightMode(themeId.get());
-                preferences.edit().putInt(Keys.APP_THEME, themeId.get()).apply();
+                Keys.APP_THEME.put(themeId.get());
                 updateThemeIcon(themeId.get());
             });
         }
@@ -45,7 +44,7 @@ public class ThemeSelectButton extends MaterialButton {
         updateThemeIcon(themeId.get());
     }
     
-    private void updateThemeIcon(byte themeId) {
+    private void updateThemeIcon(int themeId) {
         switch (themeId) {
             case APP_THEME_DARK:
                 setIconResource(R.drawable.ic_theme_dark);

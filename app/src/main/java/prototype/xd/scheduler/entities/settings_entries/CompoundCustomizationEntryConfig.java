@@ -2,16 +2,13 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
-import static prototype.xd.scheduler.utilities.DialogUtilities.invokeColorDialogue;
+
 import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
-import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-import static prototype.xd.scheduler.utilities.PreferencesStore.servicePreferences;
+import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +50,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         CompoundCustomizationViewHolder(CompoundCustomizationSettingsEntryBinding viewBinding, Lifecycle lifecycle) {
             super(viewBinding);
             
-            todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE));
+            todoItemViewType = TodoItemViewType.valueOf(TODO_ITEM_VIEW_TYPE.get());
             
             LayoutInflater layoutInflater = LayoutInflater.from(context);
             LinearLayout viewSelectionDialogView = TodoItemViewSelectionDialogBinding.inflate(layoutInflater).getRoot();
@@ -66,7 +63,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                 View view = LockScreenTodoItemView.inflateViewByType(viewType, viewSelectionDialogView, layoutInflater).getRoot();
                 view.setOnClickListener(v -> {
                     todoItemViewType = viewType;
-                    preferences.edit().putString(TODO_ITEM_VIEW_TYPE, todoItemViewType.name()).apply();
+                    TODO_ITEM_VIEW_TYPE.put(todoItemViewType.name());
                     updatePreviews();
                     viewSelectionDialog.dismiss();
                 });
@@ -78,78 +75,73 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             
             updatePreviews();
             
-            DialogUtilities.ColorPickerKeyedClickListener colorPickerClickListener = (dialog, selectedColor, key, allColors) -> {
-                preferences.edit().putInt(key, selectedColor).apply();
-                switch (key) {
-                    case Keys.UPCOMING_BG_COLOR:
-                    case Keys.BG_COLOR:
-                    case Keys.EXPIRED_BG_COLOR:
-                    
-                    case Keys.UPCOMING_FONT_COLOR:
-                    case Keys.FONT_COLOR:
-                    case Keys.EXPIRED_FONT_COLOR:
-                        updatePreviewFontsAndBgs();
-                        break;
-                    case Keys.UPCOMING_BORDER_COLOR:
-                    case Keys.BORDER_COLOR:
-                    case Keys.EXPIRED_BORDER_COLOR:
-                        updatePreviewBorders();
-                        break;
+            DialogUtilities.ColorPickerColorSelectionListener colorPickerColorSelectedListener = (value, selectedColor) -> {
+                value.put(selectedColor);
+                if (value.equals(Keys.UPCOMING_BG_COLOR) ||
+                        value.equals(Keys.BG_COLOR) ||
+                        value.equals(Keys.EXPIRED_BG_COLOR) ||
+                        value.equals(Keys.UPCOMING_FONT_COLOR) ||
+                        value.equals(Keys.FONT_COLOR) ||
+                        value.equals(Keys.EXPIRED_FONT_COLOR)) {
+                    updatePreviewFontsAndBgs();
+                } else if (value.equals(Keys.UPCOMING_BORDER_COLOR) ||
+                        value.equals(Keys.BORDER_COLOR) ||
+                        value.equals(Keys.EXPIRED_BORDER_COLOR)) {
+                    updatePreviewBorders();
                 }
-                servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL, true).apply();
+                setBitmapUpdateFlag();
             };
             
             viewBinding.backgroundColorSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_REGULAR_EVENT_BG_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.BG_COLOR));
             viewBinding.backgroundColorUpcomingSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.UPCOMING_BG_COLOR));
             viewBinding.backgroundColorExpiredSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.EXPIRED_BG_COLOR));
             
             viewBinding.fontColorSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.FONT_COLOR));
             viewBinding.fontColorUpcomingSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.UPCOMING_FONT_COLOR));
             viewBinding.fontColorExpiredSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.EXPIRED_FONT_COLOR));
             
             viewBinding.borderColorSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.BORDER_COLOR));
             viewBinding.borderColorUpcomingSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.UPCOMING_BORDER_COLOR));
             viewBinding.borderColorExpiredSelector.setOnClickListener(v ->
-                    invokeColorDialogue(context, lifecycle,
-                            colorPickerClickListener,
-                            Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR));
+                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                            colorPickerColorSelectedListener,
+                            Keys.EXPIRED_BORDER_COLOR));
             
-            Utilities.SliderOnChangeKeyedListener onChangeListener = (slider, progress, fromUser, key) -> {
-                switch (key) {
-                    case UPCOMING_BORDER_THICKNESS:
-                        updateUpcomingPreviewBorderThickness((int) progress);
-                        break;
-                    case EXPIRED_BORDER_THICKNESS:
-                        updateExpiredPreviewBorderThickness((int) progress);
-                        break;
-                    case BORDER_THICKNESS:
-                    default:
-                        updateCurrentPreviewBorderThickness((int) progress);
-                        break;
+            Utilities.SliderOnChangeKeyedListener onChangeListener = (slider, sliderValue, fromUser, value) -> {
+                if (value.equals(UPCOMING_BORDER_THICKNESS)) {
+                    updateUpcomingPreviewBorderThickness(sliderValue);
+                    return;
+                }
+                if (value.equals(EXPIRED_BORDER_THICKNESS)) {
+                    updateExpiredPreviewBorderThickness(sliderValue);
+                    return;
+                }
+                if (value.equals(BORDER_THICKNESS)) {
+                    updateCurrentPreviewBorderThickness(sliderValue);
                 }
             };
             
@@ -157,25 +149,25 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                     viewBinding.upcomingBorderThicknessText,
                     viewBinding.upcomingBorderThicknessSeekBar,
                     onChangeListener, R.string.settings_upcoming_border_thickness,
-                    Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS, true);
+                    Keys.UPCOMING_BORDER_THICKNESS, true);
             
             Utilities.setSliderChangeListener(
                     viewBinding.currentBorderThicknessText,
                     viewBinding.currentBorderThicknessSeekBar,
                     onChangeListener, R.string.settings_current_border_thickness,
-                    Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS, true);
+                    Keys.BORDER_THICKNESS, true);
             
             Utilities.setSliderChangeListener(
                     viewBinding.expiredBorderThicknessText,
                     viewBinding.expiredBorderThicknessSeekBar,
                     onChangeListener, R.string.settings_expired_border_thickness,
-                    Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS, true);
+                    Keys.EXPIRED_BORDER_THICKNESS, true);
             
             Utilities.setSliderChangeListener(
                     viewBinding.fontSizeText,
                     viewBinding.fontSizeSeekBar,
-                    (slider, value, fromUser, key) -> updatePreviewFontSize((int) value), R.string.settings_font_size,
-                    Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE, false);
+                    (slider, sliderValue, fromUser, value) -> updatePreviewFontSize(sliderValue), R.string.settings_font_size,
+                    Keys.FONT_SIZE, false);
             
         }
         
@@ -207,24 +199,24 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             updatePreviewFontsAndBgs();
             updatePreviewBorders();
             
-            updateUpcomingPreviewBorderThickness(preferences.getInt(Keys.UPCOMING_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_THICKNESS));
-            updateCurrentPreviewBorderThickness(preferences.getInt(Keys.BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_BORDER_THICKNESS));
-            updateExpiredPreviewBorderThickness(preferences.getInt(Keys.EXPIRED_BORDER_THICKNESS, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_THICKNESS));
+            updateUpcomingPreviewBorderThickness(Keys.UPCOMING_BORDER_THICKNESS.get());
+            updateCurrentPreviewBorderThickness(Keys.BORDER_THICKNESS.get());
+            updateExpiredPreviewBorderThickness(Keys.EXPIRED_BORDER_THICKNESS.get());
             
-            updatePreviewFontSize(preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE));
+            updatePreviewFontSize(Keys.FONT_SIZE.get());
         }
         
         
         public void updateUpcomingPreviewBorderThickness(int borderThickness) {
-            upcomingEntryPreview.setBorderSizeDP(borderThickness, preferences);
+            upcomingEntryPreview.setBorderSizeDP(borderThickness);
         }
         
         public void updateCurrentPreviewBorderThickness(int borderThickness) {
-            todayEntryPreview.setBorderSizeDP(borderThickness, preferences);
+            todayEntryPreview.setBorderSizeDP(borderThickness);
         }
         
         public void updateExpiredPreviewBorderThickness(int borderThickness) {
-            expiredEntryPreview.setBorderSizeDP(borderThickness, preferences);
+            expiredEntryPreview.setBorderSizeDP(borderThickness);
         }
         
         
@@ -236,18 +228,18 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         
         public void updatePreviewFontsAndBgs() {
             
-            int fontColor = preferences.getInt(Keys.FONT_COLOR, Keys.SETTINGS_DEFAULT_FONT_COLOR);
-            int fontColorUpcoming = preferences.getInt(Keys.UPCOMING_FONT_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_FONT_COLOR);
-            int fontColorExpired = preferences.getInt(Keys.EXPIRED_FONT_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_FONT_COLOR);
+            int fontColor = Keys.FONT_COLOR.get();
+            int fontColorUpcoming = Keys.UPCOMING_FONT_COLOR.get();
+            int fontColorExpired = Keys.EXPIRED_FONT_COLOR.get();
             
             viewBinding.fontColorUpcomingSelector.setCardBackgroundColor(fontColorUpcoming);
             viewBinding.fontColorSelector.setCardBackgroundColor(fontColor);
             viewBinding.fontColorExpiredSelector.setCardBackgroundColor(fontColorExpired);
             
             
-            int bgColor = preferences.getInt(Keys.BG_COLOR, Keys.SETTINGS_DEFAULT_REGULAR_EVENT_BG_COLOR);
-            int bgColorUpcoming = preferences.getInt(Keys.UPCOMING_BG_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BG_COLOR);
-            int bgColorExpired = preferences.getInt(Keys.EXPIRED_BG_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BG_COLOR);
+            int bgColor = Keys.BG_COLOR.get();
+            int bgColorUpcoming = Keys.UPCOMING_BG_COLOR.get();
+            int bgColorExpired = Keys.EXPIRED_BG_COLOR.get();
             
             viewBinding.backgroundColorUpcomingSelector.setCardBackgroundColor(bgColorUpcoming);
             viewBinding.backgroundColorSelector.setCardBackgroundColor(bgColor);
@@ -265,9 +257,9 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         
         public void updatePreviewBorders() {
             
-            int borderColor = preferences.getInt(Keys.BORDER_COLOR, Keys.SETTINGS_DEFAULT_BORDER_COLOR);
-            int borderColorUpcoming = preferences.getInt(Keys.UPCOMING_BORDER_COLOR, Keys.SETTINGS_DEFAULT_UPCOMING_BORDER_COLOR);
-            int borderColorExpired = preferences.getInt(Keys.EXPIRED_BORDER_COLOR, Keys.SETTINGS_DEFAULT_EXPIRED_BORDER_COLOR);
+            int borderColor = Keys.BORDER_COLOR.get();
+            int borderColorUpcoming = Keys.UPCOMING_BORDER_COLOR.get();
+            int borderColorExpired = Keys.EXPIRED_BORDER_COLOR.get();
             
             viewBinding.borderColorUpcomingSelector.setCardBackgroundColor(borderColorUpcoming);
             viewBinding.borderColorSelector.setCardBackgroundColor(borderColor);

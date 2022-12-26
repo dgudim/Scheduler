@@ -2,7 +2,6 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.RESET_BUTTON;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.os.Bundle;
 
@@ -12,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.Keys;
 
 public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     
@@ -42,7 +42,7 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
                             R.string.reset_settings_prompt, R.string.reset_settings_description,
                             R.string.cancel, R.string.reset,
                             view -> {
-                                preferences.edit().clear().apply();
+                                Keys.clearAll();
                                 config.fragment.onViewCreated(view, config.savedInstanceState);
                             }));
         }

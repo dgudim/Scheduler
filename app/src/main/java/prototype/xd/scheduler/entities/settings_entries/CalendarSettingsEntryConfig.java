@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
+import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 
 import android.app.AlertDialog;
 import android.content.res.ColorStateList;
@@ -56,12 +56,12 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         @Override
         void bind(CalendarSettingsEntryConfig config) {
             viewBinding.calendarName.setText(config.calendarName);
-            viewBinding.eventCount.setText(context.getString(R.string.calendar_events_full, config.calendarEventsCount));
+            viewBinding.eventCount.setText(getPluralString(context, R.plurals.calendar_event_count, config.calendarEventsCount));
             
             viewBinding.checkBox.setButtonTintList(ColorStateList.valueOf(config.calendarColor));
-            viewBinding.checkBox.setCheckedSilent(preferences.getBoolean(config.calendarKey + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
+            viewBinding.checkBox.setCheckedSilent(Keys.getBoolean(config.calendarKey + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
             viewBinding.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
-                    preferences.edit().putBoolean(config.calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
+                    Keys.edit().putBoolean(config.calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
             
             viewBinding.settingsButton.setOnClickListener(view -> config.systemCalendarSettings.show(config.calendarKey, config.calendarColor));
             config.updateSettingsButtonVisibility(viewBinding.settingsButton);

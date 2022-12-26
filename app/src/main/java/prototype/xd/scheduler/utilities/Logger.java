@@ -8,7 +8,6 @@ import static android.util.Log.VERBOSE;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTimeString;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 import static prototype.xd.scheduler.utilities.Utilities.throwOnFalse;
 
 import android.util.Log;
@@ -44,8 +43,8 @@ public class Logger {
     public static void tryInit() {
         if (!init) {
             init = true;
-            logFile = new File(preferences.getString(ROOT_DIR, ""), "log.txt");
-            logFileOld = new File(preferences.getString(ROOT_DIR, ""), "log.old.txt");
+            logFile = new File(ROOT_DIR.get(), "log.txt");
+            logFileOld = new File(ROOT_DIR.get(), "log.old.txt");
             logQueue = new LinkedBlockingQueue<>();
             try {
                 logFile.createNewFile();

@@ -3,7 +3,6 @@ package prototype.xd.scheduler;
 import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.log;
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import com.google.android.material.color.HarmonizedColorsOptions;
 import java.io.File;
 
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.PreferencesStore;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // enable warnings in debug mode
         //if (BuildConfig.DEBUG) {
-            //StrictMode.enableDefaults();
+        //StrictMode.enableDefaults();
             /* try {
             Class.forName("dalvik.system.CloseGuard")
                     .getMethod("setEnabled", boolean.class)
@@ -42,14 +40,14 @@ public class MainActivity extends AppCompatActivity {
             }*/
         //}
         
-        PreferencesStore.init(this);
+        Keys.initPrefs(this);
         
         File rootDir = getExternalFilesDir("");
         if (rootDir == null) {
             Log.e(NAME, "Shared storage not available wtf");
             System.exit(0);
-        } else if (preferences.getString(ROOT_DIR, null) == null) {
-            preferences.edit().putString(ROOT_DIR, rootDir.getAbsolutePath()).apply();
+        } else if (ROOT_DIR.get().isEmpty()) {
+            ROOT_DIR.put(rootDir.getAbsolutePath());
             log(INFO, NAME, "Root dir: " + rootDir);
             if (!rootDir.exists()) {
                 log(INFO, NAME, "Created folder structure: " + rootDir.mkdirs());
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         }
         
         // init theme
-        AppCompatDelegate.setDefaultNightMode(preferences.getInt(Keys.APP_THEME, Keys.DEFAULT_APP_THEME));
+        AppCompatDelegate.setDefaultNightMode(Keys.APP_THEME.get());
         
         HarmonizedColors.applyToContextIfAvailable(this,
                 new HarmonizedColorsOptions.Builder()
@@ -72,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         DynamicColors.applyToActivityIfAvailable(this);
         
         // switch intro activity and close current one
-        if (!preferences.getBoolean(Keys.INTRO_SHOWN, false)) {
+        if (!Keys.INTRO_SHOWN.get()) {
             // switch intro activity and close current one
             MainActivity.this.startActivity(new Intent(MainActivity.this, IntroActivity.class));
             finish();

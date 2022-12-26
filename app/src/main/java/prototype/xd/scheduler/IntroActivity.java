@@ -1,7 +1,5 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.PreferencesStore.preferences;
-
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -79,7 +77,7 @@ public class IntroActivity extends AppIntro {
         super.onDonePressed(currentFragment);
         // go back to the main activity
         IntroActivity.this.startActivity(new Intent(IntroActivity.this, MainActivity.class));
-        preferences.edit().putBoolean(Keys.INTRO_SHOWN, true).apply();
+        Keys.INTRO_SHOWN.put(true);
         finish();
     }
 }

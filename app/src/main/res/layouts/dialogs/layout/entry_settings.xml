@@ -524,7 +524,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:text="@string/settings_show_days_upcoming"
+                        android:text="@plurals/settings_show_days_upcoming"
                         android:textAppearance="@style/SmallHeading" />
 
                     <com.google.android.material.slider.Slider
@@ -576,7 +576,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:text="@string/settings_show_days_expired"
+                        android:text="@plurals/settings_show_days_expired"
                         android:textAppearance="@style/SmallHeading" />
 
                     <com.google.android.material.slider.Slider

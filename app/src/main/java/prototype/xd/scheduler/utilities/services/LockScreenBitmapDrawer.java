@@ -12,9 +12,7 @@ import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUT
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
-import static prototype.xd.scheduler.utilities.Keys.PREFERENCES;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
-import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
@@ -29,7 +27,6 @@ import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -67,31 +64,30 @@ class LockScreenBitmapDrawer {
     private volatile boolean busy = false;
     
     private final WallpaperManager wallpaperManager;
-    private final SharedPreferences preferences;
     private final LayoutInflater layoutInflater;
     
     private long previous_hash;
     
     public LockScreenBitmapDrawer(Context context) throws IllegalStateException {
         wallpaperManager = WallpaperManager.getInstance(context);
-        preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         
-        if (preferences.getFloat(DISPLAY_METRICS_DENSITY, -1) == -1) {
+        if (DISPLAY_METRICS_DENSITY.get() == -1) {
             DisplayMetrics displayMetrics = new DisplayMetrics();
             ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(displayMetrics);
             
-            preferences.edit()
-                    .putInt(DISPLAY_METRICS_WIDTH, displayMetrics.widthPixels)
-                    .putInt(DISPLAY_METRICS_HEIGHT, displayMetrics.heightPixels)
-                    .putFloat(DISPLAY_METRICS_DENSITY, displayMetrics.density).apply();
+            Keys.edit()
+                    .putInt(DISPLAY_METRICS_WIDTH.key, displayMetrics.widthPixels)
+                    .putInt(DISPLAY_METRICS_HEIGHT.key, displayMetrics.heightPixels)
+                    .putFloat(DISPLAY_METRICS_DENSITY.key, displayMetrics.density)
+                    .apply();
             
             log(INFO, NAME, "got display metrics: " + displayMetrics);
         }
         
         previous_hash = 0;
         
-        displayWidth = preferences.getInt(DISPLAY_METRICS_WIDTH, 100);
-        displayHeight = preferences.getInt(DISPLAY_METRICS_HEIGHT, 100);
+        displayWidth = DISPLAY_METRICS_WIDTH.get();
+        displayHeight = DISPLAY_METRICS_HEIGHT.get();
         
         layoutInflater = LayoutInflater.from(context);
     }
@@ -163,10 +159,10 @@ class LockScreenBitmapDrawer {
                     // relay
                     Thread.currentThread().interrupt();
                 } catch (FileNotFoundException e) {
-                    preferences.edit().putBoolean(WALLPAPER_OBTAIN_FAILED, true).apply();
+                    WALLPAPER_OBTAIN_FAILED.put(true);
                     logException(NAME, e);
                 } catch (Exception e) {
-                    preferences.edit().putBoolean(SERVICE_FAILED, true).apply();
+                    SERVICE_FAILED.put(true);
                     logException(NAME, e);
                 }
                 busy = false;
@@ -181,7 +177,7 @@ class LockScreenBitmapDrawer {
         
         Canvas canvas = new Canvas(bitmap);
         GroupList groups = loadGroups();
-        TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(preferences.getString(TODO_ITEM_VIEW_TYPE, SETTINGS_DEFAULT_TODO_ITEM_VIEW_TYPE));
+        TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(TODO_ITEM_VIEW_TYPE.get());
         // load user defined entries (from files)
         // add entries from all calendars
         // sort and filter entries
@@ -193,7 +189,7 @@ class LockScreenBitmapDrawer {
                 false), currentDayUTC);
         toAdd.removeIf(todoListEntry -> !todoListEntry.isVisibleOnLockscreenToday());
         
-        long currentHash = toAdd.hashCode() + preferences.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
+        long currentHash = toAdd.hashCode() + Keys.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {
             throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
         }
@@ -207,7 +203,7 @@ class LockScreenBitmapDrawer {
         // first pass, add all views, setup layout independent parameters
         for (TodoListEntry todoListEntry : toAdd) {
             LockScreenTodoItemView<?> itemView = LockScreenTodoItemView.inflateViewByType(todoItemViewType, rootView, layoutInflater);
-            itemView.applyLayoutIndependentParameters(todoListEntry, preferences);
+            itemView.applyLayoutIndependentParameters(todoListEntry);
             itemViews.add(itemView);
             rootView.addView(itemView.getRoot());
         }
@@ -231,7 +227,7 @@ class LockScreenBitmapDrawer {
     
     private File getBackgroundAccordingToDayAndTime() {
         
-        if (!preferences.getBoolean(Keys.ADAPTIVE_BACKGROUND_ENABLED, Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED)) {
+        if (!Keys.ADAPTIVE_BACKGROUND_ENABLED.get()) {
             return getFile(Keys.DEFAULT_BACKGROUND_NAME);
         }
         

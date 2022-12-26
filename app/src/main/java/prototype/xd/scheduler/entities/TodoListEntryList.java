@@ -29,14 +29,14 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     private static final String NAME = "TodoListEntryList";
     
     // 4 mappings for normal events
-    Map<Long, Set<TodoListEntry>> entriesPerDayCore;
-    Map<TodoListEntry, Set<Long>> daysPerEntryCore;
+    final Map<Long, Set<TodoListEntry>> entriesPerDayCore;
+    final Map<TodoListEntry, Set<Long>> daysPerEntryCore;
     
-    Map<Long, Set<TodoListEntry>> entriesPerDayUpcomingExpired;
-    Map<TodoListEntry, Set<Long>> daysPerEntryUpcomingExpired;
+    final Map<Long, Set<TodoListEntry>> entriesPerDayUpcomingExpired;
+    final Map<TodoListEntry, Set<Long>> daysPerEntryUpcomingExpired;
     
     // container for global entries
-    Set<TodoListEntry> globalEntries;
+    final Set<TodoListEntry> globalEntries;
     
     private boolean displayUpcomingExpired;
     private long loadedDay_start;

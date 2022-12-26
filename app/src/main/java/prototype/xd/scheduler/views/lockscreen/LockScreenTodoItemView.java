@@ -7,12 +7,9 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
-import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK;
-import static prototype.xd.scheduler.utilities.Keys.SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LABEL_LOCK;
 import static prototype.xd.scheduler.utilities.Keys.SHOW_GLOBAL_ITEMS_LABEL_LOCK;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,9 +28,9 @@ import prototype.xd.scheduler.utilities.Keys;
 // base class for lockscreen todolist entries
 public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
-    V viewBinding;
-    View root;
-    Context context;
+    final V viewBinding;
+    final View root;
+    final Context context;
     
     LockScreenTodoItemView(V binding) {
         viewBinding = binding;
@@ -56,8 +53,8 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     public abstract void setTimeTextColor(int color);
     
     // should not be overridden
-    public void setBorderSizeDP(int sizeDP, SharedPreferences preferences) {
-        setBorderSizePX((int) (sizeDP * preferences.getFloat(DISPLAY_METRICS_DENSITY, 1)));
+    public void setBorderSizeDP(int sizeDP) {
+        setBorderSizePX((int) (sizeDP * DISPLAY_METRICS_DENSITY.get()));
     }
     
     public abstract void setBorderSizePX(int sizePX);
@@ -84,15 +81,14 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     public abstract void hideIndicatorAndTime();
     
     
-    public void applyLayoutIndependentParameters(TodoListEntry entry, SharedPreferences preferences) {
+    public void applyLayoutIndependentParameters(TodoListEntry entry) {
         
-        int fontSizeSP = preferences.getInt(Keys.FONT_SIZE, Keys.SETTINGS_DEFAULT_FONT_SIZE);
+        int fontSizeSP = Keys.FONT_SIZE.get();
         
         // convert pixels to dp (equivalent of TypedValue.applyDimension(COMPLEX_UNIT_DIP, value, metrics))
-        setBorderSizeDP(entry.borderThickness.get(currentDayUTC), preferences);
+        setBorderSizeDP(entry.borderThickness.get(currentDayUTC));
         
-        setTitleText(entry.getTextOnDay(currentDayUTC, context,
-                preferences.getBoolean(SHOW_GLOBAL_ITEMS_LABEL_LOCK, SETTINGS_DEFAULT_SHOW_GLOBAL_ITEMS_LABEL_LOCK)));
+        setTitleText(entry.getTextOnDay(currentDayUTC, context, SHOW_GLOBAL_ITEMS_LABEL_LOCK.get()));
         setTitleTextSize(fontSizeSP * DEFAULT_TITLE_FONT_SIZE_MULTIPLIER);
         
         if (entry.isFromSystemCalendar()) {
@@ -106,7 +102,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         }
         
         viewBinding.getRoot().setLayoutParams(new LinearLayout.LayoutParams(
-                preferences.getBoolean(ITEM_FULL_WIDTH_LOCK, SETTINGS_DEFAULT_ITEM_FULL_WIDTH_LOCK) ?
+                ITEM_FULL_WIDTH_LOCK.get() ?
                         LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
     }

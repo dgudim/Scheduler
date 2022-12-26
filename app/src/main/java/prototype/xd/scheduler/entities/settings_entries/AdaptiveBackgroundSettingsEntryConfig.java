@@ -68,7 +68,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 
                 Utilities.setSwitchChangeListener(gridSelection.adaptiveBgSwitch,
                         Keys.ADAPTIVE_BACKGROUND_ENABLED,
-                        Keys.SETTINGS_DEFAULT_ADAPTIVE_BACKGROUND_ENABLED, null);
+                        null);
                 
                 gridSelection.resetBgButton.setOnClickListener(view1 ->
                         displayConfirmationDialogue(view1.getContext(), config.lifecycle,
