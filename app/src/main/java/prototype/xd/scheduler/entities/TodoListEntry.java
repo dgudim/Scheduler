@@ -21,8 +21,6 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.color.MaterialColors;
 
-import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -198,10 +196,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     // calendar event values
     public transient SystemCalendarEvent event;
-    private transient long startMsUTC = 0;
-    private transient long endMsUTC = 0;
-    private transient boolean isAllDay = true;
-    private transient RecurrenceSet recurrenceSet;
     
     public transient ParameterGetter<Long> startDayLocal;
     public transient ParameterGetter<Long> endDayLocal;
@@ -271,11 +265,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public TodoListEntry(SystemCalendarEvent event) {
         this.event = event;
-        
-        startMsUTC = event.startMsUTC;
-        endMsUTC = event.endMsUTC;
-        isAllDay = event.isAllDay;
-        recurrenceSet = event.rSet;
         
         initParameters();
         assignId(event.hashCode());
@@ -383,6 +372,15 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 isFromSystemCalendar() ? event.title : params.getOrDefault(Keys.TEXT_VALUE, "");
     }
     
+    // get calendar key for calendar entries and null for normal entries
+    @Nullable
+    private List<String> getSubKeys() {
+        if (isFromSystemCalendar()) {
+            return event.subKeys;
+        }
+        return null;
+    }
+    
     public void listenToParameterInvalidations(ParameterInvalidationListener parameterInvalidationListener) {
         if (this.parameterInvalidationListener != null) {
             log(WARN, NAME, rawTextValue.get() + " already has a parameterInvalidationListener, double assign");
@@ -425,8 +423,8 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return event != null;
     }
     
-    public boolean isRecurrent() {
-        return recurrenceSet != null;
+    public boolean isRecurring() {
+        return isFromSystemCalendar() && event.isRecurring();
     }
     
     
@@ -592,7 +590,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 return false;
             }
             
-            if (!isAllDay && Keys.HIDE_EXPIRED_ENTRIES_BY_TIME.get(event.subKeys)) {
+            if (!event.isAllDay && Keys.HIDE_EXPIRED_ENTRIES_BY_TIME.get(event.subKeys)) {
                 return isVisibleExact(currentDayUTC, currentTimestampUTC);
             }
         } else if (isGlobal()) {
@@ -600,18 +598,6 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
         
         return !isCompleted() && isVisible(currentDayUTC);
-    }
-    
-    @FunctionalInterface
-    interface RecurrenceSetConsumer<T> {
-        /**
-         * A function to process each entry in a recurrence set
-         *
-         * @param instanceStartMsUTC ms since epoch of the instance
-         * @return return value or null if should iterate forward
-         */
-        @Nullable
-        T processInstance(long instanceStartMsUTC, long instanceEndMsUTC, long instanceStartDayLocal, long instanceEndDayLocal);
     }
     
     private boolean isVisible(long targetDayUTC) {
@@ -697,7 +683,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         long currentUpcomingDayOffset = this.upcomingDayOffset.getToday();
         long currentExpiredDayOffset = this.expiredDayOffset.getToday();
         
-        if (isRecurrent()) {
+        if (isRecurring()) {
             event.iterateRecurrenceSet(minDay, (instanceStartMsUTC, instanceEndMsUTC, instanceStartDayLocal, instanceEndDayLocal) -> {
                 
                 // overshot
@@ -772,20 +758,23 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public boolean hideByContent() {
         if (!isFromSystemCalendar()) return false;
-        boolean hideByContent = false;
         if (Keys.HIDE_ENTRIES_BY_CONTENT.get(event.subKeys)) {
             String matchString = Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT.get(event.subKeys);
-            String[] split = !matchString.isEmpty() ? matchString.split("\\|\\|") : new String[0];
+            if (matchString.isEmpty()) {
+                return false;
+            }
+            String[] split = matchString.split("\\|\\|");
             for (String str : split) {
-                hideByContent = rawTextValue.get().contains(str);
-                if (hideByContent) break;
+                if (rawTextValue.get().contains(str)) {
+                    return true;
+                }
             }
         }
-        return hideByContent;
+        return false;
     }
     
     private TimeRange getNearestCalendarEventMsRangeUTC(long targetDayUTC) {
-        if (isRecurrent()) {
+        if (isRecurring()) {
             return event.iterateRecurrenceSet(targetDayUTC, (instanceStartMsUTC, instanceEndMsUTC, instanceStartDayLocal, instanceEndDayLocal) -> {
                 // if in range or overshoot
                 if (inRange(targetDayUTC, instanceStartDayLocal, instanceEndDayLocal) || instanceStartDayLocal >= targetDayUTC) {
@@ -794,7 +783,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 return null;
             }, TimeRange.NullRange);
         }
-        return new TimeRange(startMsUTC, endMsUTC);
+        return new TimeRange(event.startMsUTC, event.endMsUTC);
     }
     
     private TimeRange getNearestLocalEventDayRange(long targetDayUTC) {
@@ -838,20 +827,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     }
     
     public String getCalendarEntryTimeSpan(Context context, long targetDayUTC) {
-        if (isAllDay) {
+        if (event.isAllDay) {
             return context.getString(R.string.calendar_event_all_day);
         }
         
         return DateManager.getTimeSpan(getNearestCalendarEventMsRangeUTC(targetDayUTC));
-    }
-    
-    // get calendar key for calendar entries and null for normal entries
-    @Nullable
-    private List<String> getSubKeys() {
-        if (isFromSystemCalendar()) {
-            return event.subKeys;
-        }
-        return null;
     }
     
     public boolean isAdaptiveColorEnabled() {

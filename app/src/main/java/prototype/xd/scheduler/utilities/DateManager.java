@@ -28,7 +28,7 @@ public class DateManager {
     public static final long ONE_MINUTE_MS = 60000L;
     
     public static TimeZone systemTimeZone = TimeZone.getDefault();
-    public static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+    public static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     
     public static long currentDayUTC = DAY_FLAG_GLOBAL;
     public static long currentTimestampUTC = DAY_FLAG_GLOBAL;

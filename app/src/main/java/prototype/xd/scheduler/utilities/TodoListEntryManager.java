@@ -43,7 +43,7 @@ import prototype.xd.scheduler.views.CalendarView;
 
 public class TodoListEntryManager implements DefaultLifecycleObserver {
     
-    private static String NAME = "TodoListEntryManager";
+    private static final String NAME = "TodoListEntryManager";
     
     public enum SaveType {
         ENTRIES, GROUPS, NONE

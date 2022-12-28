@@ -41,7 +41,7 @@ public class SystemCalendarEvent {
     TodoListEntry associatedEntry;
     protected final SystemCalendar associatedCalendar;
     
-    public List<String> subKeys;
+    protected List<String> subKeys;
     private String prefKey;
     long id;
     
@@ -246,7 +246,23 @@ public class SystemCalendarEvent {
         }
     }
     
-    protected <T> T iterateRecurrenceSet(long firstDayUTC, TodoListEntry.RecurrenceSetConsumer<T> recurrenceSetConsumer, T defaultValue) {
+    protected boolean isRecurring() {
+        return rSet != null;
+    }
+    
+    @FunctionalInterface
+    interface RecurrenceSetConsumer<T> {
+        /**
+         * A function to process each entry in a recurrence set
+         *
+         * @param instanceStartMsUTC ms since epoch of the instance
+         * @return return value or null if should iterate forward
+         */
+        @Nullable
+        T processInstance(long instanceStartMsUTC, long instanceEndMsUTC, long instanceStartDayLocal, long instanceEndDayLocal);
+    }
+    
+    protected <T> T iterateRecurrenceSet(long firstDayUTC, RecurrenceSetConsumer<T> recurrenceSetConsumer, T defaultValue) {
         RecurrenceSetIterator it = rSet.iterator(timeZone, startMsUTC);
         it.fastForward(daysToMs(firstDayUTC - 2));
         long instanceStartMsUTC;
@@ -298,6 +314,6 @@ public class SystemCalendarEvent {
     @NonNull
     @Override
     public String toString() {
-        return "SystemCalendarEvent " + prefKey;
+        return NAME + " | " + prefKey;
     }
 }

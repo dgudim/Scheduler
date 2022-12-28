@@ -24,7 +24,6 @@ public class DateSelectButton extends MaterialButton {
     private Long selectedDayUTC;
     private Long selectedMsUTC;
     
-    private MaterialDatePicker<Long> datePicker;
     private MaterialDatePicker.Builder<Long> datePickerBuilder;
     
     private DateSelectButton pairButton;
@@ -59,7 +58,7 @@ public class DateSelectButton extends MaterialButton {
     
         datePickerBuilder.setSelection(initialMsUTC);
     
-        datePicker = datePickerBuilder.build();
+        MaterialDatePicker<Long> datePicker = datePickerBuilder.build();
         datePicker.addOnPositiveButtonClickListener(msUTCSelection -> {
             this.selectedMsUTC = msUTCSelection;
             selectedDayUTC = msToDays(msUTCSelection);
