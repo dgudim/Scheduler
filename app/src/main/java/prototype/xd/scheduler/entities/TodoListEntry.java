@@ -6,10 +6,7 @@ import static java.lang.Math.abs;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
-import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
-import static prototype.xd.scheduler.utilities.DateManager.msUTCtoMsLocal;
-import static prototype.xd.scheduler.utilities.DateManager.msUTCtoMsZoned;
 import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
@@ -175,7 +172,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         }
         
         public TimeRange toLocalDays(boolean clone) {
-            if(clone) {
+            if (clone) {
                 return new TimeRange(start, end).toLocalDays(false);
             }
             if (inDays) {
@@ -577,7 +574,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     private boolean inRange(long targetDayUTC, long instanceStartDayLocal, long instanceEndDayLocal) {
         return instanceStartDayLocal - upcomingDayOffset.getToday() <= targetDayUTC &&
-                        targetDayUTC <= instanceEndDayLocal + expiredDayOffset.getToday();
+                targetDayUTC <= instanceEndDayLocal + expiredDayOffset.getToday();
     }
     
     public boolean isCompleted() {
@@ -595,17 +592,14 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 return false;
             }
             
-            if (!isAllDay && Keys.HIDE_EXPIRED_ENTRIES_BY_TIME.get()) {
-                return isVisibleExact(currentTimestampUTC);
-            } else {
-                return isVisible(currentDayUTC);
+            if (!isAllDay && Keys.HIDE_EXPIRED_ENTRIES_BY_TIME.get(event.subKeys)) {
+                return isVisibleExact(currentDayUTC, currentTimestampUTC);
             }
-        } else {
-            if (isGlobal()) {
-                return Keys.SHOW_GLOBAL_ITEMS_LOCK.get();
-            }
-            return !isCompleted() && isVisible(currentDayUTC);
+        } else if (isGlobal()) {
+            return Keys.SHOW_GLOBAL_ITEMS_LOCK.get();
         }
+        
+        return !isCompleted() && isVisible(currentDayUTC);
     }
     
     @FunctionalInterface
@@ -632,12 +626,11 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         return inRange(targetDayUTC, getNearestLocalEventDayRange(targetDayUTC));
     }
     
-    private boolean isVisibleExact(long targetMsUTC) {
+    private boolean isVisibleExact(long targetDayUTC, long targetMsUTC) {
         // global entries are visible everywhere, no need to do anything more
         if (isGlobal()) {
             return true;
         }
-        long targetDayUTC = msToDays(targetMsUTC);
         
         if (container != null) {
             EntryType entryType = container.getEntryType(this, targetDayUTC);
@@ -659,7 +652,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         TimeRange nearestMsRangeUTC = getNearestCalendarEventMsRangeUTC(targetDayUTC);
         
         return inRange(targetDayUTC, nearestMsRangeUTC.toLocalDays(true)) &&
-                msUTCtoMsZoned(nearestMsRangeUTC.getEnd(), event.timeZone) >= msUTCtoMsLocal(targetMsUTC);
+                nearestMsRangeUTC.getEnd() >= targetMsUTC;
     }
     
     private void addDayRangeToSet(long dayFrom, long dayTo,

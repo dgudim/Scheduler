@@ -26,7 +26,6 @@ public class DateManager {
     }
     
     public static final long ONE_MINUTE_MS = 60000L;
-    public static final long ONE_DAY_MS = 86400000L;
     
     public static TimeZone systemTimeZone = TimeZone.getDefault();
     public static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -131,10 +130,6 @@ public class DateManager {
     
     public static long msUTCtoDaysLocal(long msUTC) {
         return msToDays(msUTCtoMsLocal(msUTC));
-    }
-    
-    public static long msUTCtoMsZoned(long msUTC, TimeZone timeZone) {
-        return msUTC + timeZone.getOffset(msUTC);
     }
     
     public static long msUTCtoMsLocal(long msUTC) {
