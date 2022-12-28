@@ -154,11 +154,11 @@ public class SystemCalendar {
         return Keys.getBoolean(visibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE);
     }
     
-    public List<SystemCalendarEvent> getVisibleTodoListEvents(long dayStart, long dayEnd) {
+    public List<SystemCalendarEvent> getVisibleTodoListEvents(long firstDayUTC, long lastDayUTC) {
         if(isVisible()) {
             List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
             for (SystemCalendarEvent event : systemCalendarEvents) {
-                if (event.fallsInRange(dayStart, dayEnd)) {
+                if (event.visibleOnRange(firstDayUTC, lastDayUTC)) {
                     visibleEvents.add(event);
                 }
             }

@@ -2,12 +2,12 @@ package prototype.xd.scheduler.utilities.services;
 
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
+import static prototype.xd.scheduler.utilities.DateManager.checkIfTimeSettingsChanged;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimeStringLocal;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.clearBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Keys.getBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimeString;
-import static prototype.xd.scheduler.utilities.DateManager.updateDate;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.app.NotificationChannel;
@@ -122,7 +122,7 @@ public class BackgroundSetterService extends Service {
     }
     
     private void updateNotification() {
-        getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTimeString()));
+        getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTimeStringLocal()));
         notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
     }
     
@@ -130,8 +130,8 @@ public class BackgroundSetterService extends Service {
     
     private volatile boolean lastUpdateSucceeded = false;
     private boolean initialized = false;
-    private BroadcastReceiver screenOnOffReceiver;
-    private BroadcastReceiver pingReceiver;
+    @Nullable private BroadcastReceiver screenOnOffReceiver;
+    @Nullable private BroadcastReceiver pingReceiver;
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -142,8 +142,7 @@ public class BackgroundSetterService extends Service {
                 log(DEBUG, NAME, "Received ping (keep alive job)");
             } else {
                 log(DEBUG, NAME, "Received general ping");
-                updateDate();
-                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(BackgroundSetterService.this);
+                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this, checkIfTimeSettingsChanged());
                 updateNotification();
             }
         } else {

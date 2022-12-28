@@ -6,7 +6,7 @@ import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static android.util.Log.VERBOSE;
 import static android.util.Log.WARN;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTimeString;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTimeStringLocal;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Utilities.throwOnFalse;
 
@@ -63,7 +63,7 @@ public class Logger {
         tryInit();
         Log.println(priority, tag, message);
         if (fileEnabled) {
-            logQueue.add("\n" + (getCurrentDateTimeString() + "  [" + priorityToStr(priority) + "]: " + message));
+            logQueue.add("\n" + (getCurrentDateTimeStringLocal() + "  [" + priorityToStr(priority) + "]: " + message));
         }
     }
     

@@ -1,8 +1,10 @@
 package prototype.xd.scheduler;
 
+import static android.util.Log.DEBUG;
+import static prototype.xd.scheduler.utilities.DateManager.checkIfTimeSettingsChanged;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
-import static prototype.xd.scheduler.utilities.DateManager.dateStringFromMsUTC;
+import static prototype.xd.scheduler.utilities.DateManager.dateStringUTCFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
@@ -18,6 +20,7 @@ import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
+import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
@@ -177,16 +180,23 @@ public class HomeFragment extends Fragment {
         return wrapperBnd.getRoot();
     }
     
+    // fragment becomes visible
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onResume() {
+        super.onResume();
+        log(DEBUG, "HomeFragment", "Main screen is now visible");
         // update the ui only after it's fully inflated
         
         // when all entries are loaded, update current month
         todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
-            // update adapter showing entries
-            todoListEntryManager.notifyEntryListChanged();
-            // update calendar updating indicators
-            todoListEntryManager.notifyVisibleDaysChanged();
+            if (checkIfTimeSettingsChanged()) {
+                todoListEntryManager.notifyDatasetChanged(true);
+            } else {
+                // update adapter showing entries
+                todoListEntryManager.notifyEntryListChanged();
+                // update calendar updating indicators
+                todoListEntryManager.notifyCurrentMonthChanged();
+            }
             // finally, update the status text with entry count
             updateStatusText();
         }));
@@ -211,7 +221,7 @@ public class HomeFragment extends Fragment {
     }
     
     public void invalidateAll() {
-        todoListEntryManager.notifyDatasetChanged();
+        todoListEntryManager.notifyDatasetChanged(false);
     }
     
     @Override
@@ -223,7 +233,7 @@ public class HomeFragment extends Fragment {
     
     private void updateStatusText() {
         contentBnd.statusText.setText(
-                getString(R.string.status, dateStringFromMsUTC(currentlySelectedTimestampUTC),
+                getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC),
                         todoListEntryManager.getCurrentlyVisibleEntriesCount()));
     }
 }

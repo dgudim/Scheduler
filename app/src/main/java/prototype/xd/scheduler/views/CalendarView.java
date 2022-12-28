@@ -97,19 +97,15 @@ public class CalendarView {
                 } else {
                     textColor = MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE);
                 }
-            } else {
-                textColor = context.getColor(R.color.gray_harmonized);
-            }
-            
-            binding.calendarDayText.setTextColor(textColor);
-            
-            if (dayPosition == DayPosition.MonthDate) {
                 todoListEntryManager.processEventIndicators(date.toEpochDay(),
                         MAX_INDICATORS, this::setEventIndicatorInCalendar);
             } else {
+                textColor = context.getColor(R.color.gray_harmonized);
                 todoListEntryManager.processEventIndicators(date.toEpochDay(),
                         MAX_INDICATORS, this::setEventIndicatorOffCalendar);
             }
+            
+            binding.calendarDayText.setTextColor(textColor);
             
             // highlight current date
             if (datesEqual(date, calendarView.selectedDate) && dayPosition == DayPosition.MonthDate) {
@@ -302,7 +298,7 @@ public class CalendarView {
         days.forEach(this::notifyDayChanged);
     }
     
-    public void notifyVisibleDaysChanged() {
+    public void notifyCurrentMonthChanged() {
         if (selectedMonth != null) {
             // internally will rebind all visible dates
             rootCalendarView.notifyMonthChanged(selectedMonth);

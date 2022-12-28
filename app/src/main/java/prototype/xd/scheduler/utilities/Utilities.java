@@ -76,7 +76,7 @@ public class Utilities {
         return str == null ? "" : str.trim();
     }
     
-    public static boolean isVerticalOrientation(Context context) {
+    public static boolean isVerticalOrientation(@NonNull Context context) {
         return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
     
@@ -213,7 +213,7 @@ public class Utilities {
         
         for (TodoListEntry entry : entries) {
             // Look at {@link prototype.xd.scheduler.entities.TodoListEntry.EntryType}
-            entry.setSortingIndex(entry.getEntryType(targetDay).ordinal());
+            entry.cacheSortingIndex(targetDay);
             if (entry.isFromSystemCalendar()) {
                 // obtain nearest start ms near a particular day for use in sorting later
                 entry.cacheNearestStartMsUTC(targetDay);

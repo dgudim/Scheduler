@@ -101,7 +101,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding) viewBinding;
             
             bnd.eventColor.setCardBackgroundColor(entry.event.color);
-            bnd.timeText.setText(entry.getTimeSpan(context, currentlySelectedDayUTC));
+            bnd.timeText.setText(entry.getCalendarEntryTimeSpan(context, currentlySelectedDayUTC));
             bnd.timeText.setTextColor(getTimeTextColor(
                     entry.fontColor.get(currentlySelectedDayUTC),
                     entry.bgColor.get(currentlySelectedDayUTC)));

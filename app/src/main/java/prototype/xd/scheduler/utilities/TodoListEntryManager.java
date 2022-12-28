@@ -43,6 +43,8 @@ import prototype.xd.scheduler.views.CalendarView;
 
 public class TodoListEntryManager implements DefaultLifecycleObserver {
     
+    private static String NAME = "TodoListEntryManager";
+    
     public enum SaveType {
         ENTRIES, GROUPS, NONE
     }
@@ -85,7 +87,6 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                 
                 todoListEntries.notifyEntryVisibilityChanged(
                         entry,
-                        calendarView,
                         coreDaysChanged,
                         daysToRebind);
                 
@@ -167,7 +168,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                             saveType = SaveType.NONE;
                         } catch (InterruptedException e) {
                             interrupt();
-                            log(INFO, Thread.currentThread().getName(), "Stopped");
+                            String name = Thread.currentThread().getName();
+                            log(INFO, name, name + " stopped");
                         }
                         
                     } while (!isInterrupted());
@@ -179,11 +181,13 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
+        log(INFO, NAME, "Cleaning up " + NAME + " (" + todoListEntries.size() + " entries, " + groups.size() + " groups)");
         //stop IO thread
         asyncSaver.interrupt();
         // remove all entries (unlink all groups and events)
         todoListEntries.clear();
         groups.clear();
+        log(INFO, NAME, NAME + " destroyed");
     }
     
     public void onInitFinished(@NonNull Runnable onInitFinishedRunnable) {
@@ -239,10 +243,10 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         todoListViewAdapter.notifyVisibleEntriesUpdated();
     }
     
-    // tells calendar list that all visible entries have changed
-    public void notifyVisibleDaysChanged() {
+    // tells calendar list that current month entries have changed
+    public void notifyCurrentMonthChanged() {
         if (calendarView != null) {
-            calendarView.notifyVisibleDaysChanged();
+            calendarView.notifyCurrentMonthChanged();
         }
     }
     
@@ -254,9 +258,16 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     // tells all entries that their parameters have changed and refreshes all ui stuff
-    public void notifyDatasetChanged() {
+    public void notifyDatasetChanged(boolean timezoneChanged) {
         for (TodoListEntry todoListEntry : todoListEntries) {
             todoListEntry.invalidateAllParameters(false);
+            if(timezoneChanged && todoListEntry.isFromSystemCalendar()) {
+                todoListEntry.notifyTimeZoneChanged();
+                todoListEntries.notifyEntryVisibilityChanged(
+                        todoListEntry,
+                        true,
+                        daysToRebind);
+            }
         }
         updateStaticVarsAndCalendarVisibility();
         notifyCalendarChanged();

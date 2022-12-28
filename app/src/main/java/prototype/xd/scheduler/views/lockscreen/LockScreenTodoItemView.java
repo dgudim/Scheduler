@@ -92,7 +92,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         setTitleTextSize(fontSizeSP * DEFAULT_TITLE_FONT_SIZE_MULTIPLIER);
         
         if (entry.isFromSystemCalendar()) {
-            String timeSpan = entry.getTimeSpan(context, currentDayUTC);
+            String timeSpan = entry.getCalendarEntryTimeSpan(context, currentDayUTC);
             setTimeSpanText(timeSpan);
             setTimeStartText(timeSpan.split(" - ")[0]);
             setTimeTextSize(fontSizeSP);

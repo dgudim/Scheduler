@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 import prototype.xd.scheduler.entities.TodoListEntry.ParameterInvalidationListener;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
-import prototype.xd.scheduler.views.CalendarView;
 
 // a list specifically for storing TodoListEntries, automatically unlinks groups on remove to avoid memory leaks
 public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
@@ -248,9 +247,8 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     public void notifyEntryVisibilityChanged(TodoListEntry entry,
-                                             CalendarView calendarView,
                                              boolean coreDaysChanged,
-                                             Set<Long> invalidatedDaySet) {
+                                             @Nullable Set<Long> invalidatedDaySet) {
         // if the entry is currently marked as global in the list and is global now
         if (globalEntries.contains(entry) && entry.isGlobal() && !coreDaysChanged) {
             log(WARN, NAME, "Trying to change visibility range of a global entry");
@@ -261,7 +259,9 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         if (globalEntries.remove(entry)) {
             TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
             linkEntryToLookupContainers(entry, newDaySet);
-            invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
+            if (invalidatedDaySet != null) {
+                invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
+            }
             return;
         }
         
@@ -271,20 +271,23 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         // entry became global
         if (entry.isGlobal()) {
             globalEntries.add(entry);
-            invalidatedDaySet.addAll(displayUpcomingExpired ? prevExpiredUpcomingDays : prevCoreDays);
+            if (invalidatedDaySet != null) {
+                invalidatedDaySet.addAll(displayUpcomingExpired ? prevExpiredUpcomingDays : prevCoreDays);
+            }
             return;
         }
         
         // all the other cases (not global entries)
         TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
         
-        invalidatedDaySet.addAll(displayUpcomingExpired ?
-                // update changed days
-                Utilities.symmetricDifference(
-                        prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()) :
-                Utilities.symmetricDifference(
-                        prevCoreDays, newDaySet.getCoreDaySet()));
-        
+        if (invalidatedDaySet != null) {
+            invalidatedDaySet.addAll(displayUpcomingExpired ?
+                    // update changed days
+                    Utilities.symmetricDifference(
+                            prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()) :
+                    Utilities.symmetricDifference(
+                            prevCoreDays, newDaySet.getCoreDaySet()));
+        }
         
         linkEntryToLookupContainers(entry, newDaySet);
     }

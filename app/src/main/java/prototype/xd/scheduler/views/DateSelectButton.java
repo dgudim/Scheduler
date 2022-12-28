@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.views;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
-import static prototype.xd.scheduler.utilities.DateManager.dateStringMonthNamesFromMsUTC;
-import static prototype.xd.scheduler.utilities.DateManager.daysUTCFromMsUTC;
-import static prototype.xd.scheduler.utilities.DateManager.msUTCFromDaysUTC;
+import static prototype.xd.scheduler.utilities.DateManager.dateStringMonthNamesUTCFromMsUTC;
+import static prototype.xd.scheduler.utilities.DateManager.msToDays;
+import static prototype.xd.scheduler.utilities.DateManager.daysToMs;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -53,7 +53,7 @@ public class DateSelectButton extends MaterialButton {
         if(initialDay == -1) {
             initialDay = currentlySelectedDayUTC;
         }
-        long initialMsUTC = msUTCFromDaysUTC(initialDay);
+        long initialMsUTC = daysToMs(initialDay);
         selectedDayUTC = initialDay;
         selectedMsUTC = initialMsUTC;
     
@@ -62,7 +62,7 @@ public class DateSelectButton extends MaterialButton {
         datePicker = datePickerBuilder.build();
         datePicker.addOnPositiveButtonClickListener(msUTCSelection -> {
             this.selectedMsUTC = msUTCSelection;
-            selectedDayUTC = daysUTCFromMsUTC(msUTCSelection);
+            selectedDayUTC = msToDays(msUTCSelection);
             updateText();
         });
         
@@ -98,6 +98,6 @@ public class DateSelectButton extends MaterialButton {
     }
     
     private void updateText() {
-        setText(dateStringMonthNamesFromMsUTC(selectedMsUTC));
+        setText(dateStringMonthNamesUTCFromMsUTC(selectedMsUTC));
     }
 }

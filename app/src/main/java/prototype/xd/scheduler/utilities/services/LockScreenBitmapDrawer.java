@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.utilities.services;
 
+import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
@@ -130,9 +131,9 @@ class LockScreenBitmapDrawer {
         return makeMutable(bitmap);
     }
     
-    public boolean constructBitmap(BackgroundSetterService backgroundSetterService) {
+    public boolean constructBitmap(@NonNull Context context, boolean forceRedraw) {
         
-        if (!isVerticalOrientation(backgroundSetterService)) {
+        if (!isVerticalOrientation(context)) {
             log(WARN, NAME, "Not starting bitmap thread, orientation not vertical");
             return false;
         }
@@ -147,7 +148,7 @@ class LockScreenBitmapDrawer {
                     
                     Bitmap bitmap = getBitmapToDrawOn();
                     
-                    drawItemsOnBitmap(backgroundSetterService, bitmap);
+                    drawItemsOnBitmap(context, bitmap, forceRedraw);
                     log(INFO, NAME, "Processed wallpaper in " + (getCurrentTimestampUTC() - time) + "ms");
                     
                     time = getCurrentTimestampUTC();
@@ -173,7 +174,7 @@ class LockScreenBitmapDrawer {
     }
     
     @SuppressLint("InflateParams")
-    private void drawItemsOnBitmap(@NonNull Context context, @NonNull Bitmap bitmap) throws InterruptedException {
+    private void drawItemsOnBitmap(@NonNull Context context, @NonNull Bitmap bitmap, boolean forceRedraw) throws InterruptedException {
         
         Canvas canvas = new Canvas(bitmap);
         GroupList groups = loadGroups();
@@ -191,7 +192,11 @@ class LockScreenBitmapDrawer {
         
         long currentHash = toAdd.hashCode() + Keys.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {
-            throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
+            if (forceRedraw) {
+                log(DEBUG, NAME, "Updating bitmap because 'forceRedraw' is true");
+            } else {
+                throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
+            }
         }
         previous_hash = currentHash;
         
