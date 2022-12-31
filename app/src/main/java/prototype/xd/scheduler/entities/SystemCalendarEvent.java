@@ -1,14 +1,11 @@
 package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Events;
-import static android.util.Log.ERROR;
-import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.DateManager.ONE_MINUTE_MS;
 import static prototype.xd.scheduler.utilities.DateManager.daysToMs;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoMsLocal;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
@@ -32,6 +29,8 @@ import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.List;
 import java.util.TimeZone;
+
+import prototype.xd.scheduler.utilities.Logger;
 
 public class SystemCalendarEvent {
     
@@ -95,7 +94,7 @@ public class SystemCalendarEvent {
             startMsUTC += ONE_MINUTE_MS;
             durationMs -= 2 * ONE_MINUTE_MS;
         }
-    
+        
         computeEventVisibilityDays();
     }
     
@@ -115,7 +114,7 @@ public class SystemCalendarEvent {
                         DateTimeZonePair pair = checkRDates(rDateStr);
                         rSet.addInstances(new RecurrenceList(pair.date, pair.timeZone));
                     } catch (IllegalArgumentException e) {
-                        log(ERROR, NAME, "Error adding rDate: " + e.getMessage());
+                        Logger.error( NAME, "Error adding rDate: " + e.getMessage());
                     }
                 }
                 
@@ -126,7 +125,7 @@ public class SystemCalendarEvent {
                     try {
                         rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRuleStr)));
                     } catch (IllegalArgumentException e) {
-                        log(ERROR, NAME, "Error adding exRule: " + e.getMessage());
+                        Logger.error( NAME, "Error adding exRule: " + e.getMessage());
                     }
                 }
                 
@@ -135,7 +134,7 @@ public class SystemCalendarEvent {
                         DateTimeZonePair pair = checkRDates(exDateStr);
                         rSet.addExceptions(new RecurrenceList(pair.date, pair.timeZone));
                     } catch (IllegalArgumentException e) {
-                        log(ERROR, NAME, "Error adding exDate: " + e.getMessage());
+                        Logger.error( NAME, "Error adding exDate: " + e.getMessage());
                     }
                 }
                 
@@ -169,7 +168,7 @@ public class SystemCalendarEvent {
     
     public void linkEntry(TodoListEntry todoListEntry) {
         if (associatedEntry != null) {
-            log(WARN, NAME, "Calendar event " + title + " already linked to " +
+            Logger.warning( NAME, "Calendar event " + title + " already linked to " +
                     associatedEntry.getId() + " relinking to " + todoListEntry.getId());
         }
         associatedEntry = todoListEntry;
@@ -223,7 +222,7 @@ public class SystemCalendarEvent {
     private DateTimeZonePair checkRDates(String datesToParse) {
         TimeZone newTimeZone = timeZone;
         if (datesToParse.contains(";")) {
-            log(WARN, NAME, "Not standard dates for " + title + ", " + datesToParse + ", probably contains timezone, attempting to parse");
+            Logger.warning( NAME, "Not standard dates for " + title + ", " + datesToParse + ", probably contains timezone, attempting to parse");
             String[] split = datesToParse.split(";");
             newTimeZone = TimeZone.getTimeZone(split[0]);
             datesToParse = split[1];
@@ -285,7 +284,7 @@ public class SystemCalendarEvent {
         if (rSet != null) {
             return iterateRecurrenceSet(firstDayUTC, (instanceStartMsUTC, instanceEndMsUTC, instanceStartDayLocal, instanceEndDayLocal) -> {
                 // overshot
-                if(instanceStartDayLocal > lastDayUTC) {
+                if (instanceStartDayLocal > lastDayUTC) {
                     return false;
                 }
                 // if in range
@@ -307,7 +306,7 @@ public class SystemCalendarEvent {
             }
             rSet.addExceptions(new RecurrenceList(exceptionsPrimitiveArray));
         } else {
-            log(WARN, NAME, "Couldn't add exceptions to " + title);
+            Logger.warning( NAME, "Couldn't add exceptions to " + title);
         }
     }
     

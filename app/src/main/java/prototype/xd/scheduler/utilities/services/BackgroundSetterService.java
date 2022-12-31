@@ -1,14 +1,11 @@
 package prototype.xd.scheduler.utilities.services;
 
-import static android.util.Log.DEBUG;
-import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.DateManager.checkIfTimeSettingsChanged;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimeStringLocal;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.clearBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Keys.getBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
-import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -28,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Logger;
 
 public class BackgroundSetterService extends Service {
     
@@ -130,8 +128,10 @@ public class BackgroundSetterService extends Service {
     
     private volatile boolean lastUpdateSucceeded = false;
     private boolean initialized = false;
-    @Nullable private BroadcastReceiver screenOnOffReceiver;
-    @Nullable private BroadcastReceiver pingReceiver;
+    @Nullable
+    private BroadcastReceiver screenOnOffReceiver;
+    @Nullable
+    private BroadcastReceiver pingReceiver;
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -139,15 +139,15 @@ public class BackgroundSetterService extends Service {
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 setBitmapUpdateFlag();
-                log(DEBUG, NAME, "Received ping (keep alive job)");
+                Logger.info( NAME, "Received ping (keep alive job)");
             } else {
-                log(DEBUG, NAME, "Received general ping");
+                Logger.info( NAME, "Received general ping");
                 lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this, checkIfTimeSettingsChanged());
                 updateNotification();
             }
         } else {
             initialized = true;
-            log(DEBUG, NAME, "Received ping (initial)");
+            Logger.info( NAME, "Received ping (initial)");
             
             screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
@@ -155,16 +155,16 @@ public class BackgroundSetterService extends Service {
                     if (!lastUpdateSucceeded || getBitmapUpdateFlag()) {
                         ping(context);
                         clearBitmapUpdateFlag();
-                        log(DEBUG, NAME, "Sent ping (on - off receiver)");
+                        Logger.info( NAME, "Sent ping (on - off receiver)");
                     }
-                    log(DEBUG, NAME, "Receiver state: " + intent.getAction());
+                    Logger.info( NAME, "Receiver state: " + intent.getAction());
                 }
             };
             pingReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     ping(context);
-                    log(DEBUG, NAME, "Sent ping (date changed receiver)");
+                    Logger.info( NAME, "Sent ping (date changed receiver)");
                 }
             };
             
@@ -182,7 +182,7 @@ public class BackgroundSetterService extends Service {
     }
     
     private void scheduleRestartJob() {
-        log(INFO, NAME, "restart job scheduled");
+        Logger.info( NAME, "restart job scheduled");
         getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
                 new ComponentName(getApplicationContext(), KeepAliveService.class))
                 .setPeriodic(15 * 60L * 1000, 5 * 60L * 1000).build());

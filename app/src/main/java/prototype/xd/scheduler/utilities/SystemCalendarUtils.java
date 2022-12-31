@@ -1,7 +1,5 @@
 package prototype.xd.scheduler.utilities;
 
-import static android.util.Log.INFO;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;
@@ -40,7 +38,7 @@ public class SystemCalendarUtils {
             CalendarContract.Calendars.CALENDAR_COLOR,
             CalendarContract.Calendars.CALENDAR_TIME_ZONE));
     
-    public static final List<String> calendarEventsColumns =  Collections.unmodifiableList(Arrays.asList(
+    public static final List<String> calendarEventsColumns = Collections.unmodifiableList(Arrays.asList(
             CalendarContract.Events.TITLE,
             CalendarContract.Events.DISPLAY_COLOR,
             CalendarContract.Events.DTSTART,
@@ -69,7 +67,7 @@ public class SystemCalendarUtils {
             cursor.moveToNext();
         }
         cursor.close();
-        log(INFO, NAME, "Loaded " + systemCalendars.size() + " calendars");
+        Logger.info(NAME, "Loaded " + systemCalendars.size() + " calendars");
         return systemCalendars;
     }
     
@@ -82,7 +80,7 @@ public class SystemCalendarUtils {
                 todoListEntries.add(new TodoListEntry(event));
             }
         }
-        log(INFO, NAME, "Read calendar entries: " + todoListEntries.size());
+        Logger.info(NAME, "Read calendar entries: " + todoListEntries.size());
         return todoListEntries;
     }
     

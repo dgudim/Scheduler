@@ -1,11 +1,8 @@
 package prototype.xd.scheduler.utilities;
 
-import static android.util.Log.ERROR;
-import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
@@ -108,9 +105,9 @@ public class Utilities {
                 entry.initGroupAndId(groups, id++, attachGroupToEntry);
             }
             
-            log(INFO, NAME, "Read todo list: " + readEntries.size());
+            Logger.info(NAME, "Read todo list: " + readEntries.size());
         } catch (IOException e) {
-            log(INFO, NAME, "No todo list");
+            Logger.info(NAME, "No todo list");
         } catch (Exception e) {
             logException(NAME, e);
         }
@@ -134,9 +131,9 @@ public class Utilities {
             
             saveObject(ENTRIES_FILE, entriesToSave);
             
-            log(INFO, NAME, "Saved todo list");
+            Logger.info(NAME, "Saved todo list");
         } catch (IOException e) {
-            log(ERROR, NAME, "Missing permission, failed to save todo list");
+            Logger.error(NAME, "Missing permission, failed saving todo list");
         } catch (Exception e) {
             logException(NAME, e);
         }
@@ -149,7 +146,7 @@ public class Utilities {
             groups.addAll(loadObject(GROUPS_FILE));
             return groups;
         } catch (IOException e) {
-            log(INFO, NAME, "No groups file, creating one");
+            Logger.info(NAME, "No groups file, creating one");
             saveGroups(groups);
         } catch (Exception e) {
             logException(NAME, e);
@@ -169,7 +166,7 @@ public class Utilities {
             }
             
             saveObject(GROUPS_FILE, groupsToSave);
-            log(INFO, NAME, "Saved group list");
+            Logger.info(NAME, "Saved group list");
         } catch (IOException e) {
             logException(NAME, e);
         }
@@ -231,29 +228,36 @@ public class Utilities {
         void onValueChanged(@NonNull Slider slider, int sliderValue, boolean fromUser, Keys.DefaultedInteger value);
     }
     
-    //listener for general settings
     public static void setSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
                                                @Nullable final SliderOnChangeKeyedListener onChangeListener,
                                                @StringRes @PluralsRes final int stringResource,
                                                Keys.DefaultedInteger value,
                                                boolean zeroIsOff) {
-        int loadedVal = value.get();
         Context context = displayTo.getContext();
-        if (loadedVal == 0 && zeroIsOff) {
-            displayTo.setText(context.getString(stringResource, context.getString(R.string.off)));
-        } else {
-            displayTo.setText(getQuantityString(context, stringResource, loadedVal));
-        }
+        Function<Integer, String> textFormatter = (Function<Integer, String>) progress -> {
+            if (progress == 0 && zeroIsOff) {
+                return context.getString(stringResource, context.getString(R.string.off));
+            } else {
+                return getQuantityString(context, stringResource, progress);
+            }
+        };
+        setSliderChangeListener(displayTo, slider, onChangeListener, value, textFormatter);
+    }
+    
+    //listener for general settings
+    public static void setSliderChangeListener(final TextView displayTo,
+                                               final Slider slider,
+                                               @Nullable final SliderOnChangeKeyedListener onChangeListener,
+                                               Keys.DefaultedInteger value,
+                                               @NonNull Function<Integer, String> textFormatter) {
+        int loadedVal = value.get();
+        displayTo.setText(textFormatter.apply(loadedVal));
         slider.clearOnChangeListeners();
         slider.setValue(loadedVal);
         slider.addOnChangeListener((listenerSlider, progress, fromUser) -> {
             if (fromUser) {
-                if (progress == 0 && zeroIsOff) {
-                    displayTo.setText(context.getString(stringResource, context.getString(R.string.off)));
-                } else {
-                    displayTo.setText(getQuantityString(context, stringResource, (int) progress));
-                }
+                displayTo.setText(textFormatter.apply((int) progress));
                 if (onChangeListener != null) {
                     onChangeListener.onValueChanged(listenerSlider, (int) progress, true, value);
                 }
@@ -354,7 +358,7 @@ public class Utilities {
     // accept normal and plural single arg strings
     public static String getQuantityString(@NonNull Context context, @StringRes @PluralsRes int resId, int quantity) {
         Resources res = context.getResources();
-        if(res.getResourceTypeName(resId).equals("plurals")) {
+        if (res.getResourceTypeName(resId).equals("plurals")) {
             return res.getQuantityString(resId, quantity, quantity);
         }
         return res.getString(resId, quantity);

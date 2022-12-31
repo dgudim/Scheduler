@@ -1,6 +1,5 @@
 package prototype.xd.scheduler.utilities;
 
-import static android.util.Log.INFO;
 import static java.lang.Math.min;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
@@ -10,7 +9,6 @@ import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
@@ -77,6 +75,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         @Override
         public void parametersInvalidated(TodoListEntry entry, Set<String> parameters) {
             
+            Logger.debug(NAME, entry + " parameters changed: " + parameters);
+            
             boolean coreDaysChanged = parameters.contains(START_DAY_UTC) ||
                     parameters.contains(END_DAY_UTC);
             
@@ -138,7 +138,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             
             initFinished = true;
             
-            log(INFO, Thread.currentThread().getName(), "TodoListEntryStorage cold start complete in " +
+            Logger.info(Thread.currentThread().getName(), "TodoListEntryStorage cold start complete in " +
                     (System.currentTimeMillis() - start) + "ms, loaded " + todoListEntries.size() + " entries");
             if (onInitFinishedRunnable != null) {
                 onInitFinishedRunnable.run();
@@ -169,7 +169,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                         } catch (InterruptedException e) {
                             interrupt();
                             String name = Thread.currentThread().getName();
-                            log(INFO, name, name + " stopped");
+                            Logger.info(name, name + " stopped");
                         }
                         
                     } while (!isInterrupted());
@@ -181,13 +181,13 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
-        log(INFO, NAME, "Cleaning up " + NAME + " (" + todoListEntries.size() + " entries, " + groups.size() + " groups)");
+        Logger.info(NAME, "Cleaning up " + NAME + " (" + todoListEntries.size() + " entries, " + groups.size() + " groups)");
         //stop IO thread
         asyncSaver.interrupt();
         // remove all entries (unlink all groups and events)
         todoListEntries.clear();
         groups.clear();
-        log(INFO, NAME, NAME + " destroyed");
+        Logger.info(NAME, NAME + " destroyed");
     }
     
     public void onInitFinished(@NonNull Runnable onInitFinishedRunnable) {
@@ -212,9 +212,11 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
                 
                 if (visibilityNow && !visibilityBefore) {
                     // new calendar is visible now
+                    Logger.debug(NAME, calendar + " is now visible");
                     addEvents(calendar.getVisibleTodoListEvents(loadedDay_start, loadedDay_end));
                 } else if (visibilityBefore && !visibilityNow) {
                     // calendar became invisible
+                    Logger.debug(NAME, calendar + " is now invisible");
                     calendar.unlinkAllTodoListEntries();
                 }
             }
@@ -223,6 +225,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     // perform all deferred tasks
     public void performDeferredTasks() {
+        Logger.debug(NAME, "Performing deferred tasks...");
         if (shouldSaveEntries) {
             saveEntriesAsync();
             shouldSaveEntries = false;
@@ -233,6 +236,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     private void notifyDaysChanged(Set<Long> days) {
+        Logger.debug(NAME, days.size() + " days changed");
         if (calendarView != null) {
             calendarView.notifyDaysChanged(days);
         }
@@ -240,28 +244,24 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     // tells entry list that all entries have changed
     public void notifyEntryListChanged() {
-        todoListViewAdapter.notifyVisibleEntriesUpdated();
+        Logger.debug(NAME, "NotifyEntryListChanged called");
+        todoListViewAdapter.notifyEntryListChanged();
     }
     
     // tells calendar list that current month entries have changed
     public void notifyCurrentMonthChanged() {
+        Logger.debug(NAME, "NotifyCurrentMonthChanged called");
         if (calendarView != null) {
             calendarView.notifyCurrentMonthChanged();
         }
     }
     
-    // tells calendar list that all visible entries have changed
-    public void notifyCalendarChanged() {
-        if (calendarView != null) {
-            calendarView.notifyCalendarChanged();
-        }
-    }
-    
     // tells all entries that their parameters have changed and refreshes all ui stuff
     public void notifyDatasetChanged(boolean timezoneChanged) {
+        Logger.debug(NAME, "Dataset changed! (timezone changed: " + timezoneChanged + " )");
         for (TodoListEntry todoListEntry : todoListEntries) {
             todoListEntry.invalidateAllParameters(false);
-            if(timezoneChanged && todoListEntry.isFromSystemCalendar()) {
+            if (timezoneChanged && todoListEntry.isFromSystemCalendar()) {
                 todoListEntry.notifyTimeZoneChanged();
                 todoListEntries.notifyEntryVisibilityChanged(
                         todoListEntry,
@@ -270,7 +270,10 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
             }
         }
         updateStaticVarsAndCalendarVisibility();
-        notifyCalendarChanged();
+        if (calendarView != null && !calendarView.checkIfFirstDayOfWeekChanged()) {
+            // tells calendar list that all months have changed
+            calendarView.notifyCalendarChanged();
+        }
         notifyEntryListChanged();
     }
     

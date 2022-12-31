@@ -59,7 +59,23 @@ public class Logger {
         }
     }
     
-    public static void log(int priority, String tag, String message) {
+    public static void error(String tag, String message) {
+        log(ERROR, tag, message);
+    }
+    
+    public static void warning(String tag, String message) {
+        log(WARN, tag, message);
+    }
+    
+    public static void info(String tag, String message) {
+        log(INFO, tag, message);
+    }
+    
+    public static void debug(String tag, String message) {
+        log(DEBUG, tag, message);
+    }
+    
+    private static void log(int priority, String tag, String message) {
         tryInit();
         Log.println(priority, tag, message);
         if (fileEnabled) {

@@ -41,7 +41,7 @@ public class BaseSettingsFragment <T extends RecyclerView.Adapter<?>> extends Di
     public void onDismiss(@NonNull DialogInterface dialog) {
         setBitmapUpdateFlag();
         if(!preferenceStateBefore.equals(Keys.getAll())) {
-            findFragmentInNavHost(requireActivity(), HomeFragment.class).invalidateAll();
+            findFragmentInNavHost(requireActivity(), HomeFragment.class).notifySettingsChanged();
         }
         super.onDismiss(dialog);
     }

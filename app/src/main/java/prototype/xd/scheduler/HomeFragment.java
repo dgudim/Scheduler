@@ -1,6 +1,5 @@
 package prototype.xd.scheduler;
 
-import static android.util.Log.DEBUG;
 import static prototype.xd.scheduler.utilities.DateManager.checkIfTimeSettingsChanged;
 import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
@@ -20,7 +19,6 @@ import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
@@ -46,6 +44,7 @@ import prototype.xd.scheduler.databinding.ContentWrapperBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -184,7 +183,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        log(DEBUG, "HomeFragment", "Main screen is now visible");
+        Logger.debug("HomeFragment", "Main screen is now visible");
         // update the ui only after it's fully inflated
         
         // when all entries are loaded, update current month
@@ -220,7 +219,7 @@ public class HomeFragment extends Fragment {
         }
     }
     
-    public void invalidateAll() {
+    public void notifySettingsChanged() {
         todoListEntryManager.notifyDatasetChanged(false);
     }
     

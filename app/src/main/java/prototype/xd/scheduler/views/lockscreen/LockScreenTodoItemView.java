@@ -107,14 +107,14 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
                 LinearLayout.LayoutParams.WRAP_CONTENT));
     }
     
-    public void applyLayoutDependentParameters(TodoListEntry entry, Bitmap bgBitmap) {
+    public void applyLayoutDependentParameters(TodoListEntry entry, Bitmap bgBitmap, ViewGroup container) {
         
         if (entry.isAdaptiveColorEnabled()) {
             int width = root.getWidth();
             int height = root.getHeight();
             
-            int[] pixels = new int[width * height];
-            bgBitmap.getPixels(pixels, 0, width, (int) root.getX(), (int) root.getY(), width, height);
+            int[] pixels = new int[width * height];                       // add container y offset
+            bgBitmap.getPixels(pixels, 0, width, (int) root.getX(), (int) (root.getY() + container.getY()), width, height);
             entry.setAverageBackgroundColor(getAverageColor(pixels));
         }
         

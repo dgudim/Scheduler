@@ -1,8 +1,5 @@
 package prototype.xd.scheduler.entities;
 
-import static android.util.Log.WARN;
-import static prototype.xd.scheduler.utilities.Logger.log;
-
 import android.content.Context;
 import android.util.ArrayMap;
 
@@ -16,6 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
 
@@ -50,14 +48,14 @@ public class Group implements Serializable {
     // to be called only by TodoListEntry
     protected void attachEntryInternal(TodoListEntry todoListEntry) {
         if (associatedEntries.put(todoListEntry.getId(), todoListEntry) != null) {
-            log(WARN, NAME, "attachEntryInternal called with " + todoListEntry + " but it's already attached");
+            Logger.warning(NAME, "attachEntryInternal called with " + todoListEntry + " but it's already attached");
         }
     }
     
     // to be called only by TodoListEntry
     protected void detachEntryInternal(TodoListEntry todoListEntry) {
         if (associatedEntries.remove(todoListEntry.getId()) == null) {
-            log(WARN, NAME, "detachEntryInternal called with " + todoListEntry + " but it's not attached");
+            Logger.warning(NAME, "detachEntryInternal called with " + todoListEntry + " but it's not attached");
         }
     }
     

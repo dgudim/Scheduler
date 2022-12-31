@@ -4,6 +4,7 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 
 import android.widget.CompoundButton;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
@@ -17,7 +18,8 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     @Nullable
     private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
     
-    public SwitchSettingsEntryConfig(Keys.DefaultedBoolean value, String text,
+    public SwitchSettingsEntryConfig(@NonNull Keys.DefaultedBoolean value,
+                                     @NonNull String text,
                                      @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
         this.text = text;
         this.value = value;

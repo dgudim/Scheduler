@@ -1,10 +1,5 @@
 package prototype.xd.scheduler.utilities;
 
-import static android.util.Log.DEBUG;
-import static android.util.Log.WARN;
-
-import static prototype.xd.scheduler.utilities.Logger.log;
-
 import android.app.Dialog;
 
 import androidx.annotation.NonNull;
@@ -28,13 +23,13 @@ public class DialogDismissLifecycleObserver implements DefaultLifecycleObserver 
     
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
-        if(dialog == null) {
-            log(WARN, NAME, "Something is not right, onDestroy was called but observer already fired");
+        if (dialog == null) {
+            Logger.warning(NAME, "Something is not right, onDestroy was called but observer already fired");
         }
         if (dialog != null && dialog.isShowing()) {
             // dismiss the dialog to avoid android.view.WindowLeaked
             dialog.dismiss();
-            log(DEBUG, NAME, "Activity destroyed, closed lingering dialog " + dialog);
+            Logger.info(NAME, "Activity destroyed, closed lingering dialog " + dialog);
             dialog = null;
         }
     }

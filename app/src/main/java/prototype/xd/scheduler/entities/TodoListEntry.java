@@ -1,13 +1,11 @@
 package prototype.xd.scheduler.entities;
 
-import static android.util.Log.WARN;
 import static androidx.core.math.MathUtils.clamp;
 import static java.lang.Math.abs;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
 
@@ -35,6 +33,7 @@ import java.util.function.Function;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
@@ -174,7 +173,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
                 return new TimeRange(start, end).toLocalDays(false);
             }
             if (inDays) {
-                log(WARN, "TimeRange", "Trying to convert range to days but it's already in days");
+                Logger.warning("TimeRange", "Trying to convert range to days but it's already in days");
                 return this;
             }
             start = msUTCtoDaysLocal(start);
@@ -306,7 +305,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
         if (!tempGroupName.isEmpty()) {
             group = Group.findGroupInList(groups, tempGroupName);
             if (group == null) {
-                log(WARN, NAME, "Unknown group: " + tempGroupName);
+                Logger.warning(NAME, "Unknown group: " + tempGroupName);
             } else if (attachGroupToEntry) {
                 group.attachEntryInternal(this);
             }
@@ -383,7 +382,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     public void listenToParameterInvalidations(ParameterInvalidationListener parameterInvalidationListener) {
         if (this.parameterInvalidationListener != null) {
-            log(WARN, NAME, rawTextValue.get() + " already has a parameterInvalidationListener, double assign");
+            Logger.warning(NAME, rawTextValue.get() + " already has a parameterInvalidationListener, double assign");
         }
         this.parameterInvalidationListener = parameterInvalidationListener;
     }
@@ -394,7 +393,7 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     protected void linkToContainer(TodoListEntryList todoListEntryList) {
         if (container != null) {
-            log(WARN, NAME, rawTextValue.get() + " already has a container, double linking");
+            Logger.warning(NAME, rawTextValue.get() + " already has a container, double linking");
         }
         container = todoListEntryList;
     }
@@ -411,10 +410,10 @@ public class TodoListEntry extends RecycleViewEntry implements Serializable {
     
     protected void removeFromContainer() {
         if (container == null) {
-            log(WARN, NAME, rawTextValue.get() + " is not in a container, can't remove");
+            Logger.warning(NAME, rawTextValue.get() + " is not in a container, can't remove");
         } else {
             if (!container.remove(this)) {
-                log(WARN, NAME, rawTextValue.get() + " error removing from the container");
+                Logger.warning(NAME, rawTextValue.get() + " error removing from the container");
             }
         }
     }

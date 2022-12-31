@@ -1,8 +1,5 @@
 package prototype.xd.scheduler.entities;
 
-import static android.util.Log.ERROR;
-import static android.util.Log.WARN;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import androidx.annotation.NonNull;
@@ -20,6 +17,7 @@ import java.util.function.Consumer;
 
 import prototype.xd.scheduler.entities.TodoListEntry.ParameterInvalidationListener;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
 // a list specifically for storing TodoListEntries, automatically unlinks groups on remove to avoid memory leaks
@@ -104,13 +102,13 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
                                                       Map<Long, Set<TodoListEntry>> entriesPerDay) {
         Set<Long> daysForEntry = daysPerEntry.remove(entry);
         if (daysForEntry == null) {
-            log(ERROR, NAME, "Can't remove associations for '" + entry + "', entry not managed by current container");
+            Logger.error(NAME, "Can't remove associations for '" + entry + "', entry not managed by current container");
             return Collections.emptySet();
         } else {
             for (Long day : daysForEntry) {
                 Set<TodoListEntry> entriesOnDay = entriesPerDay.get(day);
                 if (entriesOnDay == null) {
-                    log(ERROR, NAME, "Can't remove associations for '" + entry + "' on day " + day);
+                    Logger.error(NAME, "Can't remove associations for '" + entry + "' on day " + day);
                     continue;
                 }
                 entriesOnDay.remove(entry);
@@ -201,7 +199,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         Set<Long> extendedDays = daysPerEntryUpcomingExpired.get(entry);
         Set<Long> coreDays = daysPerEntryCore.get(entry);
         if (extendedDays == null || coreDays == null) {
-            log(ERROR, NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day + ". Entry not managed by current container");
+            Logger.error(NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day + ". Entry not managed by current container");
             return TodoListEntry.EntryType.UNKNOWN;
         }
         
@@ -251,7 +249,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
                                              @Nullable Set<Long> invalidatedDaySet) {
         // if the entry is currently marked as global in the list and is global now
         if (globalEntries.contains(entry) && entry.isGlobal() && !coreDaysChanged) {
-            log(WARN, NAME, "Trying to change visibility range of a global entry");
+            Logger.warning(NAME, "Trying to change visibility range of a global entry");
             return;
         }
         

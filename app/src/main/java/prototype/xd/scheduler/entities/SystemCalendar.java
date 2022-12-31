@@ -1,8 +1,6 @@
 package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
-import static android.util.Log.WARN;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
@@ -26,6 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Logger;
 
 public class SystemCalendar {
     
@@ -59,8 +58,8 @@ public class SystemCalendar {
         
         String calTimeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
         
-        if(calTimeZoneId.isEmpty()) {
-            log(WARN, NAME, "Calendar " + prefKey + " has no timezone, defaulting to UTC");
+        if (calTimeZoneId.isEmpty()) {
+            Logger.warning(NAME, "Calendar " + prefKey + " has no timezone, defaulting to UTC");
             this.timeZoneId = "UTC";
         } else {
             this.timeZoneId = calTimeZoneId;
@@ -82,7 +81,7 @@ public class SystemCalendar {
     
     void loadAvailableEventColors() {
         eventColorCountMap.clear();
-        if(accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
+        if (accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 eventColorCountMap.computeIfAbsent(event.color, key -> getEventCountWithColor(event.color));
             }
@@ -116,7 +115,7 @@ public class SystemCalendar {
             long originalInstanceTime = getLong(cursor, calendarEventsColumns, Events.ORIGINAL_INSTANCE_TIME);
             if (originalInstanceTime != 0) {
                 // if original id is set this event is an exception to some other event
-                if(!loadMinimal) {
+                if (!loadMinimal) {
                     exceptionLists.computeIfAbsent(getLong(cursor, calendarEventsColumns, Events.ORIGINAL_ID), k -> new ArrayList<>())
                             .add(originalInstanceTime);
                 }
@@ -145,7 +144,7 @@ public class SystemCalendar {
                 }
             }
             if (!applied) {
-                log(WARN, account_name, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
+                Logger.warning(account_name, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
             }
         }
     }
@@ -155,7 +154,7 @@ public class SystemCalendar {
     }
     
     public List<SystemCalendarEvent> getVisibleTodoListEvents(long firstDayUTC, long lastDayUTC) {
-        if(isVisible()) {
+        if (isVisible()) {
             List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.visibleOnRange(firstDayUTC, lastDayUTC)) {

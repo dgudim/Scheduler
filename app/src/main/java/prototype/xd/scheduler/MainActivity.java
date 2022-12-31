@@ -1,8 +1,6 @@
 package prototype.xd.scheduler;
 
-import static android.util.Log.INFO;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
-import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +16,7 @@ import com.google.android.material.color.HarmonizedColorsOptions;
 import java.io.File;
 
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class MainActivity extends AppCompatActivity {
@@ -48,9 +47,9 @@ public class MainActivity extends AppCompatActivity {
             System.exit(0);
         } else if (ROOT_DIR.get().isEmpty()) {
             ROOT_DIR.put(rootDir.getAbsolutePath());
-            log(INFO, NAME, "Root dir: " + rootDir);
+            Logger.info(NAME, "Root dir: " + rootDir);
             if (!rootDir.exists()) {
-                log(INFO, NAME, "Created folder structure: " + rootDir.mkdirs());
+                Logger.info(NAME, "Created folder structure: " + rootDir.mkdirs());
             }
         }
         
