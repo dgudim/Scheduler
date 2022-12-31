@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="category_appearance">Внешний вид</string>
-    <string name="category_visibility">Видимость</string>
+<resources>
+    <string name="category_lockscreen_appearance">Внешний вид экрана блокировки</string>
+    <string name="category_event_visibility">Видимость событий</string>
     <string name="category_system_calendars">Интеграция с системным календарём</string>
+    <string name="category_application_settings">Приложение</string>
     <string name="apply">Применить</string>
     <string name="choose_color">Выберите цвет</string>
     <string name="add_current_config_as_group_message">(Параметры, которые были изменены вручную (Зеленые или синие ромбики), будут добавлены в группу)</string>
@@ -95,14 +96,8 @@
     <string name="settings_max_rWidth_lock">Растянуть фон события на всю ширину экрана блокировки</string>
     <string name="settings_font_size">Размер шрифта(Экран блокировки): %d</string>
     <string name="delete_all_saved_backgrounds_prompt">Удалить все сохраненные фоны?</string>
-    <string name="day_monday">понедельник</string>
-    <string name="day_tuesday">вторник</string>
-    <string name="day_wednesday">среда</string>
-    <string name="day_friday">пятница</string>
-    <string name="day_thursday">четверг</string>
-    <string name="day_saturday">суббота</string>
-    <string name="day_sunday">воскресенье</string>
-    <string name="day_default">дефолтный</string>
+    <string name="first_weekday">First day of the week:</string>
+    <string name="day_default">Дефолтный</string>
     <string name="background_service_persistent_message">Фоновый сервис активен</string>
     <string name="last_update_time">последнее обновление: %s</string>
     <string name="settings_colors">Цвета</string>
@@ -177,4 +172,8 @@
     <string name="whole_calendar_settings_off_warning">Вы отключили глобальные настройки аккаунтов и календарей, те, которые вы уже изменили, остались.</string>
     <string name="yay">Вуху!</string>
     <string name="i_understand">Я понял</string>
+    <string name="settings_event_vertical_bias">Вертикальная позиция событий: %d</string>
+    <string name="top">Сверху</string>
+    <string name="bottom">Снизу</string>
+    <string name="middle">По центру</string>
 </resources>

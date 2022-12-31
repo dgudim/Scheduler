@@ -81,9 +81,10 @@
     <string name="add_group">Add group</string>
     <string name="delete">Delete</string>
     <string name="choose_color">Choose color</string>
-    <string name="category_visibility">Visibility</string>
+    <string name="category_event_visibility">Event visibility</string>
     <string name="category_system_calendars">System calendar integration</string>
-    <string name="category_appearance">Appearance</string>
+    <string name="category_lockscreen_appearance">Lockscreen appearance</string>
+    <string name="category_application_settings">Application</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
     <string name="are_you_sure">Are you sure?</string>
@@ -94,14 +95,8 @@
     <string name="add_current_config_as_group_message">(Parameters marked with green or blue rhombs(manually edited) will be added to the group)</string>
     <string name="settings_max_rWidth_lock">Stretch event background to fill lock screen width</string>
     <string name="delete_all_saved_backgrounds_prompt">Delete all saved backgrounds?</string>
-    <string name="day_monday">monday</string>
-    <string name="day_tuesday">tuesday</string>
-    <string name="day_wednesday">wednesday</string>
-    <string name="day_friday">friday</string>
-    <string name="day_saturday">saturday</string>
-    <string name="day_sunday">sunday</string>
-    <string name="day_default">default</string>
-    <string name="day_thursday">thursday</string>
+    <string name="first_weekday">First day of the week:</string>
+    <string name="day_default">Default</string>
     <string name="background_service_persistent_message">Background service running</string>
     <string name="last_update_time">last update: %s</string>
     <string name="settings_colors">Colors</string>
@@ -173,4 +168,8 @@
     <string name="whole_calendar_settings_off_warning">You turned off global account and calendar settings, the ones you have already changed have stayed.</string>
     <string name="yay">Yay!</string>
     <string name="i_understand">I understand</string>
+    <string name="settings_event_vertical_bias">Vertical position of events: %d</string>
+    <string name="top">Top</string>
+    <string name="bottom">Bottom</string>
+    <string name="middle">Middle</string>
 </resources>
