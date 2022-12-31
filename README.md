@@ -38,7 +38,7 @@ Or just download [latest build](https://github.com/dgudim/Scheduler/releases/lat
 | ------------------------- | -------------------------- |
 | ![](https://raw.githubusercontent.com/dgudim/Scheduler/master/fastlane/metadata/android/en-US/images/phoneScreenshots/01.jpg) | <img id="thumb" src="https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/02.jpg?raw=true"> |
 
-| Global settings           | Event settings             |
+| Global settings           | Calendar settings          |
 | ------------------------- | -------------------------- |
 | ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/03.jpg?raw=true) | ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/04.jpg?raw=true) |
 
