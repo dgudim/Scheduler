@@ -1,8 +1,5 @@
 package prototype.xd.scheduler.utilities.services;
 
-import static android.util.Log.DEBUG;
-import static android.util.Log.INFO;
-import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.makeMutable;
@@ -10,14 +7,15 @@ import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayLocaleAgnosticString;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
+import static prototype.xd.scheduler.utilities.Keys.LOCKSCREEN_VIEW_VERTICAL_BIAS;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
-import static prototype.xd.scheduler.utilities.Logger.log;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 import static prototype.xd.scheduler.utilities.Utilities.isVerticalOrientation;
@@ -39,19 +37,21 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.databinding.LockscreenRootContainerBinding;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
@@ -82,7 +82,7 @@ class LockScreenBitmapDrawer {
                     .putFloat(DISPLAY_METRICS_DENSITY.key, displayMetrics.density)
                     .apply();
             
-            log(INFO, NAME, "got display metrics: " + displayMetrics);
+            Logger.info(NAME, "got display metrics: " + displayMetrics);
         }
         
         previous_hash = 0;
@@ -120,7 +120,7 @@ class LockScreenBitmapDrawer {
             if (bg.exists()) {
                 bitmap = readStream(new FileInputStream(bg));
             } else {
-                File defFile = getFile(Keys.DEFAULT_BACKGROUND_NAME);
+                File defFile = getFile(DateManager.DEFAULT_BACKGROUND_NAME);
                 if (defFile.exists()) {
                     bitmap = readStream(new FileInputStream(defFile));
                 } else {
@@ -134,7 +134,7 @@ class LockScreenBitmapDrawer {
     public boolean constructBitmap(@NonNull Context context, boolean forceRedraw) {
         
         if (!isVerticalOrientation(context)) {
-            log(WARN, NAME, "Not starting bitmap thread, orientation not vertical");
+            Logger.warning(NAME, "Not starting bitmap thread, orientation not vertical");
             return false;
         }
         
@@ -144,19 +144,19 @@ class LockScreenBitmapDrawer {
                 try {
                     
                     long time = getCurrentTimestampUTC();
-                    log(INFO, NAME, "Setting wallpaper");
+                    Logger.info(NAME, "Setting wallpaper");
                     
                     Bitmap bitmap = getBitmapToDrawOn();
                     
                     drawItemsOnBitmap(context, bitmap, forceRedraw);
-                    log(INFO, NAME, "Processed wallpaper in " + (getCurrentTimestampUTC() - time) + "ms");
+                    Logger.info(NAME, "Processed wallpaper in " + (getCurrentTimestampUTC() - time) + "ms");
                     
                     time = getCurrentTimestampUTC();
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    log(INFO, NAME, "Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000f + "s");
+                    Logger.info(NAME, "Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000f + "s");
                     
                 } catch (InterruptedException e) {
-                    log(INFO, NAME, e.getMessage());
+                    Logger.info(NAME, e.getMessage());
                     // relay
                     Thread.currentThread().interrupt();
                 } catch (FileNotFoundException e) {
@@ -193,7 +193,7 @@ class LockScreenBitmapDrawer {
         long currentHash = toAdd.hashCode() + Keys.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {
             if (forceRedraw) {
-                log(DEBUG, NAME, "Updating bitmap because 'forceRedraw' is true");
+                Logger.debug(NAME, "Updating bitmap because 'forceRedraw' is true");
             } else {
                 throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
             }
@@ -201,16 +201,23 @@ class LockScreenBitmapDrawer {
         previous_hash = currentHash;
         
         // inflate the root container
-        LinearLayout rootView = (LinearLayout) layoutInflater.inflate(R.layout.lockscreen_root_container, null);
+        LockscreenRootContainerBinding binding = LockscreenRootContainerBinding.inflate(layoutInflater);
+        LinearLayout containerView = binding.linearContainer;
+        ConstraintLayout rootView = binding.getRoot();
+        
+        // set vertical bias
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) containerView.getLayoutParams();
+        params.verticalBias = LOCKSCREEN_VIEW_VERTICAL_BIAS.get() / 100f; // convert percentage to 0 to 1
+        containerView.setLayoutParams(params);
         
         List<LockScreenTodoItemView<?>> itemViews = new ArrayList<>();
         
         // first pass, add all views, setup layout independent parameters
         for (TodoListEntry todoListEntry : toAdd) {
-            LockScreenTodoItemView<?> itemView = LockScreenTodoItemView.inflateViewByType(todoItemViewType, rootView, layoutInflater);
+            LockScreenTodoItemView<?> itemView = LockScreenTodoItemView.inflateViewByType(todoItemViewType, containerView, layoutInflater);
             itemView.applyLayoutIndependentParameters(todoListEntry);
             itemViews.add(itemView);
-            rootView.addView(itemView.getRoot());
+            containerView.addView(itemView.getRoot());
         }
         
         // get measure specs with screen size
@@ -224,27 +231,18 @@ class LockScreenBitmapDrawer {
         
         // second pass, apply layout dependent parameters
         for (int i = 0; i < itemViews.size(); i++) {
-            itemViews.get(i).applyLayoutDependentParameters(toAdd.get(i), bitmap);
+            itemViews.get(i).applyLayoutDependentParameters(toAdd.get(i), bitmap, containerView);
         }
-        
+    
         rootView.draw(canvas);
     }
     
     private File getBackgroundAccordingToDayAndTime() {
         
         if (!Keys.ADAPTIVE_BACKGROUND_ENABLED.get()) {
-            return getFile(Keys.DEFAULT_BACKGROUND_NAME);
+            return getFile(DateManager.DEFAULT_BACKGROUND_NAME);
         }
         
-        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-        CharSequence dayString;
-        // Calendar.SUNDAY is one
-        if (day == 1) {
-            dayString = Keys.WEEK_DAYS.get(6);
-        } else {
-            dayString = Keys.WEEK_DAYS.get(day - 2);
-        }
-        
-        return getFile(dayString + ".png");
+        return getFile(getCurrentWeekdayLocaleAgnosticString() + ".png");
     }
 }

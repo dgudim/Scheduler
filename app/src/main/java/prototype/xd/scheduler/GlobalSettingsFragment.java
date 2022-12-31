@@ -1,10 +1,12 @@
 package prototype.xd.scheduler;
 
-import static android.util.Log.ERROR;
 import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
-import static prototype.xd.scheduler.utilities.Logger.log;
+import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK;
+import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
+import static prototype.xd.scheduler.utilities.DateManager.getFirstDaysOfWeekLocal;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -27,13 +29,16 @@ import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SeekBarSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.BitmapUtilities;
+import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
 public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> {
@@ -50,26 +55,53 @@ public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        Context context = requireContext();
+        
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
         
         List<SettingsEntryConfig> settingsEntries = new ArrayList<>();
         
         adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(requireContext(), getLifecycle(), this::selectBackground);
         
-        settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_appearance)));
+        settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_application_settings)));
         settingsEntries.add(new AppThemeSelectorEntryConfig());
+        settingsEntries.add(new DropdownSettingsEntryConfig<>(R.string.first_weekday, getFirstDaysOfWeekLocal(), FIRST_DAYS_OF_WEEK, FIRST_DAY_OF_WEEK));
+        
+        
+        settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)));
         settingsEntries.add(adaptiveBackgroundSettingsEntry);
         settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.ADAPTIVE_COLOR_BALANCE,
-                0, 10, true, true, R.string.settings_adaptive_color_balance));
+                0, 10, 1, true, R.string.settings_adaptive_color_balance));
         settingsEntries.add(new CompoundCustomizationEntryConfig());
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)));
+        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.LOCKSCREEN_VIEW_VERTICAL_BIAS,
+                0, 100, 5, value -> {
+            String baseString = context.getString(R.string.settings_event_vertical_bias, (int) value) + "%";
+            if (value == 0) {
+                return baseString + " (" + context.getString(R.string.top) + ")";
+            }
+            if (value == 25) {
+                return baseString + " (1/4)";
+            }
+            if (value == 50) {
+                return baseString + " (" + context.getString(R.string.middle) + ")";
+            }
+            if (value == 75) {
+                return baseString + " (3/4)";
+            }
+            if (value == 100) {
+                return baseString + " (" + context.getString(R.string.bottom) + ")";
+            }
+            return baseString;
+        }));
         
-        settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_visibility)));
-        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET, 0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
-                true, false, R.plurals.settings_show_days_upcoming));
-        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET, 0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
-                true, false, R.plurals.settings_show_days_expired));
+        
+        settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_event_visibility)));
+        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET,
+                0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_show_days_upcoming));
+        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
+                0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_show_days_expired));
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, getString(R.string.settings_hide_expired_entries_by_time)));
         
@@ -125,11 +157,11 @@ public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> 
                 InputStream stream = requireActivity().getContentResolver().openInputStream(uri);
                 if (stream != null) {
                     BitmapUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                            new File(Keys.ROOT_DIR.get(), Keys.WEEK_DAYS.get(adaptiveBackgroundSettingsEntry.getLastClickedBgIndex()) + ".png"));
+                            new File(Keys.ROOT_DIR.get(), DateManager.WEEK_DAYS_ROOT.get(adaptiveBackgroundSettingsEntry.getLastClickedBgIndex()) + ".png"));
                     stream.close();
                     requireActivity().runOnUiThread(() -> adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated());
                 } else {
-                    log(ERROR, NAME, "Stream null for uri: " + uri.getPath());
+                    Logger.error(NAME, "Stream null for uri: " + uri.getPath());
                 }
                 
             } catch (Exception e) {
