@@ -183,7 +183,9 @@
             android:id="@+id/preview_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/light_gray_bg_tint"
+            android:focusable="true"
+            android:clickable="true"
+            android:background="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="5dp"/>
