@@ -22,7 +22,7 @@ import androidx.viewbinding.ViewBinding;
 import prototype.xd.scheduler.databinding.BasicEntryBinding;
 import prototype.xd.scheduler.databinding.RoundedEntryBinding;
 import prototype.xd.scheduler.databinding.SleekEntryBinding;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.Keys;
 
 // base class for lockscreen todolist entries
@@ -81,7 +81,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     public abstract void hideIndicatorAndTime();
     
     
-    public void applyLayoutIndependentParameters(TodoListEntry entry) {
+    public void applyLayoutIndependentParameters(TodoEntry entry) {
         
         int fontSizeSP = Keys.FONT_SIZE.get();
         
@@ -107,7 +107,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
                 LinearLayout.LayoutParams.WRAP_CONTENT));
     }
     
-    public void applyLayoutDependentParameters(TodoListEntry entry, Bitmap bgBitmap, ViewGroup container) {
+    public void applyLayoutDependentParameters(TodoEntry entry, Bitmap bgBitmap, ViewGroup container) {
         
         if (entry.isAdaptiveColorEnabled()) {
             int width = root.getWidth();

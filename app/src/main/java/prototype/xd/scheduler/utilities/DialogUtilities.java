@@ -37,7 +37,7 @@ import prototype.xd.scheduler.databinding.AddOrEditEntryDialogBinding;
 import prototype.xd.scheduler.databinding.AddOrEditGroupDialogBinding;
 import prototype.xd.scheduler.databinding.TwoButtonsBinding;
 import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.views.DateSelectButton;
 import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
@@ -96,7 +96,7 @@ public class DialogUtilities {
     public static void displayEntryAdditionEditDialog(@NonNull FragmentManager fragmentManager,
                                                       @NonNull Context context,
                                                       @NonNull Lifecycle lifecycle,
-                                                      @Nullable TodoListEntry entry,
+                                                      @Nullable TodoEntry entry,
                                                       @NonNull List<Group> groupList,
                                                       @NonNull OnClickListenerWithViewAccess<AddOrEditEntryDialogBinding> confirmationListener) {
         

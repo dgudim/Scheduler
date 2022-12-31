@@ -48,7 +48,7 @@ import java.util.List;
 
 import prototype.xd.scheduler.databinding.LockscreenRootContainerBinding;
 import prototype.xd.scheduler.entities.GroupList;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
@@ -182,7 +182,7 @@ class LockScreenBitmapDrawer {
         // load user defined entries (from files)
         // add entries from all calendars
         // sort and filter entries
-        List<TodoListEntry> toAdd = sortEntries(loadTodoEntries(
+        List<TodoEntry> toAdd = sortEntries(loadTodoEntries(
                 context,
                 currentDayUTC - SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
                 currentDayUTC + SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
@@ -213,9 +213,9 @@ class LockScreenBitmapDrawer {
         List<LockScreenTodoItemView<?>> itemViews = new ArrayList<>();
         
         // first pass, add all views, setup layout independent parameters
-        for (TodoListEntry todoListEntry : toAdd) {
+        for (TodoEntry todoEntry : toAdd) {
             LockScreenTodoItemView<?> itemView = LockScreenTodoItemView.inflateViewByType(todoItemViewType, containerView, layoutInflater);
-            itemView.applyLayoutIndependentParameters(todoListEntry);
+            itemView.applyLayoutIndependentParameters(todoEntry);
             itemViews.add(itemView);
             containerView.addView(itemView.getRoot());
         }

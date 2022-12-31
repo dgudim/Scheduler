@@ -34,9 +34,9 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.SystemCalendarEvent;
-import prototype.xd.scheduler.entities.TodoListEntry;
-import prototype.xd.scheduler.entities.TodoListEntry.RangeType;
-import prototype.xd.scheduler.entities.TodoListEntryList;
+import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.entities.TodoEntry.RangeType;
+import prototype.xd.scheduler.entities.TodoEntryList;
 import prototype.xd.scheduler.views.CalendarView;
 
 public class TodoListEntryManager implements DefaultLifecycleObserver {
@@ -55,7 +55,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private final TodoListViewAdapter todoListViewAdapter;
     
     private List<SystemCalendar> calendars;
-    private final TodoListEntryList todoListEntries;
+    private final TodoEntryList todoListEntries;
     private final GroupList groups;
     
     private final Thread asyncSaver;
@@ -71,9 +71,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
     
-    final TodoListEntry.ParameterInvalidationListener parameterInvalidationListener = new TodoListEntry.ParameterInvalidationListener() {
+    final TodoEntry.ParameterInvalidationListener parameterInvalidationListener = new TodoEntry.ParameterInvalidationListener() {
         @Override
-        public void parametersInvalidated(TodoListEntry entry, Set<String> parameters) {
+        public void parametersInvalidated(TodoEntry entry, Set<String> parameters) {
             
             Logger.debug(NAME, entry + " parameters changed: " + parameters);
             
@@ -111,7 +111,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         calendarVisibilityMap = new ArrayMap<>();
         groups = loadGroups();
         
-        todoListEntries = new TodoListEntryList(Keys.TODO_LIST_INITIAL_CAPACITY);
+        todoListEntries = new TodoEntryList(Keys.TODO_LIST_INITIAL_CAPACITY);
         updateStaticVarsAndCalendarVisibility();
         
         lifecycle.addObserver(this);
@@ -259,12 +259,12 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     // tells all entries that their parameters have changed and refreshes all ui stuff
     public void notifyDatasetChanged(boolean timezoneChanged) {
         Logger.debug(NAME, "Dataset changed! (timezone changed: " + timezoneChanged + " )");
-        for (TodoListEntry todoListEntry : todoListEntries) {
-            todoListEntry.invalidateAllParameters(false);
-            if (timezoneChanged && todoListEntry.isFromSystemCalendar()) {
-                todoListEntry.notifyTimeZoneChanged();
+        for (TodoEntry todoEntry : todoListEntries) {
+            todoEntry.invalidateAllParameters(false);
+            if (timezoneChanged && todoEntry.isFromSystemCalendar()) {
+                todoEntry.notifyTimeZoneChanged();
                 todoListEntries.notifyEntryVisibilityChanged(
-                        todoListEntry,
+                        todoEntry,
                         true,
                         daysToRebind);
             }
@@ -293,10 +293,10 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         return todoListViewAdapter.getItemCount();
     }
     
-    public List<TodoListEntry> getVisibleTodoListEntries(long day) {
+    public List<TodoEntry> getVisibleTodoListEntries(long day) {
         return todoListEntries.getOnDay(day, (entry, entryType) -> {
-            if (entryType == TodoListEntry.EntryType.UPCOMING ||
-                    entryType == TodoListEntry.EntryType.EXPIRED) {
+            if (entryType == TodoEntry.EntryType.UPCOMING ||
+                    entryType == TodoEntry.EntryType.EXPIRED) {
                 return !entry.isCompleted();
             } else {
                 return true;
@@ -311,8 +311,8 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     
     public void processEventIndicators(long day, int maxIndicators, EventIndicatorConsumer eventIndicatorConsumer) {
         
-        List<TodoListEntry> todoListEntriesOnDay = todoListEntries.getOnDay(day, (entry, entryType) ->
-                entryType != TodoListEntry.EntryType.GLOBAL && !entry.isCompleted());
+        List<TodoEntry> todoListEntriesOnDay = todoListEntries.getOnDay(day, (entry, entryType) ->
+                entryType != TodoEntry.EntryType.GLOBAL && !entry.isCompleted());
         
         int index = 0;
         
@@ -364,7 +364,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         for (SystemCalendarEvent event : eventsToAdd) {
             // if the event hasn't been associated with an entry, add it
             if (!event.isAssociatedWithEntry()) {
-                todoListEntries.add(new TodoListEntry(event), parameterInvalidationListener);
+                todoListEntries.add(new TodoEntry(event), parameterInvalidationListener);
             }
         }
     }
@@ -385,7 +385,7 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
     }
     
     // entry added / removed
-    private void notifyEntryRemovedAdded(@NonNull final TodoListEntry entry) {
+    private void notifyEntryRemovedAdded(@NonNull final TodoEntry entry) {
         if (calendarView != null) {
             notifyDaysChanged(
                     entry.getVisibleDaysOnCalendar(calendarView,
@@ -398,12 +398,12 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         saveEntriesAsync();
     }
     
-    public void addEntry(@NonNull final TodoListEntry entry) {
+    public void addEntry(@NonNull final TodoEntry entry) {
         todoListEntries.add(entry, parameterInvalidationListener);
         notifyEntryRemovedAdded(entry);
     }
     
-    public void removeEntry(@NonNull final TodoListEntry entry) {
+    public void removeEntry(@NonNull final TodoEntry entry) {
         todoListEntries.remove(entry);
         notifyEntryRemovedAdded(entry);
     }

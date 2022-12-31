@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
@@ -34,7 +34,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     private String calendarKey;
     
     // if called from main screen
-    private TodoListEntry todoListEntry;
+    private TodoEntry todoEntry;
     
     private TextWatcher currentListener;
     
@@ -50,8 +50,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
         dialog.show();
     }
     
-    public void show(final TodoListEntry entry) {
-        this.todoListEntry = entry;
+    public void show(final TodoEntry entry) {
+        this.todoEntry = entry;
         initialize(entry.event.getKey(), entry.event.color);
         dialog.show();
     }
@@ -83,8 +83,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
                                 }
                             }
                             editor.apply();
-                            if (todoListEntry != null) {
-                                todoListEntry.event.invalidateAllParametersOfConnectedEntries();
+                            if (todoEntry != null) {
+                                todoEntry.event.invalidateAllParametersOfConnectedEntries();
                             }
                             initialize(calendarKey, eventColor);
                         }));
@@ -195,8 +195,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
         Keys.putAny(calendarKey + "_" + parameterKey, value);
         setStateIconColor(displayTo, parameterKey);
         // invalidate parameters on entries in the same calendar category / color
-        if (todoListEntry != null) {
-            todoListEntry.event.invalidateParameterOfConnectedEntries(parameterKey);
+        if (todoEntry != null) {
+            todoEntry.event.invalidateParameterOfConnectedEntries(parameterKey);
         }
     }
     

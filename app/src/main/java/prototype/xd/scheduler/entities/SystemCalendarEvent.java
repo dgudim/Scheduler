@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.DateManager.ONE_MINUTE_MS;
 import static prototype.xd.scheduler.utilities.DateManager.daysToMs;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
-import static prototype.xd.scheduler.utilities.DateManager.msUTCtoMsLocal;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
@@ -37,7 +36,7 @@ public class SystemCalendarEvent {
     private static final String NAME = "System calendar event";
     
     protected @Nullable
-    TodoListEntry associatedEntry;
+    TodoEntry associatedEntry;
     protected final SystemCalendar associatedCalendar;
     
     protected List<String> subKeys;
@@ -157,8 +156,8 @@ public class SystemCalendarEvent {
             startDayLocal = msToDays(startMsUTC);
             endDayLocal = startDayLocal;
         } else {
-            startDayLocal = msToDays(msUTCtoMsLocal(startMsUTC));
-            endDayLocal = msToDays(msUTCtoMsLocal(endMsUTC));
+            startDayLocal = msUTCtoDaysLocal(startMsUTC);
+            endDayLocal = msUTCtoDaysLocal(endMsUTC);
         }
     }
     
@@ -166,12 +165,12 @@ public class SystemCalendarEvent {
         return associatedEntry != null;
     }
     
-    public void linkEntry(TodoListEntry todoListEntry) {
+    public void linkEntry(TodoEntry todoEntry) {
         if (associatedEntry != null) {
             Logger.warning( NAME, "Calendar event " + title + " already linked to " +
-                    associatedEntry.getId() + " relinking to " + todoListEntry.getId());
+                    associatedEntry.getId() + " relinking to " + todoEntry.getId());
         }
-        associatedEntry = todoListEntry;
+        associatedEntry = todoEntry;
     }
     
     public void unlinkEntry() {

@@ -34,7 +34,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
 import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
@@ -62,7 +62,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             context = viewBinding.getRoot().getContext();
         }
         
-        private void displayDeletionDialog(@NonNull final TodoListEntry entry,
+        private void displayDeletionDialog(@NonNull final TodoEntry entry,
                                            @NonNull final TodoListEntryManager todoListEntryManager) {
             displayConfirmationDialogue(context, lifecycle,
                     R.string.delete, R.string.are_you_sure,
@@ -70,7 +70,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                     view2 -> todoListEntryManager.removeEntry(entry));
         }
         
-        private void displayEditDialog(@NonNull final TodoListEntry entry,
+        private void displayEditDialog(@NonNull final TodoEntry entry,
                                        @NonNull final TodoListEntryManager todoListEntryManager) {
             final List<Group> groupList = todoListEntryManager.getGroups();
             
@@ -96,7 +96,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                     });
         }
         
-        private void bindToSystemCalendarEntry(@NonNull final TodoListEntry entry,
+        private void bindToSystemCalendarEntry(@NonNull final TodoEntry entry,
                                                @NonNull final SystemCalendarSettings systemCalendarSettings) {
             ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding) viewBinding;
             
@@ -108,7 +108,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             bnd.settings.setOnClickListener(v -> systemCalendarSettings.show(entry));
         }
         
-        private void bindToRegularEntry(@NonNull final TodoListEntry entry,
+        private void bindToRegularEntry(@NonNull final TodoEntry entry,
                                         @NonNull final TodoListEntryManager todoListEntryManager,
                                         @NonNull final EntrySettings entrySettings) {
             ListSelectionTodoBinding bnd = (ListSelectionTodoBinding) viewBinding;
@@ -136,7 +136,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             bnd.settings.setOnClickListener(v -> entrySettings.show(entry, v.getContext()));
         }
         
-        private void bindToCommonPart(@NonNull final TodoListEntry entry) {
+        private void bindToCommonPart(@NonNull final TodoEntry entry) {
             // fallback to get view by id because this part is common and we can't cast to any binding
             View root = viewBinding.getRoot();
             TextView todoText = root.findViewById(R.id.todoText);
@@ -157,7 +157,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             todoText.setText(entry.getTextOnDay(currentlySelectedDayUTC, context, true));
         }
         
-        void bindTo(@NonNull final TodoListEntry currentEntry,
+        void bindTo(@NonNull final TodoEntry currentEntry,
                     @NonNull final TodoListEntryManager todoListEntryManager,
                     @NonNull final EntrySettings entrySettings,
                     @NonNull final SystemCalendarSettings systemCalendarSettings) {
@@ -175,7 +175,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     @NonNull
     private final TodoListEntryManager todoListEntryManager;
     @NonNull
-    private List<TodoListEntry> currentTodoListEntries;
+    private List<TodoEntry> currentTodoListEntries;
     
     @NonNull
     private final EntrySettings entrySettings;

@@ -3,13 +3,14 @@ apply plugin: 'com.android.application'
 def versionMajor = 0
 def versionMinor = 5
 def versionPatch = 7
+def globalSuffix = ".patch1"
 
 ext.getVersionCode = { ->
     return versionMajor * 10000 + versionMinor * 100 + versionPatch
 }
 
 ext.getVersionName = { ->
-    return "${versionMajor}.${versionMinor}.${versionPatch}"
+    return "${versionMajor}.${versionMinor}.${versionPatch}${globalSuffix}"
 }
 
 android {
@@ -27,7 +28,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 32
         versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}${globalSuffix}"
         signingConfig signingConfigs.debug
     }
 

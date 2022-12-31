@@ -15,31 +15,31 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import prototype.xd.scheduler.entities.TodoListEntry.ParameterInvalidationListener;
+import prototype.xd.scheduler.entities.TodoEntry.ParameterInvalidationListener;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
 // a list specifically for storing TodoListEntries, automatically unlinks groups on remove to avoid memory leaks
-public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
+public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     
     private static final String NAME = "TodoListEntryList";
     
     // 4 mappings for normal events
-    final Map<Long, Set<TodoListEntry>> entriesPerDayCore;
-    final Map<TodoListEntry, Set<Long>> daysPerEntryCore;
+    final Map<Long, Set<TodoEntry>> entriesPerDayCore;
+    final Map<TodoEntry, Set<Long>> daysPerEntryCore;
     
-    final Map<Long, Set<TodoListEntry>> entriesPerDayUpcomingExpired;
-    final Map<TodoListEntry, Set<Long>> daysPerEntryUpcomingExpired;
+    final Map<Long, Set<TodoEntry>> entriesPerDayUpcomingExpired;
+    final Map<TodoEntry, Set<Long>> daysPerEntryUpcomingExpired;
     
     // container for global entries
-    final Set<TodoListEntry> globalEntries;
+    final Set<TodoEntry> globalEntries;
     
     private boolean displayUpcomingExpired;
     private long firstLoadedDay;
     private long lastLoadedDay;
     
-    public TodoListEntryList(int initialCapacity) {
+    public TodoEntryList(int initialCapacity) {
         super(initialCapacity);
         entriesPerDayUpcomingExpired = new HashMap<>(initialCapacity);
         daysPerEntryUpcomingExpired = new HashMap<>(initialCapacity);
@@ -55,7 +55,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     
     // extend to the left
     public void extendLoadingRangeStartDay(long newDayStart) {
-        for (TodoListEntry entry : this) {
+        for (TodoEntry entry : this) {
             // we know that newDayStart is smaller than previous loadedDay_start
             linkEntryToLookupContainers(entry, newDayStart, firstLoadedDay - 1);
         }
@@ -64,7 +64,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     
     // extend to the right
     public void extendLoadingRangeEndDay(long newDayEnd) {
-        for (TodoListEntry entry : this) {
+        for (TodoEntry entry : this) {
             // we know that newDayStart is bigger than previous loadedDay_start
             linkEntryToLookupContainers(entry, lastLoadedDay + 1, newDayEnd);
         }
@@ -74,7 +74,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     // handle unlinking
     protected @Nullable
     @Override
-    TodoListEntry handleOldEntry(@Nullable TodoListEntry oldEntry) {
+    TodoEntry handleOldEntry(@Nullable TodoEntry oldEntry) {
         if (oldEntry != null) {
             oldEntry.stopListeningToParameterInvalidations();
             oldEntry.unlinkGroupInternal(false);
@@ -97,16 +97,16 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         return null;
     }
     
-    private Set<Long> unlinkEntryFromLookupContainers(TodoListEntry entry,
-                                                      Map<TodoListEntry, Set<Long>> daysPerEntry,
-                                                      Map<Long, Set<TodoListEntry>> entriesPerDay) {
+    private Set<Long> unlinkEntryFromLookupContainers(TodoEntry entry,
+                                                      Map<TodoEntry, Set<Long>> daysPerEntry,
+                                                      Map<Long, Set<TodoEntry>> entriesPerDay) {
         Set<Long> daysForEntry = daysPerEntry.remove(entry);
         if (daysForEntry == null) {
             Logger.error(NAME, "Can't remove associations for '" + entry + "', entry not managed by current container");
             return Collections.emptySet();
         } else {
             for (Long day : daysForEntry) {
-                Set<TodoListEntry> entriesOnDay = entriesPerDay.get(day);
+                Set<TodoEntry> entriesOnDay = entriesPerDay.get(day);
                 if (entriesOnDay == null) {
                     Logger.error(NAME, "Can't remove associations for '" + entry + "' on day " + day);
                     continue;
@@ -117,18 +117,18 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         }
     }
     
-    private void linkEntryToLookupContainers(TodoListEntry entry, long minDay, long maxDay) {
+    private void linkEntryToLookupContainers(TodoEntry entry, long minDay, long maxDay) {
         if (entry.isGlobal()) {
             // don't link global entries
             return;
         }
-        TodoListEntry.FullDaySet fullDaySet = entry.getFullDaySet(minDay, maxDay);
+        TodoEntry.FullDaySet fullDaySet = entry.getFullDaySet(minDay, maxDay);
         linkEntryToLookupContainers(entry, fullDaySet);
     }
     
     // link entry to 4 maps (core and extended)
-    private void linkEntryToLookupContainers(TodoListEntry entry,
-                                             TodoListEntry.FullDaySet fullDaySet) {
+    private void linkEntryToLookupContainers(TodoEntry entry,
+                                             TodoEntry.FullDaySet fullDaySet) {
         // link to core days
         linkEntryToLookupContainers(entry, fullDaySet.getCoreDaySet(), daysPerEntryCore, entriesPerDayCore);
         // link to extended days
@@ -136,10 +136,10 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     // link entry to both maps
-    private void linkEntryToLookupContainers(TodoListEntry entry,
+    private void linkEntryToLookupContainers(TodoEntry entry,
                                              Set<Long> eventDays,
-                                             Map<TodoListEntry, Set<Long>> daysPerEntry,
-                                             Map<Long, Set<TodoListEntry>> entriesPerDay) {
+                                             Map<TodoEntry, Set<Long>> daysPerEntry,
+                                             Map<Long, Set<TodoEntry>> entriesPerDay) {
         daysPerEntry
                 .computeIfAbsent(entry, k -> new HashSet<>())
                 .addAll(eventDays);
@@ -151,7 +151,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     // handle linking to container and assigning an invalidation listener
-    protected void handleNewEntry(@Nullable TodoListEntry newEntry,
+    protected void handleNewEntry(@Nullable TodoEntry newEntry,
                                   ParameterInvalidationListener parameterInvalidationListener) {
         if (newEntry != null) {
             // link to current container
@@ -171,17 +171,17 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     // add, assign invalidation listener and handle linking to container
-    public boolean add(TodoListEntry todoListEntry,
+    public boolean add(TodoEntry todoEntry,
                        ParameterInvalidationListener parameterInvalidationListener) {
-        handleNewEntry(todoListEntry, parameterInvalidationListener);
-        return super.add(todoListEntry);
+        handleNewEntry(todoEntry, parameterInvalidationListener);
+        return super.add(todoEntry);
     }
     
     // add, assign invalidation listener and handle linking to container
-    public boolean addAll(@NonNull Collection<? extends TodoListEntry> collection,
+    public boolean addAll(@NonNull Collection<? extends TodoEntry> collection,
                           ParameterInvalidationListener parameterInvalidationListener) {
-        for (TodoListEntry todoListEntry : collection) {
-            handleNewEntry(todoListEntry, parameterInvalidationListener);
+        for (TodoEntry todoEntry : collection) {
+            handleNewEntry(todoEntry, parameterInvalidationListener);
         }
         return super.addAll(collection);
     }
@@ -189,44 +189,51 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     @FunctionalInterface
     public
     interface TodoListEntryFilter {
-        boolean filter(TodoListEntry entry, TodoListEntry.EntryType entryType);
+        boolean filter(TodoEntry entry, TodoEntry.EntryType entryType);
     }
     
-    public TodoListEntry.EntryType getEntryType(TodoListEntry entry, long day) {
+    public TodoEntry.EntryType getEntryType(TodoEntry entry, long day) {
         if (entry.isGlobal()) {
-            return TodoListEntry.EntryType.GLOBAL;
+            return TodoEntry.EntryType.GLOBAL;
         }
         Set<Long> extendedDays = daysPerEntryUpcomingExpired.get(entry);
         Set<Long> coreDays = daysPerEntryCore.get(entry);
         if (extendedDays == null || coreDays == null) {
             Logger.error(NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day + ". Entry not managed by current container");
-            return TodoListEntry.EntryType.UNKNOWN;
+            return TodoEntry.EntryType.UNKNOWN;
         }
         
         if (coreDays.contains(day)) {
-            return TodoListEntry.EntryType.TODAY;
+            return TodoEntry.EntryType.TODAY;
+        }
+        
+        if (!extendedDays.contains(day)) {
+            // entry is 100% not expired or upcoming
+            Logger.debug(NAME, entry + " is not visible on " + day);
+            return TodoEntry.EntryType.UNKNOWN;
         }
         
         // our event is not today's, we need to check SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET to the left and to the right
         for (long day_offset = 1; day_offset < Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET; day_offset++) {
             // + + + event + + +
             //       event     we are here
-            if (extendedDays.contains(day - day_offset)) {
-                return TodoListEntry.EntryType.EXPIRED;
+            if (coreDays.contains(day - day_offset)) {
+                return TodoEntry.EntryType.EXPIRED;
                 //           + + + event + + +
                 // we are here     event
-            } else if (extendedDays.contains(day + day_offset)) {
-                return TodoListEntry.EntryType.UPCOMING;
+            } else if (coreDays.contains(day + day_offset)) {
+                return TodoEntry.EntryType.UPCOMING;
             }
         }
-        return TodoListEntry.EntryType.UNKNOWN;
+        Logger.error(NAME, "Can't determine if '" + entry + "' is expired or upcoming on day " + day + ". Cause: unknown");
+        return TodoEntry.EntryType.UNKNOWN;
     }
     
     // get all entries visible on a particular day
-    public List<TodoListEntry> getOnDay(long day, TodoListEntryFilter filter) {
-        List<TodoListEntry> filtered = new ArrayList<>();
-        Set<TodoListEntry> notFiltered = displayUpcomingExpired ? entriesPerDayUpcomingExpired.get(day) : entriesPerDayCore.get(day);
-        Consumer<TodoListEntry> consumer = entry -> {
+    public List<TodoEntry> getOnDay(long day, TodoListEntryFilter filter) {
+        List<TodoEntry> filtered = new ArrayList<>();
+        Set<TodoEntry> notFiltered = displayUpcomingExpired ? entriesPerDayUpcomingExpired.get(day) : entriesPerDayCore.get(day);
+        Consumer<TodoEntry> consumer = entry -> {
             if (filter.filter(entry, getEntryType(entry, day))) {
                 filtered.add(entry);
             }
@@ -239,12 +246,12 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     }
     
     // fast lookup instead of iterating the recurrence set (does not check for global entries)
-    public boolean notGlobalEntryVisibleOnDay(TodoListEntry entry, long targetDayLocal) {
+    public boolean notGlobalEntryVisibleOnDay(TodoEntry entry, long targetDayLocal) {
         Set<Long> extendedDays = daysPerEntryUpcomingExpired.get(entry);
         return extendedDays != null && extendedDays.contains(targetDayLocal);
     }
     
-    public void notifyEntryVisibilityChanged(TodoListEntry entry,
+    public void notifyEntryVisibilityChanged(TodoEntry entry,
                                              boolean coreDaysChanged,
                                              @Nullable Set<Long> invalidatedDaySet) {
         // if the entry is currently marked as global in the list and is global now
@@ -255,7 +262,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         
         // entry was global and now it's normal we unlink it from global container and link to normal container
         if (globalEntries.remove(entry)) {
-            TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
+            TodoEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
             linkEntryToLookupContainers(entry, newDaySet);
             if (invalidatedDaySet != null) {
                 invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
@@ -276,7 +283,7 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
         }
         
         // all the other cases (not global entries)
-        TodoListEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
+        TodoEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
         
         if (invalidatedDaySet != null) {
             invalidatedDaySet.addAll(displayUpcomingExpired ?
@@ -296,22 +303,22 @@ public class TodoListEntryList extends BaseCleanupList<TodoListEntry> {
     
     // unsupported, will cause inconsistent state
     @Override
-    public boolean add(TodoListEntry todoListEntry) {
+    public boolean add(TodoEntry todoEntry) {
         throw new UnsupportedOperationException();
     }
     
     @Override
-    public void add(int index, TodoListEntry todoListEntry) {
+    public void add(int index, TodoEntry todoEntry) {
         throw new UnsupportedOperationException();
     }
     
     @Override
-    public boolean addAll(@NonNull Collection<? extends TodoListEntry> collection) {
+    public boolean addAll(@NonNull Collection<? extends TodoEntry> collection) {
         throw new UnsupportedOperationException();
     }
     
     @Override
-    public boolean addAll(int index, @NonNull Collection<? extends TodoListEntry> collection) {
+    public boolean addAll(int index, @NonNull Collection<? extends TodoEntry> collection) {
         throw new UnsupportedOperationException();
     }
 }

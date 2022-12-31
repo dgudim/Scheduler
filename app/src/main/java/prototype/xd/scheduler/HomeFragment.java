@@ -43,7 +43,7 @@ import java.util.Objects;
 import prototype.xd.scheduler.databinding.ContentWrapperBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
@@ -144,7 +144,7 @@ public class HomeFragment extends Fragment {
                                 dialogBinding.dayToButton.getSelectedDayUTCStr());
                         values.put(IS_COMPLETED, "false");
                         
-                        todoListEntryManager.addEntry(new TodoListEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
+                        todoListEntryManager.addEntry(new TodoEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
                                 groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
                         return true;
                     });

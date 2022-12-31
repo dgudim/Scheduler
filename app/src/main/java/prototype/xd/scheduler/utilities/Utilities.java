@@ -52,7 +52,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
@@ -89,18 +89,18 @@ public class Utilities {
         }
     }
     
-    public static List<TodoListEntry> loadTodoEntries(Context context,
-                                                      long dayStart, long dayEnd,
-                                                      GroupList groups,
-                                                      @Nullable List<SystemCalendar> calendars,
-                                                      boolean attachGroupToEntry) {
+    public static List<TodoEntry> loadTodoEntries(Context context,
+                                                  long dayStart, long dayEnd,
+                                                  GroupList groups,
+                                                  @Nullable List<SystemCalendar> calendars,
+                                                  boolean attachGroupToEntry) {
         
-        List<TodoListEntry> readEntries = new ArrayList<>();
+        List<TodoEntry> readEntries = new ArrayList<>();
         try {
             readEntries = loadObject(ENTRIES_FILE);
             
             int id = 0;
-            for (TodoListEntry entry : readEntries) {
+            for (TodoEntry entry : readEntries) {
                 // post deserialize
                 entry.initGroupAndId(groups, id++, attachGroupToEntry);
             }
@@ -118,12 +118,12 @@ public class Utilities {
         return readEntries;
     }
     
-    public static void saveEntries(List<TodoListEntry> entries) {
+    public static void saveEntries(List<TodoEntry> entries) {
         try {
-            List<TodoListEntry> entriesToSave = new ArrayList<>();
+            List<TodoEntry> entriesToSave = new ArrayList<>();
             
             for (int i = 0; i < entries.size(); i++) {
-                TodoListEntry entry = entries.get(i);
+                TodoEntry entry = entries.get(i);
                 if (!entry.isFromSystemCalendar()) {
                     entriesToSave.add(entry);
                 }
@@ -206,9 +206,9 @@ public class Utilities {
         callback.launch(Intent.createChooser(chooseImage, "Choose an image"));
     }
     
-    public static List<TodoListEntry> sortEntries(List<TodoListEntry> entries, long targetDay) {
+    public static List<TodoEntry> sortEntries(List<TodoEntry> entries, long targetDay) {
         
-        for (TodoListEntry entry : entries) {
+        for (TodoEntry entry : entries) {
             // Look at {@link prototype.xd.scheduler.entities.TodoListEntry.EntryType}
             entry.cacheSortingIndex(targetDay);
             if (entry.isFromSystemCalendar()) {
@@ -529,23 +529,23 @@ public class Utilities {
     }
 }
 
-class TodoListEntryEntryTypeComparator implements Comparator<TodoListEntry> {
+class TodoListEntryEntryTypeComparator implements Comparator<TodoEntry> {
     @Override
-    public int compare(TodoListEntry o1, TodoListEntry o2) {
+    public int compare(TodoEntry o1, TodoEntry o2) {
         return Integer.compare(o1.getSortingIndex(), o2.getSortingIndex());
     }
 }
 
-class TodoListEntryPriorityComparator implements Comparator<TodoListEntry> {
+class TodoListEntryPriorityComparator implements Comparator<TodoEntry> {
     @Override
-    public int compare(TodoListEntry o1, TodoListEntry o2) {
+    public int compare(TodoEntry o1, TodoEntry o2) {
         return Integer.compare(o2.priority.getToday(), o1.priority.getToday());
     }
 }
 
-class TodoListEntryGroupComparator implements Comparator<TodoListEntry> {
+class TodoListEntryGroupComparator implements Comparator<TodoEntry> {
     @Override
-    public int compare(TodoListEntry o1, TodoListEntry o2) {
+    public int compare(TodoEntry o1, TodoEntry o2) {
         if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
             return Long.compare(o1.getCachedNearestStartMsUTC(), o2.getCachedNearestStartMsUTC());
         }

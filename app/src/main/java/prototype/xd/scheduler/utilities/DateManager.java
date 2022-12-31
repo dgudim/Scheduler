@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 
 public class DateManager {
     
@@ -50,7 +50,7 @@ public class DateManager {
     private static final DateFormat timeFormatLocal = new SimpleDateFormat("HH:mm", systemLocale);
     
     public static final List<String> WEEK_DAYS_ROOT = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
-    public static final String DEFAULT_BACKGROUND_NAME = DateManager.WEEK_DAYS_ROOT.get(7) + ".png"; // get "default"
+    public static final String DEFAULT_BACKGROUND_NAME = DateManager.WEEK_DAYS_ROOT.get(7) + ".png"; // get "default.png"
     private static final List<String> WEEK_DAYS_LOCAL;
     
     public static final List<DayOfWeek> FIRST_DAYS_OF_WEEK = Collections.unmodifiableList(
@@ -115,7 +115,7 @@ public class DateManager {
         return month.atEndOfMonth().toEpochDay();
     }
     
-    public static String getTimeSpan(TodoListEntry.TimeRange timeRange) {
+    public static String getTimeSpan(TodoEntry.TimeRange timeRange) {
         return getTimeSpan(timeRange.getStart(), timeRange.getEnd());
     }
     

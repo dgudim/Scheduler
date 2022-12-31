@@ -25,7 +25,7 @@ import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.entities.TodoListEntry;
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.TodoListEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -33,7 +33,7 @@ import prototype.xd.scheduler.utilities.Utilities;
 public class EntrySettings extends PopupSettingsView {
     
     public final TodoListEntryManager todoListEntryManager;
-    private TodoListEntry todoListEntry;
+    private TodoEntry todoEntry;
     
     public EntrySettings(@NonNull final TodoListEntryManager todoListEntryManager,
                          @NonNull final Context context,
@@ -48,21 +48,21 @@ public class EntrySettings extends PopupSettingsView {
         this.todoListEntryManager = todoListEntryManager;
     }
     
-    public void show(final TodoListEntry entry, final Context context) {
+    public void show(final TodoEntry entry, final Context context) {
         initialise(entry, context);
         dialog.show();
     }
     
-    private void initialise(TodoListEntry entry, Context context) {
+    private void initialise(TodoEntry entry, Context context) {
         
-        todoListEntry = entry;
+        todoEntry = entry;
         
         updateAllIndicators();
         updatePreviews(
-                todoListEntry.fontColor.getToday(),
-                todoListEntry.bgColor.getToday(),
-                todoListEntry.borderColor.getToday(),
-                todoListEntry.borderThickness.getToday());
+                todoEntry.fontColor.getToday(),
+                todoEntry.bgColor.getToday(),
+                todoEntry.borderColor.getToday(),
+                todoEntry.borderThickness.getToday());
         
         final List<Group> groupList = todoListEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
@@ -179,7 +179,7 @@ public class EntrySettings extends PopupSettingsView {
                 ADAPTIVE_COLOR_BALANCE,
                 parameterKey -> entry.adaptiveColorBalance.getToday());
         
-        if (todoListEntry.isGlobal()) {
+        if (todoEntry.isGlobal()) {
             // global entries can't have upcoming / expired days
             bnd.showDaysUpcomingContainer.setVisibility(View.GONE);
             bnd.showDaysExpiredContainer.setVisibility(View.GONE);
@@ -208,31 +208,31 @@ public class EntrySettings extends PopupSettingsView {
                                      Context context) {
         if (existingGroup != null) {
             // setParams automatically handles parameter invalidation on other entries
-            existingGroup.setParams(todoListEntry.getDisplayParams());
+            existingGroup.setParams(todoEntry.getDisplayParams());
             // save groups manually
             todoListEntryManager.saveGroupsAsync();
         } else {
-            Group newGroup = new Group(groupName, todoListEntry.getDisplayParams());
+            Group newGroup = new Group(groupName, todoEntry.getDisplayParams());
             todoListEntryManager.addGroup(newGroup);
-            todoListEntry.changeGroup(newGroup);
+            todoEntry.changeGroup(newGroup);
         }
         
-        todoListEntry.removeDisplayParams();
+        todoEntry.removeDisplayParams();
         rebuild(context);
     }
     
     private void rebuild(Context context) {
-        initialise(todoListEntry, context);
+        initialise(todoEntry, context);
     }
     
     @Override
     public <T> void notifyParameterChanged(TextView displayTo, String parameterKey, T value) {
-        todoListEntry.changeParameters(parameterKey, String.valueOf(value));
+        todoEntry.changeParameters(parameterKey, String.valueOf(value));
         setStateIconColor(displayTo, parameterKey);
     }
     
     @Override
     protected void setStateIconColor(TextView icon, String parameterKey) {
-        todoListEntry.setStateIconColor(icon, parameterKey);
+        todoEntry.setStateIconColor(icon, parameterKey);
     }
 }

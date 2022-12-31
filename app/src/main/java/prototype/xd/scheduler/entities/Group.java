@@ -24,7 +24,7 @@ public class Group implements Serializable {
     public static final transient Group NULL_GROUP = new Group();
     
     private String groupName;
-    private transient ArrayMap<Long, TodoListEntry> associatedEntries;
+    private transient ArrayMap<Long, TodoEntry> associatedEntries;
     protected SArrayMap<String, String> params;
     
     public Group() {
@@ -46,16 +46,16 @@ public class Group implements Serializable {
     }
     
     // to be called only by TodoListEntry
-    protected void attachEntryInternal(TodoListEntry todoListEntry) {
-        if (associatedEntries.put(todoListEntry.getId(), todoListEntry) != null) {
-            Logger.warning(NAME, "attachEntryInternal called with " + todoListEntry + " but it's already attached");
+    protected void attachEntryInternal(TodoEntry todoEntry) {
+        if (associatedEntries.put(todoEntry.getId(), todoEntry) != null) {
+            Logger.warning(NAME, "attachEntryInternal called with " + todoEntry + " but it's already attached");
         }
     }
     
     // to be called only by TodoListEntry
-    protected void detachEntryInternal(TodoListEntry todoListEntry) {
-        if (associatedEntries.remove(todoListEntry.getId()) == null) {
-            Logger.warning(NAME, "detachEntryInternal called with " + todoListEntry + " but it's not attached");
+    protected void detachEntryInternal(TodoEntry todoEntry) {
+        if (associatedEntries.remove(todoEntry.getId()) == null) {
+            Logger.warning(NAME, "detachEntryInternal called with " + todoEntry + " but it's not attached");
         }
     }
     
