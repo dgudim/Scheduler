@@ -1,12 +1,9 @@
 package prototype.xd.scheduler.utilities;
 
-import static android.util.Log.ERROR;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
-
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
-import static prototype.xd.scheduler.utilities.Logger.log;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -52,7 +49,7 @@ public class Keys {
         public T get(@Nullable List<String> subKeys) {
             return get(preferences, subKeys, defaultValue);
         }
-    
+        
         public T get(@Nullable List<String> subKeys, T defaultValueOverride) {
             return get(preferences, subKeys, defaultValueOverride);
         }
@@ -66,18 +63,18 @@ public class Keys {
         }
         
         public abstract void put(T value);
-    
+        
         @Override
         public int hashCode() {
             return Objects.hash(key, defaultValue);
         }
-    
+        
         @Override
         public boolean equals(@Nullable Object obj) {
-            if(obj == null) {
+            if (obj == null) {
                 return false;
             }
-            if(obj == this) {
+            if (obj == this) {
                 return true;
             }
             if (!(obj instanceof DefaultedValue<?>))
@@ -85,7 +82,7 @@ public class Keys {
             DefaultedValue<?> val = (DefaultedValue<?>) obj;
             return Objects.equals(val.defaultValue, defaultValue) && val.key.equals(key);
         }
-    
+        
         @NonNull
         @Override
         public String toString() {
@@ -102,7 +99,7 @@ public class Keys {
         protected Boolean getInternal(SharedPreferences preferences, String actualKey, Boolean actualDefaultValue) {
             return preferences.getBoolean(actualKey, actualDefaultValue);
         }
-    
+        
         @Override
         public void put(Boolean value) {
             preferences.edit().putBoolean(key, value).apply();
@@ -118,7 +115,7 @@ public class Keys {
         protected Integer getInternal(SharedPreferences preferences, String actualKey, Integer actualDefaultValue) {
             return preferences.getInt(actualKey, actualDefaultValue);
         }
-    
+        
         @Override
         public void put(Integer value) {
             preferences.edit().putInt(key, value).apply();
@@ -134,7 +131,7 @@ public class Keys {
         protected Float getInternal(SharedPreferences preferences, String actualKey, Float actualDefaultValue) {
             return preferences.getFloat(actualKey, actualDefaultValue);
         }
-    
+        
         @Override
         public void put(Float value) {
             preferences.edit().putFloat(key, value).apply();
@@ -150,10 +147,41 @@ public class Keys {
         protected String getInternal(SharedPreferences preferences, String actualKey, String actualDefaultValue) {
             return preferences.getString(actualKey, actualDefaultValue);
         }
-    
+        
         @Override
         public void put(String value) {
             preferences.edit().putString(key, value).apply();
+        }
+    }
+    
+    public static class DefaultedEnum<T extends Enum<T>> extends DefaultedValue<T> {
+        
+        private final Class<T> enumClass;
+        
+        DefaultedEnum(String key, T defaultValue, Class<T> enumClass) {
+            super(key, defaultValue);
+            this.enumClass = enumClass;
+        }
+        
+        @Override
+        protected T getInternal(SharedPreferences preferences, String actualKey, T actualDefaultValue) {
+            String valName = preferences.getString(actualKey, null);
+            return valName == null ? actualDefaultValue : T.valueOf(enumClass, valName);
+        }
+        
+        @Override
+        public void put(T value) {
+            preferences.edit().putString(key, value.name()).apply();
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, defaultValue, enumClass);
+        }
+        
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            return super.equals(obj) && ((DefaultedEnum<?>) obj).enumClass.equals(enumClass);
         }
     }
     
@@ -176,7 +204,7 @@ public class Keys {
         } else if (value.getClass() == Float.class) {
             preferences.edit().putFloat(key, (Float) value).apply();
         } else {
-            log(ERROR, "Keys", "Can't put key: " + key + " with value " + value);
+            Logger.error("Keys", "Can't put key: " + key + " with value " + value);
         }
     }
     
@@ -270,6 +298,8 @@ public class Keys {
     public static final DefaultedBoolean ADAPTIVE_BACKGROUND_ENABLED = new DefaultedBoolean("adaptive_background_enabled", false);
     public static final DefaultedInteger ADAPTIVE_COLOR_BALANCE = new DefaultedInteger("adaptive_color_balance", 3);
     
+    public static final DefaultedInteger LOCKSCREEN_VIEW_VERTICAL_BIAS = new DefaultedInteger("lockscreen_view_vertical_bias", 50);
+    
     public static final DefaultedBoolean HIDE_ENTRIES_BY_CONTENT = new DefaultedBoolean("hide_entries_by_content", false);
     public static final DefaultedString HIDE_ENTRIES_BY_CONTENT_CONTENT = new DefaultedString("hide_entries_by_content_content", "");
     
@@ -317,7 +347,5 @@ public class Keys {
     public static final String GITHUB_REPO = "https://github.com/dgudim/Scheduler";
     public static final String GITHUB_RELEASES = "https://github.com/dgudim/Scheduler/releases";
     
-    public static final List<String> WEEK_DAYS = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
-    public static final String DEFAULT_BACKGROUND_NAME = "default.png";
     public static final int TODO_LIST_INITIAL_CAPACITY = 75;
 }

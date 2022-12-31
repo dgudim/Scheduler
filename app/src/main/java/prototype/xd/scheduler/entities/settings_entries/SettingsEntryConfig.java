@@ -22,16 +22,20 @@ import prototype.xd.scheduler.databinding.AppThemeSelectorSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.DropdownSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.SeekbarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
 import prototype.xd.scheduler.entities.RecycleViewEntry;
+import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig.DropdownViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig.ResetButtonViewHolder;
+
+
 
 enum SettingsEntryType {
     CALENDAR_ACCOUNT, CALENDAR, COMPOUND_CUSTOMIZATION,
-    RESET_BUTTON, SEEK_BAR, SWITCH, TITLE_BAR, ADAPTIVE_BACKGROUND_SETTINGS, APP_THEME_SELECTOR
+    RESET_BUTTON, SEEK_BAR, SWITCH, DROPDOWN, TITLE_BAR, ADAPTIVE_BACKGROUND_SETTINGS, APP_THEME_SELECTOR
 }
 
 public abstract class SettingsEntryConfig extends RecycleViewEntry {
@@ -53,13 +57,16 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
                 return new SeekBarViewHolder(SeekbarSettingsEntryBinding.inflate(inflater, parent, false));
             case SWITCH:
                 return new SwitchViewHolder(SwitchSettingsEntryBinding.inflate(inflater, parent, false));
+            case DROPDOWN:
+                return new DropdownViewHolder(DropdownSettingsEntryBinding.inflate(inflater, parent, false));
             case ADAPTIVE_BACKGROUND_SETTINGS:
                 return new AdaptiveBackgroundViewHolder(AdaptiveBackgroundSettingsEntryBinding.inflate(inflater, parent, false));
             case APP_THEME_SELECTOR:
                 return new AppThemeSelectorViewHolder(AppThemeSelectorSettingsEntryBinding.inflate(inflater, parent, false));
             case TITLE_BAR:
-            default:
                 return new TitleBarViewHolder(TitleSettingsEntryBinding.inflate(inflater, parent, false));
+            default:
+                throw new IllegalArgumentException("Can't create viewHolder for " + SettingsEntryType.values()[viewType]);
         }
     }
     

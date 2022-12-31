@@ -18,6 +18,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.BackgroundImagesGridViewAdapter;
 import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.BgGridSelectionViewBinding;
+import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 
@@ -76,8 +77,8 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                                 R.string.delete_all_saved_backgrounds_description,
                                 R.string.cancel, R.string.delete,
                                 view2 -> {
-                                    for (int dayIndex = 0; dayIndex < Keys.WEEK_DAYS.size() - 1; dayIndex++) {
-                                        String availableDay = Keys.WEEK_DAYS.get(dayIndex);
+                                    for (int dayIndex = 0; dayIndex < DateManager.WEEK_DAYS_ROOT.size() - 1; dayIndex++) {
+                                        String availableDay = DateManager.WEEK_DAYS_ROOT.get(dayIndex);
                                         getFile(availableDay + ".png").delete();
                                         getFile(availableDay + ".png_min.png").delete();
                                     }

@@ -20,36 +20,26 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.DateManager;
 
 public class BackgroundImagesGridViewAdapter extends BaseAdapter {
     
     private final Consumer<Integer> bgSelectionClickedCallback;
-    private final String[] availableDays_localized;
-    
+    private final String defaultDay;
     public BackgroundImagesGridViewAdapter(@NonNull final Context context,
                                            @NonNull final Consumer<Integer> bgSelectionClickedCallback) {
+        defaultDay = context.getString(R.string.day_default);
         this.bgSelectionClickedCallback = bgSelectionClickedCallback;
-        availableDays_localized = new String[]{
-                context.getString(R.string.day_monday),
-                context.getString(R.string.day_tuesday),
-                context.getString(R.string.day_wednesday),
-                context.getString(R.string.day_thursday),
-                context.getString(R.string.day_friday),
-                context.getString(R.string.day_saturday),
-                context.getString(R.string.day_sunday),
-                context.getString(R.string.day_default)
-        };
     }
     
     @Override
     public int getCount() {
-        return Keys.WEEK_DAYS.size();
+        return DateManager.WEEK_DAYS_ROOT.size();
     }
     
     @Override
     public Object getItem(int i) {
-        return Keys.WEEK_DAYS.get(i);
+        return DateManager.WEEK_DAYS_ROOT.get(i);
     }
     
     @Override
@@ -64,11 +54,11 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.background_image_entry, parent, false);
         }
         
-        ((TextView) convertView.findViewById(R.id.bg_title)).setText(availableDays_localized[i]);
+        ((TextView) convertView.findViewById(R.id.bg_title)).setText(DateManager.getLocalWeekdayByIndex(i, defaultDay));
         ImageView imageView = convertView.findViewById(R.id.bg_image);
         
         try {
-            FileInputStream inputStream = new FileInputStream(getFile(Keys.WEEK_DAYS.get(i) + ".png_min.png"));
+            FileInputStream inputStream = new FileInputStream(getFile(DateManager.WEEK_DAYS_ROOT.get(i) + ".png_min.png"));
             imageView.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             inputStream.close();
         } catch (FileNotFoundException e) {

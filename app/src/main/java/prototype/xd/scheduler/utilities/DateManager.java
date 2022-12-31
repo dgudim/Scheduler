@@ -1,17 +1,22 @@
 package prototype.xd.scheduler.utilities;
 
-import static android.util.Log.DEBUG;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
-import static prototype.xd.scheduler.utilities.Logger.log;
+
+import android.icu.text.DateFormatSymbols;
 
 import androidx.annotation.NonNull;
 import androidx.core.os.LocaleListCompat;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -44,7 +49,31 @@ public class DateManager {
     private static final DateFormat dateFormatMonthNamesUTC = new SimpleDateFormat("MMM d", systemLocale);
     private static final DateFormat timeFormatLocal = new SimpleDateFormat("HH:mm", systemLocale);
     
+    public static final List<String> WEEK_DAYS_ROOT = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
+    public static final String DEFAULT_BACKGROUND_NAME = DateManager.WEEK_DAYS_ROOT.get(7); // get "default"
+    private static final List<String> WEEK_DAYS_LOCAL;
+    
+    public static final List<DayOfWeek> FIRST_DAYS_OF_WEEK = Collections.unmodifiableList(
+            Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
+    public static final Keys.DefaultedEnum<DayOfWeek> FIRST_DAY_OF_WEEK =
+            new Keys.DefaultedEnum<>("first_week_day", DayOfWeek.MONDAY, DayOfWeek.class);
+    
+    private static final Calendar localLookupCalendar = Calendar.getInstance(systemTimeZone, systemLocale);
+    
     static {
+        // init local weekdays (remap)
+        String[] weekDaysLocal = new String[7];
+        String[] newDays = new DateFormatSymbols(systemLocale).getWeekdays();
+        weekDaysLocal[0] = newDays[Calendar.MONDAY];
+        weekDaysLocal[1] = newDays[Calendar.TUESDAY];
+        weekDaysLocal[2] = newDays[Calendar.WEDNESDAY];
+        weekDaysLocal[3] = newDays[Calendar.THURSDAY];
+        weekDaysLocal[4] = newDays[Calendar.FRIDAY];
+        weekDaysLocal[5] = newDays[Calendar.SATURDAY];
+        weekDaysLocal[6] = newDays[Calendar.SUNDAY];
+        
+        WEEK_DAYS_LOCAL = Collections.unmodifiableList(Arrays.asList(weekDaysLocal));
+        
         dateFormatUTC.setTimeZone(utcTimeZone);
         dateFormatMonthNamesUTC.setTimeZone(utcTimeZone);
     }
@@ -52,9 +81,11 @@ public class DateManager {
     public static synchronized boolean checkIfTimeSettingsChanged() {
         TimeZone newTimeZone = TimeZone.getDefault();
         if (!newTimeZone.equals(systemTimeZone)) {
-            log(DEBUG, "DateManager", "Timezone changed! Old: " + systemTimeZone.getID() + " | New: " + newTimeZone.getID());
+            Logger.debug("DateManager", "Timezone changed! Old: " + systemTimeZone.getID() + " | New: " + newTimeZone.getID());
             // reinitialize all the stuff
             systemTimeZone = newTimeZone;
+            // update timezones of calendar and formatters
+            localLookupCalendar.setTimeZone(systemTimeZone);
             timeFormatLocal.setTimeZone(systemTimeZone);
             dateTimeFormatLocal.setTimeZone(systemTimeZone);
             updateDate();
@@ -182,6 +213,28 @@ public class DateManager {
     // returns current timestamp in UTC
     public static long getCurrentTimestampUTC() {
         return System.currentTimeMillis();
+    }
+    
+    public static String getCurrentWeekdayLocaleAgnosticString() {
+        localLookupCalendar.setTimeInMillis(System.currentTimeMillis());
+        return WEEK_DAYS_ROOT.get(normalizeCalendarDayOffset(localLookupCalendar.get(Calendar.DAY_OF_WEEK)));
+    }
+    
+    public static String[] getFirstDaysOfWeekLocal() {
+        String[] localizedWeekdays = new String[FIRST_DAYS_OF_WEEK.size()];
+        for (int i = 0; i < localizedWeekdays.length; i++) {
+            localizedWeekdays[i] = WEEK_DAYS_LOCAL.get(FIRST_DAYS_OF_WEEK.get(i).ordinal());
+        }
+        return localizedWeekdays;
+    }
+    
+    public static String getLocalWeekdayByIndex(int index, String defaultValue) {
+        return index >= 7 ? defaultValue : WEEK_DAYS_LOCAL.get(index);
+    }
+    
+    private static int normalizeCalendarDayOffset(int day) {
+        // Calendar.SUNDAY == 1
+        return day == 1 ? 6 : day - 2;
     }
     
 }

@@ -4,6 +4,7 @@ import static com.kizitonwose.calendar.core.ExtensionsKt.daysOfWeek;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.systemLocale;
@@ -143,12 +144,15 @@ public class CalendarView {
     public static final int CACHED_PANELS = 2;
     public static final int POTENTIALLY_VISIBLE_DAYS = DAYS_ON_ONE_PANEL * CACHED_PANELS;
     
+    private DayOfWeek firstDayOfWeek;
+    private List<DayOfWeek> daysOfWeek;
+    
     @Nullable
     LocalDate selectedDate;
     @Nullable
     YearMonth selectedMonth;
     
-    private final Set<YearMonth> loadedMonths;
+    private final Set<YearMonth> loadedMonths = new HashSet<>();
     
     private long firstSelectedMonthDayUTC = 0;
     private long lastSelectedMonthDayUTC = 0;
@@ -167,13 +171,6 @@ public class CalendarView {
     
     public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoListEntryManager todoListEntryManager) {
         this.rootCalendarView = rootCalendarView;
-        
-        loadedMonths = new HashSet<>();
-        
-        YearMonth currentMonth = YearMonth.now();
-        addLoadedMonth(currentMonth, false);
-        
-        List<DayOfWeek> daysOfWeek = daysOfWeek(DayOfWeek.MONDAY);
         
         rootCalendarView.setDayBinder(new MonthDayBinder<CalendarDayViewContainer>() {
             @NonNull
@@ -227,9 +224,27 @@ public class CalendarView {
             return null;
         });
         
+        YearMonth currentMonth = YearMonth.now();
+        addLoadedMonth(currentMonth, false);
+        init(currentMonth, FIRST_DAY_OF_WEEK.get());
+    }
+    
+    private void init(YearMonth currentMonth, DayOfWeek newFirstDayOfWeek) {
+        firstDayOfWeek = newFirstDayOfWeek;
+        daysOfWeek = daysOfWeek(newFirstDayOfWeek);
+    
         rootCalendarView.setup(currentMonth.minusMonths(100), currentMonth.plusMonths(100), daysOfWeek.get(0));
         selectDate(DateManager.currentDate);
         rootCalendarView.scrollToMonth(currentMonth);
+    }
+    
+    public boolean checkIfFirstDayOfWeekChanged() {
+        DayOfWeek newFirstDayOfWeek = FIRST_DAY_OF_WEEK.get();
+        if(!newFirstDayOfWeek.equals(firstDayOfWeek)) {
+            init(YearMonth.now(), newFirstDayOfWeek);
+            return true;
+        }
+        return false;
     }
     
     private void addLoadedMonth(YearMonth month, boolean extend) {
