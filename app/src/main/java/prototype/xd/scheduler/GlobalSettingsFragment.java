@@ -77,7 +77,7 @@ public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> 
                 Keys.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)));
         settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.LOCKSCREEN_VIEW_VERTICAL_BIAS,
                 0, 100, 5, value -> {
-            String baseString = context.getString(R.string.settings_event_vertical_bias, (int) value) + "%";
+            String baseString = context.getString(R.string.settings_event_vertical_bias, value) + "%";
             if (value == 0) {
                 return baseString + " (" + context.getString(R.string.top) + ")";
             }

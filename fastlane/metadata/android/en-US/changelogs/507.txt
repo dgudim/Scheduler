@@ -1,0 +1,6 @@
+New features:
+- Ability to change first day of the week
+- Ability to change position of the events on the lockscreen
+
+Internal changes:
+- Debug logging is now stripped via proguard in release builds

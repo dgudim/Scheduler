@@ -235,7 +235,7 @@ public class Utilities {
                                                Keys.DefaultedInteger value,
                                                boolean zeroIsOff) {
         Context context = displayTo.getContext();
-        Function<Integer, String> textFormatter = (Function<Integer, String>) progress -> {
+        Function<Integer, String> textFormatter = progress -> {
             if (progress == 0 && zeroIsOff) {
                 return context.getString(stringResource, context.getString(R.string.off));
             } else {
