@@ -50,7 +50,7 @@ public class DateManager {
     private static final DateFormat timeFormatLocal = new SimpleDateFormat("HH:mm", systemLocale);
     
     public static final List<String> WEEK_DAYS_ROOT = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
-    public static final String DEFAULT_BACKGROUND_NAME = DateManager.WEEK_DAYS_ROOT.get(7); // get "default"
+    public static final String DEFAULT_BACKGROUND_NAME = DateManager.WEEK_DAYS_ROOT.get(7) + ".png"; // get "default"
     private static final List<String> WEEK_DAYS_LOCAL;
     
     public static final List<DayOfWeek> FIRST_DAYS_OF_WEEK = Collections.unmodifiableList(
