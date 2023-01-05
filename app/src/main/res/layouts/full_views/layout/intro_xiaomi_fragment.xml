@@ -22,7 +22,7 @@
         android:contentDescription="@string/xiaomi_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_xiaomi"
+        app:srcCompat="@drawable/ic_xiaomi_150"
         tools:ignore="ImageContrastCheck"
         tools:layout_editor_absoluteY="325dp" />
 

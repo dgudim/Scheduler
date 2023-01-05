@@ -83,21 +83,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/note_animated_wallpapers"
-                app:drawableStartCompat="@drawable/ic_animation" />
+                app:drawableStartCompat="@drawable/ic_animation_24" />
 
             <TextView
                 style="@style/SecondaryAccentedTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/note_bugs"
-                app:drawableStartCompat="@drawable/ic_bug" />
+                app:drawableStartCompat="@drawable/ic_bug_24" />
 
             <TextView
                 style="@style/SecondaryAccentedTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/note_contribute"
-                app:drawableStartCompat="@drawable/ic_github" />
+                app:drawableStartCompat="@drawable/ic_github_24" />
 
             <prototype.xd.scheduler.views.CheckBox
                 android:id="@+id/understood_checkbox"

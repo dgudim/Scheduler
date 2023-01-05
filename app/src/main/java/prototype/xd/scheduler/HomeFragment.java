@@ -158,7 +158,7 @@ public class HomeFragment extends Fragment {
         
         wrapperBnd.navView.logo.setOnClickListener(v -> displayMessageDialog(requireContext(), getLifecycle(),
                 R.string.easter_egg, R.string.easter_egg_description,
-                R.drawable.ic_egg, R.string.yay,
+                R.drawable.ic_egg_24_primary, R.string.yay,
                 R.style.DefaultAlertDialogTheme,
                 null));
         
@@ -204,7 +204,7 @@ public class HomeFragment extends Fragment {
             // display warning if the background service failed
             displayMessageDialog(requireContext(), getLifecycle(),
                     R.string.service_error, R.string.service_error_description,
-                    R.drawable.ic_warning, R.string.close,
+                    R.drawable.ic_warning_24_onerrorcontainer, R.string.close,
                     R.style.ErrorAlertDialogTheme,
                     dialog -> SERVICE_FAILED.put(false));
         }
@@ -213,7 +213,7 @@ public class HomeFragment extends Fragment {
             // display warning if there wan an error getting the wallpaper
             displayMessageDialog(requireContext(), getLifecycle(),
                     R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description,
-                    R.drawable.ic_warning, R.string.close,
+                    R.drawable.ic_warning_24_onerrorcontainer, R.string.close,
                     R.style.ErrorAlertDialogTheme,
                     dialog -> WALLPAPER_OBTAIN_FAILED.put(false));
         }

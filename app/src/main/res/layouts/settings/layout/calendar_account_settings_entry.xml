@@ -15,7 +15,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_account_circle" />
+        app:srcCompat="@drawable/ic_account_circle_55"
+        tools:ignore="ContentDescription" />
 
 
     <TextView
@@ -49,12 +50,13 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:background="@color/transparent"
+        android:contentDescription="@string/action_settings"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/expand_button"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/ic_settings"
+        app:srcCompat="@drawable/ic_settings_45"
         tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck,TouchTargetSizeCheck"
         tools:visibility="visible" />
 
@@ -63,9 +65,10 @@
         android:layout_width="40dp"
         android:layout_height="0dp"
         android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_expand"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_left" />
+        app:srcCompat="@drawable/ic_arrow_left_55" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

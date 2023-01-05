@@ -80,15 +80,15 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         private int getIconFromAccountType(String accountType) {
             String type = accountType.toLowerCase(Locale.ROOT);
             if (type.contains("exchange")) {
-                return R.drawable.ic_microsoft_exchange;
+                return R.drawable.ic_microsoft_exchange_55;
             }
             if (type.contains("google")) {
-                return R.drawable.ic_google;
+                return R.drawable.ic_google_55;
             }
             if (type.contains("local")) {
-                return R.drawable.ic_mobile;
+                return R.drawable.ic_mobile_55;
             }
-            return R.drawable.ic_account_circle;
+            return R.drawable.ic_account_circle_55;
         }
     }
 }

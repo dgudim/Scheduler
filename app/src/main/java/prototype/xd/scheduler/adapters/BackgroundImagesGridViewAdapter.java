@@ -62,7 +62,7 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
             imageView.setImageBitmap(BitmapFactory.decodeStream(inputStream));
             inputStream.close();
         } catch (FileNotFoundException e) {
-            imageView.setImageResource(R.drawable.ic_not);
+            imageView.setImageResource(R.drawable.ic_not_90);
         } catch (IOException e) {
             logException("GridViewAdapter", e);
         }

@@ -662,7 +662,7 @@
                 android:backgroundTint="?colorPrimaryContainer"
                 android:contentDescription="@string/add_group"
                 android:minWidth="10dp"
-                app:srcCompat="@drawable/ic_add" />
+                app:srcCompat="@drawable/ic_add_24" />
 
             <ImageButton
                 android:id="@+id/editGroupButton"
@@ -674,7 +674,7 @@
                 android:backgroundTint="?colorPrimaryContainer"
                 android:contentDescription="@string/add_group"
                 android:minWidth="10dp"
-                app:srcCompat="@drawable/ic_edit" />
+                app:srcCompat="@drawable/ic_edit_24" />
 
         </LinearLayout>
 

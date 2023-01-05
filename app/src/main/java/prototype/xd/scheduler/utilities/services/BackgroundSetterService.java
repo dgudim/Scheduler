@@ -58,7 +58,7 @@ public class BackgroundSetterService extends Service {
     private NotificationCompat.Builder getForegroundNotification() {
         if (foregroundNotification == null) {
             foregroundNotification = new NotificationCompat.Builder(getApplicationContext(), getNotificationChannelId())
-                    .setSmallIcon(R.drawable.ic_settings)
+                    .setSmallIcon(R.drawable.ic_settings_45)
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSound(null)
                     .setOngoing(true)

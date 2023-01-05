@@ -93,13 +93,13 @@ public class CalendarSettingsFragment extends BaseSettingsFragment<ConcatAdapter
             if (isChecked) {
                 displayMessageDialog(requireContext(), getLifecycle(),
                         R.string.attention, R.string.whole_calendar_settings_on_warning,
-                        R.drawable.ic_warning, R.string.i_understand,
+                        R.drawable.ic_warning_24_onerrorcontainer, R.string.i_understand,
                         R.style.DefaultAlertDialogTheme,
                         null);
             } else {
                 displayMessageDialog(requireContext(), getLifecycle(),
                         R.string.attention, R.string.whole_calendar_settings_off_warning,
-                        R.drawable.ic_warning, R.string.i_understand,
+                        R.drawable.ic_warning_24_onerrorcontainer, R.string.i_understand,
                         R.style.DefaultAlertDialogTheme,
                         null);
             }

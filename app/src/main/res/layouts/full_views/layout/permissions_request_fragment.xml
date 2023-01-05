@@ -54,7 +54,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/calendar_permission_granted"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView14"
-                app:srcCompat="@drawable/ic_calendar_month"
+                app:srcCompat="@drawable/ic_calendar_month_55"
                 tools:layout_conversion_absoluteHeight="55dp"
                 tools:layout_conversion_absoluteWidth="55dp" />
 
@@ -108,7 +108,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/storage_permission_granted"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView16"
-                app:srcCompat="@drawable/ic_folder"
+                app:srcCompat="@drawable/ic_folder_55"
                 tools:layout_conversion_absoluteHeight="55dp"
                 tools:layout_conversion_absoluteWidth="55dp" />
 
@@ -162,7 +162,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/battery_permission_granted"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView18"
-                app:srcCompat="@drawable/ic_energy_savings"
+                app:srcCompat="@drawable/ic_energy_savings_55"
                 tools:layout_conversion_absoluteHeight="55dp"
                 tools:layout_conversion_absoluteWidth="55dp" />
 
@@ -263,7 +263,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/notification_permission_granted"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView20"
-                app:srcCompat="@drawable/ic_notifications" />
+                app:srcCompat="@drawable/ic_notifications_55" />
 
             <TextView
                 android:id="@+id/notification_permission_granted"

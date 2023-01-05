@@ -40,11 +40,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:clickable="true"
+                    android:contentDescription="@string/go_to_today"
                     android:focusable="true"
                     android:foreground="?android:attr/actionBarItemBackground"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
-                    android:src="@drawable/ic_today"
+                    android:src="@drawable/ic_today_55"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -73,7 +74,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
         android:contentDescription="@string/add_event_fab"
-        android:src="@drawable/ic_add"
+        android:src="@drawable/ic_add_24"
         tools:ignore="ImageContrastCheck" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

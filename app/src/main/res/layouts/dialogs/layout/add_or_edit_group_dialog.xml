@@ -46,5 +46,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/textField"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_delete" />
+        app:srcCompat="@drawable/ic_delete_50"
+        android:contentDescription="@string/action_delete_group" />
 </androidx.constraintlayout.widget.ConstraintLayout>

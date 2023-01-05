@@ -177,4 +177,10 @@
     <string name="bottom">Снизу</string>
     <string name="middle">По центру</string>
     <string name="settings_merge_entries">Объединять события с одинаковым содержанием и временем</string>
+    <string name="go_to_today">Перейти к сегодняшнему дню</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_expand">Раскрыть</string>
+    <string name="action_delete_item">Удалить элемент</string>
+    <string name="action_delete_group">Удалить группу</string>
+    <string name="action_per_color_settings">Настройки по цветам</string>
 </resources>

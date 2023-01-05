@@ -88,7 +88,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView6"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/source_title"
-                app:srcCompat="@drawable/ic_source"
+                app:srcCompat="@drawable/ic_source_45"
                 app:tint="?colorPrimary"
                 tools:ignore="ContentDescription" />
 
@@ -100,7 +100,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView8"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/github_issue_title"
-                app:srcCompat="@drawable/ic_send"
+                app:srcCompat="@drawable/ic_send_45"
                 app:tint="?colorPrimary"
                 tools:ignore="ContentDescription" />
 
@@ -135,7 +135,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView10"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/latest_release_title"
-                app:srcCompat="@drawable/ic_get_app"
+                app:srcCompat="@drawable/ic_get_app_45"
                 app:tint="?colorPrimary"
                 tools:ignore="ContentDescription" />
 
@@ -170,7 +170,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView22"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/calendar_settings_title"
-                app:srcCompat="@drawable/ic_calendar_month"
+                app:srcCompat="@drawable/ic_calendar_month_55"
                 app:tint="?colorPrimary"
                 tools:ignore="ContentDescription" />
 
@@ -205,7 +205,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView24"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/global_settings_title"
-                app:srcCompat="@drawable/ic_settings_outline"
+                app:srcCompat="@drawable/ic_settings_outline_45"
                 app:tint="?colorPrimary"
                 tools:ignore="ContentDescription" />
 
@@ -240,7 +240,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textView26"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/user_guide_title"
-                app:srcCompat="@drawable/ic_supervised_user"
+                app:srcCompat="@drawable/ic_supervised_user_45"
                 app:tint="?colorPrimary"
                 tools:ignore="ContentDescription" />
 
@@ -376,7 +376,7 @@
         android:drawablePadding="3dp"
         android:gravity="center_vertical"
         android:text="@string/app_version_combined"
-        app:drawableStartCompat="@drawable/ic_info"
+        app:drawableStartCompat="@drawable/ic_info_24"
         app:drawableTint="?colorTertiary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

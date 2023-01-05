@@ -47,16 +47,16 @@ public class ThemeSelectButton extends MaterialButton {
     private void updateThemeIcon(int themeId) {
         switch (themeId) {
             case APP_THEME_DARK:
-                setIconResource(R.drawable.ic_theme_dark);
+                setIconResource(R.drawable.ic_theme_dark_30);
                 setText(getContext().getString(R.string.app_theme_dark));
                 break;
             case APP_THEME_LIGHT:
-                setIconResource(R.drawable.ic_theme_light);
+                setIconResource(R.drawable.ic_theme_light_30);
                 setText(getContext().getString(R.string.app_theme_light));
                 break;
             case APP_THEME_SYSTEM:
             default:
-                setIconResource(R.drawable.ic_theme_auto);
+                setIconResource(R.drawable.ic_theme_auto_30);
                 setText(getContext().getString(R.string.app_theme_system));
                 break;
         }

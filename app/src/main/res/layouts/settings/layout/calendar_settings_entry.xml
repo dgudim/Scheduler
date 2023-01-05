@@ -44,17 +44,19 @@
         style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:background="#00FFFFFF"
-        app:srcCompat="@drawable/ic_palette"
-        tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck" />
+        android:background="@color/transparent"
+        app:srcCompat="@drawable/ic_palette_45"
+        tools:ignore="ImageContrastCheck"
+        android:contentDescription="@string/action_per_color_settings" />
 
     <ImageButton
         android:id="@+id/settings_button"
         style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:background="#00FFFFFF"
-        app:srcCompat="@drawable/ic_settings"
-        tools:ignore="SpeakableTextPresentCheck,ImageContrastCheck" />
+        android:background="@color/transparent"
+        app:srcCompat="@drawable/ic_settings_45"
+        tools:ignore="ImageContrastCheck"
+        android:contentDescription="@string/action_settings" />
 
 </LinearLayout>
