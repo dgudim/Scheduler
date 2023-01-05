@@ -27,25 +27,25 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DialogUtilities;
-import prototype.xd.scheduler.utilities.TodoListEntryManager;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 
 public class EntrySettings extends PopupSettingsView {
     
-    public final TodoListEntryManager todoListEntryManager;
+    public final TodoEntryManager todoEntryManager;
     private TodoEntry todoEntry;
     
-    public EntrySettings(@NonNull final TodoListEntryManager todoListEntryManager,
+    public EntrySettings(@NonNull final TodoEntryManager todoEntryManager,
                          @NonNull final Context context,
                          @NonNull final Lifecycle lifecycle) {
-        super(context, todoListEntryManager, lifecycle);
+        super(context, todoEntryManager, lifecycle);
         
         bnd.hideExpiredItemsByTimeContainer.setVisibility(View.GONE);
         bnd.hideByContentContainer.setVisibility(View.GONE);
         bnd.entrySettingsTitle.setVisibility(View.GONE);
         bnd.showOnLockContainer.setVisibility(View.GONE);
         
-        this.todoListEntryManager = todoListEntryManager;
+        this.todoEntryManager = todoEntryManager;
     }
     
     public void show(final TodoEntry entry, final Context context) {
@@ -64,7 +64,7 @@ public class EntrySettings extends PopupSettingsView {
                 todoEntry.borderColor.getToday(),
                 todoEntry.borderThickness.getToday());
         
-        final List<Group> groupList = todoListEntryManager.getGroups();
+        final List<Group> groupList = todoEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
         bnd.groupSpinner.setSelectedItem(max(Group.groupIndexInList(groupList, entry.getRawGroupName()), 0));
         
@@ -102,7 +102,7 @@ public class EntrySettings extends PopupSettingsView {
                             R.string.no, R.string.yes,
                             v1 -> {
                                 dialog.dismiss();
-                                todoListEntryManager.removeGroup(selection);
+                                todoEntryManager.removeGroup(selection);
                                 rebuild(context);
                             }));
             
@@ -210,10 +210,10 @@ public class EntrySettings extends PopupSettingsView {
             // setParams automatically handles parameter invalidation on other entries
             existingGroup.setParams(todoEntry.getDisplayParams());
             // save groups manually
-            todoListEntryManager.saveGroupsAsync();
+            todoEntryManager.saveGroupsAsync();
         } else {
             Group newGroup = new Group(groupName, todoEntry.getDisplayParams());
-            todoListEntryManager.addGroup(newGroup);
+            todoEntryManager.addGroup(newGroup);
             todoEntry.changeGroup(newGroup);
         }
         

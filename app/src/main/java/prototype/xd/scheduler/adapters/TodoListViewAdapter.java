@@ -35,7 +35,7 @@ import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
 import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.utilities.TodoListEntryManager;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
@@ -63,16 +63,16 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         }
         
         private void displayDeletionDialog(@NonNull final TodoEntry entry,
-                                           @NonNull final TodoListEntryManager todoListEntryManager) {
+                                           @NonNull final TodoEntryManager todoEntryManager) {
             displayConfirmationDialogue(context, lifecycle,
                     R.string.delete, R.string.are_you_sure,
                     R.string.no, R.string.yes,
-                    view2 -> todoListEntryManager.removeEntry(entry));
+                    view2 -> todoEntryManager.removeEntry(entry));
         }
         
         private void displayEditDialog(@NonNull final TodoEntry entry,
-                                       @NonNull final TodoListEntryManager todoListEntryManager) {
-            final List<Group> groupList = todoListEntryManager.getGroups();
+                                       @NonNull final TodoEntryManager todoEntryManager) {
+            final List<Group> groupList = todoEntryManager.getGroups();
             
             displayEntryAdditionEditDialog(fragmentManager, context, lifecycle,
                     entry, groupList,
@@ -91,7 +91,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                     START_DAY_UTC, dialogBinding.dayFromButton.getSelectedDayUTCStr(),
                                     END_DAY_UTC, dialogBinding.dayToButton.getSelectedDayUTCStr());
                         }
-                        todoListEntryManager.performDeferredTasks();
+                        todoEntryManager.performDeferredTasks();
                         return true;
                     });
         }
@@ -109,11 +109,11 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         }
         
         private void bindToRegularEntry(@NonNull final TodoEntry entry,
-                                        @NonNull final TodoListEntryManager todoListEntryManager,
+                                        @NonNull final TodoEntryManager todoEntryManager,
                                         @NonNull final EntrySettings entrySettings) {
             ListSelectionTodoBinding bnd = (ListSelectionTodoBinding) viewBinding;
             
-            bnd.deletionButton.setOnClickListener(view1 -> displayDeletionDialog(entry, todoListEntryManager));
+            bnd.deletionButton.setOnClickListener(view1 -> displayDeletionDialog(entry, todoEntryManager));
             
             bnd.isDone.setCheckedSilent(entry.isCompleted());
             
@@ -126,11 +126,11 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                             START_DAY_UTC, selectedDay,
                             END_DAY_UTC, selectedDay);
                 }
-                todoListEntryManager.performDeferredTasks();
+                todoEntryManager.performDeferredTasks();
             });
             
             bnd.getRoot().setOnLongClickListener(view1 -> {
-                displayEditDialog(entry, todoListEntryManager);
+                displayEditDialog(entry, todoEntryManager);
                 return true;
             });
             bnd.settings.setOnClickListener(v -> entrySettings.show(entry, v.getContext()));
@@ -158,14 +158,14 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         }
         
         void bindTo(@NonNull final TodoEntry currentEntry,
-                    @NonNull final TodoListEntryManager todoListEntryManager,
+                    @NonNull final TodoEntryManager todoEntryManager,
                     @NonNull final EntrySettings entrySettings,
                     @NonNull final SystemCalendarSettings systemCalendarSettings) {
             
             if (currentEntry.isFromSystemCalendar()) {
                 bindToSystemCalendarEntry(currentEntry, systemCalendarSettings);
             } else {
-                bindToRegularEntry(currentEntry, todoListEntryManager, entrySettings);
+                bindToRegularEntry(currentEntry, todoEntryManager, entrySettings);
             }
             
             bindToCommonPart(currentEntry);
@@ -173,7 +173,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     }
     
     @NonNull
-    private final TodoListEntryManager todoListEntryManager;
+    private final TodoEntryManager todoEntryManager;
     @NonNull
     private List<TodoEntry> currentTodoListEntries;
     
@@ -186,17 +186,17 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     @NonNull
     private final FragmentManager fragmentManager;
     
-    public TodoListViewAdapter(@NonNull final TodoListEntryManager todoListEntryManager,
+    public TodoListViewAdapter(@NonNull final TodoEntryManager todoEntryManager,
                                @NonNull final Context context,
                                @NonNull final Lifecycle lifecycle,
                                @NonNull FragmentManager fragmentManager) {
         
-        this.todoListEntryManager = todoListEntryManager;
+        this.todoEntryManager = todoEntryManager;
         this.lifecycle = lifecycle;
         this.fragmentManager = fragmentManager;
         currentTodoListEntries = new ArrayList<>();
-        entrySettings = new EntrySettings(todoListEntryManager, context, lifecycle);
-        systemCalendarSettings = new SystemCalendarSettings(todoListEntryManager, context, lifecycle);
+        entrySettings = new EntrySettings(todoEntryManager, context, lifecycle);
+        systemCalendarSettings = new SystemCalendarSettings(todoEntryManager, context, lifecycle);
         setHasStableIds(true);
     }
     
@@ -212,7 +212,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
     public void notifyEntryListChanged() {
         int itemsCount = currentTodoListEntries.size();
-        currentTodoListEntries = todoListEntryManager.getVisibleTodoListEntries(currentlySelectedDayUTC);
+        currentTodoListEntries = todoEntryManager.getVisibleTodoListEntries(currentlySelectedDayUTC);
         notifyItemRangeChanged(0, max(itemsCount, currentTodoListEntries.size()));
     }
     
@@ -232,7 +232,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
     @Override
     public void onBindViewHolder(@NonNull EntryViewHolder<?> holder, int position) {
-        holder.bindTo(currentTodoListEntries.get(position), todoListEntryManager, entrySettings, systemCalendarSettings);
+        holder.bindTo(currentTodoListEntries.get(position), todoEntryManager, entrySettings, systemCalendarSettings);
     }
     
     @Override

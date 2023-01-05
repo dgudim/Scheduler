@@ -625,7 +625,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         if (isGlobal()) {
             return true;
         }
-    
+        
         if (!isFromSystemCalendar()) {
             // local events don't have timestamps, just check one range
             return inRange(targetDayUTC, startDayLocal.get(), endDayLocal.get());
@@ -641,7 +641,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 // upcoming are always visible
                 return true;
             }
-            if(!container.notGlobalEntryVisibleOnDay(this, targetDayUTC)) {
+            if (!container.notGlobalEntryVisibleOnDay(this, targetDayUTC)) {
                 // well, it's not visible
                 return false;
             }
@@ -919,6 +919,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         } else {
             icon.setTextColor(icon.getContext().getColor(R.color.entry_settings_parameter_default));
         }
+    }
+    
+    // only callable after a call to cacheNearestStartMsUTC()
+    public int getInstanceHash() {
+        return Objects.hash(event.title, cachedNearestStartMsUTC, event.durationMs);
     }
     
     // for recyclerview

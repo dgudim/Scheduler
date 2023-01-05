@@ -40,7 +40,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CalendarDayLayoutBinding;
 import prototype.xd.scheduler.databinding.CalendarHeaderBinding;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.TodoListEntryManager;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 
 public class CalendarView {
     
@@ -84,7 +84,7 @@ public class CalendarView {
             setEventIndicator(color, index, visiblePosition, false);
         }
         
-        public void bindTo(CalendarDay elementDay, CalendarView calendarView, TodoListEntryManager todoListEntryManager) {
+        public void bindTo(CalendarDay elementDay, CalendarView calendarView, TodoEntryManager todoEntryManager) {
             date = elementDay.getDate();
             binding.calendarDayText.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
             
@@ -98,11 +98,11 @@ public class CalendarView {
                 } else {
                     textColor = MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE);
                 }
-                todoListEntryManager.processEventIndicators(date.toEpochDay(),
+                todoEntryManager.processEventIndicators(date.toEpochDay(),
                         MAX_INDICATORS, this::setEventIndicatorInCalendar);
             } else {
                 textColor = context.getColor(R.color.gray_harmonized);
-                todoListEntryManager.processEventIndicators(date.toEpochDay(),
+                todoEntryManager.processEventIndicators(date.toEpochDay(),
                         MAX_INDICATORS, this::setEventIndicatorOffCalendar);
             }
             
@@ -169,7 +169,7 @@ public class CalendarView {
     @Nullable
     MonthBindListener newMonthBindListener;
     
-    public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoListEntryManager todoListEntryManager) {
+    public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoEntryManager todoEntryManager) {
         this.rootCalendarView = rootCalendarView;
         
         rootCalendarView.setDayBinder(new MonthDayBinder<CalendarDayViewContainer>() {
@@ -181,7 +181,7 @@ public class CalendarView {
             
             @Override
             public void bind(@NonNull CalendarDayViewContainer container, CalendarDay calendarDay) {
-                container.bindTo(calendarDay, CalendarView.this, todoListEntryManager);
+                container.bindTo(calendarDay, CalendarView.this, todoEntryManager);
             }
         });
         

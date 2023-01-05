@@ -16,7 +16,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
 import prototype.xd.scheduler.utilities.DialogDismissLifecycleObserver;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.TodoListEntryManager;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 
 public abstract class PopupSettingsView {
     
@@ -27,7 +27,7 @@ public abstract class PopupSettingsView {
     protected final int defaultTextColor;
     
     PopupSettingsView(@NonNull final Context context,
-                      @Nullable final TodoListEntryManager todoListEntryManager,
+                      @Nullable final TodoEntryManager todoEntryManager,
                       @NonNull final Lifecycle lifecycle) {
         
         bnd = EntrySettingsBinding.inflate(LayoutInflater.from(context));
@@ -41,8 +41,8 @@ public abstract class PopupSettingsView {
         
         dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
                 .setOnDismissListener(dialog -> {
-                    if (todoListEntryManager != null) {
-                        todoListEntryManager.performDeferredTasks();
+                    if (todoEntryManager != null) {
+                        todoEntryManager.performDeferredTasks();
                     }
                 }).setView(bnd.getRoot()).create();
         lifecycle.addObserver(new DialogDismissLifecycleObserver(dialog));

@@ -176,4 +176,5 @@
     <string name="top">Сверху</string>
     <string name="bottom">Снизу</string>
     <string name="middle">По центру</string>
+    <string name="settings_merge_entries">Объединять события с одинаковым содержанием и временем</string>
 </resources>

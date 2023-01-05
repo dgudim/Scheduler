@@ -25,7 +25,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Keys;
-import prototype.xd.scheduler.utilities.TodoListEntryManager;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 
 public class SystemCalendarSettings extends PopupSettingsView {
     
@@ -38,10 +38,10 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     private TextWatcher currentListener;
     
-    public SystemCalendarSettings(@Nullable final TodoListEntryManager todoListEntryManager,
+    public SystemCalendarSettings(@Nullable final TodoEntryManager todoEntryManager,
                                   @NonNull final Context context,
                                   @NonNull final Lifecycle lifecycle) {
-        super(context, todoListEntryManager, lifecycle);
+        super(context, todoEntryManager, lifecycle);
         bnd.groupSelector.setVisibility(View.GONE);
     }
     

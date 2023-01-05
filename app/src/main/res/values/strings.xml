@@ -172,4 +172,5 @@
     <string name="top">Top</string>
     <string name="bottom">Bottom</string>
     <string name="middle">Middle</string>
+    <string name="settings_merge_entries">Merge events with the same content and timeframe</string>
 </resources>

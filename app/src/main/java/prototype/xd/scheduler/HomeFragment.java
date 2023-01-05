@@ -46,13 +46,13 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
-import prototype.xd.scheduler.utilities.TodoListEntryManager;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
 
 public class HomeFragment extends Fragment {
     
-    private volatile TodoListEntryManager todoListEntryManager;
+    private volatile TodoEntryManager todoEntryManager;
     private ContentWrapperBinding contentBnd;
     
     public HomeFragment() {
@@ -65,7 +65,7 @@ public class HomeFragment extends Fragment {
         // init date manager
         // select current day
         selectDate(LocalDate.now());
-        todoListEntryManager = new TodoListEntryManager(requireContext(), getLifecycle(), getParentFragmentManager());
+        todoEntryManager = new TodoEntryManager(requireContext(), getLifecycle(), getParentFragmentManager());
     }
     
     @Override
@@ -76,23 +76,23 @@ public class HomeFragment extends Fragment {
         
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        contentBnd.content.recyclerView.setAdapter(todoListEntryManager.getTodoListViewAdapter());
+        contentBnd.content.recyclerView.setAdapter(todoEntryManager.getTodoListViewAdapter());
         
         // construct custom calendar view
-        CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoListEntryManager);
-        todoListEntryManager.attachCalendarView(calendarView);
+        CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoEntryManager);
+        todoEntryManager.attachCalendarView(calendarView);
         
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             selectDate(selectedDate);
-            todoListEntryManager.notifyEntryListChanged();
+            todoEntryManager.notifyEntryListChanged();
             updateStatusText();
         });
         
         // setup month listener, called when a new month is loaded (first month is loaded differently)
         calendarView.setNewMonthBindListener(month ->
                 // load current month entries (with overlap of one panel) before displaying the data
-                todoListEntryManager.loadEntries(
+                todoEntryManager.loadEntries(
                         getStartOfMonthDayUTC(month) - DAYS_ON_ONE_PANEL,
                         getEndOfMonthDayUTC(month) + DAYS_ON_ONE_PANEL)
         );
@@ -131,7 +131,7 @@ public class HomeFragment extends Fragment {
         });
         
         contentBnd.fab.setOnClickListener(view1 -> {
-            final List<Group> groupList = todoListEntryManager.getGroups();
+            final List<Group> groupList = todoEntryManager.getGroups();
             displayEntryAdditionEditDialog(getChildFragmentManager(), view1.getContext(), getLifecycle(),
                     null, groupList,
                     (view2, text, dialogBinding, selectedIndex) -> {
@@ -144,7 +144,7 @@ public class HomeFragment extends Fragment {
                                 dialogBinding.dayToButton.getSelectedDayUTCStr());
                         values.put(IS_COMPLETED, "false");
                         
-                        todoListEntryManager.addEntry(new TodoEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
+                        todoEntryManager.addEntry(new TodoEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
                                 groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
                         return true;
                     });
@@ -187,14 +187,14 @@ public class HomeFragment extends Fragment {
         // update the ui only after it's fully inflated
         
         // when all entries are loaded, update current month
-        todoListEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
+        todoEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
             if (checkIfTimeSettingsChanged()) {
-                todoListEntryManager.notifyDatasetChanged(true);
+                todoEntryManager.notifyDatasetChanged(true);
             } else {
                 // update adapter showing entries
-                todoListEntryManager.notifyEntryListChanged();
+                todoEntryManager.notifyEntryListChanged();
                 // update calendar updating indicators
-                todoListEntryManager.notifyCurrentMonthChanged();
+                todoEntryManager.notifyCurrentMonthChanged();
             }
             // finally, update the status text with entry count
             updateStatusText();
@@ -220,19 +220,19 @@ public class HomeFragment extends Fragment {
     }
     
     public void notifySettingsChanged() {
-        todoListEntryManager.notifyDatasetChanged(false);
+        todoEntryManager.notifyDatasetChanged(false);
     }
     
     @Override
     public void onDestroyView() {
         // remove reference to ui element
-        todoListEntryManager.detachCalendarView();
+        todoEntryManager.detachCalendarView();
         super.onDestroyView();
     }
     
     private void updateStatusText() {
         contentBnd.statusText.setText(
                 getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC),
-                        todoListEntryManager.getCurrentlyVisibleEntriesCount()));
+                        todoEntryManager.getCurrentlyVisibleEntriesCount()));
     }
 }

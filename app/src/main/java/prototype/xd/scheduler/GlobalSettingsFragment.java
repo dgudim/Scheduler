@@ -103,6 +103,8 @@ public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> 
         settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
                 0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_show_days_expired));
         settingsEntries.add(new SwitchSettingsEntryConfig(
+                Keys.MERGE_ENTRIES, getString(R.string.settings_merge_entries)));
+        settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, getString(R.string.settings_hide_expired_entries_by_time)));
         
         settingsEntries.add(new SwitchSettingsEntryConfig(

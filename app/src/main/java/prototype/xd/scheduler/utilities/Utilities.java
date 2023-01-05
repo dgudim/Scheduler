@@ -2,6 +2,7 @@ package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
+import static prototype.xd.scheduler.utilities.Keys.MERGE_ENTRIES;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
@@ -220,6 +221,17 @@ public class Utilities {
         entries.sort(new TodoListEntryEntryTypeComparator());
         entries.sort(new TodoListEntryGroupComparator());
         entries.sort(new TodoListEntryPriorityComparator());
+        
+        if(MERGE_ENTRIES.get()) {
+            return mergeInstances(entries);
+        }
+        
+        return entries;
+    }
+    
+    private static List<TodoEntry> mergeInstances(List<TodoEntry> entries) {
+        Set<Integer> seen = new ArraySet<>(entries.size());
+        entries.removeIf(e -> !seen.add(e.getInstanceHash()));
         return entries;
     }
     

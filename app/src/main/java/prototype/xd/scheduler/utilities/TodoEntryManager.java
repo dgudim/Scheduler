@@ -39,9 +39,9 @@ import prototype.xd.scheduler.entities.TodoEntry.RangeType;
 import prototype.xd.scheduler.entities.TodoEntryList;
 import prototype.xd.scheduler.views.CalendarView;
 
-public class TodoListEntryManager implements DefaultLifecycleObserver {
+public class TodoEntryManager implements DefaultLifecycleObserver {
     
-    private static final String NAME = "TodoListEntryManager";
+    private static final String NAME = "TodoEntryManager";
     
     public enum SaveType {
         ENTRIES, GROUPS, NONE
@@ -104,9 +104,9 @@ public class TodoListEntryManager implements DefaultLifecycleObserver {
         }
     };
     
-    public TodoListEntryManager(@NonNull final Context context,
-                                @NonNull final Lifecycle lifecycle,
-                                @NonNull final FragmentManager fragmentManager) {
+    public TodoEntryManager(@NonNull final Context context,
+                            @NonNull final Lifecycle lifecycle,
+                            @NonNull final FragmentManager fragmentManager) {
         todoListViewAdapter = new TodoListViewAdapter(this, context, lifecycle, fragmentManager);
         calendarVisibilityMap = new ArrayMap<>();
         groups = loadGroups();

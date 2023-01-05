@@ -311,6 +311,8 @@ public class Keys {
     public static final DefaultedBoolean HIDE_EXPIRED_ENTRIES_BY_TIME = new DefaultedBoolean("hide_entries_strict", false);
     public static final DefaultedBoolean ITEM_FULL_WIDTH_LOCK = new DefaultedBoolean("force_max_RWidth_lock", true);
     
+    public static final DefaultedBoolean MERGE_ENTRIES = new DefaultedBoolean("merge_events", true);
+    
     public static final DefaultedBoolean SHOW_GLOBAL_ITEMS_LOCK = new DefaultedBoolean("show_global_tasks_lock", true);
     public static final DefaultedBoolean SHOW_GLOBAL_ITEMS_LABEL_LOCK = new DefaultedBoolean("show_global_tasks_label_lock", true);
     
