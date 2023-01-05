@@ -69,7 +69,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/user_guide_click_view" />
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/source_description"
                 style="@style/MediumHeadingSubtext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView6"
+                app:layout_constraintBottom_toBottomOf="@+id/source_description"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/source_title"
                 app:srcCompat="@drawable/ic_source_45"
@@ -97,7 +97,7 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView8"
+                app:layout_constraintBottom_toBottomOf="@+id/github_issue_decription"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/github_issue_title"
                 app:srcCompat="@drawable/ic_send_45"
@@ -116,7 +116,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/source_code_click_view" />
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/github_issue_decription"
                 style="@style/MediumHeadingSubtext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -132,7 +132,7 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView10"
+                app:layout_constraintBottom_toBottomOf="@+id/latest_release_description"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/latest_release_title"
                 app:srcCompat="@drawable/ic_get_app_45"
@@ -151,7 +151,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/github_issue_click_view" />
 
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/latest_release_description"
                 style="@style/MediumHeadingSubtext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -163,11 +163,11 @@
                 app:layout_constraintTop_toBottomOf="@+id/latest_release_title" />
 
             <ImageView
-                android:id="@+id/per_calendar_settings_image"
+                android:id="@+id/calendar_settings_image"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView22"
+                app:layout_constraintBottom_toBottomOf="@+id/calendar_settings_description"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/calendar_settings_title"
                 app:srcCompat="@drawable/ic_calendar_month_55"
@@ -181,21 +181,56 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="8dp"
-                android:text="@string/per_calendar_settings_title"
-                app:layout_constraintStart_toEndOf="@+id/per_calendar_settings_image"
+                android:text="@string/calendar_settings_title"
+                app:layout_constraintStart_toEndOf="@+id/calendar_settings_image"
                 app:layout_constraintTop_toBottomOf="@+id/global_settings_click_view" />
 
             <TextView
-                android:id="@+id/textView22"
+                android:id="@+id/calendar_settings_description"
                 style="@style/MediumHeadingSubtext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/per_calendar_settings_description"
+                android:text="@string/calendar_settings_description"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/per_calendar_settings_image"
+                app:layout_constraintStart_toEndOf="@+id/calendar_settings_image"
                 app:layout_constraintTop_toBottomOf="@+id/calendar_settings_title" />
+
+            <ImageView
+                android:id="@+id/sorting_settings_image"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/sorting_settings_description"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/sorting_settings_title"
+                app:srcCompat="@drawable/ic_sort_45"
+                app:tint="?colorPrimary"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/sorting_settings_title"
+                style="@style/MediumHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/sorting_settings_title"
+                app:layout_constraintStart_toEndOf="@+id/sorting_settings_image"
+                app:layout_constraintTop_toBottomOf="@+id/calendar_settings_click_view" />
+
+            <TextView
+                android:id="@+id/sorting_settings_description"
+                style="@style/MediumHeadingSubtext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/sorting_settings_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/sorting_settings_image"
+                app:layout_constraintTop_toBottomOf="@+id/sorting_settings_title" />
 
             <ImageView
                 android:id="@+id/global_settings_image"
@@ -237,7 +272,7 @@
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/textView26"
+                app:layout_constraintBottom_toBottomOf="@+id/user_guide_description"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/user_guide_title"
                 app:srcCompat="@drawable/ic_supervised_user_45"
@@ -253,10 +288,10 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/user_guide_title"
                 app:layout_constraintStart_toEndOf="@+id/user_guide_image"
-                app:layout_constraintTop_toBottomOf="@+id/calendar_settings_click_view" />
+                app:layout_constraintTop_toBottomOf="@+id/sorting_settings_click_view" />
 
             <TextView
-                android:id="@+id/textView26"
+                android:id="@+id/user_guide_description"
                 style="@style/MediumHeadingSubtext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -275,7 +310,7 @@
                 android:layout_marginBottom="-8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
-                app:layout_constraintBottom_toBottomOf="@+id/textView26"
+                app:layout_constraintBottom_toBottomOf="@+id/user_guide_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/user_guide_title"
@@ -303,10 +338,24 @@
                 android:layout_marginBottom="-8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
-                app:layout_constraintBottom_toBottomOf="@+id/textView22"
+                app:layout_constraintBottom_toBottomOf="@+id/calendar_settings_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/calendar_settings_title"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <View
+                android:id="@+id/sorting_settings_click_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="-8dp"
+                android:layout_marginBottom="-8dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                app:layout_constraintBottom_toBottomOf="@+id/sorting_settings_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/sorting_settings_title"
                 tools:ignore="SpeakableTextPresentCheck" />
 
             <View
@@ -317,7 +366,7 @@
                 android:layout_marginBottom="-8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
-                app:layout_constraintBottom_toBottomOf="@+id/textView10"
+                app:layout_constraintBottom_toBottomOf="@+id/latest_release_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/latest_release_title"
@@ -331,7 +380,7 @@
                 android:layout_marginBottom="-8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
-                app:layout_constraintBottom_toBottomOf="@+id/textView8"
+                app:layout_constraintBottom_toBottomOf="@+id/github_issue_decription"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/github_issue_title"
@@ -345,7 +394,7 @@
                 android:layout_marginBottom="-8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
-                app:layout_constraintBottom_toBottomOf="@+id/textView6"
+                app:layout_constraintBottom_toBottomOf="@+id/source_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/source_title"

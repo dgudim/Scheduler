@@ -33,12 +33,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import prototype.xd.scheduler.databinding.ContentWrapperBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
@@ -163,18 +161,13 @@ public class HomeFragment extends Fragment {
                 null));
         
         wrapperBnd.navView.globalSettingsClickView.setOnClickListener(v ->
-                ((NavHostFragment) Objects.requireNonNull(
-                        requireActivity().getSupportFragmentManager()
-                                .findFragmentById(R.id.nav_host_fragment)))
-                        .getNavController()
-                        .navigate(R.id.action_HomeFragment_to_GlobalSettingsFragment));
+                Utilities.navigateToFragment(requireActivity(), R.id.action_HomeFragment_to_GlobalSettingsFragment));
         
         wrapperBnd.navView.calendarSettingsClickView.setOnClickListener(v ->
-                ((NavHostFragment) Objects.requireNonNull(
-                        requireActivity().getSupportFragmentManager()
-                                .findFragmentById(R.id.nav_host_fragment)))
-                        .getNavController()
-                        .navigate(R.id.action_HomeFragment_to_CalendarSettingsFragment));
+                Utilities.navigateToFragment(requireActivity(), R.id.action_HomeFragment_to_CalendarSettingsFragment));
+    
+        wrapperBnd.navView.sortingSettingsClickView.setOnClickListener(v ->
+                Utilities.navigateToFragment(requireActivity(), R.id.action_HomeFragment_to_SortingSettingsFragment));
         
         return wrapperBnd.getRoot();
     }

@@ -12,6 +12,7 @@ import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 
 public class Keys {
@@ -151,6 +153,43 @@ public class Keys {
         @Override
         public void put(String value) {
             preferences.edit().putString(key, value).apply();
+        }
+    }
+    
+    public static class DefaultedEnumList<T extends Enum<T>> extends DefaultedValue<List<T>> {
+        
+        private final String delimiter;
+        private final Class<T> enumClass;
+        
+        DefaultedEnumList(String key, List<T> defaultValue, String delimiter, Class<T> enumClass) {
+            super(key, defaultValue);
+            this.delimiter = delimiter;
+            this.enumClass = enumClass;
+        }
+        
+        @Override
+        protected List<T> getInternal(SharedPreferences preferences, String actualKey, List<T> actualDefaultValue) {
+            String stringValue = preferences.getString(actualKey, null);
+            if (stringValue == null) {
+                return actualDefaultValue;
+            }
+            String[] stringList = stringValue.split(delimiter);
+            List<T> list = new ArrayList<>(stringList.length);
+            for (String value : stringList) {
+                list.add(T.valueOf(enumClass, value));
+            }
+            return list;
+        }
+        
+        @Override
+        public void put(List<T> enumList) {
+            StringBuilder stringValue = new StringBuilder(enumList.get(0).name());
+            for (int i = 1; i < enumList.size(); i++) {
+                stringValue
+                        .append(delimiter)
+                        .append(enumList.get(i).name());
+            }
+            preferences.edit().putString(key, stringValue.toString()).apply();
         }
     }
     
@@ -319,6 +358,10 @@ public class Keys {
     public static final DefaultedBoolean ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS = new DefaultedBoolean("allow_global_calendar_settings", false);
     
     public static final DefaultedString TODO_ITEM_VIEW_TYPE = new DefaultedString("lockScreenTodoItemViewType", LockScreenTodoItemView.TodoItemViewType.BASIC.name());
+    
+    public static final DefaultedEnumList<TodoEntry.EntryType> TODO_ITEM_SORTING_ORDER = new DefaultedEnumList<>(
+            "sort_order", Arrays.asList(TodoEntry.EntryType.values()),
+            "_", TodoEntry.EntryType.class);
     
     public static final int APP_THEME_LIGHT = MODE_NIGHT_NO;
     public static final int APP_THEME_DARK = MODE_NIGHT_YES;

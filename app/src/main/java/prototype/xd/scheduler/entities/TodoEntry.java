@@ -147,7 +147,6 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private static final transient String NAME = "Todo list entry";
     
-    // don't rearrange, entry sorting is based on this
     public enum EntryType {TODAY, GLOBAL, UPCOMING, EXPIRED, UNKNOWN}
     
     @FunctionalInterface
@@ -839,6 +838,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             return EntryType.EXPIRED;
         }
         
+        Logger.warning(NAME, "Type of " + this + " is unknown on day: " + targetDayUTC);
         return EntryType.UNKNOWN;
     }
     

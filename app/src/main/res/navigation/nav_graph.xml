@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_HomeFragment_to_CalendarSettingsFragment"
             app:destination="@id/CalendarSettingsFragment" />
+        <action
+            android:id="@+id/action_HomeFragment_to_SortingSettingsFragment"
+            app:destination="@id/SortingSettingsFragment" />
     </fragment>
 
     <dialog
@@ -31,6 +34,14 @@
         android:name="prototype.xd.scheduler.CalendarSettingsFragment"
         android:label="@string/calendar_settings_fragment_label"
         tools:layout="@layout/settings_fragment">
+
+    </dialog>
+
+    <dialog
+        android:id="@+id/SortingSettingsFragment"
+        android:name="prototype.xd.scheduler.SortingSettingsFragment"
+        android:label="@string/sorting_settings_fragment_label"
+        tools:layout="@layout/sorting_settings_fragment">
 
     </dialog>
 

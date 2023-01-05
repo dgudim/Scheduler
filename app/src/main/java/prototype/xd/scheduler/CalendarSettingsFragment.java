@@ -8,7 +8,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.ConcatAdapter;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryCon
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-public class CalendarSettingsFragment extends BaseSettingsFragment<ConcatAdapter> {
+public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
     
     private SystemCalendarSettings systemCalendarSettings;
     
@@ -37,8 +36,6 @@ public class CalendarSettingsFragment extends BaseSettingsFragment<ConcatAdapter
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         systemCalendarSettings = new SystemCalendarSettings(null, requireContext(), getLifecycle());
-        
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
         
         List<SettingsEntryConfig> staticEntries = new ArrayList<>();
         staticEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_system_calendars)));

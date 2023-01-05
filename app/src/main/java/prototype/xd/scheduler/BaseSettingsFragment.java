@@ -10,30 +10,36 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewbinding.ViewBinding;
 
 import java.util.Map;
 
-import prototype.xd.scheduler.databinding.SettingsFragmentBinding;
 import prototype.xd.scheduler.utilities.Keys;
 
-public class BaseSettingsFragment <T extends RecyclerView.Adapter<?>> extends DialogFragment {
+// base dialog class that refreshes main screen on settings changes
+public abstract class BaseSettingsFragment<T extends ViewBinding> extends DialogFragment {
     
-    protected SettingsFragmentBinding binding;
-    
-    protected T listViewAdapter;
+    protected T binding;
     
     private Map<String, ?> preferenceStateBefore;
+    
+    public abstract T inflate(@NonNull LayoutInflater inflater, ViewGroup container);
     
     // view creation begin
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = SettingsFragmentBinding.inflate(inflater, container, false);
+        binding = inflate(inflater, container);
         preferenceStateBefore = Keys.getAll();
         return binding.getRoot();
+    }
+    
+    // fragment creation begin
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
     }
     
     // dialog dismissed (user pressed back button)
@@ -45,15 +51,4 @@ public class BaseSettingsFragment <T extends RecyclerView.Adapter<?>> extends Di
         }
         super.onDismiss(dialog);
     }
-    
-    // view creation end (fragment visible)
-    @Override
-    public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-        binding.recyclerView.addItemDecoration(dividerItemDecoration);
-        binding.recyclerView.setAdapter(listViewAdapter);
-    }
-    
 }

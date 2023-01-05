@@ -32,6 +32,7 @@ import com.github.appintro.SlidePolicy;
 import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.databinding.PermissionsRequestFragmentBinding;
+import prototype.xd.scheduler.utilities.BitmapUtilities;
 
 
 public class PermissionRequestFragment extends Fragment implements SlidePolicy {
@@ -110,11 +111,6 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         return essentialGranted;
     }
     
-    private int swapRedAndGreenChannels(int color) {
-        Color col = Color.valueOf(color);
-        return Color.rgb(col.green(), col.red(), col.blue());
-    }
-    
     private void setPermissionChipColor(boolean permissionGranted, TextView permissionText) {
         permissionText.setText(permissionGranted ? R.string.permissions_granted : R.string.permissions_not_granted);
         
@@ -122,8 +118,8 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         int onContainerColor = MaterialColors.getColor(permissionText, R.attr.colorOnErrorContainer, Color.RED);
         
         if(permissionGranted) {
-            containerColor = swapRedAndGreenChannels(containerColor);
-            onContainerColor = swapRedAndGreenChannels(onContainerColor);
+            containerColor = BitmapUtilities.swapRedAndGreenChannels(containerColor);
+            onContainerColor = BitmapUtilities.swapRedAndGreenChannels(onContainerColor);
         }
         
         permissionText.setTextColor(onContainerColor);

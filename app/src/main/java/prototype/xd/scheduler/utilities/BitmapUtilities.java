@@ -148,6 +148,21 @@ public class BitmapUtilities {
         }
     }
     
+    public static int swapRedAndGreenChannels(int color) {
+        Color col = Color.valueOf(color);
+        return Color.rgb(col.green(), col.red(), col.blue());
+    }
+    
+    public static int getOnSurfaceColor(int surfaceColor) {
+        // get a color that will look good on the specified surfaceColor
+        return mixTwoColors(inverseColor(surfaceColor), surfaceColor, 0.2);
+    }
+    
+    public static int inverseColor(int color) {
+        Color col = Color.valueOf(color);
+        return Color.rgb(1 - col.green(), 1 - col.red(), 1 - col.blue());
+    }
+    
     public static int mixTwoColors(int color1, int color2, double balance) {
         Color c1 = Color.valueOf(color1);
         Color c2 = Color.valueOf(color2);
@@ -159,13 +174,13 @@ public class BitmapUtilities {
     }
     
     // get harmonized font color
-    public static int getFontColor(int fontColor, int backgroundColor) {
+    public static int getHarmonizedFontColor(int fontColor, int backgroundColor) {
         return MaterialColors.harmonize(fontColor, backgroundColor);
     }
     
-    // mix and harmonize (25% gray, 75% font color + harmonized with background);
-    public static int getTimeTextColor(int fontColor, int backgroundColor) {
-        return MaterialColors.harmonize(mixTwoColors(fontColor, Color.DKGRAY, Keys.DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR), backgroundColor);
+    // mix and harmonize (25% background color, 75% font color + harmonized with background);
+    public static int getHarmonizedTimeTextColor(int fontColor, int backgroundColor) {
+        return MaterialColors.harmonize(mixTwoColors(fontColor, backgroundColor, Keys.DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR), backgroundColor);
     }
     
     public static int getAverageColor(int[] pixels) {

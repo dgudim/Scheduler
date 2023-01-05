@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getFontColor;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getTimeTextColor;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getHarmonizedFontColor;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getHarmonizedTimeTextColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
@@ -102,7 +102,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             
             bnd.eventColor.setCardBackgroundColor(entry.event.color);
             bnd.timeText.setText(entry.getCalendarEntryTimeSpan(context, currentlySelectedDayUTC));
-            bnd.timeText.setTextColor(getTimeTextColor(
+            bnd.timeText.setTextColor(getHarmonizedTimeTextColor(
                     entry.fontColor.get(currentlySelectedDayUTC),
                     entry.bgColor.get(currentlySelectedDayUTC)));
             bnd.settings.setOnClickListener(v -> systemCalendarSettings.show(entry));
@@ -143,7 +143,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             MaterialCardView backgroundLayer = root.findViewById(R.id.backgroundLayer);
             
             int bgColor = entry.bgColor.get(currentlySelectedDayUTC);
-            int fontColor = getFontColor(entry.fontColor.get(currentlySelectedDayUTC), bgColor);
+            int fontColor = getHarmonizedFontColor(entry.fontColor.get(currentlySelectedDayUTC), bgColor);
             
             backgroundLayer.setCardBackgroundColor(bgColor);
             backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDayUTC));

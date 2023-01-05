@@ -24,12 +24,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.slider.Slider;
 
@@ -200,6 +202,14 @@ public class Utilities {
         throw new NullPointerException("Fragment " + targetFragmentClass + " not found");
     }
     
+    public static void navigateToFragment(FragmentActivity activity, @IdRes int actionId) {
+        ((NavHostFragment) Objects.requireNonNull(
+                activity.getSupportFragmentManager()
+                        .findFragmentById(R.id.nav_host_fragment)))
+                .getNavController()
+                .navigate(actionId);
+    }
+    
     public static void callImageFileChooser(ActivityResultLauncher<Intent> callback) {
         Intent chooseImage = new Intent(Intent.ACTION_GET_CONTENT);
         chooseImage.addCategory(Intent.CATEGORY_OPENABLE);
@@ -222,7 +232,7 @@ public class Utilities {
         entries.sort(new TodoListEntryGroupComparator());
         entries.sort(new TodoListEntryPriorityComparator());
         
-        if(MERGE_ENTRIES.get()) {
+        if (MERGE_ENTRIES.get()) {
             return mergeInstances(entries);
         }
         

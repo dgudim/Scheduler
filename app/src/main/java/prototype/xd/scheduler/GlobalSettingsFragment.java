@@ -16,7 +16,6 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.ConcatAdapter;
 
 import java.io.File;
@@ -41,7 +40,7 @@ import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> {
+public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
     
     private static final String NAME = "BackgroundImagesGridViewAdapter";
     
@@ -56,8 +55,6 @@ public class GlobalSettingsFragment extends BaseSettingsFragment<ConcatAdapter> 
         super.onCreate(savedInstanceState);
         
         Context context = requireContext();
-        
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
         
         List<SettingsEntryConfig> settingsEntries = new ArrayList<>();
         
