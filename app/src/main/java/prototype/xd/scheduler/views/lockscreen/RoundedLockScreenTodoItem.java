@@ -69,6 +69,6 @@ public class RoundedLockScreenTodoItem extends LockScreenTodoItemView<RoundedEnt
     @Override
     public void hideIndicatorAndTime() {
         viewBinding.timeText.setVisibility(View.GONE);
-        viewBinding.indicatorView.setVisibility(View.GONE);
+        viewBinding.indicatorView.setVisibility(View.INVISIBLE);
     }
 }

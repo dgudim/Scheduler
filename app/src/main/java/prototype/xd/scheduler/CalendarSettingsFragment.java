@@ -105,7 +105,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
             }
             // almost all the list is updated (except first entry)
             listViewAdapter.notifyItemRangeChanged(staticEntries.size(), calendarConfigEntries.size());
-        }));
+        }, false));
         staticEntriesListViewAdapter.notifyItemInserted(staticEntries.size());
     }
     

@@ -20,14 +20,18 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     
     public SwitchSettingsEntryConfig(@NonNull Keys.DefaultedBoolean value,
                                      @NonNull String text,
-                                     @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
+                                     @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener,
+                                     boolean instantlyTriggerListener) {
         this.text = text;
         this.value = value;
         this.onCheckedChangeListener = onCheckedChangeListener;
+        if(onCheckedChangeListener != null && instantlyTriggerListener) {
+            onCheckedChangeListener.onCheckedChanged(null, value.get());
+        }
     }
     
     public SwitchSettingsEntryConfig(Keys.DefaultedBoolean value, String text) {
-        this(value, text, null);
+        this(value, text, null, false);
     }
     
     @Override

@@ -191,6 +191,16 @@ public class Keys {
             }
             preferences.edit().putString(key, stringValue.toString()).apply();
         }
+    
+        @Override
+        public int hashCode() {
+            return Objects.hash(key, defaultValue, enumClass);
+        }
+    
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            return super.equals(obj) && ((DefaultedEnumList<?>) obj).enumClass.equals(enumClass);
+        }
     }
     
     public static class DefaultedEnum<T extends Enum<T>> extends DefaultedValue<T> {
@@ -360,8 +370,13 @@ public class Keys {
     public static final DefaultedString TODO_ITEM_VIEW_TYPE = new DefaultedString("lockScreenTodoItemViewType", LockScreenTodoItemView.TodoItemViewType.BASIC.name());
     
     public static final DefaultedEnumList<TodoEntry.EntryType> TODO_ITEM_SORTING_ORDER = new DefaultedEnumList<>(
-            "sort_order", Arrays.asList(TodoEntry.EntryType.values()),
+            "sort_order", Arrays.asList(
+            TodoEntry.EntryType.GLOBAL,
+            TodoEntry.EntryType.UPCOMING,
+            TodoEntry.EntryType.TODAY,
+            TodoEntry.EntryType.EXPIRED),
             "_", TodoEntry.EntryType.class);
+    public static final DefaultedBoolean TREAT_GLOBAL_ITEMS_AS_TODAYS = new DefaultedBoolean("treat_global_as_todays", false);
     
     public static final int APP_THEME_LIGHT = MODE_NIGHT_NO;
     public static final int APP_THEME_DARK = MODE_NIGHT_YES;

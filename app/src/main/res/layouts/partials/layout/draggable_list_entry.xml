@@ -5,9 +5,9 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
+    android:layout_marginStart="8dp"
     android:layout_marginTop="4dp"
-    android:layout_marginEnd="16dp"
+    android:layout_marginEnd="8dp"
     android:layout_marginBottom="4dp"
     app:contentPadding="8dp">
 
@@ -23,20 +23,32 @@
             android:layout_height="wrap_content"
             android:text="item_text"
             android:textAlignment="viewStart"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/drag_handle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/item_description_text"
+            style="@style/MediumHeadingSubtext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="item_description"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/drag_handle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/item_text"
             tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/drag_handle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/action_drag_item"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_drag_indicator_24" />
+            app:srcCompat="@drawable/ic_drag_indicator_34" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

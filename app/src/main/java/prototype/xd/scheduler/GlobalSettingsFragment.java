@@ -100,7 +100,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
                 0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_show_days_expired));
         settingsEntries.add(new SwitchSettingsEntryConfig(
-                Keys.MERGE_ENTRIES, getString(R.string.settings_merge_entries)));
+                Keys.MERGE_ENTRIES, getString(R.string.settings_merge_events)));
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, getString(R.string.settings_hide_expired_entries_by_time)));
         
@@ -113,7 +113,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.SHOW_GLOBAL_ITEMS_LOCK, getString(R.string.settings_show_global_items_lock),
-                (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked)));
+                (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked), false));
         
         globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.SHOW_GLOBAL_ITEMS_LABEL_LOCK, getString(R.string.settings_show_global_items_label_lock)));

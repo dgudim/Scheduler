@@ -4,6 +4,7 @@ import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
 import static prototype.xd.scheduler.utilities.Keys.MERGE_ENTRIES;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
+import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_SORTING_ORDER;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
@@ -203,11 +204,15 @@ public class Utilities {
     }
     
     public static void navigateToFragment(FragmentActivity activity, @IdRes int actionId) {
-        ((NavHostFragment) Objects.requireNonNull(
-                activity.getSupportFragmentManager()
-                        .findFragmentById(R.id.nav_host_fragment)))
-                .getNavController()
-                .navigate(actionId);
+        try {
+            ((NavHostFragment) Objects.requireNonNull(
+                    activity.getSupportFragmentManager()
+                            .findFragmentById(R.id.nav_host_fragment)))
+                    .getNavController()
+                    .navigate(actionId);
+        } catch (IllegalArgumentException e) {
+            Logger.error(NAME, "Error navigating: " + e + " Double click?");
+        }
     }
     
     public static void callImageFileChooser(ActivityResultLauncher<Intent> callback) {
@@ -219,17 +224,18 @@ public class Utilities {
     
     public static List<TodoEntry> sortEntries(List<TodoEntry> entries, long targetDay) {
         
+        List<TodoEntry.EntryType> sortingOrder = TODO_ITEM_SORTING_ORDER.get();
+        
         for (TodoEntry entry : entries) {
-            // Look at {@link prototype.xd.scheduler.entities.TodoListEntry.EntryType}
-            entry.cacheSortingIndex(targetDay);
+            entry.cacheSortingIndex(targetDay, sortingOrder);
             if (entry.isFromSystemCalendar()) {
                 // obtain nearest start ms near a particular day for use in sorting later
                 entry.cacheNearestStartMsUTC(targetDay);
             }
         }
         
-        entries.sort(new TodoListEntryEntryTypeComparator());
         entries.sort(new TodoListEntryGroupComparator());
+        entries.sort(new TodoListEntryEntryTypeComparator());
         entries.sort(new TodoListEntryPriorityComparator());
         
         if (MERGE_ENTRIES.get()) {

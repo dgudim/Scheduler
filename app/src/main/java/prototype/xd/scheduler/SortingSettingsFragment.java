@@ -1,6 +1,7 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getHarmonizedFontColor;
+import static prototype.xd.scheduler.utilities.BitmapUtilities.getHarmonizedTimeTextColor;
 import static prototype.xd.scheduler.utilities.BitmapUtilities.getOnSurfaceColor;
 
 import android.annotation.SuppressLint;
@@ -20,11 +21,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.DraggableListEntryBinding;
 import prototype.xd.scheduler.databinding.SortingSettingsFragmentBinding;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class SortingSettingsFragment extends BaseSettingsFragment<SortingSettingsFragmentBinding> {
@@ -38,10 +43,19 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
     @Override
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        
+        binding.orderRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        
         EntryTypeAdapter entryTypeAdapter = new EntryTypeAdapter();
-        binding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recyclerView.setAdapter(entryTypeAdapter);
-        entryTypeAdapter.attachDragToRecyclerView(binding.recyclerView);
+        binding.orderRecyclerView.setAdapter(entryTypeAdapter);
+        entryTypeAdapter.attachDragToRecyclerView(binding.orderRecyclerView);
+        
+        List<SettingsEntryConfig> settingsEntries = new ArrayList<>();
+        settingsEntries.add(new SwitchSettingsEntryConfig(
+                Keys.TREAT_GLOBAL_ITEMS_AS_TODAYS, getString(R.string.treat_global_as_todays),
+                (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true));
+        binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(settingsEntries, getLifecycle()));
     }
     
     private static class EntryTypeAdapter extends RecyclerView.Adapter<EntryTypeAdapter.CardViewHolder> {
@@ -49,13 +63,31 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         private final ItemTouchHelper itemDragHelper;
         private final List<TodoEntry.EntryType> sortOrder;
         
+        private boolean globalEventsVisible;
+        
         private EntryTypeAdapter() {
             itemDragHelper = new ItemTouchHelper(new DragHelperCallback(this));
             sortOrder = Keys.TODO_ITEM_SORTING_ORDER.get();
+            globalEventsVisible = sortOrder.contains(TodoEntry.EntryType.GLOBAL);
         }
         
         public void attachDragToRecyclerView(RecyclerView recyclerView) {
             itemDragHelper.attachToRecyclerView(recyclerView);
+        }
+        
+        public void setGlobalEventsVisible(boolean globalEventsVisible) {
+            if(globalEventsVisible && !this.globalEventsVisible) {
+                sortOrder.add(TodoEntry.EntryType.GLOBAL);
+                notifyItemInserted(sortOrder.size());
+            } else if (!globalEventsVisible && this.globalEventsVisible) {
+                int indexOfGlobal = sortOrder.indexOf(TodoEntry.EntryType.GLOBAL);
+                sortOrder.remove(indexOfGlobal);
+                notifyItemRemoved(indexOfGlobal);
+            }
+            if(this.globalEventsVisible != globalEventsVisible) {
+                Keys.TODO_ITEM_SORTING_ORDER.put(sortOrder);
+            }
+            this.globalEventsVisible = globalEventsVisible;
         }
         
         @NonNull
@@ -97,32 +129,33 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
             
             @SuppressLint("ClickableViewAccessibility")
             private void bind(TodoEntry.EntryType entryType, final ItemTouchHelper dragHelper) {
-                String text;
+                String titleText = "ERR/UNKNOWN";
+                String descriptionText = "ERR/UNKNOWN";
                 int bgColor = 0;
                 int fontColor = 0;
                 int borderColor = 0;
                 switch (entryType) {
                     case UPCOMING:
-                        text = context.getString(R.string.upcoming_entries);
+                        titleText = context.getString(R.string.upcoming_events);
+                        descriptionText = context.getString(R.string.upcoming_events_description);
                         bgColor = Keys.UPCOMING_BG_COLOR.get();
                         fontColor = Keys.UPCOMING_FONT_COLOR.get();
                         borderColor = Keys.UPCOMING_BORDER_COLOR.get();
                         break;
                     case EXPIRED:
-                        text = context.getString(R.string.expired_entries);
+                        titleText = context.getString(R.string.expired_events);
+                        descriptionText = context.getString(R.string.expired_events_description);
                         bgColor = Keys.EXPIRED_BG_COLOR.get();
                         fontColor = Keys.EXPIRED_FONT_COLOR.get();
                         borderColor = Keys.EXPIRED_BORDER_COLOR.get();
                         break;
                     case TODAY:
-                        text = context.getString(R.string.today_entries);
+                        titleText = context.getString(R.string.todays_events);
+                        descriptionText = context.getString(R.string.todays_events_description);
                         break;
                     case GLOBAL:
-                        text = context.getString(R.string.global_entries);
-                        break;
-                    case UNKNOWN:
-                    default:
-                        text = context.getString(R.string.other_entries);
+                        titleText = context.getString(R.string.global_events);
+                        descriptionText = context.getString(R.string.global_events_description);
                         break;
                 }
                 
@@ -132,10 +165,15 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
                     borderColor = Keys.BORDER_COLOR.get();
                 }
                 
-                binding.itemText.setText(text);
+                binding.itemText.setText(titleText);
                 binding.itemText.setTextColor(getHarmonizedFontColor(fontColor, bgColor));
+                
+                binding.itemDescriptionText.setText(descriptionText);
+                binding.itemDescriptionText.setTextColor(getHarmonizedTimeTextColor(fontColor, bgColor));
+                
                 binding.card.setCardBackgroundColor(bgColor);
                 binding.card.setStrokeColor(borderColor);
+                
                 binding.dragHandle.setImageTintList(ColorStateList.valueOf(getOnSurfaceColor(bgColor)));
                 binding.dragHandle.setOnTouchListener(
                         (v, event) -> {

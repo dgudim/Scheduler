@@ -4,6 +4,7 @@
     <string name="category_event_visibility">Видимость событий</string>
     <string name="category_system_calendars">Интеграция с системным календарём</string>
     <string name="category_application_settings">Приложение</string>
+    <string name="category_sorting_settings">Порядок событий</string>
     <string name="apply">Применить</string>
     <string name="choose_color">Выберите цвет</string>
     <string name="add_current_config_as_group_message">(Параметры, которые были изменены вручную (Зеленые или синие ромбики), будут добавлены в группу)</string>
@@ -153,6 +154,7 @@
     <string name="calendar_settings_description">Настройте параметры для каждого календаря индивидуально</string>
     <string name="sorting_settings_title">Настройки сортировки</string>
     <string name="sorting_settings_description">Настройте расположение событий</string>
+    <string name="sorting_settings_note">Примечание: это изменит сортировку событий на экране блокировки и в календаре.</string>
     <string name="user_guide_title">Гид пользователя</string>
     <string name="user_guide_description">Посмотреть туториал</string>
     <string name="latest_release_title">Последний релиз</string>
@@ -178,16 +180,22 @@
     <string name="top">Сверху</string>
     <string name="bottom">Снизу</string>
     <string name="middle">По центру</string>
-    <string name="settings_merge_entries">Объединять события с одинаковым содержанием и временем</string>
+    <string name="settings_merge_events">Объединять события с одинаковым содержанием и временем</string>
     <string name="go_to_today">Перейти к сегодняшнему дню</string>
     <string name="action_settings">Настройки</string>
     <string name="action_expand">Раскрыть</string>
     <string name="action_delete_item">Удалить элемент</string>
     <string name="action_delete_group">Удалить группу</string>
     <string name="action_per_color_settings">Настройки по цветам</string>
-    <string name="upcoming_entries">Предстоящие события</string>
-    <string name="expired_entries">Просроченные события</string>
-    <string name="today_entries">Сегодняшние события</string>
-    <string name="global_entries">Глобальные события</string>
-    <string name="other_entries">Другие события</string>
+    <string name="action_drag_item">Перетащить элемент</string>
+    <string name="upcoming_events">Предстоящие события</string>
+    <string name="expired_events">Просроченные события</string>
+    <string name="todays_events">Сегодняшние события</string>
+    <string name="global_events">Глобальные события</string>
+    <string name="other_events">Другие события</string>
+    <string name="treat_global_as_todays">Сортировать глобальные события вместе с текущими</string>
+    <string name="upcoming_events_description">События, которые начнутся через несколько дней</string>
+    <string name="expired_events_description">События, которые уже закончились</string>
+    <string name="todays_events_description">Текущие события</string>
+    <string name="global_events_description">События, которые видны на всех днях</string>
 </resources>

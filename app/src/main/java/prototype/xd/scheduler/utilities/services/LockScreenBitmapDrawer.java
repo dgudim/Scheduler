@@ -181,14 +181,16 @@ class LockScreenBitmapDrawer {
         TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(TODO_ITEM_VIEW_TYPE.get());
         // load user defined entries (from files)
         // add entries from all calendars
-        // sort and filter entries
-        List<TodoEntry> toAdd = sortEntries(loadTodoEntries(
+        // filter and sort entries
+        List<TodoEntry> toAdd = loadTodoEntries(
                 context,
                 currentDayUTC - SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
                 currentDayUTC + SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
                 groups, null,
-                false), currentDayUTC);
+                false);
+    
         toAdd.removeIf(todoListEntry -> !todoListEntry.isVisibleOnLockscreenToday());
+        toAdd = sortEntries(toAdd, currentDayUTC);
         
         long currentHash = toAdd.hashCode() + Keys.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {

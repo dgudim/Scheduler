@@ -4,13 +4,14 @@
     <string name="action_per_color_settings">Per color settings</string>
     <string name="action_expand">Expand</string>
     <string name="action_delete_group">Delete group</string>
+    <string name="action_delete_item">Delete item</string>
+    <string name="action_drag_item">Drag item</string>
     <string name="home_fragment_label" translatable="false">Home Fragment</string>
     <string name="global_settings_fragment_label" translatable="false">Settings Fragment</string>
     <string name="sorting_settings_fragment_label" translatable="false">Sorting settings fragment</string>
     <string name="nav_drawer_open">Open drawer</string>
     <string name="nav_drawer_close">Close drawer</string>
     <string name="please_read_the_notes" type="id">Please read the notes</string>
-    <string name="action_delete_item">Delete item</string>
     <string name="settings_state_symbol" translatable="false">⬧</string>
     <string name="calendar_event_all_day">all day</string>
     <string name="permissions_granted">granted</string>
@@ -89,6 +90,7 @@
     <string name="category_system_calendars">System calendar integration</string>
     <string name="category_lockscreen_appearance">Lockscreen appearance</string>
     <string name="category_application_settings">Application</string>
+    <string name="category_sorting_settings">Order of events</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
     <string name="are_you_sure">Are you sure?</string>
@@ -152,6 +154,7 @@
     <string name="calendar_settings_description">Configure parameters for each calendar individually</string>
     <string name="sorting_settings_title">Sorting settings</string>
     <string name="sorting_settings_description">Customize how events are sorted</string>
+    <string name="sorting_settings_note">Note: this will change how events are sorted on the lockscreen and in the calendar</string>
     <string name="user_guide_title">User guide</string>
     <string name="user_guide_description">View tutorial</string>
     <string name="latest_release_title">Latest release</string>
@@ -179,10 +182,15 @@
     <string name="top">Top</string>
     <string name="bottom">Bottom</string>
     <string name="middle">Middle</string>
-    <string name="settings_merge_entries">Merge events with the same content and timeframe</string>
-    <string name="upcoming_entries">Upcoming entries</string>
-    <string name="expired_entries">Expired entries</string>
-    <string name="today_entries">Today\'s entries</string>
-    <string name="global_entries">Global entries</string>
-    <string name="other_entries">Other entries</string>
+    <string name="settings_merge_events">Merge events with the same content and timeframe</string>
+    <string name="upcoming_events">Upcoming events</string>
+    <string name="expired_events">Expired events</string>
+    <string name="todays_events">Today\'s events</string>
+    <string name="global_events">Global events</string>
+    <string name="other_events">Other events</string>
+    <string name="treat_global_as_todays">Treat global events as today\'s events</string>
+    <string name="upcoming_events_description">Events that will begin in a few days</string>
+    <string name="expired_events_description">Events that have already ended</string>
+    <string name="todays_events_description">Current events</string>
+    <string name="global_events_description">Events visible on all days</string>
 </resources>

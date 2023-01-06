@@ -239,8 +239,12 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return sortingIndex;
     }
     
-    public void cacheSortingIndex(long targetDayUTC) {
-        sortingIndex = getEntryType(targetDayUTC).ordinal();
+    public void cacheSortingIndex(long targetDayUTC, List<EntryType> order) {
+        sortingIndex = order.indexOf(getEntryType(targetDayUTC));
+        if(sortingIndex == -1) {
+            // fallback to treating like today's
+            sortingIndex = EntryType.TODAY.ordinal();
+        }
     }
     
     long cachedNearestStartMsUTC = 0;
