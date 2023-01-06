@@ -261,8 +261,9 @@ public class DialogUtilities {
                                          @NonNull Lifecycle lifecycle,
                                          final int initialValue,
                                          @NonNull ColorPickerClickListener listener) {
+        
         attachDialogToLifecycle(ColorPickerDialogBuilder
-                .with(context)
+                .with(context, R.style.ColorPickerDialogStyle)
                 .setTitle(context.getString(R.string.choose_color))
                 .initialColor(initialValue)
                 .showAlphaSlider(false)
