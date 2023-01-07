@@ -1,10 +1,10 @@
 package prototype.xd.scheduler.utilities.services;
 
-import static prototype.xd.scheduler.utilities.BitmapUtilities.fingerPrintAndSaveBitmap;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.hashBitmap;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.makeMutable;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.noFingerPrint;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.readStream;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.fingerPrintAndSaveBitmap;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.hashBitmap;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.makeMutable;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.noFingerPrint;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.readStream;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayLocaleAgnosticString;

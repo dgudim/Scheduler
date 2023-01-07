@@ -2,7 +2,8 @@ package prototype.xd.scheduler.entities;
 
 import static androidx.core.math.MathUtils.clamp;
 import static java.lang.Math.abs;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
@@ -326,23 +327,23 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         bgColor = new Parameter<>(this, Keys.BG_COLOR.key,
                 previousValue -> {
                     if (isFromSystemCalendar()) {
-                        return Keys.BG_COLOR.get(event.subKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(event.color));
+                        return Keys.BG_COLOR.getOnlyBySubKeys(event.subKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(event.color));
                     }
                     return Keys.BG_COLOR.get();
                 },
                 Integer::parseInt,
-                todayValue -> mixTwoColors(todayValue, Keys.UPCOMING_BG_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
-                todayValue -> mixTwoColors(todayValue, Keys.EXPIRED_BG_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.UPCOMING_BG_COLOR.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.EXPIRED_BG_COLOR.get()));
         fontColor = new Parameter<>(this, Keys.FONT_COLOR.key,
                 previousValue -> Keys.FONT_COLOR.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> mixTwoColors(todayValue, Keys.UPCOMING_FONT_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
-                todayValue -> mixTwoColors(todayValue, Keys.EXPIRED_FONT_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.UPCOMING_FONT_COLOR.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.EXPIRED_FONT_COLOR.get()));
         borderColor = new Parameter<>(this, Keys.BORDER_COLOR.key,
                 previousValue -> Keys.BORDER_COLOR.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> mixTwoColors(todayValue, Keys.UPCOMING_BORDER_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR),
-                todayValue -> mixTwoColors(todayValue, Keys.EXPIRED_BORDER_COLOR.get(), Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.UPCOMING_BORDER_COLOR.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.EXPIRED_BORDER_COLOR.get()));
         borderThickness = new Parameter<>(this, Keys.BORDER_THICKNESS.key,
                 previousValue -> Keys.BORDER_THICKNESS.get(getSubKeys()),
                 Integer::parseInt,

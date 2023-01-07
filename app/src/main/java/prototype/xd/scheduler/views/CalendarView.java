@@ -3,7 +3,7 @@ package prototype.xd.scheduler.views;
 import static com.kizitonwose.calendar.core.ExtensionsKt.daysOfWeek;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;

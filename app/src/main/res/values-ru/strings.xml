@@ -70,17 +70,18 @@
     <string name="add_event_fab">Добавить событие</string>
     <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
     <string name="settings_adaptive_color_balance">Слияние с фоном: %s</string>
-    <plurals name="settings_show_days_expired">
-        <item quantity="many">Показывать события после %d дней</item>
-        <item quantity="one">Показывать события после %d день</item>
-        <item quantity="few">Показывать события после %d дня</item>
-        <item quantity="other">Показывать события после %d дня</item>
+    <string name="settings_show_events">Показывать события</string>
+    <plurals name="settings_after_n_days">
+        <item quantity="many">после %d дней</item>
+        <item quantity="one">после %d день</item>
+        <item quantity="few">после %d дня</item>
+        <item quantity="other">после %d дня</item>
     </plurals>
-    <plurals name="settings_show_days_upcoming">
-        <item quantity="many">Показывать события за %d дней</item>
-        <item quantity="one">Показывать события за %d день</item>
-        <item quantity="few">Показывать события за %d дня</item>
-        <item quantity="other">Показывать события за %d дня</item>
+    <plurals name="settings_in_n_days">
+        <item quantity="many">за %d дней</item>
+        <item quantity="one">за %d день</item>
+        <item quantity="few">за %d дня</item>
+        <item quantity="other">за %d дня</item>
     </plurals>
     <string name="settings_bg_color">Фон</string>
     <string name="settings_border_color">Контур</string>

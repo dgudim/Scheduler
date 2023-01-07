@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -49,6 +49,8 @@
                     android:id="@+id/show_on_lock_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingStart="3dp"
+                    android:paddingEnd="5dp"
                     android:text="@string/settings_show_items_lock"
                     android:textAppearance="@style/SmallHeading"
                     tools:ignore="TextContrastCheck" />
@@ -61,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -89,6 +91,8 @@
                         android:id="@+id/hide_by_content_switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingStart="3dp"
+                        android:paddingEnd="5dp"
                         android:text="@string/hide_by_content"
                         android:textAppearance="@style/SmallHeading"
                         tools:ignore="TextContrastCheck" />
@@ -135,7 +139,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -187,7 +191,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="3dp"
             android:layout_marginBottom="3dp"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -236,7 +240,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -297,8 +301,8 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:text="@string/settings_state_symbol"
-                            android:textAlignment="center"
 
+                            android:textAlignment="center"
                             android:textAppearance="@style/MediumHeading"
                             android:textStyle="bold" />
 
@@ -491,107 +495,111 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/show_days_upcoming_container"
+            android:id="@+id/show_days_upcoming_expired_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="@dimen/card_corner_radius">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/show_days_upcoming_state"
-                    android:layout_width="15dp"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="@string/settings_state_symbol"
-                    android:textAlignment="center"
-
-                    android:textAppearance="@style/MediumHeading"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/show_events_title"
+                    style="@style/SmallHeading"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/show_days_upcoming_description"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:text="@plurals/settings_show_days_upcoming"
-                        android:textAppearance="@style/SmallHeading" />
-
-                    <com.google.android.material.slider.Slider
-                        android:id="@+id/show_days_upcoming_bar"
-                        style="@style/Widget.AppCompat.SeekBar.Discrete"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:stepSize="1.0"
-                        android:value="1.0"
-                        android:valueFrom="0.0"
-                        android:valueTo="14.0"
-                        tools:ignore="SpeakableTextPresentCheck" />
-
-                </LinearLayout>
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/show_days_expired_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            app:cardCornerRadius="5dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                    android:text="@string/settings_show_events"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/show_days_expired_state"
+                    style="@style/MediumHeading"
                     android:layout_width="15dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:gravity="center"
                     android:text="@string/settings_state_symbol"
-                    android:textAlignment="center"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/show_days_expired_description"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    android:textAppearance="@style/MediumHeading"
-                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/show_days_expired_description"
+                    style="@style/SmallHeading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@plurals/settings_after_n_days"
+                    app:layout_constraintStart_toEndOf="@+id/show_events_title"
+                    app:layout_constraintTop_toBottomOf="@+id/show_days_expired_state" />
+
+                <TextView
+                    android:id="@+id/show_days_upcoming_description"
+                    style="@style/SmallHeading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@plurals/settings_in_n_days"
+                    app:layout_constraintEnd_toStartOf="@+id/show_events_title"
+                    app:layout_constraintTop_toBottomOf="@+id/show_days_upcoming_state" />
+
+                <TextView
+                    android:id="@+id/show_days_upcoming_state"
+                    style="@style/MediumHeading"
+                    android:layout_width="15dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="8dp"
+                    android:gravity="center"
+                    android:text="@string/settings_state_symbol"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="@+id/show_days_upcoming_description"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/show_days_expired_description"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:text="@plurals/settings_show_days_expired"
-                        android:textAppearance="@style/SmallHeading" />
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/show_days_expired_description">
 
                     <com.google.android.material.slider.Slider
-                        android:id="@+id/show_days_expired_bar"
-                        style="@style/Widget.AppCompat.SeekBar.Discrete"
-                        android:layout_width="match_parent"
+                        android:id="@+id/show_days_upcoming_slider"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:stepSize="1.0"
-                        android:value="1.0"
+                        android:layout_weight="1"
+                        android:layoutDirection="rtl"
+                        android:stepSize="1"
+                        android:textDirection="rtl"
+                        android:value="0.0"
                         android:valueFrom="0.0"
-                        android:valueTo="14.0"
-                        tools:ignore="SpeakableTextPresentCheck" />
+                        android:valueTo="14"
+                        tools:ignore="SpeakableTextPresentCheck">
 
+                    </com.google.android.material.slider.Slider>
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/show_days_expired_slider"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layoutDirection="ltr"
+                        android:stepSize="1"
+                        android:textDirection="ltr"
+                        android:value="0.0"
+                        android:valueFrom="0.0"
+                        android:valueTo="14"
+                        tools:ignore="SpeakableTextPresentCheck">
+
+                    </com.google.android.material.slider.Slider>
                 </LinearLayout>
-            </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -600,7 +608,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -622,6 +630,8 @@
                     android:id="@+id/hide_expired_items_by_time_switch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingStart="3dp"
+                    android:paddingEnd="5dp"
                     android:text="@string/settings_hide_expired_entries_by_time"
                     android:textAppearance="@style/SmallHeading" />
             </LinearLayout>
@@ -686,9 +696,8 @@
             <Button
                 android:id="@+id/settings_reset_button"
                 style="@style/DefaultButtonStyle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:text="@string/settings_reset_to_defaults"
                 tools:ignore="TextContrastCheck" />
 

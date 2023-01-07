@@ -37,13 +37,14 @@
     <string name="add_event_fab">Add event</string>
     <string name="settings_adaptive_background">Different lock screen background according to day</string>
     <string name="settings_adaptive_color_balance">Blend with background: %s</string>
-    <plurals name="settings_show_days_expired">
-        <item quantity="one">Show events after %d day</item>
-        <item quantity="other">Show events after %d days</item>
+    <string name="settings_show_events">Show events</string>
+    <plurals name="settings_after_n_days">
+        <item quantity="one">after %d day</item>
+        <item quantity="other">after %d days</item>
     </plurals>
-    <plurals name="settings_show_days_upcoming">
-        <item quantity="one">Show events in %d day</item>
-        <item quantity="other">Show events in %d days</item>
+    <plurals name="settings_in_n_days">
+        <item quantity="one">in %d day</item>
+        <item quantity="other">in %d days</item>
     </plurals>
     <string name="settings_bg_color">Background</string>
     <string name="settings_border_color">Border</string>

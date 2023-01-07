@@ -3,7 +3,7 @@ package prototype.xd.scheduler.utilities;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixTwoColors;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,27 +41,32 @@ public class Keys {
         
         protected abstract T getInternal(SharedPreferences preferences, String actualKey, T actualDefaultValue);
         
-        public T get(SharedPreferences preferences, @Nullable List<String> subKeys, T actualDefaultValue) {
+        public T get(SharedPreferences preferences, @Nullable List<String> subKeys, T actualDefaultValue, boolean ignoreBaseKey) {
             if (subKeys != null) {
-                return getInternal(preferences, getFirstValidKey(subKeys, key), actualDefaultValue);
+                String targetKey = getFirstValidKey(subKeys, key);
+                if(targetKey.equals(key) && ignoreBaseKey) {
+                    return actualDefaultValue;
+                }
+                return getInternal(preferences, targetKey, actualDefaultValue);
             }
             return getInternal(preferences, key, actualDefaultValue);
         }
         
         public T get(@Nullable List<String> subKeys) {
-            return get(preferences, subKeys, defaultValue);
+            return get(preferences, subKeys, defaultValue, false);
         }
         
-        public T get(@Nullable List<String> subKeys, T defaultValueOverride) {
-            return get(preferences, subKeys, defaultValueOverride);
+        // ignore the "base" key, only use sub-keys
+        public T getOnlyBySubKeys(@NonNull List<String> subKeys, T defaultValueOverride) {
+            return get(preferences, subKeys, defaultValueOverride, true);
         }
         
         public T get(SharedPreferences preferences) {
-            return get(preferences, null, defaultValue);
+            return get(preferences, null, defaultValue, false);
         }
         
         public T get() {
-            return get(preferences, null, defaultValue);
+            return get(preferences, null, defaultValue, false);
         }
         
         public abstract void put(T value);

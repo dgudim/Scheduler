@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.views.settings;
 
-import static prototype.xd.scheduler.utilities.BitmapUtilities.mixTwoColors;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -15,6 +14,7 @@ import androidx.lifecycle.Lifecycle;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
 import prototype.xd.scheduler.utilities.DialogDismissLifecycleObserver;
+import prototype.xd.scheduler.utilities.GraphicsUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
@@ -33,8 +33,11 @@ public abstract class PopupSettingsView {
         bnd = EntrySettingsBinding.inflate(LayoutInflater.from(context));
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
         
-        bnd.showDaysUpcomingBar.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
-        bnd.showDaysExpiredBar.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
+        bnd.showDaysUpcomingSlider.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
+        bnd.showDaysExpiredSlider.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
+        
+        new GraphicsUtilities.SliderTinter(context, Keys.UPCOMING_BG_COLOR.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
+        new GraphicsUtilities.SliderTinter(context, Keys.EXPIRED_BG_COLOR.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
         
         this.context = context;
         this.lifecycle = lifecycle;
@@ -113,22 +116,22 @@ public abstract class PopupSettingsView {
     public void updatePreviewFont(int fontColor) {
         bnd.fontColorSelector.setCardBackgroundColor(fontColor);
         bnd.previewText.setTextColor(fontColor);
-        bnd.previewTextUpcoming.setTextColor(mixTwoColors(fontColor, Keys.UPCOMING_FONT_COLOR.get(), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
-        bnd.previewTextExpired.setTextColor(mixTwoColors(fontColor, Keys.EXPIRED_FONT_COLOR.get(), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+        bnd.previewTextUpcoming.setTextColor(getExpiredUpcomingColor(fontColor, Keys.UPCOMING_FONT_COLOR.get()));
+        bnd.previewTextExpired.setTextColor(getExpiredUpcomingColor(fontColor, Keys.EXPIRED_FONT_COLOR.get()));
     }
     
     public void updatePreviewBg(int bgColor) {
         bnd.backgroundColorSelector.setCardBackgroundColor(bgColor);
         bnd.previewText.setBackgroundColor(bgColor);
-        bnd.previewTextUpcoming.setBackgroundColor(mixTwoColors(bgColor, Keys.UPCOMING_BG_COLOR.get(), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
-        bnd.previewTextExpired.setBackgroundColor(mixTwoColors(bgColor, Keys.EXPIRED_BG_COLOR.get(), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+        bnd.previewTextUpcoming.setBackgroundColor(getExpiredUpcomingColor(bgColor, Keys.UPCOMING_BG_COLOR.get()));
+        bnd.previewTextExpired.setBackgroundColor(getExpiredUpcomingColor(bgColor, Keys.EXPIRED_BG_COLOR.get()));
     }
     
     public void updatePreviewBorder(int borderColor) {
         bnd.borderColorSelector.setCardBackgroundColor(borderColor);
         bnd.previewBorder.setBackgroundColor(borderColor);
-        bnd.previewBorderUpcoming.setBackgroundColor(mixTwoColors(borderColor, Keys.UPCOMING_BORDER_COLOR.get(), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
-        bnd.previewBorderExpired.setBackgroundColor(mixTwoColors(borderColor, Keys.EXPIRED_BORDER_COLOR.get(), DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR));
+        bnd.previewBorderUpcoming.setBackgroundColor(getExpiredUpcomingColor(borderColor, Keys.UPCOMING_BORDER_COLOR.get()));
+        bnd.previewBorderExpired.setBackgroundColor(getExpiredUpcomingColor(borderColor, Keys.EXPIRED_BORDER_COLOR.get()));
     }
     
 }

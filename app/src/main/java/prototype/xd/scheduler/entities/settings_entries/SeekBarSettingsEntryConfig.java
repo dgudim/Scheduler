@@ -2,10 +2,14 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.SEEK_BAR;
 
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
+
+import com.google.android.material.slider.Slider;
 
 import java.util.function.Function;
 
@@ -57,24 +61,29 @@ public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
             super(viewBinding);
         }
         
-        @Override
-        void bind(SeekBarSettingsEntryConfig config) {
-            viewBinding.slider.setStepSize(config.stepSize);
-            viewBinding.slider.setValueFrom(config.seekMin);
-            viewBinding.slider.setValueTo(config.seekMax);
+        // bind from anywhere
+        static void bindExternal(SeekBarSettingsEntryConfig config, Slider slider, TextView sliderDescription) {
+            slider.setStepSize(config.stepSize);
+            slider.setValueFrom(config.seekMin);
+            slider.setValueTo(config.seekMax);
             if (config.textFormatter != null) {
-                Utilities.setSliderChangeListener(viewBinding.seekBarDescription, viewBinding.slider,
+                Utilities.setSliderChangeListener(sliderDescription, slider,
                         null,
                         config.value,
                         config.textFormatter);
             } else {
                 Utilities.setSliderChangeListener(
-                        viewBinding.seekBarDescription, viewBinding.slider,
+                        sliderDescription, slider,
                         null,
                         config.stringResource,
                         config.value,
                         config.zeroIsOff);
             }
+        }
+        
+        @Override
+        void bind(SeekBarSettingsEntryConfig config) {
+            bindExternal(config, viewBinding.slider, viewBinding.sliderDescription);
         }
     }
 }

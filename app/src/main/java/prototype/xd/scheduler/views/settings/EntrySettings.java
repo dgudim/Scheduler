@@ -181,23 +181,21 @@ public class EntrySettings extends PopupSettingsView {
         
         if (todoEntry.isGlobal()) {
             // global entries can't have upcoming / expired days
-            bnd.showDaysUpcomingContainer.setVisibility(View.GONE);
-            bnd.showDaysExpiredContainer.setVisibility(View.GONE);
+            bnd.showDaysUpcomingExpiredContainer.setVisibility(View.GONE);
         } else {
-            bnd.showDaysUpcomingContainer.setVisibility(View.VISIBLE);
-            bnd.showDaysExpiredContainer.setVisibility(View.VISIBLE);
+            bnd.showDaysUpcomingExpiredContainer.setVisibility(View.VISIBLE);
             
             Utilities.setSliderChangeListener(
                     bnd.showDaysUpcomingDescription,
-                    bnd.showDaysUpcomingBar, bnd.showDaysUpcomingState,
-                    this, null, R.plurals.settings_show_days_upcoming,
+                    bnd.showDaysUpcomingSlider, bnd.showDaysUpcomingState,
+                    this, null, R.plurals.settings_in_n_days,
                     UPCOMING_ITEMS_OFFSET,
                     parameterKey -> entry.upcomingDayOffset.getToday());
             
             Utilities.setSliderChangeListener(
                     bnd.showDaysExpiredDescription,
-                    bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
-                    this, null, R.plurals.settings_show_days_expired,
+                    bnd.showDaysExpiredSlider, bnd.showDaysExpiredState,
+                    this, null, R.plurals.settings_after_n_days,
                     EXPIRED_ITEMS_OFFSET,
                     parameterKey -> entry.expiredDayOffset.getToday());
         }

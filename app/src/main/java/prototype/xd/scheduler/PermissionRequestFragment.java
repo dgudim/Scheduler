@@ -32,7 +32,7 @@ import com.github.appintro.SlidePolicy;
 import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.databinding.PermissionsRequestFragmentBinding;
-import prototype.xd.scheduler.utilities.BitmapUtilities;
+import prototype.xd.scheduler.utilities.GraphicsUtilities;
 
 
 public class PermissionRequestFragment extends Fragment implements SlidePolicy {
@@ -118,8 +118,8 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         int onContainerColor = MaterialColors.getColor(permissionText, R.attr.colorOnErrorContainer, Color.RED);
         
         if(permissionGranted) {
-            containerColor = BitmapUtilities.swapRedAndGreenChannels(containerColor);
-            onContainerColor = BitmapUtilities.swapRedAndGreenChannels(onContainerColor);
+            containerColor = GraphicsUtilities.swapRedAndGreenChannels(containerColor);
+            onContainerColor = GraphicsUtilities.swapRedAndGreenChannels(onContainerColor);
         }
         
         permissionText.setTextColor(onContainerColor);

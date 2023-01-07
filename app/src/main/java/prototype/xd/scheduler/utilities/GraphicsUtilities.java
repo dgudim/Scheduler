@@ -1,9 +1,12 @@
 package prototype.xd.scheduler.utilities;
 
 import static java.lang.Math.max;
+import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
 
+import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,7 +14,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+
 import com.google.android.material.color.MaterialColors;
+import com.google.android.material.slider.Slider;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class BitmapUtilities {
+public class GraphicsUtilities {
     
     
     public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output) throws IOException {
@@ -34,7 +41,7 @@ public class BitmapUtilities {
         cutBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         outputStream.close();
         
-        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4f), (int) (cutBitmap.getHeight() / 4f), BitmapUtilities.ScalingLogic.FIT);
+        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4f), (int) (cutBitmap.getHeight() / 4f), GraphicsUtilities.ScalingLogic.FIT);
         
         FileOutputStream outputStreamMin = new FileOutputStream(output.getAbsolutePath() + "_min.png");
         resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStreamMin);
@@ -153,14 +160,19 @@ public class BitmapUtilities {
         return Color.rgb(col.green(), col.red(), col.blue());
     }
     
-    public static int getOnSurfaceColor(int surfaceColor) {
+    public static int getOnBgColor(int surfaceColor) {
         // get a color that will look good on the specified surfaceColor
-        return mixTwoColors(inverseColor(surfaceColor), surfaceColor, 0.2);
+        return mixTwoColors(getIntensityColor(surfaceColor), surfaceColor, 0.3);
     }
     
-    public static int inverseColor(int color) {
-        Color col = Color.valueOf(color);
-        return Color.rgb(1 - col.green(), 1 - col.red(), 1 - col.blue());
+    // return black or white based on the background color
+    public static int getIntensityColor(int bgColor) {
+        Color col = Color.valueOf(bgColor);
+        float intensity = col.red() * 0.299f + col.green() * 0.587f + col.blue() * 0.114f;
+        if (intensity > 0.729411f) {
+            return Color.BLACK;
+        }
+        return Color.WHITE;
     }
     
     public static int mixTwoColors(int color1, int color2, double balance) {
@@ -173,14 +185,19 @@ public class BitmapUtilities {
         return Color.argb(a, r, g, b);
     }
     
-    // get harmonized font color
-    public static int getHarmonizedFontColor(int fontColor, int backgroundColor) {
-        return MaterialColors.harmonize(fontColor, backgroundColor);
+    // get harmonized color with the background
+    public static int getHarmonizedFontColorWithBg(int color, int backgroundColor) {
+        // harmonize with extrapolated primary color
+        return MaterialColors.harmonize(color, getOnBgColor(backgroundColor));
     }
     
     // mix and harmonize (25% background color, 75% font color + harmonized with background);
-    public static int getHarmonizedTimeTextColor(int fontColor, int backgroundColor) {
-        return MaterialColors.harmonize(mixTwoColors(fontColor, backgroundColor, Keys.DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR), backgroundColor);
+    public static int getHarmonizedSecondaryFontColorWithBg(int color, int backgroundColor) {
+        return getHarmonizedFontColorWithBg(mixTwoColors(color, backgroundColor, Keys.DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR), backgroundColor);
+    }
+    
+    public static int getExpiredUpcomingColor(int baseColor, int tintColor) {
+        return mixTwoColors(baseColor, tintColor, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR);
     }
     
     public static int getAverageColor(int[] pixels) {
@@ -218,6 +235,30 @@ public class BitmapUtilities {
                 redBucket / nonBlackPixelCount,
                 greenBucket / nonBlackPixelCount,
                 blueBucket / nonBlackPixelCount);
+    }
+    
+    public static class SliderTinter {
+        
+        ColorStateList sliderPrimaryColor;
+        ColorStateList sliderOnSurfaceColor;
+        ColorStateList sliderHaloColor;
+        
+        public SliderTinter(@NonNull Context context, @ColorInt int sliderAccentColor) {
+            sliderAccentColor = MaterialColors.harmonizeWithPrimary(context, sliderAccentColor);
+            
+            sliderPrimaryColor = ColorStateList.valueOf(sliderAccentColor);
+            sliderOnSurfaceColor = ColorStateList.valueOf(getOnBgColor(sliderAccentColor));
+            sliderHaloColor = ColorStateList.valueOf(mixTwoColors(sliderAccentColor, Color.TRANSPARENT, 0.5));
+        }
+        
+        public void tintSlider(Slider slider) {
+            slider.setThumbTintList(sliderPrimaryColor);
+            slider.setHaloTintList(sliderHaloColor);
+            slider.setTrackActiveTintList(sliderPrimaryColor);
+            slider.setTickActiveTintList(sliderOnSurfaceColor);
+            slider.setTickInactiveTintList(sliderPrimaryColor);
+        }
+        
     }
     
     public static void fingerPrintBitmap(Bitmap bitmap) {

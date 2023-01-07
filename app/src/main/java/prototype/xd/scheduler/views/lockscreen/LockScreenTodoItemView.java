@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.views.lockscreen;
 
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getAverageColor;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getHarmonizedFontColor;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getHarmonizedTimeTextColor;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getAverageColor;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedSecondaryFontColorWithBg;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
@@ -127,9 +127,9 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     public void mixAndSetBgAndTextColors(boolean setTimeTextColor, int fontColor, int backgroundColor) {
         // setup colors
         setBackgroundColor(backgroundColor);
-        setTitleTextColor(getHarmonizedFontColor(fontColor, backgroundColor));
+        setTitleTextColor(getHarmonizedFontColorWithBg(fontColor, backgroundColor));
         if (setTimeTextColor) {
-            setTimeTextColor(getHarmonizedTimeTextColor(fontColor, backgroundColor));
+            setTimeTextColor(getHarmonizedSecondaryFontColorWithBg(fontColor, backgroundColor));
         }
     }
     

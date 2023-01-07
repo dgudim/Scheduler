@@ -1,8 +1,9 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getHarmonizedFontColor;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getHarmonizedTimeTextColor;
-import static prototype.xd.scheduler.utilities.BitmapUtilities.getOnSurfaceColor;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedSecondaryFontColorWithBg;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getOnBgColor;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -131,23 +132,23 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
             private void bind(TodoEntry.EntryType entryType, final ItemTouchHelper dragHelper) {
                 String titleText = "ERR/UNKNOWN";
                 String descriptionText = "ERR/UNKNOWN";
-                int bgColor = 0;
-                int fontColor = 0;
-                int borderColor = 0;
+                int bgColor = Keys.BG_COLOR.get();
+                int fontColor = Keys.FONT_COLOR.get();
+                int borderColor = Keys.BORDER_COLOR.get();
                 switch (entryType) {
                     case UPCOMING:
                         titleText = context.getString(R.string.upcoming_events);
                         descriptionText = context.getString(R.string.upcoming_events_description);
-                        bgColor = Keys.UPCOMING_BG_COLOR.get();
-                        fontColor = Keys.UPCOMING_FONT_COLOR.get();
-                        borderColor = Keys.UPCOMING_BORDER_COLOR.get();
+                        bgColor = getExpiredUpcomingColor(bgColor, Keys.UPCOMING_BG_COLOR.get());
+                        fontColor = getExpiredUpcomingColor(fontColor, Keys.UPCOMING_FONT_COLOR.get());
+                        borderColor = getExpiredUpcomingColor(borderColor, Keys.UPCOMING_BORDER_COLOR.get());
                         break;
                     case EXPIRED:
                         titleText = context.getString(R.string.expired_events);
                         descriptionText = context.getString(R.string.expired_events_description);
-                        bgColor = Keys.EXPIRED_BG_COLOR.get();
-                        fontColor = Keys.EXPIRED_FONT_COLOR.get();
-                        borderColor = Keys.EXPIRED_BORDER_COLOR.get();
+                        bgColor = getExpiredUpcomingColor(bgColor, Keys.EXPIRED_BG_COLOR.get());
+                        fontColor = getExpiredUpcomingColor(fontColor, Keys.EXPIRED_FONT_COLOR.get());
+                        borderColor = getExpiredUpcomingColor(borderColor, Keys.EXPIRED_BORDER_COLOR.get());
                         break;
                     case TODAY:
                         titleText = context.getString(R.string.todays_events);
@@ -159,22 +160,16 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
                         break;
                 }
                 
-                if (bgColor == 0) {
-                    bgColor = Keys.BG_COLOR.get();
-                    fontColor = Keys.FONT_COLOR.get();
-                    borderColor = Keys.BORDER_COLOR.get();
-                }
-                
                 binding.itemText.setText(titleText);
-                binding.itemText.setTextColor(getHarmonizedFontColor(fontColor, bgColor));
+                binding.itemText.setTextColor(getHarmonizedFontColorWithBg(fontColor, bgColor));
                 
                 binding.itemDescriptionText.setText(descriptionText);
-                binding.itemDescriptionText.setTextColor(getHarmonizedTimeTextColor(fontColor, bgColor));
+                binding.itemDescriptionText.setTextColor(getHarmonizedSecondaryFontColorWithBg(fontColor, bgColor));
                 
                 binding.card.setCardBackgroundColor(bgColor);
                 binding.card.setStrokeColor(borderColor);
                 
-                binding.dragHandle.setImageTintList(ColorStateList.valueOf(getOnSurfaceColor(bgColor)));
+                binding.dragHandle.setImageTintList(ColorStateList.valueOf(getOnBgColor(bgColor)));
                 binding.dragHandle.setOnTouchListener(
                         (v, event) -> {
                             if (event.getAction() == MotionEvent.ACTION_DOWN) {

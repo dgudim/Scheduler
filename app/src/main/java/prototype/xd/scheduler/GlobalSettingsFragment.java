@@ -28,13 +28,14 @@ import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.DoubleSeekBarSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SeekBarSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
-import prototype.xd.scheduler.utilities.BitmapUtilities;
+import prototype.xd.scheduler.utilities.GraphicsUtilities;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
@@ -95,10 +96,13 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_event_visibility)));
-        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET,
-                0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_show_days_upcoming));
-        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
-                0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_show_days_expired));
+        settingsEntries.add(new DoubleSeekBarSettingsEntryConfig(context, R.string.settings_show_events,
+                new SeekBarSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET,
+                        0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_in_n_days),
+                Keys.UPCOMING_BG_COLOR.defaultValue,
+                new SeekBarSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
+                        0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_after_n_days),
+                Keys.EXPIRED_BG_COLOR.defaultValue));
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.MERGE_ENTRIES, getString(R.string.settings_merge_events)));
         settingsEntries.add(new SwitchSettingsEntryConfig(
@@ -155,7 +159,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 
                 InputStream stream = requireActivity().getContentResolver().openInputStream(uri);
                 if (stream != null) {
-                    BitmapUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
+                    GraphicsUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
                             new File(Keys.ROOT_DIR.get(), DateManager.WEEK_DAYS_ROOT.get(adaptiveBackgroundSettingsEntry.getLastClickedBgIndex()) + ".png"));
                     stream.close();
                     requireActivity().runOnUiThread(() -> adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated());

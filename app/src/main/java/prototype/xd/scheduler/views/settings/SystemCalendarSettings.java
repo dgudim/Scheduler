@@ -65,7 +65,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         updatePreviews(
                 Keys.FONT_COLOR.get(calendarSubKeys),
-                Keys.BG_COLOR.get(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor)),
+                Keys.BG_COLOR.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor)),
                 Keys.BORDER_COLOR.get(calendarSubKeys),
                 Keys.BORDER_THICKNESS.get(calendarSubKeys));
         
@@ -99,7 +99,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 context, lifecycle,
                 bnd.backgroundColorState, this,
                 Keys.BG_COLOR,
-                value -> value.get(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
+                value -> value.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
         
         bnd.borderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
@@ -130,15 +130,15 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         setSliderChangeListener(
                 bnd.showDaysUpcomingDescription,
-                bnd.showDaysUpcomingBar, bnd.showDaysUpcomingState,
-                this, null, R.plurals.settings_show_days_upcoming,
+                bnd.showDaysUpcomingSlider, bnd.showDaysUpcomingState,
+                this, null, R.plurals.settings_in_n_days,
                 Keys.UPCOMING_ITEMS_OFFSET,
                 value -> value.get(calendarSubKeys));
         
         setSliderChangeListener(
                 bnd.showDaysExpiredDescription,
-                bnd.showDaysExpiredBar, bnd.showDaysExpiredState,
-                this, null, R.plurals.settings_show_days_expired,
+                bnd.showDaysExpiredSlider, bnd.showDaysExpiredState,
+                this, null, R.plurals.settings_after_n_days,
                 Keys.EXPIRED_ITEMS_OFFSET,
                 value -> value.get(calendarSubKeys),
                 (slider, value, fromUser) ->
