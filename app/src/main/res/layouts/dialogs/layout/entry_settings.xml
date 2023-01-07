@@ -345,7 +345,7 @@
                         android:orientation="vertical">
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/background_color_selector"
+                            android:id="@+id/current_background_color_selector"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_margin="5dp"
@@ -354,7 +354,7 @@
                             app:strokeWidth="0dp" />
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/font_color_selector"
+                            android:id="@+id/current_font_color_selector"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_margin="5dp"
@@ -363,7 +363,7 @@
                             app:strokeWidth="0dp" />
 
                         <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/border_color_selector"
+                            android:id="@+id/current_border_color_selector"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_margin="5dp"
@@ -379,68 +379,14 @@
                         android:background="?android:attr/listDivider" />
 
                     <LinearLayout
+                        android:id="@+id/preview_container"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:background="@color/light_gray_bg_tint"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:padding="5dp">
-
-                        <LinearLayout
-                            android:id="@+id/preview_border_upcoming"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/preview_text_upcoming"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:paddingBottom="3dp"
-                                android:text="@string/settings_preview_upcoming"
-                                android:textAppearance="@style/SmallHeading" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/preview_border"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="15dp"
-                            android:layout_marginBottom="15dp"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/preview_text"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:paddingBottom="3dp"
-                                android:text="@string/settings_preview_current"
-                                android:textAppearance="@style/SmallHeading" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/preview_border_expired"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/preview_text_expired"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:paddingBottom="3dp"
-                                android:text="@string/settings_preview_expired"
-                                android:textAppearance="@style/SmallHeading" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
+                        android:padding="3dp" />
 
                 </LinearLayout>
 

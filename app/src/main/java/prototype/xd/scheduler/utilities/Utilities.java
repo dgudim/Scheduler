@@ -309,13 +309,12 @@ public class Utilities {
     public static void setSliderChangeListener(final TextView displayTo,
                                                final Slider slider,
                                                final TextView stateIcon,
-                                               final PopupSettingsView settingsView,
-                                               @Nullable final View borderView,
+                                               @NonNull final PopupSettingsView settingsView,
                                                @StringRes @PluralsRes final int stringResource,
                                                final Keys.DefaultedInteger value,
-                                               final Function<Keys.DefaultedInteger, Integer> initialValueFactory,
-                                               final Slider.OnChangeListener customProgressListener,
-                                               final Slider.OnSliderTouchListener customTouchListener) {
+                                               @NonNull final Function<Keys.DefaultedInteger, Integer> initialValueFactory,
+                                               @Nullable final Slider.OnChangeListener customProgressListener,
+                                               @Nullable final Slider.OnSliderTouchListener customTouchListener) {
         int initialValue = initialValueFactory.apply(value);
         displayTo.setText(getQuantityString(displayTo.getContext(), stringResource, initialValue));
         slider.clearOnChangeListeners();
@@ -325,9 +324,6 @@ public class Utilities {
                 customProgressListener.onValueChange(slider1, progress, fromUser);
             if (fromUser) {
                 displayTo.setText(getQuantityString(displayTo.getContext(), stringResource, (int) progress));
-                if (borderView != null) {
-                    borderView.setPadding((int) progress, (int) progress, (int) progress, 0);
-                }
             }
         });
         slider.clearOnSliderTouchListeners();
@@ -350,13 +346,13 @@ public class Utilities {
                                                final Slider slider,
                                                final TextView stateIcon,
                                                final PopupSettingsView systemCalendarSettings,
-                                               @Nullable final View borderView,
                                                @StringRes @PluralsRes final int stringResource,
                                                final Keys.DefaultedInteger value,
-                                               final Function<Keys.DefaultedInteger, Integer> initialValueFactory) {
+                                               final Function<Keys.DefaultedInteger, Integer> initialValueFactory,
+                                               @Nullable final Slider.OnChangeListener customProgressListener) {
         setSliderChangeListener(
-                displayTo, slider, stateIcon, systemCalendarSettings, borderView,
-                stringResource, value, initialValueFactory, null, null);
+                displayTo, slider, stateIcon, systemCalendarSettings,
+                stringResource, value, initialValueFactory, customProgressListener, null);
     }
     
     //switch listener for regular settings

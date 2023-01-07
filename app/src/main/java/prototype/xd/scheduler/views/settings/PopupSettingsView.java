@@ -1,7 +1,5 @@
 package prototype.xd.scheduler.views.settings;
 
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -21,6 +19,9 @@ import prototype.xd.scheduler.utilities.TodoEntryManager;
 public abstract class PopupSettingsView {
     
     protected final EntrySettingsBinding bnd;
+    
+    protected final EntryPreviewContainer entryPreviewContainer;
+    
     protected final Context context;
     protected AlertDialog dialog;
     protected final Lifecycle lifecycle;
@@ -42,6 +43,12 @@ public abstract class PopupSettingsView {
         this.context = context;
         this.lifecycle = lifecycle;
         
+        entryPreviewContainer = getEntryPreviewContainer();
+        entryPreviewContainer.attachCurrentSelectors(
+                bnd.currentFontColorSelector,
+                bnd.currentBorderColorSelector,
+                bnd.currentBackgroundColorSelector);
+        
         dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
                 .setOnDismissListener(dialog -> {
                     if (todoEntryManager != null) {
@@ -50,6 +57,8 @@ public abstract class PopupSettingsView {
                 }).setView(bnd.getRoot()).create();
         lifecycle.addObserver(new DialogDismissLifecycleObserver(dialog));
     }
+    
+    public abstract EntryPreviewContainer getEntryPreviewContainer();
     
     /**
      * public method that should be called when some parameter changes, for example from a switch listener
@@ -61,17 +70,7 @@ public abstract class PopupSettingsView {
      * public method that should be called when some color changes (font, bg, border), for example from a switch listener
      */
     public void notifyColorChanged(Keys.DefaultedInteger value, int newColor) {
-        if (value.equals(Keys.FONT_COLOR)) {
-            updatePreviewFont(newColor);
-            return;
-        }
-        if (value.equals(Keys.BORDER_COLOR)) {
-            updatePreviewBorder(newColor);
-            return;
-        }
-        if (value.equals(Keys.BG_COLOR)) {
-            updatePreviewBg(newColor);
-        }
+        entryPreviewContainer.notifyColorChanged(value, newColor);
     }
     
     /**
@@ -96,42 +95,4 @@ public abstract class PopupSettingsView {
         setStateIconColor(bnd.hideByContentSwitchState, Keys.HIDE_ENTRIES_BY_CONTENT.key);
         setStateIconColor(bnd.hideByContentFieldState, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT.key);
     }
-    
-    protected void updatePreviews(int fontColor, int bgColor, int borderColor, int borderThickness) {
-        updatePreviewFont(fontColor);
-        updatePreviewBg(bgColor);
-        updatePreviewBorder(borderColor);
-        bnd.previewBorder.setPadding(borderThickness,
-                borderThickness, borderThickness, 0);
-        
-        int upcomingBorderThickness = Keys.UPCOMING_BORDER_THICKNESS.get();
-        int expiredBorderThickness = Keys.EXPIRED_BORDER_THICKNESS.get();
-        
-        bnd.previewBorderUpcoming.setPadding(upcomingBorderThickness,
-                upcomingBorderThickness, upcomingBorderThickness, 0);
-        bnd.previewBorderExpired.setPadding(expiredBorderThickness,
-                expiredBorderThickness, expiredBorderThickness, 0);
-    }
-    
-    public void updatePreviewFont(int fontColor) {
-        bnd.fontColorSelector.setCardBackgroundColor(fontColor);
-        bnd.previewText.setTextColor(fontColor);
-        bnd.previewTextUpcoming.setTextColor(getExpiredUpcomingColor(fontColor, Keys.UPCOMING_FONT_COLOR.get()));
-        bnd.previewTextExpired.setTextColor(getExpiredUpcomingColor(fontColor, Keys.EXPIRED_FONT_COLOR.get()));
-    }
-    
-    public void updatePreviewBg(int bgColor) {
-        bnd.backgroundColorSelector.setCardBackgroundColor(bgColor);
-        bnd.previewText.setBackgroundColor(bgColor);
-        bnd.previewTextUpcoming.setBackgroundColor(getExpiredUpcomingColor(bgColor, Keys.UPCOMING_BG_COLOR.get()));
-        bnd.previewTextExpired.setBackgroundColor(getExpiredUpcomingColor(bgColor, Keys.EXPIRED_BG_COLOR.get()));
-    }
-    
-    public void updatePreviewBorder(int borderColor) {
-        bnd.borderColorSelector.setCardBackgroundColor(borderColor);
-        bnd.previewBorder.setBackgroundColor(borderColor);
-        bnd.previewBorderUpcoming.setBackgroundColor(getExpiredUpcomingColor(borderColor, Keys.UPCOMING_BORDER_COLOR.get()));
-        bnd.previewBorderExpired.setBackgroundColor(getExpiredUpcomingColor(borderColor, Keys.EXPIRED_BORDER_COLOR.get()));
-    }
-    
 }

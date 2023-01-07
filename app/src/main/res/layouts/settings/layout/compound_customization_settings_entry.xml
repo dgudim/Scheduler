@@ -67,7 +67,7 @@
                     android:textAppearance="@style/SmallHeading" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/backgroundColor_upcoming_selector"
+                    android:id="@+id/upcoming_background_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
@@ -76,7 +76,7 @@
                     app:strokeWidth="0dp" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/fontColor_upcoming_selector"
+                    android:id="@+id/upcoming_font_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
@@ -85,7 +85,7 @@
                     app:strokeWidth="0dp" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/borderColor_upcoming_selector"
+                    android:id="@+id/upcoming_border_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
@@ -108,7 +108,7 @@
                     android:textAppearance="@style/SmallHeading" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/background_color_selector"
+                    android:id="@+id/current_background_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
@@ -117,7 +117,7 @@
                     app:strokeWidth="0dp" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/font_color_selector"
+                    android:id="@+id/current_font_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
@@ -126,7 +126,7 @@
                     app:strokeWidth="0dp" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/border_color_selector"
+                    android:id="@+id/current_border_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
@@ -149,7 +149,7 @@
                     android:textAppearance="@style/SmallHeading" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/backgroundColor_expired_selector"
+                    android:id="@+id/expired_background_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
@@ -158,7 +158,7 @@
                     app:strokeWidth="0dp" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/fontColor_expired_selector"
+                    android:id="@+id/expired_font_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"
@@ -167,7 +167,7 @@
                     app:strokeWidth="0dp" />
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/borderColor_expired_selector"
+                    android:id="@+id/expired_border_color_selector"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="5dp"

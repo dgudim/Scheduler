@@ -178,7 +178,7 @@ class LockScreenBitmapDrawer {
         
         Canvas canvas = new Canvas(bitmap);
         GroupList groups = loadGroups();
-        TodoItemViewType todoItemViewType = TodoItemViewType.valueOf(TODO_ITEM_VIEW_TYPE.get());
+        TodoItemViewType todoItemViewType = TODO_ITEM_VIEW_TYPE.get();
         // load user defined entries (from files)
         // add entries from all calendars
         // filter and sort entries

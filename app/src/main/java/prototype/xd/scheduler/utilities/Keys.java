@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
+import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
 public class Keys {
     
@@ -44,7 +44,7 @@ public class Keys {
         public T get(SharedPreferences preferences, @Nullable List<String> subKeys, T actualDefaultValue, boolean ignoreBaseKey) {
             if (subKeys != null) {
                 String targetKey = getFirstValidKey(subKeys, key);
-                if(targetKey.equals(key) && ignoreBaseKey) {
+                if (targetKey.equals(key) && ignoreBaseKey) {
                     return actualDefaultValue;
                 }
                 return getInternal(preferences, targetKey, actualDefaultValue);
@@ -196,12 +196,12 @@ public class Keys {
             }
             preferences.edit().putString(key, stringValue.toString()).apply();
         }
-    
+        
         @Override
         public int hashCode() {
             return Objects.hash(key, defaultValue, enumClass);
         }
-    
+        
         @Override
         public boolean equals(@Nullable Object obj) {
             return super.equals(obj) && ((DefaultedEnumList<?>) obj).enumClass.equals(enumClass);
@@ -372,7 +372,8 @@ public class Keys {
     
     public static final DefaultedBoolean ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS = new DefaultedBoolean("allow_global_calendar_settings", false);
     
-    public static final DefaultedString TODO_ITEM_VIEW_TYPE = new DefaultedString("lockScreenTodoItemViewType", LockScreenTodoItemView.TodoItemViewType.BASIC.name());
+    public static final DefaultedEnum<TodoItemViewType> TODO_ITEM_VIEW_TYPE =
+            new DefaultedEnum<>("lockScreenTodoItemViewType", TodoItemViewType.BASIC, TodoItemViewType.class);
     
     public static final DefaultedEnumList<TodoEntry.EntryType> TODO_ITEM_SORTING_ORDER = new DefaultedEnumList<>(
             "sort_order", Arrays.asList(

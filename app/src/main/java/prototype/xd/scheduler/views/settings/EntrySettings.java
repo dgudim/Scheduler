@@ -48,6 +48,31 @@ public class EntrySettings extends PopupSettingsView {
         this.todoEntryManager = todoEntryManager;
     }
     
+    @Override
+    public EntryPreviewContainer getEntryPreviewContainer() {
+        return new EntryPreviewContainer(context, bnd.previewContainer, false) {
+            @Override
+            protected int currentFontColorGetter() {
+                return todoEntry.fontColor.getToday();
+            }
+            
+            @Override
+            protected int currentBgColorGetter() {
+                return todoEntry.bgColor.getToday();
+            }
+            
+            @Override
+            protected int currentBorderColorGetter() {
+                return todoEntry.borderColor.getToday();
+            }
+            
+            @Override
+            protected int currentBorderThicknessGetter() {
+                return todoEntry.borderThickness.getToday();
+            }
+        };
+    }
+    
     public void show(final TodoEntry entry, final Context context) {
         initialise(entry, context);
         dialog.show();
@@ -58,11 +83,7 @@ public class EntrySettings extends PopupSettingsView {
         todoEntry = entry;
         
         updateAllIndicators();
-        updatePreviews(
-                todoEntry.fontColor.getToday(),
-                todoEntry.bgColor.getToday(),
-                todoEntry.borderColor.getToday(),
-                todoEntry.borderThickness.getToday());
+        entryPreviewContainer.refreshAll();
         
         final List<Group> groupList = todoEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
@@ -85,7 +106,7 @@ public class EntrySettings extends PopupSettingsView {
                     selectedGroupName,
                     (view2, name, dialogBinding, selectedIndex) -> {
                         int groupIndex = Group.groupIndexInList(groupList, name);
-    
+                        
                         String newName = name;
                         int i = 0;
                         while (groupIndex > 0) {
@@ -93,7 +114,7 @@ public class EntrySettings extends PopupSettingsView {
                             newName = name + "(" + i + ")";
                             groupIndex = Group.groupIndexInList(groupList, newName);
                         }
-    
+                        
                         selectedGroup.setName(newName);
                         bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, context));
                         return true;
@@ -140,19 +161,19 @@ public class EntrySettings extends PopupSettingsView {
                             rebuild(context);
                         }));
         
-        bnd.fontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.fontColorState, this,
                 FONT_COLOR,
                 parameterKey -> entry.fontColor.getToday()));
         
-        bnd.backgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.backgroundColorState, this,
                 BG_COLOR,
                 parameterKey -> entry.bgColor.getToday()));
         
-        bnd.borderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.borderColorState, this,
                 BORDER_COLOR,
@@ -161,23 +182,24 @@ public class EntrySettings extends PopupSettingsView {
         Utilities.setSliderChangeListener(
                 bnd.borderThicknessDescription,
                 bnd.borderThicknessBar, bnd.borderThicknessState,
-                this, bnd.previewBorder, R.string.settings_border_thickness,
+                this, R.string.settings_border_thickness,
                 BORDER_THICKNESS,
-                parameterKey -> entry.borderThickness.getToday());
+                parameterKey -> entry.borderThickness.getToday(),
+                (slider, value, fromUser) -> entryPreviewContainer.updateCurrentPreviewBorderThickness((int) value));
         
         Utilities.setSliderChangeListener(
                 bnd.priorityDescription,
                 bnd.priorityBar, bnd.priorityState,
-                this, null, R.string.settings_priority,
+                this, R.string.settings_priority,
                 PRIORITY,
-                parameterKey -> entry.priority.getToday());
+                parameterKey -> entry.priority.getToday(), null);
         
         Utilities.setSliderChangeListener(
                 bnd.adaptiveColorBalanceDescription,
                 bnd.adaptiveColorBalanceBar, bnd.adaptiveColorBalanceState,
-                this, null, R.string.settings_adaptive_color_balance,
+                this, R.string.settings_adaptive_color_balance,
                 ADAPTIVE_COLOR_BALANCE,
-                parameterKey -> entry.adaptiveColorBalance.getToday());
+                parameterKey -> entry.adaptiveColorBalance.getToday(), null);
         
         if (todoEntry.isGlobal()) {
             // global entries can't have upcoming / expired days
@@ -188,16 +210,16 @@ public class EntrySettings extends PopupSettingsView {
             Utilities.setSliderChangeListener(
                     bnd.showDaysUpcomingDescription,
                     bnd.showDaysUpcomingSlider, bnd.showDaysUpcomingState,
-                    this, null, R.plurals.settings_in_n_days,
+                    this, R.plurals.settings_in_n_days,
                     UPCOMING_ITEMS_OFFSET,
-                    parameterKey -> entry.upcomingDayOffset.getToday());
+                    parameterKey -> entry.upcomingDayOffset.getToday(), null);
             
             Utilities.setSliderChangeListener(
                     bnd.showDaysExpiredDescription,
                     bnd.showDaysExpiredSlider, bnd.showDaysExpiredState,
-                    this, null, R.plurals.settings_after_n_days,
+                    this, R.plurals.settings_after_n_days,
                     EXPIRED_ITEMS_OFFSET,
-                    parameterKey -> entry.expiredDayOffset.getToday());
+                    parameterKey -> entry.expiredDayOffset.getToday(), null);
         }
     }
     

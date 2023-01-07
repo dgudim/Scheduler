@@ -32,6 +32,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     // if called from regular settings
     private List<String> calendarSubKeys;
     private String calendarKey;
+    private int eventColor;
     
     // if called from main screen
     private TodoEntry todoEntry;
@@ -43,6 +44,31 @@ public class SystemCalendarSettings extends PopupSettingsView {
                                   @NonNull final Lifecycle lifecycle) {
         super(context, todoEntryManager, lifecycle);
         bnd.groupSelector.setVisibility(View.GONE);
+    }
+    
+    @Override
+    public EntryPreviewContainer getEntryPreviewContainer() {
+        return new EntryPreviewContainer(context, bnd.previewContainer, true) {
+            @Override
+            protected int currentFontColorGetter() {
+                return Keys.FONT_COLOR.get(calendarSubKeys);
+            }
+            
+            @Override
+            protected int currentBgColorGetter() {
+                return Keys.BG_COLOR.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor));
+            }
+            
+            @Override
+            protected int currentBorderColorGetter() {
+                return Keys.BORDER_COLOR.get(calendarSubKeys);
+            }
+            
+            @Override
+            protected int currentBorderThicknessGetter() {
+                return Keys.BORDER_THICKNESS.get(calendarSubKeys);
+            }
+        };
     }
     
     public void show(final String calendarKey, int eventColor) {
@@ -61,15 +87,11 @@ public class SystemCalendarSettings extends PopupSettingsView {
         bnd.entrySettingsTitle.setText(calendarKeyToReadable(dialog.getContext(), calendarKey));
         
         this.calendarKey = calendarKey;
+        this.eventColor = eventColor;
         calendarSubKeys = generateSubKeysFromCalendarKey(calendarKey);
         
-        updatePreviews(
-                Keys.FONT_COLOR.get(calendarSubKeys),
-                Keys.BG_COLOR.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor)),
-                Keys.BORDER_COLOR.get(calendarSubKeys),
-                Keys.BORDER_THICKNESS.get(calendarSubKeys));
-        
         updateAllIndicators();
+        entryPreviewContainer.refreshAll();
         
         bnd.settingsResetButton.setOnClickListener(v ->
                 displayConfirmationDialogue(v.getContext(), lifecycle,
@@ -89,19 +111,19 @@ public class SystemCalendarSettings extends PopupSettingsView {
                             initialize(calendarKey, eventColor);
                         }));
         
-        bnd.fontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.fontColorState, this,
                 Keys.FONT_COLOR,
                 value -> value.get(calendarSubKeys)));
         
-        bnd.backgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.backgroundColorState, this,
                 Keys.BG_COLOR,
                 value -> value.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
         
-        bnd.borderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.borderColorState, this,
                 Keys.BORDER_COLOR,
@@ -110,35 +132,36 @@ public class SystemCalendarSettings extends PopupSettingsView {
         setSliderChangeListener(
                 bnd.borderThicknessDescription,
                 bnd.borderThicknessBar, bnd.borderThicknessState,
-                this, bnd.previewBorder, R.string.settings_border_thickness,
+                this, R.string.settings_border_thickness,
                 Keys.BORDER_THICKNESS,
-                value -> value.get(calendarSubKeys));
+                value -> value.get(calendarSubKeys),
+                (slider, value, fromUser) -> entryPreviewContainer.updateCurrentPreviewBorderThickness((int) value));
         
         setSliderChangeListener(
                 bnd.priorityDescription,
                 bnd.priorityBar, bnd.priorityState,
-                this, null, R.string.settings_priority,
+                this, R.string.settings_priority,
                 Keys.PRIORITY,
-                value -> value.get(calendarSubKeys));
+                value -> value.get(calendarSubKeys), null);
         
         setSliderChangeListener(
                 bnd.adaptiveColorBalanceDescription,
                 bnd.adaptiveColorBalanceBar, bnd.adaptiveColorBalanceState,
-                this, null, R.string.settings_adaptive_color_balance,
+                this, R.string.settings_adaptive_color_balance,
                 Keys.ADAPTIVE_COLOR_BALANCE,
-                value -> value.get(calendarSubKeys));
+                value -> value.get(calendarSubKeys), null);
         
         setSliderChangeListener(
                 bnd.showDaysUpcomingDescription,
                 bnd.showDaysUpcomingSlider, bnd.showDaysUpcomingState,
-                this, null, R.plurals.settings_in_n_days,
+                this, R.plurals.settings_in_n_days,
                 Keys.UPCOMING_ITEMS_OFFSET,
-                value -> value.get(calendarSubKeys));
+                value -> value.get(calendarSubKeys), null);
         
         setSliderChangeListener(
                 bnd.showDaysExpiredDescription,
                 bnd.showDaysExpiredSlider, bnd.showDaysExpiredState,
-                this, null, R.plurals.settings_after_n_days,
+                this, R.plurals.settings_after_n_days,
                 Keys.EXPIRED_ITEMS_OFFSET,
                 value -> value.get(calendarSubKeys),
                 (slider, value, fromUser) ->
