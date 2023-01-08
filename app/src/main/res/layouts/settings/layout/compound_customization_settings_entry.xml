@@ -68,30 +68,15 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/upcoming_background_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/upcoming_font_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/upcoming_border_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
             </LinearLayout>
 
             <LinearLayout
@@ -109,30 +94,15 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/current_background_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/current_font_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/current_border_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
             </LinearLayout>
 
             <LinearLayout
@@ -150,30 +120,15 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/expired_background_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/expired_font_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/expired_border_color_selector"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_margin="5dp"
-                    app:cardCornerRadius="25dp"
-                    app:cardElevation="5dp"
-                    app:strokeWidth="0dp" />
+                    style="@style/ColorPickerCardView" />
 
             </LinearLayout>
 

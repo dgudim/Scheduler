@@ -124,15 +124,16 @@
     </style>
     <!-- end -->
 
-    <style name="Padding8_4">
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginTop">4dp</item>
-        <item name="android:layout_marginBottom">4dp</item>
-    </style>
-
-    <style name="Padding3_3">
-        <item name="android:layout_margin">3dp</item>
+    <style name="ColorPickerCardView">
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="cardCornerRadius">25dp</item>
+        <item name="cardElevation">5dp</item>
+        <item name="strokeWidth">0dp</item>
     </style>
 
     <style name="SecondaryAccentedTextStyle" parent="MediumHeadingSubtext">
