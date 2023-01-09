@@ -33,7 +33,7 @@ import prototype.xd.scheduler.utilities.Logger;
 
 public class SystemCalendarEvent {
     
-    private static final String NAME = "System calendar event";
+    public static final String NAME = SystemCalendarEvent.class.getSimpleName();
     
     protected @Nullable
     TodoEntry associatedEntry;
@@ -113,7 +113,7 @@ public class SystemCalendarEvent {
                         DateTimeZonePair pair = checkRDates(rDateStr);
                         rSet.addInstances(new RecurrenceList(pair.date, pair.timeZone));
                     } catch (IllegalArgumentException e) {
-                        Logger.error( NAME, "Error adding rDate: " + e.getMessage());
+                        Logger.error(NAME, "Error adding rDate: " + e.getMessage());
                     }
                 }
                 
@@ -124,7 +124,7 @@ public class SystemCalendarEvent {
                     try {
                         rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRuleStr)));
                     } catch (IllegalArgumentException e) {
-                        Logger.error( NAME, "Error adding exRule: " + e.getMessage());
+                        Logger.error(NAME, "Error adding exRule: " + e.getMessage());
                     }
                 }
                 
@@ -133,7 +133,7 @@ public class SystemCalendarEvent {
                         DateTimeZonePair pair = checkRDates(exDateStr);
                         rSet.addExceptions(new RecurrenceList(pair.date, pair.timeZone));
                     } catch (IllegalArgumentException e) {
-                        Logger.error( NAME, "Error adding exDate: " + e.getMessage());
+                        Logger.error(NAME, "Error adding exDate: " + e.getMessage());
                     }
                 }
                 
@@ -167,7 +167,7 @@ public class SystemCalendarEvent {
     
     public void linkEntry(TodoEntry todoEntry) {
         if (associatedEntry != null) {
-            Logger.warning( NAME, "Calendar event " + title + " already linked to " +
+            Logger.warning(NAME, "Calendar event " + title + " already linked to " +
                     associatedEntry.getId() + " relinking to " + todoEntry.getId());
         }
         associatedEntry = todoEntry;
@@ -221,7 +221,7 @@ public class SystemCalendarEvent {
     private DateTimeZonePair checkRDates(String datesToParse) {
         TimeZone newTimeZone = timeZone;
         if (datesToParse.contains(";")) {
-            Logger.warning( NAME, "Not standard dates for " + title + ", " + datesToParse + ", probably contains timezone, attempting to parse");
+            Logger.warning(NAME, "Not standard dates for " + title + ", " + datesToParse + ", probably contains timezone, attempting to parse");
             String[] split = datesToParse.split(";");
             newTimeZone = TimeZone.getTimeZone(split[0]);
             datesToParse = split[1];
@@ -305,7 +305,7 @@ public class SystemCalendarEvent {
             }
             rSet.addExceptions(new RecurrenceList(exceptionsPrimitiveArray));
         } else {
-            Logger.warning( NAME, "Couldn't add exceptions to " + title);
+            Logger.warning(NAME, "Couldn't add exceptions to " + title);
         }
     }
     

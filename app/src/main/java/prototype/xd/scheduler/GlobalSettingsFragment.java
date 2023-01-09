@@ -31,19 +31,19 @@ import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEnt
 import prototype.xd.scheduler.entities.settings_entries.DoubleSliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig;
-import prototype.xd.scheduler.entities.settings_entries.SliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.SliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
-import prototype.xd.scheduler.utilities.GraphicsUtilities;
 import prototype.xd.scheduler.utilities.DateManager;
+import prototype.xd.scheduler.utilities.GraphicsUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
 public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
     
-    private static final String NAME = "BackgroundImagesGridViewAdapter";
+    public static final String NAME = GlobalSettingsFragment.class.getSimpleName();
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBackgroundSettingsEntry;
     
@@ -59,7 +59,8 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         List<SettingsEntryConfig> settingsEntries = new ArrayList<>();
         
-        adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(requireContext(), getLifecycle(), this::selectBackground);
+        adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(requireContext(), getLifecycle(),
+                bgIndex -> Utilities.callImageFileChooser(pickBg));
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_application_settings)));
         settingsEntries.add(new AppThemeSelectorEntryConfig());
@@ -136,10 +137,6 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     public void onDestroy() {
         adaptiveBackgroundSettingsEntry = null;
         super.onDestroy();
-    }
-    
-    public void selectBackground(Integer bgIndex) {
-        Utilities.callImageFileChooser(pickBg);
     }
     
     public void onBgSelected(ActivityResult result) {

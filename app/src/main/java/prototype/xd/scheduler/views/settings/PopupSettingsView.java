@@ -11,7 +11,7 @@ import androidx.lifecycle.Lifecycle;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
-import prototype.xd.scheduler.utilities.DialogDismissLifecycleObserver;
+import prototype.xd.scheduler.utilities.DialogDismissObserver;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
@@ -55,7 +55,7 @@ public abstract class PopupSettingsView {
                         todoEntryManager.performDeferredTasks();
                     }
                 }).setView(bnd.getRoot()).create();
-        lifecycle.addObserver(new DialogDismissLifecycleObserver(dialog));
+        lifecycle.addObserver(new DialogDismissObserver(dialog));
     }
     
     public abstract EntryPreviewContainer getEntryPreviewContainer();

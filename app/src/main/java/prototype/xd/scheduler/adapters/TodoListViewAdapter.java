@@ -82,7 +82,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                         if (isGlobal) {
                             entry.changeParameters(
                                     TEXT_VALUE, text,
-                                    IS_COMPLETED, "false",
+                                    IS_COMPLETED, Boolean.toString(false),
                                     START_DAY_UTC, DAY_FLAG_GLOBAL_STR,
                                     END_DAY_UTC, DAY_FLAG_GLOBAL_STR);
                         } else {

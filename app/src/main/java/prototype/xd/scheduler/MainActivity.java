@@ -21,7 +21,7 @@ import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class MainActivity extends AppCompatActivity {
     
-    private static final String NAME = "MainActivity";
+    public static final String NAME = MainActivity.class.getSimpleName();
     public static final String PACKAGE_NAME = BuildConfig.APPLICATION_ID;
     
     @Override

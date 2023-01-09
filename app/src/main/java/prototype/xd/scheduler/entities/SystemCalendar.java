@@ -28,7 +28,7 @@ import prototype.xd.scheduler.utilities.Logger;
 
 public class SystemCalendar {
     
-    private static final String NAME = "SystemCalendar";
+    public static final String NAME = SystemCalendar.class.getSimpleName();
     
     public final String account_type;
     public final String account_name;

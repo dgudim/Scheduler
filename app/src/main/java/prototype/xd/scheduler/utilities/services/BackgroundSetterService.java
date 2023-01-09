@@ -29,7 +29,7 @@ import prototype.xd.scheduler.utilities.Logger;
 
 public class BackgroundSetterService extends Service {
     
-    private static final String NAME = "Bg setter service";
+    public static final String NAME = BackgroundSetterService.class.getSimpleName();
     
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
@@ -139,15 +139,15 @@ public class BackgroundSetterService extends Service {
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 setBitmapUpdateFlag();
-                Logger.info( NAME, "Received ping (keep alive job)");
+                Logger.info(NAME, "Received ping (keep alive job)");
             } else {
-                Logger.info( NAME, "Received general ping");
+                Logger.info(NAME, "Received general ping");
                 lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this, checkIfTimeSettingsChanged());
                 updateNotification();
             }
         } else {
             initialized = true;
-            Logger.info( NAME, "Received ping (initial)");
+            Logger.info(NAME, "Received ping (initial)");
             
             screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
@@ -155,16 +155,16 @@ public class BackgroundSetterService extends Service {
                     if (!lastUpdateSucceeded || getBitmapUpdateFlag()) {
                         ping(context);
                         clearBitmapUpdateFlag();
-                        Logger.info( NAME, "Sent ping (on - off receiver)");
+                        Logger.info(NAME, "Sent ping (on - off receiver)");
                     }
-                    Logger.info( NAME, "Receiver state: " + intent.getAction());
+                    Logger.info(NAME, "Receiver state: " + intent.getAction());
                 }
             };
             pingReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     ping(context);
-                    Logger.info( NAME, "Sent ping (date changed receiver)");
+                    Logger.info(NAME, "Sent ping (date changed receiver)");
                 }
             };
             
@@ -182,7 +182,7 @@ public class BackgroundSetterService extends Service {
     }
     
     private void scheduleRestartJob() {
-        Logger.info( NAME, "restart job scheduled");
+        Logger.info(NAME, "restart job scheduled");
         getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
                 new ComponentName(getApplicationContext(), KeepAliveService.class))
                 .setPeriodic(15 * 60L * 1000, 5 * 60L * 1000).build());

@@ -10,14 +10,14 @@ import androidx.lifecycle.LifecycleOwner;
 /**
  * Utility class for dismissing a dialog before activity exit
  */
-public class DialogDismissLifecycleObserver implements DefaultLifecycleObserver {
+public class DialogDismissObserver implements DefaultLifecycleObserver {
     
-    private static final String NAME = "DialogLifecycle";
+    public static final String NAME = DialogDismissObserver.class.getSimpleName();
     
     private @Nullable
     Dialog dialog;
     
-    public DialogDismissLifecycleObserver(@NonNull final Dialog dialog) {
+    public DialogDismissObserver(@NonNull final Dialog dialog) {
         this.dialog = dialog;
     }
     

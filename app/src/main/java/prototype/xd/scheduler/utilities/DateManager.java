@@ -26,8 +26,10 @@ import prototype.xd.scheduler.entities.TodoEntry;
 
 public class DateManager {
     
+    public static final String NAME = DateManager.class.getSimpleName();
+    
     private DateManager() {
-        throw new IllegalStateException("Utility date manager class");
+        throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
     public static final long ONE_MINUTE_MS = 60000L;
@@ -81,7 +83,7 @@ public class DateManager {
     public static synchronized boolean checkIfTimeSettingsChanged() {
         TimeZone newTimeZone = TimeZone.getDefault();
         if (!newTimeZone.equals(systemTimeZone)) {
-            Logger.debug("DateManager", "Timezone changed! Old: " + systemTimeZone.getID() + " | New: " + newTimeZone.getID());
+            Logger.debug(NAME, "Timezone changed! Old: " + systemTimeZone.getID() + " | New: " + newTimeZone.getID());
             // reinitialize all the stuff
             systemTimeZone = newTimeZone;
             // update timezones of calendar and formatters

@@ -195,7 +195,7 @@ public class DialogUtilities {
                                                   @NonNull final Lifecycle lifecycle,
                                                   @Nullable DialogInterface.OnDismissListener dismissListener) {
         // make sure the dialog is dismissed on activity destroy
-        DialogDismissLifecycleObserver dismissLifecycleObserver = new DialogDismissLifecycleObserver(dialog);
+        DialogDismissObserver dismissLifecycleObserver = new DialogDismissObserver(dialog);
         lifecycle.addObserver(dismissLifecycleObserver);
         // remove the observer as soon as the dialog in dismissed
         dialog.setOnDismissListener(dialog1 -> {

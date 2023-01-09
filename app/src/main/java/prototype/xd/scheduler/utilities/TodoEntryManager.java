@@ -41,7 +41,7 @@ import prototype.xd.scheduler.views.CalendarView;
 
 public class TodoEntryManager implements DefaultLifecycleObserver {
     
-    private static final String NAME = "TodoEntryManager";
+    public static final String NAME = TodoEntryManager.class.getSimpleName();
     
     public enum SaveType {
         ENTRIES, GROUPS, NONE
@@ -138,7 +138,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
             
             initFinished = true;
             
-            Logger.info(Thread.currentThread().getName(), "TodoListEntryStorage cold start complete in " +
+            Logger.info(Thread.currentThread().getName(), NAME + " cold start complete in " +
                     (System.currentTimeMillis() - start) + "ms, loaded " + todoListEntries.size() + " entries");
             if (onInitFinishedRunnable != null) {
                 onInitFinishedRunnable.run();
@@ -168,8 +168,8 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
                             saveType = SaveType.NONE;
                         } catch (InterruptedException e) {
                             interrupt();
-                            String name = Thread.currentThread().getName();
-                            Logger.info(name, name + " stopped");
+                            String threadName = Thread.currentThread().getName();
+                            Logger.info(threadName, threadName + " stopped");
                         }
                         
                     } while (!isInterrupted());

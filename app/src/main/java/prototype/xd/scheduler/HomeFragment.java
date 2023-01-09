@@ -50,6 +50,8 @@ import prototype.xd.scheduler.views.CalendarView;
 
 public class HomeFragment extends Fragment {
     
+    public static final String NAME = HomeFragment.class.getSimpleName();
+    
     private volatile TodoEntryManager todoEntryManager;
     private ContentWrapperBinding contentBnd;
     
@@ -140,7 +142,7 @@ public class HomeFragment extends Fragment {
                                 dialogBinding.dayFromButton.getSelectedDayUTCStr());
                         values.put(END_DAY_UTC, isGlobal ? DAY_FLAG_GLOBAL_STR :
                                 dialogBinding.dayToButton.getSelectedDayUTCStr());
-                        values.put(IS_COMPLETED, "false");
+                        values.put(IS_COMPLETED, Boolean.toString(false));
                         
                         todoEntryManager.addEntry(new TodoEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
                                 groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
@@ -176,7 +178,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Logger.debug("HomeFragment", "Main screen is now visible");
+        Logger.debug(NAME, "Main screen is now visible");
         // update the ui only after it's fully inflated
         
         // when all entries are loaded, update current month

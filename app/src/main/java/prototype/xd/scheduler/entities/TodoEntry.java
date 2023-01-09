@@ -144,7 +144,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
     }
     
-    private static final transient String NAME = "Todo list entry";
+    public static final transient String NAME = TodoEntry.class.getSimpleName();
     
     public enum EntryType {TODAY, GLOBAL, UPCOMING, EXPIRED, UNKNOWN}
     
@@ -154,6 +154,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public static class TimeRange {
+        
+        public static final String NAME = TimeRange.class.getSimpleName();
         
         public static final TimeRange NullRange = new TimeRange(-1, -1);
         
@@ -172,7 +174,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 return new TimeRange(start, end).toDays(false, local);
             }
             if (inDays) {
-                Logger.warning("TimeRange", "Trying to convert range to days but it's already in days");
+                Logger.warning(NAME, "Trying to convert range to days but it's already in days");
                 return this;
             }
             start = local ? msUTCtoDaysLocal(start) : msToDays(start);
@@ -240,7 +242,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     public void cacheSortingIndex(long targetDayUTC, List<EntryType> order) {
         sortingIndex = order.indexOf(getEntryType(targetDayUTC));
-        if(sortingIndex == -1) {
+        if (sortingIndex == -1) {
             // fallback to treating like today's
             sortingIndex = EntryType.TODAY.ordinal();
         }

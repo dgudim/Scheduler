@@ -23,10 +23,10 @@ import prototype.xd.scheduler.entities.TodoEntry;
 
 public class SystemCalendarUtils {
     
-    private static final String NAME = "CalendarUtils";
+    public static final String NAME = SystemCalendarUtils.class.getSimpleName();
     
     private SystemCalendarUtils() {
-        throw new IllegalStateException("System calendar utility class");
+        throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
     public static final List<String> calendarColumns = Collections.unmodifiableList(Arrays.asList(

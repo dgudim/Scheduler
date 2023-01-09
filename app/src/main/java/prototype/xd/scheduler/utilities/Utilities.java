@@ -63,14 +63,14 @@ import prototype.xd.scheduler.views.settings.PopupSettingsView;
 @SuppressWarnings({"unchecked"})
 public class Utilities {
     
-    private static final String NAME = "Utilities";
+    public static final String NAME = Utilities.class.getSimpleName();
     
     public static File getFile(String filename) {
         return new File(ROOT_DIR.get(), filename);
     }
     
     private Utilities() {
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
     public static String nullWrapper(String str) {

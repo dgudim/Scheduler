@@ -57,7 +57,7 @@ import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemVi
 
 class LockScreenBitmapDrawer {
     
-    private static final String NAME = "Lockscreen bitmap drawer";
+    public static final String NAME = LockScreenBitmapDrawer.class.getSimpleName();
     
     public final int displayWidth;
     public final int displayHeight;

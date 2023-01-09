@@ -10,8 +10,10 @@ import java.util.List;
 
 public class QueryUtilities {
     
+    public static final String NAME = QueryUtilities.class.getSimpleName();
+    
     private QueryUtilities() {
-        throw new IllegalStateException("Query utility class");
+        throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
     public static String getString(Cursor cursor, List<String> columns, String column){

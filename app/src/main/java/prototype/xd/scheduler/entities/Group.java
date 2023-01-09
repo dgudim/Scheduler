@@ -19,7 +19,7 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public class Group implements Serializable {
     
-    private static final String NAME = "Group";
+    public static final String NAME = Group.class.getSimpleName();
     
     public static final transient Group NULL_GROUP = new Group();
     

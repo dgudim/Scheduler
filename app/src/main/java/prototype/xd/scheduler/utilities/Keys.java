@@ -25,8 +25,10 @@ import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemVi
 
 public class Keys {
     
+    public static final String NAME = Keys.class.getSimpleName();
+    
     private Keys() {
-        throw new IllegalStateException("Utility key storage class");
+        throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
     public abstract static class DefaultedValue<T> {
@@ -258,7 +260,7 @@ public class Keys {
         } else if (value.getClass() == Float.class) {
             preferences.edit().putFloat(key, (Float) value).apply();
         } else {
-            Logger.error("Keys", "Can't put key: " + key + " with value " + value);
+            Logger.error(NAME, "Can't put key: " + key + " with value " + value);
         }
     }
     

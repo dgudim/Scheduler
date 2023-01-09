@@ -23,7 +23,7 @@ import prototype.xd.scheduler.utilities.Utilities;
 // a list specifically for storing TodoListEntries, automatically unlinks groups on remove to avoid memory leaks
 public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     
-    private static final String NAME = "TodoListEntryList";
+    public static final String NAME = TodoEntryList.class.getSimpleName();
     
     // 4 mappings for normal events
     final Map<Long, Set<TodoEntry>> entriesPerDayCore;

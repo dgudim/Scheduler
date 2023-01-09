@@ -22,7 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Logger {
     
-    private static final String NAME = "Logger";
+    public static final String NAME = Logger.class.getSimpleName();
     
     private static File logFile;
     private static File logFileOld;
@@ -36,7 +36,7 @@ public class Logger {
     private static final long ROTATE_SIZE = 10 * 1024 * 1024L; // 10MB
     
     private Logger() {
-        throw new IllegalStateException("Utility logger class");
+        throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
     @SuppressWarnings("ResultOfMethodCallIgnored")
