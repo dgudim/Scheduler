@@ -1,6 +1,6 @@
 New features:
 - Ability to change order of events (e.g: global first, upcoming last)
-- Ability to merge instances with the same same and time
+- Ability to merge instances with the same name and time
 
 General ui improvements:
 - Combined event visibility range sliders
