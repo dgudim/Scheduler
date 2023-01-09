@@ -1,0 +1,13 @@
+New features:
+- Ability to change order of events (e.g: global first, upcoming last)
+- Ability to merge instances with the same same and time
+
+General ui improvements:
+- Combined event visibility range sliders
+- Removed outlines around switches in settings
+- Improved event previews in event settings
+- Improved colors of color picked dialog
+
+Under the hood changes:
+- Changed how event previews work
+- Class names for logging now use class.getSimpleName(); instead of hardcoded values
