@@ -1,6 +1,5 @@
 package prototype.xd.scheduler.views.settings;
 
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixColorWithBg;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 
 import android.content.Context;
@@ -100,7 +99,7 @@ public abstract class EntryPreviewContainer {
         borderColor.current = currentBorderColorGetter();
         borderColor.expired = Keys.EXPIRED_BORDER_COLOR.get();
         
-        adaptiveColorBalance = currentBorderColorGetter();
+        adaptiveColorBalance = adaptiveColorBalanceGetter();
         
         updatePreviewFontAndBgColors();
         updatePreviewBorderColors();
@@ -115,9 +114,9 @@ public abstract class EntryPreviewContainer {
     public void setTodoItemViewType(LockScreenTodoItemView.TodoItemViewType newTodoItemViewType) {
         if (todoItemViewType != newTodoItemViewType) {
             TODO_ITEM_VIEW_TYPE.put(todoItemViewType);
+            todoItemViewType = newTodoItemViewType;
             inflate(true);
         }
-        todoItemViewType = newTodoItemViewType;
     }
     
     public void attachCurrentSelectors(@NonNull MaterialCardView currentFontColorSelector,
@@ -171,14 +170,19 @@ public abstract class EntryPreviewContainer {
     private void updatePreviewFontAndBgColors() {
     
         fontColor.applyTo(fontColorSelector, this::updateSelector);
-        
-        int currentBgColor = mixColorWithBg(bgColor.current, surfaceColor, adaptiveColorBalance);
-    
         bgColor.applyTo(bgColorSelector, this::updateSelector);
         
-        entryPreview.upcoming.mixAndSetBgAndTextColors(true, fontColor.getUpcomingMixed(), bgColor.getUpcomingMixed(currentBgColor));
-        entryPreview.current.mixAndSetBgAndTextColors(true, fontColor.current, currentBgColor);
-        entryPreview.expired.mixAndSetBgAndTextColors(true, fontColor.getExpiredMixed(), bgColor.getExpiredMixed(currentBgColor));
+        entryPreview.upcoming.mixAndSetBgAndTextColors(true,
+                fontColor.getUpcoming(),
+                bgColor.getUpcomingMixed(surfaceColor, adaptiveColorBalance));
+        
+        entryPreview.current.mixAndSetBgAndTextColors(true,
+                fontColor.current,
+                bgColor.getCurrentMixed(surfaceColor, adaptiveColorBalance));
+        
+        entryPreview.expired.mixAndSetBgAndTextColors(true,
+                fontColor.getExpired(),
+                bgColor.getExpiredMixed(surfaceColor, adaptiveColorBalance));
     }
     
     public void setPreviewCurrentBgColor(int currentBgColor) {
@@ -199,13 +203,11 @@ public abstract class EntryPreviewContainer {
     
     private void updatePreviewBorderColors() {
         
-        int currentBorderColor = mixColorWithBg(borderColor.current, surfaceColor, adaptiveColorBalance);
-    
         borderColor.applyTo(borderColorSelector, this::updateSelector);
         
-        entryPreview.upcoming.setBorderColor(borderColor.getUpcomingMixed(currentBorderColor));
-        entryPreview.current.setBorderColor(currentBorderColor);
-        entryPreview.expired.setBorderColor(borderColor.getExpiredMixed(currentBorderColor));
+        entryPreview.upcoming.setBorderColor(borderColor.getUpcomingMixed(surfaceColor, adaptiveColorBalance));
+        entryPreview.current.setBorderColor(borderColor.getCurrentMixed(surfaceColor, adaptiveColorBalance));
+        entryPreview.expired.setBorderColor(borderColor.getExpiredMixed(surfaceColor, adaptiveColorBalance));
     }
     
     public void notifyColorChanged(Keys.DefaultedInteger value, int newColor, boolean checkExpiredUpcoming) {

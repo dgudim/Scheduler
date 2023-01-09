@@ -198,7 +198,7 @@ public class GraphicsUtilities {
     
     // mix color with bg color based on balance (from 1 to 10)
     public static int mixColorWithBg(int inputColor, int backgroundColor, int balance) {
-        if(balance <= 0) {
+        if (balance <= 0) {
             return inputColor;
         }
         return mixTwoColors(MaterialColors.harmonize(inputColor, backgroundColor),

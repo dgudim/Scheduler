@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixColorWithBg;
 
 import java.util.function.BiConsumer;
 
@@ -17,19 +18,23 @@ public class Triplet<T> {
     
     public static class ColorTriplet extends Triplet<Integer> {
         
-        public Integer getUpcomingMixed(int currentColorOverride) {
-            return getExpiredUpcomingColor(currentColorOverride, upcoming);
+        public int getCurrentMixed(int surfaceColor, int adaptiveColorBalance) {
+            return mixColorWithBg(current, surfaceColor, adaptiveColorBalance);
+        }
+    
+        public int getUpcomingMixed(int surfaceColor, int adaptiveColorBalance) {
+            return mixColorWithBg(getExpiredUpcomingColor(current, upcoming), surfaceColor, adaptiveColorBalance);
+        }
+    
+        public int getExpiredMixed(int surfaceColor, int adaptiveColorBalance) {
+            return mixColorWithBg(getExpiredUpcomingColor(current, expired), surfaceColor, adaptiveColorBalance);
         }
         
-        public Integer getUpcomingMixed() {
+        public int getUpcoming() {
             return getExpiredUpcomingColor(current, upcoming);
         }
         
-        public Integer getExpiredMixed(int currentColorOverride) {
-            return getExpiredUpcomingColor(currentColorOverride, expired);
-        }
-        
-        public Integer getExpiredMixed() {
+        public int getExpired() {
             return getExpiredUpcomingColor(current, expired);
         }
         
