@@ -247,7 +247,7 @@ public class Utilities {
     
     private static List<TodoEntry> mergeInstances(List<TodoEntry> entries) {
         Set<Integer> seen = new ArraySet<>(entries.size());
-        entries.removeIf(e -> !seen.add(e.getInstanceHash()));
+        entries.removeIf(e -> e.isFromSystemCalendar() && !seen.add(e.getInstanceHash()));
         return entries;
     }
     
