@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<prototype.xd.scheduler.views.Switch xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_switch"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    app:cardCornerRadius="5dp">
+    android:layout_marginStart="3dp"
+    android:layout_marginEnd="3dp"
+    android:text="parameter"
+    android:textAppearance="@style/SmallHeading"
+    tools:ignore="HardcodedText,TouchTargetSizeCheck" />
 
-        <prototype.xd.scheduler.views.Switch
-            android:id="@+id/main_switch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="3dp"
-            android:layout_marginEnd="3dp"
-            android:text="parameter"
-            android:textAppearance="@style/SmallHeading"
-            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
-
-</com.google.android.material.card.MaterialCardView>

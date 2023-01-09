@@ -1,6 +1,6 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
-import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.SEEK_BAR;
+import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.SLIDER;
 
 import android.widget.TextView;
 
@@ -13,11 +13,11 @@ import com.google.android.material.slider.Slider;
 
 import java.util.function.Function;
 
-import prototype.xd.scheduler.databinding.SeekbarSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.SliderSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
+public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     
     private final int seekMin;
     private final int seekMax;
@@ -31,8 +31,8 @@ public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
     @Nullable
     Function<Integer, String> textFormatter;
     
-    public SeekBarSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize, boolean zeroIfOff,
-                                      @StringRes @PluralsRes int stringResource) {
+    public SliderSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize, boolean zeroIfOff,
+                                     @StringRes @PluralsRes int stringResource) {
         this.seekMin = seekMin;
         this.seekMax = seekMax;
         this.stepSize = stepSize;
@@ -41,8 +41,8 @@ public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
         this.stringResource = stringResource;
     }
     
-    public SeekBarSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize,
-                                      @NonNull Function<Integer, String> textFormatter) {
+    public SliderSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize,
+                                     @NonNull Function<Integer, String> textFormatter) {
         this.seekMin = seekMin;
         this.seekMax = seekMax;
         this.stepSize = stepSize;
@@ -52,17 +52,17 @@ public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
     
     @Override
     public int getType() {
-        return SEEK_BAR.ordinal();
+        return SLIDER.ordinal();
     }
     
-    static class SeekBarViewHolder extends SettingsEntryConfig.SettingsViewHolder<SeekbarSettingsEntryBinding, SeekBarSettingsEntryConfig> {
+    static class SeekBarViewHolder extends SettingsEntryConfig.SettingsViewHolder<SliderSettingsEntryBinding, SliderSettingsEntryConfig> {
         
-        SeekBarViewHolder(SeekbarSettingsEntryBinding viewBinding) {
+        SeekBarViewHolder(SliderSettingsEntryBinding viewBinding) {
             super(viewBinding);
         }
         
         // bind from anywhere
-        static void bindExternal(SeekBarSettingsEntryConfig config, Slider slider, TextView sliderDescription) {
+        static void bindExternal(SliderSettingsEntryConfig config, Slider slider, TextView sliderDescription) {
             slider.setStepSize(config.stepSize);
             slider.setValueFrom(config.seekMin);
             slider.setValueTo(config.seekMax);
@@ -82,7 +82,7 @@ public class SeekBarSettingsEntryConfig extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(SeekBarSettingsEntryConfig config) {
+        void bind(SliderSettingsEntryConfig config) {
             bindExternal(config, viewBinding.slider, viewBinding.sliderDescription);
         }
     }

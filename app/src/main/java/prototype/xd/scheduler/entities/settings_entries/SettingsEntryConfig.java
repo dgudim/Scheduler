@@ -5,7 +5,7 @@ import static prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorE
 import static prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntryConfig.CalendarAccountViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.CalendarSettingsEntryConfig.CalendarViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig.CompoundCustomizationViewHolder;
-import static prototype.xd.scheduler.entities.settings_entries.SeekBarSettingsEntryConfig.SeekBarViewHolder;
+import static prototype.xd.scheduler.entities.settings_entries.SliderSettingsEntryConfig.SeekBarViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig.SwitchViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig.TitleBarViewHolder;
 
@@ -22,14 +22,14 @@ import prototype.xd.scheduler.databinding.AppThemeSelectorSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
-import prototype.xd.scheduler.databinding.DoubleSeekbarSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.DoubleSliderSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.DropdownSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
-import prototype.xd.scheduler.databinding.SeekbarSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.SliderSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
 import prototype.xd.scheduler.entities.RecycleViewEntry;
-import prototype.xd.scheduler.entities.settings_entries.DoubleSeekBarSettingsEntryConfig.DoubleSeekBarViewHolder;
+import prototype.xd.scheduler.entities.settings_entries.DoubleSliderSettingsEntryConfig.DoubleSeekBarViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig.DropdownViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig.ResetButtonViewHolder;
 
@@ -37,7 +37,7 @@ import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntry
 
 enum SettingsEntryType {
     CALENDAR_ACCOUNT, CALENDAR, COMPOUND_CUSTOMIZATION,
-    RESET_BUTTON, SEEK_BAR, DOUBLE_SEEK_BAR, SWITCH, DROPDOWN, TITLE_BAR, ADAPTIVE_BACKGROUND_SETTINGS, APP_THEME_SELECTOR
+    RESET_BUTTON, SLIDER, DOUBLE_SLIDER, SWITCH, DROPDOWN, TITLE_BAR, ADAPTIVE_BACKGROUND_SETTINGS, APP_THEME_SELECTOR
 }
 
 public abstract class SettingsEntryConfig extends RecycleViewEntry {
@@ -55,10 +55,10 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
                         CompoundCustomizationSettingsEntryBinding.inflate(inflater, parent, false), lifecycle);
             case RESET_BUTTON:
                 return new ResetButtonViewHolder(ResetButtonSettingsEntryBinding.inflate(inflater, parent, false));
-            case SEEK_BAR:
-                return new SeekBarViewHolder(SeekbarSettingsEntryBinding.inflate(inflater, parent, false));
-            case DOUBLE_SEEK_BAR:
-                return new DoubleSeekBarViewHolder(DoubleSeekbarSettingsEntryBinding.inflate(inflater, parent, false));
+            case SLIDER:
+                return new SeekBarViewHolder(SliderSettingsEntryBinding.inflate(inflater, parent, false));
+            case DOUBLE_SLIDER:
+                return new DoubleSeekBarViewHolder(DoubleSliderSettingsEntryBinding.inflate(inflater, parent, false));
             case SWITCH:
                 return new SwitchViewHolder(SwitchSettingsEntryBinding.inflate(inflater, parent, false));
             case DROPDOWN:

@@ -70,6 +70,11 @@ public class EntrySettings extends PopupSettingsView {
             protected int currentBorderThicknessGetter() {
                 return todoEntry.borderThickness.getToday();
             }
+    
+            @Override
+            protected int adaptiveColorBalanceGetter() {
+                return todoEntry.adaptiveColorBalance.getToday();
+            }
         };
     }
     
@@ -181,25 +186,26 @@ public class EntrySettings extends PopupSettingsView {
         
         Utilities.setSliderChangeListener(
                 bnd.borderThicknessDescription,
-                bnd.borderThicknessBar, bnd.borderThicknessState,
+                bnd.borderThicknessSlider, bnd.borderThicknessState,
                 this, R.string.settings_border_thickness,
                 BORDER_THICKNESS,
                 parameterKey -> entry.borderThickness.getToday(),
-                (slider, value, fromUser) -> entryPreviewContainer.updateCurrentPreviewBorderThickness((int) value));
+                (slider, value, fromUser) -> entryPreviewContainer.setCurrentPreviewBorderThickness((int) value));
         
         Utilities.setSliderChangeListener(
                 bnd.priorityDescription,
-                bnd.priorityBar, bnd.priorityState,
+                bnd.prioritySlider, bnd.priorityState,
                 this, R.string.settings_priority,
                 PRIORITY,
                 parameterKey -> entry.priority.getToday(), null);
         
         Utilities.setSliderChangeListener(
                 bnd.adaptiveColorBalanceDescription,
-                bnd.adaptiveColorBalanceBar, bnd.adaptiveColorBalanceState,
+                bnd.adaptiveColorBalanceSlider, bnd.adaptiveColorBalanceState,
                 this, R.string.settings_adaptive_color_balance,
                 ADAPTIVE_COLOR_BALANCE,
-                parameterKey -> entry.adaptiveColorBalance.getToday(), null);
+                parameterKey -> entry.adaptiveColorBalance.getToday(),
+                (slider, value, fromUser) -> entryPreviewContainer.setPreviewAdaptiveColorBalance((int) value));
         
         if (todoEntry.isGlobal()) {
             // global entries can't have upcoming / expired days

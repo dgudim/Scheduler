@@ -27,8 +27,7 @@ public class BaseListSettingsFragment<T extends RecyclerView.Adapter<?>> extends
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(binding.recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-        binding.recyclerView.addItemDecoration(dividerItemDecoration);
+        binding.recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
         binding.recyclerView.setAdapter(listViewAdapter);
     }
     

@@ -168,13 +168,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/settings_priority"
                     android:textAppearance="@style/SmallHeading"
-                    app:layout_constraintBottom_toTopOf="@+id/priority_bar"
+                    app:layout_constraintBottom_toTopOf="@+id/priority_slider"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/priority_state"
                     tools:ignore="TextContrastCheck" />
 
                 <com.google.android.material.slider.Slider
-                    android:id="@+id/priority_bar"
+                    android:id="@+id/priority_slider"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:stepSize="1.0"
@@ -224,7 +224,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <com.google.android.material.slider.Slider
-                    android:id="@+id/adaptive_color_balance_bar"
+                    android:id="@+id/adaptive_color_balance_slider"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:stepSize="1.0"
@@ -463,7 +463,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.slider.Slider
-                        android:id="@+id/border_thickness_bar"
+                        android:id="@+id/border_thickness_slider"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:stepSize="1.0"

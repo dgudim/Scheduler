@@ -28,10 +28,10 @@ import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig;
-import prototype.xd.scheduler.entities.settings_entries.DoubleSeekBarSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.DoubleSliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig;
-import prototype.xd.scheduler.entities.settings_entries.SeekBarSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.SliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
@@ -68,12 +68,10 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)));
         settingsEntries.add(adaptiveBackgroundSettingsEntry);
-        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.ADAPTIVE_COLOR_BALANCE,
-                0, 10, 1, true, R.string.settings_adaptive_color_balance));
         settingsEntries.add(new CompoundCustomizationEntryConfig());
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)));
-        settingsEntries.add(new SeekBarSettingsEntryConfig(Keys.LOCKSCREEN_VIEW_VERTICAL_BIAS,
+        settingsEntries.add(new SliderSettingsEntryConfig(Keys.LOCKSCREEN_VIEW_VERTICAL_BIAS,
                 0, 100, 5, value -> {
             String baseString = context.getString(R.string.settings_event_vertical_bias, value) + "%";
             if (value == 0) {
@@ -96,11 +94,11 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_event_visibility)));
-        settingsEntries.add(new DoubleSeekBarSettingsEntryConfig(context, R.string.settings_show_events,
-                new SeekBarSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET,
+        settingsEntries.add(new DoubleSliderSettingsEntryConfig(context, R.string.settings_show_events,
+                new SliderSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET,
                         0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_in_n_days),
                 Keys.UPCOMING_BG_COLOR.defaultValue,
-                new SeekBarSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
+                new SliderSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
                         0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_after_n_days),
                 Keys.EXPIRED_BG_COLOR.defaultValue));
         settingsEntries.add(new SwitchSettingsEntryConfig(

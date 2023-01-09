@@ -54,6 +54,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
     // should not be overridden
     public void setBorderSizeDP(int sizeDP) {
+        // convert to dp to pixels
         setBorderSizePX((int) (sizeDP * DISPLAY_METRICS_DENSITY.get()));
     }
     
@@ -85,7 +86,6 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         
         int fontSizeSP = Keys.FONT_SIZE.get();
         
-        // convert pixels to dp (equivalent of TypedValue.applyDimension(COMPLEX_UNIT_DIP, value, metrics))
         setBorderSizeDP(entry.borderThickness.get(currentDayUTC));
         
         setTitleText(entry.getTextOnDay(currentDayUTC, context, SHOW_GLOBAL_ITEMS_LABEL_LOCK.get()));

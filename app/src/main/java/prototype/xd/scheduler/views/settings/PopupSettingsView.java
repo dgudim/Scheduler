@@ -70,7 +70,7 @@ public abstract class PopupSettingsView {
      * public method that should be called when some color changes (font, bg, border), for example from a switch listener
      */
     public void notifyColorChanged(Keys.DefaultedInteger value, int newColor) {
-        entryPreviewContainer.notifyColorChanged(value, newColor);
+        entryPreviewContainer.notifyColorChanged(value, newColor, false);
     }
     
     /**

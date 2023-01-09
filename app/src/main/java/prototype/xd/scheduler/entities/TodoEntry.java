@@ -2,12 +2,12 @@ package prototype.xd.scheduler.entities;
 
 import static androidx.core.math.MathUtils.clamp;
 import static java.lang.Math.abs;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixColorWithBg;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
 
@@ -18,8 +18,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.google.android.material.color.MaterialColors;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -864,12 +862,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public int getAdaptiveColor(int inputColor) {
-        if (isAdaptiveColorEnabled()) {
-            return mixTwoColors(MaterialColors.harmonize(inputColor, averageBackgroundColor),
-                    averageBackgroundColor, (adaptiveColorBalance.getToday() - 1) / 9d);
-            //active adaptiveColorBalance is from 1 to 10, so we make it from 0 to 9
-        }
-        return inputColor;
+        return mixColorWithBg(inputColor, averageBackgroundColor, adaptiveColorBalance.getToday());
     }
     
     public String getTextOnDay(long targetDayUTC, Context context, boolean displayGlobalLabel) {

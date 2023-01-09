@@ -152,7 +152,29 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/upcoming_border_thickness_text"
+                android:id="@+id/adaptive_color_balance_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:text="@string/settings_adaptive_color_balance"
+                android:textAppearance="@style/SmallHeading" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/adaptive_color_balance_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stepSize="1.0"
+                android:valueFrom="0.0"
+                android:valueTo="10"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:id="@+id/upcoming_border_thickness_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="3dp"
@@ -160,7 +182,7 @@
                 android:textAppearance="@style/SmallHeading" />
 
             <com.google.android.material.slider.Slider
-                android:id="@+id/upcoming_border_thickness_seek_bar"
+                android:id="@+id/upcoming_border_thickness_slider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:stepSize="1.0"
@@ -174,7 +196,7 @@
                 android:background="?android:attr/listDivider" />
 
             <TextView
-                android:id="@+id/current_border_thickness_text"
+                android:id="@+id/current_border_thickness_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="3dp"
@@ -182,7 +204,7 @@
                 android:textAppearance="@style/SmallHeading" />
 
             <com.google.android.material.slider.Slider
-                android:id="@+id/current_border_thickness_seek_bar"
+                android:id="@+id/current_border_thickness_slider"
                 style="@android:style/Widget.Material.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -197,7 +219,7 @@
                 android:background="?android:attr/listDivider" />
 
             <TextView
-                android:id="@+id/expired_border_thickness_text"
+                android:id="@+id/expired_border_thickness_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="3dp"
@@ -205,7 +227,7 @@
                 android:textAppearance="@style/SmallHeading" />
 
             <com.google.android.material.slider.Slider
-                android:id="@+id/expired_border_thickness_seek_bar"
+                android:id="@+id/expired_border_thickness_slider"
                 style="@android:style/Widget.Material.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -220,7 +242,7 @@
                 android:background="?android:attr/listDivider" />
 
             <TextView
-                android:id="@+id/font_size_text"
+                android:id="@+id/font_size_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="3dp"
@@ -228,7 +250,7 @@
                 android:textAppearance="@style/SmallHeading" />
 
             <com.google.android.material.slider.Slider
-                android:id="@+id/font_size_seek_bar"
+                android:id="@+id/font_size_slider"
                 style="@android:style/Widget.Material.SeekBar.Discrete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

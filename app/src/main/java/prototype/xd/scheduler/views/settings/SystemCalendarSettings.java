@@ -68,6 +68,11 @@ public class SystemCalendarSettings extends PopupSettingsView {
             protected int currentBorderThicknessGetter() {
                 return Keys.BORDER_THICKNESS.get(calendarSubKeys);
             }
+            
+            @Override
+            protected int adaptiveColorBalanceGetter() {
+                return Keys.ADAPTIVE_COLOR_BALANCE.get(calendarSubKeys);
+            }
         };
     }
     
@@ -131,25 +136,26 @@ public class SystemCalendarSettings extends PopupSettingsView {
         
         setSliderChangeListener(
                 bnd.borderThicknessDescription,
-                bnd.borderThicknessBar, bnd.borderThicknessState,
+                bnd.borderThicknessSlider, bnd.borderThicknessState,
                 this, R.string.settings_border_thickness,
                 Keys.BORDER_THICKNESS,
                 value -> value.get(calendarSubKeys),
-                (slider, value, fromUser) -> entryPreviewContainer.updateCurrentPreviewBorderThickness((int) value));
+                (slider, value, fromUser) -> entryPreviewContainer.setCurrentPreviewBorderThickness((int) value));
         
         setSliderChangeListener(
                 bnd.priorityDescription,
-                bnd.priorityBar, bnd.priorityState,
+                bnd.prioritySlider, bnd.priorityState,
                 this, R.string.settings_priority,
                 Keys.PRIORITY,
                 value -> value.get(calendarSubKeys), null);
         
         setSliderChangeListener(
                 bnd.adaptiveColorBalanceDescription,
-                bnd.adaptiveColorBalanceBar, bnd.adaptiveColorBalanceState,
+                bnd.adaptiveColorBalanceSlider, bnd.adaptiveColorBalanceState,
                 this, R.string.settings_adaptive_color_balance,
                 Keys.ADAPTIVE_COLOR_BALANCE,
-                value -> value.get(calendarSubKeys), null);
+                value -> value.get(calendarSubKeys),
+                (slider, value, fromUser) -> entryPreviewContainer.setPreviewAdaptiveColorBalance((int) value));
         
         setSliderChangeListener(
                 bnd.showDaysUpcomingDescription,

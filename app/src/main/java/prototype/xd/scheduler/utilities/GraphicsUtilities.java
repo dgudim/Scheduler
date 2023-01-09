@@ -196,6 +196,15 @@ public class GraphicsUtilities {
         return getHarmonizedFontColorWithBg(mixTwoColors(color, backgroundColor, Keys.DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR), backgroundColor);
     }
     
+    // mix color with bg color based on balance (from 1 to 10)
+    public static int mixColorWithBg(int inputColor, int backgroundColor, int balance) {
+        if(balance <= 0) {
+            return inputColor;
+        }
+        return mixTwoColors(MaterialColors.harmonize(inputColor, backgroundColor),
+                backgroundColor, (balance - 1) / 9d);
+    }
+    
     public static int getExpiredUpcomingColor(int baseColor, int tintColor) {
         return mixTwoColors(baseColor, tintColor, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR);
     }

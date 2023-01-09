@@ -1,9 +1,6 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
-import static prototype.xd.scheduler.utilities.Keys.BORDER_THICKNESS;
-import static prototype.xd.scheduler.utilities.Keys.EXPIRED_BORDER_THICKNESS;
-import static prototype.xd.scheduler.utilities.Keys.UPCOMING_BORDER_THICKNESS;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +63,11 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                 protected int currentBorderThicknessGetter() {
                     return Keys.BORDER_THICKNESS.get();
                 }
+                
+                @Override
+                protected int adaptiveColorBalanceGetter() {
+                    return Keys.ADAPTIVE_COLOR_BALANCE.get();
+                }
             };
             
             entryPreviewContainer.attachUpcomingSelectors(
@@ -99,7 +101,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             
             DialogUtilities.ColorPickerColorSelectionListener colorPickerColorSelectedListener = (value, selectedColor) -> {
                 value.put(selectedColor);
-                entryPreviewContainer.notifyColorChanged(value, selectedColor);
+                entryPreviewContainer.notifyColorChanged(value, selectedColor, true);
             };
             
             viewBinding.currentBackgroundColorSelector.setOnClickListener(v ->
@@ -141,42 +143,38 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                             colorPickerColorSelectedListener,
                             Keys.EXPIRED_BORDER_COLOR));
             
-            Utilities.SliderOnChangeKeyedListener onChangeListener = (slider, sliderValue, fromUser, value) -> {
-                if (value.equals(UPCOMING_BORDER_THICKNESS)) {
-                    entryPreviewContainer.updateUpcomingPreviewBorderThickness(sliderValue);
-                    return;
-                }
-                if (value.equals(EXPIRED_BORDER_THICKNESS)) {
-                    entryPreviewContainer.updateExpiredPreviewBorderThickness(sliderValue);
-                    return;
-                }
-                if (value.equals(BORDER_THICKNESS)) {
-                    entryPreviewContainer.updateCurrentPreviewBorderThickness(sliderValue);
-                }
-            };
+            Utilities.setSliderChangeListener(
+                    viewBinding.adaptiveColorBalanceDescription,
+                    viewBinding.adaptiveColorBalanceSlider,
+                    (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setPreviewAdaptiveColorBalance(sliderValue),
+                    R.string.settings_adaptive_color_balance,
+                    Keys.ADAPTIVE_COLOR_BALANCE, true);
             
             Utilities.setSliderChangeListener(
-                    viewBinding.upcomingBorderThicknessText,
-                    viewBinding.upcomingBorderThicknessSeekBar,
-                    onChangeListener, R.string.settings_upcoming_border_thickness,
+                    viewBinding.upcomingBorderThicknessDescription,
+                    viewBinding.upcomingBorderThicknessSlider,
+                    (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setUpcomingPreviewBorderThickness(sliderValue),
+                    R.string.settings_upcoming_border_thickness,
                     Keys.UPCOMING_BORDER_THICKNESS, true);
             
             Utilities.setSliderChangeListener(
-                    viewBinding.currentBorderThicknessText,
-                    viewBinding.currentBorderThicknessSeekBar,
-                    onChangeListener, R.string.settings_current_border_thickness,
+                    viewBinding.currentBorderThicknessDescription,
+                    viewBinding.currentBorderThicknessSlider,
+                    (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setCurrentPreviewBorderThickness(sliderValue),
+                    R.string.settings_current_border_thickness,
                     Keys.BORDER_THICKNESS, true);
             
             Utilities.setSliderChangeListener(
-                    viewBinding.expiredBorderThicknessText,
-                    viewBinding.expiredBorderThicknessSeekBar,
-                    onChangeListener, R.string.settings_expired_border_thickness,
+                    viewBinding.expiredBorderThicknessDescription,
+                    viewBinding.expiredBorderThicknessSlider,
+                    (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setExpiredPreviewBorderThickness(sliderValue),
+                    R.string.settings_expired_border_thickness,
                     Keys.EXPIRED_BORDER_THICKNESS, true);
             
             Utilities.setSliderChangeListener(
-                    viewBinding.fontSizeText,
-                    viewBinding.fontSizeSeekBar,
-                    (slider, sliderValue, fromUser, value) -> entryPreviewContainer.updatePreviewFontSize(sliderValue), R.string.settings_font_size,
+                    viewBinding.fontSizeDescription,
+                    viewBinding.fontSizeSlider,
+                    (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setPreviewFontSize(sliderValue), R.string.settings_font_size,
                     Keys.FONT_SIZE, false);
             
         }

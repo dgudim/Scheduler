@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,10 +46,8 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
     public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        binding.orderRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        
         EntryTypeAdapter entryTypeAdapter = new EntryTypeAdapter();
+        binding.orderRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.orderRecyclerView.setAdapter(entryTypeAdapter);
         entryTypeAdapter.attachDragToRecyclerView(binding.orderRecyclerView);
         
@@ -56,6 +55,8 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.TREAT_GLOBAL_ITEMS_AS_TODAYS, getString(R.string.treat_global_as_todays),
                 (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true));
+        binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.settingsRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
         binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(settingsEntries, getLifecycle()));
     }
     
