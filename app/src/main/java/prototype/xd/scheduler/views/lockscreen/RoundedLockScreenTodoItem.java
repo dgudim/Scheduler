@@ -15,6 +15,11 @@ public class RoundedLockScreenTodoItem extends LockScreenTodoItemView<RoundedEnt
     }
     
     @Override
+    public View getClickableRoot() {
+        return viewBinding.backgroundOutline;
+    }
+    
+    @Override
     public void setBackgroundColor(int color) {
         viewBinding.backgroundMain.setCardBackgroundColor(color);
     }

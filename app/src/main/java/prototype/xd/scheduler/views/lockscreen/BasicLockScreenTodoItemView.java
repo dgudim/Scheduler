@@ -12,6 +12,11 @@ public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEnt
     }
     
     @Override
+    public View getClickableRoot() {
+        return viewBinding.backgroundOutline;
+    }
+    
+    @Override
     public void setBackgroundColor(int color) {
         viewBinding.backgroundMain.setBackgroundColor(color);
     }

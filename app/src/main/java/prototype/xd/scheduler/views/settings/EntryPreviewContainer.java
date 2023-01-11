@@ -77,9 +77,9 @@ public abstract class EntryPreviewContainer {
         }
         
         container.removeAllViews();
-        container.addView(entryPreview.upcoming.getRoot());
-        container.addView(entryPreview.current.getRoot());
-        container.addView(entryPreview.expired.getRoot());
+        entryPreview.upcoming.addToContainer(container);
+        entryPreview.current.addToContainer(container);
+        entryPreview.expired.addToContainer(container);
     }
     
     public void refreshAll(boolean reInflate) {

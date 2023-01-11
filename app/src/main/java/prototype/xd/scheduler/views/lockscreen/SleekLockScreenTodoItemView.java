@@ -15,6 +15,11 @@ public class SleekLockScreenTodoItemView extends LockScreenTodoItemView<SleekEnt
     }
     
     @Override
+    public View getClickableRoot() {
+        return viewBinding.backgroundOutline;
+    }
+    
+    @Override
     public void setBackgroundColor(int color) {
         viewBinding.backgroundMain.setCardBackgroundColor(color);
     }

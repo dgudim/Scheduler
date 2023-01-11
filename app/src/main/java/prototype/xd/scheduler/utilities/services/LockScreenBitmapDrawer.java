@@ -188,7 +188,7 @@ class LockScreenBitmapDrawer {
                 currentDayUTC + SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
                 groups, null,
                 false);
-    
+        
         toAdd.removeIf(todoListEntry -> !todoListEntry.isVisibleOnLockscreenToday());
         toAdd = sortEntries(toAdd, currentDayUTC);
         
@@ -216,10 +216,9 @@ class LockScreenBitmapDrawer {
         
         // first pass, add all views, setup layout independent parameters
         for (TodoEntry todoEntry : toAdd) {
-            LockScreenTodoItemView<?> itemView = LockScreenTodoItemView.inflateViewByType(todoItemViewType, containerView, layoutInflater);
-            itemView.applyLayoutIndependentParameters(todoEntry);
-            itemViews.add(itemView);
-            containerView.addView(itemView.getRoot());
+            itemViews.add(LockScreenTodoItemView.inflateViewByType(todoItemViewType, containerView, layoutInflater)
+                    .applyLayoutIndependentParameters(todoEntry)
+                    .addToContainer(containerView));
         }
         
         // get measure specs with screen size
@@ -235,7 +234,7 @@ class LockScreenBitmapDrawer {
         for (int i = 0; i < itemViews.size(); i++) {
             itemViews.get(i).applyLayoutDependentParameters(toAdd.get(i), bitmap, containerView);
         }
-    
+        
         rootView.draw(canvas);
     }
     

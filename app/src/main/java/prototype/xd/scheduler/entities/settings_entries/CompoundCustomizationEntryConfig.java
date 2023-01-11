@@ -3,7 +3,6 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
@@ -89,14 +88,11 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             entryPreviewContainer.refreshAll(false);
             
             for (TodoItemViewType viewType : TodoItemViewType.values()) {
-                View view = LockScreenTodoItemView.inflateViewByType(viewType, viewSelectionDialogView, layoutInflater).getRoot();
-                view.setClickable(true);
-                view.setFocusable(true);
-                view.setOnClickListener(v -> {
-                    entryPreviewContainer.setTodoItemViewType(viewType);
-                    viewSelectionDialog.dismiss();
-                });
-                viewSelectionDialogView.addView(view);
+                LockScreenTodoItemView.inflateViewByType(viewType, viewSelectionDialogView, layoutInflater)
+                        .setOnClickListener(v -> {
+                            entryPreviewContainer.setTodoItemViewType(viewType);
+                            viewSelectionDialog.dismiss();
+                        }).addToContainer(viewSelectionDialogView);
             }
             
             viewBinding.previewContainer.setOnClickListener(v ->

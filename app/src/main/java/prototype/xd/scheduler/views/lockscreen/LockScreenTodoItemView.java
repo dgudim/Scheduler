@@ -11,14 +11,17 @@ import static prototype.xd.scheduler.utilities.Keys.SHOW_GLOBAL_ITEMS_LABEL_LOCK
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.viewbinding.ViewBinding;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.BasicEntryBinding;
 import prototype.xd.scheduler.databinding.RoundedEntryBinding;
 import prototype.xd.scheduler.databinding.SleekEntryBinding;
@@ -38,8 +41,22 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         context = binding.getRoot().getContext();
     }
     
-    public View getRoot() {
-        return root;
+    protected abstract View getClickableRoot();
+    
+    public LockScreenTodoItemView<V> setOnClickListener(@Nullable View.OnClickListener onClickListener) {
+        View view = getClickableRoot();
+        view.setClickable(true);
+        view.setFocusable(true);
+        TypedValue themedValue = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.selectableItemBackground, themedValue, true);
+        view.setForeground(AppCompatResources.getDrawable(context, themedValue.resourceId));
+        view.setOnClickListener(onClickListener);
+        return this;
+    }
+    
+    public LockScreenTodoItemView<V> addToContainer(ViewGroup container) {
+        container.addView(root);
+        return this;
     }
     
     public abstract void setBackgroundColor(int color);
@@ -82,7 +99,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     public abstract void hideIndicatorAndTime();
     
     
-    public void applyLayoutIndependentParameters(TodoEntry entry) {
+    public LockScreenTodoItemView<V> applyLayoutIndependentParameters(TodoEntry entry) {
         
         int fontSizeSP = Keys.FONT_SIZE.get();
         
@@ -105,6 +122,8 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
                 ITEM_FULL_WIDTH_LOCK.get() ?
                         LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
+        
+        return this;
     }
     
     public void applyLayoutDependentParameters(TodoEntry entry, Bitmap bgBitmap, ViewGroup container) {
