@@ -98,10 +98,10 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         settingsEntries.add(new DoubleSliderSettingsEntryConfig(context, R.string.settings_show_events,
                 new SliderSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET,
                         0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_in_n_days),
-                Keys.UPCOMING_BG_COLOR.defaultValue,
+                Keys.BG_COLOR.UPCOMING.defaultValue,
                 new SliderSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
                         0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_after_n_days),
-                Keys.EXPIRED_BG_COLOR.defaultValue));
+                Keys.BG_COLOR.EXPIRED.defaultValue));
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.MERGE_ENTRIES, getString(R.string.settings_merge_events)));
         settingsEntries.add(new SwitchSettingsEntryConfig(

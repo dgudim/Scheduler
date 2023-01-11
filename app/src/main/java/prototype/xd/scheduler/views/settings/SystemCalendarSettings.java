@@ -51,22 +51,22 @@ public class SystemCalendarSettings extends PopupSettingsView {
         return new EntryPreviewContainer(context, bnd.previewContainer, true) {
             @Override
             protected int currentFontColorGetter() {
-                return Keys.FONT_COLOR.get(calendarSubKeys);
+                return Keys.FONT_COLOR.CURRENT.get(calendarSubKeys);
             }
             
             @Override
             protected int currentBgColorGetter() {
-                return Keys.BG_COLOR.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor));
+                return Keys.BG_COLOR.CURRENT.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor));
             }
             
             @Override
             protected int currentBorderColorGetter() {
-                return Keys.BORDER_COLOR.get(calendarSubKeys);
+                return Keys.BORDER_COLOR.CURRENT.get(calendarSubKeys);
             }
             
             @Override
             protected int currentBorderThicknessGetter() {
-                return Keys.BORDER_THICKNESS.get(calendarSubKeys);
+                return Keys.BORDER_THICKNESS.CURRENT.get(calendarSubKeys);
             }
             
             @Override
@@ -96,7 +96,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         calendarSubKeys = generateSubKeysFromCalendarKey(calendarKey);
         
         updateAllIndicators();
-        entryPreviewContainer.refreshAll();
+        entryPreviewContainer.refreshAll(true);
         
         bnd.settingsResetButton.setOnClickListener(v ->
                 displayConfirmationDialogue(v.getContext(), lifecycle,
@@ -119,26 +119,26 @@ public class SystemCalendarSettings extends PopupSettingsView {
         bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.fontColorState, this,
-                Keys.FONT_COLOR,
+                Keys.FONT_COLOR.CURRENT,
                 value -> value.get(calendarSubKeys)));
         
         bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.backgroundColorState, this,
-                Keys.BG_COLOR,
+                Keys.BG_COLOR.CURRENT,
                 value -> value.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
         
         bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.borderColorState, this,
-                Keys.BORDER_COLOR,
+                Keys.BORDER_COLOR.CURRENT,
                 value -> value.get(calendarSubKeys)));
         
         setSliderChangeListener(
                 bnd.borderThicknessDescription,
                 bnd.borderThicknessSlider, bnd.borderThicknessState,
                 this, R.string.settings_border_thickness,
-                Keys.BORDER_THICKNESS,
+                Keys.BORDER_THICKNESS.CURRENT,
                 value -> value.get(calendarSubKeys),
                 (slider, value, fromUser) -> entryPreviewContainer.setCurrentPreviewBorderThickness((int) value));
         

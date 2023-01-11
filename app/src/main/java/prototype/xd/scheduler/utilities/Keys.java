@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.utilities.Triplet.DefaultedValueTriplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
 public class Keys {
@@ -33,42 +34,64 @@ public class Keys {
     
     public abstract static class DefaultedValue<T> {
         
+        protected Triplet.Type type = Triplet.Type.CURRENT;
+        
         public final String key;
         public final T defaultValue;
+        @Nullable
+        private final SharedPreferences internalPrefs;
+        
+        DefaultedValue(String key, T defaultValue, @Nullable SharedPreferences preferences) {
+            this.key = key;
+            this.defaultValue = defaultValue;
+            internalPrefs = preferences;
+        }
+        
+        DefaultedValue(String key, T defaultValue, Triplet.Type type) {
+            this.key = key;
+            this.defaultValue = defaultValue;
+            internalPrefs = null;
+            this.type = type;
+        }
         
         DefaultedValue(String key, T defaultValue) {
             this.key = key;
             this.defaultValue = defaultValue;
+            internalPrefs = null;
         }
         
-        protected abstract T getInternal(SharedPreferences preferences, String actualKey, T actualDefaultValue);
+        protected SharedPreferences getInternalPrefs() {
+            return internalPrefs == null ? Keys.preferences : internalPrefs;
+        }
         
-        public T get(SharedPreferences preferences, @Nullable List<String> subKeys, T actualDefaultValue, boolean ignoreBaseKey) {
+        protected abstract T getInternal(String actualKey, T actualDefaultValue);
+        
+        public Triplet.Type getType() {
+            return type;
+        }
+        
+        public T get(@Nullable List<String> subKeys, T actualDefaultValue, boolean ignoreBaseKey) {
             if (subKeys != null) {
                 String targetKey = getFirstValidKey(subKeys, key);
                 if (targetKey.equals(key) && ignoreBaseKey) {
                     return actualDefaultValue;
                 }
-                return getInternal(preferences, targetKey, actualDefaultValue);
+                return getInternal(targetKey, actualDefaultValue);
             }
-            return getInternal(preferences, key, actualDefaultValue);
+            return getInternal(key, actualDefaultValue);
         }
         
         public T get(@Nullable List<String> subKeys) {
-            return get(preferences, subKeys, defaultValue, false);
+            return get(subKeys, defaultValue, false);
         }
         
         // ignore the "base" key, only use sub-keys
         public T getOnlyBySubKeys(@NonNull List<String> subKeys, T defaultValueOverride) {
-            return get(preferences, subKeys, defaultValueOverride, true);
-        }
-        
-        public T get(SharedPreferences preferences) {
-            return get(preferences, null, defaultValue, false);
+            return get(subKeys, defaultValueOverride, true);
         }
         
         public T get() {
-            return get(preferences, null, defaultValue, false);
+            return get(null, defaultValue, false);
         }
         
         public abstract void put(T value);
@@ -89,7 +112,10 @@ public class Keys {
             if (!(obj instanceof DefaultedValue<?>))
                 return false;
             DefaultedValue<?> val = (DefaultedValue<?>) obj;
-            return Objects.equals(val.defaultValue, defaultValue) && val.key.equals(key);
+            return Objects.equals(val.defaultValue, defaultValue) &&
+                    val.key.equals(key) &&
+                    val.type == type &&
+                    Objects.equals(val.internalPrefs, internalPrefs);
         }
         
         @NonNull
@@ -100,34 +126,43 @@ public class Keys {
     }
     
     public static class DefaultedBoolean extends DefaultedValue<Boolean> {
+        DefaultedBoolean(String key, Boolean defaultValue, SharedPreferences preferences) {
+            super(key, defaultValue, preferences);
+        }
+        
         DefaultedBoolean(String key, Boolean defaultValue) {
             super(key, defaultValue);
         }
         
         @Override
-        protected Boolean getInternal(SharedPreferences preferences, String actualKey, Boolean actualDefaultValue) {
-            return preferences.getBoolean(actualKey, actualDefaultValue);
+        protected Boolean getInternal(String actualKey, Boolean actualDefaultValue) {
+            return getInternalPrefs().getBoolean(actualKey, actualDefaultValue);
         }
         
         @Override
         public void put(Boolean value) {
-            preferences.edit().putBoolean(key, value).apply();
+            getInternalPrefs().edit().putBoolean(key, value).apply();
         }
     }
     
     public static class DefaultedInteger extends DefaultedValue<Integer> {
+        
+        DefaultedInteger(String key, Integer defaultValue, Triplet.Type type) {
+            super(key, defaultValue, type);
+        }
+        
         DefaultedInteger(String key, Integer defaultValue) {
             super(key, defaultValue);
         }
         
         @Override
-        protected Integer getInternal(SharedPreferences preferences, String actualKey, Integer actualDefaultValue) {
-            return preferences.getInt(actualKey, actualDefaultValue);
+        protected Integer getInternal(String actualKey, Integer actualDefaultValue) {
+            return getInternalPrefs().getInt(actualKey, actualDefaultValue);
         }
         
         @Override
         public void put(Integer value) {
-            preferences.edit().putInt(key, value).apply();
+            getInternalPrefs().edit().putInt(key, value).apply();
         }
     }
     
@@ -137,13 +172,13 @@ public class Keys {
         }
         
         @Override
-        protected Float getInternal(SharedPreferences preferences, String actualKey, Float actualDefaultValue) {
-            return preferences.getFloat(actualKey, actualDefaultValue);
+        protected Float getInternal(String actualKey, Float actualDefaultValue) {
+            return getInternalPrefs().getFloat(actualKey, actualDefaultValue);
         }
         
         @Override
         public void put(Float value) {
-            preferences.edit().putFloat(key, value).apply();
+            getInternalPrefs().edit().putFloat(key, value).apply();
         }
     }
     
@@ -153,13 +188,13 @@ public class Keys {
         }
         
         @Override
-        protected String getInternal(SharedPreferences preferences, String actualKey, String actualDefaultValue) {
-            return preferences.getString(actualKey, actualDefaultValue);
+        protected String getInternal(String actualKey, String actualDefaultValue) {
+            return getInternalPrefs().getString(actualKey, actualDefaultValue);
         }
         
         @Override
         public void put(String value) {
-            preferences.edit().putString(key, value).apply();
+            getInternalPrefs().edit().putString(key, value).apply();
         }
     }
     
@@ -175,8 +210,8 @@ public class Keys {
         }
         
         @Override
-        protected List<T> getInternal(SharedPreferences preferences, String actualKey, List<T> actualDefaultValue) {
-            String stringValue = preferences.getString(actualKey, null);
+        protected List<T> getInternal(String actualKey, List<T> actualDefaultValue) {
+            String stringValue = getInternalPrefs().getString(actualKey, null);
             if (stringValue == null) {
                 return actualDefaultValue;
             }
@@ -196,7 +231,7 @@ public class Keys {
                         .append(delimiter)
                         .append(enumList.get(i).name());
             }
-            preferences.edit().putString(key, stringValue.toString()).apply();
+            getInternalPrefs().edit().putString(key, stringValue.toString()).apply();
         }
         
         @Override
@@ -220,14 +255,14 @@ public class Keys {
         }
         
         @Override
-        protected T getInternal(SharedPreferences preferences, String actualKey, T actualDefaultValue) {
-            String valName = preferences.getString(actualKey, null);
+        protected T getInternal(String actualKey, T actualDefaultValue) {
+            String valName = getInternalPrefs().getString(actualKey, null);
             return valName == null ? actualDefaultValue : T.valueOf(enumClass, valName);
         }
         
         @Override
         public void put(T value) {
-            preferences.edit().putString(key, value.name()).apply();
+            getInternalPrefs().edit().putString(key, value.name()).apply();
         }
         
         @Override
@@ -299,15 +334,12 @@ public class Keys {
     }
     
     public static void setBitmapUpdateFlag() {
+        SERVICE_UPDATE_SIGNAL.put(Boolean.TRUE);
         servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL.key, true).apply();
     }
     
-    public static boolean getBitmapUpdateFlag() {
-        return SERVICE_UPDATE_SIGNAL.get(servicePreferences);
-    }
-    
     public static void clearBitmapUpdateFlag() {
-        servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL.key, false).apply();
+        SERVICE_UPDATE_SIGNAL.put(Boolean.FALSE);
     }
     
     private static volatile SharedPreferences preferences;
@@ -330,25 +362,32 @@ public class Keys {
     public static final String END_DAY_UTC = "endDay";
     public static final DefaultedInteger PRIORITY = new DefaultedInteger("priority", 0);
     
-    public static final DefaultedInteger BG_COLOR = new DefaultedInteger("bgColor", 0xff_999999);
+    public static final DefaultedValueTriplet<Integer, DefaultedInteger> BG_COLOR = new DefaultedValueTriplet<>(
+            DefaultedInteger::new,
+            "upcomingBgColor", 0xff_CCFFCC,
+            "bgColor", 0xff_999999,
+            "expiredBgColor", 0xff_FFCCCC);
     
     public static final Function<Integer, Integer> SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR = eventColor ->
             mixTwoColors(Color.WHITE, eventColor, Keys.DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR);
     
-    public static final DefaultedInteger UPCOMING_BG_COLOR = new DefaultedInteger("upcomingBgColor", 0xff_CCFFCC);
-    public static final DefaultedInteger EXPIRED_BG_COLOR = new DefaultedInteger("expiredBgColor", 0xff_FFCCCC);
+    public static final DefaultedValueTriplet<Integer, DefaultedInteger> BORDER_COLOR = new DefaultedValueTriplet<>(
+            DefaultedInteger::new,
+            "upcomingBevelColor", 0xff_88FF88,
+            "bevelColor", 0xff_777777,
+            "expiredBevelColor", 0xff_FF8888);
     
-    public static final DefaultedInteger BORDER_COLOR = new DefaultedInteger("bevelColor", 0xff_777777);
-    public static final DefaultedInteger UPCOMING_BORDER_COLOR = new DefaultedInteger("upcomingBevelColor", 0xff_88FF88);
-    public static final DefaultedInteger EXPIRED_BORDER_COLOR = new DefaultedInteger("expiredBevelColor", 0xff_FF8888);
+    public static final DefaultedValueTriplet<Integer, DefaultedInteger> BORDER_THICKNESS = new DefaultedValueTriplet<>(
+            DefaultedInteger::new,
+            "upcomingBevelThickness", 3,
+            "bevelThickness", 2,
+            "expiredBevelThickness", 3);
     
-    public static final DefaultedInteger BORDER_THICKNESS = new DefaultedInteger("bevelThickness", 2);
-    public static final DefaultedInteger UPCOMING_BORDER_THICKNESS = new DefaultedInteger("upcomingBevelThickness", 3);
-    public static final DefaultedInteger EXPIRED_BORDER_THICKNESS = new DefaultedInteger("expiredBevelThickness", 3);
-    
-    public static final DefaultedInteger FONT_COLOR = new DefaultedInteger("fontColor", 0xff_000000);
-    public static final DefaultedInteger UPCOMING_FONT_COLOR = new DefaultedInteger("upcomingFontColor", 0xff_005500);
-    public static final DefaultedInteger EXPIRED_FONT_COLOR = new DefaultedInteger("expiredFontColor", 0xff_990000);
+    public static final DefaultedValueTriplet<Integer, DefaultedInteger> FONT_COLOR = new DefaultedValueTriplet<>(
+            DefaultedInteger::new,
+            "upcomingFontColor", 0xff_005500,
+            "fontColor", 0xff_000000,
+            "expiredFontColor", 0xff_990000);
     
     public static final DefaultedInteger FONT_SIZE = new DefaultedInteger("fontSize", 15);
     public static final DefaultedBoolean ADAPTIVE_BACKGROUND_ENABLED = new DefaultedBoolean("adaptive_background_enabled", false);
@@ -398,7 +437,7 @@ public class Keys {
     
     public static final DefaultedBoolean INTRO_SHOWN = new DefaultedBoolean("app_intro", false);
     
-    public static final DefaultedBoolean SERVICE_UPDATE_SIGNAL = new DefaultedBoolean("update_lockscreen", false);
+    public static final DefaultedBoolean SERVICE_UPDATE_SIGNAL = new DefaultedBoolean("update_lockscreen", false, servicePreferences);
     public static final String SERVICE_KEEP_ALIVE_SIGNAL = "keep_alive";
     public static final DefaultedBoolean SERVICE_FAILED = new DefaultedBoolean("service_failed", false);
     public static final DefaultedBoolean WALLPAPER_OBTAIN_FAILED = new DefaultedBoolean("wallpaper_obtain_failed", false);

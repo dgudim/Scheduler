@@ -262,10 +262,10 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private static ArrayMap<String, Parameter<?>> mapParameters(TodoEntry entry) {
         ArrayMap<String, Parameter<?>> parameterMap = new ArrayMap<>(8);
-        parameterMap.put(Keys.BG_COLOR.key, entry.bgColor);
-        parameterMap.put(Keys.FONT_COLOR.key, entry.fontColor);
-        parameterMap.put(Keys.BORDER_COLOR.key, entry.borderColor);
-        parameterMap.put(Keys.BORDER_THICKNESS.key, entry.borderThickness);
+        parameterMap.put(Keys.BG_COLOR.CURRENT.key, entry.bgColor);
+        parameterMap.put(Keys.FONT_COLOR.CURRENT.key, entry.fontColor);
+        parameterMap.put(Keys.BORDER_COLOR.CURRENT.key, entry.borderColor);
+        parameterMap.put(Keys.BORDER_THICKNESS.CURRENT.key, entry.borderThickness);
         parameterMap.put(Keys.PRIORITY.key, entry.priority);
         parameterMap.put(Keys.EXPIRED_ITEMS_OFFSET.key, entry.expiredDayOffset);
         parameterMap.put(Keys.UPCOMING_ITEMS_OFFSET.key, entry.upcomingDayOffset);
@@ -324,31 +324,31 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void initParameters() {
-        bgColor = new Parameter<>(this, Keys.BG_COLOR.key,
+        bgColor = new Parameter<>(this, Keys.BG_COLOR.CURRENT.key,
                 previousValue -> {
                     if (isFromSystemCalendar()) {
-                        return Keys.BG_COLOR.getOnlyBySubKeys(event.subKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(event.color));
+                        return Keys.BG_COLOR.CURRENT.getOnlyBySubKeys(event.subKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(event.color));
                     }
-                    return Keys.BG_COLOR.get();
+                    return Keys.BG_COLOR.CURRENT.get();
                 },
                 Integer::parseInt,
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.UPCOMING_BG_COLOR.get()),
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.EXPIRED_BG_COLOR.get()));
-        fontColor = new Parameter<>(this, Keys.FONT_COLOR.key,
-                previousValue -> Keys.FONT_COLOR.get(getSubKeys()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.BG_COLOR.UPCOMING.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.BG_COLOR.EXPIRED.get()));
+        fontColor = new Parameter<>(this, Keys.FONT_COLOR.CURRENT.key,
+                previousValue -> Keys.FONT_COLOR.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.UPCOMING_FONT_COLOR.get()),
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.EXPIRED_FONT_COLOR.get()));
-        borderColor = new Parameter<>(this, Keys.BORDER_COLOR.key,
-                previousValue -> Keys.BORDER_COLOR.get(getSubKeys()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.FONT_COLOR.UPCOMING.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.FONT_COLOR.EXPIRED.get()));
+        borderColor = new Parameter<>(this, Keys.BORDER_COLOR.CURRENT.key,
+                previousValue -> Keys.BORDER_COLOR.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.UPCOMING_BORDER_COLOR.get()),
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.EXPIRED_BORDER_COLOR.get()));
-        borderThickness = new Parameter<>(this, Keys.BORDER_THICKNESS.key,
-                previousValue -> Keys.BORDER_THICKNESS.get(getSubKeys()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.BORDER_COLOR.UPCOMING.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Keys.BORDER_COLOR.EXPIRED.get()));
+        borderThickness = new Parameter<>(this, Keys.BORDER_THICKNESS.CURRENT.key,
+                previousValue -> Keys.BORDER_THICKNESS.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> Keys.UPCOMING_BORDER_THICKNESS.get(),
-                todayValue -> Keys.EXPIRED_BORDER_THICKNESS.get());
+                todayValue -> Keys.BORDER_THICKNESS.UPCOMING.get(),
+                todayValue -> Keys.BORDER_THICKNESS.EXPIRED.get());
         priority = new Parameter<>(this, Keys.PRIORITY.key,
                 previousValue -> isFromSystemCalendar() ?
                         Keys.PRIORITY.get(event.subKeys) :

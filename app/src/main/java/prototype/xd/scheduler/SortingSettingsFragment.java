@@ -133,23 +133,23 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
             private void bind(TodoEntry.EntryType entryType, final ItemTouchHelper dragHelper) {
                 String titleText = "ERR/UNKNOWN";
                 String descriptionText = "ERR/UNKNOWN";
-                int bgColor = Keys.BG_COLOR.get();
-                int fontColor = Keys.FONT_COLOR.get();
-                int borderColor = Keys.BORDER_COLOR.get();
+                int bgColor = Keys.BG_COLOR.CURRENT.get();
+                int fontColor = Keys.FONT_COLOR.CURRENT.get();
+                int borderColor = Keys.BORDER_COLOR.CURRENT.get();
                 switch (entryType) {
                     case UPCOMING:
                         titleText = context.getString(R.string.upcoming_events);
                         descriptionText = context.getString(R.string.upcoming_events_description);
-                        bgColor = getExpiredUpcomingColor(bgColor, Keys.UPCOMING_BG_COLOR.get());
-                        fontColor = getExpiredUpcomingColor(fontColor, Keys.UPCOMING_FONT_COLOR.get());
-                        borderColor = getExpiredUpcomingColor(borderColor, Keys.UPCOMING_BORDER_COLOR.get());
+                        bgColor = getExpiredUpcomingColor(bgColor, Keys.BG_COLOR.UPCOMING.get());
+                        fontColor = getExpiredUpcomingColor(fontColor, Keys.FONT_COLOR.UPCOMING.get());
+                        borderColor = getExpiredUpcomingColor(borderColor, Keys.BORDER_COLOR.UPCOMING.get());
                         break;
                     case EXPIRED:
                         titleText = context.getString(R.string.expired_events);
                         descriptionText = context.getString(R.string.expired_events_description);
-                        bgColor = getExpiredUpcomingColor(bgColor, Keys.EXPIRED_BG_COLOR.get());
-                        fontColor = getExpiredUpcomingColor(fontColor, Keys.EXPIRED_FONT_COLOR.get());
-                        borderColor = getExpiredUpcomingColor(borderColor, Keys.EXPIRED_BORDER_COLOR.get());
+                        bgColor = getExpiredUpcomingColor(bgColor, Keys.BG_COLOR.EXPIRED.get());
+                        fontColor = getExpiredUpcomingColor(fontColor, Keys.FONT_COLOR.EXPIRED.get());
+                        borderColor = getExpiredUpcomingColor(borderColor, Keys.BORDER_COLOR.EXPIRED.get());
                         break;
                     case TODAY:
                         titleText = context.getString(R.string.todays_events);

@@ -91,7 +91,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
                         daysToRebind);
                 
                 // changes indicators
-            } else if (parameters.contains(BG_COLOR.key) || parameters.contains(IS_COMPLETED)) {
+            } else if (parameters.contains(BG_COLOR.CURRENT.key) || parameters.contains(IS_COMPLETED)) {
                 entry.getVisibleDaysOnCalendar(
                         calendarView, daysToRebind,
                         displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE);

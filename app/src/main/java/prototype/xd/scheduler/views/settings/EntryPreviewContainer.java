@@ -38,7 +38,7 @@ public abstract class EntryPreviewContainer {
     private final Triplet<MaterialCardView> fontColorSelector = new Triplet<>();
     private final Triplet<MaterialCardView> borderColorSelector = new Triplet<>();
     private final Triplet<MaterialCardView> bgColorSelector = new Triplet<>();
- 
+    
     protected EntryPreviewContainer(@NonNull Context context,
                                     @NonNull ViewGroup container,
                                     boolean timeVisible) {
@@ -48,7 +48,7 @@ public abstract class EntryPreviewContainer {
         this.container = container;
         this.timeVisible = timeVisible;
         surfaceColor = MaterialColors.getColor(container, R.attr.colorSurface);
-        inflate(false);
+        inflate();
     }
     
     protected abstract int currentFontColorGetter();
@@ -61,11 +61,11 @@ public abstract class EntryPreviewContainer {
     
     protected abstract int adaptiveColorBalanceGetter();
     
-    private void inflate(boolean update) {
+    private void inflate() {
         entryPreview.upcoming = LockScreenTodoItemView.inflateViewByType(todoItemViewType, container, inflater);
         entryPreview.current = LockScreenTodoItemView.inflateViewByType(todoItemViewType, container, inflater);
         entryPreview.expired = LockScreenTodoItemView.inflateViewByType(todoItemViewType, container, inflater);
-    
+        
         entryPreview.upcoming.setTitleText(context.getString(R.string.settings_preview_upcoming));
         entryPreview.current.setTitleText(context.getString(R.string.settings_preview_current));
         entryPreview.expired.setTitleText(context.getString(R.string.settings_preview_expired));
@@ -80,67 +80,69 @@ public abstract class EntryPreviewContainer {
         container.addView(entryPreview.upcoming.getRoot());
         container.addView(entryPreview.current.getRoot());
         container.addView(entryPreview.expired.getRoot());
-        if (update) {
-            refreshAll();
-        }
     }
     
-    public void refreshAll() {
+    public void refreshAll(boolean reInflate) {
         
-        fontColor.upcoming = Keys.UPCOMING_FONT_COLOR.get();
+        fontColor.upcoming = Keys.FONT_COLOR.UPCOMING.get();
         fontColor.current = currentFontColorGetter();
-        fontColor.expired = Keys.EXPIRED_FONT_COLOR.get();
+        fontColor.expired = Keys.FONT_COLOR.EXPIRED.get();
         
-        bgColor.upcoming = Keys.UPCOMING_BG_COLOR.get();
+        bgColor.upcoming = Keys.BG_COLOR.UPCOMING.get();
         bgColor.current = currentBgColorGetter();
-        bgColor.expired = Keys.EXPIRED_BG_COLOR.get();
+        bgColor.expired = Keys.BG_COLOR.EXPIRED.get();
         
-        borderColor.upcoming = Keys.UPCOMING_BORDER_COLOR.get();
+        borderColor.upcoming = Keys.BORDER_COLOR.UPCOMING.get();
         borderColor.current = currentBorderColorGetter();
-        borderColor.expired = Keys.EXPIRED_BORDER_COLOR.get();
+        borderColor.expired = Keys.BORDER_COLOR.EXPIRED.get();
         
         adaptiveColorBalance = adaptiveColorBalanceGetter();
         
         updatePreviewFontAndBgColors();
         updatePreviewBorderColors();
         
-        setUpcomingPreviewBorderThickness(Keys.UPCOMING_BORDER_THICKNESS.get());
+        setUpcomingPreviewBorderThickness(Keys.BORDER_THICKNESS.UPCOMING.get());
         setCurrentPreviewBorderThickness(currentBorderThicknessGetter());
-        setExpiredPreviewBorderThickness(Keys.UPCOMING_BORDER_THICKNESS.get());
+        setExpiredPreviewBorderThickness(Keys.BORDER_THICKNESS.UPCOMING.get());
         
         setPreviewFontSize(Keys.FONT_SIZE.get());
+        
+        if (reInflate) {
+            setTodoItemViewType(TODO_ITEM_VIEW_TYPE.get());
+        }
     }
     
     public void setTodoItemViewType(LockScreenTodoItemView.TodoItemViewType newTodoItemViewType) {
         if (todoItemViewType != newTodoItemViewType) {
-            TODO_ITEM_VIEW_TYPE.put(todoItemViewType);
+            TODO_ITEM_VIEW_TYPE.put(newTodoItemViewType);
             todoItemViewType = newTodoItemViewType;
-            inflate(true);
+            inflate();
+            refreshAll(false);
         }
     }
     
     public void attachCurrentSelectors(@NonNull MaterialCardView currentFontColorSelector,
                                        @NonNull MaterialCardView currentBorderColorSelector,
                                        @NonNull MaterialCardView currentBackgroundColorSelector) {
-        fontColorSelector.current   = currentFontColorSelector;
+        fontColorSelector.current = currentFontColorSelector;
         borderColorSelector.current = currentBorderColorSelector;
-        bgColorSelector.current     = currentBackgroundColorSelector;
+        bgColorSelector.current = currentBackgroundColorSelector;
     }
     
     public void attachUpcomingSelectors(@NonNull MaterialCardView upcomingFontColorSelector,
                                         @NonNull MaterialCardView upcomingBorderColorSelector,
                                         @NonNull MaterialCardView upcomingBackgroundColorSelector) {
-        fontColorSelector.upcoming   = upcomingFontColorSelector;
+        fontColorSelector.upcoming = upcomingFontColorSelector;
         borderColorSelector.upcoming = upcomingBorderColorSelector;
-        bgColorSelector.upcoming     = upcomingBackgroundColorSelector;
+        bgColorSelector.upcoming = upcomingBackgroundColorSelector;
     }
     
     public void attachExpiredSelectors(@NonNull MaterialCardView expiredFontColorSelector,
                                        @NonNull MaterialCardView expiredBorderColorSelector,
                                        @NonNull MaterialCardView expiredBackgroundColorSelector) {
-        fontColorSelector.expired   = expiredFontColorSelector;
+        fontColorSelector.expired = expiredFontColorSelector;
         borderColorSelector.expired = expiredBorderColorSelector;
-        bgColorSelector.expired     = expiredBackgroundColorSelector;
+        bgColorSelector.expired = expiredBackgroundColorSelector;
     }
     
     public void setUpcomingPreviewBorderThickness(int upcomingBorderThickness) {
@@ -168,7 +170,7 @@ public abstract class EntryPreviewContainer {
     }
     
     private void updatePreviewFontAndBgColors() {
-    
+        
         fontColor.applyTo(fontColorSelector, this::updateSelector);
         bgColor.applyTo(bgColorSelector, this::updateSelector);
         
@@ -183,16 +185,6 @@ public abstract class EntryPreviewContainer {
         entryPreview.expired.mixAndSetBgAndTextColors(true,
                 fontColor.getExpired(),
                 bgColor.getExpiredMixed(surfaceColor, adaptiveColorBalance));
-    }
-    
-    public void setPreviewCurrentBgColor(int currentBgColor) {
-        bgColor.current = currentBgColor;
-        updatePreviewFontAndBgColors();
-    }
-    
-    public void setPreviewCurrentFontColor(int currentFontColor) {
-        fontColor.current = currentFontColor;
-        updatePreviewFontAndBgColors();
     }
     
     public void setPreviewAdaptiveColorBalance(int adaptiveColorBalance) {
@@ -210,50 +202,20 @@ public abstract class EntryPreviewContainer {
         entryPreview.expired.setBorderColor(borderColor.getExpiredMixed(surfaceColor, adaptiveColorBalance));
     }
     
-    public void notifyColorChanged(Keys.DefaultedInteger value, int newColor, boolean checkExpiredUpcoming) {
-        if (value.equals(Keys.BG_COLOR)) {
-            setPreviewCurrentBgColor(newColor);
+    public void notifyColorChanged(Keys.DefaultedInteger value, int newColor) {
+        if (Keys.BG_COLOR.has(value)) {
+            bgColor.setByType(value.getType(), newColor);
+            updatePreviewFontAndBgColors();
             return;
         }
-        if (value.equals(Keys.FONT_COLOR)) {
-            setPreviewCurrentFontColor(newColor);
+        if (Keys.FONT_COLOR.has(value)) {
+            fontColor.setByType(value.getType(), newColor);
+            updatePreviewFontAndBgColors();
             return;
         }
-        if (value.equals(Keys.BORDER_COLOR)) {
-            borderColor.current = newColor;
+        if (Keys.BORDER_COLOR.has(value)) {
+            borderColor.setByType(value.getType(), newColor);
             updatePreviewBorderColors();
-            return;
-        }
-        if(checkExpiredUpcoming) {
-            if (value.equals(Keys.UPCOMING_BG_COLOR)) {
-                bgColor.upcoming = newColor;
-                updatePreviewFontAndBgColors();
-                return;
-            }
-            if (value.equals(Keys.UPCOMING_FONT_COLOR)) {
-                fontColor.upcoming = newColor;
-                updatePreviewFontAndBgColors();
-                return;
-            }
-            if (value.equals(Keys.UPCOMING_BORDER_COLOR)) {
-                borderColor.upcoming = newColor;
-                updatePreviewBorderColors();
-                return;
-            }
-            if (value.equals(Keys.EXPIRED_BG_COLOR)) {
-                bgColor.expired = newColor;
-                updatePreviewFontAndBgColors();
-                return;
-            }
-            if (value.equals(Keys.EXPIRED_FONT_COLOR)) {
-                fontColor.expired = newColor;
-                updatePreviewFontAndBgColors();
-                return;
-            }
-            if (value.equals(Keys.EXPIRED_BORDER_COLOR)) {
-                borderColor.expired = newColor;
-                updatePreviewBorderColors();
-            }
         }
     }
 }

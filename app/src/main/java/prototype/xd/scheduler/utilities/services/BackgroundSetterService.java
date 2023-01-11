@@ -3,8 +3,8 @@ package prototype.xd.scheduler.utilities.services;
 import static prototype.xd.scheduler.utilities.DateManager.checkIfTimeSettingsChanged;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimeStringLocal;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
+import static prototype.xd.scheduler.utilities.Keys.SERVICE_UPDATE_SIGNAL;
 import static prototype.xd.scheduler.utilities.Keys.clearBitmapUpdateFlag;
-import static prototype.xd.scheduler.utilities.Keys.getBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
 
 import android.app.NotificationChannel;
@@ -152,7 +152,7 @@ public class BackgroundSetterService extends Service {
             screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    if (!lastUpdateSucceeded || getBitmapUpdateFlag()) {
+                    if (!lastUpdateSucceeded || SERVICE_UPDATE_SIGNAL.get()) {
                         ping(context);
                         clearBitmapUpdateFlag();
                         Logger.info(NAME, "Sent ping (on - off receiver)");

@@ -88,7 +88,7 @@ public class EntrySettings extends PopupSettingsView {
         todoEntry = entry;
         
         updateAllIndicators();
-        entryPreviewContainer.refreshAll();
+        entryPreviewContainer.refreshAll(true);
         
         final List<Group> groupList = todoEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
@@ -169,26 +169,26 @@ public class EntrySettings extends PopupSettingsView {
         bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.fontColorState, this,
-                FONT_COLOR,
+                FONT_COLOR.CURRENT,
                 parameterKey -> entry.fontColor.getToday()));
         
         bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.backgroundColorState, this,
-                BG_COLOR,
+                BG_COLOR.CURRENT,
                 parameterKey -> entry.bgColor.getToday()));
         
         bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
                 context, lifecycle,
                 bnd.borderColorState, this,
-                BORDER_COLOR,
+                BORDER_COLOR.CURRENT,
                 parameterKey -> entry.borderColor.getToday()));
         
         Utilities.setSliderChangeListener(
                 bnd.borderThicknessDescription,
                 bnd.borderThicknessSlider, bnd.borderThicknessState,
                 this, R.string.settings_border_thickness,
-                BORDER_THICKNESS,
+                BORDER_THICKNESS.CURRENT,
                 parameterKey -> entry.borderThickness.getToday(),
                 (slider, value, fromUser) -> entryPreviewContainer.setCurrentPreviewBorderThickness((int) value));
         

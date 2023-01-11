@@ -37,8 +37,8 @@ public abstract class PopupSettingsView {
         bnd.showDaysUpcomingSlider.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         bnd.showDaysExpiredSlider.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         
-        new GraphicsUtilities.SliderTinter(context, Keys.UPCOMING_BG_COLOR.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
-        new GraphicsUtilities.SliderTinter(context, Keys.EXPIRED_BG_COLOR.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
+        new GraphicsUtilities.SliderTinter(context, Keys.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
+        new GraphicsUtilities.SliderTinter(context, Keys.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
         
         this.context = context;
         this.lifecycle = lifecycle;
@@ -70,7 +70,7 @@ public abstract class PopupSettingsView {
      * public method that should be called when some color changes (font, bg, border), for example from a switch listener
      */
     public void notifyColorChanged(Keys.DefaultedInteger value, int newColor) {
-        entryPreviewContainer.notifyColorChanged(value, newColor, false);
+        entryPreviewContainer.notifyColorChanged(value, newColor);
     }
     
     /**
@@ -82,10 +82,10 @@ public abstract class PopupSettingsView {
     protected abstract void setStateIconColor(TextView icon, String parameterKey);
     
     protected void updateAllIndicators() {
-        setStateIconColor(bnd.fontColorState, Keys.FONT_COLOR.key);
-        setStateIconColor(bnd.backgroundColorState, Keys.BG_COLOR.key);
-        setStateIconColor(bnd.borderColorState, Keys.BORDER_COLOR.key);
-        setStateIconColor(bnd.borderThicknessState, Keys.BORDER_THICKNESS.key);
+        setStateIconColor(bnd.fontColorState, Keys.FONT_COLOR.CURRENT.key);
+        setStateIconColor(bnd.backgroundColorState, Keys.BG_COLOR.CURRENT.key);
+        setStateIconColor(bnd.borderColorState, Keys.BORDER_COLOR.CURRENT.key);
+        setStateIconColor(bnd.borderThicknessState, Keys.BORDER_THICKNESS.CURRENT.key);
         setStateIconColor(bnd.priorityState, Keys.PRIORITY.key);
         setStateIconColor(bnd.showOnLockState, Keys.CALENDAR_SHOW_ON_LOCK.key);
         setStateIconColor(bnd.adaptiveColorBalanceState, Keys.ADAPTIVE_COLOR_BALANCE.key);
