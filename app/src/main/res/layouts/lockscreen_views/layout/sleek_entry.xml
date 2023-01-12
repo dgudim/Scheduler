@@ -52,7 +52,8 @@
                     android:textColor="@color/gray_harmonized"
                     app:layout_constraintBottom_toBottomOf="@+id/indicator_view"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/title_text"

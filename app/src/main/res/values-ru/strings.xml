@@ -193,7 +193,6 @@
     <string name="expired_events">Просроченные события</string>
     <string name="todays_events">Сегодняшние события</string>
     <string name="global_events">Глобальные события</string>
-    <string name="other_events">Другие события</string>
     <string name="treat_global_as_todays">Сортировать глобальные события вместе с текущими</string>
     <string name="upcoming_events_description">События, которые начнутся через несколько дней</string>
     <string name="expired_events_description">События, которые уже закончились</string>

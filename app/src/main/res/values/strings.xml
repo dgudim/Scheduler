@@ -188,7 +188,6 @@
     <string name="expired_events">Expired events</string>
     <string name="todays_events">Today\'s events</string>
     <string name="global_events">Global events</string>
-    <string name="other_events">Other events</string>
     <string name="treat_global_as_todays">Treat global events as today\'s events</string>
     <string name="upcoming_events_description">Events that will begin in a few days</string>
     <string name="expired_events_description">Events that have already ended</string>

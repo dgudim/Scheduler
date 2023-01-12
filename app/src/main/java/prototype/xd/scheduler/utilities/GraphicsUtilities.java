@@ -249,9 +249,9 @@ public class GraphicsUtilities {
     
     public static class SliderTinter {
         
-        ColorStateList sliderPrimaryColor;
-        ColorStateList sliderOnSurfaceColor;
-        ColorStateList sliderHaloColor;
+        private final ColorStateList sliderPrimaryColor;
+        private final ColorStateList sliderOnSurfaceColor;
+        private final ColorStateList sliderHaloColor;
         
         public SliderTinter(@NonNull Context context, @ColorInt int sliderAccentColor) {
             sliderAccentColor = MaterialColors.harmonizeWithPrimary(context, sliderAccentColor);

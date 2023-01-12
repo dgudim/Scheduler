@@ -15,7 +15,7 @@ import prototype.xd.scheduler.utilities.GraphicsUtilities;
 public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
     
     @StringRes
-    int titleId;
+    final int titleId;
     
     protected final SliderSettingsEntryConfig leftSliderConfig;
     protected final GraphicsUtilities.SliderTinter leftSliderTinter;

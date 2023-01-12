@@ -24,15 +24,8 @@ public class ContextWrapper {
     public final Context context;
     @NonNull
     public final Lifecycle lifecycle;
-    @Nullable
-    private final FragmentManager fragmentManager;
-    
-    public ContextWrapper(@NonNull final Context context,
-                          @NonNull final Lifecycle lifecycle) {
-        this.context = context;
-        this.lifecycle = lifecycle;
-        this.fragmentManager = null;
-    }
+    @NonNull
+    public final FragmentManager fragmentManager;
     
     public ContextWrapper(@NonNull final Context context,
                           @NonNull final Lifecycle lifecycle,
@@ -52,14 +45,6 @@ public class ContextWrapper {
             layoutInflater = LayoutInflater.from(context);
         }
         return layoutInflater;
-    }
-    
-    @NonNull
-    public FragmentManager getFragmentManager() {
-        if (fragmentManager == null) {
-            throw new IllegalStateException("ContextWrapper " + this + " has no FragmentManager attached.");
-        }
-        return fragmentManager;
     }
     
     // ------------------------ METHODS FOR LIFECYCLE PART

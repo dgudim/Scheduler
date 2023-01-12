@@ -111,8 +111,8 @@ public class DialogUtilities {
         groupSpinner.setSelectedItem(initialGroupIndex);
         groupSpinner.setOnItemClickListener((parent, view, position, id) -> selectedIndex[0] = position);
         
-        dialogBinding.dayFromButton.setup(wrapper.getFragmentManager(), entry == null ? currentlySelectedDayUTC : entry.startDayLocal.get());
-        dialogBinding.dayToButton.setup(wrapper.getFragmentManager(), entry == null ? currentlySelectedDayUTC : entry.endDayLocal.get());
+        dialogBinding.dayFromButton.setup(wrapper.fragmentManager, entry == null ? currentlySelectedDayUTC : entry.startDayLocal.get());
+        dialogBinding.dayToButton.setup(wrapper.fragmentManager, entry == null ? currentlySelectedDayUTC : entry.endDayLocal.get());
         
         // for date validation
         dialogBinding.dayFromButton.setRole(DateSelectButton.Role.START_DAY, dialogBinding.dayToButton);
