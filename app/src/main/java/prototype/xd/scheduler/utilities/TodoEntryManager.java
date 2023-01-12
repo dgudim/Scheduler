@@ -14,11 +14,10 @@ import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
-import android.util.ArraySet;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
+import androidx.collection.ArraySet;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
@@ -163,6 +162,11 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
                             saveType = SaveType.NONE;
                         } catch (InterruptedException e) {
                             interrupt();
+                            Utilities.saveEntries(todoListEntries);
+                            Utilities.saveGroups(groups);
+                            // only clear after saving
+                            todoListEntries.clear();
+                            groups.clear();
                             String threadName = Thread.currentThread().getName();
                             Logger.info(threadName, threadName + " stopped");
                         }
@@ -180,8 +184,6 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         //stop IO thread
         asyncSaver.interrupt();
         // remove all entries (unlink all groups and events)
-        todoListEntries.clear();
-        groups.clear();
         Logger.info(NAME, NAME + " destroyed");
     }
     

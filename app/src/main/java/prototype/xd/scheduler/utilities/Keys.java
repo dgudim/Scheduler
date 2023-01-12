@@ -448,7 +448,9 @@ public class Keys {
     
     public static final DefaultedString ROOT_DIR = new DefaultedString("root_directory", "");
     public static final String ENTRIES_FILE = "entries";
+    public static final String ENTRIES_FILE_BACKUP = ENTRIES_FILE + ".old";
     public static final String GROUPS_FILE = "groupData";
+    public static final String GROUPS_FILE_BACKUP = GROUPS_FILE + ".old";
     
     public static final String GITHUB_ISSUES = "https://github.com/dgudim/Scheduler/issues";
     public static final String GITHUB_REPO = "https://github.com/dgudim/Scheduler";

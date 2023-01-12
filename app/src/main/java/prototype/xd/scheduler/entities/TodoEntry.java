@@ -12,12 +12,12 @@ import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
 
 import android.content.Context;
-import android.util.ArrayMap;
-import android.util.ArraySet;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
+import androidx.collection.ArraySet;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

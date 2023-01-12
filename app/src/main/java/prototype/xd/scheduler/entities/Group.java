@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.entities;
 
 import android.content.Context;
-import android.util.ArrayMap;
 
 import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

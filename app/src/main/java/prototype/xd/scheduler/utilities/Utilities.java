@@ -1,11 +1,14 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
+import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE_BACKUP;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
+import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE_BACKUP;
 import static prototype.xd.scheduler.utilities.Keys.MERGE_ENTRIES;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_SORTING_ORDER;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Logger.warning;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
 
@@ -18,7 +21,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
-import android.util.ArraySet;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
+import androidx.collection.ArraySet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
@@ -43,6 +46,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -101,7 +106,7 @@ public class Utilities {
         
         List<TodoEntry> readEntries = new ArrayList<>();
         try {
-            readEntries = loadObject(ENTRIES_FILE);
+            readEntries = loadObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP);
             
             int id = 0;
             for (TodoEntry entry : readEntries) {
@@ -133,6 +138,7 @@ public class Utilities {
                 }
             }
             
+            moveFile(ENTRIES_FILE, ENTRIES_FILE_BACKUP);
             saveObject(ENTRIES_FILE, entriesToSave);
             
             Logger.info(NAME, "Saved todo list");
@@ -147,7 +153,7 @@ public class Utilities {
         GroupList groups = new GroupList();
         groups.add(Group.NULL_GROUP); // add "null" group
         try {
-            groups.addAll(loadObject(GROUPS_FILE));
+            groups.addAll(loadObjectWithBackup(GROUPS_FILE, GROUPS_FILE_BACKUP));
             return groups;
         } catch (IOException e) {
             Logger.info(NAME, "No groups file, creating one: (" + e + ")");
@@ -169,10 +175,29 @@ public class Utilities {
                 }
             }
             
+            moveFile(GROUPS_FILE, GROUPS_FILE_BACKUP);
             saveObject(GROUPS_FILE, groupsToSave);
+            
             Logger.info(NAME, "Saved group list");
         } catch (IOException e) {
             logException(NAME, e);
+        }
+    }
+    
+    public static void moveFile(String fileName, String newFileName) throws IOException {
+        Files.move(getFile(fileName).toPath(), getFile(newFileName).toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+    }
+    
+    public static <T> T loadObjectWithBackup(String fileName, String backupName) throws IOException, ClassNotFoundException {
+        try {
+            return loadObject(fileName);
+        } catch (Exception e) {
+            T obj = loadObject(backupName);
+            // restore backup if it was read successfully
+            Files.copy(getFile(backupName).toPath(), getFile(fileName).toPath(),
+                    StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            warning(NAME, "Restored " + backupName + " to " + fileName);
+            return obj;
         }
     }
     
