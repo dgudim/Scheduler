@@ -13,6 +13,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Triplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
@@ -39,12 +40,12 @@ public abstract class EntryPreviewContainer {
     private final Triplet<MaterialCardView> borderColorSelector = new Triplet<>();
     private final Triplet<MaterialCardView> bgColorSelector = new Triplet<>();
     
-    protected EntryPreviewContainer(@NonNull Context context,
+    protected EntryPreviewContainer(@NonNull ContextWrapper wrapper,
                                     @NonNull ViewGroup container,
                                     boolean timeVisible) {
-        inflater = LayoutInflater.from(context);
+        inflater = wrapper.getLayoutInflater();
         this.todoItemViewType = TODO_ITEM_VIEW_TYPE.get();
-        this.context = context;
+        context = wrapper.context;
         this.container = container;
         this.timeVisible = timeVisible;
         surfaceColor = MaterialColors.getColor(container, R.attr.colorSurface);

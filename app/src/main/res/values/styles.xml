@@ -124,6 +124,24 @@
     </style>
     <!-- end -->
 
+    <style name="DefaultImageButton">
+        <item name="android:background">?android:attr/actionBarItemBackground</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="ClickableView">
+        <item name="android:clickable">true</item>
+        <item name="android:selectable">true</item>
+    </style>
+
+    <style name="ClickableViewFg" parent="ClickableView">
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <style name="ClickableViewBg" parent="ClickableView">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+
     <style name="ColorPickerCardView">
         <item name="android:layout_height">50dp</item>
         <item name="android:layout_width">50dp</item>

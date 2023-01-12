@@ -304,12 +304,11 @@
 
             <View
                 android:id="@+id/user_guide_click_view"
+                style="@style/ClickableViewFg"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="-8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="@+id/user_guide_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -318,12 +317,11 @@
 
             <View
                 android:id="@+id/global_settings_click_view"
+                style="@style/ClickableViewFg"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="-8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="@+id/textView24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -332,12 +330,11 @@
 
             <View
                 android:id="@+id/calendar_settings_click_view"
+                style="@style/ClickableViewFg"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="-8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="@+id/calendar_settings_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -346,12 +343,11 @@
 
             <View
                 android:id="@+id/sorting_settings_click_view"
+                style="@style/ClickableViewFg"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="-8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="@+id/sorting_settings_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -360,12 +356,11 @@
 
             <View
                 android:id="@+id/latest_release_click_view"
+                style="@style/ClickableViewFg"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="-8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="@+id/latest_release_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -374,12 +369,11 @@
 
             <View
                 android:id="@+id/github_issue_click_view"
+                style="@style/ClickableViewFg"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="-8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="@+id/github_issue_decription"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -392,13 +386,12 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="-8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
                 app:layout_constraintBottom_toBottomOf="@+id/source_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/source_title"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="SpeakableTextPresentCheck"
+                style="@style/ClickableViewFg" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

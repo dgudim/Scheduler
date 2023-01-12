@@ -25,8 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
         android:layout_weight="1"
-        app:cardCornerRadius="5dp"
-        app:strokeWidth="0.7dp">
+        app:cardCornerRadius="@dimen/card_corner_radius">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,9 +56,10 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <ImageView
-        android:id="@+id/settings"
-        android:layout_width="30dp"
+    <ImageButton
+        android:id="@+id/open_settings_button"
+        style="@style/DefaultImageButton"
+        android:layout_width="35dp"
         android:layout_height="match_parent"
         android:contentDescription="@string/action_settings"
         app:srcCompat="@drawable/ic_settings_45" />

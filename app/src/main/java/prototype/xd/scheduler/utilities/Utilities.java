@@ -111,7 +111,7 @@ public class Utilities {
             
             Logger.info(NAME, "Read todo list: " + readEntries.size());
         } catch (IOException e) {
-            Logger.info(NAME, "No todo list");
+            Logger.info(NAME, "No todo list: (" + e + ")");
         } catch (Exception e) {
             logException(NAME, e);
         }
@@ -150,7 +150,7 @@ public class Utilities {
             groups.addAll(loadObject(GROUPS_FILE));
             return groups;
         } catch (IOException e) {
-            Logger.info(NAME, "No groups file, creating one");
+            Logger.info(NAME, "No groups file, creating one: (" + e + ")");
             saveGroups(groups);
         } catch (Exception e) {
             logException(NAME, e);

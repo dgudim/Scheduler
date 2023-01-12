@@ -42,6 +42,7 @@ import prototype.xd.scheduler.databinding.ContentWrapperBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
@@ -54,6 +55,7 @@ public class HomeFragment extends Fragment {
     
     private volatile TodoEntryManager todoEntryManager;
     private ContentWrapperBinding contentBnd;
+    private ContextWrapper wrapper;
     
     public HomeFragment() {
         super();
@@ -65,7 +67,8 @@ public class HomeFragment extends Fragment {
         // init date manager
         // select current day
         selectDate(LocalDate.now());
-        todoEntryManager = new TodoEntryManager(requireContext(), getLifecycle(), getParentFragmentManager());
+        wrapper = ContextWrapper.from(this);
+        todoEntryManager = new TodoEntryManager(wrapper);
     }
     
     @Override
@@ -132,7 +135,7 @@ public class HomeFragment extends Fragment {
         
         contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoEntryManager.getGroups();
-            displayEntryAdditionEditDialog(getChildFragmentManager(), view1.getContext(), getLifecycle(),
+            displayEntryAdditionEditDialog(wrapper,
                     null, groupList,
                     (view2, text, dialogBinding, selectedIndex) -> {
                         SArrayMap<String, String> values = new SArrayMap<>();
@@ -156,7 +159,7 @@ public class HomeFragment extends Fragment {
         
         wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> displayToast(requireContext(), R.string.work_in_progress));
         
-        wrapperBnd.navView.logo.setOnClickListener(v -> displayMessageDialog(requireContext(), getLifecycle(),
+        wrapperBnd.navView.logo.setOnClickListener(v -> displayMessageDialog(wrapper,
                 R.string.easter_egg, R.string.easter_egg_description,
                 R.drawable.ic_egg_24_primary, R.string.yay,
                 R.style.DefaultAlertDialogTheme,
@@ -167,7 +170,7 @@ public class HomeFragment extends Fragment {
         
         wrapperBnd.navView.calendarSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(requireActivity(), R.id.action_HomeFragment_to_CalendarSettingsFragment));
-    
+        
         wrapperBnd.navView.sortingSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(requireActivity(), R.id.action_HomeFragment_to_SortingSettingsFragment));
         
@@ -197,7 +200,7 @@ public class HomeFragment extends Fragment {
         
         if (SERVICE_FAILED.get()) {
             // display warning if the background service failed
-            displayMessageDialog(requireContext(), getLifecycle(),
+            displayMessageDialog(wrapper,
                     R.string.service_error, R.string.service_error_description,
                     R.drawable.ic_warning_24_onerrorcontainer, R.string.close,
                     R.style.ErrorAlertDialogTheme,
@@ -206,7 +209,7 @@ public class HomeFragment extends Fragment {
         
         if (WALLPAPER_OBTAIN_FAILED.get()) {
             // display warning if there wan an error getting the wallpaper
-            displayMessageDialog(requireContext(), getLifecycle(),
+            displayMessageDialog(wrapper,
                     R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description,
                     R.drawable.ic_warning_24_onerrorcontainer, R.string.close,
                     R.style.ErrorAlertDialogTheme,

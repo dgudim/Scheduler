@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="5dp">
+    app:cardCornerRadius="@dimen/card_corner_radius">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -56,12 +56,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <ImageView
-            android:id="@+id/settings"
+        <ImageButton
+            android:id="@+id/open_settings_button"
+            style="@style/DefaultImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/action_settings"
             app:srcCompat="@drawable/ic_settings_45"
-            android:contentDescription="@string/action_settings" />
+            tools:ignore="TouchTargetSizeCheck" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

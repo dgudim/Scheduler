@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import prototype.xd.scheduler.databinding.DoubleSliderSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
 
 public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
@@ -16,22 +17,22 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
     @StringRes
     int titleId;
     
-    SliderSettingsEntryConfig leftSliderConfig;
-    GraphicsUtilities.SliderTinter leftSliderTinter;
+    protected final SliderSettingsEntryConfig leftSliderConfig;
+    protected final GraphicsUtilities.SliderTinter leftSliderTinter;
     
-    SliderSettingsEntryConfig rightSliderConfig;
-    GraphicsUtilities.SliderTinter rightSliderTinter;
+    protected final SliderSettingsEntryConfig rightSliderConfig;
+    protected final GraphicsUtilities.SliderTinter rightSliderTinter;
     
     public DoubleSliderSettingsEntryConfig(@NonNull Context context,
                                            @StringRes int titleId,
-                                           SliderSettingsEntryConfig leftSliderConfig,
+                                           @NonNull final SliderSettingsEntryConfig leftSliderConfig,
                                            @ColorInt int leftSliderAccentColor,
-                                           SliderSettingsEntryConfig rightSliderConfig,
+                                           @NonNull final SliderSettingsEntryConfig rightSliderConfig,
                                            @ColorInt int rightSliderAccentColor) {
         this.titleId = titleId;
         this.leftSliderConfig = leftSliderConfig;
         this.rightSliderConfig = rightSliderConfig;
-    
+        
         leftSliderTinter = new GraphicsUtilities.SliderTinter(context, leftSliderAccentColor);
         rightSliderTinter = new GraphicsUtilities.SliderTinter(context, rightSliderAccentColor);
     }
@@ -43,15 +44,15 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
     
     static class DoubleSeekBarViewHolder extends SettingsEntryConfig.SettingsViewHolder<DoubleSliderSettingsEntryBinding, DoubleSliderSettingsEntryConfig> {
         
-        DoubleSeekBarViewHolder(DoubleSliderSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        DoubleSeekBarViewHolder(@NonNull ContextWrapper wrapper, @NonNull DoubleSliderSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @Override
         void bind(DoubleSliderSettingsEntryConfig config) {
             
             viewBinding.title.setText(config.titleId);
-    
+            
             config.leftSliderTinter.tintSlider(viewBinding.leftSlider);
             config.rightSliderTinter.tintSlider(viewBinding.rightSlider);
             

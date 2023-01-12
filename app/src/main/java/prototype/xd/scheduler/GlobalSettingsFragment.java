@@ -6,7 +6,6 @@ import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
 import static prototype.xd.scheduler.utilities.DateManager.getFirstDaysOfWeekLocal;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -55,11 +54,9 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        Context context = requireContext();
-        
         List<SettingsEntryConfig> settingsEntries = new ArrayList<>();
         
-        adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(requireContext(), getLifecycle(),
+        adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper.context,
                 bgIndex -> Utilities.callImageFileChooser(pickBg));
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_application_settings)));
@@ -74,28 +71,28 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 Keys.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)));
         settingsEntries.add(new SliderSettingsEntryConfig(Keys.LOCKSCREEN_VIEW_VERTICAL_BIAS,
                 0, 100, 5, value -> {
-            String baseString = context.getString(R.string.settings_event_vertical_bias, value) + "%";
+            String baseString = wrapper.getString(R.string.settings_event_vertical_bias, value) + "%";
             if (value == 0) {
-                return baseString + " (" + context.getString(R.string.top) + ")";
+                return baseString + " (" + wrapper.getString(R.string.top) + ")";
             }
             if (value == 25) {
                 return baseString + " (1/4)";
             }
             if (value == 50) {
-                return baseString + " (" + context.getString(R.string.middle) + ")";
+                return baseString + " (" + wrapper.getString(R.string.middle) + ")";
             }
             if (value == 75) {
                 return baseString + " (3/4)";
             }
             if (value == 100) {
-                return baseString + " (" + context.getString(R.string.bottom) + ")";
+                return baseString + " (" + wrapper.getString(R.string.bottom) + ")";
             }
             return baseString;
         }));
         
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_event_visibility)));
-        settingsEntries.add(new DoubleSliderSettingsEntryConfig(context, R.string.settings_show_events,
+        settingsEntries.add(new DoubleSliderSettingsEntryConfig(wrapper.context, R.string.settings_show_events,
                 new SliderSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET,
                         0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_in_n_days),
                 Keys.BG_COLOR.UPCOMING.defaultValue,
@@ -111,7 +108,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 Keys.SHOW_UPCOMING_EXPIRED_IN_LIST, getString(R.string.show_upcoming_and_expired_event_indicators)));
         
         List<SettingsEntryConfig> globalSwitchSettingsEntries = new ArrayList<>();
-        SettingsListViewAdapter globalSwitchSettingsListViewAdapter = new SettingsListViewAdapter(globalSwitchSettingsEntries, getLifecycle(),
+        SettingsListViewAdapter globalSwitchSettingsListViewAdapter = new SettingsListViewAdapter(wrapper, globalSwitchSettingsEntries,
                 !Keys.SHOW_GLOBAL_ITEMS_LOCK.get());
         
         globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
@@ -124,19 +121,12 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
                 .setIsolateViewTypes(false)
                 .setStableIdMode(NO_STABLE_IDS).build(),
-                new SettingsListViewAdapter(settingsEntries, getLifecycle()),
+                new SettingsListViewAdapter(wrapper, settingsEntries),
                 globalSwitchSettingsListViewAdapter,
-                new SettingsListViewAdapter(
+                new SettingsListViewAdapter(wrapper,
                         Collections.singletonList(
-                                new ResetButtonSettingsEntryConfig(this, savedInstanceState)), getLifecycle()));
+                                new ResetButtonSettingsEntryConfig(this, savedInstanceState))));
         
-    }
-    
-    // full destroy
-    @Override
-    public void onDestroy() {
-        adaptiveBackgroundSettingsEntry = null;
-        super.onDestroy();
     }
     
     public void onBgSelected(ActivityResult result) {

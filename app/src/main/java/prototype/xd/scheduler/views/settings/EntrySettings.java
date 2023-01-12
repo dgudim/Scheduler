@@ -13,19 +13,18 @@ import static prototype.xd.scheduler.utilities.Keys.FONT_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.PRIORITY;
 import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 
-import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Lifecycle;
 
 import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -35,10 +34,9 @@ public class EntrySettings extends PopupSettingsView {
     public final TodoEntryManager todoEntryManager;
     private TodoEntry todoEntry;
     
-    public EntrySettings(@NonNull final TodoEntryManager todoEntryManager,
-                         @NonNull final Context context,
-                         @NonNull final Lifecycle lifecycle) {
-        super(context, todoEntryManager, lifecycle);
+    public EntrySettings(@NonNull final ContextWrapper wrapper,
+                         @NonNull final TodoEntryManager todoEntryManager) {
+        super(wrapper, todoEntryManager);
         
         bnd.hideExpiredItemsByTimeContainer.setVisibility(View.GONE);
         bnd.hideByContentContainer.setVisibility(View.GONE);
@@ -50,7 +48,7 @@ public class EntrySettings extends PopupSettingsView {
     
     @Override
     public EntryPreviewContainer getEntryPreviewContainer() {
-        return new EntryPreviewContainer(context, bnd.previewContainer, false) {
+        return new EntryPreviewContainer(wrapper, bnd.previewContainer, false) {
             @Override
             protected int currentFontColorGetter() {
                 return todoEntry.fontColor.getToday();
@@ -70,7 +68,7 @@ public class EntrySettings extends PopupSettingsView {
             protected int currentBorderThicknessGetter() {
                 return todoEntry.borderThickness.getToday();
             }
-    
+            
             @Override
             protected int adaptiveColorBalanceGetter() {
                 return todoEntry.adaptiveColorBalance.getToday();
@@ -78,12 +76,12 @@ public class EntrySettings extends PopupSettingsView {
         };
     }
     
-    public void show(final TodoEntry entry, final Context context) {
-        initialise(entry, context);
+    public void show(final TodoEntry entry) {
+        initialise(entry);
         dialog.show();
     }
     
-    private void initialise(TodoEntry entry, Context context) {
+    private void initialise(TodoEntry entry) {
         
         todoEntry = entry;
         
@@ -91,7 +89,7 @@ public class EntrySettings extends PopupSettingsView {
         entryPreviewContainer.refreshAll(true);
         
         final List<Group> groupList = todoEntryManager.getGroups();
-        bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, context));
+        bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, wrapper));
         bnd.groupSpinner.setSelectedItem(max(Group.groupIndexInList(groupList, entry.getRawGroupName()), 0));
         
         bnd.editGroupButton.setOnClickListener(v -> {
@@ -105,7 +103,7 @@ public class EntrySettings extends PopupSettingsView {
             Group selectedGroup = groupList.get(selection);
             String selectedGroupName = selectedGroup.getRawName();
             
-            displayGroupAdditionEditDialog(v.getContext(), lifecycle,
+            displayGroupAdditionEditDialog(wrapper,
                     R.string.edit, R.string.name,
                     R.string.cancel, R.string.save,
                     selectedGroupName,
@@ -121,65 +119,65 @@ public class EntrySettings extends PopupSettingsView {
                         }
                         
                         selectedGroup.setName(newName);
-                        bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, context));
+                        bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
                         return true;
-                    }, (v2, dialog) -> displayConfirmationDialogue(v2.getContext(), lifecycle,
+                    }, (v2, dialog) -> displayConfirmationDialogue(wrapper,
                             R.string.delete, R.string.are_you_sure,
                             R.string.no, R.string.yes,
                             v1 -> {
                                 dialog.dismiss();
                                 todoEntryManager.removeGroup(selection);
-                                rebuild(context);
+                                rebuild();
                             }));
             
         });
         
         bnd.groupSpinner.setOnItemClickListener((parent, view, position, id) -> {
             if (entry.changeGroup(groupList.get(position))) {
-                rebuild(context);
+                rebuild();
             }
         });
         
-        bnd.addGroupButton.setOnClickListener(v -> displayGroupAdditionEditDialog(v.getContext(), lifecycle,
+        bnd.addGroupButton.setOnClickListener(v -> displayGroupAdditionEditDialog(wrapper,
                 R.string.add_current_config_as_group_prompt,
                 R.string.add_current_config_as_group_message,
                 R.string.cancel, R.string.add, "",
                 (view, text, dialogueBinding, selection) -> {
                     Group existingGroup = findGroupInList(groupList, text);
                     if (existingGroup != null) {
-                        displayConfirmationDialogue(view.getContext(), lifecycle,
+                        displayConfirmationDialogue(wrapper,
                                 R.string.group_with_same_name_exists, R.string.overwrite_prompt,
-                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(text, existingGroup, context));
+                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(text, existingGroup));
                     } else {
-                        addGroupToGroupList(text, null, context);
+                        addGroupToGroupList(text, null);
                     }
                     return true;
                 }, null));
         
         bnd.settingsResetButton.setOnClickListener(v ->
-                displayConfirmationDialogue(v.getContext(), lifecycle,
+                displayConfirmationDialogue(wrapper,
                         R.string.reset_settings_prompt, R.string.reset_calendar_settings_description,
                         R.string.cancel, R.string.reset,
                         view -> {
                             entry.removeDisplayParams();
                             entry.changeGroup(null);
-                            rebuild(context);
+                            rebuild();
                         }));
         
         bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
-                context, lifecycle,
+                wrapper,
                 bnd.fontColorState, this,
                 FONT_COLOR.CURRENT,
                 parameterKey -> entry.fontColor.getToday()));
         
         bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
-                context, lifecycle,
+                wrapper,
                 bnd.backgroundColorState, this,
                 BG_COLOR.CURRENT,
                 parameterKey -> entry.bgColor.getToday()));
         
         bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
-                context, lifecycle,
+                wrapper,
                 bnd.borderColorState, this,
                 BORDER_COLOR.CURRENT,
                 parameterKey -> entry.borderColor.getToday()));
@@ -230,8 +228,7 @@ public class EntrySettings extends PopupSettingsView {
     }
     
     private void addGroupToGroupList(String groupName,
-                                     @Nullable Group existingGroup,
-                                     Context context) {
+                                     @Nullable Group existingGroup) {
         if (existingGroup != null) {
             // setParams automatically handles parameter invalidation on other entries
             existingGroup.setParams(todoEntry.getDisplayParams());
@@ -244,11 +241,11 @@ public class EntrySettings extends PopupSettingsView {
         }
         
         todoEntry.removeDisplayParams();
-        rebuild(context);
+        rebuild();
     }
     
-    private void rebuild(Context context) {
-        initialise(todoEntry, context);
+    private void rebuild() {
+        initialise(todoEntry);
     }
     
     @Override

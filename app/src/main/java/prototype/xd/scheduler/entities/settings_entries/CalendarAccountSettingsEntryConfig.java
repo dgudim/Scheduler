@@ -12,6 +12,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
@@ -23,8 +24,6 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
     private final int calendarColor;
     
     private final SettingsListViewAdapter containerAdapter;
-    
-    
     
     public CalendarAccountSettingsEntryConfig(@NonNull final SystemCalendarSettings systemCalendarSettings,
                                               @NonNull final SystemCalendar calendar,
@@ -45,8 +44,8 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
     
     static class CalendarAccountViewHolder extends SettingsEntryConfig.SettingsViewHolder<CalendarAccountSettingsEntryBinding, CalendarAccountSettingsEntryConfig> {
         
-        CalendarAccountViewHolder(CalendarAccountSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        CalendarAccountViewHolder(@NonNull ContextWrapper wrapper, @NonNull CalendarAccountSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @Override
@@ -66,11 +65,11 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         
         private void updateCollapseIcon(CalendarAccountSettingsEntryConfig config, boolean animate) {
             int rotation = config.containerAdapter.isCollapsed() ? 0 : -90;
-            if(animate) {
+            if (animate) {
                 viewBinding.expandButton
                         .animate()
                         .rotation(rotation)
-                        .setDuration(context.getResources().getInteger(R.integer.material_motion_duration_short_2))
+                        .setDuration(wrapper.getInteger(R.integer.material_motion_duration_short_2))
                         .start();
             } else {
                 viewBinding.expandButton.setRotation(rotation);

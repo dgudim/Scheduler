@@ -16,7 +16,7 @@
         android:layout_marginEnd="3dp"
         android:hint="@string/name"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/deleteButton"
+        app:layout_constraintStart_toEndOf="@+id/delete_group_button"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -39,13 +39,13 @@
         app:layout_constraintTop_toBottomOf="@+id/textField" />
 
     <ImageButton
-        android:id="@+id/deleteButton"
+        android:id="@+id/delete_group_button"
+        style="@style/DefaultImageButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_delete_group"
         app:layout_constraintBottom_toBottomOf="@+id/textField"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_delete_50"
-        android:contentDescription="@string/action_delete_group" />
+        app:srcCompat="@drawable/ic_delete_50" />
 </androidx.constraintlayout.widget.ConstraintLayout>

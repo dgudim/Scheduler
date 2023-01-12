@@ -50,7 +50,8 @@ public class GraphicsUtilities {
         return cutBitmap;
     }
     
-    public static Bitmap readStream(FileInputStream inputStream) throws IOException {
+    public static Bitmap readBitmapFromFile(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
         inputStream.close();
         return bitmap;

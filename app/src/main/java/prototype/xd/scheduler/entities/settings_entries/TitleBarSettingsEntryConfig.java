@@ -2,7 +2,10 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.TITLE_BAR;
 
+import androidx.annotation.NonNull;
+
 import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 
 public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
     
@@ -18,9 +21,9 @@ public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
     }
     
     static class TitleBarViewHolder extends SettingsEntryConfig.SettingsViewHolder<TitleSettingsEntryBinding, TitleBarSettingsEntryConfig> {
-    
-        TitleBarViewHolder(TitleSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        
+        TitleBarViewHolder(@NonNull ContextWrapper wrapper, @NonNull TitleSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @Override

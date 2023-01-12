@@ -9,11 +9,10 @@ import static prototype.xd.scheduler.entities.settings_entries.SliderSettingsEnt
 import static prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig.SwitchViewHolder;
 import static prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig.TitleBarViewHolder;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import androidx.lifecycle.Lifecycle;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
@@ -32,7 +31,7 @@ import prototype.xd.scheduler.entities.RecycleViewEntry;
 import prototype.xd.scheduler.entities.settings_entries.DoubleSliderSettingsEntryConfig.DoubleSeekBarViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig.DropdownViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig.ResetButtonViewHolder;
-
+import prototype.xd.scheduler.utilities.ContextWrapper;
 
 
 enum SettingsEntryType {
@@ -42,33 +41,34 @@ enum SettingsEntryType {
 
 public abstract class SettingsEntryConfig extends RecycleViewEntry {
     
-    public static SettingsViewHolder<?, ? extends SettingsEntryConfig> createViewHolder(ViewGroup parent, int viewType, Lifecycle lifecycle) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+    public static SettingsViewHolder<?, ? extends SettingsEntryConfig> createViewHolder(@NonNull ContextWrapper wrapper,
+                                                                                        @NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = wrapper.getLayoutInflater();
         // we should make sure to return appropriate holders, otherwise it will crash in @onBindViewHolder
         switch (SettingsEntryType.values()[viewType]) {
             case CALENDAR_ACCOUNT:
-                return new CalendarAccountViewHolder(CalendarAccountSettingsEntryBinding.inflate(inflater, parent, false));
+                return new CalendarAccountViewHolder(wrapper, CalendarAccountSettingsEntryBinding.inflate(inflater, parent, false));
             case CALENDAR:
-                return new CalendarViewHolder(CalendarSettingsEntryBinding.inflate(inflater, parent, false));
+                return new CalendarViewHolder(wrapper, CalendarSettingsEntryBinding.inflate(inflater, parent, false));
             case COMPOUND_CUSTOMIZATION:
-                return new CompoundCustomizationViewHolder(
-                        CompoundCustomizationSettingsEntryBinding.inflate(inflater, parent, false), lifecycle);
+                return new CompoundCustomizationViewHolder(wrapper,
+                        CompoundCustomizationSettingsEntryBinding.inflate(inflater, parent, false));
             case RESET_BUTTON:
-                return new ResetButtonViewHolder(ResetButtonSettingsEntryBinding.inflate(inflater, parent, false));
+                return new ResetButtonViewHolder(wrapper, ResetButtonSettingsEntryBinding.inflate(inflater, parent, false));
             case SLIDER:
-                return new SeekBarViewHolder(SliderSettingsEntryBinding.inflate(inflater, parent, false));
+                return new SeekBarViewHolder(wrapper, SliderSettingsEntryBinding.inflate(inflater, parent, false));
             case DOUBLE_SLIDER:
-                return new DoubleSeekBarViewHolder(DoubleSliderSettingsEntryBinding.inflate(inflater, parent, false));
+                return new DoubleSeekBarViewHolder(wrapper, DoubleSliderSettingsEntryBinding.inflate(inflater, parent, false));
             case SWITCH:
-                return new SwitchViewHolder(SwitchSettingsEntryBinding.inflate(inflater, parent, false));
+                return new SwitchViewHolder(wrapper, SwitchSettingsEntryBinding.inflate(inflater, parent, false));
             case DROPDOWN:
-                return new DropdownViewHolder(DropdownSettingsEntryBinding.inflate(inflater, parent, false));
+                return new DropdownViewHolder(wrapper, DropdownSettingsEntryBinding.inflate(inflater, parent, false));
             case ADAPTIVE_BACKGROUND_SETTINGS:
-                return new AdaptiveBackgroundViewHolder(AdaptiveBackgroundSettingsEntryBinding.inflate(inflater, parent, false));
+                return new AdaptiveBackgroundViewHolder(wrapper, AdaptiveBackgroundSettingsEntryBinding.inflate(inflater, parent, false));
             case APP_THEME_SELECTOR:
-                return new AppThemeSelectorViewHolder(AppThemeSelectorSettingsEntryBinding.inflate(inflater, parent, false));
+                return new AppThemeSelectorViewHolder(wrapper, AppThemeSelectorSettingsEntryBinding.inflate(inflater, parent, false));
             case TITLE_BAR:
-                return new TitleBarViewHolder(TitleSettingsEntryBinding.inflate(inflater, parent, false));
+                return new TitleBarViewHolder(wrapper, TitleSettingsEntryBinding.inflate(inflater, parent, false));
             default:
                 throw new IllegalArgumentException("Can't create viewHolder for " + SettingsEntryType.values()[viewType]);
         }
@@ -76,19 +76,20 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
     
     public abstract static class SettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends RecyclerView.ViewHolder {
         
-        protected V viewBinding;
-        protected Context context;
+        protected final V viewBinding;
+        protected final ContextWrapper wrapper;
         
-        SettingsViewHolder(V viewBinding) {
+        SettingsViewHolder(@NonNull final ContextWrapper wrapper,
+                           @NonNull final V viewBinding) {
             super(viewBinding.getRoot());
             this.viewBinding = viewBinding;
-            context = viewBinding.getRoot().getContext();
+            this.wrapper = wrapper;
         }
         
         abstract void bind(S config);
         
         @SuppressWarnings("unchecked")
-        public void uncheckedBind(SettingsEntryConfig settingsEntryConfig) {
+        public void uncheckedBind(@NonNull final SettingsEntryConfig settingsEntryConfig) {
             bind((S) settingsEntryConfig);
         }
     }

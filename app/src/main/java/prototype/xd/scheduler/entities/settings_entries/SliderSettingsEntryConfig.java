@@ -14,6 +14,7 @@ import com.google.android.material.slider.Slider;
 import java.util.function.Function;
 
 import prototype.xd.scheduler.databinding.SliderSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 
@@ -57,8 +58,8 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     
     static class SeekBarViewHolder extends SettingsEntryConfig.SettingsViewHolder<SliderSettingsEntryBinding, SliderSettingsEntryConfig> {
         
-        SeekBarViewHolder(SliderSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        SeekBarViewHolder(@NonNull ContextWrapper wrapper, @NonNull SliderSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         // bind from anywhere

@@ -5,15 +5,17 @@ import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 
 import android.app.AlertDialog;
 import android.content.res.ColorStateList;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
+
+import androidx.annotation.NonNull;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.GridSelectionViewBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
@@ -49,14 +51,14 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
     
     static class CalendarViewHolder extends SettingsEntryConfig.SettingsViewHolder<CalendarSettingsEntryBinding, CalendarSettingsEntryConfig> {
         
-        CalendarViewHolder(CalendarSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        CalendarViewHolder(@NonNull ContextWrapper wrapper, @NonNull CalendarSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @Override
         void bind(CalendarSettingsEntryConfig config) {
             viewBinding.calendarName.setText(config.calendarName);
-            viewBinding.eventCount.setText(getPluralString(context, R.plurals.calendar_event_count, config.calendarEventsCount));
+            viewBinding.eventCount.setText(getPluralString(wrapper.context, R.plurals.calendar_event_count, config.calendarEventsCount));
             
             viewBinding.checkBox.setButtonTintList(ColorStateList.valueOf(config.calendarColor));
             viewBinding.checkBox.setCheckedSilent(Keys.getBoolean(config.calendarKey + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
@@ -70,8 +72,8 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
                 viewBinding.colorSelectButton.setVisibility(View.VISIBLE);
                 viewBinding.colorSelectButton.setOnClickListener(v -> {
                     final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-    
-                    GridSelectionViewBinding gridSelection = GridSelectionViewBinding.inflate(LayoutInflater.from(context));
+                    
+                    GridSelectionViewBinding gridSelection = GridSelectionViewBinding.inflate(wrapper.getLayoutInflater());
                     GridView gridView = gridSelection.gridView;
                     gridView.setNumColumns(2);
                     gridView.setHorizontalSpacing(5);

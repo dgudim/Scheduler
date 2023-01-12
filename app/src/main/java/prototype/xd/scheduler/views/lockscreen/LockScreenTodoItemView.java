@@ -45,7 +45,6 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
     public LockScreenTodoItemView<V> setOnClickListener(@Nullable View.OnClickListener onClickListener) {
         View view = getClickableRoot();
-        view.setClickable(true);
         view.setFocusable(true);
         TypedValue themedValue = new TypedValue();
         context.getTheme().resolveAttribute(R.attr.selectableItemBackground, themedValue, true);

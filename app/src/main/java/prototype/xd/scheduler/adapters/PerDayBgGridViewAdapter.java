@@ -1,10 +1,10 @@
 package prototype.xd.scheduler.adapters;
 
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.readBitmapFromFile;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -22,12 +21,19 @@ import java.util.function.Consumer;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
 
-public class BackgroundImagesGridViewAdapter extends BaseAdapter {
+/**
+ * Grid adapter class for displaying "per day wallpapers"
+ */
+public class PerDayBgGridViewAdapter extends BaseAdapter {
     
+    public static final String NAME = PerDayBgGridViewAdapter.class.getSimpleName();
+    
+    // called when a user clicks on an image to select a new one
     private final Consumer<Integer> bgSelectionClickedCallback;
+    // fallback day
     private final String defaultDay;
-    public BackgroundImagesGridViewAdapter(@NonNull final Context context,
-                                           @NonNull final Consumer<Integer> bgSelectionClickedCallback) {
+    public PerDayBgGridViewAdapter(@NonNull final Context context,
+                                   @NonNull final Consumer<Integer> bgSelectionClickedCallback) {
         defaultDay = context.getString(R.string.day_default);
         this.bgSelectionClickedCallback = bgSelectionClickedCallback;
     }
@@ -58,13 +64,13 @@ public class BackgroundImagesGridViewAdapter extends BaseAdapter {
         ImageView imageView = convertView.findViewById(R.id.bg_image);
         
         try {
-            FileInputStream inputStream = new FileInputStream(getFile(DateManager.WEEK_DAYS_ROOT.get(i) + ".png_min.png"));
-            imageView.setImageBitmap(BitmapFactory.decodeStream(inputStream));
-            inputStream.close();
+            // load bitmap from file
+            imageView.setImageBitmap(readBitmapFromFile(getFile(DateManager.WEEK_DAYS_ROOT.get(i) + ".png_min.png")));
         } catch (FileNotFoundException e) {
+            // set default empty image
             imageView.setImageResource(R.drawable.ic_not_90);
         } catch (IOException e) {
-            logException("GridViewAdapter", e);
+            logException(NAME, e);
         }
         
         convertView.findViewById(R.id.bg_image_container).setOnClickListener(v -> bgSelectionClickedCallback.accept(i));

@@ -555,7 +555,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     // change any number of parameters
     public void changeParameters(String... keyValuePairs) {
         if (keyValuePairs.length % 2 != 0) {
-            throw new IllegalArgumentException("Can't call changeParameters with event number of arguments");
+            throw new IllegalArgumentException("Can't call changeParameters with even number of arguments");
         }
         if (keyValuePairs.length == 2) { // just one parameter
             if (changeParameterInternal(keyValuePairs[0], keyValuePairs[1])) {

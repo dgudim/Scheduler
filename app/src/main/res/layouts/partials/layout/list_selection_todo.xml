@@ -18,13 +18,13 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/backgroundLayer"
+        style="@style/ClickableViewFg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
         android:layout_weight="1"
         android:minHeight="55dp"
-        app:cardCornerRadius="5dp"
-        app:strokeWidth="0.7dp">
+        app:cardCornerRadius="@dimen/card_corner_radius">
 
         <TextView
             android:id="@+id/todoText"
@@ -40,15 +40,18 @@
             android:textAppearance="@style/MediumHeading" />
     </com.google.android.material.card.MaterialCardView>
 
-    <ImageView
-        android:id="@+id/settings"
-        android:layout_width="30dp"
+    <ImageButton
+        android:id="@+id/open_settings_button"
+        style="@style/DefaultImageButton"
+        android:layout_width="35dp"
         android:layout_height="match_parent"
         android:contentDescription="@string/action_settings"
-        app:srcCompat="@drawable/ic_settings_45" />
+        app:srcCompat="@drawable/ic_settings_45"
+        tools:ignore="TouchTargetSizeCheck" />
 
-    <ImageView
-        android:id="@+id/deletionButton"
+    <ImageButton
+        android:id="@+id/delete_entry_button"
+        style="@style/DefaultImageButton"
         android:layout_width="45dp"
         android:layout_height="55dp"
         android:layout_gravity="center_vertical"

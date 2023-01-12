@@ -23,13 +23,11 @@
 
         <ImageButton
             android:id="@+id/adaptive_bg_settings"
-            style="@android:style/Widget.Material.Light.ImageButton"
+            style="@style/DefaultImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/transparent"
             android:contentDescription="@string/action_settings"
-            app:srcCompat="@drawable/ic_settings_45"
-            tools:ignore="SpeakableTextPresentCheck" />
+            app:srcCompat="@drawable/ic_settings_45" />
 
     </LinearLayout>
 

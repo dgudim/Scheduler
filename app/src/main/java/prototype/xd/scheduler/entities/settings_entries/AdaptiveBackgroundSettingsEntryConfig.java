@@ -6,18 +6,17 @@ import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.widget.GridView;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Lifecycle;
 
 import java.util.function.Consumer;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.adapters.BackgroundImagesGridViewAdapter;
+import prototype.xd.scheduler.adapters.PerDayBgGridViewAdapter;
 import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.BgGridSelectionViewBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -25,19 +24,15 @@ import prototype.xd.scheduler.utilities.Utilities;
 public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     
     @NonNull
-    private final BackgroundImagesGridViewAdapter gridViewAdapter;
-    @NonNull
-    private final Lifecycle lifecycle;
+    private final PerDayBgGridViewAdapter gridViewAdapter;
     private Integer lastClickedBgIndex;
     
-    public AdaptiveBackgroundSettingsEntryConfig(@NonNull final Context context,
-                                                 @NonNull final Lifecycle lifecycle,
+    public AdaptiveBackgroundSettingsEntryConfig(@NonNull Context context,
                                                  @NonNull final Consumer<Integer> bgSelectionClickedCallback) {
-        gridViewAdapter = new BackgroundImagesGridViewAdapter(context, bgIndex -> {
+        gridViewAdapter = new PerDayBgGridViewAdapter(context, bgIndex -> {
             lastClickedBgIndex = bgIndex;
             bgSelectionClickedCallback.accept(bgIndex);
         });
-        this.lifecycle = lifecycle;
     }
     
     public Integer getLastClickedBgIndex() {
@@ -55,24 +50,23 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     
     static class AdaptiveBackgroundViewHolder extends SettingsEntryConfig.SettingsViewHolder<AdaptiveBackgroundSettingsEntryBinding, AdaptiveBackgroundSettingsEntryConfig> {
         
-        AdaptiveBackgroundViewHolder(AdaptiveBackgroundSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        AdaptiveBackgroundViewHolder(@NonNull ContextWrapper wrapper, @NonNull AdaptiveBackgroundSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
         void bind(AdaptiveBackgroundSettingsEntryConfig config) {
             viewBinding.adaptiveBgSettings.setOnClickListener(v -> {
-                final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext(), R.style.FullScreenDialog);
                 
-                BgGridSelectionViewBinding gridSelection = BgGridSelectionViewBinding.inflate(LayoutInflater.from(context));
+                BgGridSelectionViewBinding gridSelection = BgGridSelectionViewBinding.inflate(wrapper.getLayoutInflater());
                 
                 Utilities.setSwitchChangeListener(gridSelection.adaptiveBgSwitch,
                         Keys.ADAPTIVE_BACKGROUND_ENABLED,
                         null);
                 
                 gridSelection.resetBgButton.setOnClickListener(view1 ->
-                        displayConfirmationDialogue(view1.getContext(), config.lifecycle,
+                        displayConfirmationDialogue(wrapper,
                                 R.string.delete_all_saved_backgrounds_prompt,
                                 R.string.delete_all_saved_backgrounds_description,
                                 R.string.cancel, R.string.delete,
@@ -91,8 +85,9 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 gridView.setVerticalSpacing(30);
                 gridView.setAdapter(config.gridViewAdapter);
                 
-                alert.setView(gridSelection.getRoot());
-                alert.show();
+                wrapper.attachDialogToLifecycle(
+                        new AlertDialog.Builder(v.getContext(), R.style.FullScreenDialog)
+                                .setView(gridSelection.getRoot()).show(), null);
             });
         }
     }

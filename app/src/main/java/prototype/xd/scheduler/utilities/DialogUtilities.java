@@ -8,7 +8,6 @@ import static prototype.xd.scheduler.utilities.Utilities.fancyHideUnhideView;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -20,8 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
-import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.Lifecycle;
 import androidx.viewbinding.ViewBinding;
 
 import com.flask.colorpicker.ColorPickerView;
@@ -44,15 +41,14 @@ import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
 public class DialogUtilities {
     
-    public static void displayConfirmationDialogue(@NonNull Context context,
-                                                   @NonNull Lifecycle lifecycle,
+    public static void displayConfirmationDialogue(@NonNull ContextWrapper wrapper,
                                                    @StringRes int titleStringResource,
                                                    @StringRes int messageStringResource,
                                                    @StringRes int cancelButtonStringResource,
                                                    @StringRes int confirmButtonStringResource,
                                                    @NonNull View.OnClickListener confirmationListener) {
-        TwoButtonsBinding twoButtonsBinding = TwoButtonsBinding.inflate(LayoutInflater.from(context));
-        Dialog dialog = buildTemplate(context, lifecycle, titleStringResource, messageStringResource, twoButtonsBinding);
+        TwoButtonsBinding twoButtonsBinding = TwoButtonsBinding.inflate(wrapper.getLayoutInflater());
+        Dialog dialog = buildTemplate(wrapper, titleStringResource, messageStringResource, twoButtonsBinding);
         
         setupButtons(dialog, twoButtonsBinding,
                 cancelButtonStringResource, confirmButtonStringResource,
@@ -62,8 +58,7 @@ public class DialogUtilities {
                 });
     }
     
-    public static void displayGroupAdditionEditDialog(@NonNull Context context,
-                                                      @NonNull Lifecycle lifecycle,
+    public static void displayGroupAdditionEditDialog(@NonNull ContextWrapper wrapper,
                                                       @StringRes int titleStringResource,
                                                       @StringRes int messageStringResource,
                                                       @StringRes int cancelButtonStringResource,
@@ -71,16 +66,16 @@ public class DialogUtilities {
                                                       @NonNull String defaultEditTextValue,
                                                       @NonNull OnClickListenerWithViewAccess<AddOrEditGroupDialogBinding> confirmationListener,
                                                       @Nullable OnClickListenerWithDialogAccess deletionListener) {
-        AddOrEditGroupDialogBinding dialogBinding = AddOrEditGroupDialogBinding.inflate(LayoutInflater.from(context));
+        AddOrEditGroupDialogBinding dialogBinding = AddOrEditGroupDialogBinding.inflate(wrapper.getLayoutInflater());
         
-        Dialog dialog = buildTemplate(context, lifecycle, titleStringResource, messageStringResource, dialogBinding);
+        Dialog dialog = buildTemplate(wrapper, titleStringResource, messageStringResource, dialogBinding);
         
         setupEditText(dialogBinding.entryNameEditText, defaultEditTextValue);
         
         if (deletionListener != null) {
-            dialogBinding.deleteButton.setOnClickListener(v -> deletionListener.onClick(v, dialog));
+            dialogBinding.deleteGroupButton.setOnClickListener(v -> deletionListener.onClick(v, dialog));
         } else {
-            dialogBinding.deleteButton.setVisibility(View.GONE);
+            dialogBinding.deleteGroupButton.setVisibility(View.GONE);
         }
         
         setupButtons(dialog, dialogBinding.twoButtons,
@@ -93,21 +88,19 @@ public class DialogUtilities {
                 });
     }
     
-    public static void displayEntryAdditionEditDialog(@NonNull FragmentManager fragmentManager,
-                                                      @NonNull Context context,
-                                                      @NonNull Lifecycle lifecycle,
+    public static void displayEntryAdditionEditDialog(@NonNull ContextWrapper wrapper,
                                                       @Nullable TodoEntry entry,
                                                       @NonNull List<Group> groupList,
                                                       @NonNull OnClickListenerWithViewAccess<AddOrEditEntryDialogBinding> confirmationListener) {
         
-        AddOrEditEntryDialogBinding dialogBinding = AddOrEditEntryDialogBinding.inflate(LayoutInflater.from(context));
+        AddOrEditEntryDialogBinding dialogBinding = AddOrEditEntryDialogBinding.inflate(wrapper.getLayoutInflater());
         
-        Dialog dialog = buildTemplate(context, lifecycle,
+        Dialog dialog = buildTemplate(wrapper,
                 entry == null ? R.string.add_event_fab : R.string.edit_event,
                 -1, dialogBinding);
         setupEditText(dialogBinding.entryNameEditText, entry == null ? "" : entry.getRawTextValue());
         
-        String[] items = Group.groupListToNames(groupList, context);
+        String[] items = Group.groupListToNames(groupList, wrapper);
         SelectableAutoCompleteTextView groupSpinner = dialogBinding.groupSpinner;
         groupSpinner.setSimpleItems(items);
         
@@ -118,8 +111,8 @@ public class DialogUtilities {
         groupSpinner.setSelectedItem(initialGroupIndex);
         groupSpinner.setOnItemClickListener((parent, view, position, id) -> selectedIndex[0] = position);
         
-        dialogBinding.dayFromButton.setup(fragmentManager, entry == null ? currentlySelectedDayUTC : entry.startDayLocal.get());
-        dialogBinding.dayToButton.setup(fragmentManager, entry == null ? currentlySelectedDayUTC : entry.endDayLocal.get());
+        dialogBinding.dayFromButton.setup(wrapper.getFragmentManager(), entry == null ? currentlySelectedDayUTC : entry.startDayLocal.get());
+        dialogBinding.dayToButton.setup(wrapper.getFragmentManager(), entry == null ? currentlySelectedDayUTC : entry.endDayLocal.get());
         
         // for date validation
         dialogBinding.dayFromButton.setRole(DateSelectButton.Role.START_DAY, dialogBinding.dayToButton);
@@ -177,34 +170,17 @@ public class DialogUtilities {
         return text;
     }
     
-    private static Dialog buildTemplate(@NonNull final Context context,
-                                        @NonNull final Lifecycle lifecycle,
+    private static Dialog buildTemplate(@NonNull final ContextWrapper wrapper,
                                         @StringRes int titleStringResource,
                                         @StringRes int messageStringResource,
                                         @NonNull ViewBinding viewBinding) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(wrapper.context);
         builder.setTitle(titleStringResource);
         if (messageStringResource != -1) {
             builder.setMessage(messageStringResource);
         }
         builder.setView(viewBinding.getRoot());
-        return attachDialogToLifecycle(builder.show(), lifecycle, null);
-    }
-    
-    private static Dialog attachDialogToLifecycle(@NonNull final Dialog dialog,
-                                                  @NonNull final Lifecycle lifecycle,
-                                                  @Nullable DialogInterface.OnDismissListener dismissListener) {
-        // make sure the dialog is dismissed on activity destroy
-        DialogDismissObserver dismissLifecycleObserver = new DialogDismissObserver(dialog);
-        lifecycle.addObserver(dismissLifecycleObserver);
-        // remove the observer as soon as the dialog in dismissed
-        dialog.setOnDismissListener(dialog1 -> {
-            if (dismissListener != null) {
-                dismissListener.onDismiss(dialog1);
-            }
-            lifecycle.removeObserver(dismissLifecycleObserver);
-        });
-        return dialog;
+        return wrapper.attachDialogToLifecycle(builder.show(), null);
     }
     
     @FunctionalInterface
@@ -217,61 +193,57 @@ public class DialogUtilities {
         void onClick(View view, Dialog dialog);
     }
     
-    public static void displayMessageDialog(@NonNull final Context context,
-                                            @NonNull final Lifecycle lifecycle,
+    public static void displayMessageDialog(@NonNull final ContextWrapper wrapper,
                                             @StringRes int titleStringResource,
                                             @StringRes int messageStringResource,
                                             @DrawableRes int iconResource,
                                             @StringRes int positiveButton,
                                             @StyleRes int theme,
                                             DialogInterface.OnDismissListener dismissListener) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, theme);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(wrapper.context, theme);
         builder.setTitle(titleStringResource);
         builder.setMessage(messageStringResource);
         builder.setIcon(iconResource);
         builder.setPositiveButton(positiveButton, null);
-        attachDialogToLifecycle(builder.show(), lifecycle, dismissListener);
+        wrapper.attachDialogToLifecycle(builder.show(), dismissListener);
     }
     
     //color dialog for general settings
-    public static void invokeColorDialog(@NonNull final Context context,
-                                         @NonNull final Lifecycle lifecycle,
+    public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
                                          final ColorPickerColorSelectionListener clickListener,
                                          final Keys.DefaultedInteger defaultedInteger) {
-        invokeColorDialog(context, lifecycle, defaultedInteger.get(),
+        invokeColorDialog(wrapper, defaultedInteger.get(),
                 (dialog, selectedColor, allColors) ->
                         clickListener.onClick(defaultedInteger, selectedColor));
     }
     
     //color dialog for entry settings
-    public static void invokeColorDialog(@NonNull final Context context,
-                                         @NonNull final Lifecycle lifecycle,
+    public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
                                          final TextView stateIcon,
                                          final PopupSettingsView settingsView,
                                          final Keys.DefaultedInteger defaultedInteger,
                                          final Function<Keys.DefaultedInteger, Integer> initialValueFactory) {
-        invokeColorDialog(context, lifecycle,
+        invokeColorDialog(wrapper,
                 initialValueFactory.apply(defaultedInteger), (dialog, selectedColor, allColors) -> {
                     settingsView.notifyParameterChanged(stateIcon, defaultedInteger.key, selectedColor);
                     settingsView.notifyColorChanged(defaultedInteger, selectedColor);
                 });
     }
     
-    public static void invokeColorDialog(@NonNull final Context context,
-                                         @NonNull Lifecycle lifecycle,
+    public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
                                          final int initialValue,
                                          @NonNull ColorPickerClickListener listener) {
         
-        attachDialogToLifecycle(ColorPickerDialogBuilder
-                .with(context, R.style.ColorPickerDialogStyle)
-                .setTitle(context.getString(R.string.choose_color))
+        wrapper.attachDialogToLifecycle(ColorPickerDialogBuilder
+                .with(wrapper.context, R.style.ColorPickerDialogStyle)
+                .setTitle(wrapper.getString(R.string.choose_color))
                 .initialColor(initialValue)
                 .showAlphaSlider(false)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
-                .setPositiveButton(context.getString(R.string.apply), listener)
+                .setPositiveButton(wrapper.getString(R.string.apply), listener)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
-                }).build(), lifecycle, null).show();
+                }).build(), null).show();
     }
     
     @FunctionalInterface

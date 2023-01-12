@@ -57,7 +57,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
                 (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true));
         binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.settingsRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
-        binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(settingsEntries, getLifecycle()));
+        binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
     }
     
     private static class EntryTypeAdapter extends RecyclerView.Adapter<EntryTypeAdapter.CardViewHolder> {
@@ -78,7 +78,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         }
         
         public void setGlobalEventsVisible(boolean globalEventsVisible) {
-            if(globalEventsVisible && !this.globalEventsVisible) {
+            if (globalEventsVisible && !this.globalEventsVisible) {
                 sortOrder.add(TodoEntry.EntryType.GLOBAL);
                 notifyItemInserted(sortOrder.size());
             } else if (!globalEventsVisible && this.globalEventsVisible) {
@@ -86,7 +86,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
                 sortOrder.remove(indexOfGlobal);
                 notifyItemRemoved(indexOfGlobal);
             }
-            if(this.globalEventsVisible != globalEventsVisible) {
+            if (this.globalEventsVisible != globalEventsVisible) {
                 Keys.TODO_ITEM_SORTING_ORDER.put(sortOrder);
             }
             this.globalEventsVisible = globalEventsVisible;

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.collection.ArrayMap;
 
@@ -15,17 +16,23 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
+/**
+ * Grid adapter class for displaying per color event settings
+ */
 public class CalendarColorsGridViewAdapter extends BaseAdapter {
     
+    // base calendar color (the default one)
     private final int calendarColor;
     
+    // event color to event count map
     private final ArrayMap<Integer, Integer> eventColorCountMap;
     
     private final SystemCalendarSettings systemCalendarSettings;
     
     private final SystemCalendar calendar;
     
-    public CalendarColorsGridViewAdapter(final SystemCalendarSettings systemCalendarSettings, final SystemCalendar calendar) {
+    public CalendarColorsGridViewAdapter(@NonNull final SystemCalendarSettings systemCalendarSettings,
+                                         @NonNull final SystemCalendar calendar) {
         this.systemCalendarSettings = systemCalendarSettings;
         eventColorCountMap = calendar.eventColorCountMap;
         calendarColor = calendar.color;
@@ -60,7 +67,7 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(color);
         view.findViewById(R.id.title_default).setVisibility(calendarColor == color ? View.VISIBLE : View.GONE);
         ((TextView) view.findViewById(R.id.event_count)).setText(getPluralString(view.getContext(), R.plurals.calendar_event_count, count));
-        view.findViewById(R.id.settings).setOnClickListener(v -> systemCalendarSettings.show(calendar.makeKey(color), color));
+        view.findViewById(R.id.open_settings_button).setOnClickListener(v -> systemCalendarSettings.show(calendar.makeKey(color), color));
         
         return view;
     }

@@ -28,18 +28,17 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
     
-    private SystemCalendarSettings systemCalendarSettings;
-    
     // initial window creation
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        systemCalendarSettings = new SystemCalendarSettings(null, requireContext(), getLifecycle());
+        
+        SystemCalendarSettings systemCalendarSettings = new SystemCalendarSettings(wrapper, null);
         
         List<SettingsEntryConfig> staticEntries = new ArrayList<>();
         staticEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_system_calendars)));
-        SettingsListViewAdapter staticEntriesListViewAdapter = new SettingsListViewAdapter(staticEntries, getLifecycle());
+        SettingsListViewAdapter staticEntriesListViewAdapter = new SettingsListViewAdapter(wrapper, staticEntries);
         
         listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
                 .setIsolateViewTypes(false)
@@ -63,7 +62,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
             for (List<SystemCalendar> calendarGroup : sortedCalendars.values()) {
                 
                 ArrayList<GenericCalendarSettingsEntryConfig> calendarEntryList = new ArrayList<>();
-                SettingsListViewAdapter calendarEntryListAdapter = new SettingsListViewAdapter(calendarEntryList, getLifecycle(), true);
+                SettingsListViewAdapter calendarEntryListAdapter = new SettingsListViewAdapter(wrapper, calendarEntryList, true);
                 
                 calendarEntryList.add(new CalendarAccountSettingsEntryConfig(
                         systemCalendarSettings,
@@ -88,13 +87,13 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
                 Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
                 getString(R.string.settings_allow_global_calendar_account_settings), (buttonView, isChecked) -> {
             if (isChecked) {
-                displayMessageDialog(requireContext(), getLifecycle(),
+                displayMessageDialog(wrapper,
                         R.string.attention, R.string.whole_calendar_settings_on_warning,
                         R.drawable.ic_warning_24_onerrorcontainer, R.string.i_understand,
                         R.style.DefaultAlertDialogTheme,
                         null);
             } else {
-                displayMessageDialog(requireContext(), getLifecycle(),
+                displayMessageDialog(wrapper,
                         R.string.attention, R.string.whole_calendar_settings_off_warning,
                         R.drawable.ic_warning_24_onerrorcontainer, R.string.i_understand,
                         R.style.DefaultAlertDialogTheme,
@@ -107,12 +106,5 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
             listViewAdapter.notifyItemRangeChanged(staticEntries.size(), calendarConfigEntries.size());
         }, false));
         staticEntriesListViewAdapter.notifyItemInserted(staticEntries.size());
-    }
-    
-    // full destroy
-    @Override
-    public void onDestroy() {
-        systemCalendarSettings = null;
-        super.onDestroy();
     }
 }

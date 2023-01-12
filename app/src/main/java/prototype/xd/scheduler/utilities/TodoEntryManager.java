@@ -14,15 +14,12 @@ import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
-import android.content.Context;
 import android.util.ArraySet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
 import java.util.Collections;
@@ -104,22 +101,20 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         }
     };
     
-    public TodoEntryManager(@NonNull final Context context,
-                            @NonNull final Lifecycle lifecycle,
-                            @NonNull final FragmentManager fragmentManager) {
-        todoListViewAdapter = new TodoListViewAdapter(this, context, lifecycle, fragmentManager);
+    public TodoEntryManager(@NonNull final ContextWrapper wrapper) {
+        todoListViewAdapter = new TodoListViewAdapter(wrapper, this);
         calendarVisibilityMap = new ArrayMap<>();
         groups = loadGroups();
         
         todoListEntries = new TodoEntryList(Keys.TODO_LIST_INITIAL_CAPACITY);
         updateStaticVarsAndCalendarVisibility();
-        
-        lifecycle.addObserver(this);
+    
+        wrapper.lifecycle.addObserver(this);
         
         // load calendars and static entries in a separate thread (~300ms)
         new Thread(() -> {
             long start = System.currentTimeMillis();
-            calendars = getAllCalendars(context, false);
+            calendars = getAllCalendars(wrapper.context, false);
             
             for (SystemCalendar calendar : calendars) {
                 calendarVisibilityMap.put(calendar, calendar.isVisible());
@@ -130,7 +125,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
             loadedDay_end = currentDayUTC + DAYS_ON_ONE_PANEL;
             
             todoListEntries.initLoadingRange(loadedDay_start, loadedDay_end);
-            todoListEntries.addAll(loadTodoEntries(context,
+            todoListEntries.addAll(loadTodoEntries(wrapper.context,
                     loadedDay_start,
                     loadedDay_end,
                     groups, calendars,

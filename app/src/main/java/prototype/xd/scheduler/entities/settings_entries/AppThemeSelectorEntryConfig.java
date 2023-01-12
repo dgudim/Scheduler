@@ -2,7 +2,10 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.APP_THEME_SELECTOR;
 
+import androidx.annotation.NonNull;
+
 import prototype.xd.scheduler.databinding.AppThemeSelectorSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 
 public class AppThemeSelectorEntryConfig extends SettingsEntryConfig {
     @Override
@@ -12,8 +15,8 @@ public class AppThemeSelectorEntryConfig extends SettingsEntryConfig {
     
     static class AppThemeSelectorViewHolder extends SettingsEntryConfig.SettingsViewHolder<AppThemeSelectorSettingsEntryBinding, AppThemeSelectorEntryConfig> {
         
-        AppThemeSelectorViewHolder(AppThemeSelectorSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        AppThemeSelectorViewHolder(@NonNull ContextWrapper wrapper, @NonNull AppThemeSelectorSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @Override

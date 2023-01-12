@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
 
@@ -25,7 +26,7 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
         this.text = text;
         this.value = value;
         this.onCheckedChangeListener = onCheckedChangeListener;
-        if(onCheckedChangeListener != null && instantlyTriggerListener) {
+        if (onCheckedChangeListener != null && instantlyTriggerListener) {
             onCheckedChangeListener.onCheckedChanged(null, value.get());
         }
     }
@@ -41,8 +42,8 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     
     static class SwitchViewHolder extends SettingsEntryConfig.SettingsViewHolder<SwitchSettingsEntryBinding, SwitchSettingsEntryConfig> {
         
-        SwitchViewHolder(SwitchSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        SwitchViewHolder(@NonNull ContextWrapper wrapper, @NonNull SwitchSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @Override

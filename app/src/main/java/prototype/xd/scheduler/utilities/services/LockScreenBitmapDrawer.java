@@ -1,13 +1,13 @@
 package prototype.xd.scheduler.utilities.services;
 
+import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayLocaleAgnosticString;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.makeMutable;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.noFingerPrint;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.readStream;
-import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayLocaleAgnosticString;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.readBitmapFromFile;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
@@ -40,7 +40,6 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -118,11 +117,11 @@ class LockScreenBitmapDrawer {
             bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
         } else {
             if (bg.exists()) {
-                bitmap = readStream(new FileInputStream(bg));
+                bitmap = readBitmapFromFile(bg);
             } else {
                 File defFile = getFile(DateManager.DEFAULT_BACKGROUND_NAME);
                 if (defFile.exists()) {
-                    bitmap = readStream(new FileInputStream(defFile));
+                    bitmap = readBitmapFromFile(defFile);
                 } else {
                     throw new FileNotFoundException("No available background to load");
                 }

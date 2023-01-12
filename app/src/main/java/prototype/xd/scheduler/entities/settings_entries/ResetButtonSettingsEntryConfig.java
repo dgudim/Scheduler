@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
@@ -31,14 +32,14 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     
     static class ResetButtonViewHolder extends SettingsEntryConfig.SettingsViewHolder<ResetButtonSettingsEntryBinding, ResetButtonSettingsEntryConfig> {
         
-        ResetButtonViewHolder(ResetButtonSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        ResetButtonViewHolder(@NonNull ContextWrapper wrapper, @NonNull ResetButtonSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @Override
         void bind(ResetButtonSettingsEntryConfig config) {
             viewBinding.resetSettingsButton.setOnClickListener(v ->
-                    displayConfirmationDialogue(v.getContext(), config.fragment.getLifecycle(),
+                    displayConfirmationDialogue(wrapper,
                             R.string.reset_settings_prompt, R.string.reset_settings_description,
                             R.string.cancel, R.string.reset,
                             view -> {

@@ -5,14 +5,15 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.lifecycle.Lifecycle;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.TodoItemViewSelectionDialogBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -32,17 +33,19 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         private final EntryPreviewContainer entryPreviewContainer;
         private final AlertDialog viewSelectionDialog;
         
-        CompoundCustomizationViewHolder(CompoundCustomizationSettingsEntryBinding viewBinding, Lifecycle lifecycle) {
-            super(viewBinding);
+        CompoundCustomizationViewHolder(@NonNull final ContextWrapper wrapper,
+                                        @NonNull final CompoundCustomizationSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
             
-            LayoutInflater layoutInflater = LayoutInflater.from(context);
+            LayoutInflater layoutInflater = wrapper.getLayoutInflater();
             LinearLayout viewSelectionDialogView = TodoItemViewSelectionDialogBinding.inflate(layoutInflater).getRoot();
             
-            viewSelectionDialog = new MaterialAlertDialogBuilder(context)
-                    .setView(viewSelectionDialogView)
-                    .create();
+            viewSelectionDialog = wrapper.attachDialogToLifecycle(
+                    new MaterialAlertDialogBuilder(wrapper.context)
+                            .setView(viewSelectionDialogView)
+                            .create(), null);
             
-            entryPreviewContainer = new EntryPreviewContainer(context, viewBinding.previewContainer, true) {
+            entryPreviewContainer = new EntryPreviewContainer(wrapper, viewBinding.previewContainer, true) {
                 @Override
                 protected int currentFontColorGetter() {
                     return Keys.FONT_COLOR.CURRENT.get();
@@ -104,41 +107,41 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             };
             
             viewBinding.currentBackgroundColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BG_COLOR.CURRENT));
             viewBinding.upcomingBackgroundColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BG_COLOR.UPCOMING));
             viewBinding.expiredBackgroundColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BG_COLOR.EXPIRED));
             
             viewBinding.currentFontColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.FONT_COLOR.CURRENT));
             viewBinding.upcomingFontColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.FONT_COLOR.UPCOMING));
             viewBinding.expiredFontColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.FONT_COLOR.EXPIRED));
             
             viewBinding.currentBorderColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BORDER_COLOR.CURRENT));
             viewBinding.upcomingBorderColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BORDER_COLOR.UPCOMING));
             viewBinding.expiredBorderColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(context, lifecycle,
+                    DialogUtilities.invokeColorDialog(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BORDER_COLOR.EXPIRED));
             

@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -83,10 +84,10 @@ public class Group implements Serializable {
         return index == -1 ? null : groups.get(index);
     }
     
-    public static String[] groupListToNames(List<Group> groups, Context context) {
+    public static String[] groupListToNames(List<Group> groups, ContextWrapper wrapper) {
         String[] names = new String[groups.size()];
         for (int i = 0; i < groups.size(); i++) {
-            names[i] = groups.get(i).getLocalizedName(context);
+            names[i] = groups.get(i).getLocalizedName(wrapper.context);
         }
         return names;
     }

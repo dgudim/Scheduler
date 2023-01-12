@@ -8,6 +8,7 @@ import androidx.annotation.StringRes;
 import java.util.List;
 
 import prototype.xd.scheduler.databinding.DropdownSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Keys;
 
 public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
@@ -25,7 +26,7 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
         this.hintId = hintId;
         this.displayItems = displayItems;
         this.items = items;
-        if(displayItems.length != items.size()) {
+        if (displayItems.length != items.size()) {
             throw new IllegalArgumentException("displayItems.size != items.size");
         }
         this.value = value;
@@ -46,8 +47,8 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
     
     static class DropdownViewHolder extends SettingsEntryConfig.SettingsViewHolder<DropdownSettingsEntryBinding, DropdownSettingsEntryConfig<?>> {
         
-        DropdownViewHolder(DropdownSettingsEntryBinding viewBinding) {
-            super(viewBinding);
+        DropdownViewHolder(@NonNull ContextWrapper wrapper, @NonNull DropdownSettingsEntryBinding viewBinding) {
+            super(wrapper, viewBinding);
         }
         
         @Override

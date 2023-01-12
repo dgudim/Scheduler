@@ -41,22 +41,20 @@
 
     <ImageButton
         android:id="@+id/color_select_button"
-        style="@style/Widget.AppCompat.ImageButton"
+        style="@style/DefaultImageButton"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:background="@color/transparent"
+        android:contentDescription="@string/action_per_color_settings"
         app:srcCompat="@drawable/ic_palette_45"
-        tools:ignore="ImageContrastCheck"
-        android:contentDescription="@string/action_per_color_settings" />
+        tools:ignore="ImageContrastCheck" />
 
     <ImageButton
         android:id="@+id/settings_button"
-        style="@style/Widget.AppCompat.ImageButton"
+        style="@style/DefaultImageButton"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:background="@color/transparent"
+        android:contentDescription="@string/action_settings"
         app:srcCompat="@drawable/ic_settings_45"
-        tools:ignore="ImageContrastCheck"
-        android:contentDescription="@string/action_settings" />
+        tools:ignore="ImageContrastCheck" />
 
 </LinearLayout>

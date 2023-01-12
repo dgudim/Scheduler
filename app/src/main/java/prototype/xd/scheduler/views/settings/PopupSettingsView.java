@@ -1,17 +1,14 @@
 package prototype.xd.scheduler.views.settings;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.view.LayoutInflater;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Lifecycle;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
-import prototype.xd.scheduler.utilities.DialogDismissObserver;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
@@ -22,26 +19,23 @@ public abstract class PopupSettingsView {
     
     protected final EntryPreviewContainer entryPreviewContainer;
     
-    protected final Context context;
-    protected AlertDialog dialog;
-    protected final Lifecycle lifecycle;
+    protected final ContextWrapper wrapper;
+    protected final AlertDialog dialog;
     protected final int defaultTextColor;
     
-    PopupSettingsView(@NonNull final Context context,
-                      @Nullable final TodoEntryManager todoEntryManager,
-                      @NonNull final Lifecycle lifecycle) {
+    PopupSettingsView(@NonNull final ContextWrapper wrapper,
+                      @Nullable final TodoEntryManager todoEntryManager) {
         
-        bnd = EntrySettingsBinding.inflate(LayoutInflater.from(context));
+        this.wrapper = wrapper;
+        
+        bnd = EntrySettingsBinding.inflate(wrapper.getLayoutInflater());
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
         
         bnd.showDaysUpcomingSlider.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         bnd.showDaysExpiredSlider.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         
-        new GraphicsUtilities.SliderTinter(context, Keys.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
-        new GraphicsUtilities.SliderTinter(context, Keys.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
-        
-        this.context = context;
-        this.lifecycle = lifecycle;
+        new GraphicsUtilities.SliderTinter(wrapper.context, Keys.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
+        new GraphicsUtilities.SliderTinter(wrapper.context, Keys.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
         
         entryPreviewContainer = getEntryPreviewContainer();
         entryPreviewContainer.attachCurrentSelectors(
@@ -49,13 +43,13 @@ public abstract class PopupSettingsView {
                 bnd.currentBorderColorSelector,
                 bnd.currentBackgroundColorSelector);
         
-        dialog = new AlertDialog.Builder(context, R.style.FullScreenDialog)
-                .setOnDismissListener(dialog -> {
+        dialog = wrapper.attachDialogToLifecycle(
+                new AlertDialog.Builder(wrapper.context, R.style.FullScreenDialog).setView(bnd.getRoot()).create(),
+                dialogInterface -> {
                     if (todoEntryManager != null) {
                         todoEntryManager.performDeferredTasks();
                     }
-                }).setView(bnd.getRoot()).create();
-        lifecycle.addObserver(new DialogDismissObserver(dialog));
+                });
     }
     
     public abstract EntryPreviewContainer getEntryPreviewContainer();

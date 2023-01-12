@@ -16,12 +16,15 @@ import androidx.viewbinding.ViewBinding;
 
 import java.util.Map;
 
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.Keys;
 
 // base dialog class that refreshes main screen on settings changes
 public abstract class BaseSettingsFragment<T extends ViewBinding> extends DialogFragment {
     
     protected T binding;
+    
+    protected ContextWrapper wrapper;
     
     private Map<String, ?> preferenceStateBefore;
     
@@ -39,6 +42,7 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        wrapper = ContextWrapper.from(this);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
     }
     

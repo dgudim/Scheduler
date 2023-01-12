@@ -35,14 +35,12 @@
                     app:layout_constraintTop_toTopOf="@+id/to_current_date_button"
                     tools:ignore="HardcodedText" />
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/to_current_date_button"
+                    style="@style/DefaultImageButton"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:clickable="true"
                     android:contentDescription="@string/go_to_today"
-                    android:focusable="true"
-                    android:foreground="?android:attr/actionBarItemBackground"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
                     android:src="@drawable/ic_today_55"

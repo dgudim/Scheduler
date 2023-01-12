@@ -7,7 +7,6 @@ import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKe
 import static prototype.xd.scheduler.utilities.Utilities.setSliderChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,13 +15,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Lifecycle;
 
 import java.util.List;
 import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
@@ -39,16 +38,15 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     private TextWatcher currentListener;
     
-    public SystemCalendarSettings(@Nullable final TodoEntryManager todoEntryManager,
-                                  @NonNull final Context context,
-                                  @NonNull final Lifecycle lifecycle) {
-        super(context, todoEntryManager, lifecycle);
+    public SystemCalendarSettings(@NonNull final ContextWrapper wrapper,
+                                  @Nullable final TodoEntryManager todoEntryManager) {
+        super(wrapper, todoEntryManager);
         bnd.groupSelector.setVisibility(View.GONE);
     }
     
     @Override
     public EntryPreviewContainer getEntryPreviewContainer() {
-        return new EntryPreviewContainer(context, bnd.previewContainer, true) {
+        return new EntryPreviewContainer(wrapper, bnd.previewContainer, true) {
             @Override
             protected int currentFontColorGetter() {
                 return Keys.FONT_COLOR.CURRENT.get(calendarSubKeys);
@@ -89,7 +87,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     private void initialize(final String calendarKey, int eventColor) {
         
-        bnd.entrySettingsTitle.setText(calendarKeyToReadable(dialog.getContext(), calendarKey));
+        bnd.entrySettingsTitle.setText(calendarKeyToReadable(wrapper.context, calendarKey));
         
         this.calendarKey = calendarKey;
         this.eventColor = eventColor;
@@ -99,7 +97,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
         entryPreviewContainer.refreshAll(true);
         
         bnd.settingsResetButton.setOnClickListener(v ->
-                displayConfirmationDialogue(v.getContext(), lifecycle,
+                displayConfirmationDialogue(wrapper,
                         R.string.reset_settings_prompt, R.string.reset_calendar_settings_description,
                         R.string.cancel, R.string.reset, v1 -> {
                             Set<String> preferenceKeys = Keys.getAll().keySet();
@@ -117,19 +115,19 @@ public class SystemCalendarSettings extends PopupSettingsView {
                         }));
         
         bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
-                context, lifecycle,
+                wrapper,
                 bnd.fontColorState, this,
                 Keys.FONT_COLOR.CURRENT,
                 value -> value.get(calendarSubKeys)));
         
         bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
-                context, lifecycle,
+                wrapper,
                 bnd.backgroundColorState, this,
                 Keys.BG_COLOR.CURRENT,
                 value -> value.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
         
         bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
-                context, lifecycle,
+                wrapper,
                 bnd.borderColorState, this,
                 Keys.BORDER_COLOR.CURRENT,
                 value -> value.get(calendarSubKeys)));
@@ -173,7 +171,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 (slider, value, fromUser) ->
                         bnd.hideExpiredItemsByTimeSwitch.setTextColor(value == 0 ?
                                 defaultTextColor :
-                                slider.getContext().getColor(R.color.entry_settings_parameter_group_and_personal)), null);
+                                wrapper.getColor(R.color.entry_settings_parameter_group_and_personal)), null);
         
         setSwitchChangeListener(
                 bnd.hideExpiredItemsByTimeSwitch,
@@ -233,11 +231,11 @@ public class SystemCalendarSettings extends PopupSettingsView {
     public void setStateIconColor(TextView display, String parameterKey) {
         int keyIndex = getFirstValidKeyIndex(calendarSubKeys, parameterKey);
         if (keyIndex == calendarSubKeys.size() - 1) {
-            display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_personal));
+            display.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_personal));
         } else if (keyIndex >= 0) {
-            display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_group));
+            display.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_group));
         } else {
-            display.setTextColor(display.getContext().getColor(R.color.entry_settings_parameter_default));
+            display.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_default));
         }
     }
 }
