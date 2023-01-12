@@ -6,7 +6,7 @@ General ui improvements:
 - Combined event visibility range sliders
 - Removed outlines around switches in settings
 - Improved event previews in event settings
-- Improved colors of color picked dialog
+- Improved colors of color picker dialog
 
 Under the hood changes:
 - Changed how event previews work
