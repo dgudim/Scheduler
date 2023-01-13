@@ -20,6 +20,8 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public class Group implements Serializable {
     
+    static final long serialVersionUID = -5159688717810769428L;
+    
     public static final String NAME = Group.class.getSimpleName();
     
     public static final transient Group NULL_GROUP = new Group();

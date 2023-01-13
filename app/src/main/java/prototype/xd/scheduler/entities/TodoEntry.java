@@ -40,6 +40,8 @@ import prototype.xd.scheduler.views.CalendarView;
 
 public class TodoEntry extends RecycleViewEntry implements Serializable {
     
+    static final long serialVersionUID = 3578172096594611826L;
+    
     static class CachedGetter<T> {
         
         final ParameterGetter<T> parameterGetter;
