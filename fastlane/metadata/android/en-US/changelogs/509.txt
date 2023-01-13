@@ -1,6 +1,6 @@
 Internal changes and bugfixes:
 - Changed how event and group saving works, should work reliably now
-- Fixed groups sometimes unliking from entries
+- Fixed groups sometimes unlinking from entries
 - Fixed group edits / settings resets not saving correctly
 - Fixed days on calendar not refreshing completely
 - Fixed broken group edit dialog
