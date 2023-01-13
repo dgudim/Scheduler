@@ -3,6 +3,7 @@ package prototype.xd.scheduler.views.settings;
 import android.app.AlertDialog;
 import android.widget.TextView;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -13,6 +14,7 @@ import prototype.xd.scheduler.utilities.GraphicsUtilities;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
+@MainThread
 public abstract class PopupSettingsView {
     
     protected final EntrySettingsBinding bnd;

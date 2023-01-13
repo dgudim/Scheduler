@@ -12,6 +12,7 @@ import static prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsE
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
@@ -89,6 +90,7 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
         abstract void bind(S config);
         
         @SuppressWarnings("unchecked")
+        @MainThread
         public void uncheckedBind(@NonNull final SettingsEntryConfig settingsEntryConfig) {
             bind((S) settingsEntryConfig);
         }

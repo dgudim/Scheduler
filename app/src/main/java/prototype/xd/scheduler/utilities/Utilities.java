@@ -435,8 +435,8 @@ public class Utilities {
     }
     
     // computes symmetric difference between 2 maps
-    public static <K, V> Set<K> symmetricDifference(@NonNull final Map<K, ? extends V> map1,
-                                                    @NonNull final Map<K, ? extends V> map2) {
+    public static <K, V> Set<K> symmetricDifference(@NonNull final Map<K, V> map1,
+                                                    @NonNull final Map<K, V> map2) {
         Set<K> keys = new ArraySet<>(map1.size() + map2.size());
         keys.addAll(map1.keySet());
         keys.addAll(map2.keySet());
@@ -446,8 +446,8 @@ public class Utilities {
     }
     
     // computes symmetric difference between 2 sets
-    public static <K> Set<K> symmetricDifference(final Set<? extends K> set1,
-                                                 final Set<? extends K> set2) {
+    public static <K> Set<K> symmetricDifference(final Set<K> set1,
+                                                 final Set<K> set2) {
         
         Set<K> combined = new ArraySet<>(set1.size() + set2.size());
         combined.addAll(set1);

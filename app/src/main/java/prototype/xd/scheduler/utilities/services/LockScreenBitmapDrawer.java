@@ -143,7 +143,7 @@ class LockScreenBitmapDrawer {
                 try {
                     
                     long time = getCurrentTimestampUTC();
-                    Logger.info(NAME, "Setting wallpaper");
+                    Logger.info(NAME, " ------------ Setting wallpaper ------------ ");
                     
                     Bitmap bitmap = getBitmapToDrawOn();
                     
@@ -152,7 +152,7 @@ class LockScreenBitmapDrawer {
                     
                     time = getCurrentTimestampUTC();
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    Logger.info(NAME, "Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000f + "s");
+                    Logger.info(NAME, " ------------ Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000f + "s ------------ ");
                     
                 } catch (InterruptedException e) {
                     Logger.info(NAME, e.getMessage());

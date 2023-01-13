@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -41,6 +42,7 @@ import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
 public class DialogUtilities {
     
+    @MainThread
     public static void displayConfirmationDialogue(@NonNull ContextWrapper wrapper,
                                                    @StringRes int titleStringResource,
                                                    @StringRes int messageStringResource,
@@ -58,6 +60,7 @@ public class DialogUtilities {
                 });
     }
     
+    @MainThread
     public static void displayGroupAdditionEditDialog(@NonNull ContextWrapper wrapper,
                                                       @StringRes int titleStringResource,
                                                       @StringRes int messageStringResource,
@@ -88,6 +91,7 @@ public class DialogUtilities {
                 });
     }
     
+    @MainThread
     public static void displayEntryAdditionEditDialog(@NonNull ContextWrapper wrapper,
                                                       @Nullable TodoEntry entry,
                                                       @NonNull List<Group> groupList,
@@ -170,6 +174,7 @@ public class DialogUtilities {
         return text;
     }
     
+    @MainThread
     private static Dialog buildTemplate(@NonNull final ContextWrapper wrapper,
                                         @StringRes int titleStringResource,
                                         @StringRes int messageStringResource,
@@ -193,6 +198,7 @@ public class DialogUtilities {
         void onClick(View view, Dialog dialog);
     }
     
+    @MainThread
     public static void displayMessageDialog(@NonNull final ContextWrapper wrapper,
                                             @StringRes int titleStringResource,
                                             @StringRes int messageStringResource,
@@ -209,6 +215,7 @@ public class DialogUtilities {
     }
     
     //color dialog for general settings
+    @MainThread
     public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
                                          final ColorPickerColorSelectionListener clickListener,
                                          final Keys.DefaultedInteger defaultedInteger) {
@@ -218,6 +225,7 @@ public class DialogUtilities {
     }
     
     //color dialog for entry settings
+    @MainThread
     public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
                                          final TextView stateIcon,
                                          final PopupSettingsView settingsView,
@@ -230,6 +238,7 @@ public class DialogUtilities {
                 });
     }
     
+    @MainThread
     public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
                                          final int initialValue,
                                          @NonNull ColorPickerClickListener listener) {

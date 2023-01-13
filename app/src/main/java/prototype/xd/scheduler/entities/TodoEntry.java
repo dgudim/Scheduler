@@ -700,6 +700,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             return;
         }
         
+        Logger.debug(NAME, "getVisibleDays called on " + this + " (" + minDay + " " + maxDay + ")");
+        
         long currentUpcomingDayOffset = this.upcomingDayOffset.getToday();
         long currentExpiredDayOffset = this.expiredDayOffset.getToday();
         

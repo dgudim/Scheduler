@@ -15,6 +15,7 @@ import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
@@ -42,15 +43,15 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
     
     public static final String NAME = TodoEntryManager.class.getSimpleName();
     
-    public enum SaveType {
+    private enum SaveType {
         ENTRIES, GROUPS
     }
     
     private long loadedDay_start;
     private long loadedDay_end;
     
-    private @Nullable
-    CalendarView calendarView;
+    @Nullable
+    private CalendarView calendarView;
     private final TodoListViewAdapter todoListViewAdapter;
     
     private List<SystemCalendar> calendars;
@@ -61,37 +62,42 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
     private final BlockingQueue<SaveType> saveQueue;
     
     private volatile boolean initFinished = false;
-    private @Nullable
-    Runnable onInitFinishedRunnable;
+    @Nullable
+    private Runnable onInitFinishedRunnable;
     
     private boolean displayUpcomingExpired;
     private final ArrayMap<SystemCalendar, Boolean> calendarVisibilityMap;
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
     
-    final TodoEntry.ParameterInvalidationListener parameterInvalidationListener = new TodoEntry.ParameterInvalidationListener() {
+    /**
+     * Listener that is called when parameters change on any TodoEntry
+     */
+    private final TodoEntry.ParameterInvalidationListener parameterInvalidationListener = new TodoEntry.ParameterInvalidationListener() {
         @Override
         public void parametersInvalidated(TodoEntry entry, Set<String> parameters) {
             
             Logger.debug(NAME, entry + " parameters changed: " + parameters);
             
+            // entry moved to a new day
             boolean coreDaysChanged = parameters.contains(START_DAY_UTC) ||
                     parameters.contains(END_DAY_UTC);
             
+            boolean extendedDaysChanged = (parameters.contains(UPCOMING_ITEMS_OFFSET.key) || parameters.contains(EXPIRED_ITEMS_OFFSET.key))
+                    && displayUpcomingExpired;
+            
             // parameters that change event range
-            if (parameters.contains(UPCOMING_ITEMS_OFFSET.key) ||
-                    parameters.contains(EXPIRED_ITEMS_OFFSET.key) ||
-                    coreDaysChanged) {
+            if (extendedDaysChanged || coreDaysChanged) {
                 
                 todoEntries.notifyEntryVisibilityChanged(
                         entry,
                         coreDaysChanged,
-                        daysToRebind);
+                        daysToRebind,
+                        // include all days if BG_COLOR changed, else include just the difference
+                        !parameters.contains(BG_COLOR.CURRENT.key));
                 
-                // changes indicators
-            }
-            
-            if (parameters.contains(BG_COLOR.CURRENT.key) || parameters.contains(IS_COMPLETED)) {
+            } else if (parameters.contains(BG_COLOR.CURRENT.key) || parameters.contains(IS_COMPLETED)) {
+                // entry didn't move but BG_COLOR changed
                 entry.getVisibleDaysOnCalendar(
                         calendarView, daysToRebind,
                         displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE);
@@ -104,6 +110,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         }
     };
     
+    @MainThread
     public TodoEntryManager(@NonNull final ContextWrapper wrapper) {
         todoListViewAdapter = new TodoListViewAdapter(wrapper, this);
         calendarVisibilityMap = new ArrayMap<>();
@@ -113,8 +120,41 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         todoEntries = new TodoEntryList(Keys.TODO_LIST_INITIAL_CAPACITY);
         updateStaticVarsAndCalendarVisibility();
         
-        wrapper.lifecycle.addObserver(this);
+        wrapper.addLifecycleObserver(this);
         
+        initAsync(wrapper);
+        
+        asyncSaver = new Thread("Async writer") {
+            @Override
+            public void run() {
+                do {
+                    try {
+                        // hangs the thread until there is an element in saveQueue
+                        switch (saveQueue.take()) {
+                            case GROUPS:
+                                Utilities.saveGroups(groups);
+                                break;
+                            case ENTRIES:
+                                Utilities.saveEntries(todoEntries);
+                                break;
+                        }
+                    } catch (InterruptedException e) {
+                        interrupt();
+                        String threadName = Thread.currentThread().getName();
+                        Logger.info(threadName, threadName + " stopped");
+                    }
+                } while (!isInterrupted());
+            }
+        };
+        asyncSaver.start();
+    }
+    
+    /**
+     * Loads entries from calendar in a separate thread
+     *
+     * @param wrapper context / lifecycle
+     */
+    private void initAsync(@NonNull final ContextWrapper wrapper) {
         // load calendars and static entries in a separate thread (~300ms)
         new Thread(() -> {
             long start = System.currentTimeMillis();
@@ -145,36 +185,6 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
                 onInitFinishedRunnable = null;
             }
         }, "CFetch thread").start();
-        
-        asyncSaver = new Thread("Async writer") {
-            @Override
-            public void run() {
-                do {
-                    try {
-                        // hangs the thread until there is an element in saveQueue
-                        switch (saveQueue.take()) {
-                            case GROUPS:
-                                Utilities.saveGroups(groups);
-                                break;
-                            case ENTRIES:
-                                Utilities.saveEntries(todoEntries);
-                                break;
-                        }
-                    } catch (InterruptedException e) {
-                        interrupt();
-                        Utilities.saveEntries(todoEntries);
-                        Utilities.saveGroups(groups);
-                        // only clear after saving
-                        todoEntries.clear();
-                        groups.clear();
-                        String threadName = Thread.currentThread().getName();
-                        Logger.info(threadName, threadName + " stopped");
-                    }
-                    
-                } while (!isInterrupted());
-            }
-        };
-        asyncSaver.start();
     }
     
     @Override
@@ -182,10 +192,17 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         Logger.info(NAME, "Cleaning up " + NAME + " (" + todoEntries.size() + " entries, " + groups.size() + " groups)");
         //stop IO thread
         asyncSaver.interrupt();
+        todoEntries.clear();
+        groups.clear();
         // remove all entries (unlink all groups and events)
         Logger.info(NAME, NAME + " destroyed");
     }
     
+    /**
+     * Runs the Runnable specified on the main thread after TodoEntryManager has finished initializing
+     *
+     * @param onInitFinishedRunnable Runnable to run
+     */
     public void onInitFinished(@NonNull Runnable onInitFinishedRunnable) {
         if (initFinished) {
             // init thread already finished, run from ui
@@ -195,7 +212,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         }
     }
     
-    public void updateStaticVarsAndCalendarVisibility() {
+    private void updateStaticVarsAndCalendarVisibility() {
         displayUpcomingExpired = Keys.SHOW_UPCOMING_EXPIRED_IN_LIST.get();
         
         todoEntries.setUpcomingExpiredVisibility(displayUpcomingExpired);
@@ -219,7 +236,9 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         }
     }
     
-    // perform all deferred tasks
+    /**
+     * Perform all deferred tasks (saving entries, notifying calendar of the changes)
+     */
     public void performDeferredTasks() {
         Logger.debug(NAME, "Performing deferred tasks...");
         if (shouldSaveEntries) {
@@ -231,6 +250,10 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         daysToRebind.clear();
     }
     
+    /**
+     * Notifies the calendar that days have changes
+     * @param days days that changed
+     */
     private void notifyDaysChanged(Set<Long> days) {
         Logger.debug(NAME, days.size() + " days changed");
         if (calendarView != null) {
@@ -238,13 +261,17 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         }
     }
     
-    // tells entry list that all entries have changed
+    /**
+     * Tells entry list that all entries have changed
+     */
     public void notifyEntryListChanged() {
         Logger.debug(NAME, "NotifyEntryListChanged called");
         todoListViewAdapter.notifyEntryListChanged();
     }
     
-    // tells calendar list that current month entries have changed
+    /**
+     * Tells calendar that current month entries have changed
+     */
     public void notifyCurrentMonthChanged() {
         Logger.debug(NAME, "NotifyCurrentMonthChanged called");
         if (calendarView != null) {
@@ -252,17 +279,23 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         }
     }
     
-    // tells all entries that their parameters have changed and refreshes all ui stuff
+    /**
+     * Tells all entries that their parameters have changed and refreshes all ui stuff
+     *
+     * @param timezoneChanged did the system timezone change
+     */
     public void notifyDatasetChanged(boolean timezoneChanged) {
         Logger.debug(NAME, "Dataset changed! (timezone changed: " + timezoneChanged + " )");
         for (TodoEntry todoEntry : todoEntries) {
             todoEntry.invalidateAllParameters(false);
             if (timezoneChanged && todoEntry.isFromSystemCalendar()) {
                 todoEntry.notifyTimeZoneChanged();
+                // entry moved because timezone changed
                 todoEntries.notifyEntryVisibilityChanged(
                         todoEntry,
                         true,
-                        daysToRebind);
+                        daysToRebind,
+                        true);
             }
         }
         updateStaticVarsAndCalendarVisibility();
@@ -333,7 +366,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         return Collections.unmodifiableList(groups);
     }
     
-    public void loadEntries(long toLoadDayStart, long toLoadDayEnd) {
+    public void loadCalendarEntries(long toLoadDayStart, long toLoadDayEnd) {
         if (initFinished) {
             long dayStart = 0;
             long dayEnd = 0;
@@ -356,6 +389,11 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         }
     }
     
+    /**
+     * Adds events from system calendar to this container if not already
+     *
+     * @param eventsToAdd events to add
+     */
     private void addEvents(List<SystemCalendarEvent> eventsToAdd) {
         for (SystemCalendarEvent event : eventsToAdd) {
             // if the event hasn't been associated with an entry, add it
@@ -392,11 +430,21 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         saveEntriesAsync();
     }
     
+    /**
+     * Add a new entry to this container
+     *
+     * @param entry entry to add
+     */
     public void addEntry(@NonNull final TodoEntry entry) {
         todoEntries.add(entry, parameterInvalidationListener);
         notifyEntryRemovedAdded(entry);
     }
     
+    /**
+     * Remove an entry from this container
+     *
+     * @param entry entry to remove
+     */
     public void removeEntry(@NonNull final TodoEntry entry) {
         todoEntries.remove(entry);
         notifyEntryRemovedAdded(entry);
@@ -413,6 +461,13 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         return false;
     }
     
+    /**
+     * Changes a group of an entry
+     *
+     * @param entry    target entry
+     * @param newGroup new group
+     * @return true if group was changed
+     */
     public boolean changeEntryGroup(@NonNull TodoEntry entry, @NonNull Group newGroup) {
         if (!groups.contains(newGroup) || !todoEntries.contains(entry)) {
             error(NAME, "Changing group of an entry not managed by current container " + newGroup + " " + entry);
@@ -424,6 +479,12 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         return false;
     }
     
+    /**
+     * Sets new name for a group
+     *
+     * @param group   target group
+     * @param newName new name
+     */
     public void setNewGroupName(@NonNull Group group, @NonNull String newName) {
         if (!groups.contains(group)) {
             error(NAME, "Changing name of a group not managed by current container " + group);
@@ -433,6 +494,13 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         }
     }
     
+    /**
+     * Sets new parameters for a group
+     *
+     * @param group     target group
+     * @param newParams new parameters
+     * @return true if parameters were changed
+     */
     public boolean setNewGroupParams(@NonNull Group group, @NonNull SArrayMap<String, String> newParams) {
         if (!groups.contains(group)) {
             error(NAME, "Settings new parameters of a group not managed by current container " + group);
@@ -444,11 +512,21 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         return false;
     }
     
+    /**
+     * Adds a new group to be managed by this container
+     *
+     * @param newGroup group to add
+     */
     public void addGroup(@NonNull Group newGroup) {
         groups.add(newGroup);
         saveGroupsAsync();
     }
     
+    /**
+     * Removes a group from the list by index, handles all entry unlinking
+     *
+     * @param index index of the group to remove
+     */
     public void removeGroup(int index) {
         groups.remove(index);
         saveGroupsAsync();

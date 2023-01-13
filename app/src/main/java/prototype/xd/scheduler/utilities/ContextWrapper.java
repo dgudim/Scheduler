@@ -9,12 +9,14 @@ import android.view.LayoutInflater;
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.IntegerRes;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
 
 public class ContextWrapper {
     
@@ -49,6 +51,22 @@ public class ContextWrapper {
     
     // ------------------------ METHODS FOR LIFECYCLE PART
     
+    /**
+     * Adds a LifecycleObserver that will be notified when the LifecycleOwner changes
+     * state.
+     * <p>
+     * The given observer will be brought to the current state of the LifecycleOwner.
+     * For example, if the LifecycleOwner is in {@link Lifecycle.State#STARTED} state, the given observer
+     * will receive {@link Lifecycle.Event#ON_CREATE}, {@link Lifecycle.Event#ON_START} events.
+     *
+     * @param observer The observer to notify.
+     */
+    @MainThread
+    public void addLifecycleObserver(@NonNull LifecycleObserver observer) {
+        lifecycle.addObserver(observer);
+    }
+    
+    @MainThread
     public <T extends Dialog> T attachDialogToLifecycle(@NonNull final T dialog,
                                                         @Nullable DialogInterface.OnDismissListener dismissListener) {
         // make sure the dialog is dismissed on activity destroy

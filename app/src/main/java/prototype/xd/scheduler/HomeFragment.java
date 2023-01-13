@@ -95,7 +95,7 @@ public class HomeFragment extends Fragment {
         // setup month listener, called when a new month is loaded (first month is loaded differently)
         calendarView.setNewMonthBindListener(month ->
                 // load current month entries (with overlap of one panel) before displaying the data
-                todoEntryManager.loadEntries(
+                todoEntryManager.loadCalendarEntries(
                         getStartOfMonthDayUTC(month) - DAYS_ON_ONE_PANEL,
                         getEndOfMonthDayUTC(month) + DAYS_ON_ONE_PANEL)
         );

@@ -102,17 +102,18 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
                                                       Map<Long, Set<TodoEntry>> entriesPerDay) {
         Set<Long> daysForEntry = daysPerEntry.remove(entry);
         if (daysForEntry == null) {
-            Logger.error(NAME, "Can't remove associations for '" + entry + "', entry not managed by current container");
+            Logger.error(NAME, "Can't remove associations for " + entry + ", entry not managed by current container");
             return Collections.emptySet();
         } else {
             for (Long day : daysForEntry) {
                 Set<TodoEntry> entriesOnDay = entriesPerDay.get(day);
                 if (entriesOnDay == null) {
-                    Logger.error(NAME, "Can't remove associations for '" + entry + "' on day " + day);
+                    Logger.error(NAME, "Can't remove associations for " + entry + " on day " + day);
                     continue;
                 }
                 entriesOnDay.remove(entry);
             }
+            Logger.debug(NAME, "Unlinked " + entry + " from " + daysForEntry.size() + " days");
             return daysForEntry;
         }
     }
@@ -133,6 +134,9 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
         linkEntryToLookupContainers(entry, fullDaySet.getCoreDaySet(), daysPerEntryCore, entriesPerDayCore);
         // link to extended days
         linkEntryToLookupContainers(entry, fullDaySet.getUpcomingExpiredDaySet(), daysPerEntryUpcomingExpired, entriesPerDayUpcomingExpired);
+        Logger.debug(NAME, "Linked " + entry + " to "
+                + fullDaySet.getCoreDaySet().size() + " core days, "
+                + fullDaySet.getUpcomingExpiredDaySet().size() + " extended days");
     }
     
     // link entry to both maps
@@ -214,7 +218,7 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
         }
         
         // our event is not today's, we need to check SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET to the left and to the right
-        for (long day_offset = 1; day_offset < Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET; day_offset++) {
+        for (long day_offset = 1; day_offset <= Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET; day_offset++) {
             // + + + event + + +
             //       event     we are here
             if (coreDays.contains(day - day_offset)) {
@@ -253,20 +257,22 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     
     public void notifyEntryVisibilityChanged(TodoEntry entry,
                                              boolean coreDaysChanged,
-                                             @Nullable Set<Long> invalidatedDaySet) {
+                                             @NonNull Set<Long> invalidatedDaySet,
+                                             boolean onlyAddDifference) {
         // if the entry is currently marked as global in the list and is global now
         if (globalEntries.contains(entry) && entry.isGlobal() && !coreDaysChanged) {
             Logger.warning(NAME, "Trying to change visibility range of a global entry");
             return;
         }
         
+        Logger.debug(NAME, "notifyEntryVisibilityChanged called");
+        
         // entry was global and now it's normal we unlink it from global container and link to normal container
         if (globalEntries.remove(entry)) {
+            Logger.debug(NAME, entry + " is now not global");
             TodoEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
             linkEntryToLookupContainers(entry, newDaySet);
-            if (invalidatedDaySet != null) {
-                invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
-            }
+            invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
             return;
         }
         
@@ -275,23 +281,26 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
         
         // entry became global
         if (entry.isGlobal()) {
+            Logger.debug(NAME, entry + " is now global");
             globalEntries.add(entry);
-            if (invalidatedDaySet != null) {
-                invalidatedDaySet.addAll(displayUpcomingExpired ? prevExpiredUpcomingDays : prevCoreDays);
-            }
+            invalidatedDaySet.addAll(displayUpcomingExpired ? prevExpiredUpcomingDays : prevCoreDays);
             return;
         }
         
         // all the other cases (not global entries)
         TodoEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
         
-        if (invalidatedDaySet != null) {
+        if (onlyAddDifference) {
+            Logger.debug(NAME, "Added difference to invalidatedDaySet");
             invalidatedDaySet.addAll(displayUpcomingExpired ?
-                    // update changed days
-                    Utilities.symmetricDifference(
-                            prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()) :
-                    Utilities.symmetricDifference(
-                            prevCoreDays, newDaySet.getCoreDaySet()));
+                    Utilities.symmetricDifference(prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()) :
+                    Utilities.symmetricDifference(prevCoreDays, newDaySet.getCoreDaySet()));
+            
+        } else {
+            invalidatedDaySet.addAll(displayUpcomingExpired ? prevExpiredUpcomingDays : prevCoreDays);
+            invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
+            
+            Logger.debug(NAME, "Added all days to invalidatedDaySet");
         }
         
         linkEntryToLookupContainers(entry, newDaySet);
