@@ -12,8 +12,8 @@
     <string name="delete">Удалить</string>
     <string name="are_you_sure">Вы уверены?</string>
     <string name="save">Сохранить</string>
-    <string name="edit">Изменить</string>
-    <string name="edit_event">Изменить событие</string>
+    <string name="edit_group">Редактировать группу</string>
+    <string name="edit_event">Редактировать событие</string>
     <string name="item_global">(Общее)</string>
     <plurals name="item_N_days_ago">
         <item quantity="many">(%d дней назад)</item>

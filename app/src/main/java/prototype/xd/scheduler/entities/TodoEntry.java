@@ -507,6 +507,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             changedKeys = Utilities.symmetricDifference(group.params, newGroup.params);
         }
         
+        Logger.debug(NAME, "Changed group of " + this + " from " + group + " to " + newGroup);
+        
         group = newGroup;
         // invalidate only after group change to avoid weird settings from cache
         invalidateParameters(changedKeys);
@@ -544,9 +546,9 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return displayParams;
     }
     
-    public void removeDisplayParams() {
+    public boolean removeDisplayParams() {
         invalidateAllParameters(true);
-        params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
+        return params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
     }
     
     // changes parameter and returns true if it was changed

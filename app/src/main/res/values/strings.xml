@@ -83,7 +83,7 @@
     <string name="group_with_same_name_exists">A group with the same name already exists</string>
     <string name="group">Group</string>
     <string name="enable">Enable</string>
-    <string name="edit">Edit</string>
+    <string name="edit_group">Edit group</string>
     <string name="add_group">Add group</string>
     <string name="delete">Delete</string>
     <string name="choose_color">Choose color</string>

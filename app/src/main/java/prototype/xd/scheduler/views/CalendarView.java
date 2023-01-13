@@ -40,9 +40,12 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CalendarDayLayoutBinding;
 import prototype.xd.scheduler.databinding.CalendarHeaderBinding;
 import prototype.xd.scheduler.utilities.DateManager;
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
 public class CalendarView {
+    
+    public static final String NAME = CalendarView.class.getSimpleName();
     
     static class CalendarDayViewContainer extends ViewContainer {
         
@@ -273,6 +276,7 @@ public class CalendarView {
         
         // we selected another date
         if (!datesEqual(targetDate, prevSelection)) {
+            Logger.debug(NAME, "Date selected: " + targetDate);
             if (prevSelection != null) {
                 rootCalendarView.notifyDateChanged(prevSelection);
             }

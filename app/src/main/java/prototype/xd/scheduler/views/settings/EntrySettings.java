@@ -101,12 +101,11 @@ public class EntrySettings extends PopupSettingsView {
             }
             
             Group selectedGroup = groupList.get(selection);
-            String selectedGroupName = selectedGroup.getRawName();
             
             displayGroupAdditionEditDialog(wrapper,
-                    R.string.edit, R.string.name,
+                    R.string.edit_group, -1,
                     R.string.cancel, R.string.save,
-                    selectedGroupName,
+                    selectedGroup.getRawName(),
                     (view2, name, dialogBinding, selectedIndex) -> {
                         int groupIndex = Group.groupIndexInList(groupList, name);
                         
@@ -118,7 +117,7 @@ public class EntrySettings extends PopupSettingsView {
                             groupIndex = Group.groupIndexInList(groupList, newName);
                         }
                         
-                        selectedGroup.setName(newName);
+                        todoEntryManager.setNewGroupName(selectedGroup, newName);
                         bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
                         return true;
                     }, (v2, dialog) -> displayConfirmationDialogue(wrapper,
@@ -133,7 +132,7 @@ public class EntrySettings extends PopupSettingsView {
         });
         
         bnd.groupSpinner.setOnItemClickListener((parent, view, position, id) -> {
-            if (entry.changeGroup(groupList.get(position))) {
+            if (todoEntryManager.changeEntryGroup(entry, groupList.get(position))) {
                 rebuild();
             }
         });
@@ -159,9 +158,9 @@ public class EntrySettings extends PopupSettingsView {
                         R.string.reset_settings_prompt, R.string.reset_calendar_settings_description,
                         R.string.cancel, R.string.reset,
                         view -> {
-                            entry.removeDisplayParams();
-                            entry.changeGroup(null);
-                            rebuild();
+                            if (todoEntryManager.resetEntrySettings(entry)) {
+                                rebuild();
+                            }
                         }));
         
         bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
@@ -229,19 +228,21 @@ public class EntrySettings extends PopupSettingsView {
     
     private void addGroupToGroupList(String groupName,
                                      @Nullable Group existingGroup) {
+        boolean rebuild;
         if (existingGroup != null) {
-            // setParams automatically handles parameter invalidation on other entries
-            existingGroup.setParams(todoEntry.getDisplayParams());
-            // save groups manually
-            todoEntryManager.saveGroupsAsync();
+            // automatically handles parameter invalidation on other entries and saving of the group
+            rebuild = todoEntryManager.setNewGroupParams(existingGroup, todoEntry.getDisplayParams());
         } else {
             Group newGroup = new Group(groupName, todoEntry.getDisplayParams());
             todoEntryManager.addGroup(newGroup);
             todoEntry.changeGroup(newGroup);
+            rebuild = true;
         }
         
         todoEntry.removeDisplayParams();
-        rebuild();
+        if (rebuild) {
+            rebuild();
+        }
     }
     
     private void rebuild() {

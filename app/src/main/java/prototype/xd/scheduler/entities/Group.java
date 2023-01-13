@@ -2,6 +2,7 @@ package prototype.xd.scheduler.entities;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 
@@ -102,14 +103,25 @@ public class Group implements Serializable {
         return groupName;
     }
     
-    public void setName(String newName) {
-        groupName = newName;
+    public boolean setName(@NonNull String newName) {
+        if(!groupName.equals(newName)) {
+            groupName = newName;
+            return true;
+        }
+        return false;
     }
     
-    public void setParams(SArrayMap<String, String> newParams) {
+    public boolean setParams(SArrayMap<String, String> newParams) {
         Set<String> changedKeys = Utilities.symmetricDifference(params, newParams);
         associatedEntries.forEach((aLong, todoListEntry) -> todoListEntry.invalidateParameters(changedKeys));
         params = newParams;
+        return !changedKeys.isEmpty();
+    }
+    
+    @NonNull
+    @Override
+    public String toString() {
+        return "[Group: " + getRawName() + "]";
     }
     
     @Override

@@ -127,7 +127,7 @@ public class Utilities {
         return readEntries;
     }
     
-    public static void saveEntries(List<TodoEntry> entries) {
+    public static synchronized void saveEntries(List<TodoEntry> entries) {
         try {
             List<TodoEntry> entriesToSave = new ArrayList<>();
             
@@ -156,15 +156,14 @@ public class Utilities {
             groups.addAll(loadObjectWithBackup(GROUPS_FILE, GROUPS_FILE_BACKUP));
             return groups;
         } catch (IOException e) {
-            Logger.info(NAME, "No groups file, creating one: (" + e + ")");
-            saveGroups(groups);
+            Logger.info(NAME, "No groups file (" + e + ")");
         } catch (Exception e) {
             logException(NAME, e);
         }
         return groups;
     }
     
-    public static void saveGroups(GroupList groups) {
+    public static synchronized void saveGroups(GroupList groups) {
         try {
             
             GroupList groupsToSave = new GroupList();
