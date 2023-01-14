@@ -27,7 +27,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     private final PerDayBgGridViewAdapter gridViewAdapter;
     private Integer lastClickedBgIndex;
     
-    public AdaptiveBackgroundSettingsEntryConfig(@NonNull Context context,
+    public AdaptiveBackgroundSettingsEntryConfig(@NonNull final Context context,
                                                  @NonNull final Consumer<Integer> bgSelectionClickedCallback) {
         gridViewAdapter = new PerDayBgGridViewAdapter(context, bgIndex -> {
             lastClickedBgIndex = bgIndex;

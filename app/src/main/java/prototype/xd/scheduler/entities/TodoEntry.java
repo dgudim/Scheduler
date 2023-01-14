@@ -526,7 +526,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    protected void invalidateParameters(Set<String> parameterKeys) {
+    protected void invalidateParameters(@NonNull Set<String> parameterKeys) {
         parameterKeys.forEach(parameterKey -> invalidateParameter(parameterKey, false));
         parameterInvalidationListener.parametersInvalidated(this, parameterKeys);
     }
@@ -538,6 +538,9 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
+    /**
+     * @return all parameters except for TEXT_VALUE START_DAY_UTC, END_DAY_UTC and completion status
+     */
     public SArrayMap<String, String> getDisplayParams() {
         // shallow copy map
         SArrayMap<String, String> displayParams = new SArrayMap<>(params);
@@ -546,18 +549,33 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return displayParams;
     }
     
+    /**
+     * Removes all display parameters and leaves just TEXT_VALUE START_DAY_UTC, END_DAY_UTC and completion status
+     *
+     * @return true if there were any display parameters
+     */
     public boolean removeDisplayParams() {
         invalidateAllParameters(true);
         return params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
     }
     
-    // changes parameter and returns true if it was changed
-    private boolean changeParameterInternal(String key, String value) {
+    /**
+     * Changes one parameter
+     *
+     * @param key   parameter to be changed
+     * @param value new parameter value
+     * @return true if the parameter was changed
+     */
+    private boolean changeParameterInternal(@NonNull String key, @NonNull String value) {
         return !Objects.equals(params.put(key, value), key);
     }
     
-    // change any number of parameters
-    public void changeParameters(String... keyValuePairs) {
+    /**
+     * Changes any number of parameters, should be listed as [key, value, key, value]
+     *
+     * @param keyValuePairs parameters to change with their bew values
+     */
+    public void changeParameters(@NonNull String... keyValuePairs) {
         if (keyValuePairs.length % 2 != 0) {
             throw new IllegalArgumentException("Can't call changeParameters with even number of arguments");
         }
@@ -580,7 +598,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         this.averageBackgroundColor = averageBackgroundColor;
     }
     
-    private boolean inRange(long targetDayUTC, TimeRange instanceRange) {
+    private boolean inRange(long targetDayUTC, @NonNull TimeRange instanceRange) {
         return inRange(targetDayUTC, instanceRange.getStart(), instanceRange.getEnd());
     }
     

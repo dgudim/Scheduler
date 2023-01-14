@@ -8,7 +8,7 @@ import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 /**
- * Utility class for dismissing a dialog before activity exit
+ * Utility class for dismissing a dialog before activity exit to avoid android.view.WindowLeaked
  */
 public class DialogDismissObserver implements DefaultLifecycleObserver {
     

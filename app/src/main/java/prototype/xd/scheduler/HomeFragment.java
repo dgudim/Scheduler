@@ -149,7 +149,6 @@ public class HomeFragment extends Fragment {
                         
                         todoEntryManager.addEntry(new TodoEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
                                 groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
-                        return true;
                     });
         });
         

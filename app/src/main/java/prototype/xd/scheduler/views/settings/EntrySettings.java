@@ -119,7 +119,6 @@ public class EntrySettings extends PopupSettingsView {
                         
                         todoEntryManager.setNewGroupName(selectedGroup, newName);
                         bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
-                        return true;
                     }, (v2, dialog) -> displayConfirmationDialogue(wrapper,
                             R.string.delete, R.string.are_you_sure,
                             R.string.no, R.string.yes,
@@ -150,7 +149,6 @@ public class EntrySettings extends PopupSettingsView {
                     } else {
                         addGroupToGroupList(text, null);
                     }
-                    return true;
                 }, null));
         
         bnd.settingsResetButton.setOnClickListener(v ->

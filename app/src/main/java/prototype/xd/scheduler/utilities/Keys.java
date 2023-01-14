@@ -69,7 +69,8 @@ public class Keys {
         public Triplet.Type getType() {
             return type;
         }
-        
+    
+        @NonNull
         public T get(@Nullable List<String> subKeys, T actualDefaultValue, boolean ignoreBaseKey) {
             if (subKeys != null) {
                 String targetKey = getFirstValidKey(subKeys, key);
@@ -80,16 +81,19 @@ public class Keys {
             }
             return getInternal(key, actualDefaultValue);
         }
-        
+    
+        @NonNull
         public T get(@Nullable List<String> subKeys) {
             return get(subKeys, defaultValue, false);
         }
         
         // ignore the "base" key, only use sub-keys
+        @NonNull
         public T getOnlyBySubKeys(@NonNull List<String> subKeys, T defaultValueOverride) {
             return get(subKeys, defaultValueOverride, true);
         }
         
+        @NonNull
         public T get() {
             return get(null, defaultValue, false);
         }

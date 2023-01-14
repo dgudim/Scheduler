@@ -1,6 +1,8 @@
 package prototype.xd.scheduler.entities;
 
-// class providing necessary methods for use with recycle view
+/**
+ * Class providing necessary methods for use with recycle view (stable ids)
+ */
 public abstract class RecycleViewEntry {
     long id = -1;
     

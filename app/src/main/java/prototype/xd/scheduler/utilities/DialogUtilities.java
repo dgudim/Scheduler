@@ -28,6 +28,7 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
@@ -83,12 +84,10 @@ public class DialogUtilities {
         
         setupButtons(dialog, dialogBinding.twoButtons,
                 cancelButtonStringResource, confirmButtonStringResource,
-                v -> {
-                    String text = checkAndGetInput(dialogBinding.entryNameEditText);
-                    if (!text.isEmpty() && confirmationListener.onClick(v, text, dialogBinding, 0)) {
-                        dialog.dismiss();
-                    }
-                });
+                v -> callIfInputNotEmpty(dialogBinding.entryNameEditText, text -> {
+                    confirmationListener.onClick(v, text, dialogBinding, 0);
+                    dialog.dismiss();
+                }));
     }
     
     @MainThread
@@ -132,24 +131,37 @@ public class DialogUtilities {
         
         setupButtons(dialog, dialogBinding.twoButtons,
                 R.string.cancel, entry == null ? R.string.add : R.string.save,
-                v -> {
-                    String text = checkAndGetInput(dialogBinding.entryNameEditText);
-                    if (!text.isEmpty() && confirmationListener.onClick(v, text, dialogBinding, selectedIndex[0])) {
-                        dialog.dismiss();
-                    }
-                });
+                v -> callIfInputNotEmpty(dialogBinding.entryNameEditText, text -> {
+                    confirmationListener.onClick(v, text, dialogBinding, selectedIndex[0]);
+                    dialog.dismiss();
+                }));
     }
     
+    /**
+     * Sets up edit text field on the dialog
+     *
+     * @param editText             edit text field
+     * @param defaultEditTextValue default (starting) value
+     */
     private static void setupEditText(@NonNull EditText editText,
                                       @NonNull String defaultEditTextValue) {
         editText.setText(defaultEditTextValue);
-        editText.setOnFocusChangeListener((v, hasFocus) -> editText.postDelayed(() -> {
-            InputMethodManager inputMethodManager = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-        }, 200));
+        editText.setOnFocusChangeListener((v, hasFocus) -> editText.postDelayed(() ->
+                        ((InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+                                .showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT),
+                200));
         editText.requestFocus();
     }
     
+    /**
+     * Sets up buttons on the dialog
+     *
+     * @param dialog                      target dialog
+     * @param buttonContainer             view binding for two buttons
+     * @param cancelButtonStringResource  cancel button string resource
+     * @param confirmButtonStringResource confirm button string resource
+     * @param confirmationListener        listener to call when the dialog is confirmed
+     */
     private static void setupButtons(@NonNull Dialog dialog,
                                      @NonNull TwoButtonsBinding buttonContainer,
                                      @StringRes int cancelButtonStringResource,
@@ -166,14 +178,30 @@ public class DialogUtilities {
         confirmButton.setOnClickListener(confirmationListener);
     }
     
-    private static String checkAndGetInput(@NonNull EditText editText) {
+    /**
+     * Invokes successCallback when text input field is not empty
+     *
+     * @param editText        text input field
+     * @param successCallback callback to invoke
+     */
+    private static void callIfInputNotEmpty(@NonNull EditText editText, @NonNull Consumer<String> successCallback) {
         String text = editText.getText() == null ? "" : editText.getText().toString().trim();
         if (text.isEmpty()) {
             editText.setError(editText.getContext().getString(R.string.input_cant_be_empty));
+        } else {
+            successCallback.accept(text);
         }
-        return text;
     }
     
+    /**
+     * Build dialog template
+     *
+     * @param wrapper               context wrapper (context and lifecycle)
+     * @param titleStringResource   dialog title string resource
+     * @param messageStringResource dialog message string resource
+     * @param viewBinding           dialog contents
+     * @return dialog with title, message and target view
+     */
     @MainThread
     private static Dialog buildTemplate(@NonNull final ContextWrapper wrapper,
                                         @StringRes int titleStringResource,
@@ -190,7 +218,7 @@ public class DialogUtilities {
     
     @FunctionalInterface
     public interface OnClickListenerWithViewAccess<T extends ViewBinding> {
-        boolean onClick(View view, String text, T dialogBinding, int selectedIndex);
+        void onClick(View view, String text, T dialogBinding, int selectedIndex);
     }
     
     @FunctionalInterface

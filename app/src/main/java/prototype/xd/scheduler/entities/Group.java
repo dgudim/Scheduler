@@ -19,13 +19,16 @@ import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
 
+/**
+ * Class for storing a bunch of parameters
+ */
 public class Group implements Serializable {
     
     static final long serialVersionUID = -5159688717810769428L;
     
     public static final String NAME = Group.class.getSimpleName();
     
-    public static final transient Group NULL_GROUP = new Group();
+    public static final Group NULL_GROUP = new Group();
     
     private String groupName;
     private transient ArrayMap<Long, TodoEntry> associatedEntries;
@@ -81,12 +84,13 @@ public class Group implements Serializable {
         return -1;
     }
     
-    public static @Nullable
-    Group findGroupInList(List<Group> groups, String groupName) {
+    @Nullable
+    public static Group findGroupInList(List<Group> groups, String groupName) {
         int index = groupIndexInList(groups, groupName);
         return index == -1 ? null : groups.get(index);
     }
     
+    @NonNull
     public static String[] groupListToNames(List<Group> groups, ContextWrapper wrapper) {
         String[] names = new String[groups.size()];
         for (int i = 0; i < groups.size(); i++) {
@@ -95,24 +99,42 @@ public class Group implements Serializable {
         return names;
     }
     
-    public String getLocalizedName(Context context) {
+    /**
+     * Get localized group name
+     * @param context any context, will be used to get string resource
+     * @return localized group name
+     */
+    @NonNull
+    public String getLocalizedName(@NonNull Context context) {
         return isNullGroup() ? context.getString(R.string.blank_group_name) : groupName;
     }
     
+    @NonNull
     public String getRawName() {
         return groupName;
     }
     
+    /**
+     * Set new group name
+     * @param newName new group name
+     * @return true if name changed
+     */
     public boolean setName(@NonNull String newName) {
-        if(!groupName.equals(newName)) {
+        if (!groupName.equals(newName)) {
             groupName = newName;
             return true;
         }
         return false;
     }
     
-    public boolean setParams(SArrayMap<String, String> newParams) {
+    /**
+     * Set new group parameters
+     * @param newParams new group parameters
+     * @return true if parameters were changed
+     */
+    public boolean setParams(@NonNull SArrayMap<String, String> newParams) {
         Set<String> changedKeys = Utilities.symmetricDifference(params, newParams);
+        // notify all connected entries of the change
         associatedEntries.forEach((aLong, todoListEntry) -> todoListEntry.invalidateParameters(changedKeys));
         params = newParams;
         return !changedKeys.isEmpty();
@@ -121,7 +143,7 @@ public class Group implements Serializable {
     @NonNull
     @Override
     public String toString() {
-        return "[Group: " + getRawName() + "]";
+        return "[Group: " + groupName + "]";
     }
     
     @Override

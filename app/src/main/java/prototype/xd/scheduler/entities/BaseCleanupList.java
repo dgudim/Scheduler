@@ -8,7 +8,11 @@ import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-// a list that has a method for cleaning up after removing an entry, useful for TodoListEntries and Groups
+/**
+ * A list that has a method for cleaning up after removing an entry, useful for TodoListEntries and Groups
+ *
+ * @param <T> type to store
+ */
 public abstract class BaseCleanupList<T> extends ArrayList<T> {
     
     protected BaseCleanupList() {
@@ -19,8 +23,13 @@ public abstract class BaseCleanupList<T> extends ArrayList<T> {
         super(initialCapacity);
     }
     
-    protected abstract @Nullable
-    T handleOldEntry(@Nullable T oldEntry);
+    /**
+     * Do stuff before removing entry from list
+     * @param oldEntry entry to be removed
+     * @return the same entry for chaining
+     */
+    @Nullable
+    protected abstract T handleOldEntry(@Nullable T oldEntry);
     
     @Override
     public T set(int index, T element) {
@@ -50,6 +59,7 @@ public abstract class BaseCleanupList<T> extends ArrayList<T> {
         super.clear();
     }
     
+    // too lazy to implement
     @Override
     public boolean removeAll(@NonNull Collection<?> c) {
         throw new UnsupportedOperationException();

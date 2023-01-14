@@ -26,6 +26,9 @@ import java.util.Objects;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 
+/**
+ * Class for storing system calendars and their events
+ */
 public class SystemCalendar {
     
     public static final String NAME = SystemCalendar.class.getSimpleName();
@@ -133,8 +136,13 @@ public class SystemCalendar {
         cursor.close();
     }
     
-    void addExceptions(final Map<Long, List<Long>> exceptionLists) {
-        for (Map.Entry<Long, List<Long>> exceptionList : exceptionLists.entrySet()) {
+    /**
+     * Add exceptions to recurrence rules
+     *
+     * @param exceptionsMap map of event ids to exception days
+     */
+    void addExceptions(final Map<Long, List<Long>> exceptionsMap) {
+        for (Map.Entry<Long, List<Long>> exceptionList : exceptionsMap.entrySet()) {
             boolean applied = false;
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.id == exceptionList.getKey()) {
@@ -149,10 +157,19 @@ public class SystemCalendar {
         }
     }
     
+    /**
+     * @return true if the user selected this calendar to be visible
+     */
     public boolean isVisible() {
         return Keys.getBoolean(visibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE);
     }
     
+    /**
+     * Get visible events between first and last days
+     * @param firstDayUTC start of range
+     * @param lastDayUTC end of range
+     * @return visible events on range
+     */
     public List<SystemCalendarEvent> getVisibleTodoListEvents(long firstDayUTC, long lastDayUTC) {
         if (isVisible()) {
             List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
@@ -166,7 +183,12 @@ public class SystemCalendar {
         return Collections.emptyList();
     }
     
-    protected void invalidateParameterOnEvents(String parameterKey, int color) {
+    /**
+     * Notifies all events with a specific color (in the same group) about parameter changes
+     * @param parameterKey parameter to invalidate
+     * @param color target events color
+     */
+    protected void invalidateParameterOnEvents(@NonNull String parameterKey, int color) {
         systemCalendarEvents.forEach(event -> {
             if (event.color == color) {
                 event.invalidateParameter(parameterKey);
@@ -174,6 +196,10 @@ public class SystemCalendar {
         });
     }
     
+    /**
+     * Notifies all events with a specific color (in the same group) about all parameter changes
+     * @param color target events color
+     */
     public void invalidateAllParametersOnEvents(int color) {
         systemCalendarEvents.forEach(event -> {
             if (event.color == color) {

@@ -106,7 +106,6 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                         }
                         // save stuff, notify days changed, etc.
                         todoEntryManager.performDeferredTasks();
-                        return true;
                     });
         }
         
