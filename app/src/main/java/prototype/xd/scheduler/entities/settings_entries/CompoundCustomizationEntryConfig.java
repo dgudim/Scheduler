@@ -107,41 +107,41 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             };
             
             viewBinding.currentBackgroundColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BG_COLOR.CURRENT));
             viewBinding.upcomingBackgroundColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BG_COLOR.UPCOMING));
             viewBinding.expiredBackgroundColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BG_COLOR.EXPIRED));
             
             viewBinding.currentFontColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.FONT_COLOR.CURRENT));
             viewBinding.upcomingFontColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.FONT_COLOR.UPCOMING));
             viewBinding.expiredFontColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.FONT_COLOR.EXPIRED));
             
             viewBinding.currentBorderColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BORDER_COLOR.CURRENT));
             viewBinding.upcomingBorderColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BORDER_COLOR.UPCOMING));
             viewBinding.expiredBorderColorSelector.setOnClickListener(v ->
-                    DialogUtilities.invokeColorDialog(wrapper,
+                    DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
                             Keys.BORDER_COLOR.EXPIRED));
             

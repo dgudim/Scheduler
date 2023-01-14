@@ -242,24 +242,41 @@ public class DialogUtilities {
         wrapper.attachDialogToLifecycle(builder.show(), dismissListener);
     }
     
-    //color dialog for general settings
+    
+    /**
+     * Shows color picker dialog (for general settings)
+     *
+     * @param wrapper               context wrapper
+     * @param colorSelectedListener listener to call when color is selected
+     * @param defaultedInteger      default value
+     */
     @MainThread
-    public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
-                                         final ColorPickerColorSelectionListener clickListener,
-                                         final Keys.DefaultedInteger defaultedInteger) {
-        invokeColorDialog(wrapper, defaultedInteger.get(),
+    public static void displayColorPicker(@NonNull final ContextWrapper wrapper,
+                                          @NonNull final ColorPickerColorSelectionListener colorSelectedListener,
+                                          @NonNull final Keys.DefaultedInteger defaultedInteger) {
+        displayColorPicker(wrapper, defaultedInteger.get(),
                 (dialog, selectedColor, allColors) ->
-                        clickListener.onClick(defaultedInteger, selectedColor));
+                        colorSelectedListener.onClick(defaultedInteger, selectedColor));
     }
     
     //color dialog for entry settings
+    
+    /**
+     * Shows color picker dialog (for entry settings)
+     *
+     * @param wrapper             context wrapper
+     * @param stateIcon           parameter state icon (from entry settings)
+     * @param settingsView        entry settings view
+     * @param defaultedInteger    default value
+     * @param initialValueFactory function to get default value
+     */
     @MainThread
-    public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
-                                         final TextView stateIcon,
-                                         final PopupSettingsView settingsView,
-                                         final Keys.DefaultedInteger defaultedInteger,
-                                         final Function<Keys.DefaultedInteger, Integer> initialValueFactory) {
-        invokeColorDialog(wrapper,
+    public static void displayColorPicker(@NonNull final ContextWrapper wrapper,
+                                          @NonNull final TextView stateIcon,
+                                          @NonNull final PopupSettingsView settingsView,
+                                          @NonNull final Keys.DefaultedInteger defaultedInteger,
+                                          @NonNull final Function<Keys.DefaultedInteger, Integer> initialValueFactory) {
+        displayColorPicker(wrapper,
                 initialValueFactory.apply(defaultedInteger), (dialog, selectedColor, allColors) -> {
                     settingsView.notifyParameterChanged(stateIcon, defaultedInteger.key, selectedColor);
                     settingsView.notifyColorChanged(defaultedInteger, selectedColor);
@@ -267,9 +284,9 @@ public class DialogUtilities {
     }
     
     @MainThread
-    public static void invokeColorDialog(@NonNull final ContextWrapper wrapper,
-                                         final int initialValue,
-                                         @NonNull ColorPickerClickListener listener) {
+    public static void displayColorPicker(@NonNull final ContextWrapper wrapper,
+                                          final int initialValue,
+                                          @NonNull ColorPickerClickListener listener) {
         
         wrapper.attachDialogToLifecycle(ColorPickerDialogBuilder
                 .with(wrapper.context, R.style.ColorPickerDialogStyle)

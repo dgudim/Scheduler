@@ -161,19 +161,19 @@ public class EntrySettings extends PopupSettingsView {
                             }
                         }));
         
-        bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,
                 bnd.fontColorState, this,
                 FONT_COLOR.CURRENT,
                 parameterKey -> entry.fontColor.getToday()));
         
-        bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,
                 bnd.backgroundColorState, this,
                 BG_COLOR.CURRENT,
                 parameterKey -> entry.bgColor.getToday()));
         
-        bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,
                 bnd.borderColorState, this,
                 BORDER_COLOR.CURRENT,

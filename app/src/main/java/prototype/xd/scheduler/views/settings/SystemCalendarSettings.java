@@ -114,19 +114,19 @@ public class SystemCalendarSettings extends PopupSettingsView {
                             initialize(calendarKey, eventColor);
                         }));
         
-        bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,
                 bnd.fontColorState, this,
                 Keys.FONT_COLOR.CURRENT,
                 value -> value.get(calendarSubKeys)));
         
-        bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentBackgroundColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,
                 bnd.backgroundColorState, this,
                 Keys.BG_COLOR.CURRENT,
                 value -> value.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
         
-        bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.invokeColorDialog(
+        bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,
                 bnd.borderColorState, this,
                 Keys.BORDER_COLOR.CURRENT,
