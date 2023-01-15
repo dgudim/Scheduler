@@ -10,7 +10,7 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromCalendarKey;
 import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
@@ -64,22 +64,22 @@ public class SystemCalendarEvent {
         this.associatedCalendar = associatedCalendar;
         
         if (loadMinimal) {
-            color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
+            color = getInt(cursor, CALENDAR_EVENT_COLUMNS, Events.DISPLAY_COLOR);
             return;
         }
         
-        id = getLong(cursor, calendarEventsColumns, Events._ID);
+        id = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events._ID);
         
-        title = getString(cursor, calendarEventsColumns, Events.TITLE).trim();
-        color = getInt(cursor, calendarEventsColumns, Events.DISPLAY_COLOR);
-        startMsUTC = getLong(cursor, calendarEventsColumns, Events.DTSTART);
-        endMsUTC = getLong(cursor, calendarEventsColumns, Events.DTEND);
-        isAllDay = getBoolean(cursor, calendarEventsColumns, Events.ALL_DAY);
+        title = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.TITLE).trim();
+        color = getInt(cursor, CALENDAR_EVENT_COLUMNS, Events.DISPLAY_COLOR);
+        startMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.DTSTART);
+        endMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.DTEND);
+        isAllDay = getBoolean(cursor, CALENDAR_EVENT_COLUMNS, Events.ALL_DAY);
         
         prefKey = associatedCalendar.makeKey(color);
         subKeys = generateSubKeysFromCalendarKey(prefKey);
         
-        String timeZoneId = getString(cursor, calendarEventsColumns, Events.EVENT_TIMEZONE);
+        String timeZoneId = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EVENT_TIMEZONE);
         
         timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? associatedCalendar.timeZoneId : timeZoneId);
         
@@ -99,8 +99,8 @@ public class SystemCalendarEvent {
     
     private void loadRecurrenceRules(Cursor cursor) {
         
-        String rRuleStr = getString(cursor, calendarEventsColumns, Events.RRULE);
-        String rDateStr = getString(cursor, calendarEventsColumns, Events.RDATE);
+        String rRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RRULE);
+        String rDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RDATE);
         
         if (rRuleStr.length() > 0) {
             try {
@@ -117,8 +117,8 @@ public class SystemCalendarEvent {
                     }
                 }
                 
-                String exRuleStr = getString(cursor, calendarEventsColumns, Events.EXRULE);
-                String exDateStr = getString(cursor, calendarEventsColumns, Events.EXDATE);
+                String exRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EXRULE);
+                String exDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EXDATE);
                 
                 if (exRuleStr.length() > 0) {
                     try {
@@ -137,7 +137,7 @@ public class SystemCalendarEvent {
                     }
                 }
                 
-                String durationStr = getString(cursor, calendarEventsColumns, Events.DURATION);
+                String durationStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.DURATION);
                 
                 if (durationStr.length() > 0) {
                     durationMs = rfc2445ToMilliseconds(durationStr);

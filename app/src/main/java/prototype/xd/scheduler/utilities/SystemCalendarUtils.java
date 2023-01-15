@@ -29,7 +29,10 @@ public class SystemCalendarUtils {
         throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
-    public static final List<String> calendarColumns = Collections.unmodifiableList(Arrays.asList(
+    /**
+     * List of columns to read from CalendarContract.Calendars.CONTENT_URI
+     */
+    public static final List<String> CALENDAR_COLUMNS = Collections.unmodifiableList(Arrays.asList(
             CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
             CalendarContract.Calendars.ACCOUNT_NAME,
             CalendarContract.Calendars.ACCOUNT_TYPE,
@@ -38,7 +41,10 @@ public class SystemCalendarUtils {
             CalendarContract.Calendars.CALENDAR_COLOR,
             CalendarContract.Calendars.CALENDAR_TIME_ZONE));
     
-    public static final List<String> calendarEventsColumns = Collections.unmodifiableList(Arrays.asList(
+    /**
+     * List of columns to read from Events.CONTENT_URI
+     */
+    public static final List<String> CALENDAR_EVENT_COLUMNS = Collections.unmodifiableList(Arrays.asList(
             CalendarContract.Events.TITLE,
             CalendarContract.Events.DISPLAY_COLOR,
             CalendarContract.Events.DTSTART,
@@ -55,11 +61,18 @@ public class SystemCalendarUtils {
             CalendarContract.Events.ORIGINAL_ID,
             CalendarContract.Events.ORIGINAL_INSTANCE_TIME));
     
-    public static List<SystemCalendar> getAllCalendars(Context context, boolean loadMinimal) {
+    /**
+     * Retrieve all calendars from the system
+     *
+     * @param context     context, will be used to get a ContentResolver
+     * @param loadMinimal whether to only load event colors
+     * @return a list of system calendars
+     */
+    public static List<SystemCalendar> getAllCalendars(@NonNull Context context, boolean loadMinimal) {
         ContentResolver contentResolver = context.getContentResolver();
         
         List<SystemCalendar> systemCalendars = new ArrayList<>();
-        Cursor cursor = query(contentResolver, CalendarContract.Calendars.CONTENT_URI, calendarColumns.toArray(new String[0]), null);
+        Cursor cursor = query(contentResolver, CalendarContract.Calendars.CONTENT_URI, CALENDAR_COLUMNS.toArray(new String[0]), null);
         int calendarCount = cursor.getCount();
         cursor.moveToFirst();
         for (int i = 0; i < calendarCount; i++) {
@@ -71,6 +84,14 @@ public class SystemCalendarUtils {
         return systemCalendars;
     }
     
+    /**
+     * Get TodoEntries from a list of system calendars
+     *
+     * @param dayStart  minimum day
+     * @param dayEnd    maximum day
+     * @param calendars list of calendars to get from
+     * @return a list of TodoEntries
+     */
     public static List<TodoEntry> getTodoListEntriesFromCalendars(long dayStart, long dayEnd,
                                                                   @NonNull List<SystemCalendar> calendars) {
         List<TodoEntry> todoListEntries = new ArrayList<>();

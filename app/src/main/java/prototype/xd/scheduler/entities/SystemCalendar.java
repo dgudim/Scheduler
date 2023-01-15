@@ -5,8 +5,8 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarColumns;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.calendarEventsColumns;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_COLUMNS;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -49,17 +49,17 @@ public class SystemCalendar {
     public final ArrayMap<Integer, Integer> eventColorCountMap;
     
     public SystemCalendar(Cursor cursor, ContentResolver contentResolver, boolean loadMinimal) {
-        account_type = getString(cursor, calendarColumns, Calendars.ACCOUNT_TYPE);
-        account_name = getString(cursor, calendarColumns, Calendars.ACCOUNT_NAME);
-        displayName = getString(cursor, calendarColumns, Calendars.CALENDAR_DISPLAY_NAME);
-        id = getLong(cursor, calendarColumns, Calendars._ID);
-        accessLevel = getInt(cursor, calendarColumns, Calendars.CALENDAR_ACCESS_LEVEL);
-        color = getInt(cursor, calendarColumns, Calendars.CALENDAR_COLOR);
+        account_type = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_TYPE);
+        account_name = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_NAME);
+        displayName = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_DISPLAY_NAME);
+        id = getLong(cursor, CALENDAR_COLUMNS, Calendars._ID);
+        accessLevel = getInt(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_ACCESS_LEVEL);
+        color = getInt(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_COLOR);
         
         prefKey = account_name + "_" + displayName;
         visibilityKey = prefKey + "_" + Keys.VISIBLE;
         
-        String calTimeZoneId = getString(cursor, calendarColumns, Calendars.CALENDAR_TIME_ZONE);
+        String calTimeZoneId = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_TIME_ZONE);
         
         if (calTimeZoneId.isEmpty()) {
             Logger.warning(NAME, "Calendar " + prefKey + " has no timezone, defaulting to UTC");
@@ -106,7 +106,7 @@ public class SystemCalendar {
     
     void loadCalendarEvents(ContentResolver contentResolver, boolean loadMinimal) {
         systemCalendarEvents.clear();
-        Cursor cursor = query(contentResolver, Events.CONTENT_URI, calendarEventsColumns.toArray(new String[0]),
+        Cursor cursor = query(contentResolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
                 Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0");
         int eventCount = cursor.getCount();
         cursor.moveToFirst();
@@ -115,11 +115,11 @@ public class SystemCalendar {
         
         for (int i = 0; i < eventCount; i++) {
             
-            long originalInstanceTime = getLong(cursor, calendarEventsColumns, Events.ORIGINAL_INSTANCE_TIME);
+            long originalInstanceTime = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_INSTANCE_TIME);
             if (originalInstanceTime != 0) {
                 // if original id is set this event is an exception to some other event
                 if (!loadMinimal) {
-                    exceptionLists.computeIfAbsent(getLong(cursor, calendarEventsColumns, Events.ORIGINAL_ID), k -> new ArrayList<>())
+                    exceptionLists.computeIfAbsent(getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_ID), k -> new ArrayList<>())
                             .add(originalInstanceTime);
                 }
             } else {

@@ -4,10 +4,15 @@ import android.os.Parcel;
 
 import com.google.android.material.datepicker.CalendarConstraints;
 
+/**
+ * Simple range date validator, will constraint selectable date between leftBoundMsUTC and rightBoundMsUTC
+ */
 public class RangeDateValidator implements CalendarConstraints.DateValidator {
     
+    // minimum selectable date in ms UTC
     private Long leftBoundMsUTC = -1L;
     
+    // maximum selectable date in ms UTC
     private Long rightBoundMsUTC = -1L;
     
     /**
@@ -25,10 +30,6 @@ public class RangeDateValidator implements CalendarConstraints.DateValidator {
                     return new RangeDateValidator[size];
                 }
             };
-    
-    public RangeDateValidator() {
-        //
-    }
     
     public void setRightBoundMsUTC(Long rightBoundMsUTC) {
         this.rightBoundMsUTC = rightBoundMsUTC;
