@@ -67,7 +67,7 @@ class LockScreenBitmapDrawer {
     private final WallpaperManager wallpaperManager;
     private final LayoutInflater layoutInflater;
     
-    private long previous_hash;
+    private long previousHash;
     
     public LockScreenBitmapDrawer(Context context) throws IllegalStateException {
         wallpaperManager = WallpaperManager.getInstance(context);
@@ -85,7 +85,7 @@ class LockScreenBitmapDrawer {
             Logger.info(NAME, "got display metrics: " + displayMetrics);
         }
         
-        previous_hash = 0;
+        previousHash = 0;
         
         displayWidth = DISPLAY_METRICS_WIDTH.get();
         displayHeight = DISPLAY_METRICS_HEIGHT.get();
@@ -200,14 +200,15 @@ class LockScreenBitmapDrawer {
         toAdd = sortEntries(toAdd, currentDayUTC);
         
         long currentHash = getEntryListHash(toAdd) + Keys.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
-        if (previous_hash == currentHash) {
+        Logger.debug(NAME, "Previous lockscreen hash: " + previousHash + " | current lockscreen hash: " + currentHash);
+        if (previousHash == currentHash) {
             if (forceRedraw) {
                 Logger.debug(NAME, "Updating bitmap because 'forceRedraw' is true");
             } else {
                 throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
             }
         }
-        previous_hash = currentHash;
+        previousHash = currentHash;
         
         // inflate the root container
         LockscreenRootContainerBinding binding = LockscreenRootContainerBinding.inflate(layoutInflater);

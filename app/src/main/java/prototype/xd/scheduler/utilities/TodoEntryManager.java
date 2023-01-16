@@ -252,6 +252,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
     
     /**
      * Notifies the calendar that days have changes
+     *
      * @param days days that changed
      */
     private void notifyDaysChanged(Set<Long> days) {
@@ -368,6 +369,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     public void loadCalendarEntries(long toLoadDayStart, long toLoadDayEnd) {
+        Logger.debug(NAME, "Loading entries from " + toLoadDayStart + " to " + toLoadDayEnd);
         if (initFinished) {
             long dayStart = 0;
             long dayEnd = 0;
@@ -455,7 +457,9 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         if (!todoEntries.contains(entry)) {
             error(NAME, "Resetting settings of an entry not managed by current container " + entry);
         }
-        if (entry.removeDisplayParams() || entry.changeGroup(Group.NULL_GROUP)) {
+        boolean paramsChanged = entry.removeDisplayParams();
+        boolean groupChanged = entry.changeGroup(Group.NULL_GROUP);
+        if (paramsChanged || groupChanged) {
             saveEntriesAsync();
             return true;
         }

@@ -213,7 +213,7 @@ public class Utilities {
         }
     }
     
-    public static <T extends Fragment> T findFragmentInNavHost(FragmentActivity activity, Class<T> targetFragmentClass) {
+    public static <T extends Fragment> T findFragmentInNavHost(@NonNull FragmentActivity activity, Class<T> targetFragmentClass) {
         List<Fragment> fragments = Objects.requireNonNull(activity.getSupportFragmentManager()
                         .findFragmentById(R.id.nav_host_fragment))
                 .getChildFragmentManager()
@@ -226,7 +226,7 @@ public class Utilities {
         throw new NullPointerException("Fragment " + targetFragmentClass + " not found");
     }
     
-    public static void navigateToFragment(FragmentActivity activity, @IdRes int actionId) {
+    public static void navigateToFragment(@NonNull FragmentActivity activity, @IdRes int actionId) {
         try {
             ((NavHostFragment) Objects.requireNonNull(
                     activity.getSupportFragmentManager()
@@ -402,7 +402,14 @@ public class Utilities {
                 settingsView.notifyParameterChanged(stateIcon, value.key, isChecked));
     }
     
-    // accept normal and plural single arg strings
+    /**
+     * Same as {@link #getPluralString} but also accepts normal strings
+     *
+     * @param context  any context
+     * @param resId    int resource id of the string
+     * @param quantity string quantity
+     * @return string with the given quantity
+     */
     public static String getQuantityString(@NonNull Context context, @StringRes @PluralsRes int resId, int quantity) {
         Resources res = context.getResources();
         if (res.getResourceTypeName(resId).equals("plurals")) {
@@ -411,29 +418,46 @@ public class Utilities {
         return res.getString(resId, quantity);
     }
     
-    // utility method for getting plural string
+    /**
+     * Get plural string
+     *
+     * @param context  any context
+     * @param resId    int resource id of the string
+     * @param quantity string quantity
+     * @return string with the given quantity
+     */
     public static String getPluralString(@NonNull Context context, @PluralsRes int resId, int quantity) {
         return context.getResources().getQuantityString(resId, quantity, quantity);
     }
     
     // opens a url in default browser (context)
+    
+    /**
+     * Opens a url in default browser
+     *
+     * @param context any context
+     * @param url     url to open
+     */
     public static void openUrl(@NonNull Context context, String url) {
         context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
     
-    // opens a url in default browser (fragment)
-    public static void openUrl(Fragment fragment, String url) {
-        openUrl(fragment.requireContext(), url);
-    }
-    
-    public static boolean datesEqual(LocalDate date1, LocalDate date2) {
+    public static boolean datesEqual(@Nullable LocalDate date1, @Nullable LocalDate date2) {
         if (date1 == null || date2 == null) {
             return false;
         }
         return date1.isEqual(date2);
     }
     
-    // returns keys with different values between two maps
+    /**
+     * Compares values of 2 maps
+     *
+     * @param map1 first map
+     * @param map2 second map
+     * @param <K>  key type
+     * @param <V>  value type
+     * @return keys with different values between two maps
+     */
     public static <K, V> Set<K> getChangedKeys(@NonNull final Map<K, V> map1,
                                                @NonNull final Map<K, V> map2) {
         if (map1.isEmpty() && map2.isEmpty() || map1.equals(map2)) {
@@ -453,9 +477,16 @@ public class Utilities {
         return keys;
     }
     
-    // computes symmetric difference between 2 sets
-    public static <K> Set<K> symmetricDifference(final Set<K> set1,
-                                                 final Set<K> set2) {
+    /**
+     * Computes symmetric difference between 2 sets
+     *
+     * @param set1 first set
+     * @param set2 second set
+     * @param <K>  key type
+     * @return symmetric difference between these two sets
+     */
+    public static <K> Set<K> symmetricDifference(@NonNull final Set<K> set1,
+                                                 @NonNull final Set<K> set2) {
         if (set1.equals(set2)) {
             return Collections.emptySet();
         }
@@ -480,12 +511,17 @@ public class Utilities {
         return combined;
     }
     
-    // display long toast with a message
-    public static void displayToast(Context context, @StringRes int textId) {
-        Toast.makeText(context, context.getString(textId), Toast.LENGTH_LONG).show();
+    /**
+     * Display long toast with a message
+     *
+     * @param context   any context
+     * @param textResId resource id of the text to show
+     */
+    public static void displayToast(@NonNull Context context, @StringRes int textResId) {
+        Toast.makeText(context, context.getString(textResId), Toast.LENGTH_LONG).show();
     }
     
-    public static void fancyHideUnhideView(View view, boolean visible, boolean animate) {
+    public static void fancyHideUnhideView(@NonNull View view, boolean visible, boolean animate) {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
         if (animate) {
             int initialHeight = view.getMeasuredHeight();
@@ -512,7 +548,8 @@ public class Utilities {
      * @param argb Color
      * @return Spannable
      */
-    public static Spannable colorizeText(final String text, final String word, final int argb) {
+    @NonNull
+    public static Spannable colorizeText(@NonNull final String text, final String word, final int argb) {
         final Spannable spannable = new SpannableString(text);
         int substringStart = 0;
         int start;

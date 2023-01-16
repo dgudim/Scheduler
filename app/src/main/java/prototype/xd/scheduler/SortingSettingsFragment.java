@@ -47,7 +47,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         super.onViewCreated(view, savedInstanceState);
         
         EntryTypeAdapter entryTypeAdapter = new EntryTypeAdapter();
-        binding.orderRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.orderRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         binding.orderRecyclerView.setAdapter(entryTypeAdapter);
         entryTypeAdapter.attachDragToRecyclerView(binding.orderRecyclerView);
         
@@ -55,8 +55,8 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         settingsEntries.add(new SwitchSettingsEntryConfig(
                 Keys.TREAT_GLOBAL_ITEMS_AS_TODAYS, getString(R.string.treat_global_as_todays),
                 (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true));
-        binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.settingsRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
+        binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
+        binding.settingsRecyclerView.addItemDecoration(new DividerItemDecoration(wrapper.context, DividerItemDecoration.VERTICAL));
         binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
     }
     

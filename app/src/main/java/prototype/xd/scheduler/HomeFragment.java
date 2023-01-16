@@ -33,6 +33,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.time.LocalDate;
@@ -73,12 +74,13 @@ public class HomeFragment extends Fragment {
     
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        FragmentActivity rootActivity = requireActivity();
         
         HomeFragmentWrapperBinding wrapperBnd = HomeFragmentWrapperBinding.inflate(inflater, container, false);
         contentBnd = wrapperBnd.contentWrapper;
         
         contentBnd.content.recyclerView.setItemAnimator(null);
-        contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         contentBnd.content.recyclerView.setAdapter(todoEntryManager.getTodoListViewAdapter());
         
         // construct custom calendar view
@@ -105,7 +107,7 @@ public class HomeFragment extends Fragment {
         DrawerLayout drawerLayout = wrapperBnd.getRoot();
         
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                requireActivity(), drawerLayout, contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
+                rootActivity, drawerLayout, contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
@@ -119,7 +121,7 @@ public class HomeFragment extends Fragment {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+        rootActivity.getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if (drawerLayout.isDrawerOpen(wrapperBnd.navViewWrapper)) {
@@ -127,7 +129,7 @@ public class HomeFragment extends Fragment {
                 } else {
                     // prevent stack overflow
                     setEnabled(false);
-                    requireActivity().onBackPressed();
+                    rootActivity.onBackPressed();
                     setEnabled(true);
                 }
             }
@@ -151,11 +153,11 @@ public class HomeFragment extends Fragment {
                     });
         });
         
-        wrapperBnd.navView.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_REPO));
-        wrapperBnd.navView.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_ISSUES));
-        wrapperBnd.navView.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(HomeFragment.this, GITHUB_RELEASES));
+        wrapperBnd.navView.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));
+        wrapperBnd.navView.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_ISSUES));
+        wrapperBnd.navView.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_RELEASES));
         
-        wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> displayToast(requireContext(), R.string.work_in_progress));
+        wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> displayToast(wrapper.context, R.string.work_in_progress));
         
         wrapperBnd.navView.logo.setOnClickListener(v -> displayMessageDialog(wrapper,
                 R.string.easter_egg, R.string.easter_egg_description,
@@ -164,13 +166,13 @@ public class HomeFragment extends Fragment {
                 null));
         
         wrapperBnd.navView.globalSettingsClickView.setOnClickListener(v ->
-                Utilities.navigateToFragment(requireActivity(), R.id.action_HomeFragment_to_GlobalSettingsFragment));
+                Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_GlobalSettingsFragment));
         
         wrapperBnd.navView.calendarSettingsClickView.setOnClickListener(v ->
-                Utilities.navigateToFragment(requireActivity(), R.id.action_HomeFragment_to_CalendarSettingsFragment));
+                Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_CalendarSettingsFragment));
         
         wrapperBnd.navView.sortingSettingsClickView.setOnClickListener(v ->
-                Utilities.navigateToFragment(requireActivity(), R.id.action_HomeFragment_to_SortingSettingsFragment));
+                Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_SortingSettingsFragment));
         
         return wrapperBnd.getRoot();
     }

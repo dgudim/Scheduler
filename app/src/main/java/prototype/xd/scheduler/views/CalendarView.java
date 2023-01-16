@@ -145,7 +145,6 @@ public class CalendarView {
     public static final int CACHED_PANELS = 2;
     public static final int POTENTIALLY_VISIBLE_DAYS = DAYS_ON_ONE_PANEL * CACHED_PANELS;
     
-    private DayOfWeek firstDayOfWeek;
     private List<DayOfWeek> daysOfWeek;
     
     @Nullable
@@ -219,6 +218,7 @@ public class CalendarView {
     
     private void setSelectedMonth(@NonNull YearMonth month, boolean extend) {
         selectedMonth = month;
+        Logger.debug(NAME, "New month selected: " + selectedMonth);
         
         firstSelectedMonthDayUTC = getStartOfMonthDayUTC(selectedMonth);
         lastSelectedMonthDayUTC = getEndOfMonthDayUTC(selectedMonth);
@@ -228,7 +228,7 @@ public class CalendarView {
         
         firstVisibleDayUTC = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstSelectedMonthDayUTC;
         lastVisibleDayUTC = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastSelectedMonthDayUTC;
-    
+        
         if (extend) {
             minVisibleDayUTC = min(minVisibleDayUTC, firstVisibleDayUTC);
             maxVisibleDayUTC = max(maxVisibleDayUTC, lastVisibleDayUTC);
@@ -238,11 +238,13 @@ public class CalendarView {
         }
     }
     
-    private void init(DayOfWeek newFirstDayOfWeek) {
-        YearMonth currentMonth = YearMonth.now();
+    private void init(DayOfWeek firstDayOfWeek) {
+        Logger.debug(NAME, "Calendar init!");
         
-        firstDayOfWeek = newFirstDayOfWeek;
-        daysOfWeek = daysOfWeek(newFirstDayOfWeek);
+        YearMonth currentMonth = YearMonth.now();
+        loadedMonths.add(currentMonth);
+        
+        daysOfWeek = daysOfWeek(firstDayOfWeek);
         
         rootCalendarView.setup(currentMonth.minusMonths(100), currentMonth.plusMonths(100), daysOfWeek.get(0));
         selectDate(DateManager.currentDate);
@@ -314,9 +316,9 @@ public class CalendarView {
     }
     
     public void notifyCalendarChanged() {
-        DayOfWeek newFirstDayOfWeek = FIRST_DAY_OF_WEEK.get();
-        if (!newFirstDayOfWeek.equals(firstDayOfWeek)) {
-            init(newFirstDayOfWeek);
+        DayOfWeek firstDayOfWeek = FIRST_DAY_OF_WEEK.get();
+        if (!firstDayOfWeek.equals(daysOfWeek.get(0))) {
+            init(firstDayOfWeek);
         } else {
             rootCalendarView.notifyCalendarChanged();
         }

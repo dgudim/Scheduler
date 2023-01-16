@@ -113,7 +113,6 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
                 }
                 entriesOnDay.remove(entry);
             }
-            Logger.debug(NAME, "Unlinked " + entry + " from " + daysForEntry.size() + " days");
             return daysForEntry;
         }
     }
@@ -134,9 +133,6 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
         linkEntryToLookupContainers(entry, fullDaySet.getCoreDaySet(), daysPerEntryCore, entriesPerDayCore);
         // link to extended days
         linkEntryToLookupContainers(entry, fullDaySet.getUpcomingExpiredDaySet(), daysPerEntryUpcomingExpired, entriesPerDayUpcomingExpired);
-        Logger.debug(NAME, "Linked " + entry + " to "
-                + fullDaySet.getCoreDaySet().size() + " core days, "
-                + fullDaySet.getUpcomingExpiredDaySet().size() + " extended days");
     }
     
     // link entry to both maps
