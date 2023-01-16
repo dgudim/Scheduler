@@ -9,8 +9,7 @@ import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_SORTING_ORDER;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Logger.warning;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoListEntriesFromCalendars;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoEntriesFromCalendars;
 
 import android.content.Context;
 import android.content.Intent;
@@ -40,16 +39,16 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.slider.Slider;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +73,10 @@ public class Utilities {
         return new File(ROOT_DIR.get(), filename);
     }
     
+    public static Path getPath(String filename) {
+        return getFile(filename).toPath();
+    }
+    
     private Utilities() {
         throw new IllegalStateException(NAME + " can't be instantiated");
     }
@@ -91,17 +94,17 @@ public class Utilities {
         if (!result) {
             try {
                 throw exceptionClass.getConstructor(String.class).newInstance(message);
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException |
+                     NoSuchMethodException e) {
                 e.printStackTrace();
                 throw new IllegalArgumentException("Error throwing exception");
             }
         }
     }
     
-    public static List<TodoEntry> loadTodoEntries(Context context,
-                                                  long dayStart, long dayEnd,
+    public static List<TodoEntry> loadTodoEntries(long dayStart, long dayEnd,
                                                   GroupList groups,
-                                                  @Nullable List<SystemCalendar> calendars,
+                                                  @NonNull List<SystemCalendar> calendars,
                                                   boolean attachGroupToEntry) {
         
         List<TodoEntry> readEntries = new ArrayList<>();
@@ -121,9 +124,7 @@ public class Utilities {
             logException(NAME, e);
         }
         
-        readEntries.addAll(getTodoListEntriesFromCalendars(
-                dayStart, dayEnd,
-                calendars == null ? getAllCalendars(context, false) : calendars));
+        readEntries.addAll(getTodoEntriesFromCalendars(dayStart, dayEnd, calendars));
         return readEntries;
     }
     
@@ -184,7 +185,7 @@ public class Utilities {
     }
     
     public static void moveFile(String fileName, String newFileName) throws IOException {
-        Files.move(getFile(fileName).toPath(), getFile(newFileName).toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        Files.move(getPath(fileName), getPath(newFileName), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
     
     public static <T> T loadObjectWithBackup(String fileName, String backupName) throws IOException, ClassNotFoundException {
@@ -193,7 +194,7 @@ public class Utilities {
         } catch (Exception e) {
             T obj = loadObject(backupName);
             // restore backup if it was read successfully
-            Files.copy(getFile(backupName).toPath(), getFile(fileName).toPath(),
+            Files.copy(getPath(backupName), getPath(fileName),
                     StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             warning(NAME, "Restored " + backupName + " to " + fileName);
             return obj;
@@ -201,15 +202,13 @@ public class Utilities {
     }
     
     public static <T> T loadObject(String fileName) throws IOException, ClassNotFoundException {
-        Object object;
-        try (ObjectInputStream s = new ObjectInputStream(new FileInputStream(getFile(fileName)))) {
-            object = s.readObject();
+        try (ObjectInputStream s = new ObjectInputStream(Files.newInputStream(getPath(fileName)))) {
+            return (T) s.readObject();
         }
-        return (T) object;
     }
     
     public static void saveObject(String fileName, Object object) throws IOException {
-        try (ObjectOutputStream s = new ObjectOutputStream(new FileOutputStream(getFile(fileName)))) {
+        try (ObjectOutputStream s = new ObjectOutputStream(Files.newOutputStream(getPath(fileName)))) {
             s.writeObject(object);
         }
     }
@@ -235,7 +234,7 @@ public class Utilities {
                     .getNavController()
                     .navigate(actionId);
         } catch (IllegalArgumentException e) {
-            Logger.error(NAME, "Error navigating: " + e + " Double click?");
+            Logger.error(NAME, "Error navigating to " + actionId + " Double click? [" + e + "]");
         }
     }
     
@@ -258,9 +257,9 @@ public class Utilities {
             }
         }
         
-        entries.sort(new TodoListEntryGroupComparator());
-        entries.sort(new TodoListEntryEntryTypeComparator());
-        entries.sort(new TodoListEntryPriorityComparator());
+        entries.sort(new TodoEntryGroupComparator());
+        entries.sort(new TodoEntryTypeComparator());
+        entries.sort(new TodoEntryPriorityComparator());
         
         if (MERGE_ENTRIES.get()) {
             return mergeInstances(entries);
@@ -434,9 +433,18 @@ public class Utilities {
         return date1.isEqual(date2);
     }
     
-    // computes symmetric difference between 2 maps
-    public static <K, V> Set<K> symmetricDifference(@NonNull final Map<K, V> map1,
-                                                    @NonNull final Map<K, V> map2) {
+    // returns keys with different values between two maps
+    public static <K, V> Set<K> getChangedKeys(@NonNull final Map<K, V> map1,
+                                               @NonNull final Map<K, V> map2) {
+        if (map1.isEmpty() && map2.isEmpty() || map1.equals(map2)) {
+            return Collections.emptySet();
+        }
+        if (map1.isEmpty()) {
+            return map2.keySet();
+        }
+        if (map2.isEmpty()) {
+            return map1.keySet();
+        }
         Set<K> keys = new ArraySet<>(map1.size() + map2.size());
         keys.addAll(map1.keySet());
         keys.addAll(map2.keySet());
@@ -448,6 +456,15 @@ public class Utilities {
     // computes symmetric difference between 2 sets
     public static <K> Set<K> symmetricDifference(final Set<K> set1,
                                                  final Set<K> set2) {
+        if (set1.equals(set2)) {
+            return Collections.emptySet();
+        }
+        if (set1.isEmpty()) {
+            return set2;
+        }
+        if (set2.isEmpty()) {
+            return set1;
+        }
         
         Set<K> combined = new ArraySet<>(set1.size() + set2.size());
         combined.addAll(set1);
@@ -577,21 +594,21 @@ public class Utilities {
     }
 }
 
-class TodoListEntryEntryTypeComparator implements Comparator<TodoEntry> {
+class TodoEntryTypeComparator implements Comparator<TodoEntry> {
     @Override
     public int compare(TodoEntry o1, TodoEntry o2) {
         return Integer.compare(o1.getSortingIndex(), o2.getSortingIndex());
     }
 }
 
-class TodoListEntryPriorityComparator implements Comparator<TodoEntry> {
+class TodoEntryPriorityComparator implements Comparator<TodoEntry> {
     @Override
     public int compare(TodoEntry o1, TodoEntry o2) {
         return Integer.compare(o2.priority.getToday(), o1.priority.getToday());
     }
 }
 
-class TodoListEntryGroupComparator implements Comparator<TodoEntry> {
+class TodoEntryGroupComparator implements Comparator<TodoEntry> {
     @Override
     public int compare(TodoEntry o1, TodoEntry o2) {
         if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {

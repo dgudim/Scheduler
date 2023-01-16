@@ -41,7 +41,7 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return DROPDOWN.ordinal();
     }
     

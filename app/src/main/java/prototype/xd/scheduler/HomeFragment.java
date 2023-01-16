@@ -147,8 +147,7 @@ public class HomeFragment extends Fragment {
                                 dialogBinding.dayToButton.getSelectedDayUTCStr());
                         values.put(IS_COMPLETED, Boolean.toString(false));
                         
-                        todoEntryManager.addEntry(new TodoEntry(values, // This is fine here as id because a person can't click 2 times in 1 ms
-                                groupList.get(selectedIndex).getRawName(), groupList, System.currentTimeMillis()));
+                        todoEntryManager.addEntry(new TodoEntry(values, groupList.get(selectedIndex), System.currentTimeMillis()));
                     });
         });
         
@@ -203,7 +202,7 @@ public class HomeFragment extends Fragment {
                     R.string.service_error, R.string.service_error_description,
                     R.drawable.ic_warning_24_onerrorcontainer, R.string.close,
                     R.style.ErrorAlertDialogTheme,
-                    dialog -> SERVICE_FAILED.put(false));
+                    dialog -> SERVICE_FAILED.put(Boolean.FALSE));
         }
         
         if (WALLPAPER_OBTAIN_FAILED.get()) {
@@ -212,7 +211,7 @@ public class HomeFragment extends Fragment {
                     R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description,
                     R.drawable.ic_warning_24_onerrorcontainer, R.string.close,
                     R.style.ErrorAlertDialogTheme,
-                    dialog -> WALLPAPER_OBTAIN_FAILED.put(false));
+                    dialog -> WALLPAPER_OBTAIN_FAILED.put(Boolean.FALSE));
         }
     }
     

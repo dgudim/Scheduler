@@ -35,7 +35,7 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         super(showSettings);
         this.systemCalendarSettings = systemCalendarSettings;
         this.calendarName = calendar.displayName;
-        calendarKey = calendar.getKey();
+        calendarKey = calendar.getPrefKey();
         this.calendarColor = calendar.color;
         calendarEventsCount = calendar.systemCalendarEvents.size();
         
@@ -45,7 +45,7 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return CALENDAR.ordinal();
     }
     

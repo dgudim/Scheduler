@@ -31,14 +31,14 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
                                               boolean showSettings) {
         super(showSettings);
         this.systemCalendarSettings = systemCalendarSettings;
-        this.accountName = calendar.account_name;
-        this.accountType = calendar.account_type;
+        this.accountName = calendar.accountName;
+        this.accountType = calendar.accountType;
         this.calendarColor = calendar.color;
         this.containerAdapter = containerAdapter;
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return CALENDAR_ACCOUNT.ordinal();
     }
     

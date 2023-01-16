@@ -17,6 +17,7 @@ import static prototype.xd.scheduler.utilities.Keys.SETTINGS_MAX_EXPIRED_UPCOMIN
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 import static prototype.xd.scheduler.utilities.Utilities.isVerticalOrientation;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
@@ -159,10 +160,10 @@ class LockScreenBitmapDrawer {
                     // relay
                     Thread.currentThread().interrupt();
                 } catch (FileNotFoundException e) {
-                    WALLPAPER_OBTAIN_FAILED.put(true);
+                    WALLPAPER_OBTAIN_FAILED.put(Boolean.TRUE);
                     logException(NAME, e);
                 } catch (Exception e) {
-                    SERVICE_FAILED.put(true);
+                    SERVICE_FAILED.put(Boolean.TRUE);
                     logException(NAME, e);
                 }
                 busy = false;
@@ -170,6 +171,14 @@ class LockScreenBitmapDrawer {
             return true;
         }
         return false;
+    }
+    
+    private long getEntryListHash(List<TodoEntry> entries) {
+        long hash = 0;
+        for (TodoEntry entry : entries) {
+            hash += entry.getLockscreenHash();
+        }
+        return hash;
     }
     
     @SuppressLint("InflateParams")
@@ -182,16 +191,15 @@ class LockScreenBitmapDrawer {
         // add entries from all calendars
         // filter and sort entries
         List<TodoEntry> toAdd = loadTodoEntries(
-                context,
                 currentDayUTC - SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
                 currentDayUTC + SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
-                groups, null,
+                groups, getAllCalendars(context, false),
                 false);
         
-        toAdd.removeIf(todoListEntry -> !todoListEntry.isVisibleOnLockscreenToday());
+        toAdd.removeIf(todoEntry -> !todoEntry.isVisibleOnLockscreenToday());
         toAdd = sortEntries(toAdd, currentDayUTC);
         
-        long currentHash = toAdd.hashCode() + Keys.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
+        long currentHash = getEntryListHash(toAdd) + Keys.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
         if (previous_hash == currentHash) {
             if (forceRedraw) {
                 Logger.debug(NAME, "Updating bitmap because 'forceRedraw' is true");

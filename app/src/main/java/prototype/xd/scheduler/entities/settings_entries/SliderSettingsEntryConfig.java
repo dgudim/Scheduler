@@ -52,7 +52,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return SLIDER.ordinal();
     }
     

@@ -1,6 +1,5 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Utilities.findFragmentInNavHost;
 
 import android.content.DialogInterface;
@@ -49,7 +48,6 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     // dialog dismissed (user pressed back button)
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
-        setBitmapUpdateFlag();
         if(!preferenceStateBefore.equals(Keys.getAll())) {
             findFragmentInNavHost(requireActivity(), HomeFragment.class).notifySettingsChanged();
         }

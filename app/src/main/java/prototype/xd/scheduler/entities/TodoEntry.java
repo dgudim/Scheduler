@@ -2,6 +2,7 @@ package prototype.xd.scheduler.entities;
 
 import static androidx.core.math.MathUtils.clamp;
 import static java.lang.Math.abs;
+import static prototype.xd.scheduler.entities.Group.NULL_GROUP;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
@@ -30,6 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
+import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Keys;
@@ -104,10 +106,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             expiredCachedGetter = new CachedGetter<>(expiredValueGetter);
             todayCachedGetter = new CachedGetter<>(previousValue -> {
                 // get parameter from group if it exists, if not, get from current parameters, if not, get from specified getter
-                String paramValue = entry.group != null ?
-                        entry.params.getOrDefault(parameterKey, entry.group.params.get(parameterKey)) :
-                        entry.params.get(parameterKey);
-                return paramValue != null ? loadedParameterConverter.apply(paramValue) : todayValueGetter.get(null);
+                String paramValue = entry.params.getOrDefault(parameterKey, entry.group.params.get(parameterKey));
+                return paramValue != null ? loadedParameterConverter.apply(paramValue) : todayValueGetter.get();
             });
             this.loadedParameterConverter = loadedParameterConverter;
         }
@@ -146,7 +146,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
     }
     
-    public static final transient String NAME = TodoEntry.class.getSimpleName();
+    public static final String NAME = TodoEntry.class.getSimpleName();
     
     public enum EntryType {TODAY, GLOBAL, UPCOMING, EXPIRED, UNKNOWN}
     
@@ -210,8 +210,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private ParameterGetter<String> rawTextValue;
     
-    @Nullable
-    private transient Group group;
+    @NonNull
+    private transient Group group = NULL_GROUP;
     // for initializing group after deserialization
     private transient String tempGroupName;
     
@@ -279,15 +279,16 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         this.event = event;
         
         initParameters();
-        assignId(event.hashCode());
+        assignRecyclerViewId(event.hashCode());
         
         event.linkEntry(this);
     }
     
-    public TodoEntry(SArrayMap<String, String> params, String groupName, List<Group> groups, long id) {
-        tempGroupName = groupName;
-        initGroupAndId(groups, id, true);
+    public TodoEntry(SArrayMap<String, String> params, @NonNull Group group, long id) {
         this.params = params;
+        this.group = group;
+        group.attachEntryInternal(this);
+        assignRecyclerViewId(id);
         initParameters();
     }
     
@@ -303,25 +304,17 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeObject(params);
-        if (group == null) {
-            out.writeObject("");
-        } else {
-            out.writeObject(group.getRawName());
-        }
+        out.writeObject(group.getRawName());
     }
     // ------------
     
     // attaching group to entry is unnecessary if called from bitmap drawer as we don't need to propagate parameter invalidations
     public void initGroupAndId(List<Group> groups, long id, boolean attachGroupToEntry) {
         // id should be assigned before attaching to group
-        assignId(id);
-        if (!tempGroupName.isEmpty()) {
-            group = Group.findGroupInList(groups, tempGroupName);
-            if (group == null) {
-                Logger.warning(NAME, "Unknown group: " + tempGroupName);
-            } else if (attachGroupToEntry) {
-                group.attachEntryInternal(this);
-            }
+        assignRecyclerViewId(id);
+        group = Group.findGroupInList(groups, tempGroupName);
+        if (attachGroupToEntry) {
+            group.attachEntryInternal(this);
         }
     }
     
@@ -395,7 +388,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     public void listenToParameterInvalidations(ParameterInvalidationListener parameterInvalidationListener) {
         if (this.parameterInvalidationListener != null) {
-            Logger.warning(NAME, rawTextValue.get() + " already has a parameterInvalidationListener, double assign");
+            Logger.warning(NAME, this + " already has a parameterInvalidationListener, double assign");
         }
         this.parameterInvalidationListener = parameterInvalidationListener;
     }
@@ -406,7 +399,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     protected void linkToContainer(TodoEntryList todoEntryList) {
         if (container != null) {
-            Logger.warning(NAME, rawTextValue.get() + " already has a container, double linking");
+            Logger.warning(NAME, this + " already has a container, double linking");
         }
         container = todoEntryList;
     }
@@ -423,10 +416,10 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     protected void removeFromContainer() {
         if (container == null) {
-            Logger.warning(NAME, rawTextValue.get() + " is not in a container, can't remove");
+            Logger.warning(NAME, this + " is not in a container, can't remove");
         } else {
             if (!container.remove(this)) {
-                Logger.warning(NAME, rawTextValue.get() + " error removing from the container");
+                Logger.warning(NAME, this + " error removing from the container");
             }
         }
     }
@@ -446,17 +439,13 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         event.computeEventVisibilityDays();
     }
     
-    @Nullable
+    @NonNull
     public Group getGroup() {
         return group;
     }
     
     public String getRawGroupName() {
-        if (group != null) {
-            return group.getRawName();
-        } else {
-            return "";
-        }
+        return group.getRawName();
     }
     
     public String getRawTextValue() {
@@ -464,12 +453,14 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     protected void unlinkGroupInternal(boolean invalidate) {
-        Set<String> parameters = null;
-        invalidate = invalidate && group != null;
-        if (invalidate) {
-            parameters = group.params.keySet();
+        if (group.isNullGroup()) {
+            return;
         }
-        group = null;
+        Set<String> parameters = null;
+        if (invalidate) {
+            parameters = group.getParameterKeys();
+        }
+        group = NULL_GROUP;
         // invalidate only after group change to avoid weird settings from cache
         if (invalidate) {
             invalidateParameters(parameters);
@@ -482,30 +473,15 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      * @param newGroup new group
      * @return true if the group was changed
      */
-    public boolean changeGroup(@Nullable Group newGroup) {
+    public boolean changeGroup(@NonNull Group newGroup) {
         if (Objects.equals(newGroup, group)) {
             return false;
         }
         
-        Set<String> changedKeys = null;
+        group.detachEntryInternal(this);
+        newGroup.attachEntryInternal(this);
         
-        if (group != null) {
-            group.detachEntryInternal(this);
-            if (newGroup == null) {
-                changedKeys = group.params.keySet();
-            }
-        }
-        
-        if (newGroup != null) {
-            newGroup.attachEntryInternal(this);
-            if (group == null) {
-                changedKeys = newGroup.params.keySet();
-            }
-        }
-        
-        if (group != null && newGroup != null) {
-            changedKeys = Utilities.symmetricDifference(group.params, newGroup.params);
-        }
+        Set<String> changedKeys = Utilities.getChangedKeys(group.params, newGroup.params);
         
         Logger.debug(NAME, "Changed group of " + this + " from " + group + " to " + newGroup);
         
@@ -527,6 +503,9 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     protected void invalidateParameters(@NonNull Set<String> parameterKeys) {
+        if (parameterKeys.isEmpty()) {
+            return;
+        }
         parameterKeys.forEach(parameterKey -> invalidateParameter(parameterKey, false));
         parameterInvalidationListener.parametersInvalidated(this, parameterKeys);
     }
@@ -567,7 +546,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      * @return true if the parameter was changed
      */
     private boolean changeParameterInternal(@NonNull String key, @NonNull String value) {
-        return !Objects.equals(params.put(key, value), key);
+        return !Objects.equals(params.put(key, value), value);
     }
     
     /**
@@ -577,7 +556,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      */
     public void changeParameters(@NonNull String... keyValuePairs) {
         if (keyValuePairs.length % 2 != 0) {
-            throw new IllegalArgumentException("Can't call changeParameters with even number of arguments");
+            throw new IllegalArgumentException("Can't call changeParameters with odd number of arguments");
         }
         if (keyValuePairs.length == 2) { // just one parameter
             if (changeParameterInternal(keyValuePairs[0], keyValuePairs[1])) {
@@ -891,11 +870,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return mixColorWithBg(inputColor, averageBackgroundColor, adaptiveColorBalance.getToday());
     }
     
-    public String getTextOnDay(long targetDayUTC, Context context, boolean displayGlobalLabel) {
-        return rawTextValue.get() + getDayOffset(targetDayUTC, context, displayGlobalLabel);
+    public String getTextOnDay(long targetDayUTC, @NonNull Context context, boolean displayGlobalLabel) {
+        return rawTextValue.get() + " " + getDayOffset(targetDayUTC, context, displayGlobalLabel);
     }
     
-    public String getDayOffset(long targetDayUTC, Context context, boolean displayGlobalLabel) {
+    public String getDayOffset(long targetDayUTC, @NonNull Context context, boolean displayGlobalLabel) {
         if (isGlobal()) {
             if (displayGlobalLabel) {
                 return context.getString(R.string.item_global);
@@ -931,7 +910,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void setStateIconColor(TextView icon, String parameter) {
-        boolean containedInGroupParams = group != null && group.params.containsKey(parameter);
+        boolean containedInGroupParams = group.params.containsKey(parameter);
         boolean containedInPersonalParams = params.containsKey(parameter);
         
         if (containedInGroupParams && containedInPersonalParams) {
@@ -950,18 +929,24 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return Objects.hash(event.title, cachedNearestStartMsUTC, event.durationMs);
     }
     
-    // for recyclerview
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return isFromSystemCalendar() ? 1 : 0;
+    }
+    
+    public int getLockscreenHash() {
+        return Objects.hash(event, params, group);
     }
     
     @NonNull
     @Override
     public String toString() {
+        String str = NAME + ": ";
         if (isFromSystemCalendar()) {
-            return "TodoListEntry: " + rawTextValue.get() + " [" + event + "] (" + startDayLocal.get() + " - " + endDayLocal.get() + ")";
+            str += "[" + event + "]";
+        } else {
+            str += BuildConfig.DEBUG ? rawTextValue.get() : rawTextValue.get().hashCode();
         }
-        return "TodoListEntry: " + rawTextValue.get() + " " + "(" + startDayLocal.get() + " - " + endDayLocal.get() + ")";
+        return str + " (" + startDayLocal.get() + " - " + endDayLocal.get() + ")";
     }
 }

@@ -16,7 +16,7 @@ public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return TITLE_BAR.ordinal();
     }
     

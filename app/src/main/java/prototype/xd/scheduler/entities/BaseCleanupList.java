@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 /**
- * A list that has a method for cleaning up after removing an entry, useful for TodoListEntries and Groups
+ * A list that has a method for cleaning up after removing an entry, useful for TodoEntries and Groups
  *
  * @param <T> type to store
  */

@@ -44,7 +44,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return ADAPTIVE_BACKGROUND_SETTINGS.ordinal();
     }
     

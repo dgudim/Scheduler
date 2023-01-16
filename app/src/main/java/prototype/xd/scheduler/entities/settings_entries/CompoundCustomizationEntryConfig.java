@@ -24,7 +24,7 @@ import prototype.xd.scheduler.views.settings.EntryPreviewContainer;
 public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return COMPOUND_CUSTOMIZATION.ordinal();
     }
     

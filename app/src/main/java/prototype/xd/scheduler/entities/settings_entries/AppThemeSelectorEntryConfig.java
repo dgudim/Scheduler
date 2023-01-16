@@ -9,7 +9,7 @@ import prototype.xd.scheduler.utilities.ContextWrapper;
 
 public class AppThemeSelectorEntryConfig extends SettingsEntryConfig {
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return APP_THEME_SELECTOR.ordinal();
     }
     

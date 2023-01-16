@@ -101,12 +101,10 @@ public class CalendarView {
                 } else {
                     textColor = MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE);
                 }
-                todoEntryManager.processEventIndicators(date.toEpochDay(),
-                        MAX_INDICATORS, this::setEventIndicatorInCalendar);
+                todoEntryManager.processEventIndicators(date.toEpochDay(), MAX_INDICATORS, this::setEventIndicatorInCalendar);
             } else {
                 textColor = context.getColor(R.color.gray_harmonized);
-                todoEntryManager.processEventIndicators(date.toEpochDay(),
-                        MAX_INDICATORS, this::setEventIndicatorOffCalendar);
+                todoEntryManager.processEventIndicators(date.toEpochDay(), MAX_INDICATORS, this::setEventIndicatorOffCalendar);
             }
             
             binding.calendarDayText.setTextColor(textColor);
@@ -163,8 +161,8 @@ public class CalendarView {
     private long firstVisibleDayUTC = 0;
     private long lastVisibleDayUTC = 0;
     
-    private long firstBoundDayUTC = 0;
-    private long lastBoundDayUTC = 0;
+    private long minVisibleDayUTC = 0;
+    private long maxVisibleDayUTC = 0;
     
     final com.kizitonwose.calendar.view.CalendarView rootCalendarView;
     @Nullable
@@ -203,87 +201,78 @@ public class CalendarView {
                 
                 // new month was loaded
                 if (!loadedMonths.contains(calendarYearMonth) && newMonthBindListener != null) {
-                    addLoadedMonth(calendarYearMonth, true);
+                    loadedMonths.add(calendarYearMonth);
+                    Logger.debug(NAME, "New month loaded: " + calendarYearMonth);
                     newMonthBindListener.onMonthLoaded(calendarYearMonth);
                 }
             }
         });
         
         rootCalendarView.setMonthScrollListener(calendarMonth -> {
-            
             // update currently visible day range and selected month
-            
-            selectedMonth = calendarMonth.getYearMonth();
-            
-            firstSelectedMonthDayUTC = getStartOfMonthDayUTC(selectedMonth);
-            lastSelectedMonthDayUTC = getEndOfMonthDayUTC(selectedMonth);
-            
-            CalendarDay firstVisibleCalendarDay = rootCalendarView.findFirstVisibleDay();
-            CalendarDay lastVisibleCalendarDay = rootCalendarView.findLastVisibleDay();
-            
-            firstVisibleDayUTC = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstSelectedMonthDayUTC;
-            lastVisibleDayUTC = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastSelectedMonthDayUTC;
-            
+            setSelectedMonth(calendarMonth.getYearMonth(), true);
             return null;
         });
         
-        YearMonth currentMonth = YearMonth.now();
-        addLoadedMonth(currentMonth, false);
-        init(currentMonth, FIRST_DAY_OF_WEEK.get());
+        init(FIRST_DAY_OF_WEEK.get());
     }
     
-    private void init(YearMonth currentMonth, DayOfWeek newFirstDayOfWeek) {
+    private void setSelectedMonth(@NonNull YearMonth month, boolean extend) {
+        selectedMonth = month;
+        
+        firstSelectedMonthDayUTC = getStartOfMonthDayUTC(selectedMonth);
+        lastSelectedMonthDayUTC = getEndOfMonthDayUTC(selectedMonth);
+        
+        CalendarDay firstVisibleCalendarDay = rootCalendarView.findFirstVisibleDay();
+        CalendarDay lastVisibleCalendarDay = rootCalendarView.findLastVisibleDay();
+        
+        firstVisibleDayUTC = firstVisibleCalendarDay != null ? firstVisibleCalendarDay.getDate().toEpochDay() : firstSelectedMonthDayUTC;
+        lastVisibleDayUTC = lastVisibleCalendarDay != null ? lastVisibleCalendarDay.getDate().toEpochDay() : lastSelectedMonthDayUTC;
+    
+        if (extend) {
+            minVisibleDayUTC = min(minVisibleDayUTC, firstVisibleDayUTC);
+            maxVisibleDayUTC = max(maxVisibleDayUTC, lastVisibleDayUTC);
+        } else {
+            minVisibleDayUTC = firstVisibleDayUTC;
+            maxVisibleDayUTC = lastVisibleDayUTC;
+        }
+    }
+    
+    private void init(DayOfWeek newFirstDayOfWeek) {
+        YearMonth currentMonth = YearMonth.now();
+        
         firstDayOfWeek = newFirstDayOfWeek;
         daysOfWeek = daysOfWeek(newFirstDayOfWeek);
-    
+        
         rootCalendarView.setup(currentMonth.minusMonths(100), currentMonth.plusMonths(100), daysOfWeek.get(0));
         selectDate(DateManager.currentDate);
         rootCalendarView.scrollToMonth(currentMonth);
-    }
-    
-    public boolean checkIfFirstDayOfWeekChanged() {
-        DayOfWeek newFirstDayOfWeek = FIRST_DAY_OF_WEEK.get();
-        if(!newFirstDayOfWeek.equals(firstDayOfWeek)) {
-            init(YearMonth.now(), newFirstDayOfWeek);
-            return true;
-        }
-        return false;
-    }
-    
-    private void addLoadedMonth(YearMonth month, boolean extend) {
-        loadedMonths.add(month);
-        if (extend) {
-            firstBoundDayUTC = min(firstBoundDayUTC, getStartOfMonthDayUTC(month));
-            lastBoundDayUTC = max(lastBoundDayUTC, getEndOfMonthDayUTC(month));
-        } else {
-            firstBoundDayUTC = getStartOfMonthDayUTC(month);
-            lastBoundDayUTC = getEndOfMonthDayUTC(month);
-        }
+        
+        setSelectedMonth(currentMonth, false);
     }
     
     public long getFirstLoadedDayUTC() {
-        return min(firstVisibleDayUTC - POTENTIALLY_VISIBLE_DAYS, firstBoundDayUTC);
+        return min(firstVisibleDayUTC - POTENTIALLY_VISIBLE_DAYS, minVisibleDayUTC);
     }
     
     public long getLastLoadedDayUTC() {
-        return min(lastVisibleDayUTC + POTENTIALLY_VISIBLE_DAYS, lastBoundDayUTC);
+        return min(lastVisibleDayUTC + POTENTIALLY_VISIBLE_DAYS, maxVisibleDayUTC);
     }
     
     public void selectDate(LocalDate targetDate) {
-        LocalDate prevSelection = selectedDate;
         
         rootCalendarView.scrollToDate(targetDate);
         
         // we selected another date
-        if (!datesEqual(targetDate, prevSelection)) {
+        if (!datesEqual(targetDate, selectedDate)) {
             Logger.debug(NAME, "Date selected: " + targetDate);
-            if (prevSelection != null) {
-                rootCalendarView.notifyDateChanged(prevSelection);
+            if (selectedDate != null) {
+                rootCalendarView.notifyDateChanged(selectedDate);
             }
             rootCalendarView.notifyDateChanged(targetDate);
             selectedDate = targetDate;
             if (dateChangeListener != null) {
-                dateChangeListener.onDateChanged(selectedDate, rootCalendarView.getContext());
+                dateChangeListener.onDateChanged(targetDate, rootCalendarView.getContext());
             }
         }
     }
@@ -293,7 +282,7 @@ public class CalendarView {
     }
     
     public void notifyDayChanged(long targetDayUTC) {
-        if(targetDayUTC < getFirstLoadedDayUTC() || targetDayUTC > getLastLoadedDayUTC()) {
+        if (targetDayUTC < getFirstLoadedDayUTC() || targetDayUTC > getLastLoadedDayUTC()) {
             // day is not loaded, skip it
             return;
         }
@@ -325,7 +314,12 @@ public class CalendarView {
     }
     
     public void notifyCalendarChanged() {
-        rootCalendarView.notifyCalendarChanged();
+        DayOfWeek newFirstDayOfWeek = FIRST_DAY_OF_WEEK.get();
+        if (!newFirstDayOfWeek.equals(firstDayOfWeek)) {
+            init(newFirstDayOfWeek);
+        } else {
+            rootCalendarView.notifyCalendarChanged();
+        }
     }
     
     public void setNewMonthBindListener(@Nullable MonthBindListener newMonthBindListener) {

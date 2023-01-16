@@ -92,17 +92,17 @@ public class SystemCalendarUtils {
      * @param calendars list of calendars to get from
      * @return a list of TodoEntries
      */
-    public static List<TodoEntry> getTodoListEntriesFromCalendars(long dayStart, long dayEnd,
-                                                                  @NonNull List<SystemCalendar> calendars) {
-        List<TodoEntry> todoListEntries = new ArrayList<>();
+    public static List<TodoEntry> getTodoEntriesFromCalendars(long dayStart, long dayEnd,
+                                                              @NonNull List<SystemCalendar> calendars) {
+        List<TodoEntry> todoEntries = new ArrayList<>();
         for (SystemCalendar calendar : calendars) {
             // add all events from all calendars
-            for (SystemCalendarEvent event : calendar.getVisibleTodoListEvents(dayStart, dayEnd)) {
-                todoListEntries.add(new TodoEntry(event));
+            for (SystemCalendarEvent event : calendar.getVisibleEvents(dayStart, dayEnd)) {
+                todoEntries.add(new TodoEntry(event));
             }
         }
-        Logger.info(NAME, "Read calendar entries: " + todoListEntries.size());
-        return todoListEntries;
+        Logger.info(NAME, "Read calendar entries: " + todoEntries.size());
+        return todoEntries;
     }
     
     public static List<String> generateSubKeysFromCalendarKey(String calendarKey) {

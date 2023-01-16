@@ -169,7 +169,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
             loadedDay_end = currentDayUTC + DAYS_ON_ONE_PANEL;
             
             todoEntries.initLoadingRange(loadedDay_start, loadedDay_end);
-            todoEntries.addAll(loadTodoEntries(wrapper.context,
+            todoEntries.addAll(loadTodoEntries(
                     loadedDay_start,
                     loadedDay_end,
                     groups, calendars,
@@ -226,11 +226,11 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
                 if (visibilityNow && !visibilityBefore) {
                     // new calendar is visible now
                     Logger.debug(NAME, calendar + " is now visible");
-                    addEvents(calendar.getVisibleTodoListEvents(loadedDay_start, loadedDay_end));
+                    addEvents(calendar.getVisibleEvents(loadedDay_start, loadedDay_end));
                 } else if (visibilityBefore && !visibilityNow) {
                     // calendar became invisible
                     Logger.debug(NAME, calendar + " is now invisible");
-                    calendar.unlinkAllTodoListEntries();
+                    calendar.unlinkAllTodoEntries();
                 }
             }
         }
@@ -299,11 +299,12 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
             }
         }
         updateStaticVarsAndCalendarVisibility();
-        if (calendarView != null && !calendarView.checkIfFirstDayOfWeekChanged()) {
+        if (calendarView != null) {
             // tells calendar list that all months have changed
             calendarView.notifyCalendarChanged();
         }
         notifyEntryListChanged();
+        setBitmapUpdateFlag();
     }
     
     public void attachCalendarView(@NonNull CalendarView calendarView) {
@@ -322,7 +323,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         return todoListViewAdapter.getItemCount();
     }
     
-    public List<TodoEntry> getVisibleTodoListEntries(long day) {
+    public List<TodoEntry> getVisibleTodoEntries(long day) {
         return todoEntries.getOnDay(day, (entry, entryType) -> {
             if (entryType == TodoEntry.EntryType.UPCOMING ||
                     entryType == TodoEntry.EntryType.EXPIRED) {
@@ -340,18 +341,18 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
     
     public void processEventIndicators(long day, int maxIndicators, EventIndicatorConsumer eventIndicatorConsumer) {
         
-        List<TodoEntry> todoListEntriesOnDay = todoEntries.getOnDay(day, (entry, entryType) ->
+        List<TodoEntry> todoEntriesOnDay = todoEntries.getOnDay(day, (entry, entryType) ->
                 entryType != TodoEntry.EntryType.GLOBAL && !entry.isCompleted());
         
         int index = 0;
         
         // show visible indicators
-        for (int ind = 0; ind < min(todoListEntriesOnDay.size(), maxIndicators); ind++) {
+        for (int ind = 0; ind < min(todoEntriesOnDay.size(), maxIndicators); ind++) {
             if (displayUpcomingExpired) {
-                eventIndicatorConsumer.submit(todoListEntriesOnDay.get(ind).bgColor.get(day), index, true);
+                eventIndicatorConsumer.submit(todoEntriesOnDay.get(ind).bgColor.get(day), index, true);
             } else {
                 // we already know that our entry lies on current day
-                eventIndicatorConsumer.submit(todoListEntriesOnDay.get(ind).bgColor.getToday(), index, true);
+                eventIndicatorConsumer.submit(todoEntriesOnDay.get(ind).bgColor.getToday(), index, true);
             }
             index++;
         }
@@ -383,7 +384,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
             }
             if (dayStart != 0) {
                 for (SystemCalendar calendar : calendars) {
-                    addEvents(calendar.getVisibleTodoListEvents(dayStart, dayEnd));
+                    addEvents(calendar.getVisibleEvents(dayStart, dayEnd));
                 }
             }
         }
@@ -454,7 +455,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         if (!todoEntries.contains(entry)) {
             error(NAME, "Resetting settings of an entry not managed by current container " + entry);
         }
-        if (entry.removeDisplayParams() || entry.changeGroup(null)) {
+        if (entry.removeDisplayParams() || entry.changeGroup(Group.NULL_GROUP)) {
             saveEntriesAsync();
             return true;
         }
@@ -470,7 +471,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
      */
     public boolean changeEntryGroup(@NonNull TodoEntry entry, @NonNull Group newGroup) {
         if (!groups.contains(newGroup) || !todoEntries.contains(entry)) {
-            error(NAME, "Changing group of an entry not managed by current container " + newGroup + " " + entry);
+            error(NAME, "Changing group of " + entry + " to " + newGroup + " but entry or group is not managed by current container");
         }
         if (entry.changeGroup(newGroup)) {
             saveEntriesAsync();
@@ -487,7 +488,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
      */
     public void setNewGroupName(@NonNull Group group, @NonNull String newName) {
         if (!groups.contains(group)) {
-            error(NAME, "Changing name of a group not managed by current container " + group);
+            error(NAME, "Changing name of " + group + " not managed by current container");
         }
         if (group.setName(newName)) {
             saveAllAsync();
@@ -503,7 +504,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
      */
     public boolean setNewGroupParams(@NonNull Group group, @NonNull SArrayMap<String, String> newParams) {
         if (!groups.contains(group)) {
-            error(NAME, "Settings new parameters of a group not managed by current container " + group);
+            error(NAME, "Settings new parameters of " + group + " not managed by current container");
         }
         if (group.setParams(newParams)) {
             saveGroupsAsync();

@@ -36,7 +36,7 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return SWITCH.ordinal();
     }
     

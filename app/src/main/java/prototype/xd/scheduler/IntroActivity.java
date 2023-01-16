@@ -77,7 +77,7 @@ public class IntroActivity extends AppIntro {
         super.onDonePressed(currentFragment);
         // go back to the main activity
         IntroActivity.this.startActivity(new Intent(IntroActivity.this, MainActivity.class));
-        Keys.INTRO_SHOWN.put(true);
+        Keys.INTRO_SHOWN.put(Boolean.TRUE);
         finish();
     }
 }

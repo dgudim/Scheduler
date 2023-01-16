@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 
@@ -33,8 +34,8 @@ public class SystemCalendar {
     
     public static final String NAME = SystemCalendar.class.getSimpleName();
     
-    public final String account_type;
-    public final String account_name;
+    public final String accountType;
+    public final String accountName;
     
     private final String prefKey;
     private final String visibilityKey;
@@ -49,20 +50,20 @@ public class SystemCalendar {
     public final ArrayMap<Integer, Integer> eventColorCountMap;
     
     public SystemCalendar(Cursor cursor, ContentResolver contentResolver, boolean loadMinimal) {
-        account_type = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_TYPE);
-        account_name = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_NAME);
+        accountType = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_TYPE);
+        accountName = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_NAME);
         displayName = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_DISPLAY_NAME);
         id = getLong(cursor, CALENDAR_COLUMNS, Calendars._ID);
         accessLevel = getInt(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_ACCESS_LEVEL);
         color = getInt(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_COLOR);
         
-        prefKey = account_name + "_" + displayName;
+        prefKey = accountName + "_" + displayName;
         visibilityKey = prefKey + "_" + Keys.VISIBLE;
         
         String calTimeZoneId = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_TIME_ZONE);
         
         if (calTimeZoneId.isEmpty()) {
-            Logger.warning(NAME, "Calendar " + prefKey + " has no timezone, defaulting to UTC");
+            Logger.warning(NAME, this + " has no timezone, defaulting to UTC");
             this.timeZoneId = "UTC";
         } else {
             this.timeZoneId = calTimeZoneId;
@@ -152,7 +153,7 @@ public class SystemCalendar {
                 }
             }
             if (!applied) {
-                Logger.warning(account_name, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
+                Logger.warning(accountName, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
             }
         }
     }
@@ -166,11 +167,12 @@ public class SystemCalendar {
     
     /**
      * Get visible events between first and last days
+     *
      * @param firstDayUTC start of range
-     * @param lastDayUTC end of range
+     * @param lastDayUTC  end of range
      * @return visible events on range
      */
-    public List<SystemCalendarEvent> getVisibleTodoListEvents(long firstDayUTC, long lastDayUTC) {
+    public List<SystemCalendarEvent> getVisibleEvents(long firstDayUTC, long lastDayUTC) {
         if (isVisible()) {
             List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
             for (SystemCalendarEvent event : systemCalendarEvents) {
@@ -185,8 +187,9 @@ public class SystemCalendar {
     
     /**
      * Notifies all events with a specific color (in the same group) about parameter changes
+     *
      * @param parameterKey parameter to invalidate
-     * @param color target events color
+     * @param color        target events color
      */
     protected void invalidateParameterOnEvents(@NonNull String parameterKey, int color) {
         systemCalendarEvents.forEach(event -> {
@@ -198,6 +201,7 @@ public class SystemCalendar {
     
     /**
      * Notifies all events with a specific color (in the same group) about all parameter changes
+     *
      * @param color target events color
      */
     public void invalidateAllParametersOnEvents(int color) {
@@ -208,7 +212,7 @@ public class SystemCalendar {
         });
     }
     
-    public void unlinkAllTodoListEntries() {
+    public void unlinkAllTodoEntries() {
         systemCalendarEvents.forEach(event -> {
             if (event.associatedEntry != null) {
                 event.associatedEntry.removeFromContainer();
@@ -219,12 +223,12 @@ public class SystemCalendar {
     @NonNull
     @Override
     public String toString() {
-        return account_name + ": " + displayName;
+        return NAME + ": " + (BuildConfig.DEBUG ? prefKey : id);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(account_type, account_name, displayName, id, accessLevel, color);
+        return Objects.hash(id);
     }
     
     @Override
@@ -234,22 +238,17 @@ public class SystemCalendar {
         } else if (obj == this) {
             return true;
         } else if (obj instanceof SystemCalendar) {
-            SystemCalendar systemCalendar = (SystemCalendar) obj;
-            return Objects.equals(account_type, systemCalendar.account_type) &&
-                    Objects.equals(account_name, systemCalendar.account_name) &&
-                    Objects.equals(displayName, systemCalendar.displayName) &&
-                    Objects.equals(id, systemCalendar.id) &&
-                    Objects.equals(accessLevel, systemCalendar.accessLevel) &&
-                    Objects.equals(color, systemCalendar.color);
+            // id is unique
+            return id == ((SystemCalendar) obj).id;
         }
-        return super.equals(obj);
+        return false;
     }
     
-    public String getKey() {
+    public String getPrefKey() {
         return prefKey;
     }
     
-    public String makeKey(int possibleEventColor) {
+    public String makePrefKey(int possibleEventColor) {
         return prefKey + "_" + possibleEventColor;
     }
 }

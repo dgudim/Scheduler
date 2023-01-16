@@ -67,7 +67,7 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(color);
         view.findViewById(R.id.title_default).setVisibility(calendarColor == color ? View.VISIBLE : View.GONE);
         ((TextView) view.findViewById(R.id.event_count)).setText(getPluralString(view.getContext(), R.plurals.calendar_event_count, count));
-        view.findViewById(R.id.open_settings_button).setOnClickListener(v -> systemCalendarSettings.show(calendar.makeKey(color), color));
+        view.findViewById(R.id.open_settings_button).setOnClickListener(v -> systemCalendarSettings.show(calendar.makePrefKey(color), color));
         
         return view;
     }

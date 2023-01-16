@@ -38,7 +38,7 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return DOUBLE_SLIDER.ordinal();
     }
     

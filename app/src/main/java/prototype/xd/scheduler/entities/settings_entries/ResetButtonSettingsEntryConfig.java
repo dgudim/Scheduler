@@ -26,7 +26,7 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     }
     
     @Override
-    public int getType() {
+    public int getRecyclerViewType() {
         return RESET_BUTTON.ordinal();
     }
     

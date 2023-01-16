@@ -27,8 +27,10 @@ import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceSetIterator;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
+import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.utilities.Logger;
 
 public class SystemCalendarEvent {
@@ -76,7 +78,7 @@ public class SystemCalendarEvent {
         endMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.DTEND);
         isAllDay = getBoolean(cursor, CALENDAR_EVENT_COLUMNS, Events.ALL_DAY);
         
-        prefKey = associatedCalendar.makeKey(color);
+        prefKey = associatedCalendar.makePrefKey(color);
         subKeys = generateSubKeysFromCalendarKey(prefKey);
         
         String timeZoneId = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EVENT_TIMEZONE);
@@ -167,8 +169,8 @@ public class SystemCalendarEvent {
     
     public void linkEntry(TodoEntry todoEntry) {
         if (associatedEntry != null) {
-            Logger.warning(NAME, "Calendar event " + title + " already linked to " +
-                    associatedEntry.getId() + " relinking to " + todoEntry.getId());
+            Logger.warning(NAME, this + " already linked to " +
+                    associatedEntry + " relinking to " + todoEntry);
         }
         associatedEntry = todoEntry;
     }
@@ -221,7 +223,7 @@ public class SystemCalendarEvent {
     private DateTimeZonePair checkRDates(String datesToParse) {
         TimeZone newTimeZone = timeZone;
         if (datesToParse.contains(";")) {
-            Logger.warning(NAME, "Not standard dates for " + title + ", " + datesToParse + ", probably contains timezone, attempting to parse");
+            Logger.warning(NAME, "Not standard dates for " + this + ", " + datesToParse + ", probably contains timezone, attempting to parse");
             String[] split = datesToParse.split(";");
             newTimeZone = TimeZone.getTimeZone(split[0]);
             datesToParse = split[1];
@@ -305,13 +307,31 @@ public class SystemCalendarEvent {
             }
             rSet.addExceptions(new RecurrenceList(exceptionsPrimitiveArray));
         } else {
-            Logger.warning(NAME, "Couldn't add exceptions to " + title);
+            Logger.warning(NAME, "Couldn't add exceptions to " + this);
         }
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+    
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null) {
+            return false;
+        } else if (obj == this) {
+            return true;
+        } else if (obj instanceof SystemCalendarEvent) {
+            // id is unique
+            return id == ((SystemCalendarEvent) obj).id;
+        }
+        return false;
     }
     
     @NonNull
     @Override
     public String toString() {
-        return NAME + " | " + prefKey;
+        return NAME + ": " + (BuildConfig.DEBUG ? title : id) + " " + associatedCalendar.toString() + " " + color;
     }
 }

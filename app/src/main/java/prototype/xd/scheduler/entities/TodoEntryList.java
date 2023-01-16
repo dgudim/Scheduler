@@ -20,7 +20,7 @@ import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
-// a list specifically for storing TodoListEntries, automatically unlinks groups on remove to avoid memory leaks
+// a list specifically for storing TodoEntries, automatically unlinks groups on remove to avoid memory leaks
 public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     
     public static final String NAME = TodoEntryList.class.getSimpleName();
@@ -192,7 +192,7 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     
     @FunctionalInterface
     public
-    interface TodoListEntryFilter {
+    interface TodoEntryFilter {
         boolean filter(TodoEntry entry, TodoEntry.EntryType entryType);
     }
     
@@ -234,7 +234,7 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     }
     
     // get all entries visible on a particular day
-    public List<TodoEntry> getOnDay(long day, TodoListEntryFilter filter) {
+    public List<TodoEntry> getOnDay(long day, TodoEntryFilter filter) {
         List<TodoEntry> filtered = new ArrayList<>();
         Set<TodoEntry> notFiltered = displayUpcomingExpired ? entriesPerDayUpcomingExpired.get(day) : entriesPerDayCore.get(day);
         Consumer<TodoEntry> consumer = entry -> {

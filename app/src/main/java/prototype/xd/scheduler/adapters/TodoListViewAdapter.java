@@ -219,7 +219,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     @NonNull
     private final TodoEntryManager todoEntryManager;
     @NonNull
-    private List<TodoEntry> currentTodoListEntries;
+    private List<TodoEntry> currentTodoEntries;
     
     @NonNull
     private final EntrySettings entrySettings;
@@ -233,7 +233,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         
         this.todoEntryManager = todoEntryManager;
         this.wrapper = wrapper;
-        currentTodoListEntries = new ArrayList<>();
+        currentTodoEntries = new ArrayList<>();
         entrySettings = new EntrySettings(wrapper, todoEntryManager);
         systemCalendarSettings = new SystemCalendarSettings(wrapper, todoEntryManager);
         // each entry has a unique id
@@ -242,21 +242,21 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
     @Override
     public long getItemId(int i) {
-        return currentTodoListEntries.get(i).getId();
+        return currentTodoEntries.get(i).getRecyclerViewId();
     }
     
     @Override
     public int getItemCount() {
-        return currentTodoListEntries.size();
+        return currentTodoEntries.size();
     }
     
     /**
      * Notifies the adapter that the list contents have changed
      */
     public void notifyEntryListChanged() {
-        int itemsCount = currentTodoListEntries.size();
-        currentTodoListEntries = todoEntryManager.getVisibleTodoListEntries(currentlySelectedDayUTC);
-        notifyItemRangeChanged(0, max(itemsCount, currentTodoListEntries.size()));
+        int itemsCount = currentTodoEntries.size();
+        currentTodoEntries = todoEntryManager.getVisibleTodoEntries(currentlySelectedDayUTC);
+        notifyItemRangeChanged(0, max(itemsCount, currentTodoEntries.size()));
     }
     
     @NonNull
@@ -275,11 +275,11 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
     @Override
     public void onBindViewHolder(@NonNull EntryViewHolder<?> holder, int position) {
-        holder.bindTo(currentTodoListEntries.get(position), todoEntryManager, entrySettings, systemCalendarSettings);
+        holder.bindTo(currentTodoEntries.get(position), todoEntryManager, entrySettings, systemCalendarSettings);
     }
     
     @Override
     public int getItemViewType(int i) {
-        return currentTodoListEntries.get(i).getType();
+        return currentTodoEntries.get(i).getRecyclerViewType();
     }
 }

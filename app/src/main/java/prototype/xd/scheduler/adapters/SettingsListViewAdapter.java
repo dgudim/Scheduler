@@ -48,7 +48,7 @@ public class SettingsListViewAdapter extends RecyclerView.Adapter<SettingsEntryC
     
     @Override
     public int getItemViewType(int i) {
-        return settingsEntries.get(i).getType();
+        return settingsEntries.get(i).getRecyclerViewType();
     }
     
     @Override
