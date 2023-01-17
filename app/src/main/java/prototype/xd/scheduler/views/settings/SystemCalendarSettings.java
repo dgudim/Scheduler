@@ -54,7 +54,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
             
             @Override
             protected int currentBgColorGetter() {
-                return Keys.BG_COLOR.CURRENT.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor));
+                return Keys.BG_COLOR.CURRENT.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(eventColor));
             }
             
             @Override
@@ -124,7 +124,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 wrapper,
                 bnd.backgroundColorState, this,
                 Keys.BG_COLOR.CURRENT,
-                value -> value.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(eventColor))));
+                value -> value.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(eventColor))));
         
         bnd.currentBorderColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,

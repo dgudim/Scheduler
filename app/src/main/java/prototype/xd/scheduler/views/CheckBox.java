@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import com.google.android.material.checkbox.MaterialCheckBox;
 
 public class CheckBox extends MaterialCheckBox {
-    private boolean ignoreCheckedChange = false;
+    private boolean ignoreCheckedChange;
     
     public CheckBox(Context context) {
         super(context);

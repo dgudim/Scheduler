@@ -13,27 +13,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import prototype.xd.scheduler.entities.TodoEntry.ParameterInvalidationListener;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
 // a list specifically for storing TodoEntries, automatically unlinks groups on remove to avoid memory leaks
-public class TodoEntryList extends BaseCleanupList<TodoEntry> {
+public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR, should only be initialized once, shouldn't be serialized
     
     public static final String NAME = TodoEntryList.class.getSimpleName();
     
     // 4 mappings for normal events
-    final Map<Long, Set<TodoEntry>> entriesPerDayCore;
-    final Map<TodoEntry, Set<Long>> daysPerEntryCore;
+    private final Map<Long, Set<TodoEntry>> entriesPerDayCore;
+    private final Map<TodoEntry, Set<Long>> daysPerEntryCore; // NOSONAR, TodoEntry does not override equals
     
-    final Map<Long, Set<TodoEntry>> entriesPerDayUpcomingExpired;
-    final Map<TodoEntry, Set<Long>> daysPerEntryUpcomingExpired;
+    private final Map<Long, Set<TodoEntry>> entriesPerDayUpcomingExpired;
+    private final Map<TodoEntry, Set<Long>> daysPerEntryUpcomingExpired; // NOSONAR
     
     // container for global entries
-    final Set<TodoEntry> globalEntries;
+    private final Set<TodoEntry> globalEntries;
     
     private boolean displayUpcomingExpired;
     private long firstLoadedDay;
@@ -98,7 +99,7 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     }
     
     private Set<Long> unlinkEntryFromLookupContainers(TodoEntry entry,
-                                                      Map<TodoEntry, Set<Long>> daysPerEntry,
+                                                      Map<TodoEntry, Set<Long>> daysPerEntry, // NOSONAR
                                                       Map<Long, Set<TodoEntry>> entriesPerDay) {
         Set<Long> daysForEntry = daysPerEntry.remove(entry);
         if (daysForEntry == null) {
@@ -138,7 +139,7 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     // link entry to both maps
     private void linkEntryToLookupContainers(TodoEntry entry,
                                              Set<Long> eventDays,
-                                             Map<TodoEntry, Set<Long>> daysPerEntry,
+                                             Map<TodoEntry, Set<Long>> daysPerEntry,  // NOSONAR
                                              Map<Long, Set<TodoEntry>> entriesPerDay) {
         daysPerEntry
                 .computeIfAbsent(entry, k -> new HashSet<>())
@@ -151,8 +152,8 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     }
     
     // handle linking to container and assigning an invalidation listener
-    protected void handleNewEntry(@Nullable TodoEntry newEntry,
-                                  ParameterInvalidationListener parameterInvalidationListener) {
+    private void handleNewEntry(@Nullable TodoEntry newEntry,
+                                  BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
         if (newEntry != null) {
             // link to current container
             newEntry.linkToContainer(this);
@@ -172,24 +173,19 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     
     // add, assign invalidation listener and handle linking to container
     public boolean add(TodoEntry todoEntry,
-                       ParameterInvalidationListener parameterInvalidationListener) {
+                       BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
         handleNewEntry(todoEntry, parameterInvalidationListener);
         return super.add(todoEntry);
     }
     
     // add, assign invalidation listener and handle linking to container
+    @SuppressWarnings("UnusedReturnValue")
     public boolean addAll(@NonNull Collection<? extends TodoEntry> collection,
-                          ParameterInvalidationListener parameterInvalidationListener) {
+                          BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
         for (TodoEntry todoEntry : collection) {
             handleNewEntry(todoEntry, parameterInvalidationListener);
         }
         return super.addAll(collection);
-    }
-    
-    @FunctionalInterface
-    public
-    interface TodoEntryFilter {
-        boolean filter(TodoEntry entry, TodoEntry.EntryType entryType);
     }
     
     public TodoEntry.EntryType getEntryType(TodoEntry entry, long day) {
@@ -230,11 +226,11 @@ public class TodoEntryList extends BaseCleanupList<TodoEntry> {
     }
     
     // get all entries visible on a particular day
-    public List<TodoEntry> getOnDay(long day, TodoEntryFilter filter) {
+    public List<TodoEntry> getOnDay(long day, BiPredicate<TodoEntry, TodoEntry.EntryType> filter) {
         List<TodoEntry> filtered = new ArrayList<>();
         Set<TodoEntry> notFiltered = displayUpcomingExpired ? entriesPerDayUpcomingExpired.get(day) : entriesPerDayCore.get(day);
         Consumer<TodoEntry> consumer = entry -> {
-            if (filter.filter(entry, getEntryType(entry, day))) {
+            if (filter.test(entry, getEntryType(entry, day))) {
                 filtered.add(entry);
             }
         };

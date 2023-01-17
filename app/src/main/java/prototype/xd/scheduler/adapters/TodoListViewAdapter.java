@@ -1,12 +1,12 @@
 package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedSecondaryFontColorWithBg;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedSecondaryFontColorWithBg;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
@@ -87,7 +87,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             
             displayEntryAdditionEditDialog(wrapper,
                     entry, groupList,
-                    (confirmationButton, text, dialogBinding, selectedIndex) -> {
+                    (text, dialogBinding, selectedIndex) -> {
                         entry.changeGroup(groupList.get(selectedIndex));
                         boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();
                         if (isGlobal) {
@@ -185,7 +185,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDayUTC));
             
             if (entry.isCompleted() || entry.hideByContent()) {
-                todoText.setTextColor(mixTwoColors(fontColor, bgColor, 0.5));
+                todoText.setTextColor(dimColorToBg(fontColor, bgColor));
             } else {
                 todoText.setTextColor(fontColor);
             }

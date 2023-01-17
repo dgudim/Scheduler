@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import com.google.android.material.materialswitch.MaterialSwitch;
 
 public class Switch extends MaterialSwitch {
-    private boolean programmaticChange = false;
+    private boolean programmaticChange;
     
     public Switch(@NonNull Context context) {
         super(context);

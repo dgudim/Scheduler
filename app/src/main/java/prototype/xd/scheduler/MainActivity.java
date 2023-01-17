@@ -1,5 +1,6 @@
 package prototype.xd.scheduler;
 
+import static android.os.Process.*;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 
 import android.content.Intent;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         File rootDir = getExternalFilesDir("");
         if (rootDir == null) {
             Log.e(NAME, "Shared storage not available wtf");
-            System.exit(0);
+            killProcess(myPid());
         } else if (ROOT_DIR.get().isEmpty()) {
             ROOT_DIR.put(rootDir.getAbsolutePath());
             Logger.info(NAME, "Root dir: " + rootDir);

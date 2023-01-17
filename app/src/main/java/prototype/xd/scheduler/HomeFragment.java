@@ -54,7 +54,7 @@ public class HomeFragment extends Fragment {
     
     public static final String NAME = HomeFragment.class.getSimpleName();
     
-    private volatile TodoEntryManager todoEntryManager;
+    private TodoEntryManager todoEntryManager;
     private ContentWrapperBinding contentBnd;
     private ContextWrapper wrapper;
     
@@ -73,7 +73,7 @@ public class HomeFragment extends Fragment {
     }
     
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentActivity rootActivity = requireActivity();
         
         HomeFragmentWrapperBinding wrapperBnd = HomeFragmentWrapperBinding.inflate(inflater, container, false);
@@ -139,7 +139,7 @@ public class HomeFragment extends Fragment {
             final List<Group> groupList = todoEntryManager.getGroups();
             displayEntryAdditionEditDialog(wrapper,
                     null, groupList,
-                    (view2, text, dialogBinding, selectedIndex) -> {
+                    (text, dialogBinding, selectedIndex) -> {
                         SArrayMap<String, String> values = new SArrayMap<>();
                         values.put(TEXT_VALUE, text);
                         boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();

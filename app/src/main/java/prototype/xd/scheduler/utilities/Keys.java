@@ -14,17 +14,16 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
 
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.Triplet.DefaultedValueTriplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
-public class Keys {
+public final class Keys {
     
     public static final String NAME = Keys.class.getSimpleName();
     
@@ -69,7 +68,7 @@ public class Keys {
         public Triplet.Type getType() {
             return type;
         }
-    
+        
         @NonNull
         public T get(@Nullable List<String> subKeys, T actualDefaultValue, boolean ignoreBaseKey) {
             if (subKeys != null) {
@@ -81,7 +80,7 @@ public class Keys {
             }
             return getInternal(key, actualDefaultValue);
         }
-    
+        
         @NonNull
         public T get(@Nullable List<String> subKeys) {
             return get(subKeys, defaultValue, false);
@@ -113,13 +112,14 @@ public class Keys {
             if (obj == this) {
                 return true;
             }
-            if (!(obj instanceof DefaultedValue<?>))
-                return false;
-            DefaultedValue<?> val = (DefaultedValue<?>) obj;
-            return Objects.equals(val.defaultValue, defaultValue) &&
-                    val.key.equals(key) &&
-                    val.type == type &&
-                    Objects.equals(val.internalPrefs, internalPrefs);
+            if (obj instanceof DefaultedValue<?>) {
+                DefaultedValue<?> val = (DefaultedValue<?>) obj;
+                return Objects.equals(val.defaultValue, defaultValue) &&
+                        val.key.equals(key) &&
+                        val.type == type &&
+                        Objects.equals(val.internalPrefs, internalPrefs);
+            }
+            return false;
         }
         
         @NonNull
@@ -280,7 +280,7 @@ public class Keys {
         }
     }
     
-    public static void initPrefs(Context context) {
+    public static synchronized void initPrefs(Context context) {
         if (preferences == null) {
             preferences = context.getSharedPreferences(PREFERENCES_MAIN, Context.MODE_PRIVATE);
             servicePreferences = context.getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
@@ -325,7 +325,7 @@ public class Keys {
                 if (preferences.getString(calendarSubKeys.get(i) + "_" + parameter, null) != null) {
                     return i;
                 }
-            } catch (ClassCastException e) {
+            } catch (ClassCastException e) { // NOSONAR
                 return i;
             }
         }
@@ -334,7 +334,7 @@ public class Keys {
     
     public static String getFirstValidKey(List<String> calendarSubKeys, String parameter) {
         int index = getFirstValidKeyIndex(calendarSubKeys, parameter);
-        return index == -1 ? parameter : calendarSubKeys.get(index) + "_" + parameter;
+        return index == -1 ? parameter : (calendarSubKeys.get(index) + "_" + parameter);
     }
     
     public static void setBitmapUpdateFlag() {
@@ -346,12 +346,13 @@ public class Keys {
         SERVICE_UPDATE_SIGNAL.put(Boolean.FALSE);
     }
     
-    private static volatile SharedPreferences preferences;
-    private static volatile SharedPreferences servicePreferences;
+    private static volatile SharedPreferences preferences; // NOSONAR, SharedPreferences are thread safe
+    private static volatile SharedPreferences servicePreferences; // NOSONAR
     
-    public static final float DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR = 0.75f;
-    public static final float DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR = 0.85f;
-    public static final float DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR = 0.25f;
+    public static final float DEFAULT_DIM_FACTOR = 0.5F;
+    public static final float DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR = 0.75F;
+    public static final float DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR = 0.85F;
+    public static final float DEFAULT_SECONDARY_TEXT_COLOR_MIX_FACTOR = 0.25F;
     public static final float DEFAULT_TITLE_FONT_SIZE_MULTIPLIER = 1.1F;
     
     public static final int DAY_FLAG_GLOBAL = -1;
@@ -372,7 +373,7 @@ public class Keys {
             "bgColor", 0xff_999999,
             "expiredBgColor", 0xff_FFCCCC);
     
-    public static final Function<Integer, Integer> SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR = eventColor ->
+    public static final IntUnaryOperator SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR = eventColor ->
             mixTwoColors(Color.WHITE, eventColor, Keys.DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR);
     
     public static final DefaultedValueTriplet<Integer, DefaultedInteger> BORDER_COLOR = new DefaultedValueTriplet<>(
@@ -433,7 +434,7 @@ public class Keys {
     public static final int APP_THEME_DARK = MODE_NIGHT_YES;
     public static final int APP_THEME_SYSTEM = MODE_NIGHT_FOLLOW_SYSTEM;
     public static final int DEFAULT_APP_THEME = APP_THEME_SYSTEM;
-    public static final List<Integer> appThemes = Collections.unmodifiableList(Arrays.asList(APP_THEME_DARK, APP_THEME_SYSTEM, APP_THEME_LIGHT));
+    public static final List<Integer> appThemes = List.of(APP_THEME_DARK, APP_THEME_SYSTEM, APP_THEME_LIGHT);
     public static final DefaultedInteger APP_THEME = new DefaultedInteger("app_theme", DEFAULT_APP_THEME);
     
     public static final String PREFERENCES_MAIN = "prefs";
@@ -448,7 +449,7 @@ public class Keys {
     
     public static final DefaultedInteger DISPLAY_METRICS_HEIGHT = new DefaultedInteger("metrics_H", 100);
     public static final DefaultedInteger DISPLAY_METRICS_WIDTH = new DefaultedInteger("metrics_W", 100);
-    public static final DefaultedFloat DISPLAY_METRICS_DENSITY = new DefaultedFloat("metrics_D", -1f);
+    public static final DefaultedFloat DISPLAY_METRICS_DENSITY = new DefaultedFloat("metrics_D", -1F);
     
     public static final DefaultedString ROOT_DIR = new DefaultedString("root_directory", "");
     public static final String ENTRIES_FILE = "entries";

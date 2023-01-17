@@ -54,7 +54,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.Group;
@@ -65,23 +67,24 @@ import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
 @SuppressWarnings({"unchecked"})
-public class Utilities {
+public final class Utilities {
     
     public static final String NAME = Utilities.class.getSimpleName();
-    
-    public static File getFile(String filename) {
-        return new File(ROOT_DIR.get(), filename);
-    }
-    
-    public static Path getPath(String filename) {
-        return getFile(filename).toPath();
-    }
     
     private Utilities() {
         throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
-    public static String nullWrapper(String str) {
+    public static File getFile(@NonNull String filename) {
+        return new File(ROOT_DIR.get(), filename);
+    }
+    
+    public static Path getPath(@NonNull String filename) {
+        return getFile(filename).toPath();
+    }
+    
+    @NonNull
+    public static String nullWrapper(@Nullable String str) {
         return str == null ? "" : str.trim();
     }
     
@@ -89,7 +92,7 @@ public class Utilities {
         return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
     
-    public static <T extends Exception> void throwOnFalse(boolean result, String message, Class<T> exceptionClass)
+    public static <T extends Exception> void throwOnFalse(boolean result, @NonNull String message, @NonNull Class<T> exceptionClass)
             throws T, IllegalArgumentException {
         if (!result) {
             try {
@@ -97,7 +100,7 @@ public class Utilities {
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException |
                      NoSuchMethodException e) {
                 e.printStackTrace();
-                throw new IllegalArgumentException("Error throwing exception");
+                throw new IllegalArgumentException("Error throwing exception", e);
             }
         }
     }
@@ -114,7 +117,8 @@ public class Utilities {
             int id = 0;
             for (TodoEntry entry : readEntries) {
                 // post deserialize
-                entry.initGroupAndId(groups, id++, attachGroupToEntry);
+                entry.initGroupAndId(groups, id, attachGroupToEntry);
+                id++;
             }
             
             Logger.info(NAME, "Read todo list: " + readEntries.size());
@@ -144,7 +148,7 @@ public class Utilities {
             
             Logger.info(NAME, "Saved todo list");
         } catch (IOException e) {
-            Logger.error(NAME, "Missing permission, failed saving todo list");
+            Logger.error(NAME, "Missing permission, failed saving todo list: " + e);
         } catch (Exception e) {
             logException(NAME, e);
         }
@@ -152,7 +156,8 @@ public class Utilities {
     
     public static GroupList loadGroups() {
         GroupList groups = new GroupList();
-        groups.add(Group.NULL_GROUP); // add "null" group
+        // add "null" group
+        groups.add(Group.NULL_GROUP);
         try {
             groups.addAll(loadObjectWithBackup(GROUPS_FILE, GROUPS_FILE_BACKUP));
             return groups;
@@ -191,12 +196,12 @@ public class Utilities {
     public static <T> T loadObjectWithBackup(String fileName, String backupName) throws IOException, ClassNotFoundException {
         try {
             return loadObject(fileName);
-        } catch (Exception e) {
+        } catch (IOException | ClassNotFoundException e) {
             T obj = loadObject(backupName);
             // restore backup if it was read successfully
             Files.copy(getPath(backupName), getPath(fileName),
                     StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            warning(NAME, "Restored " + backupName + " to " + fileName);
+            warning(NAME, "Restored " + backupName + " to " + fileName + " (" + e + ")");
             return obj;
         }
     }
@@ -283,10 +288,10 @@ public class Utilities {
                                                final Slider slider,
                                                @Nullable final SliderOnChangeKeyedListener onChangeListener,
                                                @StringRes @PluralsRes final int stringResource,
-                                               Keys.DefaultedInteger value,
+                                               @NonNull Keys.DefaultedInteger value,
                                                boolean zeroIsOff) {
         Context context = displayTo.getContext();
-        Function<Integer, String> textFormatter = progress -> {
+        IntFunction<String> textFormatter = progress -> {
             if (progress == 0 && zeroIsOff) {
                 return context.getString(stringResource, context.getString(R.string.off));
             } else {
@@ -301,7 +306,7 @@ public class Utilities {
                                                final Slider slider,
                                                @Nullable final SliderOnChangeKeyedListener onChangeListener,
                                                Keys.DefaultedInteger value,
-                                               @NonNull Function<Integer, String> textFormatter) {
+                                               @NonNull IntFunction<String> textFormatter) {
         int loadedVal = value.get();
         displayTo.setText(textFormatter.apply(loadedVal));
         slider.clearOnChangeListeners();
@@ -335,16 +340,17 @@ public class Utilities {
                                                @NonNull final PopupSettingsView settingsView,
                                                @StringRes @PluralsRes final int stringResource,
                                                final Keys.DefaultedInteger value,
-                                               @NonNull final Function<Keys.DefaultedInteger, Integer> initialValueFactory,
+                                               @NonNull final ToIntFunction<Keys.DefaultedInteger> initialValueFactory,
                                                @Nullable final Slider.OnChangeListener customProgressListener,
                                                @Nullable final Slider.OnSliderTouchListener customTouchListener) {
-        int initialValue = initialValueFactory.apply(value);
+        int initialValue = initialValueFactory.applyAsInt(value);
         displayTo.setText(getQuantityString(displayTo.getContext(), stringResource, initialValue));
         slider.clearOnChangeListeners();
         slider.setValue(initialValue);
         slider.addOnChangeListener((slider1, progress, fromUser) -> {
-            if (customProgressListener != null)
+            if (customProgressListener != null) {
                 customProgressListener.onValueChange(slider1, progress, fromUser);
+            }
             if (fromUser) {
                 displayTo.setText(getQuantityString(displayTo.getContext(), stringResource, (int) progress));
             }
@@ -353,12 +359,16 @@ public class Utilities {
         slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
-                if (customTouchListener != null) customTouchListener.onStartTrackingTouch(slider);
+                if (customTouchListener != null) {
+                    customTouchListener.onStartTrackingTouch(slider);
+                }
             }
             
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
-                if (customTouchListener != null) customTouchListener.onStopTrackingTouch(slider);
+                if (customTouchListener != null) {
+                    customTouchListener.onStopTrackingTouch(slider);
+                }
                 settingsView.notifyParameterChanged(stateIcon, value.key, (int) slider.getValue());
             }
         });
@@ -371,7 +381,7 @@ public class Utilities {
                                                final PopupSettingsView systemCalendarSettings,
                                                @StringRes @PluralsRes final int stringResource,
                                                final Keys.DefaultedInteger value,
-                                               final Function<Keys.DefaultedInteger, Integer> initialValueFactory,
+                                               final ToIntFunction<Keys.DefaultedInteger> initialValueFactory,
                                                @Nullable final Slider.OnChangeListener customProgressListener) {
         setSliderChangeListener(
                 displayTo, slider, stateIcon, systemCalendarSettings,
@@ -396,8 +406,8 @@ public class Utilities {
                                                final TextView stateIcon,
                                                final PopupSettingsView settingsView,
                                                final Keys.DefaultedBoolean value,
-                                               final Function<Keys.DefaultedBoolean, Boolean> initialValueFactory) {
-        tSwitch.setCheckedSilent(initialValueFactory.apply(value));
+                                               final Predicate<Keys.DefaultedBoolean> initialValueFactory) {
+        tSwitch.setCheckedSilent(initialValueFactory.test(value));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
                 settingsView.notifyParameterChanged(stateIcon, value.key, isChecked));
     }
@@ -410,9 +420,9 @@ public class Utilities {
      * @param quantity string quantity
      * @return string with the given quantity
      */
-    public static String getQuantityString(@NonNull Context context, @StringRes @PluralsRes int resId, int quantity) {
+    public static String getQuantityString(@NonNull Context context, @StringRes @PluralsRes int resId, int quantity) throws Resources.NotFoundException {
         Resources res = context.getResources();
-        if (res.getResourceTypeName(resId).equals("plurals")) {
+        if (res.getResourceTypeName(resId).equals("plurals")) { //NOSONAR, getResourceTypeName does not return null
             return res.getQuantityString(resId, quantity, quantity);
         }
         return res.getString(resId, quantity);
@@ -426,11 +436,9 @@ public class Utilities {
      * @param quantity string quantity
      * @return string with the given quantity
      */
-    public static String getPluralString(@NonNull Context context, @PluralsRes int resId, int quantity) {
+    public static String getPluralString(@NonNull Context context, @PluralsRes int resId, int quantity) throws Resources.NotFoundException {
         return context.getResources().getQuantityString(resId, quantity, quantity);
     }
-    
-    // opens a url in default browser (context)
     
     /**
      * Opens a url in default browser
@@ -460,7 +468,7 @@ public class Utilities {
      */
     public static <K, V> Set<K> getChangedKeys(@NonNull final Map<K, V> map1,
                                                @NonNull final Map<K, V> map2) {
-        if (map1.isEmpty() && map2.isEmpty() || map1.equals(map2)) {
+        if ((map1.isEmpty() && map2.isEmpty()) || map1.equals(map2)) {
             return Collections.emptySet();
         }
         if (map1.isEmpty()) {
@@ -504,9 +512,11 @@ public class Utilities {
         // intersection contains keys both in set1 and set2
         Set<K> intersection = new ArraySet<>(set1.size());
         intersection.addAll(set1);
-        intersection.retainAll(set2); // leave keys that are the same
+        // leave keys that are the same
+        intersection.retainAll(set2);
         
-        combined.removeAll(intersection); // remove equal keys
+        // remove equal keys
+        combined.removeAll(intersection);
         
         return combined;
     }
@@ -527,7 +537,7 @@ public class Utilities {
             int initialHeight = view.getMeasuredHeight();
             view.animate()
                     .scaleY(visible ? 1 : 0)
-                    .translationY(visible ? 0 : -initialHeight / 2f).start();
+                    .translationY(visible ? 0 : -initialHeight / 2F).start();
         }
     }
     
@@ -563,40 +573,43 @@ public class Utilities {
         return spannable;
     }
     
-    public static long rfc2445ToMilliseconds(String str) {
-        if (str == null || str.isEmpty())
-            throw new IllegalArgumentException("Null or empty RFC string");
+    public static long rfc2445ToMilliseconds(@NonNull String str) {
+        if (str.isEmpty()) {
+            throw new IllegalArgumentException("Empty RFC string");
+        }
         
         int sign = 1;
+        int index = 0;
+        
+        char c = str.charAt(index);
+        
+        if (c == '-') {
+            sign = -1;
+            index++;
+        } else if (c == '+') {
+            index++;
+        }
+        
+        c = str.charAt(index);
+        
+        if (c != 'P') {
+            throw new IllegalArgumentException("Duration.parse(str='" + str + "') expected 'P' at index=" + index);
+        }
+        
+        index++;
+        c = str.charAt(index);
+        if (c == 'T') {
+            index++;
+        }
+        
         int weeks = 0;
         int days = 0;
         int hours = 0;
         int minutes = 0;
         int seconds = 0;
         
-        int len = str.length();
-        int index = 0;
-        char c;
-        
-        c = str.charAt(0);
-        
-        if (c == '-') {
-            sign = -1;
-            index++;
-        } else if (c == '+')
-            index++;
-        
-        c = str.charAt(index);
-        
-        if (c != 'P')
-            throw new IllegalArgumentException("Duration.parse(str='" + str + "') expected 'P' at index=" + index);
-        
-        index++;
-        c = str.charAt(index);
-        if (c == 'T')
-            index++;
-        
         int n = 0;
+        int len = str.length();
         for (; index < len; index++) {
             c = str.charAt(index);
             

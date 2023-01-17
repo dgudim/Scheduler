@@ -10,6 +10,8 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.function.ObjIntConsumer;
+
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.TodoItemViewSelectionDialogBinding;
@@ -101,7 +103,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.previewContainer.setOnClickListener(v ->
                     viewSelectionDialog.show());
             
-            DialogUtilities.ColorPickerColorSelectionListener colorPickerColorSelectedListener = (value, selectedColor) -> {
+            ObjIntConsumer<Keys.DefaultedInteger> colorPickerColorSelectedListener = (value, selectedColor) -> {
                 value.put(selectedColor);
                 entryPreviewContainer.notifyColorChanged(value, selectedColor);
             };

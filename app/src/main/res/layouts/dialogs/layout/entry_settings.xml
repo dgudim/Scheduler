@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray_bg_tint">
+    android:background="@color/light_gray_bg_tint"
+    tools:ignore="Overdraw">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,7 +43,8 @@
 
                     android:text="@string/settings_state_symbol"
                     android:textAppearance="@style/MediumHeading"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="TextSizeCheck" />
 
                 <prototype.xd.scheduler.views.Switch
                     android:id="@+id/show_on_lock_switch"
@@ -52,7 +54,7 @@
                     android:paddingEnd="5dp"
                     android:text="@string/settings_show_items_lock"
                     android:textAppearance="@style/SmallHeading"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="TextContrastCheck,VisualLintButtonSize" />
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -79,7 +81,8 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/hide_by_content_switch"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/hide_by_content_switch" />
+                    app:layout_constraintTop_toTopOf="@+id/hide_by_content_switch"
+                    tools:ignore="TextSizeCheck" />
 
                 <prototype.xd.scheduler.views.Switch
                     android:id="@+id/hide_by_content_switch"
@@ -92,7 +95,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/hide_by_content_switch_state"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
 
                 <TextView
@@ -119,7 +122,8 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="@+id/hide_by_content_field"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView7" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView7"
+                    tools:ignore="TextSizeCheck" />
 
                 <EditText
                     android:id="@+id/hide_by_content_field"
@@ -132,7 +136,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/hide_by_content_field_state"
                     app:layout_constraintTop_toBottomOf="@+id/textView7"
-                    tools:ignore="TouchTargetSizeCheck" />
+                    tools:ignore="TouchTargetSizeCheck,TextContrastCheck,VisualLintTextFieldSize" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -159,7 +163,8 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/priority_description" />
+                    app:layout_constraintTop_toTopOf="@+id/priority_description"
+                    tools:ignore="TextSizeCheck" />
 
 
                 <TextView
@@ -210,7 +215,8 @@
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/adaptive_color_balance_description" />
+                    app:layout_constraintTop_toTopOf="@+id/adaptive_color_balance_description"
+                    tools:ignore="TextSizeCheck" />
 
 
                 <TextView
@@ -304,7 +310,8 @@
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="@+id/textView8"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="@+id/textView8" />
+                            app:layout_constraintTop_toTopOf="@+id/textView8"
+                            tools:ignore="TextSizeCheck" />
 
                         <TextView
                             android:id="@+id/textView8"
@@ -337,7 +344,8 @@
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="@+id/textView9"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="@+id/textView9" />
+                            app:layout_constraintTop_toTopOf="@+id/textView9"
+                            tools:ignore="TextSizeCheck" />
 
                         <TextView
                             android:id="@+id/textView9"
@@ -374,7 +382,8 @@
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="@+id/textView10"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="@+id/textView10" />
+                            app:layout_constraintTop_toTopOf="@+id/textView10"
+                            tools:ignore="TextSizeCheck" />
 
                         <TextView
                             android:id="@+id/textView10"
@@ -449,7 +458,8 @@
                         android:textStyle="bold"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/border_thickness_description" />
+                        app:layout_constraintTop_toTopOf="@+id/border_thickness_description"
+                        tools:ignore="TextSizeCheck" />
 
 
                     <TextView
@@ -513,7 +523,8 @@
                     android:text="@string/settings_state_symbol"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="@+id/show_days_expired_description"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="TextSizeCheck" />
 
                 <TextView
                     android:id="@+id/show_days_expired_description"
@@ -542,7 +553,8 @@
                     android:text="@string/settings_state_symbol"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@+id/show_days_upcoming_description"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="TextSizeCheck" />
 
                 <LinearLayout
                     android:id="@+id/linearLayout2"
@@ -608,7 +620,8 @@
 
                     android:text="@string/settings_state_symbol"
                     android:textAppearance="@style/MediumHeading"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="TextSizeCheck" />
 
                 <prototype.xd.scheduler.views.Switch
                     android:id="@+id/hide_expired_items_by_time_switch"
@@ -617,7 +630,8 @@
                     android:paddingStart="3dp"
                     android:paddingEnd="5dp"
                     android:text="@string/settings_hide_expired_entries_by_time"
-                    android:textAppearance="@style/SmallHeading" />
+                    android:textAppearance="@style/SmallHeading"
+                    tools:ignore="VisualLintButtonSize" />
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -642,7 +656,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -666,7 +680,7 @@
                 android:layout_marginTop="5dp"
                 android:background="@drawable/round_bg_8dp"
                 android:backgroundTint="?colorPrimaryContainer"
-                android:contentDescription="@string/add_group"
+                android:contentDescription="@string/edit_group"
                 android:minWidth="10dp"
                 app:srcCompat="@drawable/ic_edit_24" />
 
@@ -683,7 +697,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/settings_reset_to_defaults"
-                tools:ignore="TextContrastCheck" />
+                tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
         </LinearLayout>
 

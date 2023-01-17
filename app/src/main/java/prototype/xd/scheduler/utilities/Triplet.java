@@ -16,15 +16,6 @@ public class Triplet<T> {
         UPCOMING, CURRENT, EXPIRED
     }
     
-    public Triplet() {
-    }
-    
-    public Triplet(T upcoming, T current, T expired) {
-        this.upcoming = upcoming;
-        this.current = current;
-        this.expired = expired;
-    }
-    
     public <R> void applyTo(Triplet<R> other, BiConsumer<T, R> consumer) {
         consumer.accept(upcoming, other.upcoming);
         consumer.accept(current, other.current);
@@ -76,9 +67,9 @@ public class Triplet<T> {
     public static class DefaultedValueTriplet<T, D extends Keys.DefaultedValue<T>> extends Triplet<D> {
     
         // aliases
-        public final D UPCOMING;
-        public final D CURRENT;
-        public final D EXPIRED;
+        public final D UPCOMING; // NOSONAR, this is an alias
+        public final D CURRENT; // NOSONAR
+        public final D EXPIRED; // NOSONAR
         
         DefaultedValueTriplet(Function3<String, T, Type, D> supplier,
                               String upcomingKey, T upcomingDefaultValue,

@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatSpinner;
 
 public class Spinner extends AppCompatSpinner {
-    private boolean ignoreCheckedChange = false;
+    private boolean ignoreCheckedChange;
     
     public Spinner(@NonNull Context context) {
         super(context);

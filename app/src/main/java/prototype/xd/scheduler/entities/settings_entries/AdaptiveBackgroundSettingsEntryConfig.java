@@ -10,7 +10,7 @@ import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 
-import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.PerDayBgGridViewAdapter;
@@ -28,7 +28,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     private Integer lastClickedBgIndex;
     
     public AdaptiveBackgroundSettingsEntryConfig(@NonNull final Context context,
-                                                 @NonNull final Consumer<Integer> bgSelectionClickedCallback) {
+                                                 @NonNull final IntConsumer bgSelectionClickedCallback) {
         gridViewAdapter = new PerDayBgGridViewAdapter(context, bgIndex -> {
             lastClickedBgIndex = bgIndex;
             bgSelectionClickedCallback.accept(bgIndex);

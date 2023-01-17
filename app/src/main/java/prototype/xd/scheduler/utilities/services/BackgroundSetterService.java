@@ -27,7 +27,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 
-public class BackgroundSetterService extends Service {
+public final class BackgroundSetterService extends Service { // NOSONAR this is a service
     
     public static final String NAME = BackgroundSetterService.class.getSimpleName();
     
@@ -53,7 +53,7 @@ public class BackgroundSetterService extends Service {
     private final int foregroundNotificationId = (int) (System.currentTimeMillis() % 10000);
     
     // Notification
-    private NotificationCompat.Builder foregroundNotification = null;
+    private NotificationCompat.Builder foregroundNotification;
     
     private NotificationCompat.Builder getForegroundNotification() {
         if (foregroundNotification == null) {
@@ -70,7 +70,7 @@ public class BackgroundSetterService extends Service {
     }
     
     // Notification channel name
-    private String notificationChannelName = null;
+    private String notificationChannelName;
     
     private String getNotificationChannelName() {
         if (notificationChannelName == null) {
@@ -81,7 +81,7 @@ public class BackgroundSetterService extends Service {
     
     
     // Notification channel description
-    private String notificationChannelDescription = null;
+    private String notificationChannelDescription;
     
     private String getNotificationChannelDescription() {
         if (notificationChannelDescription == null) {
@@ -91,7 +91,7 @@ public class BackgroundSetterService extends Service {
     }
     
     // Notification channel id
-    private String notificationChannelId = null;
+    private String notificationChannelId;
     private NotificationManager notificationManager;
     
     public String getNotificationChannelId() {
@@ -126,8 +126,8 @@ public class BackgroundSetterService extends Service {
     
     // Lifecycle ===============================
     
-    private volatile boolean lastUpdateSucceeded = false;
-    private boolean initialized = false;
+    private volatile boolean lastUpdateSucceeded;
+    private boolean initialized;
     @Nullable
     private BroadcastReceiver screenOnOffReceiver;
     @Nullable

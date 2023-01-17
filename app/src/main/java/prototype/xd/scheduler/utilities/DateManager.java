@@ -12,9 +12,7 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import prototype.xd.scheduler.entities.TodoEntry;
 
-public class DateManager {
+public final class DateManager {
     
     public static final String NAME = DateManager.class.getSimpleName();
     
@@ -34,33 +32,31 @@ public class DateManager {
     
     public static final long ONE_MINUTE_MS = 60000L;
     
-    public static TimeZone systemTimeZone = TimeZone.getDefault();
+    public static TimeZone systemTimeZone = TimeZone.getDefault(); // NOSONAR
     public static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     
-    public static long currentDayUTC = DAY_FLAG_GLOBAL;
-    public static long currentTimestampUTC = DAY_FLAG_GLOBAL;
-    public static LocalDate currentDate = LocalDate.now();
+    public static long currentDayUTC = DAY_FLAG_GLOBAL; // NOSONAR
+    public static long currentTimestampUTC = DAY_FLAG_GLOBAL; // NOSONAR
+    public static LocalDate currentDate = LocalDate.now(); // NOSONAR
     
-    public static long currentlySelectedDayUTC = DAY_FLAG_GLOBAL;
-    public static long currentlySelectedTimestampUTC = DAY_FLAG_GLOBAL;
+    public static long currentlySelectedDayUTC = DAY_FLAG_GLOBAL; // NOSONAR
+    public static long currentlySelectedTimestampUTC = DAY_FLAG_GLOBAL; // NOSONAR
     
     @NonNull
     public static final Locale systemLocale = Objects.requireNonNull(LocaleListCompat.getDefault().get(0));
-    private static final DateFormat dateTimeFormatLocal = new SimpleDateFormat("dd/MM HH:mm", systemLocale);
-    private static final DateFormat dateFormatUTC = new SimpleDateFormat("dd/MM", systemLocale);
-    private static final DateFormat dateFormatMonthNamesUTC = new SimpleDateFormat("MMM d", systemLocale);
-    private static final DateFormat timeFormatLocal = new SimpleDateFormat("HH:mm", systemLocale);
+    private static final DateFormat dateTimeFormatLocal = new SimpleDateFormat("dd/MM HH:mm", systemLocale); // NOSONAR, method is synchronized
+    private static final DateFormat dateFormatUTC = new SimpleDateFormat("dd/MM", systemLocale); // NOSONAR
+    private static final DateFormat dateFormatMonthNamesUTC = new SimpleDateFormat("MMM d", systemLocale); // NOSONAR
+    private static final DateFormat timeFormatLocal = new SimpleDateFormat("HH:mm", systemLocale); // NOSONAR
     
-    public static final List<String> WEEK_DAYS_ROOT = Collections.unmodifiableList(Arrays.asList("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "default"));
-    public static final String DEFAULT_BACKGROUND_NAME = DateManager.WEEK_DAYS_ROOT.get(7) + ".png"; // get "default.png"
+    public static final List<String> WEEK_DAYS_ROOT;
+    public static final String DEFAULT_BACKGROUND_NAME = "default.png";
     private static final List<String> WEEK_DAYS_LOCAL;
     
-    public static final List<DayOfWeek> FIRST_DAYS_OF_WEEK = Collections.unmodifiableList(
-            Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
+    public static final List<DayOfWeek> FIRST_DAYS_OF_WEEK_ROOT = List.of(DayOfWeek.MONDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+    public static final List<String> FIRST_DAYS_OF_WEEK_LOCAL;
     public static final Keys.DefaultedEnum<DayOfWeek> FIRST_DAY_OF_WEEK =
             new Keys.DefaultedEnum<>("first_week_day", DayOfWeek.MONDAY, DayOfWeek.class);
-    
-    private static final Calendar localLookupCalendar = Calendar.getInstance(systemTimeZone, systemLocale);
     
     static {
         // init local weekdays (remap)
@@ -74,7 +70,23 @@ public class DateManager {
         weekDaysLocal[5] = newDays[Calendar.SATURDAY];
         weekDaysLocal[6] = newDays[Calendar.SUNDAY];
         
-        WEEK_DAYS_LOCAL = Collections.unmodifiableList(Arrays.asList(weekDaysLocal));
+        WEEK_DAYS_LOCAL = List.of(weekDaysLocal);
+    
+        DayOfWeek[] weekDays = DayOfWeek.values();
+        String[] weekDaysRoot = new String[8];
+        for (int i = 0; i < 7; i++) {
+            weekDaysRoot[i] = weekDays[i].name().toLowerCase(Locale.ROOT);
+        }
+        weekDaysRoot[7] = DEFAULT_BACKGROUND_NAME;
+        
+        WEEK_DAYS_ROOT = List.of(weekDaysRoot);
+    
+        String[] localizedWeekdays = new String[FIRST_DAYS_OF_WEEK_ROOT.size()];
+        for (int i = 0; i < localizedWeekdays.length; i++) {
+            localizedWeekdays[i] = WEEK_DAYS_LOCAL.get(FIRST_DAYS_OF_WEEK_ROOT.get(i).ordinal());
+        }
+        
+        FIRST_DAYS_OF_WEEK_LOCAL = List.of(localizedWeekdays);
         
         dateFormatUTC.setTimeZone(utcTimeZone);
         dateFormatMonthNamesUTC.setTimeZone(utcTimeZone);
@@ -87,7 +99,6 @@ public class DateManager {
             // reinitialize all the stuff
             systemTimeZone = newTimeZone;
             // update timezones of calendar and formatters
-            localLookupCalendar.setTimeZone(systemTimeZone);
             timeFormatLocal.setTimeZone(systemTimeZone);
             dateTimeFormatLocal.setTimeZone(systemTimeZone);
             updateDate();
@@ -218,25 +229,10 @@ public class DateManager {
     }
     
     public static String getCurrentWeekdayLocaleAgnosticString() {
-        localLookupCalendar.setTimeInMillis(System.currentTimeMillis());
-        return WEEK_DAYS_ROOT.get(normalizeCalendarDayOffset(localLookupCalendar.get(Calendar.DAY_OF_WEEK)));
-    }
-    
-    public static String[] getFirstDaysOfWeekLocal() {
-        String[] localizedWeekdays = new String[FIRST_DAYS_OF_WEEK.size()];
-        for (int i = 0; i < localizedWeekdays.length; i++) {
-            localizedWeekdays[i] = WEEK_DAYS_LOCAL.get(FIRST_DAYS_OF_WEEK.get(i).ordinal());
-        }
-        return localizedWeekdays;
+        return currentDate.getDayOfWeek().name().toLowerCase(Locale.ROOT);
     }
     
     public static String getLocalWeekdayByIndex(int index, String defaultValue) {
         return index >= 7 ? defaultValue : WEEK_DAYS_LOCAL.get(index);
     }
-    
-    private static int normalizeCalendarDayOffset(int day) {
-        // Calendar.SUNDAY == 1
-        return day == 1 ? 6 : day - 2;
-    }
-    
 }

@@ -1,17 +1,16 @@
 package prototype.xd.scheduler.entities;
 
 import android.content.Context;
+import android.util.ArraySet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.collection.ArrayMap;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -34,28 +33,28 @@ public class Group implements Serializable {
     public static final Group NULL_GROUP = new Group();
     
     private String groupName;
-    private transient Map<Long, TodoEntry> associatedEntries;
+    private transient Set<TodoEntry> associatedEntries;
     protected SArrayMap<String, String> params;
     
     public Group() {
         groupName = "";
         params = new SArrayMap<>();
-        associatedEntries = Collections.emptyMap();
+        associatedEntries = Collections.emptySet();
     }
     
     public Group(String groupName, SArrayMap<String, String> params) {
         this.groupName = groupName;
         this.params = params;
-        associatedEntries = new ArrayMap<>();
+        associatedEntries = new ArraySet<>();
     }
     
     private void readObject(ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         if (isNullGroup()) {
-            associatedEntries = Collections.emptyMap();
+            associatedEntries = Collections.emptySet();
         } else {
-            associatedEntries = new ArrayMap<>();
+            associatedEntries = new ArraySet<>();
         }
     }
     
@@ -65,7 +64,7 @@ public class Group implements Serializable {
             // don't attach to empty group
             return;
         }
-        if (associatedEntries.put(todoEntry.getRecyclerViewId(), todoEntry) != null) {
+        if (!associatedEntries.add(todoEntry)) {
             Logger.warning(NAME, "attachEntryInternal called with " + todoEntry + " but it's already attached");
         }
     }
@@ -76,7 +75,7 @@ public class Group implements Serializable {
             // don't detach from empty group
             return;
         }
-        if (associatedEntries.remove(todoEntry.getRecyclerViewId()) == null) {
+        if (!associatedEntries.remove(todoEntry)) {
             Logger.warning(NAME, "detachEntryInternal called with " + todoEntry + " but it's not attached");
         }
     }
@@ -86,7 +85,7 @@ public class Group implements Serializable {
             // don't detach from empty group
             return;
         }
-        associatedEntries.forEach((aLong, todoEntry) -> todoEntry.unlinkGroupInternal(true));
+        associatedEntries.forEach(todoEntry -> todoEntry.unlinkGroupInternal(true));
         associatedEntries.clear();
     }
     
@@ -176,7 +175,7 @@ public class Group implements Serializable {
         }
         Set<String> changedKeys = Utilities.getChangedKeys(params, newParams);
         // notify all connected entries of the change
-        associatedEntries.forEach((aLong, todoEntry) -> todoEntry.invalidateParameters(changedKeys));
+        associatedEntries.forEach(todoEntry -> todoEntry.invalidateParameters(changedKeys));
         params = newParams;
         return !changedKeys.isEmpty();
     }

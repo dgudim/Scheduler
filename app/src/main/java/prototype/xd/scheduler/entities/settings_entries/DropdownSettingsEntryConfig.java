@@ -20,15 +20,17 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
     private final Keys.DefaultedValue<T> value;
     
     public DropdownSettingsEntryConfig(@StringRes int hintId,
-                                       @NonNull final String[] displayItems,
+                                       @NonNull final List<String> displayItems,
                                        @NonNull final List<T> items,
                                        @NonNull final Keys.DefaultedValue<T> value) {
-        this.hintId = hintId;
-        this.displayItems = displayItems;
-        this.items = items;
-        if (displayItems.length != items.size()) {
+        
+        if (displayItems.size() != items.size()) {
             throw new IllegalArgumentException("displayItems.size != items.size");
         }
+        
+        this.hintId = hintId;
+        this.items = items;
+        this.displayItems = displayItems.toArray(new String[0]);
         this.value = value;
     }
     

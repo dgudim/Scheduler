@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.BiConsumer;
 
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.entities.Group;
@@ -39,7 +40,7 @@ import prototype.xd.scheduler.entities.TodoEntry.RangeType;
 import prototype.xd.scheduler.entities.TodoEntryList;
 import prototype.xd.scheduler.views.CalendarView;
 
-public class TodoEntryManager implements DefaultLifecycleObserver {
+public final class TodoEntryManager implements DefaultLifecycleObserver {
     
     public static final String NAME = TodoEntryManager.class.getSimpleName();
     
@@ -47,8 +48,8 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         ENTRIES, GROUPS
     }
     
-    private long loadedDay_start;
-    private long loadedDay_end;
+    private long firstLoadedDay;
+    private long lastLoadedDay;
     
     @Nullable
     private CalendarView calendarView;
@@ -61,48 +62,48 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
     private final Thread asyncSaver;
     private final BlockingQueue<SaveType> saveQueue;
     
-    private volatile boolean initFinished = false;
+    private volatile boolean initFinished;
     @Nullable
     private Runnable onInitFinishedRunnable;
     
     private boolean displayUpcomingExpired;
-    private final ArrayMap<SystemCalendar, Boolean> calendarVisibilityMap;
+    private final ArrayMap<Long, Boolean> calendarVisibilityMap;
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
     
     /**
      * Listener that is called when parameters change on any TodoEntry
      */
-    private final TodoEntry.ParameterInvalidationListener parameterInvalidationListener = new TodoEntry.ParameterInvalidationListener() {
+    private final BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener = new BiConsumer<>() { // NOSONAR, nah
         @Override
-        public void parametersInvalidated(TodoEntry entry, Set<String> parameters) {
-            
+        public void accept(TodoEntry entry, Set<String> parameters) {
+        
             Logger.debug(NAME, entry + " parameters changed: " + parameters);
-            
+        
             // entry moved to a new day
             boolean coreDaysChanged = parameters.contains(START_DAY_UTC) ||
                     parameters.contains(END_DAY_UTC);
-            
+        
             boolean extendedDaysChanged = (parameters.contains(UPCOMING_ITEMS_OFFSET.key) || parameters.contains(EXPIRED_ITEMS_OFFSET.key))
                     && displayUpcomingExpired;
-            
+        
             // parameters that change event range
             if (extendedDaysChanged || coreDaysChanged) {
-                
+            
                 todoEntries.notifyEntryVisibilityChanged(
                         entry,
                         coreDaysChanged,
                         daysToRebind,
                         // include all days if BG_COLOR changed, else include just the difference
                         !parameters.contains(BG_COLOR.CURRENT.key));
-                
+            
             } else if (parameters.contains(BG_COLOR.CURRENT.key) || parameters.contains(IS_COMPLETED)) {
                 // entry didn't move but BG_COLOR changed
                 entry.getVisibleDaysOnCalendar(
                         calendarView, daysToRebind,
                         displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE);
             }
-            
+        
             // we should save the entries but now now because sometimes we change parameters frequently
             // and we don't want to call save function 10 time when we use a slider
             shouldSaveEntries = true;
@@ -120,7 +121,7 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         todoEntries = new TodoEntryList(Keys.TODO_LIST_INITIAL_CAPACITY);
         updateStaticVarsAndCalendarVisibility();
         
-        wrapper.addLifecycleObserver(this);
+        wrapper.addLifecycleObserver(this); // NOSONAR, this is fine, just adding an observer
         
         initAsync(wrapper);
         
@@ -161,17 +162,17 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
             calendars = getAllCalendars(wrapper.context, false);
             
             for (SystemCalendar calendar : calendars) {
-                calendarVisibilityMap.put(calendar, calendar.isVisible());
+                calendarVisibilityMap.put(calendar.id, calendar.isVisible());
             }
             
             // load one panel to the right and to the left
-            loadedDay_start = currentDayUTC - DAYS_ON_ONE_PANEL;
-            loadedDay_end = currentDayUTC + DAYS_ON_ONE_PANEL;
+            firstLoadedDay = currentDayUTC - DAYS_ON_ONE_PANEL;
+            lastLoadedDay = currentDayUTC + DAYS_ON_ONE_PANEL;
             
-            todoEntries.initLoadingRange(loadedDay_start, loadedDay_end);
+            todoEntries.initLoadingRange(firstLoadedDay, lastLoadedDay);
             todoEntries.addAll(loadTodoEntries(
-                    loadedDay_start,
-                    loadedDay_end,
+                    firstLoadedDay,
+                    lastLoadedDay,
                     groups, calendars,
                     true), parameterInvalidationListener);
             
@@ -219,14 +220,14 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         
         if (!calendarVisibilityMap.isEmpty()) {
             for (SystemCalendar calendar : calendars) {
-                boolean visibilityBefore = Boolean.TRUE.equals(calendarVisibilityMap.get(calendar));
+                boolean visibilityBefore = Boolean.TRUE.equals(calendarVisibilityMap.get(calendar.id));
                 boolean visibilityNow = calendar.isVisible();
-                calendarVisibilityMap.put(calendar, visibilityNow);
+                calendarVisibilityMap.put(calendar.id, visibilityNow);
                 
                 if (visibilityNow && !visibilityBefore) {
                     // new calendar is visible now
                     Logger.debug(NAME, calendar + " is now visible");
-                    addEvents(calendar.getVisibleEvents(loadedDay_start, loadedDay_end));
+                    addEvents(calendar.getVisibleEvents(firstLoadedDay, lastLoadedDay));
                 } else if (visibilityBefore && !visibilityNow) {
                     // calendar became invisible
                     Logger.debug(NAME, calendar + " is now invisible");
@@ -373,16 +374,16 @@ public class TodoEntryManager implements DefaultLifecycleObserver {
         if (initFinished) {
             long dayStart = 0;
             long dayEnd = 0;
-            if (toLoadDayEnd > loadedDay_end) {
-                dayStart = loadedDay_end + 1;
+            if (toLoadDayEnd > lastLoadedDay) {
+                dayStart = lastLoadedDay + 1;
                 dayEnd = toLoadDayEnd;
-                loadedDay_end = toLoadDayEnd;
-                todoEntries.extendLoadingRangeEndDay(loadedDay_end);
-            } else if (toLoadDayStart < loadedDay_start) {
+                lastLoadedDay = toLoadDayEnd;
+                todoEntries.extendLoadingRangeEndDay(lastLoadedDay);
+            } else if (toLoadDayStart < firstLoadedDay) {
                 dayStart = toLoadDayStart;
-                dayEnd = loadedDay_start - 1;
-                loadedDay_start = toLoadDayStart;
-                todoEntries.extendLoadingRangeStartDay(loadedDay_start);
+                dayEnd = firstLoadedDay - 1;
+                firstLoadedDay = toLoadDayStart;
+                todoEntries.extendLoadingRangeStartDay(firstLoadedDay);
             }
             if (dayStart != 0) {
                 for (SystemCalendar calendar : calendars) {

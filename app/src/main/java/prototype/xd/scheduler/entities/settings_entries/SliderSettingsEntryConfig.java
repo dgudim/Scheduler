@@ -11,7 +11,7 @@ import androidx.annotation.StringRes;
 
 import com.google.android.material.slider.Slider;
 
-import java.util.function.Function;
+import java.util.function.IntFunction;
 
 import prototype.xd.scheduler.databinding.SliderSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.ContextWrapper;
@@ -30,7 +30,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     private int stringResource;
     
     @Nullable
-    Function<Integer, String> textFormatter;
+    IntFunction<String> textFormatter;
     
     public SliderSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize, boolean zeroIfOff,
                                      @StringRes @PluralsRes int stringResource) {
@@ -43,7 +43,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     }
     
     public SliderSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize,
-                                     @NonNull Function<Integer, String> textFormatter) {
+                                     @NonNull IntFunction<String> textFormatter) {
         this.seekMin = seekMin;
         this.seekMax = seekMax;
         this.stepSize = stepSize;

@@ -99,7 +99,7 @@ public class SystemCalendarEvent {
         computeEventVisibilityDays();
     }
     
-    private void loadRecurrenceRules(Cursor cursor) {
+    private void loadRecurrenceRules(Cursor cursor) { // NOSONAR, not that complex
         
         String rRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RRULE);
         String rDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RDATE);
@@ -298,14 +298,9 @@ public class SystemCalendarEvent {
         return rangesOverlap(startDayLocal, endDayLocal, firstDayUTC, lastDayUTC);
     }
     
-    public void addExceptions(Long[] exceptions) {
+    public void addExceptions(List<Long> exceptions) {
         if (rSet != null) {
-            // whyyyyyyy, but ok
-            long[] exceptionsPrimitiveArray = new long[exceptions.length];
-            for (int i = 0; i < exceptions.length; i++) {
-                exceptionsPrimitiveArray[i] = exceptions[i];
-            }
-            rSet.addExceptions(new RecurrenceList(exceptionsPrimitiveArray));
+            rSet.addExceptions(new RecurrenceList(exceptions.stream().mapToLong(Long::longValue).toArray()));
         } else {
             Logger.warning(NAME, "Couldn't add exceptions to " + this);
         }

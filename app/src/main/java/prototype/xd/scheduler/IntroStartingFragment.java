@@ -15,7 +15,7 @@ import com.github.appintro.SlidePolicy;
 
 import prototype.xd.scheduler.views.CheckBox;
 
-public class IntroStartingFragment extends Fragment implements SlidePolicy {
+public class IntroStartingFragment extends Fragment implements SlidePolicy { //NOSONAR this is a fragment
     
     private CheckBox understoodCheckbox;
     

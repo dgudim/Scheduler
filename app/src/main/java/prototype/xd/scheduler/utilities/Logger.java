@@ -20,7 +20,7 @@ import java.nio.file.Files;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Logger {
+public final class Logger {
     
     public static final String NAME = Logger.class.getSimpleName();
     
@@ -31,7 +31,7 @@ public class Logger {
     private static BlockingQueue<String> logQueue;
     
     static volatile boolean fileEnabled = true;
-    static volatile boolean init = false;
+    static volatile boolean init;
     
     private static final long ROTATE_SIZE = 10 * 1024 * 1024L; // 10MB
     
@@ -40,21 +40,21 @@ public class Logger {
     }
     
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void tryInit() {
+    public static synchronized void tryInit() {
         if (!init) {
             init = true;
             logFile = new File(ROOT_DIR.get(), "log.txt");
             logFileOld = new File(ROOT_DIR.get(), "log.old.txt");
             logQueue = new LinkedBlockingQueue<>();
             try {
-                logFile.createNewFile();
-                bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
+                logFile.createNewFile(); // NOSONAR, we don't need to know if the file existed or not
+                bufferedWriter = new BufferedWriter(new FileWriter(logFile, true)); // NOSONAR, using system encoding is fine
                 logWorker.setDaemon(true);
                 logWorker.start();
             } catch (IOException e) {
                 fileEnabled = false;
                 e.printStackTrace();
-                Log.e(NAME, "Error initializing logger, proceeding without file support");
+                Log.e(NAME, "Error initializing logger, proceeding without file support: (" + e + ")");
             }
         }
     }
@@ -114,7 +114,7 @@ public class Logger {
                 throwOnFalse(logFile.createNewFile(), "Error creating new file", IOException.class);
                 info(NAME, "Moved to log_old");
             }
-        } catch (IOException e) {
+        } catch (IOException e) { // NOSONAR
             fileEnabled = false;
             logWorker.interrupt();
             e.printStackTrace();
@@ -137,7 +137,7 @@ public class Logger {
                     
                     // get the next element; block if the queue is empty, store the data
                     store(logQueue.take());
-                } catch (IOException e) {
+                } catch (IOException e) { // NOSONAR
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     // propagate
@@ -147,7 +147,7 @@ public class Logger {
                 if (isInterrupted()) {
                     try {
                         bufferedWriter.close();
-                    } catch (IOException e) {
+                    } catch (IOException e) { // NOSONAR
                         e.printStackTrace();
                     }
                     Log.i(NAME, "Logger shut down");

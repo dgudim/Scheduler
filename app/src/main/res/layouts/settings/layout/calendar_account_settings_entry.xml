@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:animateLayoutChanges="true"
-    android:background="@color/light_gray_bg_tint">
+    android:background="@color/light_gray_bg_tint"
+    tools:ignore="Overdraw">
 
     <ImageView
         android:id="@+id/account_icon"

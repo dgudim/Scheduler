@@ -17,6 +17,8 @@ import java.io.Serializable;
  */
 public class SArrayMap<K extends Serializable, V extends Serializable> extends ArrayMap<K, V> implements Serializable {
     
+    private static final long serialVersionUID = 6114227458943730012L;
+    
     public SArrayMap() {
         super();
     }

@@ -66,7 +66,7 @@ public class PerDayBgGridViewAdapter extends BaseAdapter {
         try {
             // load bitmap from file
             imageView.setImageBitmap(readBitmapFromFile(getFile(DateManager.WEEK_DAYS_ROOT.get(i) + ".png_min.png")));
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) { // NOSONAR, this is fine, bg just doesn't exist
             // set default empty image
             imageView.setImageResource(R.drawable.ic_not_90);
         } catch (IOException e) {

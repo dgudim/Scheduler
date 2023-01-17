@@ -1,9 +1,9 @@
 package prototype.xd.scheduler;
 
 import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
-import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK;
+import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LOCAL;
+import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_ROOT;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
-import static prototype.xd.scheduler.utilities.DateManager.getFirstDaysOfWeekLocal;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 
 import android.content.Intent;
@@ -40,7 +40,7 @@ import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
+public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> { // NOSONAR, this is a fragment
     
     public static final String NAME = GlobalSettingsFragment.class.getSimpleName();
     
@@ -61,7 +61,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_application_settings)));
         settingsEntries.add(new AppThemeSelectorEntryConfig());
-        settingsEntries.add(new DropdownSettingsEntryConfig<>(R.string.first_weekday, getFirstDaysOfWeekLocal(), FIRST_DAYS_OF_WEEK, FIRST_DAY_OF_WEEK));
+        settingsEntries.add(new DropdownSettingsEntryConfig<>(R.string.first_weekday, FIRST_DAYS_OF_WEEK_LOCAL, FIRST_DAYS_OF_WEEK_ROOT, FIRST_DAY_OF_WEEK));
         
         
         settingsEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)));

@@ -147,7 +147,7 @@ public class SystemCalendar {
             boolean applied = false;
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.id == exceptionList.getKey()) {
-                    event.addExceptions(exceptionList.getValue().toArray(new Long[0]));
+                    event.addExceptions(exceptionList.getValue());
                     applied = true;
                     break;
                 }

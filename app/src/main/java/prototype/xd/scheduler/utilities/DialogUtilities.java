@@ -29,7 +29,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.ObjIntConsumer;
+import java.util.function.ToIntFunction;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.AddOrEditEntryDialogBinding;
@@ -68,8 +69,8 @@ public class DialogUtilities {
                                                       @StringRes int cancelButtonStringResource,
                                                       @StringRes int confirmButtonStringResource,
                                                       @NonNull String defaultEditTextValue,
-                                                      @NonNull OnClickListenerWithViewAccess<AddOrEditGroupDialogBinding> confirmationListener,
-                                                      @Nullable OnClickListenerWithDialogAccess deletionListener) {
+                                                      @NonNull Consumer<String> confirmationListener,
+                                                      @Nullable Consumer<Dialog> deletionListener) {
         AddOrEditGroupDialogBinding dialogBinding = AddOrEditGroupDialogBinding.inflate(wrapper.getLayoutInflater());
         
         Dialog dialog = buildTemplate(wrapper, titleStringResource, messageStringResource, dialogBinding);
@@ -77,7 +78,7 @@ public class DialogUtilities {
         setupEditText(dialogBinding.entryNameEditText, defaultEditTextValue);
         
         if (deletionListener != null) {
-            dialogBinding.deleteGroupButton.setOnClickListener(v -> deletionListener.onClick(v, dialog));
+            dialogBinding.deleteGroupButton.setOnClickListener(v -> deletionListener.accept(dialog));
         } else {
             dialogBinding.deleteGroupButton.setVisibility(View.GONE);
         }
@@ -85,7 +86,7 @@ public class DialogUtilities {
         setupButtons(dialog, dialogBinding.twoButtons,
                 cancelButtonStringResource, confirmButtonStringResource,
                 v -> callIfInputNotEmpty(dialogBinding.entryNameEditText, text -> {
-                    confirmationListener.onClick(v, text, dialogBinding, 0);
+                    confirmationListener.accept(text);
                     dialog.dismiss();
                 }));
     }
@@ -94,7 +95,7 @@ public class DialogUtilities {
     public static void displayEntryAdditionEditDialog(@NonNull ContextWrapper wrapper,
                                                       @Nullable TodoEntry entry,
                                                       @NonNull List<Group> groupList,
-                                                      @NonNull OnClickListenerWithViewAccess<AddOrEditEntryDialogBinding> confirmationListener) {
+                                                      @NonNull EditEntryConfirmationListener confirmationListener) {
         
         AddOrEditEntryDialogBinding dialogBinding = AddOrEditEntryDialogBinding.inflate(wrapper.getLayoutInflater());
         
@@ -132,7 +133,7 @@ public class DialogUtilities {
         setupButtons(dialog, dialogBinding.twoButtons,
                 R.string.cancel, entry == null ? R.string.add : R.string.save,
                 v -> callIfInputNotEmpty(dialogBinding.entryNameEditText, text -> {
-                    confirmationListener.onClick(v, text, dialogBinding, selectedIndex[0]);
+                    confirmationListener.onClick(text, dialogBinding, selectedIndex[0]);
                     dialog.dismiss();
                 }));
     }
@@ -217,13 +218,8 @@ public class DialogUtilities {
     }
     
     @FunctionalInterface
-    public interface OnClickListenerWithViewAccess<T extends ViewBinding> {
-        void onClick(View view, String text, T dialogBinding, int selectedIndex);
-    }
-    
-    @FunctionalInterface
-    public interface OnClickListenerWithDialogAccess {
-        void onClick(View view, Dialog dialog);
+    public interface EditEntryConfirmationListener {
+        void onClick(String text, AddOrEditEntryDialogBinding dialogBinding, int selectedIndex);
     }
     
     @MainThread
@@ -252,11 +248,11 @@ public class DialogUtilities {
      */
     @MainThread
     public static void displayColorPicker(@NonNull final ContextWrapper wrapper,
-                                          @NonNull final ColorPickerColorSelectionListener colorSelectedListener,
+                                          @NonNull final ObjIntConsumer<Keys.DefaultedInteger> colorSelectedListener,
                                           @NonNull final Keys.DefaultedInteger defaultedInteger) {
         displayColorPicker(wrapper, defaultedInteger.get(),
                 (dialog, selectedColor, allColors) ->
-                        colorSelectedListener.onClick(defaultedInteger, selectedColor));
+                        colorSelectedListener.accept(defaultedInteger, selectedColor));
     }
     
     //color dialog for entry settings
@@ -275,9 +271,9 @@ public class DialogUtilities {
                                           @NonNull final TextView stateIcon,
                                           @NonNull final PopupSettingsView settingsView,
                                           @NonNull final Keys.DefaultedInteger defaultedInteger,
-                                          @NonNull final Function<Keys.DefaultedInteger, Integer> initialValueFactory) {
+                                          @NonNull final ToIntFunction<Keys.DefaultedInteger> initialValueFactory) {
         displayColorPicker(wrapper,
-                initialValueFactory.apply(defaultedInteger), (dialog, selectedColor, allColors) -> {
+                initialValueFactory.applyAsInt(defaultedInteger), (dialog, selectedColor, allColors) -> {
                     settingsView.notifyParameterChanged(stateIcon, defaultedInteger.key, selectedColor);
                     settingsView.notifyColorChanged(defaultedInteger, selectedColor);
                 });
@@ -299,10 +295,4 @@ public class DialogUtilities {
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                 }).build(), null).show();
     }
-    
-    @FunctionalInterface
-    public interface ColorPickerColorSelectionListener {
-        void onClick(Keys.DefaultedInteger defaultedInteger, int selectedColor);
-    }
-    
 }

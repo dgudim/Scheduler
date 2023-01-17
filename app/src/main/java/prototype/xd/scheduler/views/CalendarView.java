@@ -3,11 +3,11 @@ package prototype.xd.scheduler.views;
 import static com.kizitonwose.calendar.core.ExtensionsKt.daysOfWeek;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixTwoColors;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.systemLocale;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
 import static prototype.xd.scheduler.utilities.Utilities.datesEqual;
 
 import android.content.Context;
@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -35,6 +36,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CalendarDayLayoutBinding;
@@ -62,32 +65,33 @@ public class CalendarView {
             bnd.root.setOnClickListener(v -> container.selectDate(date));
         }
         
-        private void setEventIndicator(int color, int index, boolean visiblePosition, boolean inCalendar) {
+        private void setEventIndicator(@ColorInt int color, int index, boolean visiblePosition, boolean inCalendar) {
             // first index is day text itself
             View eventIndicator = binding.root.getChildAt(index + 1);
             eventIndicator.setVisibility(visiblePosition ? View.VISIBLE : View.INVISIBLE);
+            
             if (!visiblePosition) {
                 return;
             }
             
             if (!inCalendar) {
-                // wix with the surface color dimming the color
-                color = mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), 0.8);
+                // make the indicator less visible
+                color = dimColorToBg(color, context);
             }
             eventIndicator.setBackgroundTintList(ColorStateList.valueOf(color));
         }
         
         // for month dates
-        private void setEventIndicatorInCalendar(int color, int index, boolean visiblePosition) {
+        private void setEventIndicatorInCalendar(@ColorInt int color, int index, boolean visiblePosition) {
             setEventIndicator(color, index, visiblePosition, true);
         }
         
         // for in and out dates
-        private void setEventIndicatorOffCalendar(int color, int index, boolean visiblePosition) {
+        private void setEventIndicatorOffCalendar(@ColorInt int color, int index, boolean visiblePosition) {
             setEventIndicator(color, index, visiblePosition, false);
         }
         
-        public void bindTo(CalendarDay elementDay, CalendarView calendarView, TodoEntryManager todoEntryManager) {
+        public void bindTo(@NonNull CalendarDay elementDay, @Nullable LocalDate currentlySelectedDate, @NonNull TodoEntryManager todoEntryManager) {
             date = elementDay.getDate();
             binding.calendarDayText.setText(String.format(Locale.getDefault(), "%d", date.getDayOfMonth()));
             
@@ -110,7 +114,7 @@ public class CalendarView {
             binding.calendarDayText.setTextColor(textColor);
             
             // highlight current date
-            if (datesEqual(date, calendarView.selectedDate) && dayPosition == DayPosition.MonthDate) {
+            if (datesEqual(date, currentlySelectedDate) && dayPosition == DayPosition.MonthDate) {
                 binding.root.setBackgroundResource(R.drawable.round_bg_calendar_selection);
             } else {
                 binding.root.setBackgroundResource(0);
@@ -128,22 +132,23 @@ public class CalendarView {
             binding = bnd;
         }
         
-        public void bindTo(CalendarMonth calendarMonth, List<DayOfWeek> daysOfWeek) {
+        public void bindTo(YearMonth yearMonth, List<DayOfWeek> daysOfWeek) {
             if (binding.weekdayTitlesContainer.getTag() == null) {
-                binding.weekdayTitlesContainer.setTag(calendarMonth.getYearMonth());
+                binding.weekdayTitlesContainer.setTag(yearMonth);
                 for (int i = 0; i < daysOfWeek.size(); i++) {
                     ((TextView) binding.weekdayTitlesContainer.getChildAt(i)).setText(daysOfWeek.get(i).getDisplayName(TextStyle.SHORT, systemLocale));
                 }
             }
             binding.monthTitle.setText(String.format(systemLocale, "%s %d",
-                    calendarMonth.getYearMonth().getMonth().getDisplayName(TextStyle.FULL_STANDALONE, systemLocale),
-                    calendarMonth.getYearMonth().getYear()));
+                    yearMonth.getMonth().getDisplayName(TextStyle.FULL_STANDALONE, systemLocale),
+                    yearMonth.getYear()));
         }
     }
     
     public static final int DAYS_ON_ONE_PANEL = 7 * 6;
-    public static final int CACHED_PANELS = 2;
-    public static final int POTENTIALLY_VISIBLE_DAYS = DAYS_ON_ONE_PANEL * CACHED_PANELS;
+    private static final int CACHED_PANELS = 2;
+    private static final int POTENTIALLY_VISIBLE_DAYS = DAYS_ON_ONE_PANEL * CACHED_PANELS;
+    private static final int MAX_MONTHS = 100;
     
     private List<DayOfWeek> daysOfWeek;
     
@@ -154,20 +159,20 @@ public class CalendarView {
     
     private final Set<YearMonth> loadedMonths = new HashSet<>();
     
-    private long firstSelectedMonthDayUTC = 0;
-    private long lastSelectedMonthDayUTC = 0;
+    private long firstSelectedMonthDayUTC;
+    private long lastSelectedMonthDayUTC;
     
-    private long firstVisibleDayUTC = 0;
-    private long lastVisibleDayUTC = 0;
+    private long firstVisibleDayUTC;
+    private long lastVisibleDayUTC;
     
-    private long minVisibleDayUTC = 0;
-    private long maxVisibleDayUTC = 0;
+    private long minVisibleDayUTC;
+    private long maxVisibleDayUTC;
     
     final com.kizitonwose.calendar.view.CalendarView rootCalendarView;
     @Nullable
-    DateChangeListener dateChangeListener;
+    BiConsumer<LocalDate, Context> dateChangeListener;
     @Nullable
-    MonthBindListener newMonthBindListener;
+    Consumer<YearMonth> newMonthBindListener;
     
     public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoEntryManager todoEntryManager) {
         this.rootCalendarView = rootCalendarView;
@@ -181,7 +186,7 @@ public class CalendarView {
             
             @Override
             public void bind(@NonNull CalendarDayViewContainer container, CalendarDay calendarDay) {
-                container.bindTo(calendarDay, CalendarView.this, todoEntryManager);
+                container.bindTo(calendarDay, selectedDate, todoEntryManager);
             }
         });
         
@@ -194,15 +199,15 @@ public class CalendarView {
             
             @Override
             public void bind(@NonNull CalendarHeaderContainer container, CalendarMonth calendarMonth) {
-                container.bindTo(calendarMonth, daysOfWeek);
-                
                 YearMonth calendarYearMonth = calendarMonth.getYearMonth();
+                
+                container.bindTo(calendarYearMonth, daysOfWeek);
                 
                 // new month was loaded
                 if (!loadedMonths.contains(calendarYearMonth) && newMonthBindListener != null) {
                     loadedMonths.add(calendarYearMonth);
                     Logger.debug(NAME, "New month loaded: " + calendarYearMonth);
-                    newMonthBindListener.onMonthLoaded(calendarYearMonth);
+                    newMonthBindListener.accept(calendarYearMonth);
                 }
             }
         });
@@ -246,7 +251,7 @@ public class CalendarView {
         
         daysOfWeek = daysOfWeek(firstDayOfWeek);
         
-        rootCalendarView.setup(currentMonth.minusMonths(100), currentMonth.plusMonths(100), daysOfWeek.get(0));
+        rootCalendarView.setup(currentMonth.minusMonths(MAX_MONTHS), currentMonth.plusMonths(MAX_MONTHS), daysOfWeek.get(0));
         selectDate(DateManager.currentDate);
         rootCalendarView.scrollToMonth(currentMonth);
         
@@ -261,7 +266,7 @@ public class CalendarView {
         return min(lastVisibleDayUTC + POTENTIALLY_VISIBLE_DAYS, maxVisibleDayUTC);
     }
     
-    public void selectDate(LocalDate targetDate) {
+    public void selectDate(@NonNull LocalDate targetDate) {
         
         rootCalendarView.scrollToDate(targetDate);
         
@@ -274,12 +279,16 @@ public class CalendarView {
             rootCalendarView.notifyDateChanged(targetDate);
             selectedDate = targetDate;
             if (dateChangeListener != null) {
-                dateChangeListener.onDateChanged(targetDate, rootCalendarView.getContext());
+                dateChangeListener.accept(targetDate, rootCalendarView.getContext());
             }
         }
     }
     
-    public void setOnDateChangeListener(DateChangeListener dateChangeListener) {
+    public void setNewMonthBindListener(@Nullable Consumer<YearMonth> newMonthBindListener) {
+        this.newMonthBindListener = newMonthBindListener;
+    }
+    
+    public void setOnDateChangeListener(@NonNull BiConsumer<LocalDate, Context> dateChangeListener) {
         this.dateChangeListener = dateChangeListener;
     }
     
@@ -304,7 +313,7 @@ public class CalendarView {
         rootCalendarView.notifyDateChanged(date, DayPosition.MonthDate);
     }
     
-    public void notifyDaysChanged(Set<Long> days) {
+    public void notifyDaysChanged(@NonNull Set<Long> days) {
         days.forEach(this::notifyDayChanged);
     }
     
@@ -317,25 +326,11 @@ public class CalendarView {
     
     public void notifyCalendarChanged() {
         DayOfWeek firstDayOfWeek = FIRST_DAY_OF_WEEK.get();
-        if (!firstDayOfWeek.equals(daysOfWeek.get(0))) {
+        if (firstDayOfWeek != daysOfWeek.get(0)) {
             init(firstDayOfWeek);
         } else {
             rootCalendarView.notifyCalendarChanged();
         }
-    }
-    
-    public void setNewMonthBindListener(@Nullable MonthBindListener newMonthBindListener) {
-        this.newMonthBindListener = newMonthBindListener;
-    }
-    
-    @FunctionalInterface
-    public interface DateChangeListener {
-        void onDateChanged(LocalDate selectedDate, Context context);
-    }
-    
-    @FunctionalInterface
-    public interface MonthBindListener {
-        void onMonthLoaded(YearMonth yearMonth);
     }
 }
 

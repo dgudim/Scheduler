@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import prototype.xd.scheduler.R;
+
 public class GraphicsUtilities {
     
     
@@ -41,7 +43,7 @@ public class GraphicsUtilities {
         cutBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         outputStream.close();
         
-        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4f), (int) (cutBitmap.getHeight() / 4f), GraphicsUtilities.ScalingLogic.FIT);
+        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4F), (int) (cutBitmap.getHeight() / 4F), GraphicsUtilities.ScalingLogic.FIT);
         
         FileOutputStream outputStreamMin = new FileOutputStream(output.getAbsolutePath() + "_min.png");
         resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStreamMin);
@@ -57,9 +59,11 @@ public class GraphicsUtilities {
         return bitmap;
     }
     
-    public static Bitmap makeMutable(Bitmap bitmap) {
-        if (!bitmap.isMutable())
-            bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true); // make bitmap mutable if not already
+    public static Bitmap makeMutable(@NonNull final Bitmap bitmap) {
+        if (!bitmap.isMutable()) {
+            // make bitmap mutable if not already
+            return bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        }
         return bitmap;
     }
     
@@ -169,11 +173,19 @@ public class GraphicsUtilities {
     // return black or white based on the background color
     public static int getIntensityColor(int bgColor) {
         Color col = Color.valueOf(bgColor);
-        float intensity = col.red() * 0.299f + col.green() * 0.587f + col.blue() * 0.114f;
-        if (intensity > 0.729411f) {
+        float intensity = col.red() * 0.299F + col.green() * 0.587F + col.blue() * 0.114F;
+        if (intensity > 0.729411F) {
             return Color.BLACK;
         }
         return Color.WHITE;
+    }
+    
+    public static int dimColorToBg(int color, int bgColor) {
+        return mixTwoColors(color, bgColor, Keys.DEFAULT_DIM_FACTOR);
+    }
+    
+    public static int dimColorToBg(int color, @NonNull Context context) {
+        return mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), Keys.DEFAULT_DIM_FACTOR);
     }
     
     public static int mixTwoColors(int color1, int color2, double balance) {
@@ -194,7 +206,7 @@ public class GraphicsUtilities {
     
     // mix and harmonize (25% background color, 75% font color + harmonized with background);
     public static int getHarmonizedSecondaryFontColorWithBg(int color, int backgroundColor) {
-        return getHarmonizedFontColorWithBg(mixTwoColors(color, backgroundColor, Keys.DEFAULT_CALENDAR_EVENT_TIME_COLOR_MIX_FACTOR), backgroundColor);
+        return getHarmonizedFontColorWithBg(mixTwoColors(color, backgroundColor, Keys.DEFAULT_SECONDARY_TEXT_COLOR_MIX_FACTOR), backgroundColor);
     }
     
     // mix color with bg color based on balance (from 1 to 10)
@@ -203,7 +215,7 @@ public class GraphicsUtilities {
             return inputColor;
         }
         return mixTwoColors(MaterialColors.harmonize(inputColor, backgroundColor),
-                backgroundColor, (balance - 1) / 9d);
+                backgroundColor, (balance - 1) / 9D);
     }
     
     public static int getExpiredUpcomingColor(int baseColor, int tintColor) {
@@ -258,7 +270,7 @@ public class GraphicsUtilities {
             
             sliderPrimaryColor = ColorStateList.valueOf(sliderAccentColor);
             sliderOnSurfaceColor = ColorStateList.valueOf(getOnBgColor(sliderAccentColor));
-            sliderHaloColor = ColorStateList.valueOf(mixTwoColors(sliderAccentColor, Color.TRANSPARENT, 0.5));
+            sliderHaloColor = ColorStateList.valueOf(dimColorToBg(sliderAccentColor, context));
         }
         
         public void tintSlider(Slider slider) {

@@ -98,7 +98,7 @@
     <string name="settings_max_rWidth_lock">Растянуть фон события на всю ширину экрана блокировки</string>
     <string name="settings_font_size">Размер шрифта(Экран блокировки): %d</string>
     <string name="delete_all_saved_backgrounds_prompt">Удалить все сохраненные фоны?</string>
-    <string name="first_weekday">First day of the week:</string>
+    <string name="first_weekday">Первый день недели:</string>
     <string name="day_default">Дефолтный</string>
     <string name="background_service_persistent_message">Фоновый сервис активен</string>
     <string name="last_update_time">последнее обновление: %s</string>

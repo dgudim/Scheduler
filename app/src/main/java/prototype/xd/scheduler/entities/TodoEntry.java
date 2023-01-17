@@ -29,7 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.R;
@@ -43,13 +45,15 @@ import prototype.xd.scheduler.views.CalendarView;
 public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     static final long serialVersionUID = 3578172096594611826L;
+    public static final String NAME = TodoEntry.class.getSimpleName();
+    private static final Pattern hideByContentSplitPattern = Pattern.compile("\\|\\|");
     
     static class CachedGetter<T> {
         
         final ParameterGetter<T> parameterGetter;
         
         T value;
-        boolean valid = false;
+        boolean valid;
         
         CachedGetter(ParameterGetter<T> parameterGetter) {
             this.parameterGetter = parameterGetter;
@@ -74,7 +78,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     @FunctionalInterface
-    public interface ParameterGetter<T> {
+    public interface ParameterGetter<T> { // NOSONAR, will be confusing if replaced by UnaryOperator<T>
         T get(T previousValue);
         
         default T get() {
@@ -146,14 +150,9 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
     }
     
-    public static final String NAME = TodoEntry.class.getSimpleName();
+    
     
     public enum EntryType {TODAY, GLOBAL, UPCOMING, EXPIRED, UNKNOWN}
-    
-    @FunctionalInterface
-    public interface ParameterInvalidationListener {
-        void parametersInvalidated(TodoEntry entry, Set<String> parameters);
-    }
     
     public static class TimeRange {
         
@@ -161,7 +160,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
         public static final TimeRange NullRange = new TimeRange(-1, -1);
         
-        private boolean inDays = false;
+        private boolean inDays;
         
         private long start;
         private long end;
@@ -231,12 +230,12 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private transient ArrayMap<String, Parameter<?>> parameterMap;
     // for listening to parameter changes
-    private transient ParameterInvalidationListener parameterInvalidationListener;
+    private transient BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener;
     
     private transient TodoEntryList container;
     
     // ----------- supplementary stuff for sorting START
-    int sortingIndex = 0;
+    int sortingIndex;
     
     public int getSortingIndex() {
         return sortingIndex;
@@ -250,7 +249,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    long cachedNearestStartMsUTC = 0;
+    long cachedNearestStartMsUTC;
     
     public long getCachedNearestStartMsUTC() {
         return cachedNearestStartMsUTC;
@@ -281,14 +280,14 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         initParameters();
         assignRecyclerViewId(event.hashCode());
         
-        event.linkEntry(this);
+        event.linkEntry(this); // NOSONAR
     }
     
     public TodoEntry(SArrayMap<String, String> params, @NonNull Group group, long id) {
         this.params = params;
         this.group = group;
-        group.attachEntryInternal(this);
         assignRecyclerViewId(id);
+        group.attachEntryInternal(this); // NOSONAR, make sure to call assignRecyclerViewId before attachEntryInternal though
         initParameters();
     }
     
@@ -322,7 +321,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         bgColor = new Parameter<>(this, Keys.BG_COLOR.CURRENT.key,
                 previousValue -> {
                     if (isFromSystemCalendar()) {
-                        return Keys.BG_COLOR.CURRENT.getOnlyBySubKeys(event.subKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.apply(event.color));
+                        return Keys.BG_COLOR.CURRENT.getOnlyBySubKeys(event.subKeys,
+                                Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(event.color));
                     }
                     return Keys.BG_COLOR.CURRENT.get();
                 },
@@ -347,7 +347,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         priority = new Parameter<>(this, Keys.PRIORITY.key,
                 previousValue -> isFromSystemCalendar() ?
                         Keys.PRIORITY.get(event.subKeys) :
-                        Keys.PRIORITY.defaultValue, // there is no default setting for priority
+                        // there is no default setting for priority
+                        Keys.PRIORITY.defaultValue,
                 Integer::parseInt,
                 null,
                 null);
@@ -386,7 +387,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return null;
     }
     
-    public void listenToParameterInvalidations(ParameterInvalidationListener parameterInvalidationListener) {
+    public void listenToParameterInvalidations(BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
         if (this.parameterInvalidationListener != null) {
             Logger.warning(NAME, this + " already has a parameterInvalidationListener, double assign");
         }
@@ -474,7 +475,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      * @return true if the group was changed
      */
     public boolean changeGroup(@NonNull Group newGroup) {
-        if (Objects.equals(newGroup, group)) {
+        if (newGroup.equals(group)) {
             return false;
         }
         
@@ -498,7 +499,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             param.invalidate();
         }
         if (parameterInvalidationListener != null && reportInvalidated) {
-            parameterInvalidationListener.parametersInvalidated(this, Collections.singleton(parameterKey));
+            parameterInvalidationListener.accept(this, Collections.singleton(parameterKey));
         }
     }
     
@@ -507,13 +508,13 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             return;
         }
         parameterKeys.forEach(parameterKey -> invalidateParameter(parameterKey, false));
-        parameterInvalidationListener.parametersInvalidated(this, parameterKeys);
+        parameterInvalidationListener.accept(this, parameterKeys);
     }
     
     public void invalidateAllParameters(boolean reportInvalidated) {
         parameterMap.forEach((key, parameter) -> parameter.invalidate());
         if (reportInvalidated) {
-            parameterInvalidationListener.parametersInvalidated(this, parameterMap.keySet());
+            parameterInvalidationListener.accept(this, parameterMap.keySet());
         }
     }
     
@@ -558,7 +559,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         if (keyValuePairs.length % 2 != 0) {
             throw new IllegalArgumentException("Can't call changeParameters with odd number of arguments");
         }
-        if (keyValuePairs.length == 2) { // just one parameter
+        // just one parameter
+        if (keyValuePairs.length == 2) {
             if (changeParameterInternal(keyValuePairs[0], keyValuePairs[1])) {
                 invalidateParameter(keyValuePairs[0], true);
             }
@@ -672,9 +674,9 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private void addDayRangeToSets(long startDay, long endDay,
                                    long minDay, long maxDay,
-                                   long currentExpiredDayOffset, long currentUpcomingDayOffset,
-                                   @Nullable Set<Long> coreDaySet,                   // without any expired/upcoming days
-                                   @Nullable Set<Long> currentUpcomingExpiredSet) {  // without old expired/upcoming days
+                                   long expiredDayOffset, long upcomingDayOffset,
+                                   @Nullable Set<Long> coreDaySet,
+                                   @Nullable Set<Long> currentUpcomingExpiredSet) {
         
         addDayRangeToSet(
                 startDay, endDay,
@@ -682,15 +684,15 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 coreDaySet);
         
         addDayRangeToSet(
-                startDay - currentUpcomingDayOffset, endDay + currentExpiredDayOffset,
+                startDay - upcomingDayOffset, endDay + expiredDayOffset,
                 minDay, maxDay,
                 currentUpcomingExpiredSet);
     }
     
     // get on what days from min to max an entry is visible (and was before invalidation)
     private void getVisibleDays(long minDay, long maxDay,
-                                @Nullable Set<Long> coreDaySet,                  // without any expired/upcoming days
-                                @Nullable Set<Long> currentUpcomingExpiredSet) { // with old expired/upcoming days
+                                @Nullable Set<Long> coreDaySet,
+                                @Nullable Set<Long> upcomingExpiredSet) {
         
         // we don't care about global entries, they are handled differently
         if (isGlobal()) {
@@ -714,7 +716,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                         currentExpiredDayOffset, currentUpcomingDayOffset,
                         // sets
                         coreDaySet,
-                        currentUpcomingExpiredSet);
+                        upcomingExpiredSet);
                 
                 return null;
             }, false);
@@ -722,7 +724,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             addDayRangeToSets(startDayLocal.get(), endDayLocal.get(),
                     minDay, maxDay,
                     currentExpiredDayOffset, currentUpcomingDayOffset,
-                    coreDaySet, currentUpcomingExpiredSet);
+                    coreDaySet, upcomingExpiredSet);
         }
     }
     
@@ -760,8 +762,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
         FullDaySet(TodoEntry entry, long dayStart, long dayEnd) {
             entry.getVisibleDays(dayStart, dayEnd,
-                    coreDaySet,             // core
-                    upcomingExpiredDaySet); // basic expired / upcoming
+                    coreDaySet,
+                    upcomingExpiredDaySet);
         }
         
         public Set<Long> getUpcomingExpiredDaySet() {
@@ -774,13 +776,15 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public boolean hideByContent() {
-        if (!isFromSystemCalendar()) return false;
+        if (!isFromSystemCalendar()) {
+            return false;
+        }
         if (Keys.HIDE_ENTRIES_BY_CONTENT.get(event.subKeys)) {
             String matchString = Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT.get(event.subKeys);
             if (matchString.isEmpty()) {
                 return false;
             }
-            String[] split = matchString.split("\\|\\|");
+            String[] split = hideByContentSplitPattern.split(matchString);
             for (String str : split) {
                 if (rawTextValue.get().contains(str)) {
                     return true;
@@ -872,7 +876,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return rawTextValue.get() + " " + getDayOffset(targetDayUTC, context, displayGlobalLabel);
     }
     
-    public String getDayOffset(long targetDayUTC, @NonNull Context context, boolean displayGlobalLabel) {
+    public String getDayOffset(long targetDayUTC, @NonNull Context context, boolean displayGlobalLabel) { // NOSONAR, not that complex
         if (isGlobal()) {
             if (displayGlobalLabel) {
                 return context.getString(R.string.item_global);

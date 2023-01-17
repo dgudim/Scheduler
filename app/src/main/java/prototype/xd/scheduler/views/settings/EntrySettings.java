@@ -106,7 +106,7 @@ public class EntrySettings extends PopupSettingsView {
                     R.string.edit_group, -1,
                     R.string.cancel, R.string.save,
                     selectedGroup.getRawName(),
-                    (view2, name, dialogBinding, selectedIndex) -> {
+                    name -> {
                         int groupIndex = Group.groupIndexInList(groupList, name);
                         
                         String newName = name;
@@ -119,7 +119,7 @@ public class EntrySettings extends PopupSettingsView {
                         
                         todoEntryManager.setNewGroupName(selectedGroup, newName);
                         bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
-                    }, (v2, dialog) -> displayConfirmationDialogue(wrapper,
+                    }, dialog -> displayConfirmationDialogue(wrapper,
                             R.string.delete, R.string.are_you_sure,
                             R.string.no, R.string.yes,
                             v1 -> {
@@ -140,9 +140,9 @@ public class EntrySettings extends PopupSettingsView {
                 R.string.add_current_config_as_group_prompt,
                 R.string.add_current_config_as_group_message,
                 R.string.cancel, R.string.add, "",
-                (view, text, dialogueBinding, selection) -> {
+                text -> {
                     Group existingGroup = findGroupInList(groupList, text);
-                    if (existingGroup != null) {
+                    if (!existingGroup.isNullGroup()) {
                         displayConfirmationDialogue(wrapper,
                                 R.string.group_with_same_name_exists, R.string.overwrite_prompt,
                                 R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(text, existingGroup));

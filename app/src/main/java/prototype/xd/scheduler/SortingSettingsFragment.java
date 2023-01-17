@@ -60,7 +60,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
     }
     
-    private static class EntryTypeAdapter extends RecyclerView.Adapter<EntryTypeAdapter.CardViewHolder> {
+    private static final class EntryTypeAdapter extends RecyclerView.Adapter<EntryTypeAdapter.CardViewHolder> {
         
         private final ItemTouchHelper itemDragHelper;
         private final List<TodoEntry.EntryType> sortOrder;
@@ -116,7 +116,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
             notifyItemMoved(fromPosition, toPosition);
         }
         
-        private static class CardViewHolder extends RecyclerView.ViewHolder {
+        private static final class CardViewHolder extends RecyclerView.ViewHolder {
             
             @NonNull
             private final DraggableListEntryBinding binding;
@@ -131,8 +131,8 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
             
             @SuppressLint("ClickableViewAccessibility")
             private void bind(TodoEntry.EntryType entryType, final ItemTouchHelper dragHelper) {
-                String titleText = "ERR/UNKNOWN";
-                String descriptionText = "ERR/UNKNOWN";
+                String titleText;
+                String descriptionText;
                 int bgColor = Keys.BG_COLOR.CURRENT.get();
                 int fontColor = Keys.FONT_COLOR.CURRENT.get();
                 int borderColor = Keys.BORDER_COLOR.CURRENT.get();
@@ -159,6 +159,10 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
                         titleText = context.getString(R.string.global_events);
                         descriptionText = context.getString(R.string.global_events_description);
                         break;
+                    case UNKNOWN:
+                    default:
+                        titleText = "ERR/UNKNOWN";
+                        descriptionText = "ERR/UNKNOWN";
                 }
                 
                 binding.itemText.setText(titleText);
@@ -183,7 +187,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         }
     }
     
-    private static class DragHelperCallback extends ItemTouchHelper.Callback {
+    private static final class DragHelperCallback extends ItemTouchHelper.Callback {
         
         private final EntryTypeAdapter entryTypeAdapter;
         

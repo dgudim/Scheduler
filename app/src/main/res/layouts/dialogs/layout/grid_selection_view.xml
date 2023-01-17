@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@color/light_gray_bg_tint"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:padding="5dp"
+    tools:ignore="Overdraw">
 
     <GridView
         android:id="@+id/grid_view"

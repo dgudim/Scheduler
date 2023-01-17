@@ -12,8 +12,6 @@ import android.text.SpannableString;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
@@ -21,7 +19,7 @@ import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.SystemCalendarEvent;
 import prototype.xd.scheduler.entities.TodoEntry;
 
-public class SystemCalendarUtils {
+public final class SystemCalendarUtils {
     
     public static final String NAME = SystemCalendarUtils.class.getSimpleName();
     
@@ -32,19 +30,19 @@ public class SystemCalendarUtils {
     /**
      * List of columns to read from CalendarContract.Calendars.CONTENT_URI
      */
-    public static final List<String> CALENDAR_COLUMNS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<String> CALENDAR_COLUMNS = List.of(
             CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
             CalendarContract.Calendars.ACCOUNT_NAME,
             CalendarContract.Calendars.ACCOUNT_TYPE,
             CalendarContract.Calendars._ID,
             CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
             CalendarContract.Calendars.CALENDAR_COLOR,
-            CalendarContract.Calendars.CALENDAR_TIME_ZONE));
+            CalendarContract.Calendars.CALENDAR_TIME_ZONE);
     
     /**
      * List of columns to read from Events.CONTENT_URI
      */
-    public static final List<String> CALENDAR_EVENT_COLUMNS = Collections.unmodifiableList(Arrays.asList(
+    public static final List<String> CALENDAR_EVENT_COLUMNS = List.of(
             CalendarContract.Events.TITLE,
             CalendarContract.Events.DISPLAY_COLOR,
             CalendarContract.Events.DTSTART,
@@ -59,7 +57,7 @@ public class SystemCalendarUtils {
             // for exception events
             CalendarContract.Events._ID,
             CalendarContract.Events.ORIGINAL_ID,
-            CalendarContract.Events.ORIGINAL_INSTANCE_TIME));
+            CalendarContract.Events.ORIGINAL_INSTANCE_TIME);
     
     /**
      * Retrieve all calendars from the system

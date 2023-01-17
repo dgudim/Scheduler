@@ -21,6 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.viewbinding.ViewBinding;
 
+import java.util.regex.Pattern;
+
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.BasicEntryBinding;
 import prototype.xd.scheduler.databinding.RoundedEntryBinding;
@@ -31,9 +33,11 @@ import prototype.xd.scheduler.utilities.Keys;
 // base class for lockscreen todolist entries
 public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
-    final V viewBinding;
-    final View root;
-    final Context context;
+    protected final V viewBinding;
+    private final View root;
+    private final Context context;
+    
+    private static final Pattern timeSplitPattern = Pattern.compile(" - ");
     
     LockScreenTodoItemView(V binding) {
         viewBinding = binding;
@@ -110,7 +114,8 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         if (entry.isFromSystemCalendar()) {
             String timeSpan = entry.getCalendarEntryTimeSpan(context, currentDayUTC);
             setTimeSpanText(timeSpan);
-            setTimeStartText(timeSpan.split(" - ")[0]);
+            
+            setTimeStartText(timeSplitPattern.split(timeSpan)[0]);
             setTimeTextSize(fontSizeSP);
             setIndicatorColor(entry.event.color);
         } else {
@@ -131,7 +136,8 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             int width = root.getWidth();
             int height = root.getHeight();
             
-            int[] pixels = new int[width * height];                       // add container y offset
+            int[] pixels = new int[width * height];
+            //                                                                                 add container y offset
             bgBitmap.getPixels(pixels, 0, width, (int) root.getX(), (int) (root.getY() + container.getY()), width, height);
             entry.setAverageBackgroundColor(getAverageColor(pixels));
         }

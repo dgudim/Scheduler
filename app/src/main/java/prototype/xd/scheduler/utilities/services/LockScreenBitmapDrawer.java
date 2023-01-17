@@ -62,7 +62,7 @@ class LockScreenBitmapDrawer {
     public final int displayWidth;
     public final int displayHeight;
     
-    private volatile boolean busy = false;
+    private volatile boolean busy;
     
     private final WallpaperManager wallpaperManager;
     private final LayoutInflater layoutInflater;
@@ -74,7 +74,8 @@ class LockScreenBitmapDrawer {
         
         if (DISPLAY_METRICS_DENSITY.get() == -1) {
             DisplayMetrics displayMetrics = new DisplayMetrics();
-            ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRealMetrics(displayMetrics);
+            ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
+                    .getDefaultDisplay().getRealMetrics(displayMetrics); // NOSONAR, replacement api is garbage
             
             Keys.edit()
                     .putInt(DISPLAY_METRICS_WIDTH.key, displayMetrics.widthPixels)
@@ -153,7 +154,7 @@ class LockScreenBitmapDrawer {
                     
                     time = getCurrentTimestampUTC();
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
-                    Logger.info(NAME, " ------------ Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000f + "s ------------ ");
+                    Logger.info(NAME, " ------------ Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000F + "s ------------ ");
                     
                 } catch (InterruptedException e) {
                     Logger.info(NAME, e.getMessage());
@@ -184,7 +185,6 @@ class LockScreenBitmapDrawer {
     @SuppressLint("InflateParams")
     private void drawItemsOnBitmap(@NonNull Context context, @NonNull Bitmap bitmap, boolean forceRedraw) throws InterruptedException {
         
-        Canvas canvas = new Canvas(bitmap);
         GroupList groups = loadGroups();
         TodoItemViewType todoItemViewType = TODO_ITEM_VIEW_TYPE.get();
         // load user defined entries (from files)
@@ -217,7 +217,8 @@ class LockScreenBitmapDrawer {
         
         // set vertical bias
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) containerView.getLayoutParams();
-        params.verticalBias = LOCKSCREEN_VIEW_VERTICAL_BIAS.get() / 100f; // convert percentage to 0 to 1
+        // convert percentage to 0 to 1
+        params.verticalBias = LOCKSCREEN_VIEW_VERTICAL_BIAS.get() / 100F;
         containerView.setLayoutParams(params);
         
         List<LockScreenTodoItemView<?>> itemViews = new ArrayList<>();
@@ -243,6 +244,7 @@ class LockScreenBitmapDrawer {
             itemViews.get(i).applyLayoutDependentParameters(toAdd.get(i), bitmap, containerView);
         }
         
+        Canvas canvas = new Canvas(bitmap);
         rootView.draw(canvas);
     }
     

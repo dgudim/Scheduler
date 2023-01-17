@@ -35,7 +35,7 @@ import prototype.xd.scheduler.databinding.PermissionsRequestFragmentBinding;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
 
 
-public class PermissionRequestFragment extends Fragment implements SlidePolicy {
+public class PermissionRequestFragment extends Fragment implements SlidePolicy { // NOSONAR this is a fragment
     
     private PermissionsRequestFragmentBinding bnd;
     
