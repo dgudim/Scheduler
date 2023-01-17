@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
+import androidx.annotation.NonNull;
 import androidx.collection.ArrayMap;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class SArrayMap<K extends Serializable, V extends Serializable> extends A
     }
     
     @SuppressWarnings("unchecked")
-    private void writeObject(ObjectOutputStream oos)
+    private void writeObject(@NonNull ObjectOutputStream oos)
             throws IOException {
         oos.defaultWriteObject();
         oos.writeObject(keySet().toArray((K[]) new Serializable[0]));
@@ -36,7 +37,7 @@ public class SArrayMap<K extends Serializable, V extends Serializable> extends A
     }
     
     @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream ois)
+    private void readObject(@NonNull ObjectInputStream ois)
             throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         K[] keySet = (K[]) ois.readObject();

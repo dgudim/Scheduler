@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class PerDayBgGridViewAdapter extends BaseAdapter {
     public static final String NAME = PerDayBgGridViewAdapter.class.getSimpleName();
     
     // called when a user clicks on an image to select a new one
+    @NonNull
     private final Consumer<Integer> bgSelectionClickedCallback;
     // fallback day
     private final String defaultDay;
@@ -53,8 +55,9 @@ public class PerDayBgGridViewAdapter extends BaseAdapter {
         return i;
     }
     
+    @NonNull
     @Override
-    public View getView(int i, View convertView, ViewGroup parent) {
+    public View getView(int i, @Nullable View convertView, @NonNull ViewGroup parent) {
         
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.background_image_entry, parent, false);

@@ -69,7 +69,7 @@ class LockScreenBitmapDrawer {
     
     private long previousHash;
     
-    public LockScreenBitmapDrawer(Context context) throws IllegalStateException {
+    public LockScreenBitmapDrawer(@NonNull Context context) throws IllegalStateException {
         wallpaperManager = WallpaperManager.getInstance(context);
         
         if (DISPLAY_METRICS_DENSITY.get() == -1) {
@@ -174,7 +174,7 @@ class LockScreenBitmapDrawer {
         return false;
     }
     
-    private long getEntryListHash(List<TodoEntry> entries) {
+    private long getEntryListHash(@NonNull List<TodoEntry> entries) {
         long hash = 0;
         for (TodoEntry entry : entries) {
             hash += entry.getLockscreenHash();
@@ -248,6 +248,7 @@ class LockScreenBitmapDrawer {
         rootView.draw(canvas);
     }
     
+    @NonNull
     private File getBackgroundAccordingToDayAndTime() {
         
         if (!Keys.ADAPTIVE_BACKGROUND_ENABLED.get()) {

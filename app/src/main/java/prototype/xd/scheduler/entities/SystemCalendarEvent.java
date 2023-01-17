@@ -17,6 +17,7 @@ import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
 
 import android.database.Cursor;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -37,8 +38,9 @@ public class SystemCalendarEvent {
     
     public static final String NAME = SystemCalendarEvent.class.getSimpleName();
     
-    protected @Nullable
-    TodoEntry associatedEntry;
+    @Nullable
+    protected TodoEntry associatedEntry;
+    @NonNull
     protected final SystemCalendar associatedCalendar;
     
     protected List<String> subKeys;
@@ -46,6 +48,7 @@ public class SystemCalendarEvent {
     long id;
     
     protected String title;
+    @ColorInt
     public final int color;
     
     protected long startMsUTC;
@@ -61,7 +64,7 @@ public class SystemCalendarEvent {
     
     TimeZone timeZone;
     
-    SystemCalendarEvent(Cursor cursor, SystemCalendar associatedCalendar, boolean loadMinimal) {
+    SystemCalendarEvent(@NonNull Cursor cursor, @NonNull SystemCalendar associatedCalendar, boolean loadMinimal) {
         
         this.associatedCalendar = associatedCalendar;
         
@@ -99,7 +102,7 @@ public class SystemCalendarEvent {
         computeEventVisibilityDays();
     }
     
-    private void loadRecurrenceRules(Cursor cursor) { // NOSONAR, not that complex
+    private void loadRecurrenceRules(@NonNull Cursor cursor) { // NOSONAR, not that complex
         
         String rRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RRULE);
         String rDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RDATE);
@@ -167,7 +170,7 @@ public class SystemCalendarEvent {
         return associatedEntry != null;
     }
     
-    public void linkEntry(TodoEntry todoEntry) {
+    public void linkEntry(@NonNull TodoEntry todoEntry) {
         if (associatedEntry != null) {
             Logger.warning(NAME, this + " already linked to " +
                     associatedEntry + " relinking to " + todoEntry);
@@ -187,7 +190,7 @@ public class SystemCalendarEvent {
      *
      * @param parameterKey parameter key to invalidate
      */
-    protected void invalidateParameter(String parameterKey) {
+    protected void invalidateParameter(@NonNull String parameterKey) {
         if (associatedEntry != null) {
             associatedEntry.invalidateParameter(parameterKey, true);
         }
@@ -207,7 +210,7 @@ public class SystemCalendarEvent {
      *
      * @param parameterKey parameter key to invalidate
      */
-    public void invalidateParameterOfConnectedEntries(String parameterKey) {
+    public void invalidateParameterOfConnectedEntries(@NonNull String parameterKey) {
         associatedCalendar.invalidateParameterOnEvents(parameterKey, color);
     }
     
@@ -220,7 +223,8 @@ public class SystemCalendarEvent {
     // ------------------------------ METHODS FOR WORKING WITH ENTRY PARAMETERS END
     
     
-    private DateTimeZonePair checkRDates(String datesToParse) {
+    @NonNull
+    private DateTimeZonePair checkRDates(@NonNull String datesToParse) {
         TimeZone newTimeZone = timeZone;
         if (datesToParse.contains(";")) {
             Logger.warning(NAME, "Not standard dates for " + this + ", " + datesToParse + ", probably contains timezone, attempting to parse");
@@ -236,11 +240,13 @@ public class SystemCalendarEvent {
     }
     
     private static class DateTimeZonePair {
-        
+    
+        @NonNull
         final String date;
+        @NonNull
         final TimeZone timeZone;
         
-        DateTimeZonePair(String date, TimeZone timeZone) {
+        DateTimeZonePair(@NonNull String date, @NonNull TimeZone timeZone) {
             this.date = date;
             this.timeZone = timeZone;
         }
@@ -262,7 +268,7 @@ public class SystemCalendarEvent {
         T processInstance(long instanceStartMsUTC, long instanceEndMsUTC, long instanceStartDayLocal, long instanceEndDayLocal);
     }
     
-    protected <T> T iterateRecurrenceSet(long firstDayUTC, RecurrenceSetConsumer<T> recurrenceSetConsumer, T defaultValue) {
+    protected <T> T iterateRecurrenceSet(long firstDayUTC, @NonNull RecurrenceSetConsumer<T> recurrenceSetConsumer, @Nullable T defaultValue) {
         RecurrenceSetIterator it = rSet.iterator(timeZone, startMsUTC);
         it.fastForward(daysToMs(firstDayUTC - 2));
         long instanceStartMsUTC;
@@ -286,19 +292,19 @@ public class SystemCalendarEvent {
             return iterateRecurrenceSet(firstDayUTC, (instanceStartMsUTC, instanceEndMsUTC, instanceStartDayLocal, instanceEndDayLocal) -> {
                 // overshot
                 if (instanceStartDayLocal > lastDayUTC) {
-                    return false;
+                    return Boolean.FALSE;
                 }
                 // if in range
                 if (rangesOverlap(instanceStartDayLocal, instanceEndDayLocal, firstDayUTC, lastDayUTC)) {
-                    return true;
+                    return Boolean.TRUE;
                 }
                 return null;
-            }, false);
+            }, Boolean.FALSE);
         }
         return rangesOverlap(startDayLocal, endDayLocal, firstDayUTC, lastDayUTC);
     }
     
-    public void addExceptions(List<Long> exceptions) {
+    public void addExceptions(@NonNull List<Long> exceptions) {
         if (rSet != null) {
             rSet.addExceptions(new RecurrenceList(exceptions.stream().mapToLong(Long::longValue).toArray()));
         } else {
@@ -327,6 +333,6 @@ public class SystemCalendarEvent {
     @NonNull
     @Override
     public String toString() {
-        return NAME + ": " + (BuildConfig.DEBUG ? title : id) + " " + associatedCalendar.toString() + " " + color;
+        return NAME + ": " + (BuildConfig.DEBUG ? title : id) + " " + associatedCalendar + " " + color;
     }
 }

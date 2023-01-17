@@ -4,43 +4,46 @@ import android.content.res.ColorStateList;
 import android.util.TypedValue;
 import android.view.View;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
 import prototype.xd.scheduler.databinding.SleekEntryBinding;
 
 public class SleekLockScreenTodoItemView extends LockScreenTodoItemView<SleekEntryBinding> {
     
-    SleekLockScreenTodoItemView(SleekEntryBinding binding) {
+    SleekLockScreenTodoItemView(@NonNull SleekEntryBinding binding) {
         super(binding);
     }
     
+    @NonNull
     @Override
     public View getClickableRoot() {
         return viewBinding.backgroundOutline;
     }
     
     @Override
-    public void setBackgroundColor(int color) {
+    public void setBackgroundColor(@ColorInt int color) {
         viewBinding.backgroundMain.setCardBackgroundColor(color);
     }
     
     @Override
-    public void setBorderColor(int color) {
+    public void setBorderColor(@ColorInt int color) {
         viewBinding.backgroundOutline.setCardBackgroundColor(color);
     }
     
     @Override
-    public void setTitleTextColor(int color) {
+    public void setTitleTextColor(@ColorInt int color) {
         viewBinding.titleText.setTextColor(color);
     }
     
     @Override
-    public void setIndicatorColor(int color) {
+    public void setIndicatorColor(@ColorInt int color) {
         viewBinding.indicatorView.setBackgroundTintList(ColorStateList.valueOf(color));
     }
     
     @Override
-    public void setTimeTextColor(int color) {
+    public void setTimeTextColor(@ColorInt int color) {
         viewBinding.timeTextStart.setTextColor(color);
         viewBinding.timeText.setTextColor(color);
     }
@@ -53,7 +56,7 @@ public class SleekLockScreenTodoItemView extends LockScreenTodoItemView<SleekEnt
     }
     
     @Override
-    public void setTitleText(String text) {
+    public void setTitleText(@NonNull String text) {
         viewBinding.titleText.setText(text);
     }
     
@@ -63,12 +66,12 @@ public class SleekLockScreenTodoItemView extends LockScreenTodoItemView<SleekEnt
     }
     
     @Override
-    public void setTimeSpanText(String text) {
+    public void setTimeSpanText(@NonNull String text) {
         viewBinding.timeText.setText(text);
     }
     
     @Override
-    public void setTimeStartText(String text) {
+    public void setTimeStartText(@NonNull String text) {
         viewBinding.timeTextStart.setText(text);
     }
     

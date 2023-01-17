@@ -17,6 +17,7 @@ public class BaseListSettingsFragment<T extends RecyclerView.Adapter<?>> extends
     
     protected T listViewAdapter;
     
+    @NonNull
     @Override
     public SettingsFragmentBinding inflate(@NonNull LayoutInflater inflater, ViewGroup container) {
         return SettingsFragmentBinding.inflate(inflater, container, false);

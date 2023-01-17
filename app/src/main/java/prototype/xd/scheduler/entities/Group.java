@@ -48,7 +48,7 @@ public class Group implements Serializable {
         associatedEntries = new ArraySet<>();
     }
     
-    private void readObject(ObjectInputStream in)
+    private void readObject(@NonNull ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         if (isNullGroup()) {
@@ -93,7 +93,7 @@ public class Group implements Serializable {
         return groupName.isEmpty();
     }
     
-    public static int groupIndexInList(List<Group> groups, String groupName) {
+    public static int groupIndexInList(@NonNull List<Group> groups, String groupName) {
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).groupName.equals(groupName)) {
                 return i;
@@ -103,7 +103,7 @@ public class Group implements Serializable {
     }
     
     @NonNull
-    public static Group findGroupInList(List<Group> groups, String groupName) {
+    public static Group findGroupInList(@NonNull List<Group> groups, @NonNull String groupName) {
         if (groupName.isEmpty()) {
             return NULL_GROUP;
         }
@@ -112,7 +112,7 @@ public class Group implements Serializable {
     }
     
     @NonNull
-    public static String[] groupListToNames(List<Group> groups, ContextWrapper wrapper) {
+    public static String[] groupListToNames(@NonNull List<Group> groups, @NonNull ContextWrapper wrapper) {
         String[] names = new String[groups.size()];
         for (int i = 0; i < groups.size(); i++) {
             names[i] = groups.get(i).getLocalizedName(wrapper.context);
@@ -136,6 +136,7 @@ public class Group implements Serializable {
         return groupName;
     }
     
+    @NonNull
     public Set<String> getParameterKeys() {
         if (isNullGroup()) {
             return Collections.emptySet();

@@ -17,10 +17,14 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
     @StringRes
     final int titleId;
     
+    @NonNull
     protected final SliderSettingsEntryConfig leftSliderConfig;
+    @NonNull
     protected final GraphicsUtilities.SliderTinter leftSliderTinter;
     
+    @NonNull
     protected final SliderSettingsEntryConfig rightSliderConfig;
+    @NonNull
     protected final GraphicsUtilities.SliderTinter rightSliderTinter;
     
     public DoubleSliderSettingsEntryConfig(@NonNull Context context,
@@ -49,7 +53,7 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(DoubleSliderSettingsEntryConfig config) {
+        void bind(@NonNull DoubleSliderSettingsEntryConfig config) {
             
             viewBinding.title.setText(config.titleId);
             

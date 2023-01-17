@@ -17,11 +17,14 @@ import prototype.xd.scheduler.utilities.TodoEntryManager;
 @MainThread
 public abstract class PopupSettingsView {
     
+    @NonNull
     protected final EntrySettingsBinding bnd;
     
     protected final EntryPreviewContainer entryPreviewContainer;
     
+    @NonNull
     protected final ContextWrapper wrapper;
+    @NonNull
     protected final AlertDialog dialog;
     protected final int defaultTextColor;
     
@@ -65,7 +68,7 @@ public abstract class PopupSettingsView {
     /**
      * public method that should be called when some color changes (font, bg, border), for example from a switch listener
      */
-    public void notifyColorChanged(Keys.DefaultedInteger value, int newColor) {
+    public void notifyColorChanged(@NonNull Keys.DefaultedInteger value, int newColor) {
         entryPreviewContainer.notifyColorChanged(value, newColor);
     }
     

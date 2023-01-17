@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.collection.ArrayMap;
 
@@ -25,10 +26,13 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
     private final int calendarColor;
     
     // event color to event count map
+    @NonNull
     private final ArrayMap<Integer, Integer> eventColorCountMap;
     
+    @NonNull
     private final SystemCalendarSettings systemCalendarSettings;
     
+    @NonNull
     private final SystemCalendar calendar;
     
     public CalendarColorsGridViewAdapter(@NonNull final SystemCalendarSettings systemCalendarSettings,
@@ -54,8 +58,9 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         return i;
     }
     
+    @NonNull
     @Override
-    public View getView(int i, View view, ViewGroup parent) {
+    public View getView(int i, @Nullable View view, @NonNull ViewGroup parent) {
         
         if (view == null) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.calendar_color_entry, parent, false);

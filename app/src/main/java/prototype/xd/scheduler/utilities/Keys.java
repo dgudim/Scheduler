@@ -70,7 +70,7 @@ public final class Keys {
         }
         
         @NonNull
-        public T get(@Nullable List<String> subKeys, T actualDefaultValue, boolean ignoreBaseKey) {
+        public T get(@Nullable List<String> subKeys, @NonNull T actualDefaultValue, boolean ignoreBaseKey) {
             if (subKeys != null) {
                 String targetKey = getFirstValidKey(subKeys, key);
                 if (targetKey.equals(key) && ignoreBaseKey) {
@@ -88,7 +88,7 @@ public final class Keys {
         
         // ignore the "base" key, only use sub-keys
         @NonNull
-        public T getOnlyBySubKeys(@NonNull List<String> subKeys, T defaultValueOverride) {
+        public T getOnlyBySubKeys(@NonNull List<String> subKeys, @NonNull T defaultValueOverride) {
             return get(subKeys, defaultValueOverride, true);
         }
         
@@ -138,6 +138,7 @@ public final class Keys {
             super(key, defaultValue);
         }
         
+        @NonNull
         @Override
         protected Boolean getInternal(String actualKey, Boolean actualDefaultValue) {
             return getInternalPrefs().getBoolean(actualKey, actualDefaultValue);
@@ -159,6 +160,7 @@ public final class Keys {
             super(key, defaultValue);
         }
         
+        @NonNull
         @Override
         protected Integer getInternal(String actualKey, Integer actualDefaultValue) {
             return getInternalPrefs().getInt(actualKey, actualDefaultValue);
@@ -175,6 +177,7 @@ public final class Keys {
             super(key, defaultValue);
         }
         
+        @NonNull
         @Override
         protected Float getInternal(String actualKey, Float actualDefaultValue) {
             return getInternalPrefs().getFloat(actualKey, actualDefaultValue);
@@ -228,7 +231,7 @@ public final class Keys {
         }
         
         @Override
-        public void put(List<T> enumList) {
+        public void put(@NonNull List<T> enumList) {
             StringBuilder stringValue = new StringBuilder(enumList.get(0).name());
             for (int i = 1; i < enumList.size(); i++) {
                 stringValue
@@ -265,7 +268,7 @@ public final class Keys {
         }
         
         @Override
-        public void put(T value) {
+        public void put(@NonNull T value) {
             getInternalPrefs().edit().putString(key, value.name()).apply();
         }
         
@@ -280,14 +283,14 @@ public final class Keys {
         }
     }
     
-    public static synchronized void initPrefs(Context context) {
+    public static synchronized void initPrefs(@NonNull Context context) {
         if (preferences == null) {
             preferences = context.getSharedPreferences(PREFERENCES_MAIN, Context.MODE_PRIVATE);
             servicePreferences = context.getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
         }
     }
     
-    public static <T> void putAny(String key, T value) {
+    public static <T> void putAny(String key, @NonNull T value) {
         if (value.getClass() == Integer.class) {
             preferences.edit().putInt(key, (Integer) value).apply();
         } else if (value.getClass() == String.class) {
@@ -319,7 +322,7 @@ public final class Keys {
         preferences.edit().clear().apply();
     }
     
-    public static int getFirstValidKeyIndex(List<String> calendarSubKeys, String parameter) {
+    public static int getFirstValidKeyIndex(@NonNull List<String> calendarSubKeys, String parameter) {
         for (int i = calendarSubKeys.size() - 1; i >= 0; i--) {
             try {
                 if (preferences.getString(calendarSubKeys.get(i) + "_" + parameter, null) != null) {
@@ -332,7 +335,7 @@ public final class Keys {
         return -1;
     }
     
-    public static String getFirstValidKey(List<String> calendarSubKeys, String parameter) {
+    public static String getFirstValidKey(@NonNull List<String> calendarSubKeys, String parameter) {
         int index = getFirstValidKeyIndex(calendarSubKeys, parameter);
         return index == -1 ? parameter : (calendarSubKeys.get(index) + "_" + parameter);
     }

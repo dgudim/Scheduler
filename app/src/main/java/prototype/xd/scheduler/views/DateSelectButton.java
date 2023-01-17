@@ -92,6 +92,7 @@ public class DateSelectButton extends MaterialButton {
         return selectedMsUTC;
     }
     
+    @NonNull
     public String getSelectedDayUTCStr() {
         return String.valueOf(selectedDayUTC);
     }

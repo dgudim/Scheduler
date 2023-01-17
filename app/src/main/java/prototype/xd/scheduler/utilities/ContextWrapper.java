@@ -37,7 +37,8 @@ public class ContextWrapper {
         this.fragmentManager = fragmentManager;
     }
     
-    public static ContextWrapper from(Fragment fragment) {
+    @NonNull
+    public static ContextWrapper from(@NonNull Fragment fragment) {
         return new ContextWrapper(fragment.requireContext(), fragment.getLifecycle(), fragment.getChildFragmentManager());
     }
     
@@ -66,6 +67,7 @@ public class ContextWrapper {
         lifecycle.addObserver(observer);
     }
     
+    @NonNull
     @MainThread
     public <T extends Dialog> T attachDialogToLifecycle(@NonNull final T dialog,
                                                         @Nullable DialogInterface.OnDismissListener dismissListener) {

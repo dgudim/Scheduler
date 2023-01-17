@@ -12,6 +12,8 @@ import static prototype.xd.scheduler.utilities.Utilities.throwOnFalse;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -87,6 +89,7 @@ public final class Logger {
         log(ERROR, tag, Log.getStackTraceString(e));
     }
     
+    @NonNull
     private static String priorityToStr(int priority) {
         switch (priority) {
             case VERBOSE:

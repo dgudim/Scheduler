@@ -66,6 +66,7 @@ public final class SystemCalendarUtils {
      * @param loadMinimal whether to only load event colors
      * @return a list of system calendars
      */
+    @NonNull
     public static List<SystemCalendar> getAllCalendars(@NonNull Context context, boolean loadMinimal) {
         ContentResolver contentResolver = context.getContentResolver();
         
@@ -90,6 +91,7 @@ public final class SystemCalendarUtils {
      * @param calendars list of calendars to get from
      * @return a list of TodoEntries
      */
+    @NonNull
     public static List<TodoEntry> getTodoEntriesFromCalendars(long dayStart, long dayEnd,
                                                               @NonNull List<SystemCalendar> calendars) {
         List<TodoEntry> todoEntries = new ArrayList<>();
@@ -103,7 +105,8 @@ public final class SystemCalendarUtils {
         return todoEntries;
     }
     
-    public static List<String> generateSubKeysFromCalendarKey(String calendarKey) {
+    @NonNull
+    public static List<String> generateSubKeysFromCalendarKey(@NonNull String calendarKey) {
         List<String> calendarSubKeys = new ArrayList<>();
         String[] splitKey = calendarKey.split("_");
         StringBuilder buffer = new StringBuilder();
@@ -117,7 +120,8 @@ public final class SystemCalendarUtils {
         return calendarSubKeys;
     }
     
-    public static Spannable calendarKeyToReadable(Context context, String calendarKey) {
+    @NonNull
+    public static Spannable calendarKeyToReadable(@NonNull Context context, @NonNull String calendarKey) {
         String[] splitKey = calendarKey.split("_");
         switch (splitKey.length) {
             case 3:

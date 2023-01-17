@@ -16,7 +16,9 @@ import prototype.xd.scheduler.utilities.Keys;
 
 public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     
+    @NonNull
     private final Fragment fragment;
+    @Nullable
     private final Bundle savedInstanceState;
     
     public ResetButtonSettingsEntryConfig(@NonNull final Fragment fragment,
@@ -37,7 +39,7 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(ResetButtonSettingsEntryConfig config) {
+        void bind(@NonNull ResetButtonSettingsEntryConfig config) {
             viewBinding.resetSettingsButton.setOnClickListener(v ->
                     displayConfirmationDialogue(wrapper,
                             R.string.reset_settings_prompt, R.string.reset_settings_description,

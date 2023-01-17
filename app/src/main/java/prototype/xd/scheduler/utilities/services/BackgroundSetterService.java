@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -31,13 +32,14 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
     
     public static final String NAME = BackgroundSetterService.class.getSimpleName();
     
+    @Nullable
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
-    public static void ping(Context context) {
+    public static void ping(@NonNull Context context) {
         ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
     }
     
-    public static void keepAlive(Context context) {
+    public static void keepAlive(@NonNull Context context) {
         Intent keepAliveIntent = new Intent(context, BackgroundSetterService.class);
         keepAliveIntent.putExtra(SERVICE_KEEP_ALIVE_SIGNAL, 1);
         ContextCompat.startForegroundService(context, keepAliveIntent);
@@ -55,6 +57,7 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
     // Notification
     private NotificationCompat.Builder foregroundNotification;
     
+    @NonNull
     private NotificationCompat.Builder getForegroundNotification() {
         if (foregroundNotification == null) {
             foregroundNotification = new NotificationCompat.Builder(getApplicationContext(), getNotificationChannelId())
@@ -134,7 +137,7 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
     private BroadcastReceiver pingReceiver;
     
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         Keys.initPrefs(this);
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
@@ -142,8 +145,12 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
                 Logger.info(NAME, "Received ping (keep alive job)");
             } else {
                 Logger.info(NAME, "Received general ping");
-                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this, checkIfTimeSettingsChanged());
-                updateNotification();
+                if (lockScreenBitmapDrawer != null) {
+                    lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this, checkIfTimeSettingsChanged());
+                    updateNotification();
+                } else {
+                    Logger.error(NAME, "lockScreenBitmapDrawer is null, huh?");
+                }
             }
         } else {
             initialized = true;
@@ -151,7 +158,7 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
             
             screenOnOffReceiver = new BroadcastReceiver() {
                 @Override
-                public void onReceive(Context context, Intent intent) {
+                public void onReceive(@NonNull Context context, @NonNull Intent intent) {
                     if (!lastUpdateSucceeded || SERVICE_UPDATE_SIGNAL.get()) {
                         ping(context);
                         clearBitmapUpdateFlag();
@@ -162,7 +169,7 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
             };
             pingReceiver = new BroadcastReceiver() {
                 @Override
-                public void onReceive(Context context, Intent intent) {
+                public void onReceive(@NonNull Context context, Intent intent) {
                     ping(context);
                     Logger.info(NAME, "Sent ping (date changed receiver)");
                 }

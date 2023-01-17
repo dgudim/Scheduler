@@ -42,6 +42,7 @@ enum SettingsEntryType {
 
 public abstract class SettingsEntryConfig extends RecycleViewEntry {
     
+    @NonNull
     public static SettingsViewHolder<?, ? extends SettingsEntryConfig> createViewHolder(@NonNull ContextWrapper wrapper,
                                                                                         @NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = wrapper.getLayoutInflater();
@@ -77,7 +78,9 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
     
     public abstract static class SettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends RecyclerView.ViewHolder {
         
+        @NonNull
         protected final V viewBinding;
+        @NonNull
         protected final ContextWrapper wrapper;
         
         SettingsViewHolder(@NonNull final ContextWrapper wrapper,

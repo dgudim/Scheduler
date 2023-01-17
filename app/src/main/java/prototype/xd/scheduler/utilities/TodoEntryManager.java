@@ -15,6 +15,7 @@ import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,13 +54,18 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     
     @Nullable
     private CalendarView calendarView;
+    @NonNull
     private final TodoListViewAdapter todoListViewAdapter;
     
     private List<SystemCalendar> calendars;
+    @NonNull
     private final TodoEntryList todoEntries;
+    @NonNull
     private final GroupList groups;
     
+    @NonNull
     private final Thread asyncSaver;
+    @NonNull
     private final BlockingQueue<SaveType> saveQueue;
     
     private volatile boolean initFinished;
@@ -67,6 +73,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     private Runnable onInitFinishedRunnable;
     
     private boolean displayUpcomingExpired;
+    @NonNull
     private final ArrayMap<Long, Boolean> calendarVisibilityMap;
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
@@ -76,7 +83,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      */
     private final BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener = new BiConsumer<>() { // NOSONAR, nah
         @Override
-        public void accept(TodoEntry entry, Set<String> parameters) {
+        public void accept(@NonNull TodoEntry entry, @NonNull Set<String> parameters) {
         
             Logger.debug(NAME, entry + " parameters changed: " + parameters);
         
@@ -256,7 +263,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      *
      * @param days days that changed
      */
-    private void notifyDaysChanged(Set<Long> days) {
+    private void notifyDaysChanged(@NonNull Set<Long> days) {
         Logger.debug(NAME, days.size() + " days changed");
         if (calendarView != null) {
             calendarView.notifyDaysChanged(days);
@@ -317,6 +324,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         calendarView = null;
     }
     
+    @NonNull
     public TodoListViewAdapter getTodoListViewAdapter() {
         return todoListViewAdapter;
     }
@@ -325,6 +333,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         return todoListViewAdapter.getItemCount();
     }
     
+    @NonNull
     public List<TodoEntry> getVisibleTodoEntries(long day) {
         return todoEntries.getOnDay(day, (entry, entryType) -> {
             if (entryType == TodoEntry.EntryType.UPCOMING ||
@@ -338,10 +347,10 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     
     @FunctionalInterface
     public interface EventIndicatorConsumer {
-        void submit(int color, int index, boolean visiblePosition);
+        void submit(@ColorInt int color, int index, boolean visiblePosition);
     }
     
-    public void processEventIndicators(long day, int maxIndicators, EventIndicatorConsumer eventIndicatorConsumer) {
+    public void processEventIndicators(long day, int maxIndicators, @NonNull EventIndicatorConsumer eventIndicatorConsumer) {
         
         List<TodoEntry> todoEntriesOnDay = todoEntries.getOnDay(day, (entry, entryType) ->
                 entryType != TodoEntry.EntryType.GLOBAL && !entry.isCompleted());
@@ -365,6 +374,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         }
     }
     
+    @NonNull
     public List<Group> getGroups() {
         return Collections.unmodifiableList(groups);
     }
@@ -398,7 +408,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      *
      * @param eventsToAdd events to add
      */
-    private void addEvents(List<SystemCalendarEvent> eventsToAdd) {
+    private void addEvents(@NonNull List<SystemCalendarEvent> eventsToAdd) {
         for (SystemCalendarEvent event : eventsToAdd) {
             // if the event hasn't been associated with an entry, add it
             if (!event.isAssociatedWithEntry()) {

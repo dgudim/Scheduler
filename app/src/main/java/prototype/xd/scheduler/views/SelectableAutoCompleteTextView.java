@@ -29,7 +29,7 @@ public class SelectableAutoCompleteTextView extends MaterialAutoCompleteTextView
         setText(getAdapter().getItem(position).toString(), false);
     }
     
-    public void setNewItemNames(String[] items) {
+    public void setNewItemNames(@NonNull String[] items) {
         setSimpleItems(items);
         setSelectedItem(selectedItemPosition);
     }
@@ -39,7 +39,7 @@ public class SelectableAutoCompleteTextView extends MaterialAutoCompleteTextView
     }
     
     @Override
-    public void setOnItemClickListener(AdapterView.OnItemClickListener l) {
+    public void setOnItemClickListener(@Nullable AdapterView.OnItemClickListener l) {
         super.setOnItemClickListener((parent, view, position, id) -> {
             selectedItemPosition = position;
             if(l != null) {

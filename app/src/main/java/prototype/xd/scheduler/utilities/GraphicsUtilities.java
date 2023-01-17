@@ -15,6 +15,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.FloatRange;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.color.MaterialColors;
@@ -31,7 +33,8 @@ import prototype.xd.scheduler.R;
 public class GraphicsUtilities {
     
     
-    public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, File output) throws IOException {
+    @NonNull
+    public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, @NonNull File output) throws IOException {
         bitmap = makeMutable(bitmap);
         Bitmap cutBitmap = createScaledBitmap(bitmap,
                 DISPLAY_METRICS_WIDTH.get(),
@@ -76,7 +79,7 @@ public class GraphicsUtilities {
      * @param scalingLogic   Logic to use to avoid image stretching
      * @return New scaled bitmap object
      */
-    public static Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight, ScalingLogic scalingLogic) {
+    public static Bitmap createScaledBitmap(@NonNull Bitmap unscaledBitmap, int dstWidth, int dstHeight, ScalingLogic scalingLogic) {
         
         Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth, dstHeight, scalingLogic);
         Rect dstRect = calculateDstRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth, dstHeight, scalingLogic);
@@ -114,6 +117,7 @@ public class GraphicsUtilities {
      * @param scalingLogic Logic to use to avoid image stretching
      * @return Optimal source rectangle
      */
+    @NonNull
     public static Rect calculateSrcRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
                                         ScalingLogic scalingLogic) {
         if (scalingLogic == ScalingLogic.CROP) {
@@ -144,6 +148,7 @@ public class GraphicsUtilities {
      * @param scalingLogic Logic to use to avoid image stretching
      * @return Optimal destination rectangle
      */
+    @NonNull
     public static Rect calculateDstRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
                                         ScalingLogic scalingLogic) {
         if (scalingLogic == ScalingLogic.FIT) {
@@ -160,18 +165,18 @@ public class GraphicsUtilities {
         }
     }
     
-    public static int swapRedAndGreenChannels(int color) {
+    public static int swapRedAndGreenChannels(@ColorInt int color) {
         Color col = Color.valueOf(color);
         return Color.rgb(col.green(), col.red(), col.blue());
     }
     
-    public static int getOnBgColor(int surfaceColor) {
+    public static int getOnBgColor(@ColorInt int surfaceColor) {
         // get a color that will look good on the specified surfaceColor
         return mixTwoColors(getIntensityColor(surfaceColor), surfaceColor, 0.3);
     }
     
     // return black or white based on the background color
-    public static int getIntensityColor(int bgColor) {
+    public static int getIntensityColor(@ColorInt int bgColor) {
         Color col = Color.valueOf(bgColor);
         float intensity = col.red() * 0.299F + col.green() * 0.587F + col.blue() * 0.114F;
         if (intensity > 0.729411F) {
@@ -180,15 +185,15 @@ public class GraphicsUtilities {
         return Color.WHITE;
     }
     
-    public static int dimColorToBg(int color, int bgColor) {
+    public static int dimColorToBg(@ColorInt int color, @ColorInt int bgColor) {
         return mixTwoColors(color, bgColor, Keys.DEFAULT_DIM_FACTOR);
     }
     
-    public static int dimColorToBg(int color, @NonNull Context context) {
+    public static int dimColorToBg(@ColorInt int color, @NonNull Context context) {
         return mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), Keys.DEFAULT_DIM_FACTOR);
     }
     
-    public static int mixTwoColors(int color1, int color2, double balance) {
+    public static int mixTwoColors(@ColorInt int color1, @ColorInt int color2, @FloatRange(from = 0.0, to = 1.0) double balance) {
         Color c1 = Color.valueOf(color1);
         Color c2 = Color.valueOf(color2);
         float a = (float) (c1.alpha() * (1 - balance) + c2.alpha() * balance);
@@ -199,30 +204,30 @@ public class GraphicsUtilities {
     }
     
     // get harmonized color with the background
-    public static int getHarmonizedFontColorWithBg(int color, int backgroundColor) {
+    public static int getHarmonizedFontColorWithBg(@ColorInt int color, @ColorInt int backgroundColor) {
         // harmonize with extrapolated primary color
         return MaterialColors.harmonize(color, getOnBgColor(backgroundColor));
     }
     
     // mix and harmonize (25% background color, 75% font color + harmonized with background);
-    public static int getHarmonizedSecondaryFontColorWithBg(int color, int backgroundColor) {
+    public static int getHarmonizedSecondaryFontColorWithBg(@ColorInt int color, @ColorInt int backgroundColor) {
         return getHarmonizedFontColorWithBg(mixTwoColors(color, backgroundColor, Keys.DEFAULT_SECONDARY_TEXT_COLOR_MIX_FACTOR), backgroundColor);
     }
     
     // mix color with bg color based on balance (from 1 to 10)
-    public static int mixColorWithBg(int inputColor, int backgroundColor, int balance) {
-        if (balance <= 0) {
+    public static int mixColorWithBg(@ColorInt int inputColor, @ColorInt int backgroundColor, @IntRange(from = 0, to = 10) int balance) {
+        if (balance == 0) {
             return inputColor;
         }
         return mixTwoColors(MaterialColors.harmonize(inputColor, backgroundColor),
                 backgroundColor, (balance - 1) / 9D);
     }
     
-    public static int getExpiredUpcomingColor(int baseColor, int tintColor) {
+    public static int getExpiredUpcomingColor(@ColorInt int baseColor, @ColorInt int tintColor) {
         return mixTwoColors(baseColor, tintColor, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR);
     }
     
-    public static int getAverageColor(int[] pixels) {
+    public static int getAverageColor(@NonNull int[] pixels) {
         
         int redBucket = 0;
         int greenBucket = 0;
@@ -273,7 +278,7 @@ public class GraphicsUtilities {
             sliderHaloColor = ColorStateList.valueOf(dimColorToBg(sliderAccentColor, context));
         }
         
-        public void tintSlider(Slider slider) {
+        public void tintSlider(@NonNull Slider slider) {
             slider.setThumbTintList(sliderPrimaryColor);
             slider.setHaloTintList(sliderHaloColor);
             slider.setTrackActiveTintList(sliderPrimaryColor);
@@ -283,13 +288,13 @@ public class GraphicsUtilities {
         
     }
     
-    public static void fingerPrintBitmap(Bitmap bitmap) {
+    public static void fingerPrintBitmap(@NonNull Bitmap bitmap) {
         bitmap.setPixel(0, 0, Color.DKGRAY);
         bitmap.setPixel(1, 0, Color.GREEN);
         bitmap.setPixel(0, 1, Color.YELLOW);
     }
     
-    public static boolean noFingerPrint(Bitmap bitmap) {
+    public static boolean noFingerPrint(@NonNull Bitmap bitmap) {
         int pixel1 = bitmap.getPixel(0, 0);
         int pixel2 = bitmap.getPixel(1, 0);
         int pixel3 = bitmap.getPixel(0, 1);
@@ -299,7 +304,7 @@ public class GraphicsUtilities {
                 && (pixel3 == Color.YELLOW));
     }
     
-    public static int hashBitmap(Bitmap bitmap) {
+    public static int hashBitmap(@NonNull Bitmap bitmap) {
         int[] buffer = new int[bitmap.getWidth() * bitmap.getHeight() / 16];
         bitmap.getPixels(buffer, 0, bitmap.getWidth() / 4, 0, 0, bitmap.getWidth() / 4, bitmap.getHeight() / 4);
         return Arrays.hashCode(buffer);

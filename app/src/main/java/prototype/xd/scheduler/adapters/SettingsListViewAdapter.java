@@ -19,7 +19,9 @@ public class SettingsListViewAdapter extends RecyclerView.Adapter<SettingsEntryC
     
     // if set to true the adapter will only display first entry effectively collapsing the list
     private boolean collapsed;
+    @NonNull
     private final List<? extends SettingsEntryConfig> settingsEntries;
+    @NonNull
     private final ContextWrapper wrapper;
     
     public SettingsListViewAdapter(@NonNull ContextWrapper wrapper,

@@ -2,6 +2,8 @@ package prototype.xd.scheduler.utilities;
 
 import android.os.Parcel;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.material.datepicker.CalendarConstraints;
 
 /**
@@ -19,7 +21,8 @@ public class RangeDateValidator implements CalendarConstraints.DateValidator {
      * Part of {@link android.os.Parcelable} requirements. Do not use.
      */
     public static final Creator<RangeDateValidator> CREATOR =
-            new Creator<RangeDateValidator>() {
+            new Creator<>() {
+                @NonNull
                 @Override
                 public RangeDateValidator createFromParcel(Parcel source) {
                     return new RangeDateValidator();

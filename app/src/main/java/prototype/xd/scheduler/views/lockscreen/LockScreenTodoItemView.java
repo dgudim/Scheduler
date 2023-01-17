@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.viewbinding.ViewBinding;
@@ -33,13 +35,15 @@ import prototype.xd.scheduler.utilities.Keys;
 // base class for lockscreen todolist entries
 public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
+    @NonNull
     protected final V viewBinding;
+    @NonNull
     private final View root;
     private final Context context;
     
     private static final Pattern timeSplitPattern = Pattern.compile(" - ");
     
-    LockScreenTodoItemView(V binding) {
+    LockScreenTodoItemView(@NonNull V binding) {
         viewBinding = binding;
         root = binding.getRoot();
         context = binding.getRoot().getContext();
@@ -47,6 +51,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
     protected abstract View getClickableRoot();
     
+    @NonNull
     public LockScreenTodoItemView<V> setOnClickListener(@Nullable View.OnClickListener onClickListener) {
         View view = getClickableRoot();
         view.setFocusable(true);
@@ -57,20 +62,21 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         return this;
     }
     
-    public LockScreenTodoItemView<V> addToContainer(ViewGroup container) {
+    @NonNull
+    public LockScreenTodoItemView<V> addToContainer(@NonNull ViewGroup container) {
         container.addView(root);
         return this;
     }
     
-    public abstract void setBackgroundColor(int color);
+    public abstract void setBackgroundColor(@ColorInt int color);
     
-    public abstract void setBorderColor(int color);
+    public abstract void setBorderColor(@ColorInt int color);
     
-    public abstract void setTitleTextColor(int color);
+    public abstract void setTitleTextColor(@ColorInt int color);
     
-    public abstract void setIndicatorColor(int color);
+    public abstract void setIndicatorColor(@ColorInt int color);
     
-    public abstract void setTimeTextColor(int color);
+    public abstract void setTimeTextColor(@ColorInt int color);
     
     // should not be overridden
     public void setBorderSizeDP(int sizeDP) {
@@ -90,19 +96,20 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         setTimeTextSize(sizeSP);
     }
     
-    public void setTimeStartText(String text) {
+    public void setTimeStartText(@NonNull String text) {
         // empty by default, not all views support this
     }
     
-    public abstract void setTitleText(String text);
+    public abstract void setTitleText(@NonNull String text);
     
-    public abstract void setTimeSpanText(String text);
+    public abstract void setTimeSpanText(@NonNull String text);
     
     
     public abstract void hideIndicatorAndTime();
     
     
-    public LockScreenTodoItemView<V> applyLayoutIndependentParameters(TodoEntry entry) {
+    @NonNull
+    public LockScreenTodoItemView<V> applyLayoutIndependentParameters(@NonNull TodoEntry entry) {
         
         int fontSizeSP = Keys.FONT_SIZE.get();
         
@@ -130,7 +137,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         return this;
     }
     
-    public void applyLayoutDependentParameters(TodoEntry entry, Bitmap bgBitmap, ViewGroup container) {
+    public void applyLayoutDependentParameters(@NonNull TodoEntry entry, @NonNull Bitmap bgBitmap, @NonNull ViewGroup container) {
         
         if (entry.isAdaptiveColorEnabled()) {
             int width = root.getWidth();
@@ -161,7 +168,8 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         BASIC, ROUNDED, SLEEK
     }
     
-    public static LockScreenTodoItemView<?> inflateViewByType(TodoItemViewType todoItemViewType, @Nullable ViewGroup parent, LayoutInflater layoutInflater) {
+    @NonNull
+    public static LockScreenTodoItemView<?> inflateViewByType(@NonNull TodoItemViewType todoItemViewType, @Nullable ViewGroup parent, @NonNull LayoutInflater layoutInflater) {
         switch (todoItemViewType) {
             case SLEEK:
                 return new SleekLockScreenTodoItemView(SleekEntryBinding.inflate(layoutInflater, parent, false));

@@ -12,6 +12,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.CalendarContract.Events;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
@@ -34,22 +35,31 @@ public class SystemCalendar {
     
     public static final String NAME = SystemCalendar.class.getSimpleName();
     
+    @NonNull
     public final String accountType;
+    @NonNull
     public final String accountName;
     
+    @NonNull
     private final String prefKey;
+    @NonNull
     private final String visibilityKey;
     public final long id;
     public final int accessLevel;
     
+    @NonNull
     public final String timeZoneId;
+    @NonNull
     public final String displayName;
+    @ColorInt
     public final int color;
     
+    @NonNull
     public final List<SystemCalendarEvent> systemCalendarEvents;
+    @NonNull
     public final ArrayMap<Integer, Integer> eventColorCountMap;
     
-    public SystemCalendar(Cursor cursor, ContentResolver contentResolver, boolean loadMinimal) {
+    public SystemCalendar(@NonNull Cursor cursor, @NonNull ContentResolver contentResolver, boolean loadMinimal) {
         accountType = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_TYPE);
         accountName = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_NAME);
         displayName = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_DISPLAY_NAME);
@@ -95,7 +105,7 @@ public class SystemCalendar {
         
     }
     
-    private int getEventCountWithColor(int color) {
+    private int getEventCountWithColor(@ColorInt int color) {
         int count = 0;
         for (SystemCalendarEvent event : systemCalendarEvents) {
             if (event.color == color) {
@@ -105,7 +115,7 @@ public class SystemCalendar {
         return count;
     }
     
-    void loadCalendarEvents(ContentResolver contentResolver, boolean loadMinimal) {
+    void loadCalendarEvents(@NonNull ContentResolver contentResolver, boolean loadMinimal) {
         systemCalendarEvents.clear();
         Cursor cursor = query(contentResolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
                 Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0");
@@ -142,7 +152,7 @@ public class SystemCalendar {
      *
      * @param exceptionsMap map of event ids to exception days
      */
-    void addExceptions(final Map<Long, List<Long>> exceptionsMap) {
+    void addExceptions(@NonNull final Map<Long, List<Long>> exceptionsMap) {
         for (Map.Entry<Long, List<Long>> exceptionList : exceptionsMap.entrySet()) {
             boolean applied = false;
             for (SystemCalendarEvent event : systemCalendarEvents) {
@@ -172,6 +182,7 @@ public class SystemCalendar {
      * @param lastDayUTC  end of range
      * @return visible events on range
      */
+    @NonNull
     public List<SystemCalendarEvent> getVisibleEvents(long firstDayUTC, long lastDayUTC) {
         if (isVisible()) {
             List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
@@ -244,10 +255,12 @@ public class SystemCalendar {
         return false;
     }
     
+    @NonNull
     public String getPrefKey() {
         return prefKey;
     }
     
+    @NonNull
     public String makePrefKey(int possibleEventColor) {
         return prefKey + "_" + possibleEventColor;
     }

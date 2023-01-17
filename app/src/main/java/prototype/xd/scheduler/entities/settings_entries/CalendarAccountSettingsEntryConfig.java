@@ -3,6 +3,7 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR_ACCOUNT;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import java.util.Locale;
@@ -16,11 +17,16 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
     
+    @NonNull
     private final SystemCalendarSettings systemCalendarSettings;
+    @NonNull
     private final String accountName;
+    @NonNull
     private final String accountType;
+    @ColorInt
     private final int calendarColor;
     
+    @NonNull
     private final SettingsListViewAdapter containerAdapter;
     
     public CalendarAccountSettingsEntryConfig(@NonNull final SystemCalendarSettings systemCalendarSettings,
@@ -47,7 +53,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         }
         
         @Override
-        void bind(CalendarAccountSettingsEntryConfig config) {
+        void bind(@NonNull CalendarAccountSettingsEntryConfig config) {
             viewBinding.accountIcon.setImageResource(getIconFromAccountType(config.accountType));
             viewBinding.root.setBackgroundColor(dimColorToBg(config.calendarColor, viewBinding.root.getContext()));
             viewBinding.calendarName.setText(config.accountName);
@@ -61,7 +67,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
             updateCollapseIcon(config, false);
         }
         
-        private void updateCollapseIcon(CalendarAccountSettingsEntryConfig config, boolean animate) {
+        private void updateCollapseIcon(@NonNull CalendarAccountSettingsEntryConfig config, boolean animate) {
             int rotation = config.containerAdapter.isCollapsed() ? 0 : -90;
             if (animate) {
                 viewBinding.expandButton
@@ -74,7 +80,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
             }
         }
         
-        private int getIconFromAccountType(String accountType) {
+        private int getIconFromAccountType(@NonNull String accountType) {
             String type = accountType.toLowerCase(Locale.ROOT);
             if (type.contains("exchange")) {
                 return R.drawable.ic_microsoft_exchange_55;

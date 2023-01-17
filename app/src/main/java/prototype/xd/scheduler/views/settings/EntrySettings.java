@@ -16,6 +16,8 @@ import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -31,6 +33,7 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public class EntrySettings extends PopupSettingsView {
     
+    @NonNull
     public final TodoEntryManager todoEntryManager;
     private TodoEntry todoEntry;
     
@@ -46,19 +49,23 @@ public class EntrySettings extends PopupSettingsView {
         this.todoEntryManager = todoEntryManager;
     }
     
+    @NonNull
     @Override
     public EntryPreviewContainer getEntryPreviewContainer() {
         return new EntryPreviewContainer(wrapper, bnd.previewContainer, false) {
+            @ColorInt
             @Override
             protected int currentFontColorGetter() {
                 return todoEntry.fontColor.getToday();
             }
             
+            @ColorInt
             @Override
             protected int currentBgColorGetter() {
                 return todoEntry.bgColor.getToday();
             }
             
+            @ColorInt
             @Override
             protected int currentBorderColorGetter() {
                 return todoEntry.borderColor.getToday();
@@ -69,6 +76,7 @@ public class EntrySettings extends PopupSettingsView {
                 return todoEntry.borderThickness.getToday();
             }
             
+            @IntRange(from = 0, to = 10)
             @Override
             protected int adaptiveColorBalanceGetter() {
                 return todoEntry.adaptiveColorBalance.getToday();
@@ -76,12 +84,12 @@ public class EntrySettings extends PopupSettingsView {
         };
     }
     
-    public void show(final TodoEntry entry) {
+    public void show(@NonNull final TodoEntry entry) {
         initialise(entry);
         dialog.show();
     }
     
-    private void initialise(TodoEntry entry) {
+    private void initialise(@NonNull TodoEntry entry) {
         
         todoEntry = entry;
         
@@ -248,13 +256,13 @@ public class EntrySettings extends PopupSettingsView {
     }
     
     @Override
-    public <T> void notifyParameterChanged(TextView displayTo, String parameterKey, T value) {
+    public <T> void notifyParameterChanged(@NonNull TextView displayTo, @NonNull String parameterKey, T value) {
         todoEntry.changeParameters(parameterKey, String.valueOf(value));
         setStateIconColor(displayTo, parameterKey);
     }
     
     @Override
-    protected void setStateIconColor(TextView icon, String parameterKey) {
+    protected void setStateIconColor(@NonNull TextView icon, @NonNull String parameterKey) {
         todoEntry.setStateIconColor(icon, parameterKey);
     }
 }

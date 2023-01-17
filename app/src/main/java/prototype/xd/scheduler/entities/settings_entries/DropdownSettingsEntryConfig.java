@@ -15,8 +15,11 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
     
     @StringRes
     private final int hintId;
+    @NonNull
     private final String[] displayItems;
+    @NonNull
     private final List<T> items;
+    @NonNull
     private final Keys.DefaultedValue<T> value;
     
     public DropdownSettingsEntryConfig(@StringRes int hintId,
@@ -54,7 +57,7 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(DropdownSettingsEntryConfig<?> config) {
+        void bind(@NonNull DropdownSettingsEntryConfig<?> config) {
             viewBinding.textInputLayout.setHint(config.hintId);
             viewBinding.dropdownSpinner.setSimpleItems(config.displayItems);
             viewBinding.dropdownSpinner.setSelectedItem(config.getValueIndex());

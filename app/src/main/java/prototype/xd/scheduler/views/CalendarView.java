@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -54,18 +55,20 @@ public class CalendarView {
         
         private static final int MAX_INDICATORS = 4;
         
+        @NonNull
         private final CalendarDayLayoutBinding binding;
         private final Context context;
         private LocalDate date;
         
-        public CalendarDayViewContainer(@NonNull CalendarDayLayoutBinding bnd, CalendarView container) {
+        public CalendarDayViewContainer(@NonNull CalendarDayLayoutBinding bnd, @NonNull CalendarView container) {
             super(bnd.getRoot());
             binding = bnd;
             context = bnd.getRoot().getContext();
             bnd.root.setOnClickListener(v -> container.selectDate(date));
         }
         
-        private void setEventIndicator(@ColorInt int color, int index, boolean visiblePosition, boolean inCalendar) {
+        private void setEventIndicator(@ColorInt int color, @IntRange(from = 0, to = MAX_INDICATORS) int index,
+                                       boolean visiblePosition, boolean inCalendar) {
             // first index is day text itself
             View eventIndicator = binding.root.getChildAt(index + 1);
             eventIndicator.setVisibility(visiblePosition ? View.VISIBLE : View.INVISIBLE);
@@ -82,12 +85,12 @@ public class CalendarView {
         }
         
         // for month dates
-        private void setEventIndicatorInCalendar(@ColorInt int color, int index, boolean visiblePosition) {
+        private void setEventIndicatorInCalendar(@ColorInt int color, @IntRange(from = 0, to = MAX_INDICATORS) int index, boolean visiblePosition) {
             setEventIndicator(color, index, visiblePosition, true);
         }
         
         // for in and out dates
-        private void setEventIndicatorOffCalendar(@ColorInt int color, int index, boolean visiblePosition) {
+        private void setEventIndicatorOffCalendar(@ColorInt int color, @IntRange(from = 0, to = MAX_INDICATORS) int index, boolean visiblePosition) {
             setEventIndicator(color, index, visiblePosition, false);
         }
         
@@ -125,6 +128,7 @@ public class CalendarView {
     
     static class CalendarHeaderContainer extends ViewContainer {
         
+        @NonNull
         private final CalendarHeaderBinding binding;
         
         public CalendarHeaderContainer(@NonNull CalendarHeaderBinding bnd) {
@@ -132,7 +136,7 @@ public class CalendarView {
             binding = bnd;
         }
         
-        public void bindTo(YearMonth yearMonth, List<DayOfWeek> daysOfWeek) {
+        public void bindTo(@NonNull YearMonth yearMonth, @NonNull List<DayOfWeek> daysOfWeek) {
             if (binding.weekdayTitlesContainer.getTag() == null) {
                 binding.weekdayTitlesContainer.setTag(yearMonth);
                 for (int i = 0; i < daysOfWeek.size(); i++) {
@@ -168,13 +172,14 @@ public class CalendarView {
     private long minVisibleDayUTC;
     private long maxVisibleDayUTC;
     
+    @NonNull
     final com.kizitonwose.calendar.view.CalendarView rootCalendarView;
     @Nullable
     BiConsumer<LocalDate, Context> dateChangeListener;
     @Nullable
     Consumer<YearMonth> newMonthBindListener;
     
-    public CalendarView(com.kizitonwose.calendar.view.CalendarView rootCalendarView, TodoEntryManager todoEntryManager) {
+    public CalendarView(@NonNull com.kizitonwose.calendar.view.CalendarView rootCalendarView, @NonNull TodoEntryManager todoEntryManager) {
         this.rootCalendarView = rootCalendarView;
         
         rootCalendarView.setDayBinder(new MonthDayBinder<CalendarDayViewContainer>() {
@@ -185,7 +190,7 @@ public class CalendarView {
             }
             
             @Override
-            public void bind(@NonNull CalendarDayViewContainer container, CalendarDay calendarDay) {
+            public void bind(@NonNull CalendarDayViewContainer container, @NonNull CalendarDay calendarDay) {
                 container.bindTo(calendarDay, selectedDate, todoEntryManager);
             }
         });
@@ -198,7 +203,7 @@ public class CalendarView {
             }
             
             @Override
-            public void bind(@NonNull CalendarHeaderContainer container, CalendarMonth calendarMonth) {
+            public void bind(@NonNull CalendarHeaderContainer container, @NonNull CalendarMonth calendarMonth) {
                 YearMonth calendarYearMonth = calendarMonth.getYearMonth();
                 
                 container.bindTo(calendarYearMonth, daysOfWeek);
@@ -243,7 +248,7 @@ public class CalendarView {
         }
     }
     
-    private void init(DayOfWeek firstDayOfWeek) {
+    private void init(@NonNull DayOfWeek firstDayOfWeek) {
         Logger.debug(NAME, "Calendar init!");
         
         YearMonth currentMonth = YearMonth.now();

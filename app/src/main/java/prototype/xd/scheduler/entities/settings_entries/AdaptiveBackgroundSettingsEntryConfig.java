@@ -56,7 +56,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
         
         @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
-        void bind(AdaptiveBackgroundSettingsEntryConfig config) {
+        void bind(@NonNull AdaptiveBackgroundSettingsEntryConfig config) {
             viewBinding.adaptiveBgSettings.setOnClickListener(v -> {
                 
                 BgGridSelectionViewBinding gridSelection = BgGridSelectionViewBinding.inflate(wrapper.getLayoutInflater());

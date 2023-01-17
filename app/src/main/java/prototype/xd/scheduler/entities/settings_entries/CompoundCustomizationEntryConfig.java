@@ -5,6 +5,8 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
@@ -32,7 +34,9 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
     
     static class CompoundCustomizationViewHolder extends SettingsViewHolder<CompoundCustomizationSettingsEntryBinding, CompoundCustomizationEntryConfig> {
         
+        @NonNull
         private final EntryPreviewContainer entryPreviewContainer;
+        @NonNull
         private final AlertDialog viewSelectionDialog;
         
         CompoundCustomizationViewHolder(@NonNull final ContextWrapper wrapper,
@@ -48,16 +52,19 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                             .create(), null);
             
             entryPreviewContainer = new EntryPreviewContainer(wrapper, viewBinding.previewContainer, true) {
+                @ColorInt
                 @Override
                 protected int currentFontColorGetter() {
                     return Keys.FONT_COLOR.CURRENT.get();
                 }
                 
+                @ColorInt
                 @Override
                 protected int currentBgColorGetter() {
                     return Keys.BG_COLOR.CURRENT.get();
                 }
                 
+                @ColorInt
                 @Override
                 protected int currentBorderColorGetter() {
                     return Keys.BORDER_COLOR.CURRENT.get();
@@ -68,6 +75,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                     return Keys.BORDER_THICKNESS.CURRENT.get();
                 }
                 
+                @IntRange(from = 0, to = 10)
                 @Override
                 protected int adaptiveColorBalanceGetter() {
                     return Keys.ADAPTIVE_COLOR_BALANCE.get();

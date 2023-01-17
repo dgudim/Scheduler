@@ -63,7 +63,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
         }
         
         // bind from anywhere
-        static void bindExternal(SliderSettingsEntryConfig config, Slider slider, TextView sliderDescription) {
+        static void bindExternal(@NonNull SliderSettingsEntryConfig config, @NonNull Slider slider, @NonNull TextView sliderDescription) {
             slider.setStepSize(config.stepSize);
             slider.setValueFrom(config.seekMin);
             slider.setValueTo(config.seekMax);
@@ -83,7 +83,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(SliderSettingsEntryConfig config) {
+        void bind(@NonNull SliderSettingsEntryConfig config) {
             bindExternal(config, viewBinding.slider, viewBinding.sliderDescription);
         }
     }

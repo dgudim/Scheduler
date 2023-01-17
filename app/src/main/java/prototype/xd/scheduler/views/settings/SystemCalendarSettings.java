@@ -13,6 +13,8 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -31,6 +33,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     // if called from regular settings
     private List<String> calendarSubKeys;
     private String calendarKey;
+    @ColorInt
     private int eventColor;
     
     // if called from main screen
@@ -44,19 +47,23 @@ public class SystemCalendarSettings extends PopupSettingsView {
         bnd.groupSelector.setVisibility(View.GONE);
     }
     
+    @NonNull
     @Override
     public EntryPreviewContainer getEntryPreviewContainer() {
         return new EntryPreviewContainer(wrapper, bnd.previewContainer, true) {
+            @ColorInt
             @Override
             protected int currentFontColorGetter() {
                 return Keys.FONT_COLOR.CURRENT.get(calendarSubKeys);
             }
             
+            @ColorInt
             @Override
             protected int currentBgColorGetter() {
                 return Keys.BG_COLOR.CURRENT.getOnlyBySubKeys(calendarSubKeys, Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(eventColor));
             }
             
+            @ColorInt
             @Override
             protected int currentBorderColorGetter() {
                 return Keys.BORDER_COLOR.CURRENT.get(calendarSubKeys);
@@ -67,6 +74,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
                 return Keys.BORDER_THICKNESS.CURRENT.get(calendarSubKeys);
             }
             
+            @IntRange(from = 0, to = 10)
             @Override
             protected int adaptiveColorBalanceGetter() {
                 return Keys.ADAPTIVE_COLOR_BALANCE.get(calendarSubKeys);
@@ -74,18 +82,18 @@ public class SystemCalendarSettings extends PopupSettingsView {
         };
     }
     
-    public void show(final String calendarKey, int eventColor) {
+    public void show(@NonNull final String calendarKey, @ColorInt int eventColor) {
         initialize(calendarKey, eventColor);
         dialog.show();
     }
     
-    public void show(final TodoEntry entry) {
+    public void show(@NonNull final TodoEntry entry) {
         this.todoEntry = entry;
         initialize(entry.event.getKey(), entry.event.color);
         dialog.show();
     }
     
-    private void initialize(final String calendarKey, int eventColor) {
+    private void initialize(@NonNull final String calendarKey, @ColorInt int eventColor) {
         
         bnd.entrySettingsTitle.setText(calendarKeyToReadable(wrapper.context, calendarKey));
         
@@ -202,7 +210,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
             }
             
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public void onTextChanged(@NonNull CharSequence s, int start, int before, int count) {
                 // sometimes this listener fires just on text field getting focus with count = 0
                 if (count != 0) {
                     notifyParameterChanged(bnd.hideByContentFieldState, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT.key, s.toString());
@@ -218,7 +226,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     }
     
     @Override
-    public <T> void notifyParameterChanged(TextView displayTo, String parameterKey, T value) {
+    public <T> void notifyParameterChanged(@NonNull TextView displayTo, @NonNull String parameterKey, @NonNull T value) {
         Keys.putAny(calendarKey + "_" + parameterKey, value);
         setStateIconColor(displayTo, parameterKey);
         // invalidate parameters on entries in the same calendar category / color
@@ -228,7 +236,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     }
     
     @Override
-    public void setStateIconColor(TextView display, String parameterKey) {
+    public void setStateIconColor(@NonNull TextView display, String parameterKey) {
         int keyIndex = getFirstValidKeyIndex(calendarSubKeys, parameterKey);
         if (keyIndex == calendarSubKeys.size() - 1) {
             display.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_personal));

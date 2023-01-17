@@ -3,41 +3,45 @@ package prototype.xd.scheduler.views.lockscreen;
 import android.util.TypedValue;
 import android.view.View;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+
 import prototype.xd.scheduler.databinding.BasicEntryBinding;
 
 public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEntryBinding> {
     
-    public BasicLockScreenTodoItemView(BasicEntryBinding binding) {
+    public BasicLockScreenTodoItemView(@NonNull BasicEntryBinding binding) {
         super(binding);
     }
     
+    @NonNull
     @Override
     public View getClickableRoot() {
         return viewBinding.backgroundOutline;
     }
     
     @Override
-    public void setBackgroundColor(int color) {
+    public void setBackgroundColor(@ColorInt int color) {
         viewBinding.backgroundMain.setBackgroundColor(color);
     }
     
     @Override
-    public void setBorderColor(int color) {
+    public void setBorderColor(@ColorInt int color) {
         viewBinding.backgroundOutline.setBackgroundColor(color);
     }
     
     @Override
-    public void setTitleTextColor(int color) {
+    public void setTitleTextColor(@ColorInt int color) {
         viewBinding.titleText.setTextColor(color);
     }
     
     @Override
-    public void setIndicatorColor(int color) {
+    public void setIndicatorColor(@ColorInt int color) {
         viewBinding.indicatorView.setBackgroundColor(color);
     }
     
     @Override
-    public void setTimeTextColor(int color) {
+    public void setTimeTextColor(@ColorInt int color) {
         viewBinding.timeText.setTextColor(color);
     }
     
@@ -47,7 +51,7 @@ public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEnt
     }
     
     @Override
-    public void setTitleText(String text) {
+    public void setTitleText(@NonNull String text) {
         viewBinding.titleText.setText(text);
     }
     
@@ -57,7 +61,7 @@ public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEnt
     }
     
     @Override
-    public void setTimeSpanText(String text) {
+    public void setTimeSpanText(@NonNull String text) {
         viewBinding.timeText.setText(text);
     }
     

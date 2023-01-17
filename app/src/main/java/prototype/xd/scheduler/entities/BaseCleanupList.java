@@ -31,11 +31,13 @@ public abstract class BaseCleanupList<T> extends ArrayList<T> {
     @Nullable
     protected abstract T handleOldEntry(@Nullable T oldEntry);
     
+    @Nullable
     @Override
     public T set(int index, T element) {
         return handleOldEntry(super.set(index, element));
     }
     
+    @Nullable
     @Override
     public T remove(int index) {
         return handleOldEntry(super.remove(index));

@@ -203,6 +203,7 @@ public class DialogUtilities {
      * @param viewBinding           dialog contents
      * @return dialog with title, message and target view
      */
+    @NonNull
     @MainThread
     private static Dialog buildTemplate(@NonNull final ContextWrapper wrapper,
                                         @StringRes int titleStringResource,

@@ -25,7 +25,11 @@ public class Switch extends MaterialSwitch {
     }
     
     @Override
-    public void setOnCheckedChangeListener(final OnCheckedChangeListener listener) {
+    public void setOnCheckedChangeListener(@Nullable final OnCheckedChangeListener listener) {
+        if (listener == null) {
+            super.setOnCheckedChangeListener(null);
+            return;
+        }
         super.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (programmaticChange) {
                 return;
@@ -34,7 +38,11 @@ public class Switch extends MaterialSwitch {
         });
     }
     
-    public void setOnCheckedChangeListener(final OnSilentCheckedChangeListener listener) {
+    public void setOnCheckedChangeListener(@Nullable final OnSilentCheckedChangeListener listener) {
+        if (listener == null) {
+            super.setOnCheckedChangeListener(null);
+            return;
+        }
         super.setOnCheckedChangeListener((buttonView, isChecked) ->
                 listener.onCheckedChanged(buttonView, isChecked, !programmaticChange));
     }

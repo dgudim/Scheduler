@@ -15,6 +15,7 @@ import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
 import android.content.Context;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
@@ -88,9 +89,12 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     public static class Parameter<T> {
         
+        @NonNull
         final TodoEntry entry;
         
+        @NonNull
         final CachedGetter<T> todayCachedGetter;
+        @NonNull
         final Function<String, T> loadedParameterConverter;
         @Nullable
         final
@@ -99,10 +103,10 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         final
         CachedGetter<T> expiredCachedGetter;
         
-        Parameter(TodoEntry entry,
+        Parameter(@NonNull TodoEntry entry,
                   String parameterKey,
-                  ParameterGetter<T> todayValueGetter,
-                  Function<String, T> loadedParameterConverter,
+                  @NonNull ParameterGetter<T> todayValueGetter,
+                  @NonNull Function<String, T> loadedParameterConverter,
                   @Nullable ParameterGetter<T> upcomingValueGetter,
                   @Nullable ParameterGetter<T> expiredValueGetter) {
             this.entry = entry;
@@ -116,7 +120,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             this.loadedParameterConverter = loadedParameterConverter;
         }
         
-        public T get(EntryType entryType) {
+        public T get(@NonNull EntryType entryType) {
             T todayValue = todayCachedGetter.get();
             switch (entryType) {
                 case EXPIRED:
@@ -149,7 +153,6 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
         
     }
-    
     
     
     public enum EntryType {TODAY, GLOBAL, UPCOMING, EXPIRED, UNKNOWN}
@@ -230,8 +233,10 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private transient ArrayMap<String, Parameter<?>> parameterMap;
     // for listening to parameter changes
+    @Nullable
     private transient BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener;
     
+    @Nullable
     private transient TodoEntryList container;
     
     // ----------- supplementary stuff for sorting START
@@ -241,7 +246,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return sortingIndex;
     }
     
-    public void cacheSortingIndex(long targetDayUTC, List<EntryType> order) {
+    public void cacheSortingIndex(long targetDayUTC, @NonNull List<EntryType> order) {
         sortingIndex = order.indexOf(getEntryType(targetDayUTC));
         if (sortingIndex == -1) {
             // fallback to treating like today's
@@ -261,7 +266,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     // ----------- supplementary stuff for sorting END
     
-    private static ArrayMap<String, Parameter<?>> mapParameters(TodoEntry entry) {
+    @NonNull
+    private static ArrayMap<String, Parameter<?>> mapParameters(@NonNull TodoEntry entry) {
         ArrayMap<String, Parameter<?>> parameterMap = new ArrayMap<>(8);
         parameterMap.put(Keys.BG_COLOR.CURRENT.key, entry.bgColor);
         parameterMap.put(Keys.FONT_COLOR.CURRENT.key, entry.fontColor);
@@ -274,7 +280,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return parameterMap;
     }
     
-    public TodoEntry(SystemCalendarEvent event) {
+    public TodoEntry(@NonNull SystemCalendarEvent event) {
         this.event = event;
         
         initParameters();
@@ -283,7 +289,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         event.linkEntry(this); // NOSONAR
     }
     
-    public TodoEntry(SArrayMap<String, String> params, @NonNull Group group, long id) {
+    public TodoEntry(@NonNull SArrayMap<String, String> params, @NonNull Group group, long id) {
         this.params = params;
         this.group = group;
         assignRecyclerViewId(id);
@@ -293,7 +299,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     // ------------ serialization
     @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream in)
+    private void readObject(@NonNull ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         params = (SArrayMap<String, String>) in.readObject();
         tempGroupName = (String) in.readObject();
@@ -301,14 +307,14 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     
-    private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(@NonNull ObjectOutputStream out) throws IOException {
         out.writeObject(params);
         out.writeObject(group.getRawName());
     }
     // ------------
     
     // attaching group to entry is unnecessary if called from bitmap drawer as we don't need to propagate parameter invalidations
-    public void initGroupAndId(List<Group> groups, long id, boolean attachGroupToEntry) {
+    public void initGroupAndId(@NonNull List<Group> groups, long id, boolean attachGroupToEntry) {
         // id should be assigned before attaching to group
         assignRecyclerViewId(id);
         group = Group.findGroupInList(groups, tempGroupName);
@@ -387,7 +393,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return null;
     }
     
-    public void listenToParameterInvalidations(BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
+    public void listenToParameterInvalidations(@NonNull BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
         if (this.parameterInvalidationListener != null) {
             Logger.warning(NAME, this + " already has a parameterInvalidationListener, double assign");
         }
@@ -398,7 +404,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         parameterInvalidationListener = null;
     }
     
-    protected void linkToContainer(TodoEntryList todoEntryList) {
+    protected void linkToContainer(@NonNull TodoEntryList todoEntryList) {
         if (container != null) {
             Logger.warning(NAME, this + " already has a container, double linking");
         }
@@ -445,10 +451,12 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return group;
     }
     
+    @NonNull
     public String getRawGroupName() {
         return group.getRawName();
     }
     
+    @NonNull
     public String getRawTextValue() {
         return rawTextValue.get();
     }
@@ -493,7 +501,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return true;
     }
     
-    protected void invalidateParameter(String parameterKey, boolean reportInvalidated) {
+    protected void invalidateParameter(@NonNull String parameterKey, boolean reportInvalidated) {
         Parameter<?> param = parameterMap.get(parameterKey);
         if (param != null) {
             param.invalidate();
@@ -508,12 +516,14 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             return;
         }
         parameterKeys.forEach(parameterKey -> invalidateParameter(parameterKey, false));
-        parameterInvalidationListener.accept(this, parameterKeys);
+        if (parameterInvalidationListener != null) {
+            parameterInvalidationListener.accept(this, parameterKeys);
+        }
     }
     
     public void invalidateAllParameters(boolean reportInvalidated) {
         parameterMap.forEach((key, parameter) -> parameter.invalidate());
-        if (reportInvalidated) {
+        if (parameterInvalidationListener != null && reportInvalidated) {
             parameterInvalidationListener.accept(this, parameterMap.keySet());
         }
     }
@@ -521,6 +531,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     /**
      * @return all parameters except for TEXT_VALUE START_DAY_UTC, END_DAY_UTC and completion status
      */
+    @NonNull
     public SArrayMap<String, String> getDisplayParams() {
         // shallow copy map
         SArrayMap<String, String> displayParams = new SArrayMap<>(params);
@@ -555,7 +566,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      *
      * @param keyValuePairs parameters to change with their bew values
      */
-    public void changeParameters(@NonNull String... keyValuePairs) {
+    public void changeParameters(@NonNull  String... keyValuePairs) {
         if (keyValuePairs.length % 2 != 0) {
             throw new IllegalArgumentException("Can't call changeParameters with odd number of arguments");
         }
@@ -707,7 +718,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 
                 // overshot
                 if (instanceStartDayLocal + currentUpcomingDayOffset > maxDay) {
-                    return false;
+                    return Boolean.FALSE;
                 }
                 
                 addDayRangeToSets(instanceStartDayLocal, instanceEndDayLocal,
@@ -719,7 +730,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                         upcomingExpiredSet);
                 
                 return null;
-            }, false);
+            }, Boolean.FALSE);
         } else {
             addDayRangeToSets(startDayLocal.get(), endDayLocal.get(),
                     minDay, maxDay,
@@ -740,8 +751,9 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     // return on what days from min to max an entry is visible (and was before invalidation)
+    @NonNull
     public Set<Long> getVisibleDaysOnCalendar(@NonNull final CalendarView calendarView,
-                                              RangeType rangeType) {
+                                              @NonNull final RangeType rangeType) {
         // we don't care about global entries, they are handled differently
         if (isGlobal()) {
             return Collections.emptySet();
@@ -751,6 +763,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return daySet;
     }
     
+    @NonNull
     public FullDaySet getFullDaySet(long minDay, long maxDay) {
         return new FullDaySet(this, minDay, maxDay);
     }
@@ -760,16 +773,18 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         private final Set<Long> upcomingExpiredDaySet = new ArraySet<>();
         private final Set<Long> coreDaySet = new ArraySet<>();
         
-        FullDaySet(TodoEntry entry, long dayStart, long dayEnd) {
+        FullDaySet(@NonNull TodoEntry entry, long dayStart, long dayEnd) {
             entry.getVisibleDays(dayStart, dayEnd,
                     coreDaySet,
                     upcomingExpiredDaySet);
         }
         
+        @NonNull
         public Set<Long> getUpcomingExpiredDaySet() {
             return upcomingExpiredDaySet;
         }
         
+        @NonNull
         public Set<Long> getCoreDaySet() {
             return coreDaySet;
         }
@@ -818,6 +833,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return getNearestCalendarEventMsRangeUTC(targetDayUTC).toDays(false, !event.isAllDay);
     }
     
+    @NonNull
     public EntryType getEntryType(long targetDayUTC) {
         
         if (container != null) {
@@ -856,7 +872,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return startDayLocal.get() == Keys.DAY_FLAG_GLOBAL;
     }
     
-    public String getCalendarEntryTimeSpan(Context context, long targetDayUTC) {
+    public String getCalendarEntryTimeSpan(@NonNull Context context, long targetDayUTC) {
         if (event.isAllDay) {
             return context.getString(R.string.calendar_event_all_day);
         }
@@ -868,10 +884,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return adaptiveColorBalance.getToday() > 0;
     }
     
-    public int getAdaptiveColor(int inputColor) {
+    public int getAdaptiveColor(@ColorInt int inputColor) {
         return mixColorWithBg(inputColor, averageBackgroundColor, adaptiveColorBalance.getToday());
     }
     
+    @NonNull
     public String getTextOnDay(long targetDayUTC, @NonNull Context context, boolean displayGlobalLabel) {
         return rawTextValue.get() + " " + getDayOffset(targetDayUTC, context, displayGlobalLabel);
     }
@@ -911,7 +928,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    public void setStateIconColor(TextView icon, String parameter) {
+    public void setStateIconColor(@NonNull TextView icon, @NonNull String parameter) {
         boolean containedInGroupParams = group.params.containsKey(parameter);
         boolean containedInPersonalParams = params.containsKey(parameter);
         

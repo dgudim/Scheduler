@@ -75,10 +75,12 @@ public final class Utilities {
         throw new IllegalStateException(NAME + " can't be instantiated");
     }
     
+    @NonNull
     public static File getFile(@NonNull String filename) {
         return new File(ROOT_DIR.get(), filename);
     }
     
+    @NonNull
     public static Path getPath(@NonNull String filename) {
         return getFile(filename).toPath();
     }
@@ -105,8 +107,9 @@ public final class Utilities {
         }
     }
     
+    @NonNull
     public static List<TodoEntry> loadTodoEntries(long dayStart, long dayEnd,
-                                                  GroupList groups,
+                                                  @NonNull GroupList groups,
                                                   @NonNull List<SystemCalendar> calendars,
                                                   boolean attachGroupToEntry) {
         
@@ -132,7 +135,7 @@ public final class Utilities {
         return readEntries;
     }
     
-    public static synchronized void saveEntries(List<TodoEntry> entries) {
+    public static synchronized void saveEntries(@NonNull List<TodoEntry> entries) {
         try {
             List<TodoEntry> entriesToSave = new ArrayList<>();
             
@@ -154,6 +157,7 @@ public final class Utilities {
         }
     }
     
+    @NonNull
     public static GroupList loadGroups() {
         GroupList groups = new GroupList();
         // add "null" group
@@ -169,7 +173,7 @@ public final class Utilities {
         return groups;
     }
     
-    public static synchronized void saveGroups(GroupList groups) {
+    public static synchronized void saveGroups(@NonNull GroupList groups) {
         try {
             
             GroupList groupsToSave = new GroupList();
@@ -189,11 +193,11 @@ public final class Utilities {
         }
     }
     
-    public static void moveFile(String fileName, String newFileName) throws IOException {
+    public static void moveFile(@NonNull String fileName, @NonNull String newFileName) throws IOException {
         Files.move(getPath(fileName), getPath(newFileName), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
     }
     
-    public static <T> T loadObjectWithBackup(String fileName, String backupName) throws IOException, ClassNotFoundException {
+    public static <T> T loadObjectWithBackup(@NonNull String fileName, @NonNull String backupName) throws IOException, ClassNotFoundException {
         try {
             return loadObject(fileName);
         } catch (IOException | ClassNotFoundException e) {
@@ -206,19 +210,20 @@ public final class Utilities {
         }
     }
     
-    public static <T> T loadObject(String fileName) throws IOException, ClassNotFoundException {
+    public static <T> T loadObject(@NonNull String fileName) throws IOException, ClassNotFoundException {
         try (ObjectInputStream s = new ObjectInputStream(Files.newInputStream(getPath(fileName)))) {
             return (T) s.readObject();
         }
     }
     
-    public static void saveObject(String fileName, Object object) throws IOException {
+    public static void saveObject(@NonNull String fileName, Object object) throws IOException {
         try (ObjectOutputStream s = new ObjectOutputStream(Files.newOutputStream(getPath(fileName)))) {
             s.writeObject(object);
         }
     }
     
-    public static <T extends Fragment> T findFragmentInNavHost(@NonNull FragmentActivity activity, Class<T> targetFragmentClass) {
+    @NonNull
+    public static <T extends Fragment> T findFragmentInNavHost(@NonNull FragmentActivity activity, @NonNull Class<T> targetFragmentClass) {
         List<Fragment> fragments = Objects.requireNonNull(activity.getSupportFragmentManager()
                         .findFragmentById(R.id.nav_host_fragment))
                 .getChildFragmentManager()
@@ -243,14 +248,15 @@ public final class Utilities {
         }
     }
     
-    public static void callImageFileChooser(ActivityResultLauncher<Intent> callback) {
+    public static void callImageFileChooser(@NonNull ActivityResultLauncher<Intent> callback) {
         Intent chooseImage = new Intent(Intent.ACTION_GET_CONTENT);
         chooseImage.addCategory(Intent.CATEGORY_OPENABLE);
         chooseImage.setType("image/*");
         callback.launch(Intent.createChooser(chooseImage, "Choose an image"));
     }
     
-    public static List<TodoEntry> sortEntries(List<TodoEntry> entries, long targetDay) {
+    @NonNull
+    public static List<TodoEntry> sortEntries(@NonNull List<TodoEntry> entries, long targetDay) {
         
         List<TodoEntry.EntryType> sortingOrder = TODO_ITEM_SORTING_ORDER.get();
         
@@ -273,7 +279,8 @@ public final class Utilities {
         return entries;
     }
     
-    private static List<TodoEntry> mergeInstances(List<TodoEntry> entries) {
+    @NonNull
+    private static List<TodoEntry> mergeInstances(@NonNull List<TodoEntry> entries) {
         Set<Integer> seen = new ArraySet<>(entries.size());
         entries.removeIf(e -> e.isFromSystemCalendar() && !seen.add(e.getInstanceHash()));
         return entries;
@@ -284,8 +291,8 @@ public final class Utilities {
         void onValueChanged(@NonNull Slider slider, int sliderValue, boolean fromUser, Keys.DefaultedInteger value);
     }
     
-    public static void setSliderChangeListener(final TextView displayTo,
-                                               final Slider slider,
+    public static void setSliderChangeListener(@NonNull final TextView displayTo,
+                                               @NonNull final Slider slider,
                                                @Nullable final SliderOnChangeKeyedListener onChangeListener,
                                                @StringRes @PluralsRes final int stringResource,
                                                @NonNull Keys.DefaultedInteger value,
@@ -302,10 +309,10 @@ public final class Utilities {
     }
     
     //listener for general settings
-    public static void setSliderChangeListener(final TextView displayTo,
-                                               final Slider slider,
+    public static void setSliderChangeListener(@NonNull final TextView displayTo,
+                                               @NonNull final Slider slider,
                                                @Nullable final SliderOnChangeKeyedListener onChangeListener,
-                                               Keys.DefaultedInteger value,
+                                               @NonNull Keys.DefaultedInteger value,
                                                @NonNull IntFunction<String> textFormatter) {
         int loadedVal = value.get();
         displayTo.setText(textFormatter.apply(loadedVal));
@@ -334,12 +341,12 @@ public final class Utilities {
     }
     
     //listener for entry and calendar settings
-    public static void setSliderChangeListener(final TextView displayTo,
-                                               final Slider slider,
+    public static void setSliderChangeListener(@NonNull final TextView displayTo,
+                                               @NonNull final Slider slider,
                                                final TextView stateIcon,
                                                @NonNull final PopupSettingsView settingsView,
                                                @StringRes @PluralsRes final int stringResource,
-                                               final Keys.DefaultedInteger value,
+                                               @NonNull final Keys.DefaultedInteger value,
                                                @NonNull final ToIntFunction<Keys.DefaultedInteger> initialValueFactory,
                                                @Nullable final Slider.OnChangeListener customProgressListener,
                                                @Nullable final Slider.OnSliderTouchListener customTouchListener) {
@@ -375,13 +382,13 @@ public final class Utilities {
     }
     
     // without custom listeners
-    public static void setSliderChangeListener(final TextView displayTo,
-                                               final Slider slider,
+    public static void setSliderChangeListener(@NonNull final TextView displayTo,
+                                               @NonNull final Slider slider,
                                                final TextView stateIcon,
-                                               final PopupSettingsView systemCalendarSettings,
+                                               @NonNull final PopupSettingsView systemCalendarSettings,
                                                @StringRes @PluralsRes final int stringResource,
-                                               final Keys.DefaultedInteger value,
-                                               final ToIntFunction<Keys.DefaultedInteger> initialValueFactory,
+                                               @NonNull final Keys.DefaultedInteger value,
+                                               @NonNull final ToIntFunction<Keys.DefaultedInteger> initialValueFactory,
                                                @Nullable final Slider.OnChangeListener customProgressListener) {
         setSliderChangeListener(
                 displayTo, slider, stateIcon, systemCalendarSettings,
@@ -389,8 +396,8 @@ public final class Utilities {
     }
     
     //switch listener for regular settings
-    public static void setSwitchChangeListener(final Switch tSwitch,
-                                               final Keys.DefaultedBoolean defaultedBoolean,
+    public static void setSwitchChangeListener(@NonNull final Switch tSwitch,
+                                               @NonNull final Keys.DefaultedBoolean defaultedBoolean,
                                                @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
         tSwitch.setCheckedSilent(defaultedBoolean.get());
         tSwitch.setOnCheckedChangeListener((switchView, isChecked) -> {
@@ -402,11 +409,11 @@ public final class Utilities {
     }
     
     //switch listener for calendar settings and entry settings
-    public static void setSwitchChangeListener(final Switch tSwitch,
+    public static void setSwitchChangeListener(@NonNull final Switch tSwitch,
                                                final TextView stateIcon,
-                                               final PopupSettingsView settingsView,
-                                               final Keys.DefaultedBoolean value,
-                                               final Predicate<Keys.DefaultedBoolean> initialValueFactory) {
+                                               @NonNull final PopupSettingsView settingsView,
+                                               @NonNull final Keys.DefaultedBoolean value,
+                                               @NonNull final Predicate<Keys.DefaultedBoolean> initialValueFactory) {
         tSwitch.setCheckedSilent(initialValueFactory.test(value));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
                 settingsView.notifyParameterChanged(stateIcon, value.key, isChecked));
@@ -466,6 +473,7 @@ public final class Utilities {
      * @param <V>  value type
      * @return keys with different values between two maps
      */
+    @NonNull
     public static <K, V> Set<K> getChangedKeys(@NonNull final Map<K, V> map1,
                                                @NonNull final Map<K, V> map2) {
         if ((map1.isEmpty() && map2.isEmpty()) || map1.equals(map2)) {
@@ -493,6 +501,7 @@ public final class Utilities {
      * @param <K>  key type
      * @return symmetric difference between these two sets
      */
+    @NonNull
     public static <K> Set<K> symmetricDifference(@NonNull final Set<K> set1,
                                                  @NonNull final Set<K> set2) {
         if (set1.equals(set2)) {
@@ -559,7 +568,7 @@ public final class Utilities {
      * @return Spannable
      */
     @NonNull
-    public static Spannable colorizeText(@NonNull final String text, final String word, final int argb) {
+    public static Spannable colorizeText(@NonNull final String text, @NonNull final String word, final int argb) {
         final Spannable spannable = new SpannableString(text);
         int substringStart = 0;
         int start;
@@ -646,21 +655,21 @@ public final class Utilities {
 
 class TodoEntryTypeComparator implements Comparator<TodoEntry> {
     @Override
-    public int compare(TodoEntry o1, TodoEntry o2) {
+    public int compare(@NonNull TodoEntry o1, @NonNull TodoEntry o2) {
         return Integer.compare(o1.getSortingIndex(), o2.getSortingIndex());
     }
 }
 
 class TodoEntryPriorityComparator implements Comparator<TodoEntry> {
     @Override
-    public int compare(TodoEntry o1, TodoEntry o2) {
+    public int compare(@NonNull TodoEntry o1, @NonNull TodoEntry o2) {
         return Integer.compare(o2.priority.getToday(), o1.priority.getToday());
     }
 }
 
 class TodoEntryGroupComparator implements Comparator<TodoEntry> {
     @Override
-    public int compare(TodoEntry o1, TodoEntry o2) {
+    public int compare(@NonNull TodoEntry o1, @NonNull TodoEntry o2) {
         if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
             return Long.compare(o1.getCachedNearestStartMsUTC(), o2.getCachedNearestStartMsUTC());
         }

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
 
@@ -129,7 +130,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
     }
     
-    public void onBgSelected(ActivityResult result) {
+    public void onBgSelected(@NonNull ActivityResult result) {
         
         Intent data = result.getData();
         if (data == null) {

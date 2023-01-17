@@ -14,7 +14,9 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     
+    @NonNull
     private final String text;
+    @NonNull
     private final Keys.DefaultedBoolean value;
     @Nullable
     private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
@@ -31,7 +33,7 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
         }
     }
     
-    public SwitchSettingsEntryConfig(Keys.DefaultedBoolean value, String text) {
+    public SwitchSettingsEntryConfig(@NonNull Keys.DefaultedBoolean value, @NonNull String text) {
         this(value, text, null, false);
     }
     
@@ -47,7 +49,7 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(SwitchSettingsEntryConfig config) {
+        void bind(@NonNull SwitchSettingsEntryConfig config) {
             viewBinding.mainSwitch.setText(config.text);
             Utilities.setSwitchChangeListener(
                     viewBinding.mainSwitch,

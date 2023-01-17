@@ -111,7 +111,7 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         return essentialGranted;
     }
     
-    private void setPermissionChipColor(boolean permissionGranted, TextView permissionText) {
+    private void setPermissionChipColor(boolean permissionGranted, @NonNull TextView permissionText) {
         permissionText.setText(permissionGranted ? R.string.permissions_granted : R.string.permissions_not_granted);
         
         int containerColor = MaterialColors.getColor(permissionText, R.attr.colorErrorContainer, Color.LTGRAY);

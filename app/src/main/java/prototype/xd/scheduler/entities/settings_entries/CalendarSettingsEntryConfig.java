@@ -21,16 +21,19 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
     
+    @NonNull
     private final SystemCalendarSettings systemCalendarSettings;
+    @NonNull
     private final String calendarName;
+    @NonNull
     private final String calendarKey;
     private final int calendarEventsCount;
     private final int calendarColor;
     
     private CalendarColorsGridViewAdapter gridViewAdapter;
     
-    public CalendarSettingsEntryConfig(final SystemCalendarSettings systemCalendarSettings,
-                                       final SystemCalendar calendar,
+    public CalendarSettingsEntryConfig(@NonNull final SystemCalendarSettings systemCalendarSettings,
+                                       @NonNull final SystemCalendar calendar,
                                        boolean showSettings) {
         super(showSettings);
         this.systemCalendarSettings = systemCalendarSettings;
@@ -56,7 +59,7 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         }
         
         @Override
-        void bind(CalendarSettingsEntryConfig config) {
+        void bind(@NonNull CalendarSettingsEntryConfig config) {
             viewBinding.calendarName.setText(config.calendarName);
             viewBinding.eventCount.setText(getPluralString(wrapper.context, R.plurals.calendar_event_count, config.calendarEventsCount));
             

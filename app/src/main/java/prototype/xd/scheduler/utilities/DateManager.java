@@ -49,11 +49,14 @@ public final class DateManager {
     private static final DateFormat dateFormatMonthNamesUTC = new SimpleDateFormat("MMM d", systemLocale); // NOSONAR
     private static final DateFormat timeFormatLocal = new SimpleDateFormat("HH:mm", systemLocale); // NOSONAR
     
+    @NonNull
     public static final List<String> WEEK_DAYS_ROOT;
     public static final String DEFAULT_BACKGROUND_NAME = "default.png";
+    @NonNull
     private static final List<String> WEEK_DAYS_LOCAL;
     
     public static final List<DayOfWeek> FIRST_DAYS_OF_WEEK_ROOT = List.of(DayOfWeek.MONDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+    @NonNull
     public static final List<String> FIRST_DAYS_OF_WEEK_LOCAL;
     public static final Keys.DefaultedEnum<DayOfWeek> FIRST_DAY_OF_WEEK =
             new Keys.DefaultedEnum<>("first_week_day", DayOfWeek.MONDAY, DayOfWeek.class);
@@ -114,24 +117,26 @@ public final class DateManager {
         currentDayUTC = currentDate.toEpochDay();
     }
     
-    public static void selectDate(LocalDate date) {
+    public static void selectDate(@NonNull LocalDate date) {
         updateDate();
         currentlySelectedDayUTC = date.toEpochDay();
         currentlySelectedTimestampUTC = daysToMs(currentlySelectedDayUTC);
     }
     
-    public static long getStartOfMonthDayUTC(YearMonth month) {
+    public static long getStartOfMonthDayUTC(@NonNull YearMonth month) {
         return month.atDay(1).toEpochDay();
     }
     
-    public static long getEndOfMonthDayUTC(YearMonth month) {
+    public static long getEndOfMonthDayUTC(@NonNull YearMonth month) {
         return month.atEndOfMonth().toEpochDay();
     }
     
-    public static String getTimeSpan(TodoEntry.TimeRange timeRange) {
+    @NonNull
+    public static String getTimeSpan(@NonNull TodoEntry.TimeRange timeRange) {
         return getTimeSpan(timeRange.getStart(), timeRange.getEnd());
     }
     
+    @NonNull
     public static String getTimeSpan(long timeFromMsUTC, long timeToMsUTC) {
         if (timeFromMsUTC == timeToMsUTC) {
             return datetimeStringLocalFromMsUTC(timeFromMsUTC);
@@ -189,6 +194,7 @@ public final class DateManager {
     }
     
     // return date and time given a UTC timestamp
+    @NonNull
     public static String datetimeStringLocalFromMsUTC(long msUTC) {
         synchronized (dateTimeFormatLocal) {
             return dateTimeFormatLocal.format(new Date(msUTC));
@@ -196,6 +202,7 @@ public final class DateManager {
     }
     
     // return date given a UTC timestamp
+    @NonNull
     public static String dateStringUTCFromMsUTC(long msUTC) {
         synchronized (dateFormatUTC) {
             return dateFormatUTC.format(new Date(msUTC));
@@ -203,6 +210,7 @@ public final class DateManager {
     }
     
     // return date (months are 3 letters instead of numbers) and time given a UTC timestamp
+    @NonNull
     public static String dateStringMonthNamesUTCFromMsUTC(long msUTC) {
         synchronized (dateFormatMonthNamesUTC) {
             return dateFormatMonthNamesUTC.format(new Date(msUTC));
@@ -210,6 +218,7 @@ public final class DateManager {
     }
     
     // returns current time
+    @NonNull
     public static String getCurrentTimeStringLocal() {
         synchronized (timeFormatLocal) {
             return timeFormatLocal.format(new Date());
@@ -217,6 +226,7 @@ public final class DateManager {
     }
     
     // returns current date and time
+    @NonNull
     public static String getCurrentDateTimeStringLocal() {
         synchronized (dateTimeFormatLocal) {
             return dateTimeFormatLocal.format(new Date());
@@ -228,6 +238,7 @@ public final class DateManager {
         return System.currentTimeMillis();
     }
     
+    @NonNull
     public static String getCurrentWeekdayLocaleAgnosticString() {
         return currentDate.getDayOfWeek().name().toLowerCase(Locale.ROOT);
     }

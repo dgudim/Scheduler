@@ -25,7 +25,11 @@ public class Spinner extends AppCompatSpinner {
     }
     
     @Override
-    public void setOnItemSelectedListener(final OnItemSelectedListener listener) {
+    public void setOnItemSelectedListener(@Nullable final OnItemSelectedListener listener) {
+        if (listener == null) {
+            super.setOnItemSelectedListener(null);
+            return;
+        }
         super.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

@@ -27,7 +27,7 @@ public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(TitleBarSettingsEntryConfig config) {
+        void bind(@NonNull TitleBarSettingsEntryConfig config) {
             viewBinding.textView.setText(config.text);
         }
     }

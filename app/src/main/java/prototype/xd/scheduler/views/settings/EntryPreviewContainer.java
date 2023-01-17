@@ -6,6 +6,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -20,8 +22,11 @@ import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 
 public abstract class EntryPreviewContainer {
     
+    @NonNull
     private final ViewGroup container;
+    @NonNull
     private final Context context;
+    @NonNull
     private final LayoutInflater inflater;
     private final boolean timeVisible;
     
@@ -52,15 +57,15 @@ public abstract class EntryPreviewContainer {
         inflate();
     }
     
-    protected abstract int currentFontColorGetter();
+    protected abstract @ColorInt int currentFontColorGetter();
     
-    protected abstract int currentBgColorGetter();
+    protected abstract @ColorInt int currentBgColorGetter();
     
-    protected abstract int currentBorderColorGetter();
+    protected abstract @ColorInt int currentBorderColorGetter();
     
     protected abstract int currentBorderThicknessGetter();
     
-    protected abstract int adaptiveColorBalanceGetter();
+    protected abstract @IntRange(from = 0, to = 10) int adaptiveColorBalanceGetter();
     
     private void inflate() {
         entryPreview.upcoming = LockScreenTodoItemView.inflateViewByType(todoItemViewType, container, inflater);
@@ -113,7 +118,7 @@ public abstract class EntryPreviewContainer {
         }
     }
     
-    public void setTodoItemViewType(LockScreenTodoItemView.TodoItemViewType newTodoItemViewType) {
+    public void setTodoItemViewType(@NonNull LockScreenTodoItemView.TodoItemViewType newTodoItemViewType) {
         if (todoItemViewType != newTodoItemViewType) {
             TODO_ITEM_VIEW_TYPE.put(newTodoItemViewType);
             todoItemViewType = newTodoItemViewType;
@@ -164,7 +169,7 @@ public abstract class EntryPreviewContainer {
         entryPreview.expired.setCombinedTextSize(fontSizeSP);
     }
     
-    private void updateSelector(int color, @Nullable MaterialCardView selector) {
+    private void updateSelector(@ColorInt int color, @Nullable MaterialCardView selector) {
         if (selector != null) {
             selector.setCardBackgroundColor(color);
         }
@@ -203,7 +208,7 @@ public abstract class EntryPreviewContainer {
         entryPreview.expired.setBorderColor(borderColor.getExpiredMixed(surfaceColor, adaptiveColorBalance));
     }
     
-    public void notifyColorChanged(Keys.DefaultedInteger value, int newColor) {
+    public void notifyColorChanged(@NonNull Keys.DefaultedInteger value, int newColor) {
         if (Keys.BG_COLOR.has(value)) {
             bgColor.setByType(value.getType(), newColor);
             updatePreviewFontAndBgColors();

@@ -20,7 +20,7 @@ public class AppThemeSelectorEntryConfig extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(AppThemeSelectorEntryConfig config) {
+        void bind(@NonNull AppThemeSelectorEntryConfig config) {
             // nothing should be done, this entry is self-configured
         }
     }

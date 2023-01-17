@@ -36,6 +36,7 @@ import prototype.xd.scheduler.utilities.Keys;
 
 public class SortingSettingsFragment extends BaseSettingsFragment<SortingSettingsFragmentBinding> {
     
+    @NonNull
     @Override
     public SortingSettingsFragmentBinding inflate(@NonNull LayoutInflater inflater, ViewGroup container) {
         return SortingSettingsFragmentBinding.inflate(inflater, container, false);
@@ -62,7 +63,9 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
     
     private static final class EntryTypeAdapter extends RecyclerView.Adapter<EntryTypeAdapter.CardViewHolder> {
         
+        @NonNull
         private final ItemTouchHelper itemDragHelper;
+        @NonNull
         private final List<TodoEntry.EntryType> sortOrder;
         
         private boolean globalEventsVisible;
@@ -123,14 +126,14 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
             @NonNull
             private final Context context;
             
-            private CardViewHolder(DraggableListEntryBinding binding) {
+            private CardViewHolder(@NonNull DraggableListEntryBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
                 context = binding.getRoot().getContext();
             }
             
             @SuppressLint("ClickableViewAccessibility")
-            private void bind(TodoEntry.EntryType entryType, final ItemTouchHelper dragHelper) {
+            private void bind(@NonNull TodoEntry.EntryType entryType, @NonNull final ItemTouchHelper dragHelper) {
                 String titleText;
                 String descriptionText;
                 int bgColor = Keys.BG_COLOR.CURRENT.get();
