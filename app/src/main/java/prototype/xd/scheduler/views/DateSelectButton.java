@@ -37,14 +37,14 @@ public class DateSelectButton extends MaterialButton {
     
     public DateSelectButton(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        if (!isInEditMode()) {
+        if (isInEditMode()) {
+            setText(R.string.select_date);
+        } else {
             dateValidator = new RangeDateValidator();
             datePickerBuilder = MaterialDatePicker.Builder.datePicker()
                     .setTitleText(context.getString(R.string.select_date))
                     .setCalendarConstraints(new CalendarConstraints.Builder()
                             .setValidator(dateValidator).build());
-        } else {
-            setText(R.string.select_date);
         }
     }
     
@@ -60,7 +60,7 @@ public class DateSelectButton extends MaterialButton {
     
         MaterialDatePicker<Long> datePicker = datePickerBuilder.build();
         datePicker.addOnPositiveButtonClickListener(msUTCSelection -> {
-            this.selectedMsUTC = msUTCSelection;
+            selectedMsUTC = msUTCSelection;
             selectedDayUTC = msToDays(msUTCSelection);
             updateText();
         });
@@ -70,10 +70,10 @@ public class DateSelectButton extends MaterialButton {
     
             switch (role) {
                 case START_DAY:
-                    dateValidator.setRightBoundMsUTC(pairButton.getSelectedMsUTC());
+                    dateValidator.setRightBoundMsUTC(pairButton.selectedMsUTC);
                     break;
                 case END_DAY:
-                    dateValidator.setLeftBoundMsUTC(pairButton.getSelectedMsUTC());
+                    dateValidator.setLeftBoundMsUTC(pairButton.selectedMsUTC);
                     break;
                 case NEUTRAL:
                 default:
@@ -83,13 +83,9 @@ public class DateSelectButton extends MaterialButton {
         });
     }
     
-    public void setRole(Role role, @NonNull DateSelectButton pairButton) {
+    public void setRole(@NonNull Role role, @NonNull DateSelectButton pairButton) {
         this.role = role;
         this.pairButton = pairButton;
-    }
-    
-    public Long getSelectedMsUTC() {
-        return selectedMsUTC;
     }
     
     @NonNull

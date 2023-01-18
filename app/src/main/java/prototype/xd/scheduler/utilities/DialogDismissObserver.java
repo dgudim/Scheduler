@@ -14,8 +14,8 @@ public class DialogDismissObserver implements DefaultLifecycleObserver {
     
     public static final String NAME = DialogDismissObserver.class.getSimpleName();
     
-    private @Nullable
-    Dialog dialog;
+    @Nullable
+    private Dialog dialog;
     
     public DialogDismissObserver(@NonNull final Dialog dialog) {
         this.dialog = dialog;
@@ -29,7 +29,7 @@ public class DialogDismissObserver implements DefaultLifecycleObserver {
         if (dialog != null && dialog.isShowing()) {
             // dismiss the dialog to avoid android.view.WindowLeaked
             dialog.dismiss();
-            Logger.info(NAME, "Activity destroyed, closed lingering dialog " + dialog);
+            Logger.info(NAME, "Activity destroyed, closed lingering dialog " + dialog.hashCode());
             dialog = null;
         }
     }

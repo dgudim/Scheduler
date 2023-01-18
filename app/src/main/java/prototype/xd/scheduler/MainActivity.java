@@ -1,12 +1,14 @@
 package prototype.xd.scheduler;
 
-import static android.os.Process.*;
+import static android.os.Process.killProcess;
+import static android.os.Process.myPid;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String PACKAGE_NAME = BuildConfig.APPLICATION_ID;
     
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // enable warnings in debug mode
         //if (BuildConfig.DEBUG) {
@@ -70,13 +72,13 @@ public class MainActivity extends AppCompatActivity {
         DynamicColors.applyToActivityIfAvailable(this);
         
         // switch intro activity and close current one
-        if (!Keys.INTRO_SHOWN.get()) {
-            // switch intro activity and close current one
-            MainActivity.this.startActivity(new Intent(MainActivity.this, IntroActivity.class));
-            finish();
-        } else {
+        if (Keys.INTRO_SHOWN.get()) {
             BackgroundSetterService.ping(getApplicationContext());
             setContentView(R.layout.activity_main);
+        } else {
+            // switch intro activity and close current one
+            startActivity(new Intent(this, IntroActivity.class));
+            finish();
         }
     }
 }

@@ -88,8 +88,8 @@ public class SystemCalendarSettings extends PopupSettingsView {
     }
     
     public void show(@NonNull final TodoEntry entry) {
-        this.todoEntry = entry;
-        initialize(entry.event.getKey(), entry.event.color);
+        todoEntry = entry;
+        initialize(entry.event.getPrefKey(), entry.event.color);
         dialog.show();
     }
     
@@ -236,14 +236,14 @@ public class SystemCalendarSettings extends PopupSettingsView {
     }
     
     @Override
-    public void setStateIconColor(@NonNull TextView display, String parameterKey) {
+    public void setStateIconColor(@NonNull TextView icon, @NonNull String parameterKey) {
         int keyIndex = getFirstValidKeyIndex(calendarSubKeys, parameterKey);
         if (keyIndex == calendarSubKeys.size() - 1) {
-            display.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_personal));
+            icon.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_personal));
         } else if (keyIndex >= 0) {
-            display.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_group));
+            icon.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_group));
         } else {
-            display.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_default));
+            icon.setTextColor(wrapper.context.getColor(R.color.entry_settings_parameter_default));
         }
     }
 }

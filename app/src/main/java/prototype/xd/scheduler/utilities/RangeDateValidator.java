@@ -34,11 +34,11 @@ public class RangeDateValidator implements CalendarConstraints.DateValidator {
                 }
             };
     
-    public void setRightBoundMsUTC(Long rightBoundMsUTC) {
+    public void setRightBoundMsUTC(@NonNull Long rightBoundMsUTC) {
         this.rightBoundMsUTC = rightBoundMsUTC;
     }
     
-    public void setLeftBoundMsUTC(Long leftBoundMsUTC) {
+    public void setLeftBoundMsUTC(@NonNull Long leftBoundMsUTC) {
         this.leftBoundMsUTC = leftBoundMsUTC;
     }
     
@@ -54,7 +54,7 @@ public class RangeDateValidator implements CalendarConstraints.DateValidator {
     }
     
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         // nothing to save
     }
 }

@@ -23,9 +23,9 @@ import prototype.xd.scheduler.utilities.Keys;
 public class IntroActivity extends AppIntro {
     
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    
+        
         HarmonizedColors.applyToContextIfAvailable(this,
                 new HarmonizedColorsOptions.Builder()
                         .setColorResourceIds(new int[]{
@@ -44,7 +44,7 @@ public class IntroActivity extends AppIntro {
         if (isXiaomiPhone()) {
             addSlide(AppIntroCustomLayoutFragment.newInstance(R.layout.intro_xiaomi_fragment));
         }
-    
+        
         View rootView = findViewById(android.R.id.content).getRootView();
         int surfaceColor = MaterialColors.getColor(rootView, R.attr.colorSurface);
         int surfaceColorVariant = MaterialColors.getColor(rootView, R.attr.colorSurfaceVariant);
@@ -68,7 +68,7 @@ public class IntroActivity extends AppIntro {
         setIndicatorColor(primaryColor, surfaceColorVariant);
     }
     
-    private boolean isXiaomiPhone() {
+    private static boolean isXiaomiPhone() {
         return Build.MANUFACTURER.toLowerCase(Locale.ROOT).contains("xiaomi") || Build.MODEL.toLowerCase(Locale.ROOT).contains("xiaomi");
     }
     
@@ -76,7 +76,7 @@ public class IntroActivity extends AppIntro {
     protected void onDonePressed(@Nullable Fragment currentFragment) {
         super.onDonePressed(currentFragment);
         // go back to the main activity
-        IntroActivity.this.startActivity(new Intent(IntroActivity.this, MainActivity.class));
+        startActivity(new Intent(this, MainActivity.class));
         Keys.INTRO_SHOWN.put(Boolean.TRUE);
         finish();
     }

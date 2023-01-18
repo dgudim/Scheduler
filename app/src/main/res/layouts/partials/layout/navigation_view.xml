@@ -29,7 +29,7 @@
         android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
+        tools:ignore="ContentDescription,SpeakableTextPresentCheck,ImageContrastCheck" />
 
     <View
         android:id="@+id/top_divider"
@@ -66,7 +66,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/source_code_title"
                 app:layout_constraintStart_toEndOf="@+id/source_code_image"
-                app:layout_constraintTop_toBottomOf="@+id/user_guide_click_view" />
+                app:layout_constraintTop_toBottomOf="@+id/user_guide_click_view"
+                tools:ignore="VisualLintOverlap" />
 
             <TextView
                 android:id="@+id/source_description"
@@ -78,7 +79,8 @@
                 android:text="@string/source_code_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/source_code_image"
-                app:layout_constraintTop_toBottomOf="@+id/source_title" />
+                app:layout_constraintTop_toBottomOf="@+id/source_title"
+                tools:ignore="VisualLintOverlap" />
 
             <ImageView
                 android:id="@+id/source_code_image"
@@ -113,7 +115,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/github_issue_title"
                 app:layout_constraintStart_toEndOf="@+id/github_issue_image"
-                app:layout_constraintTop_toBottomOf="@+id/source_code_click_view" />
+                app:layout_constraintTop_toBottomOf="@+id/source_code_click_view"
+                tools:ignore="VisualLintOverlap" />
 
             <TextView
                 android:id="@+id/github_issue_decription"
@@ -125,7 +128,8 @@
                 android:text="@string/github_issue_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/github_issue_image"
-                app:layout_constraintTop_toBottomOf="@+id/github_issue_title" />
+                app:layout_constraintTop_toBottomOf="@+id/github_issue_title"
+                tools:ignore="VisualLintOverlap" />
 
             <ImageView
                 android:id="@+id/latest_release_image"
@@ -148,7 +152,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/latest_release_title"
                 app:layout_constraintStart_toEndOf="@+id/latest_release_image"
-                app:layout_constraintTop_toBottomOf="@+id/github_issue_click_view" />
+                app:layout_constraintTop_toBottomOf="@+id/github_issue_click_view"
+                tools:ignore="VisualLintOverlap" />
 
             <TextView
                 android:id="@+id/latest_release_description"
@@ -160,7 +165,8 @@
                 android:text="@string/latest_release_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/latest_release_image"
-                app:layout_constraintTop_toBottomOf="@+id/latest_release_title" />
+                app:layout_constraintTop_toBottomOf="@+id/latest_release_title"
+                tools:ignore="VisualLintOverlap" />
 
             <ImageView
                 android:id="@+id/calendar_settings_image"
@@ -183,7 +189,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/calendar_settings_title"
                 app:layout_constraintStart_toEndOf="@+id/calendar_settings_image"
-                app:layout_constraintTop_toBottomOf="@+id/global_settings_click_view" />
+                app:layout_constraintTop_toBottomOf="@+id/global_settings_click_view"
+                tools:ignore="VisualLintOverlap" />
 
             <TextView
                 android:id="@+id/calendar_settings_description"
@@ -195,7 +202,8 @@
                 android:text="@string/calendar_settings_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/calendar_settings_image"
-                app:layout_constraintTop_toBottomOf="@+id/calendar_settings_title" />
+                app:layout_constraintTop_toBottomOf="@+id/calendar_settings_title"
+                tools:ignore="VisualLintOverlap" />
 
             <ImageView
                 android:id="@+id/sorting_settings_image"
@@ -218,7 +226,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/sorting_settings_title"
                 app:layout_constraintStart_toEndOf="@+id/sorting_settings_image"
-                app:layout_constraintTop_toBottomOf="@+id/calendar_settings_click_view" />
+                app:layout_constraintTop_toBottomOf="@+id/calendar_settings_click_view"
+                tools:ignore="VisualLintOverlap" />
 
             <TextView
                 android:id="@+id/sorting_settings_description"
@@ -230,7 +239,8 @@
                 android:text="@string/sorting_settings_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/sorting_settings_image"
-                app:layout_constraintTop_toBottomOf="@+id/sorting_settings_title" />
+                app:layout_constraintTop_toBottomOf="@+id/sorting_settings_title"
+                tools:ignore="VisualLintOverlap" />
 
             <ImageView
                 android:id="@+id/global_settings_image"
@@ -253,7 +263,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/global_settings_title"
                 app:layout_constraintStart_toEndOf="@+id/global_settings_image"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="VisualLintOverlap" />
 
             <TextView
                 android:id="@+id/textView24"
@@ -265,7 +276,8 @@
                 android:text="@string/global_settings_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/global_settings_image"
-                app:layout_constraintTop_toBottomOf="@+id/global_settings_title" />
+                app:layout_constraintTop_toBottomOf="@+id/global_settings_title"
+                tools:ignore="VisualLintOverlap" />
 
             <ImageView
                 android:id="@+id/user_guide_image"
@@ -288,7 +300,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/user_guide_title"
                 app:layout_constraintStart_toEndOf="@+id/user_guide_image"
-                app:layout_constraintTop_toBottomOf="@+id/sorting_settings_click_view" />
+                app:layout_constraintTop_toBottomOf="@+id/sorting_settings_click_view"
+                tools:ignore="VisualLintOverlap" />
 
             <TextView
                 android:id="@+id/user_guide_description"
@@ -300,7 +313,8 @@
                 android:text="@string/user_guide_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/user_guide_image"
-                app:layout_constraintTop_toBottomOf="@+id/user_guide_title" />
+                app:layout_constraintTop_toBottomOf="@+id/user_guide_title"
+                tools:ignore="VisualLintOverlap" />
 
             <View
                 android:id="@+id/user_guide_click_view"
@@ -313,7 +327,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/user_guide_title"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="NegativeMargin,SpeakableTextPresentCheck" />
 
             <View
                 android:id="@+id/global_settings_click_view"
@@ -326,7 +340,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/global_settings_title"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="NegativeMargin,SpeakableTextPresentCheck" />
 
             <View
                 android:id="@+id/calendar_settings_click_view"
@@ -339,7 +353,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/calendar_settings_title"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="NegativeMargin,SpeakableTextPresentCheck" />
 
             <View
                 android:id="@+id/sorting_settings_click_view"
@@ -352,7 +366,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/sorting_settings_title"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="NegativeMargin,SpeakableTextPresentCheck" />
 
             <View
                 android:id="@+id/latest_release_click_view"
@@ -365,7 +379,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/latest_release_title"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="NegativeMargin,SpeakableTextPresentCheck" />
 
             <View
                 android:id="@+id/github_issue_click_view"
@@ -378,7 +392,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/github_issue_title"
-                tools:ignore="SpeakableTextPresentCheck" />
+                tools:ignore="NegativeMargin,SpeakableTextPresentCheck" />
 
             <View
                 android:id="@+id/source_code_click_view"
@@ -390,7 +404,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/source_title"
-                tools:ignore="SpeakableTextPresentCheck"
+                tools:ignore="NegativeMargin,SpeakableTextPresentCheck"
                 style="@style/ClickableViewFg" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -57,13 +57,14 @@ public abstract class PopupSettingsView {
                 });
     }
     
+    @NonNull
     public abstract EntryPreviewContainer getEntryPreviewContainer();
     
     /**
      * public method that should be called when some parameter changes, for example from a switch listener
      * should probably call {@link #setStateIconColor}
      */
-    public abstract <T> void notifyParameterChanged(TextView displayTo, String parameterKey, T value);
+    public abstract <T> void notifyParameterChanged(@NonNull TextView displayTo, @NonNull String parameterKey, @NonNull T value);
     
     /**
      * public method that should be called when some color changes (font, bg, border), for example from a switch listener
@@ -78,7 +79,7 @@ public abstract class PopupSettingsView {
      * @param icon         TextView to colorize
      * @param parameterKey key of the changed parameter
      */
-    protected abstract void setStateIconColor(TextView icon, String parameterKey);
+    protected abstract void setStateIconColor(@NonNull TextView icon, @NonNull String parameterKey);
     
     protected void updateAllIndicators() {
         setStateIconColor(bnd.fontColorState, Keys.FONT_COLOR.CURRENT.key);

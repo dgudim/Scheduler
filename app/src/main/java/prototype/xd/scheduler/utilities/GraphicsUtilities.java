@@ -30,11 +30,16 @@ import java.util.Arrays;
 
 import prototype.xd.scheduler.R;
 
-public class GraphicsUtilities {
+public final class GraphicsUtilities {
     
+    public static final String NAME = Utilities.class.getSimpleName();
+    
+    private GraphicsUtilities() throws InstantiationException {
+        throw new InstantiationException(NAME);
+    }
     
     @NonNull
-    public static Bitmap fingerPrintAndSaveBitmap(Bitmap bitmap, @NonNull File output) throws IOException {
+    public static Bitmap fingerPrintAndSaveBitmap(@NonNull Bitmap bitmap, @NonNull File output) throws IOException {
         bitmap = makeMutable(bitmap);
         Bitmap cutBitmap = createScaledBitmap(bitmap,
                 DISPLAY_METRICS_WIDTH.get(),
@@ -55,13 +60,15 @@ public class GraphicsUtilities {
         return cutBitmap;
     }
     
-    public static Bitmap readBitmapFromFile(File file) throws IOException {
+    @NonNull
+    public static Bitmap readBitmapFromFile(@NonNull File file) throws IOException {
         FileInputStream inputStream = new FileInputStream(file);
         Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
         inputStream.close();
         return bitmap;
     }
     
+    @NonNull
     public static Bitmap makeMutable(@NonNull final Bitmap bitmap) {
         if (!bitmap.isMutable()) {
             // make bitmap mutable if not already
@@ -79,7 +86,8 @@ public class GraphicsUtilities {
      * @param scalingLogic   Logic to use to avoid image stretching
      * @return New scaled bitmap object
      */
-    public static Bitmap createScaledBitmap(@NonNull Bitmap unscaledBitmap, int dstWidth, int dstHeight, ScalingLogic scalingLogic) {
+    @NonNull
+    public static Bitmap createScaledBitmap(@NonNull Bitmap unscaledBitmap, int dstWidth, int dstHeight, @NonNull ScalingLogic scalingLogic) {
         
         Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth, dstHeight, scalingLogic);
         Rect dstRect = calculateDstRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth, dstHeight, scalingLogic);
@@ -119,10 +127,10 @@ public class GraphicsUtilities {
      */
     @NonNull
     public static Rect calculateSrcRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-                                        ScalingLogic scalingLogic) {
+                                        @NonNull ScalingLogic scalingLogic) {
         if (scalingLogic == ScalingLogic.CROP) {
-            final float srcAspect = (float) srcWidth / (float) srcHeight;
-            final float dstAspect = (float) dstWidth / (float) dstHeight;
+            final float srcAspect = srcWidth / (float) srcHeight;
+            final float dstAspect = dstWidth / (float) dstHeight;
             
             if (srcAspect > dstAspect) {
                 final int srcRectWidth = (int) (srcHeight * dstAspect);
@@ -150,10 +158,10 @@ public class GraphicsUtilities {
      */
     @NonNull
     public static Rect calculateDstRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-                                        ScalingLogic scalingLogic) {
+                                        @NonNull ScalingLogic scalingLogic) {
         if (scalingLogic == ScalingLogic.FIT) {
-            final float srcAspect = (float) srcWidth / (float) srcHeight;
-            final float dstAspect = (float) dstWidth / (float) dstHeight;
+            final float srcAspect = srcWidth / (float) srcHeight;
+            final float dstAspect = dstWidth / (float) dstHeight;
             
             if (srcAspect > dstAspect) {
                 return new Rect(0, 0, dstWidth, (int) (dstWidth / srcAspect));
@@ -193,14 +201,18 @@ public class GraphicsUtilities {
         return mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), Keys.DEFAULT_DIM_FACTOR);
     }
     
+    public static int dimColorToBg(@ColorInt int color, @NonNull Context context, @FloatRange(from = 0.0, to = 1.0) double balance) {
+        return mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), balance);
+    }
+    
     public static int mixTwoColors(@ColorInt int color1, @ColorInt int color2, @FloatRange(from = 0.0, to = 1.0) double balance) {
         Color c1 = Color.valueOf(color1);
         Color c2 = Color.valueOf(color2);
-        float a = (float) (c1.alpha() * (1 - balance) + c2.alpha() * balance);
-        float r = (float) (c1.red() * (1 - balance) + c2.red() * balance);
-        float g = (float) (c1.green() * (1 - balance) + c2.green() * balance);
-        float b = (float) (c1.blue() * (1 - balance) + c2.blue() * balance);
-        return Color.argb(a, r, g, b);
+        float alpha = (float) (c1.alpha() * (1 - balance) + c2.alpha() * balance);
+        float red = (float) (c1.red() * (1 - balance) + c2.red() * balance);
+        float green = (float) (c1.green() * (1 - balance) + c2.green() * balance);
+        float blue = (float) (c1.blue() * (1 - balance) + c2.blue() * balance);
+        return Color.argb(alpha, red, green, blue);
     }
     
     // get harmonized color with the background
@@ -294,7 +306,7 @@ public class GraphicsUtilities {
         bitmap.setPixel(0, 1, Color.YELLOW);
     }
     
-    public static boolean noFingerPrint(@NonNull Bitmap bitmap) {
+    public static boolean hasNoFingerPrint(@NonNull Bitmap bitmap) {
         int pixel1 = bitmap.getPixel(0, 0);
         int pixel2 = bitmap.getPixel(1, 0);
         int pixel3 = bitmap.getPixel(0, 1);

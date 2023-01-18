@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
@@ -38,13 +37,13 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
     
     @NonNull
     @Override
-    public SortingSettingsFragmentBinding inflate(@NonNull LayoutInflater inflater, ViewGroup container) {
+    public SortingSettingsFragmentBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return SortingSettingsFragmentBinding.inflate(inflater, container, false);
     }
     
     // view creation end (fragment visible)
     @Override
-    public void onViewCreated(@NonNull final View view, final Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
         EntryTypeAdapter entryTypeAdapter = new EntryTypeAdapter();
@@ -52,10 +51,11 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         binding.orderRecyclerView.setAdapter(entryTypeAdapter);
         entryTypeAdapter.attachDragToRecyclerView(binding.orderRecyclerView);
         
-        List<SettingsEntryConfig> settingsEntries = new ArrayList<>();
-        settingsEntries.add(new SwitchSettingsEntryConfig(
-                Keys.TREAT_GLOBAL_ITEMS_AS_TODAYS, getString(R.string.treat_global_as_todays),
-                (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true));
+        List<SettingsEntryConfig> settingsEntries = List.of(
+                new SwitchSettingsEntryConfig(
+                        Keys.TREAT_GLOBAL_ITEMS_AS_TODAYS, getString(R.string.treat_global_as_todays),
+                        (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true));
+        
         binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         binding.settingsRecyclerView.addItemDecoration(new DividerItemDecoration(wrapper.context, DividerItemDecoration.VERTICAL));
         binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
@@ -181,7 +181,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
                 binding.dragHandle.setOnTouchListener(
                         (v, event) -> {
                             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                                dragHelper.startDrag(CardViewHolder.this);
+                                dragHelper.startDrag(this);
                                 return true;
                             }
                             return false;

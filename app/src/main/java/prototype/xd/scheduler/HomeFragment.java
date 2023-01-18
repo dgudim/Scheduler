@@ -1,7 +1,6 @@
 package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.DateManager.checkIfTimeSettingsChanged;
-import static prototype.xd.scheduler.utilities.DateManager.currentDate;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringUTCFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
@@ -28,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -44,13 +44,14 @@ import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
 
-public class HomeFragment extends Fragment {
+public final class HomeFragment extends Fragment { // NOSONAR, this is a fragment
     
     public static final String NAME = HomeFragment.class.getSimpleName();
     
@@ -58,11 +59,8 @@ public class HomeFragment extends Fragment {
     private ContentWrapperBinding contentBnd;
     private ContextWrapper wrapper;
     
-    public HomeFragment() {
-        super();
-    }
-    
     @Override
+    @MainThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // init date manager
@@ -73,6 +71,8 @@ public class HomeFragment extends Fragment {
     }
     
     @Override
+    @MainThread
+    @NonNull
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentActivity rootActivity = requireActivity();
         
@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment {
                         getEndOfMonthDayUTC(month) + DAYS_ON_ONE_PANEL)
         );
         
-        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(currentDate));
+        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(DateManager.getCurrentDate()));
         
         DrawerLayout drawerLayout = wrapperBnd.getRoot();
         
@@ -179,6 +179,7 @@ public class HomeFragment extends Fragment {
     
     // fragment becomes visible
     @Override
+    @MainThread
     public void onResume() {
         super.onResume();
         Logger.debug(NAME, "Main screen is now visible");
@@ -222,6 +223,7 @@ public class HomeFragment extends Fragment {
     }
     
     @Override
+    @MainThread
     public void onDestroyView() {
         // remove reference to ui element
         todoEntryManager.detachCalendarView();

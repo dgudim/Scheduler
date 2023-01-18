@@ -23,7 +23,7 @@
             android:id="@+id/entryNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:ignore="TextContrastCheck" />
+            tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

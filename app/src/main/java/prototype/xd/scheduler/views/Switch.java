@@ -58,6 +58,6 @@ public class Switch extends MaterialSwitch {
     
     @FunctionalInterface
     public interface OnSilentCheckedChangeListener {
-        void onCheckedChanged(CompoundButton buttonView, boolean isChecked, boolean fromUser);
+        void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked, boolean fromUser);
     }
 }

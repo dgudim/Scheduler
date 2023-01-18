@@ -3,20 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="45dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal">
 
     <prototype.xd.scheduler.views.CheckBox
         android:id="@+id/check_box"
         style="@android:style/Widget.DeviceDefault.CompoundButton.CheckBox"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         tools:ignore="TouchTargetSizeCheck" />
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="5"
         android:orientation="vertical">
 

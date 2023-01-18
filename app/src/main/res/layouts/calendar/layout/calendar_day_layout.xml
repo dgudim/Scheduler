@@ -16,6 +16,7 @@
         android:layout_marginBottom="3dp"
         android:textAlignment="center"
         android:textColor="?colorPrimary"
+        android:textIsSelectable="false"
         android:textSize="16sp"
         tools:text="22" />
 

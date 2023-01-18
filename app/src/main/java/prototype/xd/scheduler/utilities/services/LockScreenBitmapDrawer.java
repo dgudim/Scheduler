@@ -6,7 +6,7 @@ import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayLoca
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.makeMutable;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.noFingerPrint;
+import static prototype.xd.scheduler.utilities.GraphicsUtilities.hasNoFingerPrint;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.readBitmapFromFile;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
@@ -22,6 +22,7 @@ import static prototype.xd.scheduler.utilities.Utilities.getFile;
 import static prototype.xd.scheduler.utilities.Utilities.isVerticalOrientation;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
+import static prototype.xd.scheduler.utilities.Utilities.nullWrapper;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import android.annotation.SuppressLint;
@@ -59,8 +60,8 @@ class LockScreenBitmapDrawer {
     
     public static final String NAME = LockScreenBitmapDrawer.class.getSimpleName();
     
-    public final int displayWidth;
-    public final int displayHeight;
+    private final int displayWidth;
+    private final int displayHeight;
     
     private volatile boolean busy;
     
@@ -69,7 +70,7 @@ class LockScreenBitmapDrawer {
     
     private long previousHash;
     
-    public LockScreenBitmapDrawer(@NonNull Context context) throws IllegalStateException {
+    LockScreenBitmapDrawer(@NonNull Context context) throws IllegalStateException {
         wallpaperManager = WallpaperManager.getInstance(context);
         
         if (DISPLAY_METRICS_DENSITY.get() == -1) {
@@ -115,7 +116,7 @@ class LockScreenBitmapDrawer {
         Bitmap bitmap = getBitmapFromLockScreen();
         File bg = getBackgroundAccordingToDayAndTime();
         
-        if (noFingerPrint(bitmap)) {
+        if (hasNoFingerPrint(bitmap)) {
             bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
         } else {
             if (bg.exists()) {
@@ -132,7 +133,8 @@ class LockScreenBitmapDrawer {
         return makeMutable(bitmap);
     }
     
-    public boolean constructBitmap(@NonNull Context context, boolean forceRedraw) {
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
+    boolean constructBitmap(@NonNull Context context, boolean forceRedraw) {
         
         if (!isVerticalOrientation(context)) {
             Logger.warning(NAME, "Not starting bitmap thread, orientation not vertical");
@@ -157,7 +159,7 @@ class LockScreenBitmapDrawer {
                     Logger.info(NAME, " ------------ Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000F + "s ------------ ");
                     
                 } catch (InterruptedException e) {
-                    Logger.info(NAME, e.getMessage());
+                    Logger.info(NAME, nullWrapper(e.getMessage()));
                     // relay
                     Thread.currentThread().interrupt();
                 } catch (FileNotFoundException e) {
@@ -174,7 +176,7 @@ class LockScreenBitmapDrawer {
         return false;
     }
     
-    private long getEntryListHash(@NonNull List<TodoEntry> entries) {
+    private static long getEntryListHash(@NonNull List<TodoEntry> entries) {
         long hash = 0;
         for (TodoEntry entry : entries) {
             hash += entry.getLockscreenHash();
@@ -221,7 +223,7 @@ class LockScreenBitmapDrawer {
         params.verticalBias = LOCKSCREEN_VIEW_VERTICAL_BIAS.get() / 100F;
         containerView.setLayoutParams(params);
         
-        List<LockScreenTodoItemView<?>> itemViews = new ArrayList<>();
+        List<LockScreenTodoItemView<?>> itemViews = new ArrayList<>(toAdd.size());
         
         // first pass, add all views, setup layout independent parameters
         for (TodoEntry todoEntry : toAdd) {
@@ -249,7 +251,7 @@ class LockScreenBitmapDrawer {
     }
     
     @NonNull
-    private File getBackgroundAccordingToDayAndTime() {
+    private static File getBackgroundAccordingToDayAndTime() {
         
         if (!Keys.ADAPTIVE_BACKGROUND_ENABLED.get()) {
             return getFile(DateManager.DEFAULT_BACKGROUND_NAME);

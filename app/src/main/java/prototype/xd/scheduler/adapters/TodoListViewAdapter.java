@@ -144,15 +144,15 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             bnd.isDone.setCheckedSilent(entry.isCompleted());
             
             bnd.isDone.setOnClickListener(view12 -> {
-                if (!entry.isGlobal()) {
-                    // not global entries can be checked normally
-                    entry.changeParameters(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
-                } else {
+                if (entry.isGlobal()) {
                     String selectedDay = String.valueOf(currentlySelectedDayUTC);
                     // global entries become current entries
                     entry.changeParameters(
                             START_DAY_UTC, selectedDay,
                             END_DAY_UTC, selectedDay);
+                } else {
+                    // not global entries can be checked normally
+                    entry.changeParameters(IS_COMPLETED, String.valueOf(bnd.isDone.isChecked()));
                 }
                 // save stuff, notify days changed, etc.
                 todoEntryManager.performDeferredTasks();
@@ -184,7 +184,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             backgroundLayer.setCardBackgroundColor(bgColor);
             backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDayUTC));
             
-            if (entry.isCompleted() || entry.hideByContent()) {
+            if (entry.isCompleted() || entry.isHiddenByContent()) {
                 todoText.setTextColor(dimColorToBg(fontColor, bgColor));
             } else {
                 todoText.setTextColor(fontColor);
@@ -219,7 +219,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     @NonNull
     private final TodoEntryManager todoEntryManager;
     @NonNull
-    private List<TodoEntry> currentTodoEntries;
+    private final List<TodoEntry> currentTodoEntries;
     
     @NonNull
     private final EntrySettings entrySettings;
@@ -228,6 +228,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     @NonNull
     private final ContextWrapper wrapper;
     
+    // default capacity is fine
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public TodoListViewAdapter(@NonNull final ContextWrapper wrapper,
                                @NonNull final TodoEntryManager todoEntryManager) {
         
@@ -254,9 +256,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
      * Notifies the adapter that the list contents have changed
      */
     public void notifyEntryListChanged() {
-        int itemsCount = currentTodoEntries.size();
-        currentTodoEntries = todoEntryManager.getVisibleTodoEntries(currentlySelectedDayUTC);
-        notifyItemRangeChanged(0, max(itemsCount, currentTodoEntries.size()));
+        int prevItemsCount = currentTodoEntries.size();
+        currentTodoEntries.clear();
+        currentTodoEntries.addAll(todoEntryManager.getVisibleTodoEntries(currentlySelectedDayUTC));
+        notifyItemRangeChanged(0, max(prevItemsCount, currentTodoEntries.size()));
     }
     
     @NonNull

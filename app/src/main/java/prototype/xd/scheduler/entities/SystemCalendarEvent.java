@@ -12,7 +12,7 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromCalendarKey;
-import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
+import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
 
 import android.database.Cursor;
@@ -43,10 +43,13 @@ public class SystemCalendarEvent {
     @NonNull
     protected final SystemCalendar associatedCalendar;
     
-    protected List<String> subKeys;
-    private String prefKey;
-    long id;
+    @NonNull
+    protected final List<String> subKeys;
+    @NonNull
+    private final String prefKey;
+    final long id;
     
+    @Nullable
     protected String title;
     @ColorInt
     public final int color;
@@ -60,29 +63,29 @@ public class SystemCalendarEvent {
     
     protected boolean isAllDay;
     
+    @Nullable
     protected RecurrenceSet rSet;
     
-    TimeZone timeZone;
+    private TimeZone timeZone;
     
     SystemCalendarEvent(@NonNull Cursor cursor, @NonNull SystemCalendar associatedCalendar, boolean loadMinimal) {
         
         this.associatedCalendar = associatedCalendar;
         
+        color = getInt(cursor, CALENDAR_EVENT_COLUMNS, Events.DISPLAY_COLOR);
+        id = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events._ID);
+    
+        prefKey = associatedCalendar.makePrefKey(color);
+        subKeys = generateSubKeysFromCalendarKey(prefKey);
+        
         if (loadMinimal) {
-            color = getInt(cursor, CALENDAR_EVENT_COLUMNS, Events.DISPLAY_COLOR);
             return;
         }
         
-        id = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events._ID);
-        
         title = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.TITLE).trim();
-        color = getInt(cursor, CALENDAR_EVENT_COLUMNS, Events.DISPLAY_COLOR);
         startMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.DTSTART);
         endMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.DTEND);
         isAllDay = getBoolean(cursor, CALENDAR_EVENT_COLUMNS, Events.ALL_DAY);
-        
-        prefKey = associatedCalendar.makePrefKey(color);
-        subKeys = generateSubKeysFromCalendarKey(prefKey);
         
         String timeZoneId = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EVENT_TIMEZONE);
         
@@ -107,16 +110,16 @@ public class SystemCalendarEvent {
         String rRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RRULE);
         String rDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RDATE);
         
-        if (rRuleStr.length() > 0) {
+        if (!rRuleStr.isEmpty()) {
             try {
                 rSet = new RecurrenceSet();
                 
                 rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRuleStr)));
                 
-                if (rDateStr.length() > 0) {
+                if (!rDateStr.isEmpty()) {
                     try {
-                        DateTimeZonePair pair = checkRDates(rDateStr);
-                        rSet.addInstances(new RecurrenceList(pair.date, pair.timeZone));
+                        DateTimeZonePair pair = getRecurrenceDates(rDateStr);
+                        rSet.addInstances(new RecurrenceList(pair.dateList, pair.timeZone));
                     } catch (IllegalArgumentException e) {
                         Logger.error(NAME, "Error adding rDate: " + e.getMessage());
                     }
@@ -125,7 +128,7 @@ public class SystemCalendarEvent {
                 String exRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EXRULE);
                 String exDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EXDATE);
                 
-                if (exRuleStr.length() > 0) {
+                if (!exRuleStr.isEmpty()) {
                     try {
                         rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRuleStr)));
                     } catch (IllegalArgumentException e) {
@@ -133,10 +136,10 @@ public class SystemCalendarEvent {
                     }
                 }
                 
-                if (exDateStr.length() > 0) {
+                if (!exDateStr.isEmpty()) {
                     try {
-                        DateTimeZonePair pair = checkRDates(exDateStr);
-                        rSet.addExceptions(new RecurrenceList(pair.date, pair.timeZone));
+                        DateTimeZonePair pair = getRecurrenceDates(exDateStr);
+                        rSet.addExceptions(new RecurrenceList(pair.dateList, pair.timeZone));
                     } catch (IllegalArgumentException e) {
                         Logger.error(NAME, "Error adding exDate: " + e.getMessage());
                     }
@@ -144,7 +147,7 @@ public class SystemCalendarEvent {
                 
                 String durationStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.DURATION);
                 
-                if (durationStr.length() > 0) {
+                if (!durationStr.isEmpty()) {
                     durationMs = rfc2445ToMilliseconds(durationStr);
                 }
                 
@@ -224,7 +227,7 @@ public class SystemCalendarEvent {
     
     
     @NonNull
-    private DateTimeZonePair checkRDates(@NonNull String datesToParse) {
+    private DateTimeZonePair getRecurrenceDates(@NonNull String datesToParse) {
         TimeZone newTimeZone = timeZone;
         if (datesToParse.contains(";")) {
             Logger.warning(NAME, "Not standard dates for " + this + ", " + datesToParse + ", probably contains timezone, attempting to parse");
@@ -235,19 +238,20 @@ public class SystemCalendarEvent {
         return new DateTimeZonePair(datesToParse, newTimeZone);
     }
     
-    public String getKey() {
+    @NonNull
+    public String getPrefKey() {
         return prefKey;
     }
     
     private static class DateTimeZonePair {
-    
+        
         @NonNull
-        final String date;
+        final String dateList;
         @NonNull
         final TimeZone timeZone;
         
-        DateTimeZonePair(@NonNull String date, @NonNull TimeZone timeZone) {
-            this.date = date;
+        DateTimeZonePair(@NonNull String dateList, @NonNull TimeZone timeZone) {
+            this.dateList = dateList;
             this.timeZone = timeZone;
         }
     }
@@ -269,7 +273,7 @@ public class SystemCalendarEvent {
     }
     
     protected <T> T iterateRecurrenceSet(long firstDayUTC, @NonNull RecurrenceSetConsumer<T> recurrenceSetConsumer, @Nullable T defaultValue) {
-        RecurrenceSetIterator it = rSet.iterator(timeZone, startMsUTC);
+        RecurrenceSetIterator it = Objects.requireNonNull(rSet).iterator(timeZone, startMsUTC);
         it.fastForward(daysToMs(firstDayUTC - 2));
         long instanceStartMsUTC;
         long instanceEndMsUTC;
@@ -287,7 +291,7 @@ public class SystemCalendarEvent {
         return defaultValue;
     }
     
-    public boolean visibleOnRange(long firstDayUTC, long lastDayUTC) {
+    public boolean isVisibleOnRange(long firstDayUTC, long lastDayUTC) {
         if (rSet != null) {
             return iterateRecurrenceSet(firstDayUTC, (instanceStartMsUTC, instanceEndMsUTC, instanceStartDayLocal, instanceEndDayLocal) -> {
                 // overshot
@@ -295,13 +299,13 @@ public class SystemCalendarEvent {
                     return Boolean.FALSE;
                 }
                 // if in range
-                if (rangesOverlap(instanceStartDayLocal, instanceEndDayLocal, firstDayUTC, lastDayUTC)) {
+                if (doRangesOverlap(instanceStartDayLocal, instanceEndDayLocal, firstDayUTC, lastDayUTC)) {
                     return Boolean.TRUE;
                 }
                 return null;
             }, Boolean.FALSE);
         }
-        return rangesOverlap(startDayLocal, endDayLocal, firstDayUTC, lastDayUTC);
+        return doRangesOverlap(startDayLocal, endDayLocal, firstDayUTC, lastDayUTC);
     }
     
     public void addExceptions(@NonNull List<Long> exceptions) {

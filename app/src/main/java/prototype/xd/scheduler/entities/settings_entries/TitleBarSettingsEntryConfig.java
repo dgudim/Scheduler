@@ -9,9 +9,10 @@ import prototype.xd.scheduler.utilities.ContextWrapper;
 
 public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
     
+    @NonNull
     private final String text;
     
-    public TitleBarSettingsEntryConfig(String text) {
+    public TitleBarSettingsEntryConfig(@NonNull String text) {
         this.text = text;
     }
     

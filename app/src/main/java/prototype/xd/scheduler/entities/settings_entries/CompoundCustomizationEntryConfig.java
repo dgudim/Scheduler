@@ -32,7 +32,8 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         return COMPOUND_CUSTOMIZATION.ordinal();
     }
     
-    static class CompoundCustomizationViewHolder extends SettingsViewHolder<CompoundCustomizationSettingsEntryBinding, CompoundCustomizationEntryConfig> {
+    static class CompoundCustomizationViewHolder
+            extends SettingsEntryConfig.SettingsViewHolder<CompoundCustomizationSettingsEntryBinding, CompoundCustomizationEntryConfig> {
         
         @NonNull
         private final EntryPreviewContainer entryPreviewContainer;

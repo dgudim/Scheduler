@@ -27,44 +27,33 @@ public final class Keys {
     
     public static final String NAME = Keys.class.getSimpleName();
     
-    private Keys() {
-        throw new IllegalStateException(NAME + " can't be instantiated");
+    private Keys() throws InstantiationException {
+        throw new InstantiationException(NAME);
     }
     
     public abstract static class DefaultedValue<T> {
         
-        protected Triplet.Type type = Triplet.Type.CURRENT;
+        @NonNull
+        protected final Triplet.Type type;
         
+        @NonNull
         public final String key;
+        @NonNull
         public final T defaultValue;
-        @Nullable
-        private final SharedPreferences internalPrefs;
         
-        DefaultedValue(String key, T defaultValue, @Nullable SharedPreferences preferences) {
+        DefaultedValue(@NonNull String key, @NonNull T defaultValue, @NonNull Triplet.Type type) {
             this.key = key;
             this.defaultValue = defaultValue;
-            internalPrefs = preferences;
-        }
-        
-        DefaultedValue(String key, T defaultValue, Triplet.Type type) {
-            this.key = key;
-            this.defaultValue = defaultValue;
-            internalPrefs = null;
             this.type = type;
         }
         
-        DefaultedValue(String key, T defaultValue) {
-            this.key = key;
-            this.defaultValue = defaultValue;
-            internalPrefs = null;
+        DefaultedValue(@NonNull String key, @NonNull T defaultValue) {
+            this(key, defaultValue, Triplet.Type.CURRENT);
         }
         
-        protected SharedPreferences getInternalPrefs() {
-            return internalPrefs == null ? Keys.preferences : internalPrefs;
-        }
+        protected abstract T getInternal(@NonNull String actualKey, @NonNull T actualDefaultValue);
         
-        protected abstract T getInternal(String actualKey, T actualDefaultValue);
-        
+        @NonNull
         public Triplet.Type getType() {
             return type;
         }
@@ -97,7 +86,7 @@ public final class Keys {
             return get(null, defaultValue, false);
         }
         
-        public abstract void put(T value);
+        public abstract void put(@NonNull T value);
         
         @Override
         public int hashCode() {
@@ -116,8 +105,7 @@ public final class Keys {
                 DefaultedValue<?> val = (DefaultedValue<?>) obj;
                 return Objects.equals(val.defaultValue, defaultValue) &&
                         val.key.equals(key) &&
-                        val.type == type &&
-                        Objects.equals(val.internalPrefs, internalPrefs);
+                        val.type == type;
             }
             return false;
         }
@@ -130,9 +118,6 @@ public final class Keys {
     }
     
     public static class DefaultedBoolean extends DefaultedValue<Boolean> {
-        DefaultedBoolean(String key, Boolean defaultValue, SharedPreferences preferences) {
-            super(key, defaultValue, preferences);
-        }
         
         DefaultedBoolean(String key, Boolean defaultValue) {
             super(key, defaultValue);
@@ -140,13 +125,13 @@ public final class Keys {
         
         @NonNull
         @Override
-        protected Boolean getInternal(String actualKey, Boolean actualDefaultValue) {
-            return getInternalPrefs().getBoolean(actualKey, actualDefaultValue);
+        protected Boolean getInternal(@NonNull String actualKey, @NonNull Boolean actualDefaultValue) {
+            return preferences.getBoolean(actualKey, actualDefaultValue);
         }
         
         @Override
-        public void put(Boolean value) {
-            getInternalPrefs().edit().putBoolean(key, value).apply();
+        public void put(@NonNull Boolean value) {
+            preferences.edit().putBoolean(key, value).apply();
         }
     }
     
@@ -162,13 +147,13 @@ public final class Keys {
         
         @NonNull
         @Override
-        protected Integer getInternal(String actualKey, Integer actualDefaultValue) {
-            return getInternalPrefs().getInt(actualKey, actualDefaultValue);
+        protected Integer getInternal(@NonNull String actualKey, @NonNull Integer actualDefaultValue) {
+            return preferences.getInt(actualKey, actualDefaultValue);
         }
         
         @Override
-        public void put(Integer value) {
-            getInternalPrefs().edit().putInt(key, value).apply();
+        public void put(@NonNull Integer value) {
+            preferences.edit().putInt(key, value).apply();
         }
     }
     
@@ -179,13 +164,13 @@ public final class Keys {
         
         @NonNull
         @Override
-        protected Float getInternal(String actualKey, Float actualDefaultValue) {
-            return getInternalPrefs().getFloat(actualKey, actualDefaultValue);
+        protected Float getInternal(@NonNull String actualKey, @NonNull Float actualDefaultValue) {
+            return preferences.getFloat(actualKey, actualDefaultValue);
         }
         
         @Override
-        public void put(Float value) {
-            getInternalPrefs().edit().putFloat(key, value).apply();
+        public void put(@NonNull Float value) {
+            preferences.edit().putFloat(key, value).apply();
         }
     }
     
@@ -195,13 +180,14 @@ public final class Keys {
         }
         
         @Override
-        protected String getInternal(String actualKey, String actualDefaultValue) {
-            return getInternalPrefs().getString(actualKey, actualDefaultValue);
+        @Nullable
+        protected String getInternal(@NonNull String actualKey, @NonNull String actualDefaultValue) {
+            return preferences.getString(actualKey, actualDefaultValue);
         }
         
         @Override
-        public void put(String value) {
-            getInternalPrefs().edit().putString(key, value).apply();
+        public void put(@NonNull String value) {
+            preferences.edit().putString(key, value).apply();
         }
     }
     
@@ -217,15 +203,16 @@ public final class Keys {
         }
         
         @Override
-        protected List<T> getInternal(String actualKey, List<T> actualDefaultValue) {
-            String stringValue = getInternalPrefs().getString(actualKey, null);
+        @NonNull
+        protected List<T> getInternal(@NonNull String actualKey, @NonNull List<T> actualDefaultValue) {
+            String stringValue = preferences.getString(actualKey, null);
             if (stringValue == null) {
                 return actualDefaultValue;
             }
             String[] stringList = stringValue.split(delimiter);
             List<T> list = new ArrayList<>(stringList.length);
             for (String value : stringList) {
-                list.add(T.valueOf(enumClass, value));
+                list.add(Enum.valueOf(enumClass, value));
             }
             return list;
         }
@@ -238,7 +225,7 @@ public final class Keys {
                         .append(delimiter)
                         .append(enumList.get(i).name());
             }
-            getInternalPrefs().edit().putString(key, stringValue.toString()).apply();
+            preferences.edit().putString(key, stringValue.toString()).apply();
         }
         
         @Override
@@ -262,14 +249,14 @@ public final class Keys {
         }
         
         @Override
-        protected T getInternal(String actualKey, T actualDefaultValue) {
-            String valName = getInternalPrefs().getString(actualKey, null);
-            return valName == null ? actualDefaultValue : T.valueOf(enumClass, valName);
+        protected T getInternal(@NonNull String actualKey, @NonNull T actualDefaultValue) {
+            String valName = preferences.getString(actualKey, null);
+            return valName == null ? actualDefaultValue : Enum.valueOf(enumClass, valName);
         }
         
         @Override
         public void put(@NonNull T value) {
-            getInternalPrefs().edit().putString(key, value.name()).apply();
+            preferences.edit().putString(key, value.name()).apply();
         }
         
         @Override
@@ -290,7 +277,7 @@ public final class Keys {
         }
     }
     
-    public static <T> void putAny(String key, @NonNull T value) {
+    public static <T> void putAny(@NonNull String key, @NonNull T value) {
         if (value.getClass() == Integer.class) {
             preferences.edit().putInt(key, (Integer) value).apply();
         } else if (value.getClass() == String.class) {
@@ -306,14 +293,16 @@ public final class Keys {
         }
     }
     
-    public static boolean getBoolean(String key, boolean defaultValue) {
+    public static boolean getBoolean(@NonNull String key, boolean defaultValue) {
         return preferences.getBoolean(key, defaultValue);
     }
     
+    @NonNull
     public static Map<String, ?> getAll() {
         return preferences.getAll();
     }
     
+    @NonNull
     public static SharedPreferences.Editor edit() {
         return preferences.edit();
     }
@@ -322,7 +311,7 @@ public final class Keys {
         preferences.edit().clear().apply();
     }
     
-    public static int getFirstValidKeyIndex(@NonNull List<String> calendarSubKeys, String parameter) {
+    public static int getFirstValidKeyIndex(@NonNull List<String> calendarSubKeys, @NonNull String parameter) {
         for (int i = calendarSubKeys.size() - 1; i >= 0; i--) {
             try {
                 if (preferences.getString(calendarSubKeys.get(i) + "_" + parameter, null) != null) {
@@ -335,24 +324,29 @@ public final class Keys {
         return -1;
     }
     
-    public static String getFirstValidKey(@NonNull List<String> calendarSubKeys, String parameter) {
+    @NonNull
+    public static String getFirstValidKey(@NonNull List<String> calendarSubKeys, @NonNull String parameter) {
         int index = getFirstValidKeyIndex(calendarSubKeys, parameter);
         return index == -1 ? parameter : (calendarSubKeys.get(index) + "_" + parameter);
     }
     
+    public static boolean getBitmapUpdateFlag() {
+        return servicePreferences.getBoolean(SERVICE_UPDATE_SIGNAL.key, SERVICE_UPDATE_SIGNAL.defaultValue);
+    }
+    
     public static void setBitmapUpdateFlag() {
-        SERVICE_UPDATE_SIGNAL.put(Boolean.TRUE);
         servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL.key, true).apply();
     }
     
     public static void clearBitmapUpdateFlag() {
-        SERVICE_UPDATE_SIGNAL.put(Boolean.FALSE);
+        servicePreferences.edit().putBoolean(SERVICE_UPDATE_SIGNAL.key, false).apply();
     }
     
     private static volatile SharedPreferences preferences; // NOSONAR, SharedPreferences are thread safe
     private static volatile SharedPreferences servicePreferences; // NOSONAR
     
     public static final float DEFAULT_DIM_FACTOR = 0.5F;
+    public static final float CALENDAR_SETTINGS_DIM_FACTOR = 0.8F;
     public static final float DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR = 0.75F;
     public static final float DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR = 0.85F;
     public static final float DEFAULT_SECONDARY_TEXT_COLOR_MIX_FACTOR = 0.25F;
@@ -377,7 +371,7 @@ public final class Keys {
             "expiredBgColor", 0xff_FFCCCC);
     
     public static final IntUnaryOperator SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR = eventColor ->
-            mixTwoColors(Color.WHITE, eventColor, Keys.DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR);
+            mixTwoColors(Color.WHITE, eventColor, DEFAULT_CALENDAR_EVENT_BG_COLOR_MIX_FACTOR);
     
     public static final DefaultedValueTriplet<Integer, DefaultedInteger> BORDER_COLOR = new DefaultedValueTriplet<>(
             DefaultedInteger::new,
@@ -437,7 +431,7 @@ public final class Keys {
     public static final int APP_THEME_DARK = MODE_NIGHT_YES;
     public static final int APP_THEME_SYSTEM = MODE_NIGHT_FOLLOW_SYSTEM;
     public static final int DEFAULT_APP_THEME = APP_THEME_SYSTEM;
-    public static final List<Integer> appThemes = List.of(APP_THEME_DARK, APP_THEME_SYSTEM, APP_THEME_LIGHT);
+    public static final List<Integer> APP_THEMES = List.of(APP_THEME_DARK, APP_THEME_SYSTEM, APP_THEME_LIGHT);
     public static final DefaultedInteger APP_THEME = new DefaultedInteger("app_theme", DEFAULT_APP_THEME);
     
     public static final String PREFERENCES_MAIN = "prefs";
@@ -445,7 +439,7 @@ public final class Keys {
     
     public static final DefaultedBoolean INTRO_SHOWN = new DefaultedBoolean("app_intro", false);
     
-    public static final DefaultedBoolean SERVICE_UPDATE_SIGNAL = new DefaultedBoolean("update_lockscreen", false, servicePreferences);
+    private static final DefaultedBoolean SERVICE_UPDATE_SIGNAL = new DefaultedBoolean("update_lockscreen", false);
     public static final String SERVICE_KEEP_ALIVE_SIGNAL = "keep_alive";
     public static final DefaultedBoolean SERVICE_FAILED = new DefaultedBoolean("service_failed", false);
     public static final DefaultedBoolean WALLPAPER_OBTAIN_FAILED = new DefaultedBoolean("wallpaper_obtain_failed", false);

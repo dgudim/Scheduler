@@ -4,9 +4,9 @@ import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
 
@@ -29,14 +29,16 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
     
     // initial window creation
-    @SuppressLint("NotifyDataSetChanged")
+    @MainThread
     @Override
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         SystemCalendarSettings systemCalendarSettings = new SystemCalendarSettings(wrapper, null);
         
-        List<SettingsEntryConfig> staticEntries = new ArrayList<>();
+        //                                                       two entries - title and the switch
+        List<SettingsEntryConfig> staticEntries = new ArrayList<>(2);
         staticEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_system_calendars)));
         SettingsListViewAdapter staticEntriesListViewAdapter = new SettingsListViewAdapter(wrapper, staticEntries);
         
@@ -45,23 +47,26 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
                 .setStableIdMode(NO_STABLE_IDS).build(),
                 staticEntriesListViewAdapter);
         
-        List<GenericCalendarSettingsEntryConfig> calendarConfigEntries = new ArrayList<>();
+        ArrayList<GenericCalendarSettingsEntryConfig> calendarConfigEntries = new ArrayList<>();
         
         new Thread(() -> {
             List<SystemCalendar> calendars = getAllCalendars(requireContext(), true);
-            Map<String, List<SystemCalendar>> sortedCalendars = new TreeMap<>();
+            Map<String, List<SystemCalendar>> calendarGroups = new TreeMap<>();
             
             for (SystemCalendar calendar : calendars) {
-                sortedCalendars.computeIfAbsent(calendar.accountName,
-                                s -> new ArrayList<>())
+                calendarGroups.computeIfAbsent(calendar.accountName,
+                                e -> new ArrayList<>())
                         .add(calendar);
             }
             
+            // set the capacity to the number of calendars + the number of groups
+            calendarConfigEntries.ensureCapacity(calendars.size() + calendarGroups.size());
+            
             boolean showSettings = Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS.get();
             
-            for (List<SystemCalendar> calendarGroup : sortedCalendars.values()) {
+            for (List<SystemCalendar> calendarGroup : calendarGroups.values()) {
                 
-                ArrayList<GenericCalendarSettingsEntryConfig> calendarEntryList = new ArrayList<>();
+                ArrayList<GenericCalendarSettingsEntryConfig> calendarEntryList = new ArrayList<>(calendarGroup.size() + 1);
                 SettingsListViewAdapter calendarEntryListAdapter = new SettingsListViewAdapter(wrapper, calendarEntryList, true);
                 
                 calendarEntryList.add(new CalendarAccountSettingsEntryConfig(

@@ -42,7 +42,13 @@ import prototype.xd.scheduler.views.DateSelectButton;
 import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
-public class DialogUtilities {
+public final class DialogUtilities {
+    
+    public static final String NAME = Utilities.class.getSimpleName();
+    
+    private DialogUtilities() throws InstantiationException {
+        throw new InstantiationException(NAME);
+    }
     
     @MainThread
     public static void displayConfirmationDialogue(@NonNull ContextWrapper wrapper,
@@ -220,7 +226,7 @@ public class DialogUtilities {
     
     @FunctionalInterface
     public interface EditEntryConfirmationListener {
-        void onClick(String text, AddOrEditEntryDialogBinding dialogBinding, int selectedIndex);
+        void onClick(@NonNull String text, @NonNull AddOrEditEntryDialogBinding dialogBinding, int selectedIndex);
     }
     
     @MainThread
@@ -230,7 +236,7 @@ public class DialogUtilities {
                                             @DrawableRes int iconResource,
                                             @StringRes int positiveButton,
                                             @StyleRes int theme,
-                                            DialogInterface.OnDismissListener dismissListener) {
+                                            @Nullable DialogInterface.OnDismissListener dismissListener) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(wrapper.context, theme);
         builder.setTitle(titleStringResource);
         builder.setMessage(messageStringResource);

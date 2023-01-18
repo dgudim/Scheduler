@@ -4,7 +4,7 @@ import static prototype.xd.scheduler.utilities.Keys.APP_THEME_DARK;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_LIGHT;
 import static prototype.xd.scheduler.utilities.Keys.APP_THEME_SYSTEM;
 import static prototype.xd.scheduler.utilities.Keys.DEFAULT_APP_THEME;
-import static prototype.xd.scheduler.utilities.Keys.appThemes;
+import static prototype.xd.scheduler.utilities.Keys.APP_THEMES;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -30,11 +30,11 @@ public class ThemeSelectButton extends MaterialButton {
         
         if (!isInEditMode()) {
             themeId.set(Keys.APP_THEME.get());
-            themeIndex.set(appThemes.indexOf(themeId.get()));
+            themeIndex.set(APP_THEMES.indexOf(themeId.get()));
             
             setOnClickListener(v -> {
-                themeIndex.set((themeIndex.get() + 1) % appThemes.size());
-                themeId.set(appThemes.get(themeIndex.get()));
+                themeIndex.set((themeIndex.get() + 1) % APP_THEMES.size());
+                themeId.set(APP_THEMES.get(themeIndex.get()));
                 AppCompatDelegate.setDefaultNightMode(themeId.get());
                 Keys.APP_THEME.put(themeId.get());
                 updateThemeIcon(themeId.get());

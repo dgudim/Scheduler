@@ -8,7 +8,7 @@ import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.systemLocale;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
-import static prototype.xd.scheduler.utilities.Utilities.datesEqual;
+import static prototype.xd.scheduler.utilities.Utilities.areDatesEqual;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -51,7 +51,7 @@ public class CalendarView {
     
     public static final String NAME = CalendarView.class.getSimpleName();
     
-    static class CalendarDayViewContainer extends ViewContainer {
+    static final class CalendarDayViewContainer extends ViewContainer {
         
         private static final int MAX_INDICATORS = 4;
         
@@ -60,7 +60,7 @@ public class CalendarView {
         private final Context context;
         private LocalDate date;
         
-        public CalendarDayViewContainer(@NonNull CalendarDayLayoutBinding bnd, @NonNull CalendarView container) {
+        private CalendarDayViewContainer(@NonNull CalendarDayLayoutBinding bnd, @NonNull CalendarView container) {
             super(bnd.getRoot());
             binding = bnd;
             context = bnd.getRoot().getContext();
@@ -103,7 +103,7 @@ public class CalendarView {
             int textColor;
             
             if (dayPosition == DayPosition.MonthDate) {
-                if (datesEqual(date, DateManager.currentDate)) {
+                if (areDatesEqual(date, DateManager.getCurrentDate())) {
                     textColor = MaterialColors.getColor(context, R.attr.colorPrimary, Color.WHITE);
                 } else {
                     textColor = MaterialColors.getColor(context, R.attr.colorOnSurface, Color.WHITE);
@@ -117,7 +117,7 @@ public class CalendarView {
             binding.calendarDayText.setTextColor(textColor);
             
             // highlight current date
-            if (datesEqual(date, currentlySelectedDate) && dayPosition == DayPosition.MonthDate) {
+            if (areDatesEqual(date, currentlySelectedDate) && dayPosition == DayPosition.MonthDate) {
                 binding.root.setBackgroundResource(R.drawable.round_bg_calendar_selection);
             } else {
                 binding.root.setBackgroundResource(0);
@@ -126,12 +126,12 @@ public class CalendarView {
         
     }
     
-    static class CalendarHeaderContainer extends ViewContainer {
+    static final class CalendarHeaderContainer extends ViewContainer {
         
         @NonNull
         private final CalendarHeaderBinding binding;
         
-        public CalendarHeaderContainer(@NonNull CalendarHeaderBinding bnd) {
+        private CalendarHeaderContainer(@NonNull CalendarHeaderBinding bnd) {
             super(bnd.getRoot());
             binding = bnd;
         }
@@ -161,6 +161,8 @@ public class CalendarView {
     @Nullable
     YearMonth selectedMonth;
     
+    // initial capacity is fine
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final Set<YearMonth> loadedMonths = new HashSet<>();
     
     private long firstSelectedMonthDayUTC;
@@ -257,7 +259,7 @@ public class CalendarView {
         daysOfWeek = daysOfWeek(firstDayOfWeek);
         
         rootCalendarView.setup(currentMonth.minusMonths(MAX_MONTHS), currentMonth.plusMonths(MAX_MONTHS), daysOfWeek.get(0));
-        selectDate(DateManager.currentDate);
+        selectDate(DateManager.getCurrentDate());
         rootCalendarView.scrollToMonth(currentMonth);
         
         setSelectedMonth(currentMonth, false);
@@ -276,7 +278,7 @@ public class CalendarView {
         rootCalendarView.scrollToDate(targetDate);
         
         // we selected another date
-        if (!datesEqual(targetDate, selectedDate)) {
+        if (!areDatesEqual(targetDate, selectedDate)) {
             Logger.debug(NAME, "Date selected: " + targetDate);
             if (selectedDate != null) {
                 rootCalendarView.notifyDateChanged(selectedDate);
@@ -309,11 +311,11 @@ public class CalendarView {
             dayPosition = DayPosition.OutDate;
         }
         LocalDate date = LocalDate.ofEpochDay(targetDayUTC);
-        if (dayPosition != DayPosition.MonthDate) {
-            rootCalendarView.notifyDateChanged(date, dayPosition);
-        } else {
+        if (dayPosition == DayPosition.MonthDate) {
             rootCalendarView.notifyDateChanged(date, DayPosition.InDate);
             rootCalendarView.notifyDateChanged(date, DayPosition.OutDate);
+        } else {
+            rootCalendarView.notifyDateChanged(date, dayPosition);
         }
         rootCalendarView.notifyDateChanged(date, DayPosition.MonthDate);
     }
@@ -331,10 +333,10 @@ public class CalendarView {
     
     public void notifyCalendarChanged() {
         DayOfWeek firstDayOfWeek = FIRST_DAY_OF_WEEK.get();
-        if (firstDayOfWeek != daysOfWeek.get(0)) {
-            init(firstDayOfWeek);
-        } else {
+        if (firstDayOfWeek == daysOfWeek.get(0)) {
             rootCalendarView.notifyCalendarChanged();
+        } else {
+            init(firstDayOfWeek);
         }
     }
 }

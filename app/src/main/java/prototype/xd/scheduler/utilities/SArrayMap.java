@@ -20,11 +20,9 @@ public class SArrayMap<K extends Serializable, V extends Serializable> extends A
     
     private static final long serialVersionUID = 6114227458943730012L;
     
-    public SArrayMap() {
-        super();
-    }
+    public SArrayMap() {}
     
-    public SArrayMap(SArrayMap<K, V> map) {
+    public SArrayMap(@NonNull SArrayMap<K, V> map) {
         super(map);
     }
     

@@ -13,6 +13,7 @@ import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
@@ -35,9 +36,9 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
                                               boolean showSettings) {
         super(showSettings);
         this.systemCalendarSettings = systemCalendarSettings;
-        this.accountName = calendar.accountName;
-        this.accountType = calendar.accountType;
-        this.calendarColor = calendar.color;
+        accountName = calendar.accountName;
+        accountType = calendar.accountType;
+        calendarColor = calendar.color;
         this.containerAdapter = containerAdapter;
     }
     
@@ -55,7 +56,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         @Override
         void bind(@NonNull CalendarAccountSettingsEntryConfig config) {
             viewBinding.accountIcon.setImageResource(getIconFromAccountType(config.accountType));
-            viewBinding.root.setBackgroundColor(dimColorToBg(config.calendarColor, viewBinding.root.getContext()));
+            viewBinding.root.setBackgroundColor(dimColorToBg(config.calendarColor, viewBinding.root.getContext(), Keys.CALENDAR_SETTINGS_DIM_FACTOR));
             viewBinding.calendarName.setText(config.accountName);
             viewBinding.accountType.setText(config.accountType);
             viewBinding.settingsButton.setOnClickListener(v -> config.systemCalendarSettings.show(config.accountName, config.calendarColor));
@@ -80,7 +81,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
             }
         }
         
-        private int getIconFromAccountType(@NonNull String accountType) {
+        private static int getIconFromAccountType(@NonNull String accountType) {
             String type = accountType.toLowerCase(Locale.ROOT);
             if (type.contains("exchange")) {
                 return R.drawable.ic_microsoft_exchange_55;

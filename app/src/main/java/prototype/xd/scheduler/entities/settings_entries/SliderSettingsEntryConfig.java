@@ -32,17 +32,17 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     @Nullable
     IntFunction<String> textFormatter;
     
-    public SliderSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize, boolean zeroIfOff,
+    public SliderSettingsEntryConfig(@NonNull Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize, boolean zeroIsOff,
                                      @StringRes @PluralsRes int stringResource) {
         this.seekMin = seekMin;
         this.seekMax = seekMax;
         this.stepSize = stepSize;
-        this.zeroIsOff = zeroIfOff;
+        this.zeroIsOff = zeroIsOff;
         this.value = value;
         this.stringResource = stringResource;
     }
     
-    public SliderSettingsEntryConfig(Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize,
+    public SliderSettingsEntryConfig(@NonNull Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize,
                                      @NonNull IntFunction<String> textFormatter) {
         this.seekMin = seekMin;
         this.seekMax = seekMax;

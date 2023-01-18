@@ -35,6 +35,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
         });
     }
     
+    @NonNull
     public Integer getLastClickedBgIndex() {
         return lastClickedBgIndex;
     }

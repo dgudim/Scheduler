@@ -26,7 +26,7 @@ import prototype.xd.scheduler.utilities.Utilities;
  */
 public class Group implements Serializable {
     
-    static final long serialVersionUID = -5159688717810769428L;
+    private static final long serialVersionUID = -5159688717810769428L;
     
     public static final String NAME = Group.class.getSimpleName();
     
@@ -34,6 +34,7 @@ public class Group implements Serializable {
     
     private String groupName;
     private transient Set<TodoEntry> associatedEntries;
+    @NonNull
     protected SArrayMap<String, String> params;
     
     public Group() {
@@ -42,7 +43,7 @@ public class Group implements Serializable {
         associatedEntries = Collections.emptySet();
     }
     
-    public Group(String groupName, SArrayMap<String, String> params) {
+    public Group(@NonNull String groupName, @NonNull SArrayMap<String, String> params) {
         this.groupName = groupName;
         this.params = params;
         associatedEntries = new ArraySet<>();
@@ -59,7 +60,7 @@ public class Group implements Serializable {
     }
     
     // to be called only by TodoEntry
-    protected void attachEntryInternal(TodoEntry todoEntry) {
+    protected void attachEntryInternal(@NonNull TodoEntry todoEntry) {
         if (isNullGroup()) {
             // don't attach to empty group
             return;
@@ -70,7 +71,7 @@ public class Group implements Serializable {
     }
     
     // to be called only by TodoEntry
-    protected void detachEntryInternal(TodoEntry todoEntry) {
+    protected void detachEntryInternal(@NonNull TodoEntry todoEntry) {
         if (isNullGroup()) {
             // don't detach from empty group
             return;
@@ -93,7 +94,7 @@ public class Group implements Serializable {
         return groupName.isEmpty();
     }
     
-    public static int groupIndexInList(@NonNull List<Group> groups, String groupName) {
+    public static int groupIndexInList(@NonNull List<Group> groups, @NonNull String groupName) {
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).groupName.equals(groupName)) {
                 return i;
@@ -151,7 +152,8 @@ public class Group implements Serializable {
      * @param newName new group name
      * @return true if name changed
      */
-    public boolean setName(@NonNull String newName) {
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
+    public boolean changeName(@NonNull String newName) {
         if (groupName.isEmpty()) {
             Logger.warning(NAME, "Trying to set name of NULL_GROUP");
             return false;
@@ -169,7 +171,8 @@ public class Group implements Serializable {
      * @param newParams new group parameters
      * @return true if parameters were changed
      */
-    public boolean setParams(@NonNull SArrayMap<String, String> newParams) {
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
+    public boolean setParameters(@NonNull SArrayMap<String, String> newParams) {
         if (groupName.isEmpty()) {
             Logger.warning(NAME, "Trying to set parameters of NULL_GROUP");
             return false;

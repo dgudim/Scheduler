@@ -10,13 +10,13 @@ public abstract class GenericCalendarSettingsEntryConfig extends SettingsEntryCo
     private boolean showSettings;
     
     GenericCalendarSettingsEntryConfig(boolean showSettings) {
-        setShowSettings(showSettings);
+        this.showSettings = showSettings;
     }
     
     public void setShowSettings(boolean showSettings) {
         this.showSettings = showSettings;
     }
- 
+    
     protected void updateSettingsButtonVisibility(@NonNull ImageButton settingsButton) {
         settingsButton.setVisibility(showSettings ? View.VISIBLE : View.GONE);
     }

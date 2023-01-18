@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
+import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
@@ -18,11 +19,13 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.utilities.Keys;
@@ -74,13 +77,10 @@ public class SystemCalendar {
         
         if (calTimeZoneId.isEmpty()) {
             Logger.warning(NAME, this + " has no timezone, defaulting to UTC");
-            this.timeZoneId = "UTC";
+            timeZoneId = "UTC";
         } else {
-            this.timeZoneId = calTimeZoneId;
+            timeZoneId = calTimeZoneId;
         }
-        
-        systemCalendarEvents = new ArrayList<>();
-        eventColorCountMap = new ArrayMap<>();
         
         //System.out.println("CALENDAR-------------------------------------------------" + name);
         //Cursor cursor_all = query(contentResolver, Events.CONTENT_EXCEPTION_URI, null,
@@ -88,63 +88,60 @@ public class SystemCalendar {
         //printTable(cursor_all);
         //cursor_all.close();
         
-        loadCalendarEvents(contentResolver, loadMinimal);
-        loadAvailableEventColors();
+        systemCalendarEvents = loadCalendarEvents(contentResolver, loadMinimal);
+        eventColorCountMap = loadAvailableEventColors();
     }
     
-    
-    void loadAvailableEventColors() {
-        eventColorCountMap.clear();
+    // default capacity is fine
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private ArrayMap<Integer, Integer> loadAvailableEventColors() {
+        ArrayMap<Integer, Integer> colors = new ArrayMap<>();
         if (accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
             for (SystemCalendarEvent event : systemCalendarEvents) {
-                eventColorCountMap.computeIfAbsent(event.color, key -> getEventCountWithColor(event.color));
+                colors.put(event.color, colors.getOrDefault(event.color, 0) + 1);
             }
         } else {
-            eventColorCountMap.put(color, systemCalendarEvents.size());
+            colors.put(color, systemCalendarEvents.size());
         }
-        
+        return colors;
     }
     
-    private int getEventCountWithColor(@ColorInt int color) {
-        int count = 0;
-        for (SystemCalendarEvent event : systemCalendarEvents) {
-            if (event.color == color) {
-                count++;
-            }
-        }
-        return count;
-    }
-    
-    void loadCalendarEvents(@NonNull ContentResolver contentResolver, boolean loadMinimal) {
-        systemCalendarEvents.clear();
-        Cursor cursor = query(contentResolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
-                Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0");
-        int eventCount = cursor.getCount();
-        cursor.moveToFirst();
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private List<SystemCalendarEvent> loadCalendarEvents(@NonNull ContentResolver contentResolver, boolean loadMinimal) {
         
-        Map<Long, List<Long>> exceptionLists = new HashMap<>();
+        Map<Long, List<Long>> exceptionLists;
+        List<SystemCalendarEvent> events;
         
-        for (int i = 0; i < eventCount; i++) {
+        final int MIN_EVENTS = 10;
+        final int MIN_EXCEPTIONS = 16;
+        
+        try (Cursor cursor = query(contentResolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
+                Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0")) {
             
-            long originalInstanceTime = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_INSTANCE_TIME);
-            if (originalInstanceTime != 0) {
-                // if original id is set this event is an exception to some other event
-                if (!loadMinimal) {
-                    exceptionLists.computeIfAbsent(getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_ID), k -> new ArrayList<>())
-                            .add(originalInstanceTime);
+            int allEvents = cursor.getCount();
+            events = new ArrayList<>(max(allEvents - MIN_EXCEPTIONS, MIN_EVENTS));
+            exceptionLists = new HashMap<>(MIN_EXCEPTIONS);
+            
+            while (cursor.moveToNext()) {
+                long originalInstanceTime = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_INSTANCE_TIME);
+                if (originalInstanceTime == 0) {
+                    events.add(new SystemCalendarEvent(cursor, this, loadMinimal));
+                } else {
+                    // if original id is set this event is an exception to some other event
+                    if (!loadMinimal) {
+                        exceptionLists.computeIfAbsent(getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_ID),
+                                        e -> new ArrayList<>())
+                                .add(originalInstanceTime);
+                    }
                 }
-            } else {
-                systemCalendarEvents.add(new SystemCalendarEvent(cursor, this, loadMinimal));
             }
-            
-            cursor.moveToNext();
         }
         
         if (!loadMinimal) {
-            addExceptions(exceptionLists);
+            addExceptions(exceptionLists, events);
         }
         
-        cursor.close();
+        return events;
     }
     
     /**
@@ -152,10 +149,10 @@ public class SystemCalendar {
      *
      * @param exceptionsMap map of event ids to exception days
      */
-    void addExceptions(@NonNull final Map<Long, List<Long>> exceptionsMap) {
+    void addExceptions(@NonNull final Map<Long, List<Long>> exceptionsMap, @NonNull final List<SystemCalendarEvent> events) {
         for (Map.Entry<Long, List<Long>> exceptionList : exceptionsMap.entrySet()) {
             boolean applied = false;
-            for (SystemCalendarEvent event : systemCalendarEvents) {
+            for (SystemCalendarEvent event : events) {
                 if (event.id == exceptionList.getKey()) {
                     event.addExceptions(exceptionList.getValue());
                     applied = true;
@@ -176,24 +173,43 @@ public class SystemCalendar {
     }
     
     /**
-     * Get visible events between first and last days
+     * Get visible events between first and last days, add them to the list
+     *
+     * @param firstDayUTC        start of range
+     * @param lastDayUTC         end of range
+     * @param list               list to add converted events to
+     * @param conversionFunction function to convert to necessary type
+     */
+    public <T> void addVisibleEventsToList(long firstDayUTC, long lastDayUTC,
+                                           @NonNull List<T> list,
+                                           @NonNull Function<SystemCalendarEvent, T> conversionFunction) {
+        if (isVisible()) {
+            for (SystemCalendarEvent event : systemCalendarEvents) {
+                if (event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
+                    list.add(conversionFunction.apply(event));
+                }
+            }
+        }
+    }
+    
+    /**
+     * Get visible events between first and last days, push them to the consumer
      *
      * @param firstDayUTC start of range
      * @param lastDayUTC  end of range
-     * @return visible events on range
+     * @param filter      function to filter out some events
+     * @param consumer    consumer that processes all events
      */
-    @NonNull
-    public List<SystemCalendarEvent> getVisibleEvents(long firstDayUTC, long lastDayUTC) {
+    public void getVisibleEvents(long firstDayUTC, long lastDayUTC,
+                                 @NonNull Predicate<SystemCalendarEvent> filter,
+                                 @NonNull Consumer<SystemCalendarEvent> consumer) {
         if (isVisible()) {
-            List<SystemCalendarEvent> visibleEvents = new ArrayList<>();
             for (SystemCalendarEvent event : systemCalendarEvents) {
-                if (event.visibleOnRange(firstDayUTC, lastDayUTC)) {
-                    visibleEvents.add(event);
+                if (filter.test(event) && event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
+                    consumer.accept(event);
                 }
             }
-            return visibleEvents;
         }
-        return Collections.emptyList();
     }
     
     /**
@@ -239,7 +255,7 @@ public class SystemCalendar {
     
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hashCode(id);
     }
     
     @Override

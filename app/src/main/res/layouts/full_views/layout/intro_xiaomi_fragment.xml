@@ -32,6 +32,7 @@
         android:gravity="fill"
         android:padding="5dp"
         android:text="@string/xiaomi_message"
-        android:textAppearance="@style/MediumHeading" />
+        android:textAppearance="@style/MediumHeading"
+        tools:ignore="VisualLintLongText" />
 
 </LinearLayout>

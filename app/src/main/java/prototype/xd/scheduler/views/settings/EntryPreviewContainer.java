@@ -49,7 +49,7 @@ public abstract class EntryPreviewContainer {
                                     @NonNull ViewGroup container,
                                     boolean timeVisible) {
         inflater = wrapper.getLayoutInflater();
-        this.todoItemViewType = TODO_ITEM_VIEW_TYPE.get();
+        todoItemViewType = TODO_ITEM_VIEW_TYPE.get();
         context = wrapper.context;
         this.container = container;
         this.timeVisible = timeVisible;
@@ -57,15 +57,19 @@ public abstract class EntryPreviewContainer {
         inflate();
     }
     
-    protected abstract @ColorInt int currentFontColorGetter();
+    @ColorInt
+    protected abstract int currentFontColorGetter();
     
-    protected abstract @ColorInt int currentBgColorGetter();
+    @ColorInt
+    protected abstract int currentBgColorGetter();
     
-    protected abstract @ColorInt int currentBorderColorGetter();
+    @ColorInt
+    protected abstract int currentBorderColorGetter();
     
     protected abstract int currentBorderThicknessGetter();
     
-    protected abstract @IntRange(from = 0, to = 10) int adaptiveColorBalanceGetter();
+    @IntRange(from = 0, to = 10)
+    protected abstract int adaptiveColorBalanceGetter();
     
     private void inflate() {
         entryPreview.upcoming = LockScreenTodoItemView.inflateViewByType(todoItemViewType, container, inflater);
@@ -169,7 +173,7 @@ public abstract class EntryPreviewContainer {
         entryPreview.expired.setCombinedTextSize(fontSizeSP);
     }
     
-    private void updateSelector(@ColorInt int color, @Nullable MaterialCardView selector) {
+    private static void updateSelector(@ColorInt int color, @Nullable MaterialCardView selector) {
         if (selector != null) {
             selector.setCardBackgroundColor(color);
         }
@@ -177,8 +181,8 @@ public abstract class EntryPreviewContainer {
     
     private void updatePreviewFontAndBgColors() {
         
-        fontColor.applyTo(fontColorSelector, this::updateSelector);
-        bgColor.applyTo(bgColorSelector, this::updateSelector);
+        fontColor.applyTo(fontColorSelector, EntryPreviewContainer::updateSelector);
+        bgColor.applyTo(bgColorSelector, EntryPreviewContainer::updateSelector);
         
         entryPreview.upcoming.mixAndSetBgAndTextColors(true,
                 fontColor.getUpcoming(),
@@ -201,7 +205,7 @@ public abstract class EntryPreviewContainer {
     
     private void updatePreviewBorderColors() {
         
-        borderColor.applyTo(borderColorSelector, this::updateSelector);
+        borderColor.applyTo(borderColorSelector, EntryPreviewContainer::updateSelector);
         
         entryPreview.upcoming.setBorderColor(borderColor.getUpcomingMixed(surfaceColor, adaptiveColorBalance));
         entryPreview.current.setBorderColor(borderColor.getCurrentMixed(surfaceColor, adaptiveColorBalance));

@@ -219,7 +219,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/notification_permission_granted"
                 tools:layout_conversion_absoluteHeight="48dp"
-                tools:layout_conversion_absoluteWidth="324dp" />
+                tools:layout_conversion_absoluteWidth="324dp"
+                tools:ignore="VisualLintButtonSize" />
 
             <TextView
                 android:id="@+id/all_set_text"

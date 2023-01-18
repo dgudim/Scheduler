@@ -41,10 +41,15 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     @NonNull
     private final Set<TodoEntry> globalEntries;
     
+    // container for non-calendar entries
+    @NonNull
+    private final Set<TodoEntry> regularEntries;
+    
     private boolean displayUpcomingExpired;
     private long firstLoadedDay;
     private long lastLoadedDay;
     
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public TodoEntryList(int initialCapacity) {
         super(initialCapacity);
         entriesPerDayUpcomingExpired = new HashMap<>(initialCapacity);
@@ -52,6 +57,7 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
         entriesPerDayCore = new HashMap<>(initialCapacity);
         daysPerEntryCore = new HashMap<>(initialCapacity);
         globalEntries = new HashSet<>();
+        regularEntries = new HashSet<>();
     }
     
     public void initLoadingRange(long dayStart, long dayEnd) {
@@ -78,17 +84,22 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     }
     
     // handle unlinking
-    protected @Nullable
+    @Nullable
     @Override
-    TodoEntry handleOldEntry(@Nullable TodoEntry oldEntry) {
+    protected TodoEntry handleOldEntry(@Nullable TodoEntry oldEntry) {
         if (oldEntry != null) {
             oldEntry.stopListeningToParameterInvalidations();
             oldEntry.unlinkGroupInternal(false);
             oldEntry.unlinkFromCalendarEvent();
             oldEntry.unlinkFromContainer();
             
+            if (!oldEntry.isFromSystemCalendar() && !regularEntries.remove(oldEntry)) {
+                Logger.warning(NAME, "Inconsistency detected: removing an entry from " + NAME + " but it's not in the regularEntries");
+            }
+            
             // if the entry is global, only unlink from global entry list
-            if (globalEntries.remove(oldEntry)) {
+            if (oldEntry.isGlobal() && !globalEntries.remove(oldEntry)) {
+                Logger.warning(NAME, "Inconsistency detected: removing a global entry from " + NAME + " but it's not in the globalEntries");
                 return oldEntry;
             }
             
@@ -104,9 +115,9 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     }
     
     @NonNull
-    private Set<Long> unlinkEntryFromLookupContainers(TodoEntry entry,
-                                                      @NonNull Map<TodoEntry, Set<Long>> daysPerEntry, // NOSONAR
-                                                      @NonNull Map<Long, Set<TodoEntry>> entriesPerDay) {
+    private static Set<Long> unlinkEntryFromLookupContainers(@NonNull TodoEntry entry,
+                                                             @NonNull Map<TodoEntry, Set<Long>> daysPerEntry, // NOSONAR
+                                                             @NonNull Map<Long, Set<TodoEntry>> entriesPerDay) {
         Set<Long> daysForEntry = daysPerEntry.remove(entry);
         if (daysForEntry == null) {
             Logger.error(NAME, "Can't remove associations for " + entry + ", entry not managed by current container");
@@ -134,7 +145,7 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     }
     
     // link entry to 4 maps (core and extended)
-    private void linkEntryToLookupContainers(TodoEntry entry,
+    private void linkEntryToLookupContainers(@NonNull TodoEntry entry,
                                              @NonNull TodoEntry.FullDaySet fullDaySet) {
         // link to core days
         linkEntryToLookupContainers(entry, fullDaySet.getCoreDaySet(), daysPerEntryCore, entriesPerDayCore);
@@ -143,16 +154,18 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     }
     
     // link entry to both maps
-    private void linkEntryToLookupContainers(TodoEntry entry,
-                                             @NonNull Set<Long> eventDays,
-                                             @NonNull Map<TodoEntry, Set<Long>> daysPerEntry,  // NOSONAR
-                                             @NonNull Map<Long, Set<TodoEntry>> entriesPerDay) {
+    // makes no sense to initialize with some capacity
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    private static void linkEntryToLookupContainers(@NonNull TodoEntry entry,
+                                                    @NonNull Set<Long> eventDays,
+                                                    @NonNull Map<TodoEntry, Set<Long>> daysPerEntry,  // NOSONAR
+                                                    @NonNull Map<Long, Set<TodoEntry>> entriesPerDay) {
         daysPerEntry
-                .computeIfAbsent(entry, k -> new HashSet<>())
+                .computeIfAbsent(entry, e -> new HashSet<>())
                 .addAll(eventDays);
         for (Long day : eventDays) {
             entriesPerDay
-                    .computeIfAbsent(day, k -> new HashSet<>())
+                    .computeIfAbsent(day, e -> new HashSet<>())
                     .add(entry);
         }
     }
@@ -165,9 +178,13 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
         // setup listener
         newEntry.listenToParameterInvalidations(parameterInvalidationListener);
         
+        if (!newEntry.isFromSystemCalendar() && !regularEntries.add(newEntry)) {
+            Logger.warning(NAME, "Trying to add duplicate entry: " + newEntry);
+        }
+        
         // if the entry is global only link to global entries list
-        if (newEntry.isGlobal()) {
-            globalEntries.add(newEntry);
+        if (newEntry.isGlobal() && !globalEntries.add(newEntry)) {
+            Logger.warning(NAME, "Trying to add duplicate global entry: " + newEntry);
             return;
         }
         
@@ -183,13 +200,18 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     }
     
     // add, assign invalidation listener and handle linking to container
-    @SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings({"UnusedReturnValue", "BooleanMethodNameMustStartWithQuestion"})
     public boolean addAll(@NonNull Collection<? extends TodoEntry> collection,
                           @NonNull BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
         for (TodoEntry todoEntry : collection) {
             handleNewEntry(todoEntry, parameterInvalidationListener);
         }
         return super.addAll(collection);
+    }
+    
+    @NonNull
+    public Set<TodoEntry> getRegularEntries() {
+        return regularEntries;
     }
     
     @NonNull
@@ -232,7 +254,10 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     
     // get all entries visible on a particular day
     @NonNull
-    public List<TodoEntry> getOnDay(long day, @NonNull BiPredicate<TodoEntry, TodoEntry.EntryType> filter) {
+    // we don't know how many will be left after filtering, default capacity is fine
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    public List<TodoEntry> getOnDay(long day,
+                                    @NonNull BiPredicate<TodoEntry, TodoEntry.EntryType> filter) {
         List<TodoEntry> filtered = new ArrayList<>();
         Set<TodoEntry> notFiltered = displayUpcomingExpired ? entriesPerDayUpcomingExpired.get(day) : entriesPerDayCore.get(day);
         Consumer<TodoEntry> consumer = entry -> {
@@ -248,7 +273,7 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     }
     
     // fast lookup instead of iterating the recurrence set (does not check for global entries)
-    public boolean notGlobalEntryVisibleOnDay(TodoEntry entry, long targetDayLocal) {
+    public boolean isNotGlobalEntryVisibleOnDay(@NonNull TodoEntry entry, long targetDayLocal) {
         Set<Long> extendedDays = daysPerEntryUpcomingExpired.get(entry);
         return extendedDays != null && extendedDays.contains(targetDayLocal);
     }
@@ -311,21 +336,21 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     // unsupported, will cause inconsistent state
     @Override
     public boolean add(TodoEntry todoEntry) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("add is not supported");
     }
     
     @Override
     public void add(int index, TodoEntry todoEntry) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("add is not supported");
     }
     
     @Override
     public boolean addAll(@NonNull Collection<? extends TodoEntry> collection) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("addAll is not supported");
     }
     
     @Override
     public boolean addAll(int index, @NonNull Collection<? extends TodoEntry> collection) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("addAll is not supported");
     }
 }

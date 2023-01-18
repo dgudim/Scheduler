@@ -14,6 +14,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import org.jetbrains.annotations.NonNls;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -22,6 +24,8 @@ import java.nio.file.Files;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized")
+@NonNls
 public final class Logger {
     
     public static final String NAME = Logger.class.getSimpleName();
@@ -32,17 +36,17 @@ public final class Logger {
     
     private static BlockingQueue<String> logQueue;
     
-    static volatile boolean fileEnabled = true;
-    static volatile boolean init;
+    private static volatile boolean fileEnabled = true;
+    private static volatile boolean init;
     
     private static final long ROTATE_SIZE = 10 * 1024 * 1024L; // 10MB
     
-    private Logger() {
-        throw new IllegalStateException(NAME + " can't be instantiated");
+    private Logger() throws InstantiationException {
+        throw new InstantiationException(NAME);
     }
     
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static synchronized void tryInit() {
+    private static synchronized void tryInit() {
         if (!init) {
             init = true;
             logFile = new File(ROOT_DIR.get(), "log.txt");
@@ -61,19 +65,19 @@ public final class Logger {
         }
     }
     
-    public static void error(String tag, String message) {
+    public static void error(@NonNull String tag, @NonNull String message) {
         log(ERROR, tag, message);
     }
     
-    public static void warning(String tag, String message) {
+    public static void warning(@NonNull String tag, @NonNull String message) {
         log(WARN, tag, message);
     }
     
-    public static void info(String tag, String message) {
+    public static void info(@NonNull String tag, @NonNull String message) {
         log(INFO, tag, message);
     }
     
-    public static void debug(String tag, String message) {
+    public static void debug(@NonNull String tag, @NonNull String message) {
         log(DEBUG, tag, message);
     }
     
@@ -85,7 +89,7 @@ public final class Logger {
         }
     }
     
-    public static void logException(String tag, Exception e) {
+    public static void logException(@NonNull String tag, @NonNull Exception e) {
         log(ERROR, tag, Log.getStackTraceString(e));
     }
     

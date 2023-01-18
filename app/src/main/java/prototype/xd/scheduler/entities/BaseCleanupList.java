@@ -15,8 +15,10 @@ import java.util.function.UnaryOperator;
  */
 public abstract class BaseCleanupList<T> extends ArrayList<T> {
     
-    protected BaseCleanupList() {
-        super();
+    private static final long serialVersionUID = -7450793963107268853L;
+    
+    BaseCleanupList() {
+    
     }
     
     protected BaseCleanupList(int initialCapacity) {
@@ -25,6 +27,7 @@ public abstract class BaseCleanupList<T> extends ArrayList<T> {
     
     /**
      * Do stuff before removing entry from list
+     *
      * @param oldEntry entry to be removed
      * @return the same entry for chaining
      */
@@ -64,21 +67,21 @@ public abstract class BaseCleanupList<T> extends ArrayList<T> {
     // too lazy to implement
     @Override
     public boolean removeAll(@NonNull Collection<?> c) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("removeAll is not supported");
     }
     
     @Override
     public boolean retainAll(@NonNull Collection<?> c) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("retainAll is not supported");
     }
     
     @Override
     public boolean removeIf(@NonNull Predicate<? super T> filter) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("removeIf is not supported");
     }
     
     @Override
     public void replaceAll(@NonNull UnaryOperator<T> operator) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("replaceAll not supported");
     }
 }

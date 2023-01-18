@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -46,16 +47,18 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     @SuppressLint("BatteryLife")
     private final ActivityResultLauncher<String[]> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                if (!refreshPermissionStates(true)) {
-                    displayGrantPermissionsToast();
-                } else {
+                if (refreshPermissionStates(true)) {
                     batteryOptimizationLauncher.launch(
                             new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + PACKAGE_NAME)));
+                } else {
+                    displayGrantPermissionsToast();
                 }
             }
     );
     
     @Override
+    @MainThread
+    @Nullable
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         bnd = PermissionsRequestFragmentBinding.inflate(inflater, container, false);
         refreshPermissionStates(true);
@@ -77,6 +80,7 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         return bnd.getRoot();
     }
     
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
     private boolean refreshPermissionStates(boolean display) {
         
         boolean storageGranted = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -111,13 +115,13 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         return essentialGranted;
     }
     
-    private void setPermissionChipColor(boolean permissionGranted, @NonNull TextView permissionText) {
+    private static void setPermissionChipColor(boolean permissionGranted, @NonNull TextView permissionText) {
         permissionText.setText(permissionGranted ? R.string.permissions_granted : R.string.permissions_not_granted);
         
         int containerColor = MaterialColors.getColor(permissionText, R.attr.colorErrorContainer, Color.LTGRAY);
         int onContainerColor = MaterialColors.getColor(permissionText, R.attr.colorOnErrorContainer, Color.RED);
         
-        if(permissionGranted) {
+        if (permissionGranted) {
             containerColor = GraphicsUtilities.swapRedAndGreenChannels(containerColor);
             onContainerColor = GraphicsUtilities.swapRedAndGreenChannels(onContainerColor);
         }

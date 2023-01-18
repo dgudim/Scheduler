@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,11 +16,13 @@ import com.github.appintro.SlidePolicy;
 
 import prototype.xd.scheduler.views.CheckBox;
 
-public class IntroStartingFragment extends Fragment implements SlidePolicy { //NOSONAR this is a fragment
+public class IntroStartingFragment extends Fragment implements SlidePolicy { // NOSONAR, this is a fragment
     
     private CheckBox understoodCheckbox;
     
     @Override
+    @MainThread
+    @Nullable
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.intro_starting_fragment, container, false);
         understoodCheckbox = view.findViewById(R.id.understood_checkbox);

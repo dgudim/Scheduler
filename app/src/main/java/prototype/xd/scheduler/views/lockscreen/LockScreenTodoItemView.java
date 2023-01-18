@@ -49,6 +49,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         context = binding.getRoot().getContext();
     }
     
+    @NonNull
     protected abstract View getClickableRoot();
     
     @NonNull

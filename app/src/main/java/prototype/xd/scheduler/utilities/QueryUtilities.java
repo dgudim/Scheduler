@@ -16,8 +16,8 @@ public final class QueryUtilities {
     
     public static final String NAME = QueryUtilities.class.getSimpleName();
     
-    private QueryUtilities() {
-        throw new IllegalStateException(NAME + " can't be instantiated");
+    private QueryUtilities() throws InstantiationException {
+        throw new InstantiationException(NAME);
     }
     
     @NonNull

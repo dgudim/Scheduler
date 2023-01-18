@@ -9,9 +9,10 @@ import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixColorWithBg;
+import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
-import static prototype.xd.scheduler.utilities.Utilities.rangesOverlap;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.widget.TextView;
 
@@ -43,9 +44,10 @@ import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
 
+@SuppressLint("UnknownNullness")
 public class TodoEntry extends RecycleViewEntry implements Serializable {
     
-    static final long serialVersionUID = 3578172096594611826L;
+    private static final long serialVersionUID = 3578172096594611826L;
     public static final String NAME = TodoEntry.class.getSimpleName();
     private static final Pattern hideByContentSplitPattern = Pattern.compile("\\|\\|");
     
@@ -104,7 +106,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         CachedGetter<T> expiredCachedGetter;
         
         Parameter(@NonNull TodoEntry entry,
-                  String parameterKey,
+                  @NonNull String parameterKey,
                   @NonNull ParameterGetter<T> todayValueGetter,
                   @NonNull Function<String, T> loadedParameterConverter,
                   @Nullable ParameterGetter<T> upcomingValueGetter,
@@ -169,10 +171,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         private long end;
         
         TimeRange(long startMsUTC, long endMsUTC) {
-            this.start = startMsUTC;
-            this.end = endMsUTC;
+            start = startMsUTC;
+            end = endMsUTC;
         }
         
+        @NonNull
         public TimeRange toDays(boolean clone, boolean local) {
             if (clone) {
                 return new TimeRange(start, end).toDays(false, local);
@@ -202,6 +205,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
+    @NonNull
     protected SArrayMap<String, String> params = new SArrayMap<>();
     
     // calendar event values
@@ -482,6 +486,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      * @param newGroup new group
      * @return true if the group was changed
      */
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
     public boolean changeGroup(@NonNull Group newGroup) {
         if (newGroup.equals(group)) {
             return false;
@@ -545,6 +550,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      *
      * @return true if there were any display parameters
      */
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
     public boolean removeDisplayParams() {
         invalidateAllParameters(true);
         return params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
@@ -557,6 +563,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      * @param value new parameter value
      * @return true if the parameter was changed
      */
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
     private boolean changeParameterInternal(@NonNull String key, @NonNull String value) {
         return !Objects.equals(params.put(key, value), value);
     }
@@ -566,7 +573,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      *
      * @param keyValuePairs parameters to change with their bew values
      */
-    public void changeParameters(@NonNull  String... keyValuePairs) {
+    public void changeParameters(@NonNull String... keyValuePairs) {
         if (keyValuePairs.length % 2 != 0) {
             throw new IllegalArgumentException("Can't call changeParameters with odd number of arguments");
         }
@@ -590,11 +597,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         this.averageBackgroundColor = averageBackgroundColor;
     }
     
-    private boolean inRange(long targetDayUTC, @NonNull TimeRange instanceRange) {
-        return inRange(targetDayUTC, instanceRange.getStart(), instanceRange.getEnd());
+    private boolean isInRange(long targetDayUTC, @NonNull TimeRange instanceRange) {
+        return isInRange(targetDayUTC, instanceRange.getStart(), instanceRange.getEnd());
     }
     
-    private boolean inRange(long targetDayUTC, long instanceStartDayLocal, long instanceEndDayLocal) {
+    private boolean isInRange(long targetDayUTC, long instanceStartDayLocal, long instanceEndDayLocal) {
         return instanceStartDayLocal - upcomingDayOffset.getToday() <= targetDayUTC &&
                 targetDayUTC <= instanceEndDayLocal + expiredDayOffset.getToday();
     }
@@ -606,7 +613,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     public boolean isVisibleOnLockscreenToday() {
         if (isFromSystemCalendar()) {
-            if (hideByContent()) {
+            if (isHiddenByContent()) {
                 return true;
             }
             
@@ -631,11 +638,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
         
         if (container != null) {
-            return container.notGlobalEntryVisibleOnDay(this, targetDayUTC);
+            return container.isNotGlobalEntryVisibleOnDay(this, targetDayUTC);
         }
         
         // fallback to iterating the recurrence set
-        return inRange(targetDayUTC, getNearestLocalEventDayRange(targetDayUTC));
+        return isInRange(targetDayUTC, getNearestLocalEventDayRange(targetDayUTC));
     }
     
     private boolean isVisibleExact(long targetDayUTC, long targetMsUTC) {
@@ -646,7 +653,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
         if (!isFromSystemCalendar()) {
             // local events don't have timestamps, just check one range
-            return inRange(targetDayUTC, startDayLocal.get(), endDayLocal.get());
+            return isInRange(targetDayUTC, startDayLocal.get(), endDayLocal.get());
         }
         
         if (container != null) {
@@ -659,7 +666,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 // upcoming are always visible
                 return true;
             }
-            if (!container.notGlobalEntryVisibleOnDay(this, targetDayUTC)) {
+            if (!container.isNotGlobalEntryVisibleOnDay(this, targetDayUTC)) {
                 // well, it's not visible
                 return false;
             }
@@ -667,14 +674,14 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
         TimeRange nearestMsRangeUTC = getNearestCalendarEventMsRangeUTC(targetDayUTC);
         
-        return inRange(targetDayUTC, nearestMsRangeUTC.toDays(true, !event.isAllDay)) &&
+        return isInRange(targetDayUTC, nearestMsRangeUTC.toDays(true, !event.isAllDay)) &&
                 nearestMsRangeUTC.getEnd() >= targetMsUTC;
     }
     
-    private void addDayRangeToSet(long dayFrom, long dayTo,
-                                  final long minDay, final long maxDay,
-                                  @Nullable Set<Long> daySet) {
-        if (daySet != null && rangesOverlap(dayFrom, dayTo, minDay, maxDay)) {
+    private static void addDayRangeToSet(long dayFrom, long dayTo,
+                                         final long minDay, final long maxDay,
+                                         @Nullable Set<Long> daySet) {
+        if (daySet != null && doRangesOverlap(dayFrom, dayTo, minDay, maxDay)) {
             dayFrom = clamp(dayFrom, minDay, maxDay);
             dayTo = clamp(dayTo, minDay, maxDay);
             for (long day = dayFrom; day <= dayTo; day++) {
@@ -683,11 +690,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    private void addDayRangeToSets(long startDay, long endDay,
-                                   long minDay, long maxDay,
-                                   long expiredDayOffset, long upcomingDayOffset,
-                                   @Nullable Set<Long> coreDaySet,
-                                   @Nullable Set<Long> currentUpcomingExpiredSet) {
+    private static void addDayRangeToSets(long startDay, long endDay,
+                                          long minDay, long maxDay,
+                                          long expiredDayOffset, long upcomingDayOffset,
+                                          @Nullable Set<Long> coreDaySet,
+                                          @Nullable Set<Long> currentUpcomingExpiredSet) {
         
         addDayRangeToSet(
                 startDay, endDay,
@@ -710,8 +717,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             return;
         }
         
-        long currentUpcomingDayOffset = this.upcomingDayOffset.getToday();
-        long currentExpiredDayOffset = this.expiredDayOffset.getToday();
+        long currentUpcomingDayOffset = upcomingDayOffset.getToday();
+        long currentExpiredDayOffset = expiredDayOffset.getToday();
         
         if (isRecurring()) {
             event.iterateRecurrenceSet(minDay, (instanceStartMsUTC, instanceEndMsUTC, instanceStartDayLocal, instanceEndDayLocal) -> {
@@ -744,7 +751,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void getVisibleDaysOnCalendar(@NonNull final CalendarView calendarView,
-                                         @NonNull final Set<Long> daySet, RangeType rangeType) {
+                                         @NonNull final Set<Long> daySet,
+                                         @NonNull RangeType rangeType) {
         getVisibleDays(calendarView.getFirstLoadedDayUTC(), calendarView.getLastLoadedDayUTC(),
                 rangeType == RangeType.CORE ? daySet : null,
                 rangeType == RangeType.EXPIRED_UPCOMING ? daySet : null);
@@ -790,7 +798,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    public boolean hideByContent() {
+    public boolean isHiddenByContent() {
         if (!isFromSystemCalendar()) {
             return false;
         }
@@ -817,7 +825,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         // covers recurring calendar events
         return event.iterateRecurrenceSet(targetDayUTC, (instanceStartMsUTC, instanceEndMsUTC, instanceStartDayLocal, instanceEndDayLocal) -> {
             // if in range or overshoot
-            if (inRange(targetDayUTC, instanceStartDayLocal, instanceEndDayLocal) || instanceStartDayLocal >= targetDayUTC) {
+            if (isInRange(targetDayUTC, instanceStartDayLocal, instanceEndDayLocal) || instanceStartDayLocal >= targetDayUTC) {
                 return new TimeRange(instanceStartMsUTC, instanceEndMsUTC);
             }
             return null;
@@ -872,6 +880,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return startDayLocal.get() == Keys.DAY_FLAG_GLOBAL;
     }
     
+    @NonNull
     public String getCalendarEntryTimeSpan(@NonNull Context context, long targetDayUTC) {
         if (event.isAllDay) {
             return context.getString(R.string.calendar_event_all_day);
@@ -893,6 +902,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return rawTextValue.get() + " " + getDayOffset(targetDayUTC, context, displayGlobalLabel);
     }
     
+    @NonNull
     public String getDayOffset(long targetDayUTC, @NonNull Context context, boolean displayGlobalLabel) { // NOSONAR, not that complex
         if (isGlobal()) {
             if (displayGlobalLabel) {

@@ -16,14 +16,15 @@
         android:paddingBottom="10dp"
         android:text="@string/enable"
         android:textAppearance="@style/MediumHeading"
-        tools:ignore="TouchTargetSizeCheck" />
+        tools:ignore="TouchTargetSizeCheck,VisualLintButtonSize" />
 
     <Button
         android:id="@+id/resetBgButton"
         style="@style/DefaultButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settings_reset_bg" />
+        android:text="@string/settings_reset_bg"
+        tools:ignore="VisualLintButtonSize" />
 
     <include
         android:id="@+id/grid_view_include"

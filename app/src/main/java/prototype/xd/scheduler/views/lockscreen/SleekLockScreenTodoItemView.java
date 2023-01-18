@@ -3,10 +3,10 @@ package prototype.xd.scheduler.views.lockscreen;
 import android.content.res.ColorStateList;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 
 import prototype.xd.scheduler.databinding.SleekEntryBinding;
 
@@ -50,7 +50,7 @@ public class SleekLockScreenTodoItemView extends LockScreenTodoItemView<SleekEnt
     
     @Override
     public void setBorderSizePX(int sizePX) {
-        CardView.LayoutParams params = (CardView.LayoutParams) viewBinding.backgroundMain.getLayoutParams();
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) viewBinding.backgroundMain.getLayoutParams();
         params.setMargins(sizePX, sizePX, sizePX, sizePX);
         viewBinding.backgroundMain.setLayoutParams(params);
     }

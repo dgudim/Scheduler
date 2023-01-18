@@ -16,15 +16,14 @@ import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
-import prototype.xd.scheduler.entities.SystemCalendarEvent;
 import prototype.xd.scheduler.entities.TodoEntry;
 
 public final class SystemCalendarUtils {
     
     public static final String NAME = SystemCalendarUtils.class.getSimpleName();
     
-    private SystemCalendarUtils() {
-        throw new IllegalStateException(NAME + " can't be instantiated");
+    private SystemCalendarUtils() throws InstantiationException {
+        throw new InstantiationException(NAME);
     }
     
     /**
@@ -68,17 +67,18 @@ public final class SystemCalendarUtils {
      */
     @NonNull
     public static List<SystemCalendar> getAllCalendars(@NonNull Context context, boolean loadMinimal) {
-        ContentResolver contentResolver = context.getContentResolver();
+        ContentResolver resolver = context.getContentResolver();
         
-        List<SystemCalendar> systemCalendars = new ArrayList<>();
-        Cursor cursor = query(contentResolver, CalendarContract.Calendars.CONTENT_URI, CALENDAR_COLUMNS.toArray(new String[0]), null);
-        int calendarCount = cursor.getCount();
-        cursor.moveToFirst();
-        for (int i = 0; i < calendarCount; i++) {
-            systemCalendars.add(new SystemCalendar(cursor, contentResolver, loadMinimal));
-            cursor.moveToNext();
+        List<SystemCalendar> systemCalendars;
+        
+        try (Cursor cursor = query(resolver, CalendarContract.Calendars.CONTENT_URI, CALENDAR_COLUMNS.toArray(new String[0]), null)) {
+            systemCalendars = new ArrayList<>(cursor.getCount());
+            
+            while (cursor.moveToNext()) {
+                systemCalendars.add(new SystemCalendar(cursor, resolver, loadMinimal));
+            }
         }
-        cursor.close();
+        
         Logger.info(NAME, "Loaded " + systemCalendars.size() + " calendars");
         return systemCalendars;
     }
@@ -89,27 +89,24 @@ public final class SystemCalendarUtils {
      * @param dayStart  minimum day
      * @param dayEnd    maximum day
      * @param calendars list of calendars to get from
-     * @return a list of TodoEntries
+     * @param list      list to add entries to
      */
-    @NonNull
-    public static List<TodoEntry> getTodoEntriesFromCalendars(long dayStart, long dayEnd,
-                                                              @NonNull List<SystemCalendar> calendars) {
-        List<TodoEntry> todoEntries = new ArrayList<>();
+    static void addTodoEntriesFromCalendars(long dayStart, long dayEnd,
+                                            @NonNull List<SystemCalendar> calendars,
+                                            @NonNull List<TodoEntry> list) {
+        int initialSize = list.size();
         for (SystemCalendar calendar : calendars) {
             // add all events from all calendars
-            for (SystemCalendarEvent event : calendar.getVisibleEvents(dayStart, dayEnd)) {
-                todoEntries.add(new TodoEntry(event));
-            }
+            calendar.addVisibleEventsToList(dayStart, dayEnd, list, TodoEntry::new);
         }
-        Logger.info(NAME, "Read calendar entries: " + todoEntries.size());
-        return todoEntries;
+        Logger.info(NAME, "Read calendar entries: " + (list.size() - initialSize));
     }
     
     @NonNull
     public static List<String> generateSubKeysFromCalendarKey(@NonNull String calendarKey) {
-        List<String> calendarSubKeys = new ArrayList<>();
         String[] splitKey = calendarKey.split("_");
-        StringBuilder buffer = new StringBuilder();
+        List<String> calendarSubKeys = new ArrayList<>(splitKey.length);
+        StringBuilder buffer = new StringBuilder(calendarKey.length() + splitKey.length);
         for (int i = 0; i < splitKey.length; i++) {
             if (i != 0) {
                 buffer.append('_');

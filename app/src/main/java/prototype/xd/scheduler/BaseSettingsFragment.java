@@ -2,12 +2,14 @@ package prototype.xd.scheduler;
 
 import static prototype.xd.scheduler.utilities.Utilities.findFragmentInNavHost;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
@@ -23,15 +25,18 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     
     protected T binding;
     
+    @SuppressLint("UnknownNullness")
     protected ContextWrapper wrapper;
     
     private Map<String, ?> preferenceStateBefore;
     
-    public abstract T inflate(@NonNull LayoutInflater inflater, ViewGroup container);
+    public abstract T inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
     
     // view creation begin
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @MainThread
+    @Nullable
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = inflate(inflater, container);
         preferenceStateBefore = Keys.getAll();
         return binding.getRoot();
@@ -39,6 +44,7 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     
     // fragment creation begin
     @Override
+    @MainThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         wrapper = ContextWrapper.from(this);
@@ -48,7 +54,7 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     // dialog dismissed (user pressed back button)
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
-        if(!preferenceStateBefore.equals(Keys.getAll())) {
+        if (!preferenceStateBefore.equals(Keys.getAll())) {
             findFragmentInNavHost(requireActivity(), HomeFragment.class).notifySettingsChanged();
         }
         super.onDismiss(dialog);

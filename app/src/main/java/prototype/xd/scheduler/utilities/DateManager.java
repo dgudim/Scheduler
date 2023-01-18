@@ -22,25 +22,31 @@ import java.util.concurrent.TimeUnit;
 
 import prototype.xd.scheduler.entities.TodoEntry;
 
+@SuppressWarnings({
+        "StaticNonFinalField",
+        "SynchronizationOnStaticField",
+        "PublicStaticCollectionField",
+        "NonPrivateFieldAccessedInSynchronizedContext",
+        "FieldAccessedSynchronizedAndUnsynchronized"})
 public final class DateManager {
     
     public static final String NAME = DateManager.class.getSimpleName();
     
-    private DateManager() {
-        throw new IllegalStateException(NAME + " can't be instantiated");
+    private DateManager() throws InstantiationException {
+        throw new InstantiationException(NAME);
     }
     
     public static final long ONE_MINUTE_MS = 60000L;
     
-    public static TimeZone systemTimeZone = TimeZone.getDefault(); // NOSONAR
+    private static TimeZone systemTimeZone = TimeZone.getDefault();
     public static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     
-    public static long currentDayUTC = DAY_FLAG_GLOBAL; // NOSONAR
-    public static long currentTimestampUTC = DAY_FLAG_GLOBAL; // NOSONAR
-    public static LocalDate currentDate = LocalDate.now(); // NOSONAR
+    public static long currentDayUTC = DAY_FLAG_GLOBAL;
+    public static long currentTimestampUTC = DAY_FLAG_GLOBAL;
+    private static LocalDate currentDate = LocalDate.now();
     
-    public static long currentlySelectedDayUTC = DAY_FLAG_GLOBAL; // NOSONAR
-    public static long currentlySelectedTimestampUTC = DAY_FLAG_GLOBAL; // NOSONAR
+    public static long currentlySelectedDayUTC = DAY_FLAG_GLOBAL;
+    public static long currentlySelectedTimestampUTC = DAY_FLAG_GLOBAL;
     
     @NonNull
     public static final Locale systemLocale = Objects.requireNonNull(LocaleListCompat.getDefault().get(0));
@@ -74,7 +80,7 @@ public final class DateManager {
         weekDaysLocal[6] = newDays[Calendar.SUNDAY];
         
         WEEK_DAYS_LOCAL = List.of(weekDaysLocal);
-    
+        
         DayOfWeek[] weekDays = DayOfWeek.values();
         String[] weekDaysRoot = new String[8];
         for (int i = 0; i < 7; i++) {
@@ -83,7 +89,7 @@ public final class DateManager {
         weekDaysRoot[7] = DEFAULT_BACKGROUND_NAME;
         
         WEEK_DAYS_ROOT = List.of(weekDaysRoot);
-    
+        
         String[] localizedWeekdays = new String[FIRST_DAYS_OF_WEEK_ROOT.size()];
         for (int i = 0; i < localizedWeekdays.length; i++) {
             localizedWeekdays[i] = WEEK_DAYS_LOCAL.get(FIRST_DAYS_OF_WEEK_ROOT.get(i).ordinal());
@@ -117,7 +123,7 @@ public final class DateManager {
         currentDayUTC = currentDate.toEpochDay();
     }
     
-    public static void selectDate(@NonNull LocalDate date) {
+    public static synchronized void selectDate(@NonNull LocalDate date) {
         updateDate();
         currentlySelectedDayUTC = date.toEpochDay();
         currentlySelectedTimestampUTC = daysToMs(currentlySelectedDayUTC);
@@ -181,7 +187,7 @@ public final class DateManager {
         return msToDays(msUTCtoMsLocal(msUTC));
     }
     
-    public static long msUTCtoMsLocal(long msUTC) {
+    public static synchronized long msUTCtoMsLocal(long msUTC) {
         return msUTC + systemTimeZone.getOffset(msUTC);
     }
     
@@ -243,7 +249,13 @@ public final class DateManager {
         return currentDate.getDayOfWeek().name().toLowerCase(Locale.ROOT);
     }
     
-    public static String getLocalWeekdayByIndex(int index, String defaultValue) {
+    @NonNull
+    public static String getLocalWeekdayByIndex(int index, @NonNull String defaultValue) {
         return index >= 7 ? defaultValue : WEEK_DAYS_LOCAL.get(index);
+    }
+    
+    @NonNull
+    public static LocalDate getCurrentDate() {
+        return currentDate;
     }
 }

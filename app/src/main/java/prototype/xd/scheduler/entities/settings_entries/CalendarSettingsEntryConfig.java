@@ -32,18 +32,18 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
     
     private CalendarColorsGridViewAdapter gridViewAdapter;
     
-    public CalendarSettingsEntryConfig(@NonNull final SystemCalendarSettings systemCalendarSettings,
+    public CalendarSettingsEntryConfig(@NonNull final SystemCalendarSettings settings,
                                        @NonNull final SystemCalendar calendar,
                                        boolean showSettings) {
         super(showSettings);
-        this.systemCalendarSettings = systemCalendarSettings;
-        this.calendarName = calendar.displayName;
+        systemCalendarSettings = settings;
+        calendarName = calendar.displayName;
         calendarKey = calendar.getPrefKey();
-        this.calendarColor = calendar.color;
+        calendarColor = calendar.color;
         calendarEventsCount = calendar.systemCalendarEvents.size();
         
-        if (calendar.eventColorCountMap.size() > 0 && calendarEventsCount > 0) {
-            gridViewAdapter = new CalendarColorsGridViewAdapter(systemCalendarSettings, calendar);
+        if (!calendar.eventColorCountMap.isEmpty() && calendarEventsCount > 0) {
+            gridViewAdapter = new CalendarColorsGridViewAdapter(settings, calendar);
         }
     }
     

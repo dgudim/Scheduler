@@ -7,9 +7,10 @@ import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE_BACKUP;
 import static prototype.xd.scheduler.utilities.Keys.MERGE_ENTRIES;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_SORTING_ORDER;
+import static prototype.xd.scheduler.utilities.Keys.TODO_LIST_INITIAL_CAPACITY;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Logger.warning;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getTodoEntriesFromCalendars;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.addTodoEntriesFromCalendars;
 
 import android.content.Context;
 import android.content.Intent;
@@ -63,16 +64,17 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.entities.TodoEntryList;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings("unchecked")
 public final class Utilities {
     
     public static final String NAME = Utilities.class.getSimpleName();
     
-    private Utilities() {
-        throw new IllegalStateException(NAME + " can't be instantiated");
+    private Utilities() throws InstantiationException {
+        throw new InstantiationException(NAME);
     }
     
     @NonNull
@@ -113,9 +115,9 @@ public final class Utilities {
                                                   @NonNull List<SystemCalendar> calendars,
                                                   boolean attachGroupToEntry) {
         
-        List<TodoEntry> readEntries = new ArrayList<>();
+        List<TodoEntry> readEntries = new ArrayList<>(TODO_LIST_INITIAL_CAPACITY);
         try {
-            readEntries = loadObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP);
+            readEntries.addAll(loadObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP));
             
             int id = 0;
             for (TodoEntry entry : readEntries) {
@@ -131,23 +133,15 @@ public final class Utilities {
             logException(NAME, e);
         }
         
-        readEntries.addAll(getTodoEntriesFromCalendars(dayStart, dayEnd, calendars));
+        addTodoEntriesFromCalendars(dayStart, dayEnd, calendars, readEntries);
         return readEntries;
     }
     
-    public static synchronized void saveEntries(@NonNull List<TodoEntry> entries) {
+    public static synchronized void saveEntries(@NonNull TodoEntryList entries) {
         try {
-            List<TodoEntry> entriesToSave = new ArrayList<>();
-            
-            for (int i = 0; i < entries.size(); i++) {
-                TodoEntry entry = entries.get(i);
-                if (!entry.isFromSystemCalendar()) {
-                    entriesToSave.add(entry);
-                }
-            }
             
             moveFile(ENTRIES_FILE, ENTRIES_FILE_BACKUP);
-            saveObject(ENTRIES_FILE, entriesToSave);
+            saveObject(ENTRIES_FILE, entries.getRegularEntries());
             
             Logger.info(NAME, "Saved todo list");
         } catch (IOException e) {
@@ -211,14 +205,14 @@ public final class Utilities {
     }
     
     public static <T> T loadObject(@NonNull String fileName) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream s = new ObjectInputStream(Files.newInputStream(getPath(fileName)))) {
-            return (T) s.readObject();
+        try (ObjectInputStream stream = new ObjectInputStream(Files.newInputStream(getPath(fileName)))) {
+            return (T) stream.readObject();
         }
     }
     
-    public static void saveObject(@NonNull String fileName, Object object) throws IOException {
-        try (ObjectOutputStream s = new ObjectOutputStream(Files.newOutputStream(getPath(fileName)))) {
-            s.writeObject(object);
+    public static void saveObject(@NonNull String fileName, @NonNull Object object) throws IOException {
+        try (ObjectOutputStream stream = new ObjectOutputStream(Files.newOutputStream(getPath(fileName)))) {
+            stream.writeObject(object);
         }
     }
     
@@ -233,7 +227,7 @@ public final class Utilities {
                 return (T) fragment;
             }
         }
-        throw new NullPointerException("Fragment " + targetFragmentClass + " not found");
+        throw new IllegalArgumentException("Fragment " + targetFragmentClass + " not found");
     }
     
     public static void navigateToFragment(@NonNull FragmentActivity activity, @IdRes int actionId) {
@@ -288,7 +282,7 @@ public final class Utilities {
     
     @FunctionalInterface
     public interface SliderOnChangeKeyedListener {
-        void onValueChanged(@NonNull Slider slider, int sliderValue, boolean fromUser, Keys.DefaultedInteger value);
+        void onValueChanged(@NonNull Slider slider, int sliderValue, boolean fromUser, @NonNull Keys.DefaultedInteger value);
     }
     
     public static void setSliderChangeListener(@NonNull final TextView displayTo,
@@ -343,7 +337,7 @@ public final class Utilities {
     //listener for entry and calendar settings
     public static void setSliderChangeListener(@NonNull final TextView displayTo,
                                                @NonNull final Slider slider,
-                                               final TextView stateIcon,
+                                               @NonNull final TextView stateIcon,
                                                @NonNull final PopupSettingsView settingsView,
                                                @StringRes @PluralsRes final int stringResource,
                                                @NonNull final Keys.DefaultedInteger value,
@@ -384,7 +378,7 @@ public final class Utilities {
     // without custom listeners
     public static void setSliderChangeListener(@NonNull final TextView displayTo,
                                                @NonNull final Slider slider,
-                                               final TextView stateIcon,
+                                               @NonNull final TextView stateIcon,
                                                @NonNull final PopupSettingsView systemCalendarSettings,
                                                @StringRes @PluralsRes final int stringResource,
                                                @NonNull final Keys.DefaultedInteger value,
@@ -410,7 +404,7 @@ public final class Utilities {
     
     //switch listener for calendar settings and entry settings
     public static void setSwitchChangeListener(@NonNull final Switch tSwitch,
-                                               final TextView stateIcon,
+                                               @NonNull final TextView stateIcon,
                                                @NonNull final PopupSettingsView settingsView,
                                                @NonNull final Keys.DefaultedBoolean value,
                                                @NonNull final Predicate<Keys.DefaultedBoolean> initialValueFactory) {
@@ -427,9 +421,10 @@ public final class Utilities {
      * @param quantity string quantity
      * @return string with the given quantity
      */
+    @NonNull
     public static String getQuantityString(@NonNull Context context, @StringRes @PluralsRes int resId, int quantity) throws Resources.NotFoundException {
         Resources res = context.getResources();
-        if (res.getResourceTypeName(resId).equals("plurals")) { //NOSONAR, getResourceTypeName does not return null
+        if (res.getResourceTypeName(resId).equals("plurals")) {
             return res.getQuantityString(resId, quantity, quantity);
         }
         return res.getString(resId, quantity);
@@ -443,6 +438,7 @@ public final class Utilities {
      * @param quantity string quantity
      * @return string with the given quantity
      */
+    @NonNull
     public static String getPluralString(@NonNull Context context, @PluralsRes int resId, int quantity) throws Resources.NotFoundException {
         return context.getResources().getQuantityString(resId, quantity, quantity);
     }
@@ -453,11 +449,11 @@ public final class Utilities {
      * @param context any context
      * @param url     url to open
      */
-    public static void openUrl(@NonNull Context context, String url) {
+    public static void openUrl(@NonNull Context context, @NonNull String url) {
         context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
     
-    public static boolean datesEqual(@Nullable LocalDate date1, @Nullable LocalDate date2) {
+    public static boolean areDatesEqual(@Nullable LocalDate date1, @Nullable LocalDate date2) {
         if (date1 == null || date2 == null) {
             return false;
         }
@@ -550,7 +546,7 @@ public final class Utilities {
         }
     }
     
-    public static boolean rangesOverlap(long x1, long x2, long y1, long y2) {
+    public static boolean doRangesOverlap(long x1, long x2, long y1, long y2) {
         return x2 >= y1 && x1 <= y2;
     }
     

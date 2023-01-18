@@ -127,11 +127,11 @@ public class EntrySettings extends PopupSettingsView {
                         
                         todoEntryManager.setNewGroupName(selectedGroup, newName);
                         bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
-                    }, dialog -> displayConfirmationDialogue(wrapper,
+                    }, additionDialog -> displayConfirmationDialogue(wrapper,
                             R.string.delete, R.string.are_you_sure,
                             R.string.no, R.string.yes,
                             v1 -> {
-                                dialog.dismiss();
+                                additionDialog.dismiss();
                                 todoEntryManager.removeGroup(selection);
                                 rebuild();
                             }));
@@ -150,12 +150,12 @@ public class EntrySettings extends PopupSettingsView {
                 R.string.cancel, R.string.add, "",
                 text -> {
                     Group existingGroup = findGroupInList(groupList, text);
-                    if (!existingGroup.isNullGroup()) {
+                    if (existingGroup.isNullGroup()) {
+                        addGroupToGroupList(text, null);
+                    } else {
                         displayConfirmationDialogue(wrapper,
                                 R.string.group_with_same_name_exists, R.string.overwrite_prompt,
                                 R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(text, existingGroup));
-                    } else {
-                        addGroupToGroupList(text, null);
                     }
                 }, null));
         
@@ -256,7 +256,7 @@ public class EntrySettings extends PopupSettingsView {
     }
     
     @Override
-    public <T> void notifyParameterChanged(@NonNull TextView displayTo, @NonNull String parameterKey, T value) {
+    public <T> void notifyParameterChanged(@NonNull TextView displayTo, @NonNull String parameterKey, @NonNull T value) {
         todoEntry.changeParameters(parameterKey, String.valueOf(value));
         setStateIconColor(displayTo, parameterKey);
     }

@@ -95,7 +95,7 @@ public class ContextWrapper {
      * text information.
      */
     @NonNull
-    public final String getString(@StringRes int resId) {
+    public String getString(@StringRes int resId) {
         return context.getResources().getString(resId);
     }
     
@@ -109,9 +109,11 @@ public class ContextWrapper {
      *                   substitution.
      * @return The string data associated with the resource, formatted and
      * stripped of styled text information.
+     * @throws android.content.res.Resources.NotFoundException if the given ID
+     *                                                         does not exist.
      */
     @NonNull
-    public final String getString(@StringRes int resId, Object... formatArgs) {
+    public String getString(@StringRes int resId, @NonNull Object... formatArgs) throws Resources.NotFoundException {
         return context.getResources().getString(resId, formatArgs);
     }
     
@@ -140,7 +142,7 @@ public class ContextWrapper {
      *                                                         does not exist.
      */
     @ColorInt
-    public final int getColor(@ColorRes int id) {
+    public int getColor(@ColorRes int id) {
         return context.getResources().getColor(id, context.getTheme());
     }
 }

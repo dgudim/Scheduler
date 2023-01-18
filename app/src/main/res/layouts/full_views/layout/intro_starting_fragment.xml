@@ -83,7 +83,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/note_animated_wallpapers"
-                app:drawableStartCompat="@drawable/ic_animation_24" />
+                app:drawableStartCompat="@drawable/ic_animation_24"
+                tools:ignore="VisualLintLongText" />
 
             <TextView
                 style="@style/SecondaryAccentedTextStyle"
@@ -104,7 +105,8 @@
                 style="@style/PrimaryAccentedCheckboxStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/read_and_understood" />
+                android:text="@string/read_and_understood"
+                tools:ignore="VisualLintButtonSize" />
 
         </LinearLayout>
 
