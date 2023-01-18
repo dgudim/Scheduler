@@ -62,7 +62,7 @@
     <ImageButton
         android:id="@+id/expand_button"
         style="@style/DefaultImageButton"
-        android:layout_width="40dp"
+        android:layout_width="48dp"
         android:layout_height="0dp"
         android:contentDescription="@string/action_expand"
         android:scaleType="center"

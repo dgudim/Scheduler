@@ -165,7 +165,7 @@
     <string name="source_code_title">Исходник</string>
     <string name="source_code_description">Посмотреть гитхаб репозиторий и внести свой вклад</string>
     <string name="reset_settings_description">Это сбросит ВСЕ ваши настройки, включая настройки календарей</string>
-    <string name="settings_show_global_items_label_lock">Показывать надпись \"Глобальный\" возле глобальных событий на экране блокировки</string>
+    <string name="settings_show_global_items_label_lock">Показывать надпись “Глобальный” возле глобальных событий на экране блокировки</string>
     <string name="settings_allow_global_calendar_account_settings">Разрешить изменение настроек целых календарей и аккаунтов</string>
     <string name="global">Глобальный</string>
     <string name="date_from_to">Дата от до</string>
@@ -174,7 +174,7 @@
     <string name="select_date">Выберите дату</string>
     <string name="attention">Внимание</string>
     <string name="whole_calendar_settings_on_warning">Вы включили глобальные настройки аккаунтов и календарей, т.к. они переопределяют локальные, это может вас запутать.</string>
-    <string name="whole_calendar_settings_off_warning">Вы отключили глобальные настройки аккаунтов и календарей, те, которые вы уже изменили, остались.</string>
+    <string name="whole_calendar_settings_off_warning">Вы отключили глобальные настройки аккаунтов и календарей, те, которые вы уже изменили не были сброшены.</string>
     <string name="yay">Вуху!</string>
     <string name="i_understand">Я понял</string>
     <string name="settings_event_vertical_bias">Вертикальная позиция событий: %d</string>
