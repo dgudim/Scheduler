@@ -47,25 +47,24 @@ public final class GraphicsUtilities {
                 ScalingLogic.CROP);
         fingerPrintBitmap(cutBitmap);
         
-        FileOutputStream outputStream = new FileOutputStream(output);
-        cutBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-        outputStream.close();
+        try (FileOutputStream outputStream = new FileOutputStream(output)) {
+            cutBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        }
         
         Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4F), (int) (cutBitmap.getHeight() / 4F), GraphicsUtilities.ScalingLogic.FIT);
         
-        FileOutputStream outputStreamMin = new FileOutputStream(output.getAbsolutePath() + "_min.png");
-        resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStreamMin);
-        outputStreamMin.close();
+        try (FileOutputStream outputStreamMin = new FileOutputStream(output.getAbsolutePath() + "_min.png")) {
+            resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStreamMin);
+        }
         
         return cutBitmap;
     }
     
     @NonNull
     public static Bitmap readBitmapFromFile(@NonNull File file) throws IOException {
-        FileInputStream inputStream = new FileInputStream(file);
-        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-        inputStream.close();
-        return bitmap;
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return BitmapFactory.decodeStream(inputStream);
+        }
     }
     
     @NonNull

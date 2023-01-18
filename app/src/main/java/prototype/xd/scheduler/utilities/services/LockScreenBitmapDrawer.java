@@ -97,18 +97,14 @@ class LockScreenBitmapDrawer {
     
     @SuppressLint("MissingPermission")
     private Bitmap getBitmapFromLockScreen() throws IOException {
-        ParcelFileDescriptor wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK);
-        if (wallpaperFile == null) {
-            wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_SYSTEM);
-        }
-        if (wallpaperFile != null) {
-            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(wallpaperFile.getFileDescriptor());
-            wallpaperFile.close();
-            return bitmap;
-        } else {
-            Bitmap blankBitmap = Bitmap.createBitmap(displayWidth, displayHeight, Bitmap.Config.ARGB_8888);
-            blankBitmap.eraseColor(13);
-            return blankBitmap;
+        try (ParcelFileDescriptor wallpaperFile = wallpaperManager.getWallpaperFile(WallpaperManager.FLAG_LOCK)) {
+            if (wallpaperFile != null) {
+                return BitmapFactory.decodeFileDescriptor(wallpaperFile.getFileDescriptor());
+            } else {
+                Bitmap blankBitmap = Bitmap.createBitmap(displayWidth, displayHeight, Bitmap.Config.ARGB_8888);
+                blankBitmap.eraseColor(13);
+                return blankBitmap;
+            }
         }
     }
     

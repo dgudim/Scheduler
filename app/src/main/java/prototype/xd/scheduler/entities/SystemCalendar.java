@@ -118,8 +118,7 @@ public class SystemCalendar {
         try (Cursor cursor = query(contentResolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
                 Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0")) {
             
-            int allEvents = cursor.getCount();
-            events = new ArrayList<>(max(allEvents - MIN_EXCEPTIONS, MIN_EVENTS));
+            events = new ArrayList<>(max(cursor.getCount() - MIN_EXCEPTIONS, MIN_EVENTS));
             exceptionLists = new HashMap<>(MIN_EXCEPTIONS);
             
             while (cursor.moveToNext()) {

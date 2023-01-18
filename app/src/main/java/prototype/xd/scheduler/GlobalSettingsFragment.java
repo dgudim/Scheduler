@@ -5,6 +5,7 @@ import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LO
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_ROOT;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -19,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -144,13 +144,11 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
             return;
         }
         new Thread(() -> {
-            try {
+            try (InputStream stream = requireActivity().getContentResolver().openInputStream(uri)) {
                 
-                InputStream stream = requireActivity().getContentResolver().openInputStream(uri);
                 if (stream != null) {
                     GraphicsUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                            new File(Keys.ROOT_DIR.get(), DateManager.WEEK_DAYS_ROOT.get(adaptiveBackgroundSettingsEntry.getLastClickedBgIndex()) + ".png"));
-                    stream.close();
+                           getFile( DateManager.WEEK_DAYS_ROOT.get(adaptiveBackgroundSettingsEntry.getLastClickedBgIndex()) + ".png"));
                     requireActivity().runOnUiThread(() -> adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated());
                 } else {
                     Logger.error(NAME, "Stream null for uri: " + uri.getPath());
