@@ -9,6 +9,7 @@ import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixColorWithBg;
+import static prototype.xd.scheduler.utilities.Keys.TIME_RANGE_SEPARATOR;
 import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 
@@ -976,6 +977,6 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         } else {
             str += BuildConfig.DEBUG ? rawTextValue.get() : rawTextValue.get().hashCode();
         }
-        return str + " (" + startDayLocal.get() + " - " + endDayLocal.get() + ")";
+        return str + " (" + startDayLocal.get() + TIME_RANGE_SEPARATOR + endDayLocal.get() + ")";
     }
 }

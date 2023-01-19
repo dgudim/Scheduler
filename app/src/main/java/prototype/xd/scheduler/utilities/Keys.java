@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntUnaryOperator;
 
+import kotlin.jvm.functions.Function2;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.Triplet.DefaultedValueTriplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
@@ -60,14 +61,12 @@ public final class Keys {
         
         @NonNull
         public T get(@Nullable List<String> subKeys, @NonNull T actualDefaultValue, boolean ignoreBaseKey) {
-            if (subKeys != null) {
-                String targetKey = getFirstValidKey(subKeys, key);
-                if (targetKey.equals(key) && ignoreBaseKey) {
+            return getFirstValidKey(subKeys, key, (validKey, index) -> {
+                if (index == -1 && ignoreBaseKey) {
                     return actualDefaultValue;
                 }
-                return getInternal(targetKey, actualDefaultValue);
-            }
-            return getInternal(key, actualDefaultValue);
+                return getInternal(validKey, actualDefaultValue);
+            });
         }
         
         @NonNull
@@ -311,23 +310,16 @@ public final class Keys {
         preferences.edit().clear().apply();
     }
     
-    public static int getFirstValidKeyIndex(@NonNull List<String> calendarSubKeys, @NonNull String parameter) {
-        for (int i = calendarSubKeys.size() - 1; i >= 0; i--) {
-            try {
-                if (preferences.getString(calendarSubKeys.get(i) + "_" + parameter, null) != null) {
-                    return i;
+    public static <T> T getFirstValidKey(@Nullable List<String> subKeys, @NonNull String parameter, @NonNull Function2<String, Integer, T> converter) {
+        if (subKeys != null) {
+            for (int i = subKeys.size() - 1; i >= 0; i--) {
+                String key = subKeys.get(i) + KEY_SEPARATOR + parameter;
+                if (preferences.contains(key)) {
+                    return converter.invoke(key, i);
                 }
-            } catch (ClassCastException e) { // NOSONAR
-                return i;
             }
         }
-        return -1;
-    }
-    
-    @NonNull
-    public static String getFirstValidKey(@NonNull List<String> calendarSubKeys, @NonNull String parameter) {
-        int index = getFirstValidKeyIndex(calendarSubKeys, parameter);
-        return index == -1 ? parameter : (calendarSubKeys.get(index) + "_" + parameter);
+        return converter.invoke(parameter, -1);
     }
     
     public static boolean getBitmapUpdateFlag() {
@@ -459,4 +451,7 @@ public final class Keys {
     public static final String GITHUB_RELEASES = "https://github.com/dgudim/Scheduler/releases";
     
     public static final int TODO_LIST_INITIAL_CAPACITY = 75;
+    
+    public static final String TIME_RANGE_SEPARATOR = " - ";
+    public static final String KEY_SEPARATOR = "_";
 }

@@ -11,7 +11,6 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.generateSubKeysFromCalendarKey;
 import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
 
@@ -74,9 +73,9 @@ public class SystemCalendarEvent {
         
         color = getInt(cursor, CALENDAR_EVENT_COLUMNS, Events.DISPLAY_COLOR);
         id = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events._ID);
-    
-        prefKey = associatedCalendar.makePrefKey(color);
-        subKeys = generateSubKeysFromCalendarKey(prefKey);
+        
+        prefKey = associatedCalendar.makeEventPrefKey(color);
+        subKeys = associatedCalendar.makeEventSubKeys(prefKey);
         
         if (loadMinimal) {
             return;
@@ -238,11 +237,6 @@ public class SystemCalendarEvent {
         return new DateTimeZonePair(datesToParse, newTimeZone);
     }
     
-    @NonNull
-    public String getPrefKey() {
-        return prefKey;
-    }
-    
     private static class DateTimeZonePair {
         
         @NonNull
@@ -314,6 +308,16 @@ public class SystemCalendarEvent {
         } else {
             Logger.warning(NAME, "Couldn't add exceptions to " + this);
         }
+    }
+    
+    @NonNull
+    public String getPrefKey() {
+        return prefKey;
+    }
+    
+    @NonNull
+    public List<String> getSubKeys() {
+        return subKeys;
     }
     
     @Override

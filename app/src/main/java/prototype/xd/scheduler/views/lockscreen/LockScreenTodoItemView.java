@@ -41,7 +41,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     private final View root;
     private final Context context;
     
-    private static final Pattern timeSplitPattern = Pattern.compile(" - ");
+    private static final Pattern timeSplitPattern = Pattern.compile(Keys.TIME_RANGE_SEPARATOR);
     
     LockScreenTodoItemView(@NonNull V binding) {
         viewBinding = binding;

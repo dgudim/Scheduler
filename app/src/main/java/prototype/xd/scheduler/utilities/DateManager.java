@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Keys.TIME_RANGE_SEPARATOR;
 
 import android.icu.text.DateFormatSymbols;
 
@@ -161,7 +162,7 @@ public final class DateManager {
         // month and day is the same
         if (dateFrom.equals(dateTo) || dateFromDayMonth.equals(dateToDayMonth)) {
             // 20:30 - 23:10
-            return dateFromHourMinute + " - " + dateToHourMinute;
+            return dateFromHourMinute + TIME_RANGE_SEPARATOR + dateToHourMinute;
         } else {
             String[] dateFromDayMonthSplit = dateFromDayMonth.split("/");
             String[] dateToDayMonthSplit = dateToDayMonth.split("/");
@@ -175,10 +176,10 @@ public final class DateManager {
             //month is the same
             if (dateFromMonth.equals(dateToMonth)) {
                 //24 20:40 - 30 21:30
-                return dateFromDay + " " + dateFromHourMinute + " - " + dateToDay + " " + dateToHourMinute;
+                return dateFromDay + " " + dateFromHourMinute + TIME_RANGE_SEPARATOR + dateToDay + " " + dateToHourMinute;
             } else {
                 //24/10 10:40 - 10/11 12:30
-                return dateFrom + " - " + dateTo;
+                return dateFrom + TIME_RANGE_SEPARATOR + dateTo;
             }
         }
     }

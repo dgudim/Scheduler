@@ -6,6 +6,8 @@ import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 import prototype.xd.scheduler.R;
@@ -23,6 +25,8 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
     @NonNull
     private final String accountName;
     @NonNull
+    private final List<String> subKeys;
+    @NonNull
     private final String accountType;
     @ColorInt
     private final int calendarColor;
@@ -37,6 +41,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         super(showSettings);
         this.systemCalendarSettings = systemCalendarSettings;
         accountName = calendar.accountName;
+        subKeys = Collections.singletonList(accountName);
         accountType = calendar.accountType;
         calendarColor = calendar.color;
         this.containerAdapter = containerAdapter;
@@ -59,7 +64,8 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
             viewBinding.root.setBackgroundColor(dimColorToBg(config.calendarColor, viewBinding.root.getContext(), Keys.CALENDAR_SETTINGS_DIM_FACTOR));
             viewBinding.calendarName.setText(config.accountName);
             viewBinding.accountType.setText(config.accountType);
-            viewBinding.settingsButton.setOnClickListener(v -> config.systemCalendarSettings.show(config.accountName, config.calendarColor));
+            viewBinding.settingsButton.setOnClickListener(v ->
+                    config.systemCalendarSettings.show(config.accountName, config.subKeys, config.calendarColor));
             config.updateSettingsButtonVisibility(viewBinding.settingsButton);
             viewBinding.expandButton.setOnClickListener(v -> {
                 config.containerAdapter.toggleCollapsed();

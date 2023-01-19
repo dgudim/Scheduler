@@ -124,7 +124,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             bnd.timeText.setTextColor(getHarmonizedSecondaryFontColorWithBg(
                     entry.fontColor.get(currentlySelectedDayUTC),
                     entry.bgColor.get(currentlySelectedDayUTC)));
-            bnd.openSettingsButton.setOnClickListener(v -> systemCalendarSettings.show(entry));
+            bnd.openSettingsButton.setOnClickListener(v -> systemCalendarSettings.show(entry.event));
         }
         
         /**

@@ -10,6 +10,8 @@ import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 
+import java.util.List;
+
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
@@ -26,7 +28,11 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
     @NonNull
     private final String calendarName;
     @NonNull
-    private final String calendarKey;
+    private final String calendarPrefKey;
+    @NonNull
+    private final List<String> calendarSubKeys;
+    @NonNull
+    private final String calendarVisibilityKey;
     private final int calendarEventsCount;
     private final int calendarColor;
     
@@ -38,7 +44,9 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         super(showSettings);
         systemCalendarSettings = settings;
         calendarName = calendar.displayName;
-        calendarKey = calendar.getPrefKey();
+        calendarPrefKey = calendar.getPrefKey();
+        calendarVisibilityKey = calendar.getVisibilityKey();
+        calendarSubKeys = calendar.getSubKeys();
         calendarColor = calendar.color;
         calendarEventsCount = calendar.systemCalendarEvents.size();
         
@@ -64,11 +72,12 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
             viewBinding.eventCount.setText(getPluralString(wrapper.context, R.plurals.calendar_event_count, config.calendarEventsCount));
             
             viewBinding.checkBox.setButtonTintList(ColorStateList.valueOf(config.calendarColor));
-            viewBinding.checkBox.setCheckedSilent(Keys.getBoolean(config.calendarKey + "_" + Keys.VISIBLE, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
+            viewBinding.checkBox.setCheckedSilent(Keys.getBoolean(config.calendarVisibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
             viewBinding.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
-                    Keys.edit().putBoolean(config.calendarKey + "_" + Keys.VISIBLE, isChecked).apply());
+                    Keys.edit().putBoolean(config.calendarVisibilityKey, isChecked).apply());
             
-            viewBinding.settingsButton.setOnClickListener(view -> config.systemCalendarSettings.show(config.calendarKey, config.calendarColor));
+            viewBinding.settingsButton.setOnClickListener(view ->
+                    config.systemCalendarSettings.show(config.calendarPrefKey, config.calendarSubKeys, config.calendarColor));
             config.updateSettingsButtonVisibility(viewBinding.settingsButton);
             
             if (config.gridViewAdapter != null) {

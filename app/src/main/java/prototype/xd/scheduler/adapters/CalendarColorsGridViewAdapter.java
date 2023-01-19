@@ -66,13 +66,16 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.calendar_color_entry, parent, false);
         }
         
-        int color = eventColorCountMap.keyAt(i);
-        int count = eventColorCountMap.valueAt(i);
+        int eventColor = eventColorCountMap.keyAt(i);
+        int eventCount = eventColorCountMap.valueAt(i);
         
-        ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(color);
-        view.findViewById(R.id.title_default).setVisibility(calendarColor == color ? View.VISIBLE : View.GONE);
-        ((TextView) view.findViewById(R.id.event_count)).setText(getPluralString(view.getContext(), R.plurals.calendar_event_count, count));
-        view.findViewById(R.id.open_settings_button).setOnClickListener(v -> systemCalendarSettings.show(calendar.makePrefKey(color), color));
+        String eventPrefKey = calendar.makeEventPrefKey(eventColor);
+        
+        ((CardView) view.findViewById(R.id.color)).setCardBackgroundColor(eventColor);
+        view.findViewById(R.id.title_default).setVisibility(calendarColor == eventColor ? View.VISIBLE : View.GONE);
+        ((TextView) view.findViewById(R.id.event_count)).setText(getPluralString(view.getContext(), R.plurals.calendar_event_count, eventCount));
+        view.findViewById(R.id.open_settings_button).setOnClickListener(v ->
+                systemCalendarSettings.show(eventPrefKey, calendar.makeEventSubKeys(eventPrefKey), eventColor));
         
         return view;
     }

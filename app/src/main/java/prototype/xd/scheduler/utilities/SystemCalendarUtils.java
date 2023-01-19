@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.utilities.Keys.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;
@@ -101,25 +102,10 @@ public final class SystemCalendarUtils {
         }
         Logger.info(NAME, "Read calendar entries: " + (list.size() - initialSize));
     }
-    
-    @NonNull
-    public static List<String> generateSubKeysFromCalendarKey(@NonNull String calendarKey) {
-        String[] splitKey = calendarKey.split("_");
-        List<String> calendarSubKeys = new ArrayList<>(splitKey.length);
-        StringBuilder buffer = new StringBuilder(calendarKey.length() + splitKey.length);
-        for (int i = 0; i < splitKey.length; i++) {
-            if (i != 0) {
-                buffer.append('_');
-            }
-            buffer.append(splitKey[i]);
-            calendarSubKeys.add(buffer.toString());
-        }
-        return calendarSubKeys;
-    }
-    
+
     @NonNull
     public static Spannable calendarKeyToReadable(@NonNull Context context, @NonNull String calendarKey) {
-        String[] splitKey = calendarKey.split("_");
+        String[] splitKey = calendarKey.split(KEY_SEPARATOR);
         switch (splitKey.length) {
             case 3:
                 if (splitKey[0].equals(splitKey[1])) {

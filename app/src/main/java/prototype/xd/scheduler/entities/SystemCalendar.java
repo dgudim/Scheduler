@@ -2,6 +2,7 @@ package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
 import static java.lang.Math.max;
+import static prototype.xd.scheduler.utilities.Keys.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
@@ -44,7 +45,9 @@ public class SystemCalendar {
     public final String accountName;
     
     @NonNull
-    private final String prefKey;
+    protected final String prefKey;
+    @NonNull
+    protected final List<String> subKeys;
     @NonNull
     private final String visibilityKey;
     public final long id;
@@ -70,8 +73,9 @@ public class SystemCalendar {
         accessLevel = getInt(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_ACCESS_LEVEL);
         color = getInt(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_COLOR);
         
-        prefKey = accountName + "_" + displayName;
-        visibilityKey = prefKey + "_" + Keys.VISIBLE;
+        prefKey = accountName + KEY_SEPARATOR + displayName;
+        subKeys = List.of(accountName, prefKey);
+        visibilityKey = prefKey + KEY_SEPARATOR + Keys.VISIBLE;
         
         String calTimeZoneId = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_TIME_ZONE);
         
@@ -247,6 +251,21 @@ public class SystemCalendar {
     }
     
     @NonNull
+    public String getPrefKey() {
+        return prefKey;
+    }
+    
+    @NonNull
+    public String getVisibilityKey() {
+        return visibilityKey;
+    }
+    
+    @NonNull
+    public List<String> getSubKeys() {
+        return subKeys;
+    }
+    
+    @NonNull
     @Override
     public String toString() {
         return NAME + ": " + (BuildConfig.DEBUG ? prefKey : id);
@@ -271,12 +290,14 @@ public class SystemCalendar {
     }
     
     @NonNull
-    public String getPrefKey() {
-        return prefKey;
+    public String makeEventPrefKey(int possibleEventColor) {
+        return prefKey + "_" + possibleEventColor;
     }
     
     @NonNull
-    public String makePrefKey(int possibleEventColor) {
-        return prefKey + "_" + possibleEventColor;
+    public List<String> makeEventSubKeys(@NonNull String eventPrefKey) {
+        List<String> eventSubKeys = new ArrayList<>(subKeys);
+        eventSubKeys.add(eventPrefKey);
+        return eventSubKeys;
     }
 }
