@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,24 +47,6 @@ public final class DialogUtilities {
     
     private DialogUtilities() throws InstantiationException {
         throw new InstantiationException(NAME);
-    }
-    
-    @MainThread
-    public static void displayConfirmationDialogue(@NonNull ContextWrapper wrapper,
-                                                   @StringRes int titleStringResource,
-                                                   @StringRes int messageStringResource,
-                                                   @StringRes int cancelButtonStringResource,
-                                                   @StringRes int confirmButtonStringResource,
-                                                   @NonNull View.OnClickListener confirmationListener) {
-        TwoButtonsBinding twoButtonsBinding = TwoButtonsBinding.inflate(wrapper.getLayoutInflater());
-        Dialog dialog = buildTemplate(wrapper, titleStringResource, messageStringResource, twoButtonsBinding);
-        
-        setupButtons(dialog, twoButtonsBinding,
-                cancelButtonStringResource, confirmButtonStringResource,
-                v -> {
-                    confirmationListener.onClick(v);
-                    dialog.dismiss();
-                });
     }
     
     @MainThread
@@ -231,20 +212,30 @@ public final class DialogUtilities {
     
     @MainThread
     public static void displayMessageDialog(@NonNull final ContextWrapper wrapper,
-                                            @StringRes int titleStringResource,
-                                            @StringRes int messageStringResource,
-                                            @DrawableRes int iconResource,
-                                            @StringRes int positiveButton,
                                             @StyleRes int theme,
+                                            @NonNull Consumer<MaterialAlertDialogBuilder> builderConsumer,
                                             @Nullable DialogInterface.OnDismissListener dismissListener) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(wrapper.context, theme);
-        builder.setTitle(titleStringResource);
-        builder.setMessage(messageStringResource);
-        builder.setIcon(iconResource);
-        builder.setPositiveButton(positiveButton, null);
+        builderConsumer.accept(builder);
         wrapper.attachDialogToLifecycle(builder.show(), dismissListener);
     }
     
+    @MainThread
+    public static void displayMessageDialog(@NonNull final ContextWrapper wrapper,
+                                            @NonNull Consumer<MaterialAlertDialogBuilder> builderConsumer) {
+        displayMessageDialog(wrapper, R.style.DefaultAlertDialogTheme, builderConsumer, null);
+    }
+    
+    public static void displayDeletionDialog(@NonNull final ContextWrapper wrapper,
+                                             @NonNull DialogInterface.OnClickListener confirmationListener) {
+        displayMessageDialog(wrapper, builder -> {
+            builder.setTitle(R.string.delete);
+            builder.setMessage(R.string.are_you_sure);
+            builder.setIcon(R.drawable.ic_delete_50);
+            builder.setNegativeButton(R.string.no, null);
+            builder.setPositiveButton(R.string.yes, confirmationListener);
+        });
+    }
     
     /**
      * Shows color picker dialog (for general settings)

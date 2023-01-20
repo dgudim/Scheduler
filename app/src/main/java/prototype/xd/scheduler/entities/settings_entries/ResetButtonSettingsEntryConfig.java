@@ -1,30 +1,22 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
+import static android.content.DialogInterface.OnClickListener;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.RESET_BUTTON;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
-
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.ContextWrapper;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.DialogUtilities;
 
 public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     
     @NonNull
-    private final Fragment fragment;
-    @Nullable
-    private final Bundle savedInstanceState;
+    private final OnClickListener onResetClickListener;
     
-    public ResetButtonSettingsEntryConfig(@NonNull final Fragment fragment,
-                                          @Nullable final Bundle savedInstanceState) {
-        this.fragment = fragment;
-        this.savedInstanceState = savedInstanceState;
+    public ResetButtonSettingsEntryConfig(@NonNull final OnClickListener onResetClickListener) {
+        this.onResetClickListener = onResetClickListener;
     }
     
     @Override
@@ -41,13 +33,13 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
         @Override
         void bind(@NonNull ResetButtonSettingsEntryConfig config) {
             viewBinding.resetSettingsButton.setOnClickListener(v ->
-                    displayConfirmationDialogue(wrapper,
-                            R.string.reset_settings_prompt, R.string.reset_settings_description,
-                            R.string.cancel, R.string.reset,
-                            view -> {
-                                Keys.clearAll();
-                                config.fragment.onViewCreated(view, config.savedInstanceState);
-                            }));
+                    DialogUtilities.displayMessageDialog(wrapper, builder -> {
+                        builder.setTitle(R.string.reset_settings_prompt);
+                        builder.setMessage(R.string.reset_settings_description);
+                        builder.setIcon(R.drawable.ic_clear_all_24);
+                        builder.setNegativeButton(R.string.cancel, null);
+                        builder.setPositiveButton(R.string.reset, config.onResetClickListener);
+                    }));
         }
     }
 }

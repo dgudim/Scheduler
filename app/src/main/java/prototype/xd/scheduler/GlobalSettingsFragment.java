@@ -7,6 +7,7 @@ import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -52,6 +53,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::onBgSelected);
     
     // initial window creation
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     @MainThread
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -129,7 +131,10 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 globalSwitchSettingsListViewAdapter,
                 new SettingsListViewAdapter(wrapper,
                         Collections.singletonList(
-                                new ResetButtonSettingsEntryConfig(this, savedInstanceState))));
+                                new ResetButtonSettingsEntryConfig((dialog, which) -> {
+                                    Keys.clearAll();
+                                    listViewAdapter.notifyDataSetChanged();
+                                }))));
         
     }
     
@@ -148,7 +153,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 
                 if (stream != null) {
                     GraphicsUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                           getFile( DateManager.WEEK_DAYS_ROOT.get(adaptiveBackgroundSettingsEntry.getLastClickedBgIndex()) + ".png"));
+                            getFile(DateManager.WEEK_DAYS_ROOT.get(adaptiveBackgroundSettingsEntry.getLastClickedBgIndex()) + ".png"));
                     requireActivity().runOnUiThread(() -> adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated());
                 } else {
                     Logger.error(NAME, "Stream null for uri: " + uri.getPath());

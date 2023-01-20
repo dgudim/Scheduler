@@ -1,6 +1,6 @@
 package prototype.xd.scheduler.views.settings;
 
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Keys.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.Keys.VISIBLE;
 import static prototype.xd.scheduler.utilities.Keys.getFirstValidKey;
@@ -108,23 +108,28 @@ public class SystemCalendarSettings extends PopupSettingsView {
         entryPreviewContainer.refreshAll(true);
         
         bnd.settingsResetButton.setOnClickListener(v ->
-                displayConfirmationDialogue(wrapper,
-                        R.string.reset_settings_prompt, R.string.reset_calendar_settings_description,
-                        R.string.cancel, R.string.reset, v1 -> {
-                            Set<String> preferenceKeys = Keys.getAll().keySet();
-                            SharedPreferences.Editor editor = Keys.edit();
-                            for (String preferenceKey : preferenceKeys) {
-                                // reset all except for visibility
-                                if (preferenceKey.startsWith(prefKey) && !preferenceKey.endsWith(VISIBLE)) {
-                                    editor.remove(preferenceKey);
-                                }
+                displayMessageDialog(wrapper, builder -> {
+                    builder.setTitle(R.string.reset_settings_prompt);
+                    builder.setMessage(R.string.reset_calendar_settings_description);
+                    builder.setIcon(R.drawable.ic_clear_all_24);
+                    builder.setNegativeButton(R.string.cancel, null);
+                    
+                    builder.setPositiveButton(R.string.reset, (dialogInterface, whichButton) -> {
+                        Set<String> preferenceKeys = Keys.getAll().keySet();
+                        SharedPreferences.Editor editor = Keys.edit();
+                        for (String preferenceKey : preferenceKeys) {
+                            // reset all except for visibility
+                            if (preferenceKey.startsWith(prefKey) && !preferenceKey.endsWith(VISIBLE)) {
+                                editor.remove(preferenceKey);
                             }
-                            editor.apply();
-                            if (event != null) {
-                                event.invalidateAllParametersOfConnectedEntries();
-                            }
-                            initialize(prefKey, subKeys, color);
-                        }));
+                        }
+                        editor.apply();
+                        if (event != null) {
+                            event.invalidateAllParametersOfConnectedEntries();
+                        }
+                        initialize(prefKey, subKeys, color);
+                    });
+                }));
         
         bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,

@@ -2,8 +2,9 @@ package prototype.xd.scheduler.views.settings;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayDeletionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayGroupAdditionEditDialog;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Keys.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Keys.BORDER_COLOR;
@@ -127,10 +128,8 @@ public class EntrySettings extends PopupSettingsView {
                         
                         todoEntryManager.setNewGroupName(selectedGroup, newName);
                         bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
-                    }, additionDialog -> displayConfirmationDialogue(wrapper,
-                            R.string.delete, R.string.are_you_sure,
-                            R.string.no, R.string.yes,
-                            v1 -> {
+                    }, additionDialog ->
+                            displayDeletionDialog(wrapper, (deletionDialog, whichButton) -> {
                                 additionDialog.dismiss();
                                 todoEntryManager.removeGroup(selection);
                                 rebuild();
@@ -153,21 +152,31 @@ public class EntrySettings extends PopupSettingsView {
                     if (existingGroup.isNullGroup()) {
                         addGroupToGroupList(text, null);
                     } else {
-                        displayConfirmationDialogue(wrapper,
-                                R.string.group_with_same_name_exists, R.string.overwrite_prompt,
-                                R.string.cancel, R.string.overwrite, v1 -> addGroupToGroupList(text, existingGroup));
+                        displayMessageDialog(wrapper, builder -> {
+                            builder.setTitle(R.string.group_with_same_name_exists);
+                            builder.setMessage(R.string.overwrite_prompt);
+                            builder.setIcon(R.drawable.ic_settings_45);
+                            builder.setNegativeButton(R.string.cancel, null);
+                            
+                            builder.setPositiveButton(R.string.overwrite, (dialogInterface, whichButton) ->
+                                    addGroupToGroupList(text, existingGroup));
+                        });
                     }
                 }, null));
         
         bnd.settingsResetButton.setOnClickListener(v ->
-                displayConfirmationDialogue(wrapper,
-                        R.string.reset_settings_prompt, R.string.reset_calendar_settings_description,
-                        R.string.cancel, R.string.reset,
-                        view -> {
-                            if (todoEntryManager.resetEntrySettings(entry)) {
-                                rebuild();
-                            }
-                        }));
+                displayMessageDialog(wrapper, builder -> {
+                    builder.setTitle(R.string.reset_settings_prompt);
+                    builder.setMessage(R.string.reset_entry_settings_description);
+                    builder.setIcon(R.drawable.ic_clear_all_24);
+                    builder.setNegativeButton(R.string.cancel, null);
+                    
+                    builder.setPositiveButton(R.string.reset, (dialogInterface, whichButton) -> {
+                        if (todoEntryManager.resetEntrySettings(entry)) {
+                            rebuild();
+                        }
+                    });
+                }));
         
         bnd.currentFontColorSelector.setOnClickListener(view -> DialogUtilities.displayColorPicker(
                 wrapper,
@@ -256,7 +265,8 @@ public class EntrySettings extends PopupSettingsView {
     }
     
     @Override
-    public <T> void notifyParameterChanged(@NonNull TextView displayTo, @NonNull String parameterKey, @NonNull T value) {
+    public <T> void notifyParameterChanged(@NonNull TextView displayTo, @NonNull String
+            parameterKey, @NonNull T value) {
         todoEntry.changeParameters(parameterKey, String.valueOf(value));
         setStateIconColor(displayTo, parameterKey);
     }

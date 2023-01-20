@@ -2,7 +2,7 @@ package prototype.xd.scheduler;
 
 import static android.os.Build.VERSION;
 import static android.os.Build.VERSION_CODES;
-import static prototype.xd.scheduler.MainActivity.PACKAGE_NAME;
+import static prototype.xd.scheduler.utilities.Keys.PACKAGE_NAME;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 
 import android.Manifest;

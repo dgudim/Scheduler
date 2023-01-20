@@ -7,6 +7,8 @@ import static android.util.Log.INFO;
 import static android.util.Log.VERBOSE;
 import static android.util.Log.WARN;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentDateTimeStringLocal;
+import static prototype.xd.scheduler.utilities.Keys.LOG_FILE;
+import static prototype.xd.scheduler.utilities.Keys.LOG_FILE_OLD;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Utilities.throwOnFalse;
 
@@ -49,8 +51,8 @@ public final class Logger {
     private static synchronized void tryInit() {
         if (!init) {
             init = true;
-            logFile = new File(ROOT_DIR.get(), "log.txt");
-            logFileOld = new File(ROOT_DIR.get(), "log.old.txt");
+            logFile = new File(ROOT_DIR.get(), LOG_FILE);
+            logFileOld = new File(ROOT_DIR.get(), LOG_FILE_OLD);
             logQueue = new LinkedBlockingQueue<>();
             try {
                 logFile.createNewFile(); // NOSONAR, we don't need to know if the file existed or not

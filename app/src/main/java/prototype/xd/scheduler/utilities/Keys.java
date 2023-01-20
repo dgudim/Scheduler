@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.function.IntUnaryOperator;
 
 import kotlin.jvm.functions.Function2;
+import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.Triplet.DefaultedValueTriplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
@@ -440,11 +441,18 @@ public final class Keys {
     public static final DefaultedInteger DISPLAY_METRICS_WIDTH = new DefaultedInteger("metrics_W", 100);
     public static final DefaultedFloat DISPLAY_METRICS_DENSITY = new DefaultedFloat("metrics_D", -1F);
     
-    public static final DefaultedString ROOT_DIR = new DefaultedString("root_directory", "");
+    public static final MutableObject<String> ROOT_DIR = new MutableObject<>();
     public static final String ENTRIES_FILE = "entries";
     public static final String ENTRIES_FILE_BACKUP = ENTRIES_FILE + ".old";
     public static final String GROUPS_FILE = "groupData";
     public static final String GROUPS_FILE_BACKUP = GROUPS_FILE + ".old";
+    
+    public static final String LOG_FILE = "log.txt";
+    public static final String LOGCAT_FILE = "logcat.txt";
+    public static final String LOG_FILE_OLD = LOG_FILE + ".old";
+    
+    public static final String PACKAGE_NAME = BuildConfig.APPLICATION_ID;
+    public static final String PACKAGE_PROVIDER_NAME = PACKAGE_NAME + ".provider";
     
     public static final String GITHUB_ISSUES = "https://github.com/dgudim/Scheduler/issues";
     public static final String GITHUB_REPO = "https://github.com/dgudim/Scheduler";

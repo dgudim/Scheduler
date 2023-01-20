@@ -2,7 +2,6 @@ package prototype.xd.scheduler;
 
 import static android.os.Process.killProcess;
 import static android.os.Process.myPid;
-import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,7 +24,6 @@ import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 public class MainActivity extends AppCompatActivity {
     
     public static final String NAME = MainActivity.class.getSimpleName();
-    public static final String PACKAGE_NAME = BuildConfig.APPLICATION_ID;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
         if (rootDir == null) {
             Log.e(NAME, "Shared storage not available wtf");
             killProcess(myPid());
-        } else if (ROOT_DIR.get().isEmpty()) {
-            ROOT_DIR.put(rootDir.getAbsolutePath());
+        } else {
+            Keys.ROOT_DIR.set(rootDir.getAbsolutePath());
             Logger.info(NAME, "Root dir: " + rootDir);
             if (!rootDir.exists()) {
                 Logger.info(NAME, "Created folder structure: " + rootDir.mkdirs());

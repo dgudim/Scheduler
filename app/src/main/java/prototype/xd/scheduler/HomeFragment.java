@@ -14,13 +14,19 @@ import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_RELEASES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_REPO;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Keys.LOGCAT_FILE;
+import static prototype.xd.scheduler.utilities.Keys.LOG_FILE;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
+import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
+import static prototype.xd.scheduler.utilities.Utilities.getFile;
+import static prototype.xd.scheduler.utilities.Utilities.shareFiles;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
+import android.content.ClipDescription;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,10 +42,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
 import prototype.xd.scheduler.databinding.ContentWrapperBinding;
+import prototype.xd.scheduler.databinding.DebugMenuDialogBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
@@ -159,11 +168,28 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         
         wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> displayToast(wrapper.context, R.string.work_in_progress));
         
-        wrapperBnd.navView.logo.setOnClickListener(v -> displayMessageDialog(wrapper,
-                R.string.easter_egg, R.string.easter_egg_description,
-                R.drawable.ic_egg_24_primary, R.string.yay,
-                R.style.DefaultAlertDialogTheme,
-                null));
+        wrapperBnd.navView.logo.setOnClickListener(v ->
+                displayMessageDialog(wrapper, builder -> {
+                    builder.setTitle(R.string.debug_menu);
+                    builder.setMessage(R.string.debug_menu_description);
+                    builder.setIcon(R.drawable.ic_developer_mode_24_primary);
+                    
+                    DebugMenuDialogBinding bnd = DebugMenuDialogBinding.inflate(LayoutInflater.from(wrapper.context));
+                    bnd.shareLogcatView.setOnClickListener(v1 -> {
+                        File logFile = getFile(LOGCAT_FILE);
+                        try {
+                            Runtime.getRuntime().exec("logcat -f " + logFile.getAbsolutePath());
+                            shareFiles(wrapper.context, ClipDescription.MIMETYPE_TEXT_PLAIN, logFile, getFile(LOG_FILE));
+                        } catch (IOException e) {
+                            displayToast(wrapper.context, R.string.logcat_obtain_fail);
+                            logException(NAME, e);
+                        }
+                    });
+                    builder.setView(bnd.root);
+                    
+                    builder.setPositiveButton(R.string.close, null);
+                })
+        );
         
         wrapperBnd.navView.globalSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_GlobalSettingsFragment));
@@ -201,20 +227,22 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         
         if (SERVICE_FAILED.get()) {
             // display warning if the background service failed
-            displayMessageDialog(wrapper,
-                    R.string.service_error, R.string.service_error_description,
-                    R.drawable.ic_warning_24_onerrorcontainer, R.string.close,
-                    R.style.ErrorAlertDialogTheme,
-                    dialog -> SERVICE_FAILED.put(Boolean.FALSE));
+            displayMessageDialog(wrapper, R.style.ErrorAlertDialogTheme, builder -> {
+                builder.setTitle(R.string.service_error);
+                builder.setMessage(R.string.service_error_description);
+                builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
+                builder.setPositiveButton(R.string.close, null);
+            }, dialog -> SERVICE_FAILED.put(Boolean.FALSE));
         }
         
         if (WALLPAPER_OBTAIN_FAILED.get()) {
             // display warning if there wan an error getting the wallpaper
-            displayMessageDialog(wrapper,
-                    R.string.wallpaper_obtain_error, R.string.wallpaper_obtain_error_description,
-                    R.drawable.ic_warning_24_onerrorcontainer, R.string.close,
-                    R.style.ErrorAlertDialogTheme,
-                    dialog -> WALLPAPER_OBTAIN_FAILED.put(Boolean.FALSE));
+            displayMessageDialog(wrapper, R.style.ErrorAlertDialogTheme, builder -> {
+                builder.setTitle(R.string.wallpaper_obtain_error);
+                builder.setMessage(R.string.wallpaper_obtain_error_description);
+                builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
+                builder.setPositiveButton(R.string.close, null);
+            }, dialog -> WALLPAPER_OBTAIN_FAILED.put(Boolean.FALSE));
         }
     }
     

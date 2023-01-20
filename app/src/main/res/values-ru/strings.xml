@@ -147,8 +147,8 @@
     <string name="service_error_description">Произошла ошибка в фоновом сервисе установки обоев :( Попробуйте перезапустить приложение. Если проблема не устранится, напишите мне.</string>
     <string name="show_upcoming_and_expired_event_indicators">Показывать прошедшие и будущие события в календаре</string>
     <string name="work_in_progress">В процессе</string>
-    <string name="easter_egg">Хэй, ты нашел пасхалку!</string>
-    <string name="easter_egg_description">Ну, больше сказать нечего, хорошая работа :)</string>
+    <string name="debug_menu">Дебаг меню</string>
+    <string name="debug_menu_description">Это меню содержит полезные вещи для отладки</string>
     <string name="global_settings_title">Глобальные настройки</string>
     <string name="global_settings_description">Глобальные настройки внешнего вида</string>
     <string name="calendar_settings_title">Настройки календарей</string>
@@ -170,9 +170,13 @@
     <string name="global">Глобальный</string>
     <string name="date_from_to">Дата от до</string>
     <string name="reset_calendar_settings_description">Это сбросит настройки текущего календаря</string>
+    <string name="reset_entry_settings_description">Это сбросит настройки события</string>
     <string name="delete_all_saved_backgrounds_description">Это сбросит все кастомные фоны по дням</string>
     <string name="select_date">Выберите дату</string>
     <string name="attention">Внимание</string>
+    <string name="logcat_obtain_fail">Не удалось получить логи :(</string>
+    <string name="share_logcat">Поделиться logcat</string>
+    <string name="share_logcat_description">Получить логи приложения для дебага</string>
     <string name="whole_calendar_settings_on_warning">Вы включили глобальные настройки аккаунтов и календарей, т.к. они переопределяют локальные, это может вас запутать.</string>
     <string name="whole_calendar_settings_off_warning">Вы отключили глобальные настройки аккаунтов и календарей, те, которые вы уже изменили не были сброшены.</string>
     <string name="yay">Вуху!</string>

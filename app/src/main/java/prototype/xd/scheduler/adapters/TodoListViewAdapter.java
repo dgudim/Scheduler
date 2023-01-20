@@ -2,7 +2,6 @@ package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
@@ -33,6 +32,7 @@ import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
@@ -69,10 +69,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
          */
         private void displayDeletionDialog(@NonNull final TodoEntry entry,
                                            @NonNull final TodoEntryManager todoEntryManager) {
-            displayConfirmationDialogue(wrapper,
-                    R.string.delete, R.string.are_you_sure,
-                    R.string.no, R.string.yes,
-                    confirmationButton -> todoEntryManager.removeEntry(entry));
+            DialogUtilities.displayDeletionDialog(wrapper, (dialog, whichButton) -> todoEntryManager.removeEntry(entry));
         }
         
         /**

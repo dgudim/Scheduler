@@ -147,8 +147,8 @@
     <string name="wallpaper_obtain_error">Error getting wallpaper</string>
     <string name="wallpaper_obtain_error_description">An error occurred while trying to get lockscreen wallpaper :( Try setting wallpaper manually and restarting the app. If the problem persists, your device probably restricts access to background or you uninstalled and reinstalled the app, but you can open an issue on github, maybe i will help.</string>
     <string name="work_in_progress">Work in progress</string>
-    <string name="easter_egg">Hey, you found an easter egg!</string>
-    <string name="easter_egg_description">There is not much more to say, good job i guess :)</string>
+    <string name="debug_menu">Debug menu</string>
+    <string name="debug_menu_description">This menu contains stuff useful for debugging</string>
     <string name="global_settings_title">Global settings</string>
     <string name="global_settings_description">Global appearance settings</string>
     <string name="calendar_settings_title">Calendar settings</string>
@@ -167,6 +167,7 @@
     <string name="calendar_settings_fragment_label" translatable="false">Calendar settings fragment</string>
     <string name="reset_settings_description">This will reset ALL your settings, including calendar ones</string>
     <string name="reset_calendar_settings_description">This will reset current calendar settings</string>
+    <string name="reset_entry_settings_description">This will reset current entry settings</string>
     <string name="settings_show_global_items_label_lock">Show “Global” label near global events on the lockscreen</string>
     <string name="settings_allow_global_calendar_account_settings">Allow changing settings of whole calendars and accounts</string>
     <string name="global">Global</string>
@@ -175,6 +176,9 @@
     <string name="select_date">Select date</string>
     <string name="go_to_today">Go to today</string>
     <string name="attention">Attention</string>
+    <string name="logcat_obtain_fail">Failed retrieving logs :(</string>
+    <string name="share_logcat">Share logcat</string>
+    <string name="share_logcat_description">Get application logs for debugging</string>
     <string name="whole_calendar_settings_on_warning">Your turned on global account and calendar settings, because they override local ones, it may be confusing for you.</string>
     <string name="whole_calendar_settings_off_warning">You turned off global account and calendar settings, the ones you have already changed were not reset.</string>
     <string name="yay">Yay!</string>

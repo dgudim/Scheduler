@@ -5,6 +5,7 @@ import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE_BACKUP;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
 import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE_BACKUP;
 import static prototype.xd.scheduler.utilities.Keys.MERGE_ENTRIES;
+import static prototype.xd.scheduler.utilities.Keys.PACKAGE_PROVIDER_NAME;
 import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_SORTING_ORDER;
 import static prototype.xd.scheduler.utilities.Keys.TODO_LIST_INITIAL_CAPACITY;
@@ -12,6 +13,7 @@ import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Logger.warning;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.addTodoEntriesFromCalendars;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -33,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
 import androidx.collection.ArraySet;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
@@ -80,6 +83,11 @@ public final class Utilities {
     @NonNull
     public static File getFile(@NonNull String filename) {
         return new File(ROOT_DIR.get(), filename);
+    }
+    
+    @NonNull
+    public static Uri getUri(@NonNull Context context, @NonNull File file) {
+        return FileProvider.getUriForFile(context, PACKAGE_PROVIDER_NAME, file);
     }
     
     @NonNull
@@ -246,7 +254,42 @@ public final class Utilities {
         Intent chooseImage = new Intent(Intent.ACTION_GET_CONTENT);
         chooseImage.addCategory(Intent.CATEGORY_OPENABLE);
         chooseImage.setType("image/*");
-        callback.launch(Intent.createChooser(chooseImage, "Choose an image"));
+        callback.launch(Intent.createChooser(chooseImage, null));
+    }
+    
+    
+    public static void shareFiles(@NonNull Context context, @NonNull String mimetype, @NonNull File... files) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        ArrayList<Uri> uris = new ArrayList<>(files.length);
+        ClipData clipData = null;
+        for (File file : files) {
+            Uri uri = getUri(context, file);
+            ClipData.Item clipItem = new ClipData.Item(uri);
+            uris.add(uri);
+            if (clipData == null) {
+                clipData = new ClipData(null, new String[]{mimetype}, clipItem);
+                continue;
+            }
+            clipData.addItem(clipItem);
+        }
+        // for compatibility with older apps
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uris);
+        // for newer apps
+        shareIntent.setClipData(clipData);
+        // allow to read the content
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        shareIntent.setType(mimetype);
+        context.startActivity(Intent.createChooser(shareIntent, null));
+    }
+    
+    /**
+     * Opens a url in default browser
+     *
+     * @param context any context
+     * @param url     url to open
+     */
+    public static void openUrl(@NonNull Context context, @NonNull String url) {
+        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
     
     @NonNull
@@ -441,16 +484,6 @@ public final class Utilities {
     @NonNull
     public static String getPluralString(@NonNull Context context, @PluralsRes int resId, int quantity) throws Resources.NotFoundException {
         return context.getResources().getQuantityString(resId, quantity, quantity);
-    }
-    
-    /**
-     * Opens a url in default browser
-     *
-     * @param context any context
-     * @param url     url to open
-     */
-    public static void openUrl(@NonNull Context context, @NonNull String url) {
-        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
     
     public static boolean areDatesEqual(@Nullable LocalDate date1, @Nullable LocalDate date2) {

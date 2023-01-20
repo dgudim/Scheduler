@@ -92,17 +92,19 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
                 Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
                 getString(R.string.settings_allow_global_calendar_account_settings), (buttonView, isChecked) -> {
             if (isChecked) {
-                displayMessageDialog(wrapper,
-                        R.string.attention, R.string.whole_calendar_settings_on_warning,
-                        R.drawable.ic_warning_24_onerrorcontainer, R.string.i_understand,
-                        R.style.DefaultAlertDialogTheme,
-                        null);
+                displayMessageDialog(wrapper, builder -> {
+                    builder.setTitle(R.string.attention);
+                    builder.setMessage(R.string.whole_calendar_settings_on_warning);
+                    builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
+                    builder.setPositiveButton(R.string.i_understand, null);
+                });
             } else {
-                displayMessageDialog(wrapper,
-                        R.string.attention, R.string.whole_calendar_settings_off_warning,
-                        R.drawable.ic_warning_24_onerrorcontainer, R.string.i_understand,
-                        R.style.DefaultAlertDialogTheme,
-                        null);
+                displayMessageDialog(wrapper, builder -> {
+                    builder.setTitle(R.string.attention);
+                    builder.setMessage(R.string.whole_calendar_settings_off_warning);
+                    builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
+                    builder.setPositiveButton(R.string.i_understand, null);
+                });
             }
             for (GenericCalendarSettingsEntryConfig calendarEntryConfig : calendarConfigEntries) {
                 calendarEntryConfig.setShowSettings(isChecked);

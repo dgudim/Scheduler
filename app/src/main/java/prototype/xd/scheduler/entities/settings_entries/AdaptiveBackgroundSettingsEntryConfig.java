@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayConfirmationDialogue;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.app.AlertDialog;
@@ -67,18 +67,21 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                         null);
                 
                 gridSelection.resetBgButton.setOnClickListener(view1 ->
-                        displayConfirmationDialogue(wrapper,
-                                R.string.delete_all_saved_backgrounds_prompt,
-                                R.string.delete_all_saved_backgrounds_description,
-                                R.string.cancel, R.string.delete,
-                                view2 -> {
-                                    for (int dayIndex = 0; dayIndex < DateManager.WEEK_DAYS_ROOT.size() - 1; dayIndex++) {
-                                        String availableDay = DateManager.WEEK_DAYS_ROOT.get(dayIndex);
-                                        getFile(availableDay + ".png").delete();
-                                        getFile(availableDay + ".png_min.png").delete();
-                                    }
-                                    config.gridViewAdapter.notifyDataSetChanged();
-                                }));
+                        displayMessageDialog(wrapper, builder -> {
+                            builder.setTitle(R.string.delete_all_saved_backgrounds_prompt);
+                            builder.setMessage(R.string.delete_all_saved_backgrounds_description);
+                            builder.setIcon(R.drawable.ic_delete_50);
+                            builder.setNegativeButton(R.string.cancel, null);
+                            
+                            builder.setPositiveButton(R.string.delete, (dialogInterface, whichButton) -> {
+                                for (int dayIndex = 0; dayIndex < DateManager.WEEK_DAYS_ROOT.size() - 1; dayIndex++) {
+                                    String availableDay = DateManager.WEEK_DAYS_ROOT.get(dayIndex);
+                                    getFile(availableDay + ".png").delete();
+                                    getFile(availableDay + ".png_min.png").delete();
+                                }
+                                config.gridViewAdapter.notifyDataSetChanged();
+                            });
+                        }));
                 
                 GridView gridView = gridSelection.gridViewInclude.gridView;
                 gridView.setNumColumns(2);
