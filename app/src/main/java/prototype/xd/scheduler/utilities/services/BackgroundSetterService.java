@@ -139,7 +139,7 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
     
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        Keys.initPrefs(this);
+        Keys.init(this);
         if (intent != null && initialized) {
             if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 setBitmapUpdateFlag();

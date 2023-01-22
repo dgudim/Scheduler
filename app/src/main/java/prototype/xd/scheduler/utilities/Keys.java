@@ -270,7 +270,7 @@ public final class Keys {
         }
     }
     
-    public static synchronized void initPrefs(@NonNull Context context) {
+    public static synchronized void init(@NonNull Context context) {
         if (preferences == null) {
             preferences = context.getSharedPreferences(PREFERENCES_MAIN, Context.MODE_PRIVATE);
             servicePreferences = context.getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);

@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
             }*/
         //}
         
-        Keys.initPrefs(this);
+        Keys.init(this);
         
         File rootDir = getExternalFilesDir("");
         if (rootDir == null) {

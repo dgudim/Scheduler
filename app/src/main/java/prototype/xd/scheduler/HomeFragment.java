@@ -42,6 +42,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.navigation.NavigationView;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -50,6 +52,7 @@ import java.util.List;
 import prototype.xd.scheduler.databinding.ContentWrapperBinding;
 import prototype.xd.scheduler.databinding.DebugMenuDialogBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
+import prototype.xd.scheduler.databinding.NavigationViewBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.ContextWrapper;
@@ -87,6 +90,8 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         
         HomeFragmentWrapperBinding wrapperBnd = HomeFragmentWrapperBinding.inflate(inflater, container, false);
         contentBnd = wrapperBnd.contentWrapper;
+        NavigationView navViewDrawer = wrapperBnd.navViewWrapper;
+        NavigationViewBinding navViewContent = wrapperBnd.navView;
         
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
@@ -121,7 +126,7 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
                 // move all content to the right when drawer opens
-                float moveFactor = wrapperBnd.navViewWrapper.getWidth() * slideOffset / 3;
+                float moveFactor = navViewDrawer.getWidth() * slideOffset / 3;
                 contentBnd.getRoot().setTranslationX(moveFactor);
                 contentBnd.getRoot().setScaleX(1 - slideOffset / 20);
                 contentBnd.getRoot().setScaleY(1 - slideOffset / 20);
@@ -133,8 +138,8 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         rootActivity.getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(wrapperBnd.navViewWrapper)) {
-                    drawerLayout.closeDrawer(wrapperBnd.navViewWrapper);
+                if (drawerLayout.isDrawerOpen(navViewDrawer)) {
+                    drawerLayout.closeDrawer(navViewDrawer);
                 } else {
                     // prevent stack overflow
                     setEnabled(false);
@@ -161,14 +166,14 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                         todoEntryManager.addEntry(new TodoEntry(values, groupList.get(selectedIndex), System.currentTimeMillis()));
                     });
         });
-        
-        wrapperBnd.navView.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));
-        wrapperBnd.navView.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_ISSUES));
-        wrapperBnd.navView.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_RELEASES));
-        
-        wrapperBnd.navView.userGuideClickView.setOnClickListener(v -> displayToast(wrapper.context, R.string.work_in_progress));
-        
-        wrapperBnd.navView.logo.setOnClickListener(v ->
+    
+        navViewContent.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));
+        navViewContent.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_ISSUES));
+        navViewContent.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_RELEASES));
+    
+        navViewContent.userGuideClickView.setOnClickListener(v -> displayToast(wrapper.context, R.string.work_in_progress));
+    
+        navViewContent.logo.setOnClickListener(v ->
                 displayMessageDialog(wrapper, builder -> {
                     builder.setTitle(R.string.debug_menu);
                     builder.setMessage(R.string.debug_menu_description);
@@ -190,15 +195,16 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                     builder.setPositiveButton(R.string.close, null);
                 })
         );
-        
-        wrapperBnd.navView.globalSettingsClickView.setOnClickListener(v ->
+    
+        navViewContent.globalSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_GlobalSettingsFragment));
-        
-        wrapperBnd.navView.calendarSettingsClickView.setOnClickListener(v ->
+    
+        navViewContent.calendarSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_CalendarSettingsFragment));
-        
-        wrapperBnd.navView.sortingSettingsClickView.setOnClickListener(v ->
+    
+        navViewContent.sortingSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_SortingSettingsFragment));
+        
         
         return wrapperBnd.getRoot();
     }

@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 def versionMajor = 0
-def versionMinor = 5
-def versionPatch = 9
+def versionMinor = 6
+def versionPatch = 0
 def globalSuffix = ""
 
 ext.getVersionCode = { ->
@@ -54,8 +54,8 @@ android {
     }
 
     compileOptions {
-        targetCompatibility JavaVersion.VERSION_1_9
-        sourceCompatibility JavaVersion.VERSION_1_9
+        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_11
     }
 
     namespace 'prototype.xd.scheduler'

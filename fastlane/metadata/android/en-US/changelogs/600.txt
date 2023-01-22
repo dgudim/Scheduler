@@ -1,0 +1,12 @@
+Bugfixes:
+- Serialization, deserialization bugfixes
+- Fixed a memory leak in TodoEntry
+- A bunch of minor fixes
+
+Misc:
+- Tweaked views
+- Added debug menu with log sharing
+
+Internal changes:
+- Annotated a bunch of functions
+
