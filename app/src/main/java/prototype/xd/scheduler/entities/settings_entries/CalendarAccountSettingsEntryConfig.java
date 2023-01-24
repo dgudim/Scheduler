@@ -3,6 +3,8 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR_ACCOUNT;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
 
+import android.view.View;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
@@ -67,10 +69,12 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
             viewBinding.settingsButton.setOnClickListener(v ->
                     config.systemCalendarSettings.show(config.accountName, config.subKeys, config.calendarColor));
             config.updateSettingsButtonVisibility(viewBinding.settingsButton);
-            viewBinding.expandButton.setOnClickListener(v -> {
+            View.OnClickListener expandListener = v -> {
                 config.containerAdapter.toggleCollapsed();
                 updateCollapseIcon(config, true);
-            });
+            };
+            viewBinding.expandButton.setOnClickListener(expandListener);
+            viewBinding.root.setOnClickListener(expandListener);
             updateCollapseIcon(config, false);
         }
         
