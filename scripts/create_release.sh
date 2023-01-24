@@ -26,7 +26,7 @@ else
 
   read -r
 
-  git commit --all -m "Version $VERSION_NAME ($VERSION_CODE)"
+  git commit --all -m "[fastlane] Version $VERSION_NAME ($VERSION_CODE)"
 
   git tag "$TAG"
   git push --tags
