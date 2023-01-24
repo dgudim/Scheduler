@@ -23,6 +23,7 @@ import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
+import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.utilities.Utilities.shareFiles;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
@@ -57,6 +58,7 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DateManager;
+import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
@@ -190,6 +192,7 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                             logException(NAME, e);
                         }
                     });
+                    setSwitchChangeListener(bnd.debugLoggingSwitch, Keys.DEBUG_LOGGING, (switchView, isChecked) -> Logger.setDebugEnabled(isChecked));
                     builder.setView(bnd.root);
                     
                     builder.setPositiveButton(R.string.close, null);

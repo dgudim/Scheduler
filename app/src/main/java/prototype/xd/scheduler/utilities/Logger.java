@@ -40,6 +40,7 @@ public final class Logger {
     
     private static volatile boolean fileEnabled = true;
     private static volatile boolean init;
+    private static volatile boolean debugEnabled;
     
     private static final long ROTATE_SIZE = 10 * 1024 * 1024L; // 10MB
     
@@ -48,7 +49,7 @@ public final class Logger {
     }
     
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private static synchronized void tryInit() {
+    private static synchronized void init() {
         if (!init) {
             init = true;
             logFile = new File(ROOT_DIR.get(), LOG_FILE);
@@ -67,6 +68,10 @@ public final class Logger {
         }
     }
     
+    public static void setDebugEnabled(boolean debugEnabled) {
+        Logger.debugEnabled = debugEnabled;
+    }
+    
     public static void error(@NonNull String tag, @NonNull String message) {
         log(ERROR, tag, message);
     }
@@ -80,11 +85,13 @@ public final class Logger {
     }
     
     public static void debug(@NonNull String tag, @NonNull String message) {
-        log(DEBUG, tag, message);
+        if (debugEnabled) {
+            log(DEBUG, tag, message);
+        }
     }
     
     private static void log(int priority, String tag, String message) {
-        tryInit();
+        init();
         Log.println(priority, tag, message);
         if (fileEnabled) {
             logQueue.add("\n" + (getCurrentDateTimeStringLocal() + "  [" + priorityToStr(priority) + "]: " + message));

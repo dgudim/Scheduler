@@ -33,8 +33,3 @@
     java.lang.Object writeReplace();
     java.lang.Object readResolve();
 }
-
-# remove debug logging
--assumenosideeffects class prototype.xd.scheduler.utilities.Logger {
-    public static void debug(...);
-}

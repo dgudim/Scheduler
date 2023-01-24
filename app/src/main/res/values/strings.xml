@@ -179,6 +179,7 @@
     <string name="logcat_obtain_fail">Failed retrieving logs :(</string>
     <string name="share_logcat">Share logcat</string>
     <string name="share_logcat_description">Get application logs for debugging</string>
+    <string name="debug_logging">Debug logging</string>
     <string name="whole_calendar_settings_on_warning">Your turned on global account and calendar settings, because they override local ones, it may be confusing for you.</string>
     <string name="whole_calendar_settings_off_warning">You turned off global account and calendar settings, the ones you have already changed were not reset.</string>
     <string name="yay">Yay!</string>
