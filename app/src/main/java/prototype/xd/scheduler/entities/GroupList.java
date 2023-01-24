@@ -6,7 +6,9 @@ import androidx.annotation.Nullable;
 /**
  * A list specifically for storing TodoEntry groups, automatically unlinks entries on remove to avoid memory leaks
  */
-public class GroupList extends BaseCleanupList<Group> { // NOSONAR, shouldn't be serialized
+public class GroupList extends BaseCleanupList<Group> {
+    
+    private static final long serialVersionUID = -2396032769321844877L;
     
     @Nullable
     @Override

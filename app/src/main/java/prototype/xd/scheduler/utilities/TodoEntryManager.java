@@ -449,6 +449,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      */
     public void addEntry(@NonNull final TodoEntry entry) {
         todoEntries.add(entry, parameterInvalidationListener);
+        Logger.debug(NAME, "Added entry: " + entry);
         notifyEntryRemovedAdded(entry);
     }
     
@@ -459,6 +460,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      */
     public void removeEntry(@NonNull final TodoEntry entry) {
         todoEntries.remove(entry);
+        Logger.debug(NAME, "Removed " + entry);
         notifyEntryRemovedAdded(entry);
     }
     
@@ -536,6 +538,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      */
     public void addGroup(@NonNull Group newGroup) {
         groups.add(newGroup);
+        Logger.debug(NAME, "Added " + newGroup);
         saveGroupsAsync();
     }
     
@@ -545,7 +548,8 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      * @param index index of the group to remove
      */
     public void removeGroup(int index) {
-        groups.remove(index);
+        Group old = groups.remove(index);
+        Logger.debug(NAME, "Removed " + old);
         saveGroupsAsync();
     }
 }

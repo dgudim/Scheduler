@@ -39,6 +39,7 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
         ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
     }
     
+    @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
     public static void keepAlive(@NonNull Context context) {
         Intent keepAliveIntent = new Intent(context, BackgroundSetterService.class);
         keepAliveIntent.putExtra(SERVICE_KEEP_ALIVE_SIGNAL, 1);

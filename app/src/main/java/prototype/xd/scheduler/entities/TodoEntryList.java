@@ -5,6 +5,10 @@ import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,6 +52,15 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     private boolean displayUpcomingExpired;
     private long firstLoadedDay;
     private long lastLoadedDay;
+    
+    private void readObject(@NonNull ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
+        throw new NotSerializableException(NAME + " should not be serialized");
+    }
+    
+    private void writeObject(@NonNull ObjectOutputStream out) throws IOException {
+        throw new NotSerializableException(NAME + " should not be serialized");
+    }
     
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     public TodoEntryList(int initialCapacity) {

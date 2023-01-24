@@ -148,8 +148,7 @@ public final class Utilities {
     public static synchronized void saveEntries(@NonNull TodoEntryList entries) {
         try {
             
-            moveFile(ENTRIES_FILE, ENTRIES_FILE_BACKUP);
-            saveObject(ENTRIES_FILE, entries.getRegularEntries());
+            saveObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP, entries.getRegularEntries());
             
             Logger.info(NAME, "Saved todo list");
         } catch (IOException e) {
@@ -186,8 +185,7 @@ public final class Utilities {
                 }
             }
             
-            moveFile(GROUPS_FILE, GROUPS_FILE_BACKUP);
-            saveObject(GROUPS_FILE, groupsToSave);
+            saveObjectWithBackup(GROUPS_FILE, GROUPS_FILE_BACKUP, groupsToSave);
             
             Logger.info(NAME, "Saved group list");
         } catch (IOException e) {
@@ -195,11 +193,13 @@ public final class Utilities {
         }
     }
     
-    public static void moveFile(@NonNull String fileName, @NonNull String newFileName) throws IOException {
-        Files.move(getPath(fileName), getPath(newFileName), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+    private static <T> T loadObject(@NonNull String fileName) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream stream = new ObjectInputStream(Files.newInputStream(getPath(fileName)))) {
+            return (T) stream.readObject();
+        }
     }
     
-    public static <T> T loadObjectWithBackup(@NonNull String fileName, @NonNull String backupName) throws IOException, ClassNotFoundException {
+    private static <T> T loadObjectWithBackup(@NonNull String fileName, @NonNull String backupName) throws IOException, ClassNotFoundException {
         try {
             return loadObject(fileName);
         } catch (IOException | ClassNotFoundException e) {
@@ -212,14 +212,15 @@ public final class Utilities {
         }
     }
     
-    public static <T> T loadObject(@NonNull String fileName) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream stream = new ObjectInputStream(Files.newInputStream(getPath(fileName)))) {
-            return (T) stream.readObject();
+    private static void saveObjectWithBackup(@NonNull String fileName, @NonNull String backupName, @NonNull Object object) throws IOException {
+        File originalFile = getFile(fileName);
+        Path originalPath = originalFile.toPath();
+        if (originalFile.exists()) {
+            Files.move(originalPath, getPath(backupName),
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE);
         }
-    }
-    
-    public static void saveObject(@NonNull String fileName, @NonNull Object object) throws IOException {
-        try (ObjectOutputStream stream = new ObjectOutputStream(Files.newOutputStream(getPath(fileName)))) {
+        try (ObjectOutputStream stream = new ObjectOutputStream(Files.newOutputStream(originalPath))) {
             stream.writeObject(object);
         }
     }
