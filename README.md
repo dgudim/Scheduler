@@ -32,6 +32,11 @@ Or just download [latest build](https://github.com/dgudim/Scheduler/releases/lat
 
 <a href="https://apt.izzysoft.de/fdroid/index/apk/prototype.xd.scheduler"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height=100></img></a>
 
+## Have any questions? 
+
+------> [Read the FAQ](./FAQ.md) <-------
+-----------------------------------------
+
 ## Screenshots
 
 | Lock screen               | Main app menu              |
