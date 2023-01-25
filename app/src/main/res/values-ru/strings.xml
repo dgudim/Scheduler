@@ -68,7 +68,7 @@
     </plurals>
     <string name="title_color_default">дефолт</string>
     <string name="add_event_fab">Добавить событие</string>
-    <string name="settings_adaptive_background">Разный фон экрана блокировки в зависимости от дня</string>
+    <string name="settings_lockscreen_background">Найстройки фона экрана блокировки</string>
     <string name="settings_adaptive_color_balance">Слияние с фоном: %s</string>
     <string name="settings_show_events">Показывать события</string>
     <plurals name="settings_after_n_days">
@@ -156,8 +156,8 @@
     <string name="sorting_settings_title">Настройки сортировки</string>
     <string name="sorting_settings_description">Настройте расположение событий</string>
     <string name="sorting_settings_note">Примечание: это изменит сортировку событий на экране блокировки и в календаре.</string>
-    <string name="user_guide_title">Гид пользователя</string>
-    <string name="user_guide_description">Посмотреть туториал</string>
+    <string name="faq_title">Открыть FAQ</string>
+    <string name="faq_description">Посмотреть часто задаваемые вопросы</string>
     <string name="latest_release_title">Последний релиз</string>
     <string name="latest_release_description">Посмотреть новую версию и журнал изменений</string>
     <string name="github_issue_title">Issue на гитхабе</string>

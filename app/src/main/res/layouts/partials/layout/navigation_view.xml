@@ -66,7 +66,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/source_code_title"
                 app:layout_constraintStart_toEndOf="@+id/source_code_image"
-                app:layout_constraintTop_toBottomOf="@+id/user_guide_click_view"
+                app:layout_constraintTop_toBottomOf="@+id/faq_click_view"
                 tools:ignore="VisualLintOverlap" />
 
             <TextView
@@ -280,53 +280,53 @@
                 tools:ignore="VisualLintOverlap" />
 
             <ImageView
-                android:id="@+id/user_guide_image"
+                android:id="@+id/faq_image"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_marginStart="8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/user_guide_description"
+                app:layout_constraintBottom_toBottomOf="@+id/faq_description"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/user_guide_title"
-                app:srcCompat="@drawable/ic_supervised_user_45"
+                app:layout_constraintTop_toTopOf="@+id/faq_title"
+                app:srcCompat="@drawable/ic_question_mark_45"
                 app:tint="?colorPrimary"
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/user_guide_title"
+                android:id="@+id/faq_title"
                 style="@style/MediumHeading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="8dp"
-                android:text="@string/user_guide_title"
-                app:layout_constraintStart_toEndOf="@+id/user_guide_image"
+                android:text="@string/faq_title"
+                app:layout_constraintStart_toEndOf="@+id/faq_image"
                 app:layout_constraintTop_toBottomOf="@+id/sorting_settings_click_view"
                 tools:ignore="VisualLintOverlap" />
 
             <TextView
-                android:id="@+id/user_guide_description"
+                android:id="@+id/faq_description"
                 style="@style/MediumHeadingSubtext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/user_guide_description"
+                android:text="@string/faq_description"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/user_guide_image"
-                app:layout_constraintTop_toBottomOf="@+id/user_guide_title"
+                app:layout_constraintStart_toEndOf="@+id/faq_image"
+                app:layout_constraintTop_toBottomOf="@+id/faq_title"
                 tools:ignore="VisualLintOverlap" />
 
             <View
-                android:id="@+id/user_guide_click_view"
+                android:id="@+id/faq_click_view"
                 style="@style/ClickableViewFg"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="-8dp"
                 android:layout_marginBottom="-8dp"
-                app:layout_constraintBottom_toBottomOf="@+id/user_guide_description"
+                app:layout_constraintBottom_toBottomOf="@+id/faq_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/user_guide_title"
+                app:layout_constraintTop_toTopOf="@+id/faq_title"
                 tools:ignore="NegativeMargin,SpeakableTextPresentCheck" />
 
             <View

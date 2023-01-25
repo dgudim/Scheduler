@@ -172,9 +172,8 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         navViewContent.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));
         navViewContent.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_ISSUES));
         navViewContent.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_RELEASES));
-    
-        navViewContent.userGuideClickView.setOnClickListener(v -> displayToast(wrapper.context, R.string.work_in_progress));
-    
+        navViewContent.faqClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_FAQ));
+        
         navViewContent.logo.setOnClickListener(v ->
                 displayMessageDialog(wrapper, builder -> {
                     builder.setTitle(R.string.debug_menu);

@@ -458,6 +458,7 @@ public final class Keys {
     public static final String GITHUB_ISSUES = "https://github.com/dgudim/Scheduler/issues";
     public static final String GITHUB_REPO = "https://github.com/dgudim/Scheduler";
     public static final String GITHUB_RELEASES = "https://github.com/dgudim/Scheduler/releases";
+    public static final String GITHUB_FAQ = "https://github.com/dgudim/Scheduler/blob/master/FAQ.md";
     
     public static final int TODO_LIST_INITIAL_CAPACITY = 75;
     

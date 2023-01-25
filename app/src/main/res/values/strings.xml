@@ -35,7 +35,7 @@
     </plurals>
     <string name="title_color_default">default</string>
     <string name="add_event_fab">Add event</string>
-    <string name="settings_adaptive_background">Different lock screen background according to day</string>
+    <string name="settings_lockscreen_background">Lock screen background settings</string>
     <string name="settings_adaptive_color_balance">Blend with background: %s</string>
     <string name="settings_show_events">Show events</string>
     <plurals name="settings_after_n_days">
@@ -156,8 +156,8 @@
     <string name="sorting_settings_title">Sorting settings</string>
     <string name="sorting_settings_description">Customize how events are sorted</string>
     <string name="sorting_settings_note">Note: this will change how events are sorted on the lockscreen and in the calendar</string>
-    <string name="user_guide_title">User guide</string>
-    <string name="user_guide_description">View tutorial</string>
+    <string name="faq_title">Open FAQ</string>
+    <string name="faq_description">View frequently asked questions</string>
     <string name="latest_release_title">Latest release</string>
     <string name="latest_release_description">Look for new version and changelog</string>
     <string name="github_issue_title">Github issue</string>
