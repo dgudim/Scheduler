@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         //}
         
         Keys.init(this);
-        Logger.setDebugEnabled(Keys.DEBUG_LOGGING.get());
+        Logger.setDebugEnabled(Keys.DEBUG_LOGGING.get() || BuildConfig.DEBUG);
         
         File rootDir = getExternalFilesDir("");
         if (rootDir == null) {

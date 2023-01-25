@@ -259,9 +259,9 @@ public final class Utilities {
     }
     
     
-    public static void shareFiles(@NonNull Context context, @NonNull String mimetype, @NonNull File... files) {
+    public static void shareFiles(@NonNull Context context, @NonNull String mimetype, @NonNull List<File> files) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-        ArrayList<Uri> uris = new ArrayList<>(files.length);
+        ArrayList<Uri> uris = new ArrayList<>(files.size());
         ClipData clipData = null;
         for (File file : files) {
             Uri uri = getUri(context, file);

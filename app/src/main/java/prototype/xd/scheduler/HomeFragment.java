@@ -10,12 +10,14 @@ import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAddit
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Keys.END_DAY_UTC;
+import static prototype.xd.scheduler.utilities.Keys.GITHUB_FAQ;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_RELEASES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_REPO;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Keys.LOGCAT_FILE;
 import static prototype.xd.scheduler.utilities.Keys.LOG_FILE;
+import static prototype.xd.scheduler.utilities.Keys.LOG_FILE_OLD;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
@@ -48,6 +50,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.databinding.ContentWrapperBinding;
@@ -168,7 +171,7 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                         todoEntryManager.addEntry(new TodoEntry(values, groupList.get(selectedIndex), System.currentTimeMillis()));
                     });
         });
-    
+        
         navViewContent.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));
         navViewContent.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_ISSUES));
         navViewContent.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_RELEASES));
@@ -185,25 +188,36 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                         File logFile = getFile(LOGCAT_FILE);
                         try {
                             Runtime.getRuntime().exec("logcat -f " + logFile.getAbsolutePath());
-                            shareFiles(wrapper.context, ClipDescription.MIMETYPE_TEXT_PLAIN, logFile, getFile(LOG_FILE));
+                            List<File> files = new ArrayList<>(List.of(logFile, getFile(LOG_FILE)));
+                            File oldLog = getFile(LOG_FILE_OLD);
+                            if (oldLog.exists()) {
+                                files.add(oldLog);
+                            }
+                            shareFiles(wrapper.context, ClipDescription.MIMETYPE_TEXT_PLAIN, files);
                         } catch (IOException e) {
                             displayToast(wrapper.context, R.string.logcat_obtain_fail);
                             logException(NAME, e);
                         }
                     });
-                    setSwitchChangeListener(bnd.debugLoggingSwitch, Keys.DEBUG_LOGGING, (switchView, isChecked) -> Logger.setDebugEnabled(isChecked));
+                    if (BuildConfig.DEBUG) {
+                        bnd.debugLoggingSwitch.setCheckedSilent(true);
+                        bnd.debugLoggingSwitch.setClickable(false);
+                        bnd.debugLoggingSwitch.setAlpha(0.5F);
+                    } else {
+                        setSwitchChangeListener(bnd.debugLoggingSwitch, Keys.DEBUG_LOGGING, (switchView, isChecked) -> Logger.setDebugEnabled(isChecked));
+                    }
                     builder.setView(bnd.root);
                     
                     builder.setPositiveButton(R.string.close, null);
                 })
         );
-    
+        
         navViewContent.globalSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_GlobalSettingsFragment));
-    
+        
         navViewContent.calendarSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_CalendarSettingsFragment));
-    
+        
         navViewContent.sortingSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_SortingSettingsFragment));
         
