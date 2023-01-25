@@ -47,7 +47,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     
     public static final String NAME = GlobalSettingsFragment.class.getSimpleName();
     
-    private AdaptiveBackgroundSettingsEntryConfig adaptiveBackgroundSettingsEntry;
+    private AdaptiveBackgroundSettingsEntryConfig adaptiveBgSettingsEntry;
     
     final ActivityResultLauncher<Intent> pickBg =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::onBgSelected);
@@ -59,7 +59,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        adaptiveBackgroundSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper.context,
+        adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper.context,
                 bgIndex -> Utilities.callImageFileChooser(pickBg));
         
         List<SettingsEntryConfig> settingsEntries = List.of(
@@ -68,7 +68,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new AppThemeSelectorEntryConfig(),
                 new DropdownSettingsEntryConfig<>(R.string.first_weekday, FIRST_DAYS_OF_WEEK_LOCAL, FIRST_DAYS_OF_WEEK_ROOT, FIRST_DAY_OF_WEEK),
                 new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)),
-                adaptiveBackgroundSettingsEntry,
+                adaptiveBgSettingsEntry,
                 new CompoundCustomizationEntryConfig(),
                 
                 new SwitchSettingsEntryConfig(
@@ -153,8 +153,8 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 
                 if (stream != null) {
                     GraphicsUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                            getFile(DateManager.WEEK_DAYS_ROOT.get(adaptiveBackgroundSettingsEntry.getLastClickedBgIndex()) + ".png"));
-                    requireActivity().runOnUiThread(() -> adaptiveBackgroundSettingsEntry.notifyBackgroundUpdated());
+                            getFile(DateManager.BG_NAMES_ROOT.get(adaptiveBgSettingsEntry.getLastClickedBgIndex())));
+                    requireActivity().runOnUiThread(() -> adaptiveBgSettingsEntry.notifyBackgroundUpdated());
                 } else {
                     Logger.error(NAME, "Stream null for uri: " + uri.getPath());
                 }

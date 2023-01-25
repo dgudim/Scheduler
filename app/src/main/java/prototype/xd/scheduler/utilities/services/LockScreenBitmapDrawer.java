@@ -2,7 +2,7 @@ package prototype.xd.scheduler.utilities.services;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
-import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayLocaleAgnosticString;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayBgName;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.makeMutable;
@@ -115,16 +115,15 @@ class LockScreenBitmapDrawer {
         if (hasNoFingerPrint(bitmap)) {
             bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
         } else {
-            if (bg.exists()) {
-                bitmap = readBitmapFromFile(bg);
-            } else {
+            if (!bg.exists()) {
+                Logger.warning(NAME, bg + "is not available, falling back to default");
                 File defFile = getFile(DateManager.DEFAULT_BACKGROUND_NAME);
-                if (defFile.exists()) {
-                    bitmap = readBitmapFromFile(defFile);
-                } else {
+                if (!defFile.exists()) {
                     throw new FileNotFoundException("No available background to load");
                 }
+                bg = defFile;
             }
+            bitmap = readBitmapFromFile(bg);
         }
         return makeMutable(bitmap);
     }
@@ -253,6 +252,6 @@ class LockScreenBitmapDrawer {
             return getFile(DateManager.DEFAULT_BACKGROUND_NAME);
         }
         
-        return getFile(getCurrentWeekdayLocaleAgnosticString() + ".png");
+        return getFile(getCurrentWeekdayBgName());
     }
 }

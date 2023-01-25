@@ -57,7 +57,7 @@ public final class DateManager {
     private static final DateFormat timeFormatLocal = new SimpleDateFormat("HH:mm", systemLocale); // NOSONAR
     
     @NonNull
-    public static final List<String> WEEK_DAYS_ROOT;
+    public static final List<String> BG_NAMES_ROOT;
     public static final String DEFAULT_BACKGROUND_NAME = "default.png";
     @NonNull
     private static final List<String> WEEK_DAYS_LOCAL;
@@ -83,13 +83,13 @@ public final class DateManager {
         WEEK_DAYS_LOCAL = List.of(weekDaysLocal);
         
         DayOfWeek[] weekDays = DayOfWeek.values();
-        String[] weekDaysRoot = new String[8];
+        String[] bgNamesRoot = new String[8];
         for (int i = 0; i < 7; i++) {
-            weekDaysRoot[i] = weekDays[i].name().toLowerCase(Locale.ROOT);
+            bgNamesRoot[i] = weekDays[i].name().toLowerCase(Locale.ROOT) + ".png";
         }
-        weekDaysRoot[7] = DEFAULT_BACKGROUND_NAME;
+        bgNamesRoot[7] = DEFAULT_BACKGROUND_NAME;
         
-        WEEK_DAYS_ROOT = List.of(weekDaysRoot);
+        BG_NAMES_ROOT = List.of(bgNamesRoot);
         
         String[] localizedWeekdays = new String[FIRST_DAYS_OF_WEEK_ROOT.size()];
         for (int i = 0; i < localizedWeekdays.length; i++) {
@@ -246,8 +246,8 @@ public final class DateManager {
     }
     
     @NonNull
-    public static String getCurrentWeekdayLocaleAgnosticString() {
-        return currentDate.getDayOfWeek().name().toLowerCase(Locale.ROOT);
+    public static String getCurrentWeekdayBgName() {
+        return currentDate.getDayOfWeek().name().toLowerCase(Locale.ROOT) + ".png";
     }
     
     @NonNull

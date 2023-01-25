@@ -74,10 +74,10 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                             builder.setNegativeButton(R.string.cancel, null);
                             
                             builder.setPositiveButton(R.string.delete, (dialogInterface, whichButton) -> {
-                                for (int dayIndex = 0; dayIndex < DateManager.WEEK_DAYS_ROOT.size() - 1; dayIndex++) {
-                                    String availableDay = DateManager.WEEK_DAYS_ROOT.get(dayIndex);
-                                    getFile(availableDay + ".png").delete();
-                                    getFile(availableDay + ".png_min.png").delete();
+                                for (int dayIndex = 0; dayIndex < DateManager.BG_NAMES_ROOT.size() - 1; dayIndex++) {
+                                    String bgName = DateManager.BG_NAMES_ROOT.get(dayIndex);
+                                    getFile(bgName).delete();
+                                    getFile(bgName + "_min.png").delete();
                                 }
                                 config.gridViewAdapter.notifyDataSetChanged();
                             });
