@@ -1,5 +1,6 @@
 Bugfixes:
 - Fixed issue #15 (event loading and saving)
+
 Misc:
 - Added an option to turn on debug logging even in release builds
 - In calendar settings clicking the account now also expands the list

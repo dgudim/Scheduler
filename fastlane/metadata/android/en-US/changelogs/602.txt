@@ -1,0 +1,6 @@
+Bugfixes:
+- Fixed background loading and previews
+
+Misc:
+- Debug logging is now always enabled in debug builds
+- Added FAQ
