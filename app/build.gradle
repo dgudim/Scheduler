@@ -35,6 +35,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             versionNameSuffix '.release'
             resValue "string", "app_version_combined", "Scheduler v${defaultConfig.versionName}.release (${defaultConfig.versionCode})"
