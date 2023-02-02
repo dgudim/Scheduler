@@ -232,14 +232,6 @@ public final class DateManager {
         }
     }
     
-    // returns current date and time
-    @NonNull
-    public static String getCurrentDateTimeStringLocal() {
-        synchronized (dateTimeFormatLocal) {
-            return dateTimeFormatLocal.format(new Date());
-        }
-    }
-    
     // returns current timestamp in UTC
     public static long getCurrentTimestampUTC() {
         return System.currentTimeMillis();

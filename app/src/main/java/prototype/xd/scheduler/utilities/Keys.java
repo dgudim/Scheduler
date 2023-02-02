@@ -447,9 +447,7 @@ public final class Keys {
     public static final String GROUPS_FILE = "groupData";
     public static final String GROUPS_FILE_BACKUP = GROUPS_FILE + ".old";
     
-    public static final String LOG_FILE = "log.txt";
     public static final String LOGCAT_FILE = "logcat.txt";
-    public static final String LOG_FILE_OLD = LOG_FILE + ".old";
     
     public static final String PACKAGE_NAME = BuildConfig.APPLICATION_ID;
     public static final String PACKAGE_PROVIDER_NAME = PACKAGE_NAME + ".provider";

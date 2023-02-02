@@ -15,21 +15,13 @@ import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_RELEASES;
 import static prototype.xd.scheduler.utilities.Keys.GITHUB_REPO;
 import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.LOGCAT_FILE;
-import static prototype.xd.scheduler.utilities.Keys.LOG_FILE;
-import static prototype.xd.scheduler.utilities.Keys.LOG_FILE_OLD;
 import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
-import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Utilities.displayToast;
-import static prototype.xd.scheduler.utilities.Utilities.getFile;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
-import static prototype.xd.scheduler.utilities.Utilities.shareFiles;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
-import android.content.ClipDescription;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,10 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.databinding.ContentWrapperBinding;
@@ -184,21 +173,8 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                     builder.setIcon(R.drawable.ic_developer_mode_24_primary);
                     
                     DebugMenuDialogBinding bnd = DebugMenuDialogBinding.inflate(LayoutInflater.from(wrapper.context));
-                    bnd.shareLogcatView.setOnClickListener(v1 -> {
-                        File logFile = getFile(LOGCAT_FILE);
-                        try {
-                            Runtime.getRuntime().exec("logcat -f " + logFile.getAbsolutePath());
-                            List<File> files = new ArrayList<>(List.of(logFile, getFile(LOG_FILE)));
-                            File oldLog = getFile(LOG_FILE_OLD);
-                            if (oldLog.exists()) {
-                                files.add(oldLog);
-                            }
-                            shareFiles(wrapper.context, ClipDescription.MIMETYPE_TEXT_PLAIN, files);
-                        } catch (IOException e) {
-                            displayToast(wrapper.context, R.string.logcat_obtain_fail);
-                            logException(NAME, e);
-                        }
-                    });
+                    bnd.shareLogcatView.setOnClickListener(v1 -> Logger.shareLog(wrapper.context));
+                    
                     if (BuildConfig.DEBUG) {
                         bnd.debugLoggingSwitch.setCheckedSilent(true);
                         bnd.debugLoggingSwitch.setClickable(false);
