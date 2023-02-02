@@ -20,6 +20,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.common.primitives.Longs;
+
 import org.dmfs.rfc5545.recur.RecurrenceRule;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceList;
 import org.dmfs.rfc5545.recurrenceset.RecurrenceRuleAdapter;
@@ -304,7 +306,7 @@ public class SystemCalendarEvent {
     
     public void addExceptions(@NonNull List<Long> exceptions) {
         if (rSet != null) {
-            rSet.addExceptions(new RecurrenceList(exceptions.stream().mapToLong(Long::longValue).toArray()));
+            rSet.addExceptions(new RecurrenceList(Longs.toArray(exceptions)));
         } else {
             Logger.warning(NAME, "Couldn't add exceptions to " + this);
         }

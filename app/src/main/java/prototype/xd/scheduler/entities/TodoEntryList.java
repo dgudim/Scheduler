@@ -5,6 +5,8 @@ import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.common.collect.Sets;
+
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -23,7 +25,6 @@ import java.util.function.Consumer;
 
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
-import prototype.xd.scheduler.utilities.Utilities;
 
 // a list specifically for storing TodoEntries, automatically unlinks groups on remove to avoid memory leaks
 public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR, should only be initialized once, shouldn't be serialized
@@ -111,8 +112,10 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
             }
             
             // if the entry is global, only unlink from global entry list
-            if (oldEntry.isGlobal() && !globalEntries.remove(oldEntry)) {
-                Logger.warning(NAME, "Inconsistency detected: removing a global entry from " + NAME + " but it's not in the globalEntries");
+            if (oldEntry.isGlobal()) {
+                if (!globalEntries.remove(oldEntry)) {
+                    Logger.warning(NAME, "Inconsistency detected: removing a global entry from " + NAME + " but it's not in the globalEntries");
+                }
                 return oldEntry;
             }
             
@@ -196,8 +199,10 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
         }
         
         // if the entry is global only link to global entries list
-        if (newEntry.isGlobal() && !globalEntries.add(newEntry)) {
-            Logger.warning(NAME, "Trying to add duplicate global entry: " + newEntry);
+        if (newEntry.isGlobal()) {
+            if (!globalEntries.add(newEntry)) {
+                Logger.warning(NAME, "Trying to add duplicate global entry: " + newEntry);
+            }
             return;
         }
         
@@ -329,8 +334,8 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
         if (onlyAddDifference) {
             Logger.debug(NAME, "Added difference to invalidatedDaySet");
             invalidatedDaySet.addAll(displayUpcomingExpired ?
-                    Utilities.symmetricDifference(prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()) :
-                    Utilities.symmetricDifference(prevCoreDays, newDaySet.getCoreDaySet()));
+                    Sets.symmetricDifference(prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()) :
+                    Sets.symmetricDifference(prevCoreDays, newDaySet.getCoreDaySet()));
             
         } else {
             invalidatedDaySet.addAll(displayUpcomingExpired ? prevExpiredUpcomingDays : prevCoreDays);

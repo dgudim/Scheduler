@@ -524,43 +524,6 @@ public final class Utilities {
     }
     
     /**
-     * Computes symmetric difference between 2 sets
-     *
-     * @param set1 first set
-     * @param set2 second set
-     * @param <K>  key type
-     * @return symmetric difference between these two sets
-     */
-    @NonNull
-    public static <K> Set<K> symmetricDifference(@NonNull final Set<K> set1,
-                                                 @NonNull final Set<K> set2) {
-        if (set1.equals(set2)) {
-            return Collections.emptySet();
-        }
-        if (set1.isEmpty()) {
-            return set2;
-        }
-        if (set2.isEmpty()) {
-            return set1;
-        }
-        
-        Set<K> combined = new ArraySet<>(set1.size() + set2.size());
-        combined.addAll(set1);
-        combined.addAll(set2);
-        
-        // intersection contains keys both in set1 and set2
-        Set<K> intersection = new ArraySet<>(set1.size());
-        intersection.addAll(set1);
-        // leave keys that are the same
-        intersection.retainAll(set2);
-        
-        // remove equal keys
-        combined.removeAll(intersection);
-        
-        return combined;
-    }
-    
-    /**
      * Display long toast with a message
      *
      * @param context   any context
