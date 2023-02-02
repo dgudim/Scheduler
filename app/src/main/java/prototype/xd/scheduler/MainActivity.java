@@ -19,6 +19,7 @@ import java.io.File;
 
 import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
+import prototype.xd.scheduler.utilities.PermissionUtilities;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class MainActivity extends AppCompatActivity {
@@ -67,11 +68,10 @@ public class MainActivity extends AppCompatActivity {
                                 R.color.entry_settings_parameter_group_and_personal,
                                 R.color.entry_settings_parameter_personal})
                         .build());
-        
         DynamicColors.applyToActivityIfAvailable(this);
         
         // switch intro activity and close current one
-        if (Keys.INTRO_SHOWN.get()) {
+        if (PermissionUtilities.areEssentialPermissionsGranted(this)) {
             BackgroundSetterService.ping(getApplicationContext());
             setContentView(R.layout.activity_main);
         } else {

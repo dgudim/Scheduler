@@ -25,6 +25,8 @@ public class IntroActivity extends AppIntro {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    
+        Keys.init(this);
         
         HarmonizedColors.applyToContextIfAvailable(this,
                 new HarmonizedColorsOptions.Builder()
@@ -77,7 +79,6 @@ public class IntroActivity extends AppIntro {
         super.onDonePressed(currentFragment);
         // go back to the main activity
         startActivity(new Intent(this, MainActivity.class));
-        Keys.INTRO_SHOWN.put(Boolean.TRUE);
         finish();
     }
 }

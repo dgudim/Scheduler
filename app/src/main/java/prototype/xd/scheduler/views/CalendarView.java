@@ -230,7 +230,7 @@ public class CalendarView {
     
     private void setSelectedMonth(@NonNull YearMonth month, boolean extend) {
         selectedMonth = month;
-        Logger.debug(NAME, "New month selected: " + selectedMonth);
+        Logger.debug(NAME, "New month selected: " + selectedMonth + (extend ? " (extension)" : ""));
         
         firstSelectedMonthDayUTC = getStartOfMonthDayUTC(selectedMonth);
         lastSelectedMonthDayUTC = getEndOfMonthDayUTC(selectedMonth);

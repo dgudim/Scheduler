@@ -1,20 +1,25 @@
 package prototype.xd.scheduler;
 
-import static android.os.Build.VERSION;
-import static android.os.Build.VERSION_CODES;
+import static android.app.Activity.RESULT_CANCELED;
+import static androidx.core.content.UnusedAppRestrictionsConstants.FEATURE_NOT_AVAILABLE;
 import static prototype.xd.scheduler.utilities.Keys.PACKAGE_NAME;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.areEssentialPermissionsGranted;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.getAutorevokeStatus;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.getPermissions;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.isAutorevokeGranted;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.isBatteryGranted;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.isCalendarGranted;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.isNotificationGranted;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.isOnAndroid13OrHigher;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.isStorageGranted;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +31,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+import androidx.core.content.IntentCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.appintro.SlidePolicy;
@@ -40,20 +45,13 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     
     private PermissionsRequestFragmentBinding bnd;
     
-    final ActivityResultLauncher<Intent> batteryOptimizationLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> refreshPermissionStates(true));
+    private final ActivityResultLauncher<Intent> intentLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result ->
+                    onActivityResult(result.getResultCode() == RESULT_CANCELED));
     
-    @SuppressLint("BatteryLife")
     private final ActivityResultLauncher<String[]> requestPermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestMultiplePermissions(), result -> {
-                if (refreshPermissionStates(true)) {
-                    batteryOptimizationLauncher.launch(
-                            new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + PACKAGE_NAME)));
-                } else {
-                    displayGrantPermissionsToast();
-                }
-            }
+            new ActivityResultContracts.RequestMultiplePermissions(), result ->
+                    onActivityResult(result.containsValue(Boolean.FALSE))
     );
     
     @Override
@@ -61,58 +59,82 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     @Nullable
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         bnd = PermissionsRequestFragmentBinding.inflate(inflater, container, false);
-        refreshPermissionStates(true);
+        displayPermissions();
         
-        // android 13 and higher
-        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
-            // new granular permissions for android 13
-            bnd.grantPermissionsButton.setOnClickListener(v -> requestPermissionLauncher.launch(new String[]{
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_CALENDAR,
-                    Manifest.permission.POST_NOTIFICATIONS}));
-        } else {
-            // normal permissions
-            bnd.grantPermissionsButton.setOnClickListener(v -> requestPermissionLauncher.launch(new String[]{
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_CALENDAR}));
+        if (!isOnAndroid13OrHigher()) {
+            bnd.notificationPermissionIcon.setVisibility(View.GONE);
+            bnd.notificationPermissionTitle.setVisibility(View.GONE);
+            bnd.notificationPermissionDescription.setVisibility(View.GONE);
+            bnd.notificationPermissionGranted.setVisibility(View.GONE);
         }
+        
+        if (getAutorevokeStatus(this) == FEATURE_NOT_AVAILABLE) {
+            bnd.ignoreAutorevokeIcon.setVisibility(View.GONE);
+            bnd.ignoreAutorevokeTitle.setVisibility(View.GONE);
+            bnd.ignoreAutorevokeDescription.setVisibility(View.GONE);
+            bnd.ignoreAutorevokeGranted.setVisibility(View.GONE);
+        }
+        
+        bnd.grantPermissionsButton.setOnClickListener(v -> requestPermissions(false));
         
         return bnd.getRoot();
     }
     
-    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
-    private boolean refreshPermissionStates(boolean display) {
+    private void onActivityResult(boolean userRejected) {
+        displayPermissions();
+        requestPermissions(userRejected);
+    }
+    
+    @SuppressLint("BatteryLife")
+    private void requestPermissions(boolean userRejected) {
         
-        boolean storageGranted = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED;
+        boolean storageGranted = isStorageGranted(requireContext());
+        boolean calendarGranted = isCalendarGranted(requireContext());
+        boolean essentialsGranted = storageGranted && calendarGranted;
         
-        boolean calendarGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_CALENDAR)
-                == PackageManager.PERMISSION_GRANTED;
-        
-        boolean notificationsGranted = true;
-        // android 13 and higher
-        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
-            notificationsGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
-                    == PackageManager.PERMISSION_GRANTED;
+        if (!essentialsGranted) {
+            if (userRejected) {
+                displayGrantPermissionsToast();
+            } else {
+                requestPermissionLauncher.launch(getPermissions());
+            }
+            return;
         }
         
-        boolean batteryGranted = ((PowerManager) requireActivity().getSystemService(Context.POWER_SERVICE))
-                .isIgnoringBatteryOptimizations(PACKAGE_NAME);
-        
-        boolean essentialGranted = storageGranted && calendarGranted;
-        boolean allGranted = essentialGranted && batteryGranted && notificationsGranted;
-        
-        if (display) {
-            setPermissionChipColor(calendarGranted, bnd.calendarPermissionGranted);
-            setPermissionChipColor(storageGranted, bnd.storagePermissionGranted);
-            setPermissionChipColor(batteryGranted, bnd.batteryPermissionGranted);
-            setPermissionChipColor(notificationsGranted, bnd.notificationPermissionGranted);
-            
-            bnd.grantPermissionsButton.setVisibility(allGranted ? View.GONE : View.VISIBLE);
-            bnd.allSetText.setVisibility(allGranted ? View.VISIBLE : View.GONE);
+        if (userRejected) {
+            return;
         }
         
-        return essentialGranted;
+        if (!isBatteryGranted(this)) {
+            intentLauncher.launch(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + PACKAGE_NAME)));
+            return;
+        }
+        
+        if (!isAutorevokeGranted(this)) {
+            displayToast(requireContext(), R.string.autorevoke_request_description);
+            intentLauncher.launch(IntentCompat.createManageUnusedAppRestrictionsIntent(requireContext(), PACKAGE_NAME));
+        }
+    }
+    
+    private void displayPermissions() {
+        
+        boolean notificationsGranted = isNotificationGranted(this);
+        
+        boolean batteryGranted = isBatteryGranted(this);
+        boolean storageGranted = isStorageGranted(requireContext());
+        boolean calendarGranted = isCalendarGranted(requireContext());
+        boolean autorevokeGranted = isAutorevokeGranted(this);
+        
+        boolean allGranted = storageGranted && calendarGranted && batteryGranted && notificationsGranted && autorevokeGranted;
+        
+        setPermissionChipColor(calendarGranted, bnd.calendarPermissionGranted);
+        setPermissionChipColor(storageGranted, bnd.storagePermissionGranted);
+        setPermissionChipColor(batteryGranted, bnd.batteryPermissionGranted);
+        setPermissionChipColor(notificationsGranted, bnd.notificationPermissionGranted);
+        setPermissionChipColor(autorevokeGranted, bnd.ignoreAutorevokeGranted);
+        
+        bnd.grantPermissionsButton.setVisibility(allGranted ? View.GONE : View.VISIBLE);
+        bnd.allSetText.setVisibility(allGranted ? View.VISIBLE : View.GONE);
     }
     
     private static void setPermissionChipColor(boolean permissionGranted, @NonNull TextView permissionText) {
@@ -132,7 +154,7 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     
     @Override
     public boolean isPolicyRespected() {
-        return refreshPermissionStates(false);
+        return areEssentialPermissionsGranted(requireContext());
     }
     
     @Override

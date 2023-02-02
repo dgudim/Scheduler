@@ -57,6 +57,9 @@
     <string name="notification_permission_description">(опционально) Для отображения уведомления со статусом сервиса</string>
     <string name="ignore_battery_optimization">Игнорировать оптимизацию батареи</string>
     <string name="ignore_battery_optimization_description">(опционально) Чтобы фоновый сервис работал надежно, не волнуйтесь, он не будет потреблять много батареи</string>
+    <string name="ignore_autorevoke">Не отзывать разрешения автоматически</string>
+    <string name="ignore_autorevoke_description">(опционально) Поскольку приложение в основном работает в фоне, Android может подумать, что вы его не используете, и отозвать разрешения, добавьте приложение в список исключений, чтобы избежать случайных поломок.</string>
+    <string name="autorevoke_request_description">Найдите настройку “Удалять разрешения, если приложение не используется”</string>
     <string name="permission_request_description">Пожалуйста, предоставьте разрешения для корректной работы приложения</string>
     <string name="permission_request">Запрос разрешений</string>
     <string name="calendar_event_all_day">весь день</string>

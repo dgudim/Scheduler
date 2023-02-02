@@ -25,6 +25,9 @@
     <string name="calendar_access_description">For sync with system calendars</string>
     <string name="ignore_battery_optimization">Ignore battery optimization</string>
     <string name="ignore_battery_optimization_description">(optional) For the background service to work reliably, don\'t worry, it won\'t consume much energy</string>
+    <string name="ignore_autorevoke">Don\'t auto-revoke permissions</string>
+    <string name="ignore_autorevoke_description">(optional) As the app mostly works in the background, Android may think that you are not using it and revoke permissions, add the app to exclusion list to avoid random breakages</string>
+    <string name="autorevoke_request_description">Find a setting called “Remove permissions if app is unused”</string>
     <string name="notification_permission">Notifications</string>
     <string name="notification_permission_description">(optional) For showing service status notification</string>
     <string name="permission_request_description">Please grant permissions for the app to properly function</string>

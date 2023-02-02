@@ -18,7 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="15dp"
+            android:paddingStart="15dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="15dp"
+            android:paddingBottom="@dimen/appintro_bottombar_height"
             tools:context=".IntroActivity">
 
             <TextView
@@ -87,13 +90,10 @@
 
             <TextView
                 android:id="@+id/calendar_permission_granted"
+                style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/round_bg_10dp"
-                android:backgroundTint="?colorErrorContainer"
-                android:padding="3dp"
                 android:text="@string/permissions_not_granted"
-                android:textColor="?colorOnErrorContainer"
                 app:layout_constraintStart_toEndOf="@+id/imageView4"
                 app:layout_constraintTop_toBottomOf="@+id/textView15"
                 tools:layout_conversion_absoluteHeight="19dp"
@@ -141,13 +141,10 @@
 
             <TextView
                 android:id="@+id/storage_permission_granted"
+                style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/round_bg_10dp"
-                android:backgroundTint="?colorErrorContainer"
-                android:padding="3dp"
                 android:text="@string/permissions_not_granted"
-                android:textColor="?colorOnErrorContainer"
                 app:layout_constraintStart_toEndOf="@+id/imageView5"
                 app:layout_constraintTop_toBottomOf="@+id/textView17"
                 tools:layout_conversion_absoluteHeight="19dp"
@@ -195,13 +192,10 @@
 
             <TextView
                 android:id="@+id/battery_permission_granted"
+                style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/round_bg_10dp"
-                android:backgroundTint="?colorErrorContainer"
-                android:padding="3dp"
                 android:text="@string/permissions_not_granted"
-                android:textColor="?colorOnErrorContainer"
                 app:layout_constraintStart_toEndOf="@+id/imageView6"
                 app:layout_constraintTop_toBottomOf="@+id/textView19"
                 tools:layout_conversion_absoluteHeight="19dp"
@@ -217,10 +211,10 @@
                 android:text="@string/permissions_grant"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/notification_permission_granted"
+                app:layout_constraintTop_toBottomOf="@+id/ignore_autorevoke_granted"
+                tools:ignore="VisualLintButtonSize"
                 tools:layout_conversion_absoluteHeight="48dp"
-                tools:layout_conversion_absoluteWidth="324dp"
-                tools:ignore="VisualLintButtonSize" />
+                tools:layout_conversion_absoluteWidth="324dp" />
 
             <TextView
                 android:id="@+id/all_set_text"
@@ -232,51 +226,89 @@
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/notification_permission_granted"
+                app:layout_constraintTop_toBottomOf="@+id/ignore_autorevoke_granted"
                 tools:layout_conversion_absoluteHeight="0dp"
                 tools:layout_conversion_absoluteWidth="0dp" />
 
             <TextView
-                android:id="@+id/textView20"
+                android:id="@+id/notification_permission_title"
                 style="@style/MediumHeading"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/notification_permission"
-                app:layout_constraintStart_toEndOf="@+id/imageView7"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/notification_permission_icon"
                 app:layout_constraintTop_toBottomOf="@+id/battery_permission_granted" />
 
             <TextView
-                android:id="@+id/textView21"
+                android:id="@+id/notification_permission_description"
                 style="@style/MediumHeadingSubtext"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/notification_permission_description"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView7"
-                app:layout_constraintTop_toBottomOf="@+id/textView20" />
+                app:layout_constraintStart_toEndOf="@+id/notification_permission_icon"
+                app:layout_constraintTop_toBottomOf="@+id/notification_permission_title" />
 
             <ImageView
-                android:id="@+id/imageView7"
+                android:id="@+id/notification_permission_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:contentDescription="@string/notification_permission_description"
                 app:layout_constraintBottom_toBottomOf="@+id/notification_permission_granted"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/textView20"
+                app:layout_constraintTop_toTopOf="@+id/notification_permission_title"
                 app:srcCompat="@drawable/ic_notifications_55" />
 
             <TextView
                 android:id="@+id/notification_permission_granted"
+                style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/round_bg_10dp"
-                android:backgroundTint="?colorErrorContainer"
-                android:padding="3dp"
                 android:text="@string/permissions_not_granted"
-                android:textColor="?colorOnErrorContainer"
-                app:layout_constraintStart_toEndOf="@+id/imageView7"
-                app:layout_constraintTop_toBottomOf="@+id/textView21" />
+                app:layout_constraintStart_toEndOf="@+id/notification_permission_icon"
+                app:layout_constraintTop_toBottomOf="@+id/notification_permission_description" />
+
+            <TextView
+                android:id="@+id/ignore_autorevoke_title"
+                style="@style/MediumHeading"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/ignore_autorevoke"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/ignore_autorevoke_icon"
+                app:layout_constraintTop_toBottomOf="@+id/notification_permission_granted" />
+
+            <ImageView
+                android:id="@+id/ignore_autorevoke_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:contentDescription="@string/ignore_autorevoke_description"
+                app:layout_constraintBottom_toBottomOf="@+id/ignore_autorevoke_granted"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/ignore_autorevoke_title"
+                app:srcCompat="@drawable/ic_time_55" />
+
+            <TextView
+                android:id="@+id/ignore_autorevoke_description"
+                style="@style/MediumHeadingSubtext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/ignore_autorevoke_description"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/ignore_autorevoke_icon"
+                app:layout_constraintTop_toBottomOf="@+id/ignore_autorevoke_title" />
+
+            <TextView
+                android:id="@+id/ignore_autorevoke_granted"
+                style="@style/PermissionsGrantText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/permissions_not_granted"
+                app:layout_constraintStart_toEndOf="@+id/ignore_autorevoke_icon"
+                app:layout_constraintTop_toBottomOf="@+id/ignore_autorevoke_description" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -154,6 +154,13 @@
         <item name="strokeWidth">0dp</item>
     </style>
 
+    <style name="PermissionsGrantText">
+        <item name="android:textColor">?colorOnErrorContainer</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:background">@drawable/round_bg_10dp</item>
+        <item name="android:backgroundTint">?colorErrorContainer</item>
+    </style>
+
     <style name="SecondaryAccentedTextStyle" parent="MediumHeadingSubtext">
         <item name="android:padding">3dp</item>
         <item name="android:layout_margin">3dp</item>

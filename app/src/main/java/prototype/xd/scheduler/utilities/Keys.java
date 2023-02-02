@@ -430,7 +430,6 @@ public final class Keys {
     public static final String PREFERENCES_MAIN = "prefs";
     public static final String PREFERENCES_SERVICE = "prefs_service";
     
-    public static final DefaultedBoolean INTRO_SHOWN = new DefaultedBoolean("app_intro", false);
     
     private static final DefaultedBoolean SERVICE_UPDATE_SIGNAL = new DefaultedBoolean("update_lockscreen", false);
     public static final DefaultedBoolean DEBUG_LOGGING = new DefaultedBoolean("debug_logging", false);
