@@ -246,8 +246,8 @@ public final class DialogUtilities {
      */
     @MainThread
     public static void displayColorPicker(@NonNull final ContextWrapper wrapper,
-                                          @NonNull final ObjIntConsumer<Keys.DefaultedInteger> colorSelectedListener,
-                                          @NonNull final Keys.DefaultedInteger defaultedInteger) {
+                                          @NonNull final ObjIntConsumer<Static.DefaultedInteger> colorSelectedListener,
+                                          @NonNull final Static.DefaultedInteger defaultedInteger) {
         displayColorPicker(wrapper, defaultedInteger.get(),
                 (dialog, selectedColor, allColors) ->
                         colorSelectedListener.accept(defaultedInteger, selectedColor));
@@ -268,8 +268,8 @@ public final class DialogUtilities {
     public static void displayColorPicker(@NonNull final ContextWrapper wrapper,
                                           @NonNull final TextView stateIcon,
                                           @NonNull final PopupSettingsView settingsView,
-                                          @NonNull final Keys.DefaultedInteger defaultedInteger,
-                                          @NonNull final ToIntFunction<Keys.DefaultedInteger> initialValueFactory) {
+                                          @NonNull final Static.DefaultedInteger defaultedInteger,
+                                          @NonNull final ToIntFunction<Static.DefaultedInteger> initialValueFactory) {
         displayColorPicker(wrapper,
                 initialValueFactory.applyAsInt(defaultedInteger), (dialog, selectedColor, allColors) -> {
                     settingsView.notifyParameterChanged(stateIcon, defaultedInteger.key, selectedColor);

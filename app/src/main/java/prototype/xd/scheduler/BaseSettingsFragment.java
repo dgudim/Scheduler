@@ -18,7 +18,7 @@ import androidx.viewbinding.ViewBinding;
 import java.util.Map;
 
 import prototype.xd.scheduler.utilities.ContextWrapper;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 
 // base dialog class that refreshes main screen on settings changes
 public abstract class BaseSettingsFragment<T extends ViewBinding> extends DialogFragment {
@@ -38,7 +38,7 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     @Nullable
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = inflate(inflater, container);
-        preferenceStateBefore = Keys.getAll();
+        preferenceStateBefore = Static.getAll();
         return binding.getRoot();
     }
     
@@ -54,8 +54,8 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     // dialog dismissed (user pressed back button)
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
-        if (!preferenceStateBefore.equals(Keys.getAll())) {
-            findFragmentInNavHost(requireActivity(), HomeFragment.class).notifySettingsChanged();
+        if (!preferenceStateBefore.equals(Static.getAll())) {
+            findFragmentInNavHost(requireActivity(), HomeFragment.class).notifyDatesetChanged();
         }
         super.onDismiss(dialog);
     }

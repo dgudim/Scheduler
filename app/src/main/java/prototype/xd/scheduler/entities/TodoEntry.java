@@ -9,7 +9,7 @@ import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixColorWithBg;
-import static prototype.xd.scheduler.utilities.Keys.TIME_RANGE_SEPARATOR;
+import static prototype.xd.scheduler.utilities.Static.TIME_RANGE_SEPARATOR;
 import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 
@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -274,14 +274,14 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     @NonNull
     private static ArrayMap<String, Parameter<?>> mapParameters(@NonNull TodoEntry entry) {
         ArrayMap<String, Parameter<?>> parameterMap = new ArrayMap<>(8);
-        parameterMap.put(Keys.BG_COLOR.CURRENT.key, entry.bgColor);
-        parameterMap.put(Keys.FONT_COLOR.CURRENT.key, entry.fontColor);
-        parameterMap.put(Keys.BORDER_COLOR.CURRENT.key, entry.borderColor);
-        parameterMap.put(Keys.BORDER_THICKNESS.CURRENT.key, entry.borderThickness);
-        parameterMap.put(Keys.PRIORITY.key, entry.priority);
-        parameterMap.put(Keys.EXPIRED_ITEMS_OFFSET.key, entry.expiredDayOffset);
-        parameterMap.put(Keys.UPCOMING_ITEMS_OFFSET.key, entry.upcomingDayOffset);
-        parameterMap.put(Keys.ADAPTIVE_COLOR_BALANCE.key, entry.adaptiveColorBalance);
+        parameterMap.put(Static.BG_COLOR.CURRENT.key, entry.bgColor);
+        parameterMap.put(Static.FONT_COLOR.CURRENT.key, entry.fontColor);
+        parameterMap.put(Static.BORDER_COLOR.CURRENT.key, entry.borderColor);
+        parameterMap.put(Static.BORDER_THICKNESS.CURRENT.key, entry.borderThickness);
+        parameterMap.put(Static.PRIORITY.key, entry.priority);
+        parameterMap.put(Static.EXPIRED_ITEMS_OFFSET.key, entry.expiredDayOffset);
+        parameterMap.put(Static.UPCOMING_ITEMS_OFFSET.key, entry.upcomingDayOffset);
+        parameterMap.put(Static.ADAPTIVE_COLOR_BALANCE.key, entry.adaptiveColorBalance);
         return parameterMap;
     }
     
@@ -329,52 +329,52 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void initParameters() {
-        bgColor = new Parameter<>(this, Keys.BG_COLOR.CURRENT.key,
+        bgColor = new Parameter<>(this, Static.BG_COLOR.CURRENT.key,
                 previousValue -> {
                     if (isFromSystemCalendar()) {
-                        return Keys.BG_COLOR.CURRENT.getOnlyBySubKeys(event.subKeys,
-                                Keys.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(event.color));
+                        return Static.BG_COLOR.CURRENT.getOnlyBySubKeys(event.subKeys,
+                                Static.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(event.color));
                     }
-                    return Keys.BG_COLOR.CURRENT.get();
+                    return Static.BG_COLOR.CURRENT.get();
                 },
                 Integer::parseInt,
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.BG_COLOR.UPCOMING.get()),
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.BG_COLOR.EXPIRED.get()));
-        fontColor = new Parameter<>(this, Keys.FONT_COLOR.CURRENT.key,
-                previousValue -> Keys.FONT_COLOR.CURRENT.get(getSubKeys()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Static.BG_COLOR.UPCOMING.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Static.BG_COLOR.EXPIRED.get()));
+        fontColor = new Parameter<>(this, Static.FONT_COLOR.CURRENT.key,
+                previousValue -> Static.FONT_COLOR.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.FONT_COLOR.UPCOMING.get()),
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.FONT_COLOR.EXPIRED.get()));
-        borderColor = new Parameter<>(this, Keys.BORDER_COLOR.CURRENT.key,
-                previousValue -> Keys.BORDER_COLOR.CURRENT.get(getSubKeys()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Static.FONT_COLOR.UPCOMING.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Static.FONT_COLOR.EXPIRED.get()));
+        borderColor = new Parameter<>(this, Static.BORDER_COLOR.CURRENT.key,
+                previousValue -> Static.BORDER_COLOR.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.BORDER_COLOR.UPCOMING.get()),
-                todayValue -> getExpiredUpcomingColor(todayValue, Keys.BORDER_COLOR.EXPIRED.get()));
-        borderThickness = new Parameter<>(this, Keys.BORDER_THICKNESS.CURRENT.key,
-                previousValue -> Keys.BORDER_THICKNESS.CURRENT.get(getSubKeys()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Static.BORDER_COLOR.UPCOMING.get()),
+                todayValue -> getExpiredUpcomingColor(todayValue, Static.BORDER_COLOR.EXPIRED.get()));
+        borderThickness = new Parameter<>(this, Static.BORDER_THICKNESS.CURRENT.key,
+                previousValue -> Static.BORDER_THICKNESS.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
-                todayValue -> Keys.BORDER_THICKNESS.UPCOMING.get(),
-                todayValue -> Keys.BORDER_THICKNESS.EXPIRED.get());
-        priority = new Parameter<>(this, Keys.PRIORITY.key,
+                todayValue -> Static.BORDER_THICKNESS.UPCOMING.get(),
+                todayValue -> Static.BORDER_THICKNESS.EXPIRED.get());
+        priority = new Parameter<>(this, Static.PRIORITY.key,
                 previousValue -> isFromSystemCalendar() ?
-                        Keys.PRIORITY.get(event.subKeys) :
+                        Static.PRIORITY.get(event.subKeys) :
                         // there is no default setting for priority
-                        Keys.PRIORITY.defaultValue,
+                        Static.PRIORITY.defaultValue,
                 Integer::parseInt,
                 null,
                 null);
-        expiredDayOffset = new Parameter<>(this, Keys.EXPIRED_ITEMS_OFFSET.key,
-                previousValue -> Keys.EXPIRED_ITEMS_OFFSET.get(getSubKeys()),
+        expiredDayOffset = new Parameter<>(this, Static.EXPIRED_ITEMS_OFFSET.key,
+                previousValue -> Static.EXPIRED_ITEMS_OFFSET.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
-        upcomingDayOffset = new Parameter<>(this, Keys.UPCOMING_ITEMS_OFFSET.key,
-                previousValue -> Keys.UPCOMING_ITEMS_OFFSET.get(getSubKeys()),
+        upcomingDayOffset = new Parameter<>(this, Static.UPCOMING_ITEMS_OFFSET.key,
+                previousValue -> Static.UPCOMING_ITEMS_OFFSET.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
-        adaptiveColorBalance = new Parameter<>(this, Keys.ADAPTIVE_COLOR_BALANCE.key,
-                previousValue -> Keys.ADAPTIVE_COLOR_BALANCE.get(getSubKeys()),
+        adaptiveColorBalance = new Parameter<>(this, Static.ADAPTIVE_COLOR_BALANCE.key,
+                previousValue -> Static.ADAPTIVE_COLOR_BALANCE.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
@@ -382,11 +382,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         parameterMap = mapParameters(this);
         
         startDayLocal = previousValue ->
-                isFromSystemCalendar() ? event.startDayLocal : Long.parseLong(params.getOrDefault(Keys.START_DAY_UTC, Keys.DAY_FLAG_GLOBAL_STR));
+                isFromSystemCalendar() ? event.startDayLocal : Long.parseLong(params.getOrDefault(Static.START_DAY_UTC, Static.DAY_FLAG_GLOBAL_STR));
         endDayLocal = previousValue ->
-                isFromSystemCalendar() ? event.endDayLocal : Long.parseLong(params.getOrDefault(Keys.END_DAY_UTC, Keys.DAY_FLAG_GLOBAL_STR));
+                isFromSystemCalendar() ? event.endDayLocal : Long.parseLong(params.getOrDefault(Static.END_DAY_UTC, Static.DAY_FLAG_GLOBAL_STR));
         rawTextValue = previousValue ->
-                isFromSystemCalendar() ? event.title : params.getOrDefault(Keys.TEXT_VALUE, "");
+                isFromSystemCalendar() ? event.title : params.getOrDefault(Static.TEXT_VALUE, "");
     }
     
     // get calendar key for calendar entries and null for normal entries
@@ -542,7 +542,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         // shallow copy map
         SArrayMap<String, String> displayParams = new SArrayMap<>(params);
         // remove not display parameters
-        displayParams.removeAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
+        displayParams.removeAll(Arrays.asList(Static.TEXT_VALUE, Static.START_DAY_UTC, Static.END_DAY_UTC, Static.IS_COMPLETED));
         return displayParams;
     }
     
@@ -554,7 +554,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
     public boolean removeDisplayParams() {
         invalidateAllParameters(true);
-        return params.retainAll(Arrays.asList(Keys.TEXT_VALUE, Keys.START_DAY_UTC, Keys.END_DAY_UTC, Keys.IS_COMPLETED));
+        return params.retainAll(Arrays.asList(Static.TEXT_VALUE, Static.START_DAY_UTC, Static.END_DAY_UTC, Static.IS_COMPLETED));
     }
     
     /**
@@ -609,7 +609,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     public boolean isCompleted() {
         // everything else except "true" is false, so we are fine here
-        return Boolean.parseBoolean(params.get(Keys.IS_COMPLETED));
+        return Boolean.parseBoolean(params.get(Static.IS_COMPLETED));
     }
     
     public boolean isVisibleOnLockscreenToday() {
@@ -618,15 +618,15 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 return true;
             }
             
-            if (!Keys.CALENDAR_SHOW_ON_LOCK.get(event.subKeys)) {
+            if (!Static.CALENDAR_SHOW_ON_LOCK.get(event.subKeys)) {
                 return false;
             }
             
-            if (!event.isAllDay && Keys.HIDE_EXPIRED_ENTRIES_BY_TIME.get(event.subKeys)) {
+            if (!event.isAllDay && Static.HIDE_EXPIRED_ENTRIES_BY_TIME.get(event.subKeys)) {
                 return isVisibleExact(currentDayUTC, currentTimestampUTC);
             }
         } else if (isGlobal()) {
-            return Keys.SHOW_GLOBAL_ITEMS_LOCK.get();
+            return Static.SHOW_GLOBAL_ITEMS_LOCK.get();
         }
         
         return !isCompleted() && isVisible(currentDayUTC);
@@ -803,8 +803,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         if (!isFromSystemCalendar()) {
             return false;
         }
-        if (Keys.HIDE_ENTRIES_BY_CONTENT.get(event.subKeys)) {
-            String matchString = Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT.get(event.subKeys);
+        if (Static.HIDE_ENTRIES_BY_CONTENT.get(event.subKeys)) {
+            String matchString = Static.HIDE_ENTRIES_BY_CONTENT_CONTENT.get(event.subKeys);
             if (matchString.isEmpty()) {
                 return false;
             }
@@ -878,7 +878,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public boolean isGlobal() {
-        return startDayLocal.get() == Keys.DAY_FLAG_GLOBAL;
+        return startDayLocal.get() == Static.DAY_FLAG_GLOBAL;
     }
     
     @NonNull

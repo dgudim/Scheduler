@@ -23,7 +23,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
 
 // a list specifically for storing TodoEntries, automatically unlinks groups on remove to avoid memory leaks
@@ -255,7 +255,7 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
         }
         
         // our event is not today's, we need to check SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET to the left and to the right
-        for (long day_offset = 1; day_offset <= Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET; day_offset++) {
+        for (long day_offset = 1; day_offset <= Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET; day_offset++) {
             // + + + event + + +
             //       event     we are here
             if (coreDays.contains(day - day_offset)) {

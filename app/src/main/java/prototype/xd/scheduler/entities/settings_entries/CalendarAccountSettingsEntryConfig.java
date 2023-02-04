@@ -17,7 +17,7 @@ import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.utilities.ContextWrapper;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
@@ -63,7 +63,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         @Override
         void bind(@NonNull CalendarAccountSettingsEntryConfig config) {
             viewBinding.accountIcon.setImageResource(getIconFromAccountType(config.accountType));
-            viewBinding.root.setBackgroundColor(dimColorToBg(config.calendarColor, viewBinding.root.getContext(), Keys.CALENDAR_SETTINGS_DIM_FACTOR));
+            viewBinding.root.setBackgroundColor(dimColorToBg(config.calendarColor, viewBinding.root.getContext(), Static.CALENDAR_SETTINGS_DIM_FACTOR));
             viewBinding.calendarName.setText(config.accountName);
             viewBinding.accountType.setText(config.accountType);
             viewBinding.settingsButton.setOnClickListener(v ->

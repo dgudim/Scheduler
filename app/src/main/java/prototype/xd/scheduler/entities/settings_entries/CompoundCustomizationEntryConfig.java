@@ -19,7 +19,7 @@ import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBind
 import prototype.xd.scheduler.databinding.TodoItemViewSelectionDialogBinding;
 import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DialogUtilities;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
@@ -56,30 +56,30 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                 @ColorInt
                 @Override
                 protected int currentFontColorGetter() {
-                    return Keys.FONT_COLOR.CURRENT.get();
+                    return Static.FONT_COLOR.CURRENT.get();
                 }
                 
                 @ColorInt
                 @Override
                 protected int currentBgColorGetter() {
-                    return Keys.BG_COLOR.CURRENT.get();
+                    return Static.BG_COLOR.CURRENT.get();
                 }
                 
                 @ColorInt
                 @Override
                 protected int currentBorderColorGetter() {
-                    return Keys.BORDER_COLOR.CURRENT.get();
+                    return Static.BORDER_COLOR.CURRENT.get();
                 }
                 
                 @Override
                 protected int currentBorderThicknessGetter() {
-                    return Keys.BORDER_THICKNESS.CURRENT.get();
+                    return Static.BORDER_THICKNESS.CURRENT.get();
                 }
                 
                 @IntRange(from = 0, to = 10)
                 @Override
                 protected int adaptiveColorBalanceGetter() {
-                    return Keys.ADAPTIVE_COLOR_BALANCE.get();
+                    return Static.ADAPTIVE_COLOR_BALANCE.get();
                 }
             };
             
@@ -112,7 +112,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.previewContainer.setOnClickListener(v ->
                     viewSelectionDialog.show());
             
-            ObjIntConsumer<Keys.DefaultedInteger> colorPickerColorSelectedListener = (value, selectedColor) -> {
+            ObjIntConsumer<Static.DefaultedInteger> colorPickerColorSelectedListener = (value, selectedColor) -> {
                 value.put(selectedColor);
                 entryPreviewContainer.notifyColorChanged(value, selectedColor);
             };
@@ -120,75 +120,75 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             viewBinding.currentBackgroundColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.BG_COLOR.CURRENT));
+                            Static.BG_COLOR.CURRENT));
             viewBinding.upcomingBackgroundColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.BG_COLOR.UPCOMING));
+                            Static.BG_COLOR.UPCOMING));
             viewBinding.expiredBackgroundColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.BG_COLOR.EXPIRED));
+                            Static.BG_COLOR.EXPIRED));
             
             viewBinding.currentFontColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.FONT_COLOR.CURRENT));
+                            Static.FONT_COLOR.CURRENT));
             viewBinding.upcomingFontColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.FONT_COLOR.UPCOMING));
+                            Static.FONT_COLOR.UPCOMING));
             viewBinding.expiredFontColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.FONT_COLOR.EXPIRED));
+                            Static.FONT_COLOR.EXPIRED));
             
             viewBinding.currentBorderColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.BORDER_COLOR.CURRENT));
+                            Static.BORDER_COLOR.CURRENT));
             viewBinding.upcomingBorderColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.BORDER_COLOR.UPCOMING));
+                            Static.BORDER_COLOR.UPCOMING));
             viewBinding.expiredBorderColorSelector.setOnClickListener(v ->
                     DialogUtilities.displayColorPicker(wrapper,
                             colorPickerColorSelectedListener,
-                            Keys.BORDER_COLOR.EXPIRED));
+                            Static.BORDER_COLOR.EXPIRED));
             
             Utilities.setSliderChangeListener(
                     viewBinding.adaptiveColorBalanceDescription,
                     viewBinding.adaptiveColorBalanceSlider,
                     (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setPreviewAdaptiveColorBalance(sliderValue),
                     R.string.settings_adaptive_color_balance,
-                    Keys.ADAPTIVE_COLOR_BALANCE, true);
+                    Static.ADAPTIVE_COLOR_BALANCE, true);
             
             Utilities.setSliderChangeListener(
                     viewBinding.upcomingBorderThicknessDescription,
                     viewBinding.upcomingBorderThicknessSlider,
                     (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setUpcomingPreviewBorderThickness(sliderValue),
                     R.string.settings_upcoming_border_thickness,
-                    Keys.BORDER_THICKNESS.UPCOMING, true);
+                    Static.BORDER_THICKNESS.UPCOMING, true);
             
             Utilities.setSliderChangeListener(
                     viewBinding.currentBorderThicknessDescription,
                     viewBinding.currentBorderThicknessSlider,
                     (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setCurrentPreviewBorderThickness(sliderValue),
                     R.string.settings_current_border_thickness,
-                    Keys.BORDER_THICKNESS.CURRENT, true);
+                    Static.BORDER_THICKNESS.CURRENT, true);
             
             Utilities.setSliderChangeListener(
                     viewBinding.expiredBorderThicknessDescription,
                     viewBinding.expiredBorderThicknessSlider,
                     (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setExpiredPreviewBorderThickness(sliderValue),
                     R.string.settings_expired_border_thickness,
-                    Keys.BORDER_THICKNESS.EXPIRED, true);
+                    Static.BORDER_THICKNESS.EXPIRED, true);
             
             Utilities.setSliderChangeListener(
                     viewBinding.fontSizeDescription,
                     viewBinding.fontSizeSlider,
                     (slider, sliderValue, fromUser, value) -> entryPreviewContainer.setPreviewFontSize(sliderValue), R.string.settings_font_size,
-                    Keys.FONT_SIZE, false);
+                    Static.FONT_SIZE, false);
             
         }
         

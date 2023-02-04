@@ -11,7 +11,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
 import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
 @MainThread
@@ -36,11 +36,11 @@ public abstract class PopupSettingsView {
         bnd = EntrySettingsBinding.inflate(wrapper.getLayoutInflater());
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
         
-        bnd.showDaysUpcomingSlider.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
-        bnd.showDaysExpiredSlider.setValueTo(Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
+        bnd.showDaysUpcomingSlider.setValueTo(Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
+        bnd.showDaysExpiredSlider.setValueTo(Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         
-        new GraphicsUtilities.SliderTinter(wrapper.context, Keys.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
-        new GraphicsUtilities.SliderTinter(wrapper.context, Keys.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
+        new GraphicsUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
+        new GraphicsUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
         
         entryPreviewContainer = getEntryPreviewContainer();
         entryPreviewContainer.attachCurrentSelectors(
@@ -69,7 +69,7 @@ public abstract class PopupSettingsView {
     /**
      * public method that should be called when some color changes (font, bg, border), for example from a switch listener
      */
-    public void notifyColorChanged(@NonNull Keys.DefaultedInteger value, int newColor) {
+    public void notifyColorChanged(@NonNull Static.DefaultedInteger value, int newColor) {
         entryPreviewContainer.notifyColorChanged(value, newColor);
     }
     
@@ -82,17 +82,17 @@ public abstract class PopupSettingsView {
     protected abstract void setStateIconColor(@NonNull TextView icon, @NonNull String parameterKey);
     
     protected void updateAllIndicators() {
-        setStateIconColor(bnd.fontColorState, Keys.FONT_COLOR.CURRENT.key);
-        setStateIconColor(bnd.backgroundColorState, Keys.BG_COLOR.CURRENT.key);
-        setStateIconColor(bnd.borderColorState, Keys.BORDER_COLOR.CURRENT.key);
-        setStateIconColor(bnd.borderThicknessState, Keys.BORDER_THICKNESS.CURRENT.key);
-        setStateIconColor(bnd.priorityState, Keys.PRIORITY.key);
-        setStateIconColor(bnd.showOnLockState, Keys.CALENDAR_SHOW_ON_LOCK.key);
-        setStateIconColor(bnd.adaptiveColorBalanceState, Keys.ADAPTIVE_COLOR_BALANCE.key);
-        setStateIconColor(bnd.showDaysUpcomingState, Keys.UPCOMING_ITEMS_OFFSET.key);
-        setStateIconColor(bnd.showDaysExpiredState, Keys.EXPIRED_ITEMS_OFFSET.key);
-        setStateIconColor(bnd.hideExpiredItemsByTimeState, Keys.HIDE_EXPIRED_ENTRIES_BY_TIME.key);
-        setStateIconColor(bnd.hideByContentSwitchState, Keys.HIDE_ENTRIES_BY_CONTENT.key);
-        setStateIconColor(bnd.hideByContentFieldState, Keys.HIDE_ENTRIES_BY_CONTENT_CONTENT.key);
+        setStateIconColor(bnd.fontColorState, Static.FONT_COLOR.CURRENT.key);
+        setStateIconColor(bnd.backgroundColorState, Static.BG_COLOR.CURRENT.key);
+        setStateIconColor(bnd.borderColorState, Static.BORDER_COLOR.CURRENT.key);
+        setStateIconColor(bnd.borderThicknessState, Static.BORDER_THICKNESS.CURRENT.key);
+        setStateIconColor(bnd.priorityState, Static.PRIORITY.key);
+        setStateIconColor(bnd.showOnLockState, Static.CALENDAR_SHOW_ON_LOCK.key);
+        setStateIconColor(bnd.adaptiveColorBalanceState, Static.ADAPTIVE_COLOR_BALANCE.key);
+        setStateIconColor(bnd.showDaysUpcomingState, Static.UPCOMING_ITEMS_OFFSET.key);
+        setStateIconColor(bnd.showDaysExpiredState, Static.EXPIRED_ITEMS_OFFSET.key);
+        setStateIconColor(bnd.hideExpiredItemsByTimeState, Static.HIDE_EXPIRED_ENTRIES_BY_TIME.key);
+        setStateIconColor(bnd.hideByContentSwitchState, Static.HIDE_ENTRIES_BY_CONTENT.key);
+        setStateIconColor(bnd.hideByContentFieldState, Static.HIDE_ENTRIES_BY_CONTENT_CONTENT.key);
     }
 }

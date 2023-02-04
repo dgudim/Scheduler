@@ -1,14 +1,14 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE;
-import static prototype.xd.scheduler.utilities.Keys.ENTRIES_FILE_BACKUP;
-import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE;
-import static prototype.xd.scheduler.utilities.Keys.GROUPS_FILE_BACKUP;
-import static prototype.xd.scheduler.utilities.Keys.MERGE_ENTRIES;
-import static prototype.xd.scheduler.utilities.Keys.PACKAGE_PROVIDER_NAME;
-import static prototype.xd.scheduler.utilities.Keys.ROOT_DIR;
-import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_SORTING_ORDER;
-import static prototype.xd.scheduler.utilities.Keys.TODO_LIST_INITIAL_CAPACITY;
+import static prototype.xd.scheduler.utilities.Static.ENTRIES_FILE;
+import static prototype.xd.scheduler.utilities.Static.ENTRIES_FILE_BACKUP;
+import static prototype.xd.scheduler.utilities.Static.GROUPS_FILE;
+import static prototype.xd.scheduler.utilities.Static.GROUPS_FILE_BACKUP;
+import static prototype.xd.scheduler.utilities.Static.MERGE_ENTRIES;
+import static prototype.xd.scheduler.utilities.Static.PACKAGE_PROVIDER_NAME;
+import static prototype.xd.scheduler.utilities.Static.ROOT_DIR;
+import static prototype.xd.scheduler.utilities.Static.TODO_ITEM_SORTING_ORDER;
+import static prototype.xd.scheduler.utilities.Static.TODO_LIST_INITIAL_CAPACITY;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Logger.warning;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.addTodoEntriesFromCalendars;
@@ -326,14 +326,14 @@ public final class Utilities {
     
     @FunctionalInterface
     public interface SliderOnChangeKeyedListener {
-        void onValueChanged(@NonNull Slider slider, int sliderValue, boolean fromUser, @NonNull Keys.DefaultedInteger value);
+        void onValueChanged(@NonNull Slider slider, int sliderValue, boolean fromUser, @NonNull Static.DefaultedInteger value);
     }
     
     public static void setSliderChangeListener(@NonNull final TextView displayTo,
                                                @NonNull final Slider slider,
                                                @Nullable final SliderOnChangeKeyedListener onChangeListener,
                                                @StringRes @PluralsRes final int stringResource,
-                                               @NonNull Keys.DefaultedInteger value,
+                                               @NonNull Static.DefaultedInteger value,
                                                boolean zeroIsOff) {
         Context context = displayTo.getContext();
         IntFunction<String> textFormatter = progress -> {
@@ -350,7 +350,7 @@ public final class Utilities {
     public static void setSliderChangeListener(@NonNull final TextView displayTo,
                                                @NonNull final Slider slider,
                                                @Nullable final SliderOnChangeKeyedListener onChangeListener,
-                                               @NonNull Keys.DefaultedInteger value,
+                                               @NonNull Static.DefaultedInteger value,
                                                @NonNull IntFunction<String> textFormatter) {
         int loadedVal = value.get();
         displayTo.setText(textFormatter.apply(loadedVal));
@@ -384,8 +384,8 @@ public final class Utilities {
                                                @NonNull final TextView stateIcon,
                                                @NonNull final PopupSettingsView settingsView,
                                                @StringRes @PluralsRes final int stringResource,
-                                               @NonNull final Keys.DefaultedInteger value,
-                                               @NonNull final ToIntFunction<Keys.DefaultedInteger> initialValueFactory,
+                                               @NonNull final Static.DefaultedInteger value,
+                                               @NonNull final ToIntFunction<Static.DefaultedInteger> initialValueFactory,
                                                @Nullable final Slider.OnChangeListener customProgressListener,
                                                @Nullable final Slider.OnSliderTouchListener customTouchListener) {
         int initialValue = initialValueFactory.applyAsInt(value);
@@ -425,8 +425,8 @@ public final class Utilities {
                                                @NonNull final TextView stateIcon,
                                                @NonNull final PopupSettingsView systemCalendarSettings,
                                                @StringRes @PluralsRes final int stringResource,
-                                               @NonNull final Keys.DefaultedInteger value,
-                                               @NonNull final ToIntFunction<Keys.DefaultedInteger> initialValueFactory,
+                                               @NonNull final Static.DefaultedInteger value,
+                                               @NonNull final ToIntFunction<Static.DefaultedInteger> initialValueFactory,
                                                @Nullable final Slider.OnChangeListener customProgressListener) {
         setSliderChangeListener(
                 displayTo, slider, stateIcon, systemCalendarSettings,
@@ -435,7 +435,7 @@ public final class Utilities {
     
     //switch listener for regular settings
     public static void setSwitchChangeListener(@NonNull final Switch tSwitch,
-                                               @NonNull final Keys.DefaultedBoolean defaultedBoolean,
+                                               @NonNull final Static.DefaultedBoolean defaultedBoolean,
                                                @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener) {
         tSwitch.setCheckedSilent(defaultedBoolean.get());
         tSwitch.setOnCheckedChangeListener((switchView, isChecked) -> {
@@ -450,8 +450,8 @@ public final class Utilities {
     public static void setSwitchChangeListener(@NonNull final Switch tSwitch,
                                                @NonNull final TextView stateIcon,
                                                @NonNull final PopupSettingsView settingsView,
-                                               @NonNull final Keys.DefaultedBoolean value,
-                                               @NonNull final Predicate<Keys.DefaultedBoolean> initialValueFactory) {
+                                               @NonNull final Static.DefaultedBoolean value,
+                                               @NonNull final Predicate<Static.DefaultedBoolean> initialValueFactory) {
         tSwitch.setCheckedSilent(initialValueFactory.test(value));
         tSwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
                 settingsView.notifyParameterChanged(stateIcon, value.key, isChecked));

@@ -18,7 +18,7 @@ import com.google.android.material.color.MaterialColors;
 
 import java.util.Locale;
 
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 
 public class IntroActivity extends AppIntro {
     
@@ -26,7 +26,7 @@ public class IntroActivity extends AppIntro {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     
-        Keys.init(this);
+        Static.init(this);
         
         HarmonizedColors.applyToContextIfAvailable(this,
                 new HarmonizedColorsOptions.Builder()

@@ -6,6 +6,8 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixTwoColors;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntUnaryOperator;
+import java.util.function.UnaryOperator;
 
 import kotlin.jvm.functions.Function2;
 import prototype.xd.scheduler.BuildConfig;
@@ -25,11 +28,11 @@ import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.Triplet.DefaultedValueTriplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
-public final class Keys {
+public final class Static {
     
-    public static final String NAME = Keys.class.getSimpleName();
+    public static final String NAME = Static.class.getSimpleName();
     
-    private Keys() throws InstantiationException {
+    private Static() throws InstantiationException {
         throw new InstantiationException(NAME);
     }
     
@@ -461,4 +464,12 @@ public final class Keys {
     
     public static final String TIME_RANGE_SEPARATOR = " - ";
     public static final String KEY_SEPARATOR = "_";
+    
+    public static final UnaryOperator<IntentFilter> calendarChangedIntentFilter = filter -> {
+        filter.addAction(Intent.ACTION_PROVIDER_CHANGED);
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY - 100);
+        filter.addDataScheme("content");
+        filter.addDataAuthority("com.android.calendar", null);
+        return filter;
+    };
 }

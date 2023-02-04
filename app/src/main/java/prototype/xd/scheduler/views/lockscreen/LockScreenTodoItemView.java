@@ -4,10 +4,10 @@ import static prototype.xd.scheduler.utilities.GraphicsUtilities.getAverageColor
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedSecondaryFontColorWithBg;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
-import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
-import static prototype.xd.scheduler.utilities.Keys.ITEM_FULL_WIDTH_LOCK;
-import static prototype.xd.scheduler.utilities.Keys.SHOW_GLOBAL_ITEMS_LABEL_LOCK;
+import static prototype.xd.scheduler.utilities.Static.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_DENSITY;
+import static prototype.xd.scheduler.utilities.Static.ITEM_FULL_WIDTH_LOCK;
+import static prototype.xd.scheduler.utilities.Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -30,7 +30,7 @@ import prototype.xd.scheduler.databinding.BasicEntryBinding;
 import prototype.xd.scheduler.databinding.RoundedEntryBinding;
 import prototype.xd.scheduler.databinding.SleekEntryBinding;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 
 // base class for lockscreen todolist entries
 public abstract class LockScreenTodoItemView<V extends ViewBinding> {
@@ -41,7 +41,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     private final View root;
     private final Context context;
     
-    private static final Pattern timeSplitPattern = Pattern.compile(Keys.TIME_RANGE_SEPARATOR);
+    private static final Pattern timeSplitPattern = Pattern.compile(Static.TIME_RANGE_SEPARATOR);
     
     LockScreenTodoItemView(@NonNull V binding) {
         viewBinding = binding;
@@ -112,7 +112,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     @NonNull
     public LockScreenTodoItemView<V> applyLayoutIndependentParameters(@NonNull TodoEntry entry) {
         
-        int fontSizeSP = Keys.FONT_SIZE.get();
+        int fontSizeSP = Static.FONT_SIZE.get();
         
         setBorderSizeDP(entry.borderThickness.get(currentDayUTC));
         

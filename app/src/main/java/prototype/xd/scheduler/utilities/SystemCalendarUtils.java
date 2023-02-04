@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.utilities.Keys.KEY_SEPARATOR;
+import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
+import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 
 import android.content.ContentResolver;
@@ -84,6 +85,43 @@ public final class SystemCalendarUtils {
         return systemCalendars;
     }
     
+    public static void addMissingCalendars(@NonNull Context context, @NonNull List<SystemCalendar> calendars) {
+        ContentResolver resolver = context.getContentResolver();
+        
+        List<Long> previousIds = new ArrayList<>(calendars.size());
+        for(SystemCalendar cal: calendars) {
+            previousIds.add(cal.id);
+        }
+        List<Long> newIds = new ArrayList<>(calendars.size());
+        
+        try (Cursor cursor = query(resolver, CalendarContract.Calendars.CONTENT_URI, CALENDAR_COLUMNS.toArray(new String[0]), null)) {
+            while (cursor.moveToNext()) {
+                long id = getLong(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars._ID);
+                newIds.add(id);
+                int index = previousIds.indexOf(id);
+                if(index != -1) {
+                    // calendar already exists
+                    SystemCalendar oldCalendar = calendars.get(index);
+                    oldCalendar.loadMissingEvents();
+                    Logger.info(NAME, "Refreshed " + oldCalendar);
+                    continue;
+                }
+                SystemCalendar newCalendar = new SystemCalendar(cursor, resolver, false);
+                calendars.add(newCalendar);
+                Logger.info(NAME, "Added " + newCalendar);
+            }
+        }
+        
+        // remove deleted calendars
+        calendars.removeIf(calendar -> {
+            if(!newIds.contains(calendar.id)) {
+                Logger.info(NAME, "Removed " + calendar);
+                return true;
+            }
+            return false;
+        });
+    }
+    
     /**
      * Get TodoEntries from a list of system calendars
      *
@@ -98,11 +136,11 @@ public final class SystemCalendarUtils {
         int initialSize = list.size();
         for (SystemCalendar calendar : calendars) {
             // add all events from all calendars
-            calendar.addVisibleEventsToList(dayStart, dayEnd, list, TodoEntry::new);
+            calendar.addVisibleEventsToList(dayStart, dayEnd, list);
         }
         Logger.info(NAME, "Read calendar entries: " + (list.size() - initialSize));
     }
-
+    
     @NonNull
     public static Spannable calendarKeyToReadable(@NonNull Context context, @NonNull String calendarKey) {
         String[] splitKey = calendarKey.split(KEY_SEPARATOR);

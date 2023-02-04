@@ -6,11 +6,11 @@ import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAddit
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedSecondaryFontColorWithBg;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
-import static prototype.xd.scheduler.utilities.Keys.END_DAY_UTC;
-import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
-import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
+import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
+import static prototype.xd.scheduler.utilities.Static.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
+import static prototype.xd.scheduler.utilities.Static.TEXT_VALUE;
 
 import android.view.LayoutInflater;
 import android.view.View;

@@ -2,18 +2,21 @@ package prototype.xd.scheduler.utilities;
 
 import static java.lang.Math.min;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
-import static prototype.xd.scheduler.utilities.Keys.BG_COLOR;
-import static prototype.xd.scheduler.utilities.Keys.END_DAY_UTC;
-import static prototype.xd.scheduler.utilities.Keys.EXPIRED_ITEMS_OFFSET;
-import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
-import static prototype.xd.scheduler.utilities.Keys.UPCOMING_ITEMS_OFFSET;
-import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.Logger.error;
+import static prototype.xd.scheduler.utilities.Static.BG_COLOR;
+import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
+import static prototype.xd.scheduler.utilities.Static.EXPIRED_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Static.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
+import static prototype.xd.scheduler.utilities.Static.UPCOMING_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Static.setBitmapUpdateFlag;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.addMissingCalendars;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
+
+import android.content.Context;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.MainThread;
@@ -126,7 +129,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         saveQueue = new LinkedBlockingQueue<>();
         groups = loadGroups();
         
-        todoEntries = new TodoEntryList(Keys.TODO_LIST_INITIAL_CAPACITY);
+        todoEntries = new TodoEntryList(Static.TODO_LIST_INITIAL_CAPACITY);
         updateStaticVarsAndCalendarVisibility();
         
         wrapper.addLifecycleObserver(this); // NOSONAR, this is fine, just adding an observer
@@ -199,6 +202,8 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
+        // remove references to ui
+        detachCalendarView();
         Logger.info(NAME, "Cleaning up " + NAME + " (" + todoEntries.size() + " entries, " + groups.size() + " groups)");
         //stop IO thread
         asyncSaver.interrupt();
@@ -223,7 +228,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     private void updateStaticVarsAndCalendarVisibility() {
-        displayUpcomingExpired = Keys.SHOW_UPCOMING_EXPIRED_IN_LIST.get();
+        displayUpcomingExpired = Static.SHOW_UPCOMING_EXPIRED_IN_LIST.get();
         
         todoEntries.setUpcomingExpiredVisibility(displayUpcomingExpired);
         
@@ -291,12 +296,42 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     /**
+     * tells calendar list that all months have changed
+     */
+    public void notifyCalendarChanged() {
+        Logger.debug(NAME, "NotifyCalendarChanged called");
+        if (calendarView != null) {
+            calendarView.notifyCalendarChanged();
+        }
+    }
+    
+    public void notifyCalendarProviderChanged(@NonNull Context context) {
+        Logger.debug(NAME, "notifyCalendarProviderChanged called");
+        addMissingCalendars(context, calendars);
+        for (SystemCalendar calendar : calendars) {
+            // will be loaded when notifyDatasetChanged is called
+            // TODO: 02.02.2023 compute difference instead
+            calendar.unlinkAllTodoEntries();
+        }
+        notifyDatasetChanged();
+    }
+    
+    public void notifyDatasetChanged() {
+        Logger.debug(NAME, "Dataset changed!");
+        notifyDatasetChanged(false);
+    }
+    
+    public void notifyTimezoneChanged() {
+        Logger.debug(NAME, "Dataset timezone changed!");
+        notifyDatasetChanged(true);
+    }
+    
+    /**
      * Tells all entries that their parameters have changed and refreshes all ui stuff
      *
      * @param timezoneChanged did the system timezone change
      */
-    public void notifyDatasetChanged(boolean timezoneChanged) {
-        Logger.debug(NAME, "Dataset changed! (timezone changed: " + timezoneChanged + " )");
+    private void notifyDatasetChanged(boolean timezoneChanged) {
         for (TodoEntry todoEntry : todoEntries) {
             todoEntry.invalidateAllParameters(false);
             if (timezoneChanged && todoEntry.isFromSystemCalendar()) {
@@ -310,10 +345,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
             }
         }
         updateStaticVarsAndCalendarVisibility();
-        if (calendarView != null) {
-            // tells calendar list that all months have changed
-            calendarView.notifyCalendarChanged();
-        }
+        notifyCalendarChanged();
         notifyEntryListChanged();
         setBitmapUpdateFlag();
     }

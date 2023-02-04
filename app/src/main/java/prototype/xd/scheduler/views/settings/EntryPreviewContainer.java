@@ -1,6 +1,6 @@
 package prototype.xd.scheduler.views.settings;
 
-import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
+import static prototype.xd.scheduler.utilities.Static.TODO_ITEM_VIEW_TYPE;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,7 +16,7 @@ import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.ContextWrapper;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Triplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 
@@ -94,28 +94,28 @@ public abstract class EntryPreviewContainer {
     
     public void refreshAll(boolean reInflate) {
         
-        fontColor.upcoming = Keys.FONT_COLOR.UPCOMING.get();
+        fontColor.upcoming = Static.FONT_COLOR.UPCOMING.get();
         fontColor.current = currentFontColorGetter();
-        fontColor.expired = Keys.FONT_COLOR.EXPIRED.get();
+        fontColor.expired = Static.FONT_COLOR.EXPIRED.get();
         
-        bgColor.upcoming = Keys.BG_COLOR.UPCOMING.get();
+        bgColor.upcoming = Static.BG_COLOR.UPCOMING.get();
         bgColor.current = currentBgColorGetter();
-        bgColor.expired = Keys.BG_COLOR.EXPIRED.get();
+        bgColor.expired = Static.BG_COLOR.EXPIRED.get();
         
-        borderColor.upcoming = Keys.BORDER_COLOR.UPCOMING.get();
+        borderColor.upcoming = Static.BORDER_COLOR.UPCOMING.get();
         borderColor.current = currentBorderColorGetter();
-        borderColor.expired = Keys.BORDER_COLOR.EXPIRED.get();
+        borderColor.expired = Static.BORDER_COLOR.EXPIRED.get();
         
         adaptiveColorBalance = adaptiveColorBalanceGetter();
         
         updatePreviewFontAndBgColors();
         updatePreviewBorderColors();
         
-        setUpcomingPreviewBorderThickness(Keys.BORDER_THICKNESS.UPCOMING.get());
+        setUpcomingPreviewBorderThickness(Static.BORDER_THICKNESS.UPCOMING.get());
         setCurrentPreviewBorderThickness(currentBorderThicknessGetter());
-        setExpiredPreviewBorderThickness(Keys.BORDER_THICKNESS.UPCOMING.get());
+        setExpiredPreviewBorderThickness(Static.BORDER_THICKNESS.UPCOMING.get());
         
-        setPreviewFontSize(Keys.FONT_SIZE.get());
+        setPreviewFontSize(Static.FONT_SIZE.get());
         
         if (reInflate) {
             setTodoItemViewType(TODO_ITEM_VIEW_TYPE.get());
@@ -212,18 +212,18 @@ public abstract class EntryPreviewContainer {
         entryPreview.expired.setBorderColor(borderColor.getExpiredMixed(surfaceColor, adaptiveColorBalance));
     }
     
-    public void notifyColorChanged(@NonNull Keys.DefaultedInteger value, int newColor) {
-        if (Keys.BG_COLOR.has(value)) {
+    public void notifyColorChanged(@NonNull Static.DefaultedInteger value, int newColor) {
+        if (Static.BG_COLOR.has(value)) {
             bgColor.setByType(value.getType(), newColor);
             updatePreviewFontAndBgColors();
             return;
         }
-        if (Keys.FONT_COLOR.has(value)) {
+        if (Static.FONT_COLOR.has(value)) {
             fontColor.setByType(value.getType(), newColor);
             updatePreviewFontAndBgColors();
             return;
         }
-        if (Keys.BORDER_COLOR.has(value)) {
+        if (Static.BORDER_COLOR.has(value)) {
             borderColor.setByType(value.getType(), newColor);
             updatePreviewBorderColors();
         }

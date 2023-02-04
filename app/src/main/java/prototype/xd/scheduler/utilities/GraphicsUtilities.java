@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.utilities;
 
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.utilities.Keys.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
-import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
-import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
+import static prototype.xd.scheduler.utilities.Static.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -193,11 +193,11 @@ public final class GraphicsUtilities {
     }
     
     public static int dimColorToBg(@ColorInt int color, @ColorInt int bgColor) {
-        return mixTwoColors(color, bgColor, Keys.DEFAULT_DIM_FACTOR);
+        return mixTwoColors(color, bgColor, Static.DEFAULT_DIM_FACTOR);
     }
     
     public static int dimColorToBg(@ColorInt int color, @NonNull Context context) {
-        return mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), Keys.DEFAULT_DIM_FACTOR);
+        return mixTwoColors(color, MaterialColors.getColor(context, R.attr.colorSurface, Color.GRAY), Static.DEFAULT_DIM_FACTOR);
     }
     
     public static int dimColorToBg(@ColorInt int color, @NonNull Context context, @FloatRange(from = 0.0, to = 1.0) double balance) {
@@ -222,7 +222,7 @@ public final class GraphicsUtilities {
     
     // mix and harmonize (25% background color, 75% font color + harmonized with background);
     public static int getHarmonizedSecondaryFontColorWithBg(@ColorInt int color, @ColorInt int backgroundColor) {
-        return getHarmonizedFontColorWithBg(mixTwoColors(color, backgroundColor, Keys.DEFAULT_SECONDARY_TEXT_COLOR_MIX_FACTOR), backgroundColor);
+        return getHarmonizedFontColorWithBg(mixTwoColors(color, backgroundColor, Static.DEFAULT_SECONDARY_TEXT_COLOR_MIX_FACTOR), backgroundColor);
     }
     
     // mix color with bg color based on balance (from 1 to 10)

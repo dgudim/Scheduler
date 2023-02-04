@@ -31,7 +31,7 @@ import prototype.xd.scheduler.databinding.SortingSettingsFragmentBinding;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 
 public class SortingSettingsFragment extends BaseSettingsFragment<SortingSettingsFragmentBinding> {
     
@@ -53,7 +53,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         
         List<SettingsEntryConfig> settingsEntries = List.of(
                 new SwitchSettingsEntryConfig(
-                        Keys.TREAT_GLOBAL_ITEMS_AS_TODAYS, getString(R.string.treat_global_as_todays),
+                        Static.TREAT_GLOBAL_ITEMS_AS_TODAYS, getString(R.string.treat_global_as_todays),
                         (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true));
         
         binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
@@ -72,7 +72,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
         
         private EntryTypeAdapter() {
             itemDragHelper = new ItemTouchHelper(new DragHelperCallback(this));
-            sortOrder = Keys.TODO_ITEM_SORTING_ORDER.get();
+            sortOrder = Static.TODO_ITEM_SORTING_ORDER.get();
             globalEventsVisible = sortOrder.contains(TodoEntry.EntryType.GLOBAL);
         }
         
@@ -90,7 +90,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
                 notifyItemRemoved(indexOfGlobal);
             }
             if (this.globalEventsVisible != globalEventsVisible) {
-                Keys.TODO_ITEM_SORTING_ORDER.put(sortOrder);
+                Static.TODO_ITEM_SORTING_ORDER.put(sortOrder);
             }
             this.globalEventsVisible = globalEventsVisible;
         }
@@ -115,7 +115,7 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
             TodoEntry.EntryType fromNumber = sortOrder.get(fromPosition);
             sortOrder.set(fromPosition, sortOrder.get(toPosition));
             sortOrder.set(toPosition, fromNumber);
-            Keys.TODO_ITEM_SORTING_ORDER.put(sortOrder);
+            Static.TODO_ITEM_SORTING_ORDER.put(sortOrder);
             notifyItemMoved(fromPosition, toPosition);
         }
         
@@ -136,23 +136,23 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
             private void bind(@NonNull TodoEntry.EntryType entryType, @NonNull final ItemTouchHelper dragHelper) {
                 String titleText;
                 String descriptionText;
-                int bgColor = Keys.BG_COLOR.CURRENT.get();
-                int fontColor = Keys.FONT_COLOR.CURRENT.get();
-                int borderColor = Keys.BORDER_COLOR.CURRENT.get();
+                int bgColor = Static.BG_COLOR.CURRENT.get();
+                int fontColor = Static.FONT_COLOR.CURRENT.get();
+                int borderColor = Static.BORDER_COLOR.CURRENT.get();
                 switch (entryType) {
                     case UPCOMING:
                         titleText = context.getString(R.string.upcoming_events);
                         descriptionText = context.getString(R.string.upcoming_events_description);
-                        bgColor = getExpiredUpcomingColor(bgColor, Keys.BG_COLOR.UPCOMING.get());
-                        fontColor = getExpiredUpcomingColor(fontColor, Keys.FONT_COLOR.UPCOMING.get());
-                        borderColor = getExpiredUpcomingColor(borderColor, Keys.BORDER_COLOR.UPCOMING.get());
+                        bgColor = getExpiredUpcomingColor(bgColor, Static.BG_COLOR.UPCOMING.get());
+                        fontColor = getExpiredUpcomingColor(fontColor, Static.FONT_COLOR.UPCOMING.get());
+                        borderColor = getExpiredUpcomingColor(borderColor, Static.BORDER_COLOR.UPCOMING.get());
                         break;
                     case EXPIRED:
                         titleText = context.getString(R.string.expired_events);
                         descriptionText = context.getString(R.string.expired_events_description);
-                        bgColor = getExpiredUpcomingColor(bgColor, Keys.BG_COLOR.EXPIRED.get());
-                        fontColor = getExpiredUpcomingColor(fontColor, Keys.FONT_COLOR.EXPIRED.get());
-                        borderColor = getExpiredUpcomingColor(borderColor, Keys.BORDER_COLOR.EXPIRED.get());
+                        bgColor = getExpiredUpcomingColor(bgColor, Static.BG_COLOR.EXPIRED.get());
+                        fontColor = getExpiredUpcomingColor(fontColor, Static.FONT_COLOR.EXPIRED.get());
+                        borderColor = getExpiredUpcomingColor(borderColor, Static.BORDER_COLOR.EXPIRED.get());
                         break;
                     case TODAY:
                         titleText = context.getString(R.string.todays_events);

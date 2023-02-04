@@ -15,7 +15,7 @@ import java.util.function.IntFunction;
 
 import prototype.xd.scheduler.databinding.SliderSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.ContextWrapper;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
 
 public class SliderSettingsEntryConfig extends SettingsEntryConfig {
@@ -24,7 +24,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     private final int seekMax;
     private final int stepSize;
     private boolean zeroIsOff;
-    private final Keys.DefaultedInteger value;
+    private final Static.DefaultedInteger value;
     @PluralsRes
     @StringRes
     private int stringResource;
@@ -32,7 +32,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     @Nullable
     IntFunction<String> textFormatter;
     
-    public SliderSettingsEntryConfig(@NonNull Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize, boolean zeroIsOff,
+    public SliderSettingsEntryConfig(@NonNull Static.DefaultedInteger value, int seekMin, int seekMax, int stepSize, boolean zeroIsOff,
                                      @StringRes @PluralsRes int stringResource) {
         this.seekMin = seekMin;
         this.seekMax = seekMax;
@@ -42,7 +42,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
         this.stringResource = stringResource;
     }
     
-    public SliderSettingsEntryConfig(@NonNull Keys.DefaultedInteger value, int seekMin, int seekMax, int stepSize,
+    public SliderSettingsEntryConfig(@NonNull Static.DefaultedInteger value, int seekMin, int seekMax, int stepSize,
                                      @NonNull IntFunction<String> textFormatter) {
         this.seekMin = seekMin;
         this.seekMax = seekMax;

@@ -3,19 +3,20 @@ package prototype.xd.scheduler.utilities.services;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayBgName;
+import static prototype.xd.scheduler.utilities.DateManager.systemTimeZone;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.fingerPrintAndSaveBitmap;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.hashBitmap;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.makeMutable;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.hasNoFingerPrint;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.readBitmapFromFile;
-import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_DENSITY;
-import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_HEIGHT;
-import static prototype.xd.scheduler.utilities.Keys.DISPLAY_METRICS_WIDTH;
-import static prototype.xd.scheduler.utilities.Keys.LOCKSCREEN_VIEW_VERTICAL_BIAS;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
-import static prototype.xd.scheduler.utilities.Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET;
-import static prototype.xd.scheduler.utilities.Keys.TODO_ITEM_VIEW_TYPE;
-import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_DENSITY;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
+import static prototype.xd.scheduler.utilities.Static.LOCKSCREEN_VIEW_VERTICAL_BIAS;
+import static prototype.xd.scheduler.utilities.Static.SERVICE_FAILED;
+import static prototype.xd.scheduler.utilities.Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Static.TODO_ITEM_VIEW_TYPE;
+import static prototype.xd.scheduler.utilities.Static.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
@@ -51,7 +52,7 @@ import prototype.xd.scheduler.databinding.LockscreenRootContainerBinding;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
@@ -78,7 +79,7 @@ class LockScreenBitmapDrawer {
             ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE))
                     .getDefaultDisplay().getRealMetrics(displayMetrics); // NOSONAR, replacement api is garbage
             
-            Keys.edit()
+            Static.edit()
                     .putInt(DISPLAY_METRICS_WIDTH.key, displayMetrics.widthPixels)
                     .putInt(DISPLAY_METRICS_HEIGHT.key, displayMetrics.heightPixels)
                     .putFloat(DISPLAY_METRICS_DENSITY.key, displayMetrics.density)
@@ -116,7 +117,7 @@ class LockScreenBitmapDrawer {
             bitmap = fingerPrintAndSaveBitmap(bitmap, bg);
         } else {
             if (!bg.exists()) {
-                Logger.warning(NAME, bg + "is not available, falling back to default");
+                Logger.warning(NAME, bg + " is not available, falling back to default");
                 File defFile = getFile(DateManager.DEFAULT_BACKGROUND_NAME);
                 if (!defFile.exists()) {
                     throw new FileNotFoundException("No available background to load");
@@ -129,7 +130,7 @@ class LockScreenBitmapDrawer {
     }
     
     @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
-    boolean constructBitmap(@NonNull Context context, boolean forceRedraw) {
+    boolean constructBitmap(@NonNull Context context) {
         
         if (!isVerticalOrientation(context)) {
             Logger.warning(NAME, "Not starting bitmap thread, orientation not vertical");
@@ -146,18 +147,21 @@ class LockScreenBitmapDrawer {
                     
                     Bitmap bitmap = getBitmapToDrawOn();
                     
-                    drawItemsOnBitmap(context, bitmap, forceRedraw);
+                    drawItemsOnBitmap(context, bitmap);
                     Logger.info(NAME, "Processed wallpaper in " + (getCurrentTimestampUTC() - time) + "ms");
                     
                     time = getCurrentTimestampUTC();
                     wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
                     Logger.info(NAME, " ------------ Set wallpaper in " + (getCurrentTimestampUTC() - time) / 1000F + "s ------------ ");
                     
+                    WALLPAPER_OBTAIN_FAILED.put(Boolean.FALSE);
+                    
                 } catch (InterruptedException e) {
                     Logger.info(NAME, nullWrapper(e.getMessage()));
                     // relay
                     Thread.currentThread().interrupt();
                 } catch (FileNotFoundException e) {
+                    // TODO: 02.02.2023 increment instead
                     WALLPAPER_OBTAIN_FAILED.put(Boolean.TRUE);
                     logException(NAME, e);
                 } catch (Exception e) {
@@ -180,7 +184,7 @@ class LockScreenBitmapDrawer {
     }
     
     @SuppressLint("InflateParams")
-    private void drawItemsOnBitmap(@NonNull Context context, @NonNull Bitmap bitmap, boolean forceRedraw) throws InterruptedException {
+    private void drawItemsOnBitmap(@NonNull Context context, @NonNull Bitmap bitmap) throws InterruptedException {
         
         GroupList groups = loadGroups();
         TodoItemViewType todoItemViewType = TODO_ITEM_VIEW_TYPE.get();
@@ -196,14 +200,17 @@ class LockScreenBitmapDrawer {
         toAdd.removeIf(todoEntry -> !todoEntry.isVisibleOnLockscreenToday());
         toAdd = sortEntries(toAdd, currentDayUTC);
         
-        long currentHash = getEntryListHash(toAdd) + Keys.getAll().hashCode() + hashBitmap(bitmap) + currentDayUTC + todoItemViewType.ordinal();
+        long currentHash =
+                getEntryListHash(toAdd) +
+                Static.getAll().hashCode() +
+                hashBitmap(bitmap) +
+                currentDayUTC +
+                todoItemViewType.ordinal() +
+                systemTimeZone.getValue().hashCode();
+        
         Logger.debug(NAME, "Previous lockscreen hash: " + previousHash + " | current lockscreen hash: " + currentHash);
         if (previousHash == currentHash) {
-            if (forceRedraw) {
-                Logger.debug(NAME, "Updating bitmap because 'forceRedraw' is true");
-            } else {
-                throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
-            }
+            throw new InterruptedException("No need to update the bitmap, list is the same, bailing out");
         }
         previousHash = currentHash;
         
@@ -248,7 +255,7 @@ class LockScreenBitmapDrawer {
     @NonNull
     private static File getBackgroundAccordingToDayAndTime() {
         
-        if (!Keys.ADAPTIVE_BACKGROUND_ENABLED.get()) {
+        if (!Static.ADAPTIVE_BACKGROUND_ENABLED.get()) {
             return getFile(DateManager.DEFAULT_BACKGROUND_NAME);
         }
         

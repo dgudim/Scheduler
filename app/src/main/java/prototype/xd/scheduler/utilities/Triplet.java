@@ -72,7 +72,7 @@ public class Triplet<T> {
     }
     
     @SuppressWarnings({"AssignmentToSuperclassField", "NonConstantFieldWithUpperCaseName"})
-    public static class DefaultedValueTriplet<T, D extends Keys.DefaultedValue<T>> extends Triplet<D> {
+    public static class DefaultedValueTriplet<T, D extends Static.DefaultedValue<T>> extends Triplet<D> {
         
         // aliases
         @NonNull

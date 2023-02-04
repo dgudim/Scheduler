@@ -1,34 +1,34 @@
 package prototype.xd.scheduler.utilities.services;
 
-import static prototype.xd.scheduler.utilities.DateManager.checkIfTimeSettingsChanged;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimeStringLocal;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_KEEP_ALIVE_SIGNAL;
-import static prototype.xd.scheduler.utilities.Keys.clearBitmapUpdateFlag;
-import static prototype.xd.scheduler.utilities.Keys.getBitmapUpdateFlag;
-import static prototype.xd.scheduler.utilities.Keys.setBitmapUpdateFlag;
+import static prototype.xd.scheduler.utilities.Static.SERVICE_KEEP_ALIVE_SIGNAL;
+import static prototype.xd.scheduler.utilities.Static.calendarChangedIntentFilter;
+import static prototype.xd.scheduler.utilities.Static.clearBitmapUpdateFlag;
+import static prototype.xd.scheduler.utilities.Static.getBitmapUpdateFlag;
+import static prototype.xd.scheduler.utilities.Static.setBitmapUpdateFlag;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.IBinder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleService;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.BroadcastReceiverHolder;
+import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
+import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.receivers.PingReceiver;
 
-public final class BackgroundSetterService extends Service { // NOSONAR this is a service
+public final class BackgroundSetterService extends LifecycleService { // NOSONAR this is a service
     
     public static final String NAME = BackgroundSetterService.class.getSimpleName();
     
@@ -36,32 +36,47 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
     
     public static void ping(@NonNull Context context) {
-        ContextCompat.startForegroundService(context, new Intent(context, BackgroundSetterService.class));
+        context.startForegroundService(new Intent(context, BackgroundSetterService.class));
     }
     
     @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
     public static void keepAlive(@NonNull Context context) {
         Intent keepAliveIntent = new Intent(context, BackgroundSetterService.class);
         keepAliveIntent.putExtra(SERVICE_KEEP_ALIVE_SIGNAL, 1);
-        ContextCompat.startForegroundService(context, keepAliveIntent);
-    }
-    
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+        context.startForegroundService(keepAliveIntent);
     }
     
     // Foreground service notification =========
     private final int foregroundNotificationId = (int) (System.currentTimeMillis() % 10000);
     
-    // Notification
     private NotificationCompat.Builder foregroundNotification;
+    private NotificationManager notificationManager;
     
     @NonNull
     private NotificationCompat.Builder getForegroundNotification() {
         if (foregroundNotification == null) {
-            foregroundNotification = new NotificationCompat.Builder(getApplicationContext(), getNotificationChannelId())
+            
+            notificationManager = notificationManager == null ?
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE) : notificationManager;
+            
+            // create notification channel if it doesn't exist
+            String notificationChannelId = "BackgroundSetterService.NotificationChannel";
+            if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
+                NotificationChannel nc = new NotificationChannel(
+                        notificationChannelId,
+                        getString(R.string.service_name),
+                        NotificationManager.IMPORTANCE_MIN
+                );
+                // Discrete notification setup
+                notificationManager.createNotificationChannel(nc);
+                nc.setDescription(getString(R.string.service_description));
+                nc.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
+                nc.setVibrationPattern(null);
+                nc.setSound(null, null);
+                nc.setShowBadge(false);
+            }
+            
+            foregroundNotification = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId)
                     .setSmallIcon(R.drawable.ic_settings_45)
                     .setPriority(NotificationCompat.PRIORITY_MIN)
                     .setSound(null)
@@ -73,57 +88,6 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
         return foregroundNotification;
     }
     
-    // Notification channel name
-    private String notificationChannelName;
-    
-    private String getNotificationChannelName() {
-        if (notificationChannelName == null) {
-            notificationChannelName = getString(R.string.service_name);
-        }
-        return notificationChannelName;
-    }
-    
-    
-    // Notification channel description
-    private String notificationChannelDescription;
-    
-    private String getNotificationChannelDescription() {
-        if (notificationChannelDescription == null) {
-            notificationChannelDescription = getString(R.string.service_description);
-        }
-        return notificationChannelDescription;
-    }
-    
-    // Notification channel id
-    private String notificationChannelId;
-    private NotificationManager notificationManager;
-    
-    @NonNull
-    public String getNotificationChannelId() {
-        if (notificationChannelId == null) {
-            notificationChannelId = "BackgroundSetterService.NotificationChannel";
-            
-            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            
-            if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
-                NotificationChannel nc = new NotificationChannel(
-                        getNotificationChannelId(),
-                        getNotificationChannelName(),
-                        NotificationManager.IMPORTANCE_MIN
-                );
-                // Discrete notification setup
-                notificationManager.createNotificationChannel(nc);
-                nc.setDescription(getNotificationChannelDescription());
-                nc.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
-                nc.setVibrationPattern(null);
-                nc.setSound(null, null);
-                nc.setShowBadge(false);
-            }
-            
-        }
-        return notificationChannelId;
-    }
-    
     private void updateNotification() {
         getForegroundNotification().setContentTitle(getString(R.string.last_update_time, getCurrentTimeStringLocal()));
         notificationManager.notify(foregroundNotificationId, getForegroundNotification().build());
@@ -131,58 +95,49 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
     
     // Lifecycle ===============================
     
-    private volatile boolean lastUpdateSucceeded;
-    private boolean initialized;
-    @Nullable
-    private BroadcastReceiver screenOnOffReceiver;
-    @Nullable
-    private BroadcastReceiver pingReceiver;
+    private volatile boolean lastUpdateSucceeded; // NOSONAR
+    @NonNull
+    private final BroadcastReceiverHolder receiverHolder = new BroadcastReceiverHolder(this);
     
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        Keys.init(this);
-        if (intent != null && initialized) {
-            if (intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
+        super.onStartCommand(intent, flags, startId);
+        
+        Static.init(this);
+        if (lockScreenBitmapDrawer != null) {
+            if (intent != null && intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 setBitmapUpdateFlag();
                 Logger.info(NAME, "Received ping (keep alive job)");
             } else {
                 Logger.info(NAME, "Received general ping");
-                if (lockScreenBitmapDrawer != null) {
-                    lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this, checkIfTimeSettingsChanged());
-                    updateNotification();
-                } else {
-                    Logger.error(NAME, "lockScreenBitmapDrawer is null, huh?");
-                }
+                DateManager.updateDate();
+                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this);
+                updateNotification();
             }
         } else {
-            initialized = true;
             Logger.info(NAME, "Received ping (initial)");
             
-            screenOnOffReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(@NonNull Context context, @NonNull Intent intent) {
-                    if (!lastUpdateSucceeded || getBitmapUpdateFlag()) {
-                        ping(context);
-                        clearBitmapUpdateFlag();
-                        Logger.info(NAME, "Sent ping (on - off receiver)");
-                    }
-                    Logger.info(NAME, "Receiver state: " + intent.getAction());
-                }
-            };
-            pingReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(@NonNull Context context, Intent intent) {
+            receiverHolder.registerReceiver((context, brIntent) -> {
+                if (!lastUpdateSucceeded || getBitmapUpdateFlag()) {
                     ping(context);
-                    Logger.info(NAME, "Sent ping (date changed receiver)");
+                    clearBitmapUpdateFlag();
+                    Logger.info(NAME, "Sent ping (screen on/off)");
                 }
-            };
+                Logger.info(NAME, "Receiver state: " + brIntent.getAction());
+            }, filter -> {
+                filter.addAction(Intent.ACTION_SCREEN_ON);
+                filter.addAction(Intent.ACTION_SCREEN_OFF);
+                return filter;
+            });
             
-            IntentFilter onOffFilter = new IntentFilter();
-            onOffFilter.addAction(Intent.ACTION_SCREEN_ON);
-            onOffFilter.addAction(Intent.ACTION_SCREEN_OFF);
+            receiverHolder.registerReceiver(
+                    new PingReceiver("Date changed"),
+                    new IntentFilter(Intent.ACTION_DATE_CHANGED));
             
-            registerReceiver(screenOnOffReceiver, onOffFilter);
-            registerReceiver(pingReceiver, new IntentFilter(Intent.ACTION_DATE_CHANGED));
+            receiverHolder.registerReceiver(
+                    new PingReceiver("Calendar changed"),
+                    calendarChangedIntentFilter);
+            
             scheduleRestartJob();
             startForeground(foregroundNotificationId, getForegroundNotification().build());
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
@@ -195,17 +150,5 @@ public final class BackgroundSetterService extends Service { // NOSONAR this is 
         getSystemService(JobScheduler.class).schedule(new JobInfo.Builder(0,
                 new ComponentName(getApplicationContext(), KeepAliveService.class))
                 .setPeriodic(15 * 60L * 1000, 5 * 60L * 1000).build());
-    }
-    
-    @Override
-    public void onDestroy() {
-        if (screenOnOffReceiver != null) {
-            unregisterReceiver(screenOnOffReceiver);
-        }
-        if (pingReceiver != null) {
-            unregisterReceiver(pingReceiver);
-        }
-        // unregister receivers
-        lockScreenBitmapDrawer = null;
     }
 }

@@ -3,7 +3,7 @@ package prototype.xd.scheduler.utilities;
 import static androidx.core.content.UnusedAppRestrictionsConstants.DISABLED;
 import static androidx.core.content.UnusedAppRestrictionsConstants.ERROR;
 import static androidx.core.content.UnusedAppRestrictionsConstants.FEATURE_NOT_AVAILABLE;
-import static prototype.xd.scheduler.utilities.Keys.PACKAGE_NAME;
+import static prototype.xd.scheduler.utilities.Static.PACKAGE_NAME;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 
 import android.Manifest;

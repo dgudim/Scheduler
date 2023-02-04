@@ -2,7 +2,7 @@ package prototype.xd.scheduler;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static androidx.core.content.UnusedAppRestrictionsConstants.FEATURE_NOT_AVAILABLE;
-import static prototype.xd.scheduler.utilities.Keys.PACKAGE_NAME;
+import static prototype.xd.scheduler.utilities.Static.PACKAGE_NAME;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.areEssentialPermissionsGranted;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.getAutorevokeStatus;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.getPermissions;

@@ -1,24 +1,25 @@
 package prototype.xd.scheduler;
 
-import static prototype.xd.scheduler.utilities.DateManager.checkIfTimeSettingsChanged;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringUTCFromMsUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
+import static prototype.xd.scheduler.utilities.DateManager.systemTimeZone;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL_STR;
-import static prototype.xd.scheduler.utilities.Keys.END_DAY_UTC;
-import static prototype.xd.scheduler.utilities.Keys.GITHUB_FAQ;
-import static prototype.xd.scheduler.utilities.Keys.GITHUB_ISSUES;
-import static prototype.xd.scheduler.utilities.Keys.GITHUB_RELEASES;
-import static prototype.xd.scheduler.utilities.Keys.GITHUB_REPO;
-import static prototype.xd.scheduler.utilities.Keys.IS_COMPLETED;
-import static prototype.xd.scheduler.utilities.Keys.SERVICE_FAILED;
-import static prototype.xd.scheduler.utilities.Keys.START_DAY_UTC;
-import static prototype.xd.scheduler.utilities.Keys.TEXT_VALUE;
-import static prototype.xd.scheduler.utilities.Keys.WALLPAPER_OBTAIN_FAILED;
+import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
+import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
+import static prototype.xd.scheduler.utilities.Static.GITHUB_FAQ;
+import static prototype.xd.scheduler.utilities.Static.GITHUB_ISSUES;
+import static prototype.xd.scheduler.utilities.Static.GITHUB_RELEASES;
+import static prototype.xd.scheduler.utilities.Static.GITHUB_REPO;
+import static prototype.xd.scheduler.utilities.Static.IS_COMPLETED;
+import static prototype.xd.scheduler.utilities.Static.SERVICE_FAILED;
+import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
+import static prototype.xd.scheduler.utilities.Static.TEXT_VALUE;
+import static prototype.xd.scheduler.utilities.Static.WALLPAPER_OBTAIN_FAILED;
+import static prototype.xd.scheduler.utilities.Static.calendarChangedIntentFilter;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
@@ -48,11 +49,12 @@ import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.databinding.NavigationViewBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.utilities.BroadcastReceiverHolder;
 import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
@@ -73,7 +75,11 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         // select current day
         selectDate(LocalDate.now());
         wrapper = ContextWrapper.from(this);
+        BroadcastReceiverHolder receiverHolder = new BroadcastReceiverHolder(requireActivity());
         todoEntryManager = new TodoEntryManager(wrapper);
+        receiverHolder.registerReceiver((context, intent) ->
+                        todoEntryManager.notifyCalendarProviderChanged(context),
+                calendarChangedIntentFilter);
     }
     
     @Override
@@ -86,6 +92,9 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         contentBnd = wrapperBnd.contentWrapper;
         NavigationView navViewDrawer = wrapperBnd.navViewWrapper;
         NavigationViewBinding navViewContent = wrapperBnd.navView;
+        
+        systemTimeZone.observe(getViewLifecycleOwner(), timeZone ->
+                todoEntryManager.notifyTimezoneChanged());
         
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
@@ -180,7 +189,7 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                         bnd.debugLoggingSwitch.setClickable(false);
                         bnd.debugLoggingSwitch.setAlpha(0.5F);
                     } else {
-                        setSwitchChangeListener(bnd.debugLoggingSwitch, Keys.DEBUG_LOGGING, (switchView, isChecked) -> Logger.setDebugEnabled(isChecked));
+                        setSwitchChangeListener(bnd.debugLoggingSwitch, Static.DEBUG_LOGGING, (switchView, isChecked) -> Logger.setDebugEnabled(isChecked));
                     }
                     builder.setView(bnd.root);
                     
@@ -197,8 +206,20 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         navViewContent.sortingSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_SortingSettingsFragment));
         
-        
         return wrapperBnd.getRoot();
+    }
+    
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // when all entries are loaded and ui is created, update current month
+        todoEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
+            // update adapter showing entries
+            todoEntryManager.notifyEntryListChanged();
+            // update calendar updating indicators
+            todoEntryManager.notifyCurrentMonthChanged();
+            // finally, update the status text with entry count
+            updateStatusText();
+        }));
     }
     
     // fragment becomes visible
@@ -207,21 +228,8 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
     public void onResume() {
         super.onResume();
         Logger.debug(NAME, "Main screen is now visible");
-        // update the ui only after it's fully inflated
         
-        // when all entries are loaded, update current month
-        todoEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
-            if (checkIfTimeSettingsChanged()) {
-                todoEntryManager.notifyDatasetChanged(true);
-            } else {
-                // update adapter showing entries
-                todoEntryManager.notifyEntryListChanged();
-                // update calendar updating indicators
-                todoEntryManager.notifyCurrentMonthChanged();
-            }
-            // finally, update the status text with entry count
-            updateStatusText();
-        }));
+        DateManager.updateTimeZone();
         
         if (SERVICE_FAILED.get()) {
             // display warning if the background service failed
@@ -244,16 +252,8 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         }
     }
     
-    public void notifySettingsChanged() {
-        todoEntryManager.notifyDatasetChanged(false);
-    }
-    
-    @Override
-    @MainThread
-    public void onDestroyView() {
-        // remove reference to ui element
-        todoEntryManager.detachCalendarView();
-        super.onDestroyView();
+    public void notifyDatesetChanged() {
+        todoEntryManager.notifyDatasetChanged();
     }
     
     private void updateStatusText() {

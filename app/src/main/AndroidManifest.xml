@@ -52,11 +52,22 @@
         </activity>
 
         <receiver
-            android:name=".utilities.receivers.BootReceiver"
+            android:name=".utilities.receivers.PingReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:priority="900">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".utilities.receivers.TimeZoneChangedReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:priority="900">
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
 

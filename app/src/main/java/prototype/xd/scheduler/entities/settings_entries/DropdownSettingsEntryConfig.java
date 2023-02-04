@@ -9,7 +9,7 @@ import java.util.List;
 
 import prototype.xd.scheduler.databinding.DropdownSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.ContextWrapper;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 
 public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
     
@@ -20,12 +20,12 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
     @NonNull
     private final List<T> items;
     @NonNull
-    private final Keys.DefaultedValue<T> value;
+    private final Static.DefaultedValue<T> value;
     
     public DropdownSettingsEntryConfig(@StringRes int hintId,
                                        @NonNull final List<String> displayItems,
                                        @NonNull final List<T> items,
-                                       @NonNull final Keys.DefaultedValue<T> value) {
+                                       @NonNull final Static.DefaultedValue<T> value) {
         
         if (displayItems.size() != items.size()) {
             throw new IllegalArgumentException("displayItems.size != items.size");

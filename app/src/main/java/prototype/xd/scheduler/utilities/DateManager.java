@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.utilities;
 
-import static prototype.xd.scheduler.utilities.Keys.DAY_FLAG_GLOBAL;
-import static prototype.xd.scheduler.utilities.Keys.TIME_RANGE_SEPARATOR;
+import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL;
+import static prototype.xd.scheduler.utilities.Static.TIME_RANGE_SEPARATOR;
 
 import android.icu.text.DateFormatSymbols;
 
@@ -39,7 +39,7 @@ public final class DateManager {
     
     public static final long ONE_MINUTE_MS = 60000L;
     
-    private static TimeZone systemTimeZone = TimeZone.getDefault();
+    public static final NonNullMutableLiveData<TimeZone> systemTimeZone = new NonNullMutableLiveData<>(TimeZone.getDefault());
     public static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     
     public static long currentDayUTC = DAY_FLAG_GLOBAL;
@@ -65,8 +65,8 @@ public final class DateManager {
     public static final List<DayOfWeek> FIRST_DAYS_OF_WEEK_ROOT = List.of(DayOfWeek.MONDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     @NonNull
     public static final List<String> FIRST_DAYS_OF_WEEK_LOCAL;
-    public static final Keys.DefaultedEnum<DayOfWeek> FIRST_DAY_OF_WEEK =
-            new Keys.DefaultedEnum<>("first_week_day", DayOfWeek.MONDAY, DayOfWeek.class);
+    public static final Static.DefaultedEnum<DayOfWeek> FIRST_DAY_OF_WEEK =
+            new Static.DefaultedEnum<>("first_week_day", DayOfWeek.MONDAY, DayOfWeek.class);
     
     static {
         // init local weekdays (remap)
@@ -102,23 +102,20 @@ public final class DateManager {
         dateFormatMonthNamesUTC.setTimeZone(utcTimeZone);
     }
     
-    public static synchronized boolean checkIfTimeSettingsChanged() {
+    public static synchronized void updateTimeZone() {
         TimeZone newTimeZone = TimeZone.getDefault();
-        if (!newTimeZone.equals(systemTimeZone)) {
-            Logger.debug(NAME, "Timezone changed! Old: " + systemTimeZone.getID() + " | New: " + newTimeZone.getID());
-            // reinitialize all the stuff
-            systemTimeZone = newTimeZone;
-            // update timezones of calendar and formatters
-            timeFormatLocal.setTimeZone(systemTimeZone);
-            dateTimeFormatLocal.setTimeZone(systemTimeZone);
-            updateDate();
-            return true;
+        if (systemTimeZone.getValue().equals(newTimeZone)) {
+            return;
         }
-        updateDate();
-        return false;
+        Logger.debug(NAME, "Timezone changed to " + newTimeZone.getID());
+        // reinitialize all the stuff
+        systemTimeZone.postValue(newTimeZone);
+        // update timezones of calendar and formatters
+        timeFormatLocal.setTimeZone(newTimeZone);
+        dateTimeFormatLocal.setTimeZone(newTimeZone);
     }
     
-    private static synchronized void updateDate() {
+    public static synchronized void updateDate() {
         currentTimestampUTC = getCurrentTimestampUTC();
         currentDate = LocalDate.now();
         currentDayUTC = currentDate.toEpochDay();
@@ -189,7 +186,7 @@ public final class DateManager {
     }
     
     public static synchronized long msUTCtoMsLocal(long msUTC) {
-        return msUTC + systemTimeZone.getOffset(msUTC);
+        return msUTC + systemTimeZone.getValue().getOffset(msUTC);
     }
     
     public static long msToDays(long msUTC) {

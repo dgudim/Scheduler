@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.ContextWrapper;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
 
 public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
@@ -17,11 +17,11 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     @NonNull
     private final String text;
     @NonNull
-    private final Keys.DefaultedBoolean value;
+    private final Static.DefaultedBoolean value;
     @Nullable
     private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
     
-    public SwitchSettingsEntryConfig(@NonNull Keys.DefaultedBoolean value,
+    public SwitchSettingsEntryConfig(@NonNull Static.DefaultedBoolean value,
                                      @NonNull String text,
                                      @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener,
                                      boolean instantlyTriggerListener) {
@@ -33,7 +33,7 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
         }
     }
     
-    public SwitchSettingsEntryConfig(@NonNull Keys.DefaultedBoolean value, @NonNull String text) {
+    public SwitchSettingsEntryConfig(@NonNull Static.DefaultedBoolean value, @NonNull String text) {
         this(value, text, null, false);
     }
     

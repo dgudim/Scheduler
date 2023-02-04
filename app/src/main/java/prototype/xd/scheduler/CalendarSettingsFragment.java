@@ -23,7 +23,7 @@ import prototype.xd.scheduler.entities.settings_entries.GenericCalendarSettingsE
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
@@ -62,7 +62,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
             // set the capacity to the number of calendars + the number of groups
             calendarConfigEntries.ensureCapacity(calendars.size() + calendarGroups.size());
             
-            boolean showSettings = Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS.get();
+            boolean showSettings = Static.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS.get();
             
             for (List<SystemCalendar> calendarGroup : calendarGroups.values()) {
                 
@@ -89,7 +89,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
         }, "SSCFetch thread").start();
         
         staticEntries.add(new SwitchSettingsEntryConfig(
-                Keys.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
+                Static.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
                 getString(R.string.settings_allow_global_calendar_account_settings), (buttonView, isChecked) -> {
             if (isChecked) {
                 displayMessageDialog(wrapper, builder -> {

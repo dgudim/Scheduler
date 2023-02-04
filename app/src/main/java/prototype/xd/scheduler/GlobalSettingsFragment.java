@@ -39,7 +39,7 @@ import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfi
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
 
@@ -72,9 +72,9 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new CompoundCustomizationEntryConfig(),
                 
                 new SwitchSettingsEntryConfig(
-                        Keys.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)),
+                        Static.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)),
                 
-                new SliderSettingsEntryConfig(Keys.LOCKSCREEN_VIEW_VERTICAL_BIAS,
+                new SliderSettingsEntryConfig(Static.LOCKSCREEN_VIEW_VERTICAL_BIAS,
                         0, 100, 5, value -> {
                     String baseString = wrapper.getString(R.string.settings_event_vertical_bias, value) + "%";
                     if (value == 0) {
@@ -99,30 +99,30 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 
                 new DoubleSliderSettingsEntryConfig(wrapper.context, R.string.settings_show_events,
                         
-                        new SliderSettingsEntryConfig(Keys.UPCOMING_ITEMS_OFFSET,
-                                0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_in_n_days),
-                        Keys.BG_COLOR.UPCOMING.defaultValue,
+                        new SliderSettingsEntryConfig(Static.UPCOMING_ITEMS_OFFSET,
+                                0, Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_in_n_days),
+                        Static.BG_COLOR.UPCOMING.defaultValue,
                         
-                        new SliderSettingsEntryConfig(Keys.EXPIRED_ITEMS_OFFSET,
-                                0, Keys.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_after_n_days),
-                        Keys.BG_COLOR.EXPIRED.defaultValue),
+                        new SliderSettingsEntryConfig(Static.EXPIRED_ITEMS_OFFSET,
+                                0, Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_after_n_days),
+                        Static.BG_COLOR.EXPIRED.defaultValue),
                 
-                new SwitchSettingsEntryConfig(Keys.MERGE_ENTRIES, getString(R.string.settings_merge_events)),
-                new SwitchSettingsEntryConfig(Keys.HIDE_EXPIRED_ENTRIES_BY_TIME, getString(R.string.settings_hide_expired_entries_by_time)),
+                new SwitchSettingsEntryConfig(Static.MERGE_ENTRIES, getString(R.string.settings_merge_events)),
+                new SwitchSettingsEntryConfig(Static.HIDE_EXPIRED_ENTRIES_BY_TIME, getString(R.string.settings_hide_expired_entries_by_time)),
                 
-                new SwitchSettingsEntryConfig(Keys.SHOW_UPCOMING_EXPIRED_IN_LIST, getString(R.string.show_upcoming_and_expired_event_indicators)));
+                new SwitchSettingsEntryConfig(Static.SHOW_UPCOMING_EXPIRED_IN_LIST, getString(R.string.show_upcoming_and_expired_event_indicators)));
         
         //                                                                      two entries (global switches)
         List<SettingsEntryConfig> globalSwitchSettingsEntries = new ArrayList<>(2);
         SettingsListViewAdapter globalSwitchSettingsListViewAdapter = new SettingsListViewAdapter(wrapper, globalSwitchSettingsEntries,
-                !Keys.SHOW_GLOBAL_ITEMS_LOCK.get());
+                !Static.SHOW_GLOBAL_ITEMS_LOCK.get());
         
         globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
-                Keys.SHOW_GLOBAL_ITEMS_LOCK, getString(R.string.settings_show_global_items_lock),
+                Static.SHOW_GLOBAL_ITEMS_LOCK, getString(R.string.settings_show_global_items_lock),
                 (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked), false));
         
         globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
-                Keys.SHOW_GLOBAL_ITEMS_LABEL_LOCK, getString(R.string.settings_show_global_items_label_lock)));
+                Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK, getString(R.string.settings_show_global_items_label_lock)));
         
         listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
                 .setIsolateViewTypes(false)
@@ -132,7 +132,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new SettingsListViewAdapter(wrapper,
                         Collections.singletonList(
                                 new ResetButtonSettingsEntryConfig((dialog, which) -> {
-                                    Keys.clearAll();
+                                    Static.clearAll();
                                     listViewAdapter.notifyDataSetChanged();
                                 }))));
         

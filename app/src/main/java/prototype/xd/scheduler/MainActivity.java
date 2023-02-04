@@ -17,7 +17,7 @@ import com.google.android.material.color.HarmonizedColorsOptions;
 
 import java.io.File;
 
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.PermissionUtilities;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
@@ -41,15 +41,15 @@ public class MainActivity extends AppCompatActivity {
             }*/
         //}
         
-        Keys.init(this);
-        Logger.setDebugEnabled(Keys.DEBUG_LOGGING.get() || BuildConfig.DEBUG);
+        Static.init(this);
+        Logger.setDebugEnabled(Static.DEBUG_LOGGING.get() || BuildConfig.DEBUG);
         
         File rootDir = getExternalFilesDir("");
         if (rootDir == null) {
             Log.e(NAME, "Shared storage not available wtf");
             killProcess(myPid());
         } else {
-            Keys.ROOT_DIR.set(rootDir.getAbsolutePath());
+            Static.ROOT_DIR.set(rootDir.getAbsolutePath());
             Logger.info(NAME, "Root dir: " + rootDir);
             if (!rootDir.exists()) {
                 Logger.info(NAME, "Created folder structure: " + rootDir.mkdirs());
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         }
         
         // init theme
-        AppCompatDelegate.setDefaultNightMode(Keys.APP_THEME.get());
+        AppCompatDelegate.setDefaultNightMode(Static.APP_THEME.get());
         
         HarmonizedColors.applyToContextIfAvailable(this,
                 new HarmonizedColorsOptions.Builder()

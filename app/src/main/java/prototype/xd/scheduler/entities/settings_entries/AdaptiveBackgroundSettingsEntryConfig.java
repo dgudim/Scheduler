@@ -18,7 +18,7 @@ import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding
 import prototype.xd.scheduler.databinding.BgGridSelectionViewBinding;
 import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
 
 public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
@@ -63,7 +63,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 BgGridSelectionViewBinding gridSelection = BgGridSelectionViewBinding.inflate(wrapper.getLayoutInflater());
                 
                 Utilities.setSwitchChangeListener(gridSelection.adaptiveBgSwitch,
-                        Keys.ADAPTIVE_BACKGROUND_ENABLED,
+                        Static.ADAPTIVE_BACKGROUND_ENABLED,
                         null);
                 
                 gridSelection.resetBgButton.setOnClickListener(view1 ->

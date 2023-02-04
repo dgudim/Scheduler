@@ -5,7 +5,7 @@ import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
 import static android.util.Log.WARN;
 
-import static prototype.xd.scheduler.utilities.Keys.LOGCAT_FILE;
+import static prototype.xd.scheduler.utilities.Static.LOGCAT_FILE;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 import static prototype.xd.scheduler.utilities.Utilities.shareFiles;

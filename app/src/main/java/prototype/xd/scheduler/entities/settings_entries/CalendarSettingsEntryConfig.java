@@ -18,7 +18,7 @@ import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.GridSelectionViewBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.utilities.ContextWrapper;
-import prototype.xd.scheduler.utilities.Keys;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
@@ -72,9 +72,9 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
             viewBinding.eventCount.setText(getPluralString(wrapper.context, R.plurals.calendar_event_count, config.calendarEventsCount));
             
             viewBinding.checkBox.setButtonTintList(ColorStateList.valueOf(config.calendarColor));
-            viewBinding.checkBox.setCheckedSilent(Keys.getBoolean(config.calendarVisibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
+            viewBinding.checkBox.setCheckedSilent(Static.getBoolean(config.calendarVisibilityKey, Static.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
             viewBinding.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
-                    Keys.edit().putBoolean(config.calendarVisibilityKey, isChecked).apply());
+                    Static.edit().putBoolean(config.calendarVisibilityKey, isChecked).apply());
             
             viewBinding.settingsButton.setOnClickListener(view ->
                     config.systemCalendarSettings.show(config.calendarPrefKey, config.calendarSubKeys, config.calendarColor));

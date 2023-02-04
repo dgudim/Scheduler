@@ -2,11 +2,11 @@ package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.utilities.Keys.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
+import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_COLUMNS;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
 
@@ -25,12 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import prototype.xd.scheduler.BuildConfig;
-import prototype.xd.scheduler.utilities.Keys;
 import prototype.xd.scheduler.utilities.Logger;
+import prototype.xd.scheduler.utilities.Static;
 
 /**
  * Class for storing system calendars and their events
@@ -75,7 +74,7 @@ public class SystemCalendar {
         
         prefKey = accountName + KEY_SEPARATOR + displayName;
         subKeys = List.of(accountName, prefKey);
-        visibilityKey = prefKey + KEY_SEPARATOR + Keys.VISIBLE;
+        visibilityKey = prefKey + KEY_SEPARATOR + Static.VISIBLE;
         
         String calTimeZoneId = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_TIME_ZONE);
         
@@ -147,6 +146,10 @@ public class SystemCalendar {
         return events;
     }
     
+    public void loadMissingEvents() {
+    
+    }
+    
     /**
      * Add exceptions to recurrence rules
      *
@@ -172,24 +175,23 @@ public class SystemCalendar {
      * @return true if the user selected this calendar to be visible
      */
     public boolean isVisible() {
-        return Keys.getBoolean(visibilityKey, Keys.CALENDAR_SETTINGS_DEFAULT_VISIBLE);
+        return Static.getBoolean(visibilityKey, Static.CALENDAR_SETTINGS_DEFAULT_VISIBLE);
     }
     
     /**
      * Get visible events between first and last days, add them to the list
      *
-     * @param firstDayUTC        start of range
-     * @param lastDayUTC         end of range
-     * @param list               list to add converted events to
-     * @param conversionFunction function to convert to necessary type
+     * @param firstDayUTC start of range
+     * @param lastDayUTC  end of range
+     * @param list        list to add todoEntries to
      */
-    public <T> void addVisibleEventsToList(long firstDayUTC, long lastDayUTC,
-                                           @NonNull List<T> list,
-                                           @NonNull Function<SystemCalendarEvent, T> conversionFunction) {
+    public void addVisibleEventsToList(long firstDayUTC, long lastDayUTC,
+                                       @NonNull List<TodoEntry> list) {
         if (isVisible()) {
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
-                    list.add(conversionFunction.apply(event));
+                    list.add(new TodoEntry(event));
+                    // TODO: 04.02.2023 generify
                 }
             }
         }
@@ -210,6 +212,7 @@ public class SystemCalendar {
             for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (filter.test(event) && event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
                     consumer.accept(event);
+                    // TODO: 04.02.2023 generify
                 }
             }
         }
@@ -225,6 +228,7 @@ public class SystemCalendar {
         systemCalendarEvents.forEach(event -> {
             if (event.color == color) {
                 event.invalidateParameter(parameterKey);
+                // TODO: 04.02.2023 generify
             }
         });
     }
@@ -238,6 +242,7 @@ public class SystemCalendar {
         systemCalendarEvents.forEach(event -> {
             if (event.color == color) {
                 event.invalidateAllParameters();
+                // TODO: 04.02.2023 generify
             }
         });
     }
