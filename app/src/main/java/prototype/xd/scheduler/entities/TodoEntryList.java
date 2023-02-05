@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.entities;
 
+import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import androidx.annotation.NonNull;
@@ -31,6 +32,8 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     
     public static final String NAME = TodoEntryList.class.getSimpleName();
     
+    public static final int TODO_LIST_INITIAL_CAPACITY = 75;
+    
     // 4 mappings for normal events
     @NonNull
     private final Map<Long, Set<TodoEntry>> entriesPerDayCore;
@@ -50,9 +53,9 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     @NonNull
     private final Set<TodoEntry> regularEntries;
     
-    private boolean displayUpcomingExpired;
-    private long firstLoadedDay;
-    private long lastLoadedDay;
+    public boolean displayUpcomingExpired;
+    public long firstLoadedDay;
+    public long lastLoadedDay;
     
     private void readObject(@NonNull ObjectInputStream in)
             throws IOException, ClassNotFoundException {
@@ -64,19 +67,28 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     }
     
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    public TodoEntryList(int initialCapacity) {
-        super(initialCapacity);
-        entriesPerDayUpcomingExpired = new HashMap<>(initialCapacity);
-        daysPerEntryUpcomingExpired = new HashMap<>(initialCapacity);
-        entriesPerDayCore = new HashMap<>(initialCapacity);
-        daysPerEntryCore = new HashMap<>(initialCapacity);
-        globalEntries = new HashSet<>();
-        regularEntries = new HashSet<>();
-    }
-    
-    public void initLoadingRange(long dayStart, long dayEnd) {
+    public TodoEntryList(long dayStart, long dayEnd,
+                         @NonNull GroupList groups,
+                         @NonNull List<SystemCalendar> calendars,
+                         @NonNull BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
+        super(TODO_LIST_INITIAL_CAPACITY);
+        
         firstLoadedDay = dayStart;
         lastLoadedDay = dayEnd;
+        
+        entriesPerDayUpcomingExpired = new HashMap<>(TODO_LIST_INITIAL_CAPACITY);
+        daysPerEntryUpcomingExpired = new HashMap<>(TODO_LIST_INITIAL_CAPACITY);
+        entriesPerDayCore = new HashMap<>(TODO_LIST_INITIAL_CAPACITY);
+        daysPerEntryCore = new HashMap<>(TODO_LIST_INITIAL_CAPACITY);
+        globalEntries = new HashSet<>();
+        regularEntries = new HashSet<>();
+        
+        addAll(loadTodoEntries(
+                        firstLoadedDay,
+                        lastLoadedDay,
+                        groups, calendars),
+                parameterInvalidationListener);
+        
     }
     
     // extend to the left
@@ -347,8 +359,8 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
         linkEntryToLookupContainers(entry, newDaySet);
     }
     
-    public void setUpcomingExpiredVisibility(boolean displayUpcomingExpired) {
-        this.displayUpcomingExpired = displayUpcomingExpired;
+    public void updateUpcomingExpiredVisibility() {
+        displayUpcomingExpired = Static.SHOW_UPCOMING_EXPIRED_IN_LIST.get();
     }
     
     // unsupported, will cause inconsistent state

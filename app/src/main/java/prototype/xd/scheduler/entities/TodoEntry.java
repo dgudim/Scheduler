@@ -7,8 +7,8 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixColorWithBg;
+import static prototype.xd.scheduler.utilities.ColorUtilities.getExpiredUpcomingColor;
+import static prototype.xd.scheduler.utilities.ColorUtilities.mixColorWithBg;
 import static prototype.xd.scheduler.utilities.Static.TIME_RANGE_SEPARATOR;
 import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
@@ -319,13 +319,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     // ------------
     
     // attaching group to entry is unnecessary if called from bitmap drawer as we don't need to propagate parameter invalidations
-    public void initGroupAndId(@NonNull List<Group> groups, long id, boolean attachGroupToEntry) {
+    public void initGroupAndId(@NonNull List<Group> groups, long id) {
         // id should be assigned before attaching to group
         assignRecyclerViewId(id);
         group = Group.findGroupInList(groups, tempGroupName);
-        if (attachGroupToEntry) {
-            group.attachEntryInternal(this);
-        }
+        group.attachEntryInternal(this);
     }
     
     public void initParameters() {
@@ -447,7 +445,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     // only call on calendar events
     public void notifyTimeZoneChanged() {
-        // days can change on timezone changes, so we update them
+        // days change on timezone changes, so we update them
         event.computeEventVisibilityDays();
     }
     

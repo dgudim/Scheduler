@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.utilities;
 
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
-import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
+import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -18,6 +18,7 @@ import java.util.List;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.entities.SystemCalendarEvent;
 import prototype.xd.scheduler.entities.TodoEntry;
 
 public final class SystemCalendarUtils {
@@ -64,12 +65,33 @@ public final class SystemCalendarUtils {
      * Retrieve all calendars from the system
      *
      * @param context     context, will be used to get a ContentResolver
-     * @param loadMinimal whether to only load event colors
      * @return a list of system calendars
      */
     @NonNull
-    public static List<SystemCalendar> getAllCalendars(@NonNull Context context, boolean loadMinimal) {
+    public static List<SystemCalendar> getAllCalendars(@NonNull Context context) {
         ContentResolver resolver = context.getContentResolver();
+    
+        final int MIN_EVENTS = 10;
+        final int MIN_EXCEPTIONS = 16;
+    
+        try (Cursor cursor = query(contentResolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
+                Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0")) {
+        
+            events = new ArrayList<>(max(cursor.getCount() - MIN_EXCEPTIONS, MIN_EVENTS));
+            exceptionLists = new HashMap<>(MIN_EXCEPTIONS);
+        
+            while (cursor.moveToNext()) {
+                long originalInstanceTime = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.ORIGINAL_INSTANCE_TIME);
+                if (originalInstanceTime == 0) {
+                    events.add(new SystemCalendarEvent(cursor, this));
+                } else {
+                    // if original id is set this event is an exception to some other event
+                    exceptionLists.computeIfAbsent(getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_ID),
+                                    e -> new ArrayList<>())
+                            .add(originalInstanceTime);
+                }
+            }
+        }
         
         List<SystemCalendar> systemCalendars;
         
@@ -77,7 +99,7 @@ public final class SystemCalendarUtils {
             systemCalendars = new ArrayList<>(cursor.getCount());
             
             while (cursor.moveToNext()) {
-                systemCalendars.add(new SystemCalendar(cursor, resolver, loadMinimal));
+                systemCalendars.add(new SystemCalendar(cursor, resolver));
             }
         }
         
@@ -106,7 +128,7 @@ public final class SystemCalendarUtils {
                     Logger.info(NAME, "Refreshed " + oldCalendar);
                     continue;
                 }
-                SystemCalendar newCalendar = new SystemCalendar(cursor, resolver, false);
+                SystemCalendar newCalendar = new SystemCalendar(cursor, resolver);
                 calendars.add(newCalendar);
                 Logger.info(NAME, "Added " + newCalendar);
             }

@@ -62,14 +62,14 @@ public class SystemCalendarEvent {
     protected long startDayLocal;
     protected long endDayLocal;
     
-    protected boolean isAllDay;
+    protected final boolean isAllDay;
     
     @Nullable
     protected RecurrenceSet rSet;
+    private String rSetHash;
+    private final TimeZone timeZone;
     
-    private TimeZone timeZone;
-    
-    SystemCalendarEvent(@NonNull Cursor cursor, @NonNull SystemCalendar associatedCalendar, boolean loadMinimal) {
+    SystemCalendarEvent(@NonNull Cursor cursor, @NonNull SystemCalendar associatedCalendar) {
         
         this.associatedCalendar = associatedCalendar;
         
@@ -78,10 +78,6 @@ public class SystemCalendarEvent {
         
         prefKey = associatedCalendar.makeEventPrefKey(color);
         subKeys = associatedCalendar.makeEventSubKeys(prefKey);
-        
-        if (loadMinimal) {
-            return;
-        }
         
         title = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.TITLE).trim();
         startMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.DTSTART);
@@ -111,6 +107,8 @@ public class SystemCalendarEvent {
         String rRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RRULE);
         String rDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RDATE);
         
+        rSetHash = rRuleStr + rDateStr;
+        
         if (!rRuleStr.isEmpty()) {
             try {
                 rSet = new RecurrenceSet();
@@ -128,6 +126,8 @@ public class SystemCalendarEvent {
                 
                 String exRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EXRULE);
                 String exDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EXDATE);
+                
+                rSetHash += exRuleStr + exDateStr;
                 
                 if (!exRuleStr.isEmpty()) {
                     try {
@@ -307,6 +307,7 @@ public class SystemCalendarEvent {
     public void addExceptions(@NonNull List<Long> exceptions) {
         if (rSet != null) {
             rSet.addExceptions(new RecurrenceList(Longs.toArray(exceptions)));
+            rSetHash += exceptions.hashCode();
         } else {
             Logger.warning(NAME, "Couldn't add exceptions to " + this);
         }
@@ -320,6 +321,20 @@ public class SystemCalendarEvent {
     @NonNull
     public List<String> getSubKeys() {
         return subKeys;
+    }
+    
+    public boolean equalsByContent(@NonNull SystemCalendarEvent event) {
+        if (event.id != id) {
+            Logger.warning(NAME, "Comparing 2 events with different ids: " + event + " and " + this);
+        }
+        return color == event.color &&
+                Objects.equals(title, event.title) &&
+                startMsUTC == event.startMsUTC &&
+                endMsUTC == event.endMsUTC &&
+                durationMs == event.durationMs &&
+                isAllDay == event.isAllDay &&
+                timeZone == event.timeZone &&
+                Objects.equals(rSetHash, event.rSetHash);
     }
     
     @Override

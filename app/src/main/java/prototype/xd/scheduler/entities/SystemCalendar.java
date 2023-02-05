@@ -1,18 +1,13 @@
 package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
-import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
-import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_COLUMNS;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
 
-import android.content.ContentResolver;
 import android.database.Cursor;
-import android.provider.CalendarContract.Events;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -20,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,7 +58,9 @@ public class SystemCalendar {
     @NonNull
     public final ArrayMap<Integer, Integer> eventColorCountMap;
     
-    public SystemCalendar(@NonNull Cursor cursor, @NonNull ContentResolver contentResolver, boolean loadMinimal) {
+    public SystemCalendar(@NonNull Cursor cursor,
+                          @NonNull List<SystemCalendarEvent> events,
+                          @NonNull Map<Long, List<Long>> exceptionLists) {
         accountType = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_TYPE);
         accountName = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_NAME);
         displayName = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_DISPLAY_NAME);
@@ -91,7 +87,8 @@ public class SystemCalendar {
         //printTable(cursor_all);
         //cursor_all.close();
         
-        systemCalendarEvents = loadCalendarEvents(contentResolver, loadMinimal);
+        systemCalendarEvents = events;
+        addExceptions(exceptionLists);
         eventColorCountMap = loadAvailableEventColors();
     }
     
@@ -109,56 +106,15 @@ public class SystemCalendar {
         return colors;
     }
     
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private List<SystemCalendarEvent> loadCalendarEvents(@NonNull ContentResolver contentResolver, boolean loadMinimal) {
-        
-        Map<Long, List<Long>> exceptionLists;
-        List<SystemCalendarEvent> events;
-        
-        final int MIN_EVENTS = 10;
-        final int MIN_EXCEPTIONS = 16;
-        
-        try (Cursor cursor = query(contentResolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
-                Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0")) {
-            
-            events = new ArrayList<>(max(cursor.getCount() - MIN_EXCEPTIONS, MIN_EVENTS));
-            exceptionLists = new HashMap<>(MIN_EXCEPTIONS);
-            
-            while (cursor.moveToNext()) {
-                long originalInstanceTime = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_INSTANCE_TIME);
-                if (originalInstanceTime == 0) {
-                    events.add(new SystemCalendarEvent(cursor, this, loadMinimal));
-                } else {
-                    // if original id is set this event is an exception to some other event
-                    if (!loadMinimal) {
-                        exceptionLists.computeIfAbsent(getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_ID),
-                                        e -> new ArrayList<>())
-                                .add(originalInstanceTime);
-                    }
-                }
-            }
-        }
-        
-        if (!loadMinimal) {
-            addExceptions(exceptionLists, events);
-        }
-        
-        return events;
-    }
-    
-    public void loadMissingEvents() {
-    
-    }
-    
     /**
      * Add exceptions to recurrence rules
      *
      * @param exceptionsMap map of event ids to exception days
      */
-    void addExceptions(@NonNull final Map<Long, List<Long>> exceptionsMap, @NonNull final List<SystemCalendarEvent> events) {
+    void addExceptions(@NonNull final Map<Long, List<Long>> exceptionsMap) {
         for (Map.Entry<Long, List<Long>> exceptionList : exceptionsMap.entrySet()) {
             boolean applied = false;
-            for (SystemCalendarEvent event : events) {
+            for (SystemCalendarEvent event : systemCalendarEvents) {
                 if (event.id == exceptionList.getKey()) {
                     event.addExceptions(exceptionList.getValue());
                     applied = true;
