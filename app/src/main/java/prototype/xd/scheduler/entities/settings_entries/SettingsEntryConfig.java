@@ -32,7 +32,7 @@ import prototype.xd.scheduler.entities.RecycleViewEntry;
 import prototype.xd.scheduler.entities.settings_entries.DoubleSliderSettingsEntryConfig.DoubleSeekBarViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig.DropdownViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig.ResetButtonViewHolder;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 
 enum SettingsEntryType {

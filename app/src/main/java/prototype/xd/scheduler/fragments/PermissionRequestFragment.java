@@ -1,8 +1,7 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.fragments;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static androidx.core.content.UnusedAppRestrictionsConstants.FEATURE_NOT_AVAILABLE;
-import static prototype.xd.scheduler.utilities.Static.PACKAGE_NAME;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.areEssentialPermissionsGranted;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.getAutorevokeStatus;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.getPermissions;
@@ -12,6 +11,7 @@ import static prototype.xd.scheduler.utilities.PermissionUtilities.isCalendarGra
 import static prototype.xd.scheduler.utilities.PermissionUtilities.isNotificationGranted;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.isOnAndroid13OrHigher;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.isStorageGranted;
+import static prototype.xd.scheduler.utilities.Static.PACKAGE_NAME;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 
 import android.annotation.SuppressLint;
@@ -32,18 +32,16 @@ import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.IntentCompat;
-import androidx.fragment.app.Fragment;
 
 import com.github.appintro.SlidePolicy;
 import com.google.android.material.color.MaterialColors;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.PermissionsRequestFragmentBinding;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
 
 
-public class PermissionRequestFragment extends Fragment implements SlidePolicy { // NOSONAR this is a fragment
-    
-    private PermissionsRequestFragmentBinding bnd;
+public class PermissionRequestFragment extends BaseFragment<PermissionsRequestFragmentBinding> implements SlidePolicy { // NOSONAR this is a fragment
     
     private final ActivityResultLauncher<Intent> intentLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result ->
@@ -55,29 +53,32 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     );
     
     @Override
+    @NonNull
+    public PermissionsRequestFragmentBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return PermissionsRequestFragmentBinding.inflate(inflater, container, false);
+    }
+    
+    @Override
     @MainThread
-    @Nullable
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        bnd = PermissionsRequestFragmentBinding.inflate(inflater, container, false);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        
         displayPermissions();
         
         if (!isOnAndroid13OrHigher()) {
-            bnd.notificationPermissionIcon.setVisibility(View.GONE);
-            bnd.notificationPermissionTitle.setVisibility(View.GONE);
-            bnd.notificationPermissionDescription.setVisibility(View.GONE);
-            bnd.notificationPermissionGranted.setVisibility(View.GONE);
+            binding.notificationPermissionIcon.setVisibility(View.GONE);
+            binding.notificationPermissionTitle.setVisibility(View.GONE);
+            binding.notificationPermissionDescription.setVisibility(View.GONE);
+            binding.notificationPermissionGranted.setVisibility(View.GONE);
         }
         
         if (getAutorevokeStatus(this) == FEATURE_NOT_AVAILABLE) {
-            bnd.ignoreAutorevokeIcon.setVisibility(View.GONE);
-            bnd.ignoreAutorevokeTitle.setVisibility(View.GONE);
-            bnd.ignoreAutorevokeDescription.setVisibility(View.GONE);
-            bnd.ignoreAutorevokeGranted.setVisibility(View.GONE);
+            binding.ignoreAutorevokeIcon.setVisibility(View.GONE);
+            binding.ignoreAutorevokeTitle.setVisibility(View.GONE);
+            binding.ignoreAutorevokeDescription.setVisibility(View.GONE);
+            binding.ignoreAutorevokeGranted.setVisibility(View.GONE);
         }
         
-        bnd.grantPermissionsButton.setOnClickListener(v -> requestPermissions(false));
-        
-        return bnd.getRoot();
+        binding.grantPermissionsButton.setOnClickListener(v -> requestPermissions(false));
     }
     
     private void onActivityResult(boolean userRejected) {
@@ -88,8 +89,8 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     @SuppressLint("BatteryLife")
     private void requestPermissions(boolean userRejected) {
         
-        boolean storageGranted = isStorageGranted(requireContext());
-        boolean calendarGranted = isCalendarGranted(requireContext());
+        boolean storageGranted = isStorageGranted(wrapper.context);
+        boolean calendarGranted = isCalendarGranted(wrapper.context);
         boolean essentialsGranted = storageGranted && calendarGranted;
         
         if (!essentialsGranted) {
@@ -111,8 +112,8 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         }
         
         if (!isAutorevokeGranted(this)) {
-            displayToast(requireContext(), R.string.autorevoke_request_description);
-            intentLauncher.launch(IntentCompat.createManageUnusedAppRestrictionsIntent(requireContext(), PACKAGE_NAME));
+            displayToast(wrapper.context, R.string.autorevoke_request_description);
+            intentLauncher.launch(IntentCompat.createManageUnusedAppRestrictionsIntent(wrapper.context, PACKAGE_NAME));
         }
     }
     
@@ -121,20 +122,20 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
         boolean notificationsGranted = isNotificationGranted(this);
         
         boolean batteryGranted = isBatteryGranted(this);
-        boolean storageGranted = isStorageGranted(requireContext());
-        boolean calendarGranted = isCalendarGranted(requireContext());
+        boolean storageGranted = isStorageGranted(wrapper.context);
+        boolean calendarGranted = isCalendarGranted(wrapper.context);
         boolean autorevokeGranted = isAutorevokeGranted(this);
         
         boolean allGranted = storageGranted && calendarGranted && batteryGranted && notificationsGranted && autorevokeGranted;
         
-        setPermissionChipColor(calendarGranted, bnd.calendarPermissionGranted);
-        setPermissionChipColor(storageGranted, bnd.storagePermissionGranted);
-        setPermissionChipColor(batteryGranted, bnd.batteryPermissionGranted);
-        setPermissionChipColor(notificationsGranted, bnd.notificationPermissionGranted);
-        setPermissionChipColor(autorevokeGranted, bnd.ignoreAutorevokeGranted);
+        setPermissionChipColor(calendarGranted, binding.calendarPermissionGranted);
+        setPermissionChipColor(storageGranted, binding.storagePermissionGranted);
+        setPermissionChipColor(batteryGranted, binding.batteryPermissionGranted);
+        setPermissionChipColor(notificationsGranted, binding.notificationPermissionGranted);
+        setPermissionChipColor(autorevokeGranted, binding.ignoreAutorevokeGranted);
         
-        bnd.grantPermissionsButton.setVisibility(allGranted ? View.GONE : View.VISIBLE);
-        bnd.allSetText.setVisibility(allGranted ? View.VISIBLE : View.GONE);
+        binding.grantPermissionsButton.setVisibility(allGranted ? View.GONE : View.VISIBLE);
+        binding.allSetText.setVisibility(allGranted ? View.VISIBLE : View.GONE);
     }
     
     private static void setPermissionChipColor(boolean permissionGranted, @NonNull TextView permissionText) {
@@ -154,7 +155,7 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     
     @Override
     public boolean isPolicyRespected() {
-        return areEssentialPermissionsGranted(requireContext());
+        return areEssentialPermissionsGranted(wrapper.context);
     }
     
     @Override
@@ -163,6 +164,6 @@ public class PermissionRequestFragment extends Fragment implements SlidePolicy {
     }
     
     private void displayGrantPermissionsToast() {
-        displayToast(requireContext(), R.string.permission_request_description);
+        displayToast(wrapper.context, R.string.permission_request_description);
     }
 }

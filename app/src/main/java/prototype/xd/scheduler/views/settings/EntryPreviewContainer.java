@@ -15,9 +15,9 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
-import prototype.xd.scheduler.utilities.Triplet;
+import prototype.xd.scheduler.utilities.misc.Triplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 
 public abstract class EntryPreviewContainer {

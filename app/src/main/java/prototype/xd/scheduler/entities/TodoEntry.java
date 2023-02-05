@@ -41,7 +41,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
-import prototype.xd.scheduler.utilities.SArrayMap;
+import prototype.xd.scheduler.utilities.misc.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
 

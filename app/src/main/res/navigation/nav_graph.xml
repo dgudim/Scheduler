@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/HomeFragment"
-        android:name="prototype.xd.scheduler.HomeFragment"
+        android:name="prototype.xd.scheduler.fragments.HomeFragment"
         android:label="@string/home_fragment_label"
         tools:layout="@layout/home_fragment_wrapper">
 
@@ -23,7 +23,7 @@
 
     <dialog
         android:id="@+id/GlobalSettingsFragment"
-        android:name="prototype.xd.scheduler.GlobalSettingsFragment"
+        android:name="prototype.xd.scheduler.fragments.GlobalSettingsFragment"
         android:label="@string/global_settings_fragment_label"
         tools:layout="@layout/settings_fragment">
 
@@ -31,7 +31,7 @@
 
     <dialog
         android:id="@+id/CalendarSettingsFragment"
-        android:name="prototype.xd.scheduler.CalendarSettingsFragment"
+        android:name="prototype.xd.scheduler.fragments.CalendarSettingsFragment"
         android:label="@string/calendar_settings_fragment_label"
         tools:layout="@layout/settings_fragment">
 
@@ -39,7 +39,7 @@
 
     <dialog
         android:id="@+id/SortingSettingsFragment"
-        android:name="prototype.xd.scheduler.SortingSettingsFragment"
+        android:name="prototype.xd.scheduler.fragments.SortingSettingsFragment"
         android:label="@string/sorting_settings_fragment_label"
         tools:layout="@layout/sorting_settings_fragment">
 

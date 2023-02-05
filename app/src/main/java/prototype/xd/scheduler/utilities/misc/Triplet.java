@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.utilities;
+package prototype.xd.scheduler.utilities.misc;
 
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixColorWithBg;
@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 import kotlin.jvm.functions.Function3;
+import prototype.xd.scheduler.utilities.Static;
 
 public class Triplet<T> {
     
@@ -19,7 +20,7 @@ public class Triplet<T> {
     public T current;
     public T expired;
     
-    enum Type {
+    public enum Type {
         UPCOMING, CURRENT, EXPIRED
     }
     
@@ -82,10 +83,10 @@ public class Triplet<T> {
         @NonNull
         public final D EXPIRED; // NOSONAR
         
-        DefaultedValueTriplet(@NonNull Function3<String, T, Type, D> supplier,
-                              @NonNull String upcomingKey, @NonNull T upcomingDefaultValue,
-                              @NonNull String currentKey, @NonNull T currentDefaultValue,
-                              @NonNull String expiredKey, @NonNull T expiredDefaultValue) {
+        public DefaultedValueTriplet(@NonNull Function3<String, T, Type, D> supplier,
+                                     @NonNull String upcomingKey, @NonNull T upcomingDefaultValue,
+                                     @NonNull String currentKey, @NonNull T currentDefaultValue,
+                                     @NonNull String expiredKey, @NonNull T expiredDefaultValue) {
             UPCOMING = upcoming = supplier.invoke(upcomingKey, upcomingDefaultValue, Type.UPCOMING);
             CURRENT = current = supplier.invoke(currentKey, currentDefaultValue, Type.CURRENT);
             EXPIRED = expired = supplier.invoke(expiredKey, expiredDefaultValue, Type.EXPIRED);

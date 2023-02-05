@@ -16,9 +16,9 @@ import java.util.Set;
 
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Logger;
-import prototype.xd.scheduler.utilities.SArrayMap;
+import prototype.xd.scheduler.utilities.misc.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
 
 /**

@@ -10,7 +10,7 @@ import androidx.viewbinding.ViewBinding;
 import java.util.List;
 
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 /**
  * List adapter class for displaying settings in settings screen

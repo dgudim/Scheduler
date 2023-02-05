@@ -17,7 +17,7 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.RangeDateValidator;
+import prototype.xd.scheduler.utilities.misc.RangeDateValidator;
 
 public class DateSelectButton extends MaterialButton {
     

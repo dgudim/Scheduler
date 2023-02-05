@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import prototype.xd.scheduler.databinding.DoubleSliderSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.GraphicsUtilities;
 
 public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {

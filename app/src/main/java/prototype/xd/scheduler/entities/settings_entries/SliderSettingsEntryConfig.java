@@ -14,7 +14,7 @@ import com.google.android.material.slider.Slider;
 import java.util.function.IntFunction;
 
 import prototype.xd.scheduler.databinding.SliderSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
 

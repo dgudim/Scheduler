@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.utilities;
+package prototype.xd.scheduler.utilities.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.UnaryOperator;
+
+import prototype.xd.scheduler.utilities.Logger;
 
 public class BroadcastReceiverHolder implements DefaultLifecycleObserver {
     

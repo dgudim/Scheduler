@@ -22,7 +22,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.LifecycleService;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.BroadcastReceiverHolder;
+import prototype.xd.scheduler.utilities.receivers.BroadcastReceiverHolder;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Static;

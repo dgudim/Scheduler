@@ -19,6 +19,8 @@ import com.google.android.material.color.MaterialColors;
 import java.util.Locale;
 
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.fragments.IntroStartingFragment;
+import prototype.xd.scheduler.fragments.PermissionRequestFragment;
 
 public class IntroActivity extends AppIntro {
     

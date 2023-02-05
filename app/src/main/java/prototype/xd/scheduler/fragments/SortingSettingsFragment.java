@@ -1,4 +1,4 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.fragments;
 
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getExpiredUpcomingColor;
 import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
@@ -25,6 +25,7 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.DraggableListEntryBinding;
 import prototype.xd.scheduler.databinding.SortingSettingsFragmentBinding;
@@ -44,7 +45,6 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
     // view creation end (fragment visible)
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         
         EntryTypeAdapter entryTypeAdapter = new EntryTypeAdapter();
         binding.orderRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));

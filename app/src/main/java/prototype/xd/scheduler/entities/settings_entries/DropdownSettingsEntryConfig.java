@@ -8,7 +8,7 @@ import androidx.annotation.StringRes;
 import java.util.List;
 
 import prototype.xd.scheduler.databinding.DropdownSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
 
 public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {

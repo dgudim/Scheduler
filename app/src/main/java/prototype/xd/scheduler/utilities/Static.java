@@ -25,7 +25,9 @@ import java.util.function.UnaryOperator;
 import kotlin.jvm.functions.Function2;
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.utilities.Triplet.DefaultedValueTriplet;
+import prototype.xd.scheduler.utilities.misc.MutableObject;
+import prototype.xd.scheduler.utilities.misc.Triplet;
+import prototype.xd.scheduler.utilities.misc.Triplet.DefaultedValueTriplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
 public final class Static {

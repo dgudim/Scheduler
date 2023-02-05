@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.utilities;
+package prototype.xd.scheduler.utilities.misc;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;

@@ -1,4 +1,4 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,7 +27,6 @@ public class BaseListSettingsFragment<T extends RecyclerView.Adapter<?>> extends
     // view creation end (fragment visible)
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
         binding.recyclerView.setAdapter(listViewAdapter);

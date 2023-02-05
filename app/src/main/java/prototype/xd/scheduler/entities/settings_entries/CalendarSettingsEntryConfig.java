@@ -17,7 +17,7 @@ import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.GridSelectionViewBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 

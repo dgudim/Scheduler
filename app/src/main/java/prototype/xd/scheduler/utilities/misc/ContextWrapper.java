@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.utilities;
+package prototype.xd.scheduler.utilities.misc;
 
 import android.app.Dialog;
 import android.content.Context;

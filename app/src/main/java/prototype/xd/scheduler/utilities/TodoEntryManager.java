@@ -41,6 +41,8 @@ import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.entities.TodoEntry.RangeType;
 import prototype.xd.scheduler.entities.TodoEntryList;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.SArrayMap;
 import prototype.xd.scheduler.views.CalendarView;
 
 public final class TodoEntryManager implements DefaultLifecycleObserver {

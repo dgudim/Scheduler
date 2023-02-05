@@ -5,7 +5,7 @@ import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType
 import androidx.annotation.NonNull;
 
 import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
     

@@ -1,4 +1,4 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.fragments;
 
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringUTCFromMsUTC;
@@ -34,7 +34,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -43,29 +42,30 @@ import com.google.android.material.navigation.NavigationView;
 import java.time.LocalDate;
 import java.util.List;
 
+import prototype.xd.scheduler.BuildConfig;
+import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.databinding.ContentWrapperBinding;
 import prototype.xd.scheduler.databinding.DebugMenuDialogBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.databinding.NavigationViewBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.utilities.BroadcastReceiverHolder;
-import prototype.xd.scheduler.utilities.ContextWrapper;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
-import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.utilities.misc.SArrayMap;
+import prototype.xd.scheduler.utilities.receivers.BroadcastReceiverHolder;
 import prototype.xd.scheduler.views.CalendarView;
 
-public final class HomeFragment extends Fragment { // NOSONAR, this is a fragment
+public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding> { // NOSONAR, this is a fragment
     
     public static final String NAME = HomeFragment.class.getSimpleName();
     
     private TodoEntryManager todoEntryManager;
-    private ContentWrapperBinding contentBnd;
-    private ContextWrapper wrapper;
+    private TodoListViewAdapter todoListViewAdapter;
     
     @Override
     @MainThread
@@ -74,7 +74,6 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         // init date manager
         // select current day
         selectDate(LocalDate.now());
-        wrapper = ContextWrapper.from(this);
         BroadcastReceiverHolder receiverHolder = new BroadcastReceiverHolder(requireActivity());
         todoEntryManager = new TodoEntryManager(wrapper);
         receiverHolder.registerReceiver((context, intent) ->
@@ -82,16 +81,20 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                 calendarChangedIntentFilter);
     }
     
+    @NonNull
+    @Override
+    public HomeFragmentWrapperBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return HomeFragmentWrapperBinding.inflate(inflater, container, false);
+    }
+    
     @Override
     @MainThread
-    @NonNull
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         FragmentActivity rootActivity = requireActivity();
         
-        HomeFragmentWrapperBinding wrapperBnd = HomeFragmentWrapperBinding.inflate(inflater, container, false);
-        contentBnd = wrapperBnd.contentWrapper;
-        NavigationView navViewDrawer = wrapperBnd.navViewWrapper;
-        NavigationViewBinding navViewContent = wrapperBnd.navView;
+        ContentWrapperBinding contentBnd = binding.contentWrapper;
+        NavigationView navViewDrawer = binding.navViewWrapper;
+        NavigationViewBinding navViewContent = binding.navView;
         
         systemTimeZone.observe(getViewLifecycleOwner(), timeZone ->
                 todoEntryManager.notifyTimezoneChanged());
@@ -121,7 +124,7 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(DateManager.getCurrentDate()));
         
-        DrawerLayout drawerLayout = wrapperBnd.getRoot();
+        DrawerLayout drawerLayout = binding.root;
         
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 rootActivity, drawerLayout, contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
@@ -130,9 +133,9 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
                 super.onDrawerSlide(drawerView, slideOffset);
                 // move all content to the right when drawer opens
                 float moveFactor = navViewDrawer.getWidth() * slideOffset / 3;
-                contentBnd.getRoot().setTranslationX(moveFactor);
-                contentBnd.getRoot().setScaleX(1 - slideOffset / 20);
-                contentBnd.getRoot().setScaleY(1 - slideOffset / 20);
+                contentBnd.root.setTranslationX(moveFactor);
+                contentBnd.root.setScaleX(1 - slideOffset / 20);
+                contentBnd.root.setScaleY(1 - slideOffset / 20);
             }
         };
         drawerLayout.addDrawerListener(toggle);
@@ -206,11 +209,6 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
         navViewContent.sortingSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_SortingSettingsFragment));
         
-        return wrapperBnd.getRoot();
-    }
-    
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // when all entries are loaded and ui is created, update current month
         todoEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
             // update adapter showing entries
@@ -257,7 +255,7 @@ public final class HomeFragment extends Fragment { // NOSONAR, this is a fragmen
     }
     
     private void updateStatusText() {
-        contentBnd.statusText.setText(
+        binding.contentWrapper.statusText.setText(
                 getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC),
                         todoEntryManager.getCurrentlyVisibleEntriesCount()));
     }

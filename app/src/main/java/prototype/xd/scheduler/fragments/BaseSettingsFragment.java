@@ -1,4 +1,4 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.fragments;
 
 import static prototype.xd.scheduler.utilities.Utilities.findFragmentInNavHost;
 
@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +18,8 @@ import androidx.viewbinding.ViewBinding;
 
 import java.util.Map;
 
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
 
 // base dialog class that refreshes main screen on settings changes
@@ -36,6 +38,7 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     @Override
     @MainThread
     @Nullable
+    @CallSuper
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = inflate(inflater, container);
         preferenceStateBefore = Static.getAll();
@@ -45,6 +48,7 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     // fragment creation begin
     @Override
     @MainThread
+    @CallSuper
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         wrapper = ContextWrapper.from(this);
@@ -53,6 +57,7 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     
     // dialog dismissed (user pressed back button)
     @Override
+    @CallSuper
     public void onDismiss(@NonNull DialogInterface dialog) {
         if (!preferenceStateBefore.equals(Static.getAll())) {
             findFragmentInNavHost(requireActivity(), HomeFragment.class).notifyDatesetChanged();

@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.utilities;
+package prototype.xd.scheduler.utilities.misc;
 
 import android.app.Dialog;
 
@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
+
+import prototype.xd.scheduler.utilities.Logger;
 
 /**
  * Utility class for dismissing a dialog before activity exit to avoid android.view.WindowLeaked

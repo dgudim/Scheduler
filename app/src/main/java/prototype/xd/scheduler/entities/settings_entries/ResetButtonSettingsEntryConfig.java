@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.ContextWrapper;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 
 public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {

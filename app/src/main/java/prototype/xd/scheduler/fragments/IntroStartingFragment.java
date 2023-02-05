@@ -1,4 +1,4 @@
-package prototype.xd.scheduler;
+package prototype.xd.scheduler.fragments;
 
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 
@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.appintro.SlidePolicy;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.views.CheckBox;
 
 public class IntroStartingFragment extends Fragment implements SlidePolicy { // NOSONAR, this is a fragment
