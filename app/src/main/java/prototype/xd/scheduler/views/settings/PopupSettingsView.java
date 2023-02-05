@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.utilities.GraphicsUtilities;
+import prototype.xd.scheduler.utilities.ColorUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
@@ -39,8 +39,8 @@ public abstract class PopupSettingsView {
         bnd.showDaysUpcomingSlider.setValueTo(Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         bnd.showDaysExpiredSlider.setValueTo(Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         
-        new GraphicsUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
-        new GraphicsUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
+        new ColorUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
+        new ColorUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
         
         entryPreviewContainer = getEntryPreviewContainer();
         entryPreviewContainer.attachCurrentSelectors(

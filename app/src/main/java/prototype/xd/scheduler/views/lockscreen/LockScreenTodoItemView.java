@@ -1,8 +1,8 @@
 package prototype.xd.scheduler.views.lockscreen;
 
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.getAverageColor;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedFontColorWithBg;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.getHarmonizedSecondaryFontColorWithBg;
+import static prototype.xd.scheduler.utilities.ColorUtilities.getAverageColor;
+import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedFontColorWithBg;
+import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedSecondaryFontColorWithBg;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Static.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_DENSITY;

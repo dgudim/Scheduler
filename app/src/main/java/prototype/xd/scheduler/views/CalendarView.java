@@ -7,7 +7,7 @@ import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.systemLocale;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
+import static prototype.xd.scheduler.utilities.ColorUtilities.dimColorToBg;
 import static prototype.xd.scheduler.utilities.Utilities.areDatesEqual;
 
 import android.content.Context;

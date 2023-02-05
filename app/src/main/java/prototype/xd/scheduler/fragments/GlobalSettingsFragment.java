@@ -39,7 +39,7 @@ import prototype.xd.scheduler.entities.settings_entries.SliderSettingsEntryConfi
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.GraphicsUtilities;
+import prototype.xd.scheduler.utilities.ColorUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -153,7 +153,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
             try (InputStream stream = requireActivity().getContentResolver().openInputStream(uri)) {
                 
                 if (stream != null) {
-                    GraphicsUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
+                    ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
                             getFile(DateManager.BG_NAMES_ROOT.get(adaptiveBgSettingsEntry.getLastClickedBgIndex())));
                     requireActivity().runOnUiThread(() -> adaptiveBgSettingsEntry.notifyBackgroundUpdated());
                 } else {

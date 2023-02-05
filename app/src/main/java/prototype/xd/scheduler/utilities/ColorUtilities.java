@@ -5,6 +5,7 @@ import static prototype.xd.scheduler.utilities.Static.DEFAULT_TIME_OFFSET_COLOR_
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -15,10 +16,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.FloatRange;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 
+import com.google.android.material.color.DynamicColors;
+import com.google.android.material.color.HarmonizedColors;
+import com.google.android.material.color.HarmonizedColorsOptions;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.slider.Slider;
 
@@ -30,11 +35,11 @@ import java.util.Arrays;
 
 import prototype.xd.scheduler.R;
 
-public final class GraphicsUtilities {
+public final class ColorUtilities {
     
     public static final String NAME = Utilities.class.getSimpleName();
     
-    private GraphicsUtilities() throws InstantiationException {
+    private ColorUtilities() throws InstantiationException {
         throw new InstantiationException(NAME);
     }
     
@@ -51,7 +56,7 @@ public final class GraphicsUtilities {
             cutBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         }
         
-        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4F), (int) (cutBitmap.getHeight() / 4F), GraphicsUtilities.ScalingLogic.FIT);
+        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4F), (int) (cutBitmap.getHeight() / 4F), ColorUtilities.ScalingLogic.FIT);
         
         try (FileOutputStream outputStreamMin = new FileOutputStream(output.getAbsolutePath() + "_min.png")) {
             resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStreamMin);

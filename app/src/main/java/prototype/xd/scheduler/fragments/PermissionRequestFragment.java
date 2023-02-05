@@ -38,7 +38,7 @@ import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.PermissionsRequestFragmentBinding;
-import prototype.xd.scheduler.utilities.GraphicsUtilities;
+import prototype.xd.scheduler.utilities.ColorUtilities;
 
 
 public class PermissionRequestFragment extends BaseFragment<PermissionsRequestFragmentBinding> implements SlidePolicy { // NOSONAR this is a fragment
@@ -145,8 +145,8 @@ public class PermissionRequestFragment extends BaseFragment<PermissionsRequestFr
         int onContainerColor = MaterialColors.getColor(permissionText, R.attr.colorOnErrorContainer, Color.RED);
         
         if (permissionGranted) {
-            containerColor = GraphicsUtilities.swapRedAndGreenChannels(containerColor);
-            onContainerColor = GraphicsUtilities.swapRedAndGreenChannels(onContainerColor);
+            containerColor = ColorUtilities.swapRedAndGreenChannels(containerColor);
+            onContainerColor = ColorUtilities.swapRedAndGreenChannels(onContainerColor);
         }
         
         permissionText.setTextColor(onContainerColor);

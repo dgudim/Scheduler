@@ -22,7 +22,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.utilities.misc.NonNullMutableLiveData;
+import prototype.xd.scheduler.utilities.misc.DefaultedMutableLiveData;
 
 @SuppressWarnings({
         "StaticNonFinalField",
@@ -40,7 +40,7 @@ public final class DateManager {
     
     public static final long ONE_MINUTE_MS = 60000L;
     
-    public static final NonNullMutableLiveData<TimeZone> systemTimeZone = new NonNullMutableLiveData<>(TimeZone.getDefault());
+    public static final DefaultedMutableLiveData<TimeZone> systemTimeZone = new DefaultedMutableLiveData<>(TimeZone.getDefault());
     public static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     
     public static long currentDayUTC = DAY_FLAG_GLOBAL;

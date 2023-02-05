@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR_ACCOUNT;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.dimColorToBg;
+import static prototype.xd.scheduler.utilities.ColorUtilities.dimColorToBg;
 
 import android.view.View;
 

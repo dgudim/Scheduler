@@ -2,7 +2,6 @@ package prototype.xd.scheduler.fragments;
 
 import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 
 import android.os.Bundle;
 
@@ -25,6 +24,7 @@ import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
@@ -51,7 +51,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
         ArrayList<GenericCalendarSettingsEntryConfig> calendarConfigEntries = new ArrayList<>();
         
         new Thread(() -> {
-            List<SystemCalendar> calendars = getAllCalendars(requireContext(), true);
+            List<SystemCalendar> calendars = TodoEntryManager.getInstance(wrapper.context).getCalendars();
             Map<String, List<SystemCalendar>> calendarGroups = new TreeMap<>();
             
             for (SystemCalendar calendar : calendars) {
