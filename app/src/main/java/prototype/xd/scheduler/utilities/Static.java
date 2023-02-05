@@ -1,19 +1,23 @@
 package prototype.xd.scheduler.utilities;
 
+import static android.os.Process.killProcess;
+import static android.os.Process.myPid;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.ColorUtilities.mixTwoColors;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -277,8 +281,27 @@ public final class Static {
     
     public static synchronized void init(@NonNull Context context) {
         if (preferences == null) {
+            
+            // init shared preferences
             preferences = context.getSharedPreferences(PREFERENCES_MAIN, Context.MODE_PRIVATE);
             servicePreferences = context.getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
+            
+            // init root dir
+            File rootDir = context.getExternalFilesDir("");
+            if (rootDir == null) {
+                Log.e(NAME, "Shared storage not available wtf");
+                killProcess(myPid());
+            } else {
+                Static.ROOT_DIR.set(rootDir.getAbsolutePath());
+                Logger.info(NAME, "Root dir: " + rootDir);
+                if (!rootDir.exists()) {
+                    Logger.info(NAME, "Created folder structure: " + rootDir.mkdirs());
+                }
+            }
+    
+            // init logger
+            Logger.setDebugEnabled(Static.DEBUG_LOGGING.get() || BuildConfig.DEBUG);
+            
         }
     }
     
@@ -461,8 +484,6 @@ public final class Static {
     public static final String GITHUB_REPO = "https://github.com/dgudim/Scheduler";
     public static final String GITHUB_RELEASES = "https://github.com/dgudim/Scheduler/releases";
     public static final String GITHUB_FAQ = "https://github.com/dgudim/Scheduler/blob/master/FAQ.md";
-    
-    public static final int TODO_LIST_INITIAL_CAPACITY = 75;
     
     public static final String TIME_RANGE_SEPARATOR = " - ";
     public static final String KEY_SEPARATOR = "_";
