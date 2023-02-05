@@ -293,6 +293,12 @@ public final class Utilities {
         context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
     
+    public static <T extends Activity> void switchActivity(@NonNull Activity currentActivity,
+                                                           @NonNull Class<T> newActivity) {
+        currentActivity.startActivity(new Intent(currentActivity, newActivity));
+        currentActivity.finish();
+    }
+    
     @NonNull
     public static List<TodoEntry> sortEntries(@NonNull List<TodoEntry> entries, long targetDay) {
         

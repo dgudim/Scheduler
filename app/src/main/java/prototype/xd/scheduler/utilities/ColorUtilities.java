@@ -238,6 +238,14 @@ public final class GraphicsUtilities {
         return mixTwoColors(baseColor, tintColor, DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR);
     }
     
+    public static void harmonizeColorsForActivity(@NonNull Activity activity, @NonNull @ColorRes int... colors) {
+        HarmonizedColors.applyToContextIfAvailable(activity,
+                new HarmonizedColorsOptions.Builder()
+                        .setColorResourceIds(colors)
+                        .build());
+        DynamicColors.applyToActivityIfAvailable(activity);
+    }
+    
     public static int getAverageColor(@NonNull int[] pixels) {
         
         int redBucket = 0;

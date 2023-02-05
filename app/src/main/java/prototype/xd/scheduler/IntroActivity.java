@@ -1,6 +1,5 @@
 package prototype.xd.scheduler;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -11,36 +10,30 @@ import androidx.fragment.app.Fragment;
 import com.github.appintro.AppIntro;
 import com.github.appintro.AppIntroCustomLayoutFragment;
 import com.github.appintro.AppIntroPageTransformerType;
-import com.google.android.material.color.DynamicColors;
-import com.google.android.material.color.HarmonizedColors;
-import com.google.android.material.color.HarmonizedColorsOptions;
 import com.google.android.material.color.MaterialColors;
 
 import java.util.Locale;
 
-import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.fragments.IntroStartingFragment;
 import prototype.xd.scheduler.fragments.PermissionRequestFragment;
+import prototype.xd.scheduler.utilities.ColorUtilities;
+import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.Utilities;
 
 public class IntroActivity extends AppIntro {
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    
+        
         Static.init(this);
         
-        HarmonizedColors.applyToContextIfAvailable(this,
-                new HarmonizedColorsOptions.Builder()
-                        .setColorResourceIds(new int[]{
-                                R.color.gray_harmonized,
-                                R.color.green_harmonized,
-                                R.color.yellow_harmonized,
-                                R.color.green_outline_harmonized,
-                                R.color.yellow_outline_harmonized
-                        })
-                        .build());
-        DynamicColors.applyToActivityIfAvailable(this);
+        ColorUtilities.harmonizeColorsForActivity(this,
+                R.color.gray_harmonized,
+                R.color.green_harmonized,
+                R.color.yellow_harmonized,
+                R.color.green_outline_harmonized,
+                R.color.yellow_outline_harmonized);
         
         setTransformer(AppIntroPageTransformerType.Depth.INSTANCE);
         addSlide(new IntroStartingFragment());
@@ -73,14 +66,14 @@ public class IntroActivity extends AppIntro {
     }
     
     private static boolean isXiaomiPhone() {
-        return Build.MANUFACTURER.toLowerCase(Locale.ROOT).contains("xiaomi") || Build.MODEL.toLowerCase(Locale.ROOT).contains("xiaomi");
+        return Build.MANUFACTURER.toLowerCase(Locale.ROOT).contains("xiaomi") ||
+                Build.MODEL.toLowerCase(Locale.ROOT).contains("xiaomi");
     }
     
     @Override
     protected void onDonePressed(@Nullable Fragment currentFragment) {
         super.onDonePressed(currentFragment);
         // go back to the main activity
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+        Utilities.switchActivity(this, MainActivity.class);
     }
 }
