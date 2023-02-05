@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.DateManager.dateStringUTCFromMsUT
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
-import static prototype.xd.scheduler.utilities.DateManager.systemTimeZone;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
@@ -75,7 +74,8 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         // select current day
         selectDate(LocalDate.now());
         BroadcastReceiverHolder receiverHolder = new BroadcastReceiverHolder(requireActivity());
-        todoEntryManager = new TodoEntryManager(wrapper);
+        todoEntryManager = TodoEntryManager.getInstance(wrapper.context);
+        todoListViewAdapter = new TodoListViewAdapter(wrapper, todoEntryManager);
         receiverHolder.registerReceiver((context, intent) ->
                         todoEntryManager.notifyCalendarProviderChanged(context),
                 calendarChangedIntentFilter);
@@ -96,16 +96,13 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         NavigationView navViewDrawer = binding.navViewWrapper;
         NavigationViewBinding navViewContent = binding.navView;
         
-        systemTimeZone.observe(getViewLifecycleOwner(), timeZone ->
-                todoEntryManager.notifyTimezoneChanged());
-        
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
-        contentBnd.content.recyclerView.setAdapter(todoEntryManager.getTodoListViewAdapter());
+        contentBnd.content.recyclerView.setAdapter(todoListViewAdapter);
         
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoEntryManager);
-        todoEntryManager.attachCalendarView(calendarView);
+        todoEntryManager.attachCalendarView(calendarView, wrapper.lifecycle);
         
         // not called on initial startup
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
@@ -113,6 +110,8 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
             todoEntryManager.notifyEntryListChanged();
             updateStatusText();
         });
+        
+        todoEntryManager.listChangedSignal.observe(getViewLifecycleOwner(), status -> todoListViewAdapter.notifyEntryListChanged());
         
         // setup month listener, called when a new month is loaded (first month is loaded differently)
         calendarView.setNewMonthBindListener(month ->
@@ -210,14 +209,14 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_SortingSettingsFragment));
         
         // when all entries are loaded and ui is created, update current month
-        todoEntryManager.onInitFinished(() -> requireActivity().runOnUiThread(() -> {
+        todoEntryManager.initFinished.observe(getViewLifecycleOwner(), status -> {
             // update adapter showing entries
             todoEntryManager.notifyEntryListChanged();
             // update calendar updating indicators
             todoEntryManager.notifyCurrentMonthChanged();
             // finally, update the status text with entry count
             updateStatusText();
-        }));
+        });
     }
     
     // fragment becomes visible
@@ -257,6 +256,6 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
     private void updateStatusText() {
         binding.contentWrapper.statusText.setText(
                 getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC),
-                        todoEntryManager.getCurrentlyVisibleEntriesCount()));
+                        todoListViewAdapter.getItemCount()));
     }
 }

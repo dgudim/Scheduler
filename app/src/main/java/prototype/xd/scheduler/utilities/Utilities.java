@@ -1,5 +1,8 @@
 package prototype.xd.scheduler.utilities;
 
+import static prototype.xd.scheduler.entities.TodoEntryList.TODO_LIST_INITIAL_CAPACITY;
+import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Logger.warning;
 import static prototype.xd.scheduler.utilities.Static.ENTRIES_FILE;
 import static prototype.xd.scheduler.utilities.Static.ENTRIES_FILE_BACKUP;
 import static prototype.xd.scheduler.utilities.Static.GROUPS_FILE;
@@ -8,11 +11,9 @@ import static prototype.xd.scheduler.utilities.Static.MERGE_ENTRIES;
 import static prototype.xd.scheduler.utilities.Static.PACKAGE_PROVIDER_NAME;
 import static prototype.xd.scheduler.utilities.Static.ROOT_DIR;
 import static prototype.xd.scheduler.utilities.Static.TODO_ITEM_SORTING_ORDER;
-import static prototype.xd.scheduler.utilities.Static.TODO_LIST_INITIAL_CAPACITY;
-import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Logger.warning;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.addTodoEntriesFromCalendars;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -46,7 +47,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -104,24 +104,10 @@ public final class Utilities {
         return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
     
-    public static <T extends Exception> void throwOnFalse(boolean result, @NonNull String message, @NonNull Class<T> exceptionClass)
-            throws T, IllegalArgumentException {
-        if (!result) {
-            try {
-                throw exceptionClass.getConstructor(String.class).newInstance(message);
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException |
-                     NoSuchMethodException e) {
-                e.printStackTrace();
-                throw new IllegalArgumentException("Error throwing exception", e);
-            }
-        }
-    }
-    
     @NonNull
     public static List<TodoEntry> loadTodoEntries(long dayStart, long dayEnd,
                                                   @NonNull GroupList groups,
-                                                  @NonNull List<SystemCalendar> calendars,
-                                                  boolean attachGroupToEntry) {
+                                                  @NonNull List<SystemCalendar> calendars) {
         
         List<TodoEntry> readEntries = new ArrayList<>(TODO_LIST_INITIAL_CAPACITY);
         try {
@@ -130,7 +116,7 @@ public final class Utilities {
             int id = 0;
             for (TodoEntry entry : readEntries) {
                 // post deserialize
-                entry.initGroupAndId(groups, id, attachGroupToEntry);
+                entry.initGroupAndId(groups, id);
                 id++;
             }
             
@@ -145,11 +131,15 @@ public final class Utilities {
         return readEntries;
     }
     
-    public static synchronized void saveEntries(@NonNull TodoEntryList entries) {
+    public static synchronized void saveEntries(@Nullable TodoEntryList entries) {
+        
+        if (entries == null) {
+            Logger.error(NAME, "Trying to save null entry list");
+            return;
+        }
+        
         try {
-            
             saveObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP, entries.getRegularEntries());
-            
             Logger.info(NAME, "Saved todo list");
         } catch (IOException e) {
             Logger.error(NAME, "Missing permission, failed saving todo list: " + e);
@@ -174,7 +164,11 @@ public final class Utilities {
         return groups;
     }
     
-    public static synchronized void saveGroups(@NonNull GroupList groups) {
+    public static synchronized void saveGroups(@Nullable GroupList groups) {
+        if (groups == null) {
+            Logger.error(NAME, "Trying to save null group list");
+            return;
+        }
         try {
             
             GroupList groupsToSave = new GroupList();

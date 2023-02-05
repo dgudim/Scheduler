@@ -15,7 +15,7 @@ public class TimeZoneChangedReceiver extends BroadcastReceiver {
         if (Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction())) {
             Logger.info("BroadcastReceiver", "Timezone changed");
             DateManager.updateTimeZone();
-            BackgroundSetterService.ping(context);
+            BackgroundSetterService.keepAlive(context);
         }
     }
 }

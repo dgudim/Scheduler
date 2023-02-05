@@ -22,6 +22,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.LifecycleService;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.receivers.BroadcastReceiverHolder;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
@@ -34,6 +35,9 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
     
     @Nullable
     private LockScreenBitmapDrawer lockScreenBitmapDrawer;
+    
+    @Nullable
+    private TodoEntryManager todoEntryManager;
     
     public static void ping(@NonNull Context context) {
         context.startForegroundService(new Intent(context, BackgroundSetterService.class));
@@ -104,14 +108,14 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
         super.onStartCommand(intent, flags, startId);
         
         Static.init(this);
-        if (lockScreenBitmapDrawer != null) {
+        if (lockScreenBitmapDrawer != null && todoEntryManager != null) {
             if (intent != null && intent.hasExtra(SERVICE_KEEP_ALIVE_SIGNAL)) {
                 setBitmapUpdateFlag();
                 Logger.info(NAME, "Received ping (keep alive job)");
             } else {
                 Logger.info(NAME, "Received general ping");
                 DateManager.updateDate();
-                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this);
+                lastUpdateSucceeded = lockScreenBitmapDrawer.constructBitmap(this, todoEntryManager);
                 updateNotification();
             }
         } else {
@@ -141,6 +145,7 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
             scheduleRestartJob();
             startForeground(foregroundNotificationId, getForegroundNotification().build());
             lockScreenBitmapDrawer = new LockScreenBitmapDrawer(this);
+            todoEntryManager = TodoEntryManager.getInstance(this);
         }
         return START_STICKY;
     }

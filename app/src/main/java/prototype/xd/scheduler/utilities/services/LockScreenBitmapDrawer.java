@@ -4,27 +4,22 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getCurrentWeekdayBgName;
 import static prototype.xd.scheduler.utilities.DateManager.systemTimeZone;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.fingerPrintAndSaveBitmap;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.hashBitmap;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.makeMutable;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.hasNoFingerPrint;
-import static prototype.xd.scheduler.utilities.GraphicsUtilities.readBitmapFromFile;
+import static prototype.xd.scheduler.utilities.ColorUtilities.fingerPrintAndSaveBitmap;
+import static prototype.xd.scheduler.utilities.ColorUtilities.hasNoFingerPrint;
+import static prototype.xd.scheduler.utilities.ColorUtilities.hashBitmap;
+import static prototype.xd.scheduler.utilities.ColorUtilities.makeMutable;
+import static prototype.xd.scheduler.utilities.ColorUtilities.readBitmapFromFile;
+import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Static.LOCKSCREEN_VIEW_VERTICAL_BIAS;
 import static prototype.xd.scheduler.utilities.Static.SERVICE_FAILED;
-import static prototype.xd.scheduler.utilities.Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Static.TODO_ITEM_VIEW_TYPE;
 import static prototype.xd.scheduler.utilities.Static.WALLPAPER_OBTAIN_FAILED;
-import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 import static prototype.xd.scheduler.utilities.Utilities.isVerticalOrientation;
-import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
-import static prototype.xd.scheduler.utilities.Utilities.loadTodoEntries;
 import static prototype.xd.scheduler.utilities.Utilities.nullWrapper;
-import static prototype.xd.scheduler.utilities.Utilities.sortEntries;
 
 import android.annotation.SuppressLint;
 import android.app.WallpaperManager;
@@ -49,11 +44,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.databinding.LockscreenRootContainerBinding;
-import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
+import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 
@@ -130,7 +125,7 @@ class LockScreenBitmapDrawer {
     }
     
     @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
-    boolean constructBitmap(@NonNull Context context) {
+    boolean constructBitmap(@NonNull Context context, @NonNull TodoEntryManager todoEntryManager) {
         
         if (!isVerticalOrientation(context)) {
             Logger.warning(NAME, "Not starting bitmap thread, orientation not vertical");
@@ -147,7 +142,7 @@ class LockScreenBitmapDrawer {
                     
                     Bitmap bitmap = getBitmapToDrawOn();
                     
-                    drawItemsOnBitmap(context, bitmap);
+                    drawItemsOnBitmap(todoEntryManager, bitmap);
                     Logger.info(NAME, "Processed wallpaper in " + (getCurrentTimestampUTC() - time) + "ms");
                     
                     time = getCurrentTimestampUTC();
@@ -161,8 +156,8 @@ class LockScreenBitmapDrawer {
                     // relay
                     Thread.currentThread().interrupt();
                 } catch (FileNotFoundException e) {
-                    // TODO: 02.02.2023 increment instead
                     WALLPAPER_OBTAIN_FAILED.put(Boolean.TRUE);
+                    // TODO: 05.02.2023 investigate
                     logException(NAME, e);
                 } catch (Exception e) {
                     SERVICE_FAILED.put(Boolean.TRUE);
@@ -184,29 +179,19 @@ class LockScreenBitmapDrawer {
     }
     
     @SuppressLint("InflateParams")
-    private void drawItemsOnBitmap(@NonNull Context context, @NonNull Bitmap bitmap) throws InterruptedException {
+    private void drawItemsOnBitmap(@NonNull TodoEntryManager todoEntryManager, @NonNull Bitmap bitmap) throws InterruptedException {
         
-        GroupList groups = loadGroups();
         TodoItemViewType todoItemViewType = TODO_ITEM_VIEW_TYPE.get();
-        // load user defined entries (from files)
-        // add entries from all calendars
-        // filter and sort entries
-        List<TodoEntry> toAdd = loadTodoEntries(
-                currentDayUTC - SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
-                currentDayUTC + SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET,
-                groups, getAllCalendars(context, false),
-                false);
         
-        toAdd.removeIf(todoEntry -> !todoEntry.isVisibleOnLockscreenToday());
-        toAdd = sortEntries(toAdd, currentDayUTC);
+        List<TodoEntry> toAdd = todoEntryManager.getVisibleTodoEntries(currentDayUTC, (entry, entryType) -> entry.isVisibleOnLockscreenToday());
         
         long currentHash =
                 getEntryListHash(toAdd) +
-                Static.getAll().hashCode() +
-                hashBitmap(bitmap) +
-                currentDayUTC +
-                todoItemViewType.ordinal() +
-                systemTimeZone.getValue().hashCode();
+                        Static.getAll().hashCode() +
+                        hashBitmap(bitmap) +
+                        currentDayUTC +
+                        todoItemViewType.ordinal() +
+                        systemTimeZone.getValue().hashCode();
         
         Logger.debug(NAME, "Previous lockscreen hash: " + previousHash + " | current lockscreen hash: " + currentHash);
         if (previousHash == currentHash) {
