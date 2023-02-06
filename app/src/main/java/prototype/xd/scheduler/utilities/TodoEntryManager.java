@@ -10,7 +10,7 @@ import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Static.setBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.addMissingCalendars;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.getAllCalendars;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.loadCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
@@ -141,7 +141,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
             long start = System.currentTimeMillis();
             
             groups = loadGroups();
-            calendars = getAllCalendars(context);
+            calendars = loadCalendars(context);
             
             calendarVisibilityMap.ensureCapacity(calendars.size());
             for (SystemCalendar calendar : calendars) {
@@ -179,7 +179,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
                         }
                     } catch (InterruptedException e) {
                         interrupt();
-                        String threadName = Thread.currentThread().getName();
+                        String threadName = getName();
                         Logger.info(threadName, threadName + " stopped");
                     }
                 } while (!isInterrupted());
@@ -316,6 +316,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     
     public void attachCalendarView(@NonNull CalendarView calendarView, @NonNull Lifecycle lifecycle) {
         this.calendarView = calendarView;
+        // observe lifecycle to clear ui references later
         lifecycle.addObserver(this);
     }
     
@@ -399,20 +400,9 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         
         Logger.debug(NAME, "Loading entries from " + toLoadDayStart + " to " + toLoadDayEnd);
         
-        long dayStart = 0;
-        long dayEnd = 0;
-        if (toLoadDayEnd > todoEntries.lastLoadedDay) {
-            dayStart = todoEntries.lastLoadedDay + 1;
-            dayEnd = toLoadDayEnd;
-            todoEntries.extendLoadingRangeEndDay(toLoadDayEnd);
-        } else if (toLoadDayStart < todoEntries.firstLoadedDay) {
-            dayStart = toLoadDayStart;
-            dayEnd = todoEntries.firstLoadedDay - 1;
-            todoEntries.extendLoadingRangeStartDay(toLoadDayStart);
-        }
-        if (dayStart != 0) {
+        if (todoEntries.tryExtendLoadingRange(toLoadDayStart, toLoadDayEnd)) {
             for (SystemCalendar calendar : calendars) {
-                addEventsFromCalendar(calendar, dayStart, dayEnd);
+                addEventsFromCalendar(calendar, toLoadDayStart, toLoadDayEnd);
             }
         }
     }
@@ -455,9 +445,8 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         }
         
         if (calendarView != null) {
-            notifyDaysChanged(
-                    entry.getVisibleDaysOnCalendar(calendarView,
-                            todoEntries.displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE));
+            notifyDaysChanged(entry.getVisibleDaysOnCalendar(calendarView,
+                    todoEntries.displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE));
         }
         notifyEntryListChanged();
         if (entry.isVisibleOnLockscreenToday()) {

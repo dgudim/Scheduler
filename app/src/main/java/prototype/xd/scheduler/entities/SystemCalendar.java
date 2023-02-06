@@ -143,14 +143,10 @@ public class SystemCalendar {
      */
     public void addVisibleEventsToList(long firstDayUTC, long lastDayUTC,
                                        @NonNull List<TodoEntry> list) {
-        if (isVisible()) {
-            for (SystemCalendarEvent event : systemCalendarEvents) {
-                if (event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
-                    list.add(new TodoEntry(event));
-                    // TODO: 04.02.2023 generify
-                }
-            }
-        }
+        getVisibleEvents(
+                firstDayUTC, lastDayUTC,
+                null,
+                event -> list.add(new TodoEntry(event)));
     }
     
     /**
@@ -162,13 +158,13 @@ public class SystemCalendar {
      * @param consumer    consumer that processes all events
      */
     public void getVisibleEvents(long firstDayUTC, long lastDayUTC,
-                                 @NonNull Predicate<SystemCalendarEvent> filter,
+                                 @Nullable Predicate<SystemCalendarEvent> filter,
                                  @NonNull Consumer<SystemCalendarEvent> consumer) {
         if (isVisible()) {
             for (SystemCalendarEvent event : systemCalendarEvents) {
-                if (filter.test(event) && event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
+                if ((filter != null && filter.test(event)) &&
+                        event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
                     consumer.accept(event);
-                    // TODO: 04.02.2023 generify
                 }
             }
         }
@@ -177,28 +173,18 @@ public class SystemCalendar {
     /**
      * Notifies all events with a specific color (in the same group) about parameter changes
      *
-     * @param parameterKey parameter to invalidate
+     * @param parameterKey parameter to invalidate, null means invalidate all parameters
      * @param color        target events color
      */
-    protected void invalidateParameterOnEvents(@NonNull String parameterKey, int color) {
+    protected void invalidateParameterOnEvents(@Nullable String parameterKey, int color) {
         systemCalendarEvents.forEach(event -> {
-            if (event.color == color) {
-                event.invalidateParameter(parameterKey);
-                // TODO: 04.02.2023 generify
+            if (event.color != color) {
+                return;
             }
-        });
-    }
-    
-    /**
-     * Notifies all events with a specific color (in the same group) about all parameter changes
-     *
-     * @param color target events color
-     */
-    public void invalidateAllParametersOnEvents(int color) {
-        systemCalendarEvents.forEach(event -> {
-            if (event.color == color) {
+            if (parameterKey == null) {
                 event.invalidateAllParameters();
-                // TODO: 04.02.2023 generify
+            } else {
+                event.invalidateParameter(parameterKey);
             }
         });
     }

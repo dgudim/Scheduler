@@ -68,7 +68,7 @@ public final class SystemCalendarUtils {
      * @return a list of system calendars
      */
     @NonNull
-    public static List<SystemCalendar> getAllCalendars(@NonNull Context context) {
+    public static List<SystemCalendar> loadCalendars(@NonNull Context context) {
         ContentResolver resolver = context.getContentResolver();
     
         final int MIN_EVENTS = 10;

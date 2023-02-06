@@ -157,7 +157,6 @@ class LockScreenBitmapDrawer {
                     Thread.currentThread().interrupt();
                 } catch (FileNotFoundException e) {
                     WALLPAPER_OBTAIN_FAILED.put(Boolean.TRUE);
-                    // TODO: 05.02.2023 investigate
                     logException(NAME, e);
                 } catch (Exception e) {
                     SERVICE_FAILED.put(Boolean.TRUE);

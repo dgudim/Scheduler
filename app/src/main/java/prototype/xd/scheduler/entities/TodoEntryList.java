@@ -91,22 +91,25 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
         
     }
     
-    // extend to the left
-    public void extendLoadingRangeStartDay(long newDayStart) {
-        for (TodoEntry entry : this) {
-            // we know that newDayStart is smaller than previous loadedDay_start
-            linkEntryToLookupContainers(entry, newDayStart, firstLoadedDay - 1);
+    public boolean tryExtendLoadingRange(long toLoadDayStart, long toLoadDayEnd) {
+        
+        if (toLoadDayEnd > lastLoadedDay) {
+            toLoadDayStart = lastLoadedDay + 1;
+            lastLoadedDay = toLoadDayEnd;
+        } else if (toLoadDayStart < firstLoadedDay) {
+            toLoadDayEnd = firstLoadedDay - 1;
+            firstLoadedDay = toLoadDayStart;
+        } else {
+            return false;
         }
-        firstLoadedDay = newDayStart;
-    }
-    
-    // extend to the right
-    public void extendLoadingRangeEndDay(long newDayEnd) {
+        
+        Logger.debug(NAME, "Actual loading range is from " + toLoadDayStart + " to " + toLoadDayEnd);
+        
         for (TodoEntry entry : this) {
-            // we know that newDayStart is bigger than previous loadedDay_start
-            linkEntryToLookupContainers(entry, lastLoadedDay + 1, newDayEnd);
+            linkEntryToLookupContainers(entry, toLoadDayStart, toLoadDayEnd);
         }
-        lastLoadedDay = newDayEnd;
+        
+        return true;
     }
     
     // handle unlinking

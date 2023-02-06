@@ -222,7 +222,7 @@ public class SystemCalendarEvent {
      * Invalidate all parameters of all connected entries
      */
     public void invalidateAllParametersOfConnectedEntries() {
-        associatedCalendar.invalidateAllParametersOnEvents(color);
+        associatedCalendar.invalidateParameterOnEvents(null, color);
     }
     // ------------------------------ METHODS FOR WORKING WITH ENTRY PARAMETERS END
     
