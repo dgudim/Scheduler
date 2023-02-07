@@ -33,53 +33,16 @@ public class SystemCalendar {
     public static final String NAME = SystemCalendar.class.getSimpleName();
     
     @NonNull
-    public final String accountType;
-    @NonNull
-    public final String accountName;
-    
-    @NonNull
-    protected final String prefKey;
-    @NonNull
-    protected final List<String> subKeys;
-    @NonNull
-    private final String visibilityKey;
-    public final long id;
-    public final int accessLevel;
-    
-    @NonNull
-    public final String timeZoneId;
-    @NonNull
-    public final String displayName;
-    @ColorInt
-    public final int color;
+    public final SystemCalendarData data;
     
     @NonNull
     public final List<SystemCalendarEvent> systemCalendarEvents;
     @NonNull
     public final ArrayMap<Integer, Integer> eventColorCountMap;
     
-    public SystemCalendar(@NonNull Cursor cursor,
-                          @NonNull List<SystemCalendarEvent> events,
-                          @NonNull Map<Long, List<Long>> exceptionLists) {
-        accountType = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_TYPE);
-        accountName = getString(cursor, CALENDAR_COLUMNS, Calendars.ACCOUNT_NAME);
-        displayName = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_DISPLAY_NAME);
-        id = getLong(cursor, CALENDAR_COLUMNS, Calendars._ID);
-        accessLevel = getInt(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_ACCESS_LEVEL);
-        color = getInt(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_COLOR);
+    public SystemCalendar(@NonNull SystemCalendarData data) {
         
-        prefKey = accountName + KEY_SEPARATOR + displayName;
-        subKeys = List.of(accountName, prefKey);
-        visibilityKey = prefKey + KEY_SEPARATOR + Static.VISIBLE;
-        
-        String calTimeZoneId = getString(cursor, CALENDAR_COLUMNS, Calendars.CALENDAR_TIME_ZONE);
-        
-        if (calTimeZoneId.isEmpty()) {
-            Logger.warning(NAME, this + " has no timezone, defaulting to UTC");
-            timeZoneId = "UTC";
-        } else {
-            timeZoneId = calTimeZoneId;
-        }
+        this.data = data;
         
         //System.out.println("CALENDAR-------------------------------------------------" + name);
         //Cursor cursor_all = query(contentResolver, Events.CONTENT_EXCEPTION_URI, null,
