@@ -13,15 +13,16 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.dmfs.rfc5545.recurrenceset.RecurrenceSet;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
+import java.util.Objects;
+
+import prototype.xd.scheduler.BuildConfig;
 
 public class SystemCalendarEventData {
     
-    @NonNull
-    private final String prefKey;
+    public static final String NAME = SystemCalendarEvent.class.getSimpleName();
+    
     final long id;
     
     @Nullable
@@ -29,31 +30,78 @@ public class SystemCalendarEventData {
     @ColorInt
     public final int color;
     
-    protected long startMsUTC;
-    protected long endMsUTC;
-    protected long durationMs;
+    protected final long refStartMsUTC;
+    protected final long refEndMsUTC;
     
     protected final boolean isAllDay;
     
+    protected final String rRuleStr;
+    protected final String rDateStr;
+    protected final String exRuleStr;
+    protected final String exDateStr;
     
-    private final TimeZone timeZone;
+    protected final String timeZoneId;
     
+    protected final List<Long> exceptions;
     
     public SystemCalendarEventData(@NonNull Cursor cursor) {
+        exceptions = new ArrayList<>();
+        
         color = getInt(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DISPLAY_COLOR);
         id = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events._ID);
         
-        prefKey = associatedCalendar.makeEventPrefKey(color);
-        
         title = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.TITLE).trim();
-        startMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DTSTART);
-        endMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DTEND);
+        refStartMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DTSTART);
+        refEndMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DTEND);
         isAllDay = getBoolean(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.ALL_DAY);
         
-        String timeZoneId = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.EVENT_TIMEZONE);
+        timeZoneId = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.EVENT_TIMEZONE);
         
-        timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? associatedCalendar.timeZoneId : timeZoneId);
+        exRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.EXRULE);
+        exDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.EXDATE);
+        
+        rRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.RRULE);
+        rDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.RDATE);
     }
     
+    public void addException(@NonNull Long exception) {
+        exceptions.add(exception);
+    }
     
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SystemCalendarEventData that = (SystemCalendarEventData) o;
+        return id == that.id &&
+                color == that.color &&
+                refStartMsUTC == that.refStartMsUTC &&
+                refEndMsUTC == that.refEndMsUTC &&
+                isAllDay == that.isAllDay &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(rRuleStr, that.rRuleStr) &&
+                Objects.equals(rDateStr, that.rDateStr) &&
+                Objects.equals(exRuleStr, that.exRuleStr) &&
+                Objects.equals(exDateStr, that.exDateStr) &&
+                Objects.equals(timeZoneId, that.timeZoneId) &&
+                Objects.equals(exceptions, that.exceptions);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, color,
+                refStartMsUTC, refEndMsUTC, isAllDay,
+                rRuleStr, rDateStr, exRuleStr, exDateStr,
+                timeZoneId, exceptions);
+    }
+    
+    @NonNull
+    @Override
+    public String toString() {
+        return NAME + ": " + (BuildConfig.DEBUG ? title : id) + " " + color;
+    }
 }

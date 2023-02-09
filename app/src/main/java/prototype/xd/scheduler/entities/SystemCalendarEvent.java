@@ -6,9 +6,6 @@ import static prototype.xd.scheduler.utilities.DateManager.daysToMs;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.QueryUtilities.getBoolean;
-import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
-import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
 import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
@@ -16,7 +13,6 @@ import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
 
 import android.database.Cursor;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -32,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.utilities.Logger;
 
 public class SystemCalendarEvent {
@@ -48,12 +43,6 @@ public class SystemCalendarEvent {
     protected final List<String> subKeys;
     @NonNull
     private final String prefKey;
-    final long id;
-    
-    @Nullable
-    protected String title;
-    @ColorInt
-    public final int color;
     
     protected long startMsUTC;
     protected long endMsUTC;
@@ -62,38 +51,33 @@ public class SystemCalendarEvent {
     protected long startDayLocal;
     protected long endDayLocal;
     
-    protected final boolean isAllDay;
+    @NonNull
+    protected final SystemCalendarEventData data;
     
     @Nullable
     protected RecurrenceSet rSet;
-    private String rSetHash;
     private final TimeZone timeZone;
     
-    SystemCalendarEvent(@NonNull Cursor cursor, @NonNull SystemCalendar associatedCalendar) {
+    SystemCalendarEvent(@NonNull Cursor cursor,
+                        @NonNull SystemCalendarEventData data,
+                        @NonNull SystemCalendar associatedCalendar) {
         
         this.associatedCalendar = associatedCalendar;
+        this.data = data;
         
-        color = getInt(cursor, CALENDAR_EVENT_COLUMNS, Events.DISPLAY_COLOR);
-        id = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events._ID);
-        
-        prefKey = associatedCalendar.makeEventPrefKey(color);
+        prefKey = associatedCalendar.makeEventPrefKey(data.color);
         subKeys = associatedCalendar.makeEventSubKeys(prefKey);
         
-        title = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.TITLE).trim();
-        startMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.DTSTART);
-        endMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.DTEND);
-        isAllDay = getBoolean(cursor, CALENDAR_EVENT_COLUMNS, Events.ALL_DAY);
+        timeZone = TimeZone.getTimeZone(data.timeZoneId.isEmpty() ? associatedCalendar.data.timeZoneId : data.timeZoneId);
         
-        String timeZoneId = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EVENT_TIMEZONE);
-        
-        timeZone = TimeZone.getTimeZone(timeZoneId.isEmpty() ? associatedCalendar.timeZoneId : timeZoneId);
-        
+        startMsUTC = data.refStartMsUTC;
+        endMsUTC = data.refEndMsUTC;
         durationMs = endMsUTC - startMsUTC;
         
         loadRecurrenceRules(cursor);
         
         // shorten the event a little because it's bounds are on midnight and that breaks stuff
-        if (isAllDay) {
+        if (data.isAllDay) {
             endMsUTC -= ONE_MINUTE_MS;
             startMsUTC += ONE_MINUTE_MS;
             durationMs -= 2 * ONE_MINUTE_MS;
@@ -104,42 +88,32 @@ public class SystemCalendarEvent {
     
     private void loadRecurrenceRules(@NonNull Cursor cursor) { // NOSONAR, not that complex
         
-        String rRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RRULE);
-        String rDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.RDATE);
-        
-        rSetHash = rRuleStr + rDateStr;
-        
-        if (!rRuleStr.isEmpty()) {
+        if (!data.rRuleStr.isEmpty()) {
             try {
                 rSet = new RecurrenceSet();
                 
-                rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(rRuleStr)));
+                rSet.addInstances(new RecurrenceRuleAdapter(new RecurrenceRule(data.rRuleStr)));
                 
-                if (!rDateStr.isEmpty()) {
+                if (!data.rDateStr.isEmpty()) {
                     try {
-                        DateTimeZonePair pair = getRecurrenceDates(rDateStr);
+                        DateTimeZonePair pair = getRecurrenceDates(data.rDateStr);
                         rSet.addInstances(new RecurrenceList(pair.dateList, pair.timeZone));
                     } catch (IllegalArgumentException e) {
                         Logger.error(NAME, "Error adding rDate: " + e.getMessage());
                     }
                 }
-                
-                String exRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EXRULE);
-                String exDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.EXDATE);
-                
-                rSetHash += exRuleStr + exDateStr;
-                
-                if (!exRuleStr.isEmpty()) {
+              
+                if (!data.exRuleStr.isEmpty()) {
                     try {
-                        rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(exRuleStr)));
+                        rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(data.exRuleStr)));
                     } catch (IllegalArgumentException e) {
                         Logger.error(NAME, "Error adding exRule: " + e.getMessage());
                     }
                 }
                 
-                if (!exDateStr.isEmpty()) {
+                if (!data.exDateStr.isEmpty()) {
                     try {
-                        DateTimeZonePair pair = getRecurrenceDates(exDateStr);
+                        DateTimeZonePair pair = getRecurrenceDates(data.exDateStr);
                         rSet.addExceptions(new RecurrenceList(pair.dateList, pair.timeZone));
                     } catch (IllegalArgumentException e) {
                         Logger.error(NAME, "Error adding exDate: " + e.getMessage());
@@ -151,8 +125,10 @@ public class SystemCalendarEvent {
                 if (!durationStr.isEmpty()) {
                     durationMs = rfc2445ToMilliseconds(durationStr);
                 }
-                
+    
                 endMsUTC = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, startMsUTC);
+    
+                rSet.addExceptions(new RecurrenceList(Longs.toArray(data.exceptions)));
             } catch (Exception e) {
                 logException(NAME, e);
             }
@@ -160,7 +136,7 @@ public class SystemCalendarEvent {
     }
     
     public void computeEventVisibilityDays() {
-        if (isAllDay) {
+        if (data.isAllDay) {
             // don't convert ms to local, all day events don't drift
             startDayLocal = msToDays(startMsUTC);
             endDayLocal = startDayLocal;
@@ -215,14 +191,14 @@ public class SystemCalendarEvent {
      * @param parameterKey parameter key to invalidate
      */
     public void invalidateParameterOfConnectedEntries(@NonNull String parameterKey) {
-        associatedCalendar.invalidateParameterOnEvents(parameterKey, color);
+        associatedCalendar.invalidateParameterOnEvents(parameterKey, data.color);
     }
     
     /**
      * Invalidate all parameters of all connected entries
      */
     public void invalidateAllParametersOfConnectedEntries() {
-        associatedCalendar.invalidateParameterOnEvents(null, color);
+        associatedCalendar.invalidateParameterOnEvents(null, data.color);
     }
     // ------------------------------ METHODS FOR WORKING WITH ENTRY PARAMETERS END
     
@@ -278,8 +254,8 @@ public class SystemCalendarEvent {
             instanceStartMsUTC = it.next();
             instanceEndMsUTC = instanceStartMsUTC + durationMs;
             val = recurrenceSetConsumer.processInstance(instanceStartMsUTC, instanceEndMsUTC,
-                    isAllDay ? msToDays(instanceStartMsUTC) : msUTCtoDaysLocal(instanceStartMsUTC),
-                    isAllDay ? msToDays(instanceEndMsUTC) : msUTCtoDaysLocal(instanceEndMsUTC));
+                    data.isAllDay ? msToDays(instanceStartMsUTC) : msUTCtoDaysLocal(instanceStartMsUTC),
+                    data.isAllDay ? msToDays(instanceEndMsUTC) : msUTCtoDaysLocal(instanceEndMsUTC));
             if (val != null) {
                 return val;
             }
@@ -304,15 +280,6 @@ public class SystemCalendarEvent {
         return doRangesOverlap(startDayLocal, endDayLocal, firstDayUTC, lastDayUTC);
     }
     
-    public void addExceptions(@NonNull List<Long> exceptions) {
-        if (rSet != null) {
-            rSet.addExceptions(new RecurrenceList(Longs.toArray(exceptions)));
-            rSetHash += exceptions.hashCode();
-        } else {
-            Logger.warning(NAME, "Couldn't add exceptions to " + this);
-        }
-    }
-    
     @NonNull
     public String getPrefKey() {
         return prefKey;
@@ -323,41 +290,25 @@ public class SystemCalendarEvent {
         return subKeys;
     }
     
-    public boolean equalsByContent(@NonNull SystemCalendarEvent event) {
-        if (event.id != id) {
-            Logger.warning(NAME, "Comparing 2 events with different ids: " + event + " and " + this);
-        }
-        return color == event.color &&
-                Objects.equals(title, event.title) &&
-                startMsUTC == event.startMsUTC &&
-                endMsUTC == event.endMsUTC &&
-                durationMs == event.durationMs &&
-                isAllDay == event.isAllDay &&
-                timeZone == event.timeZone &&
-                Objects.equals(rSetHash, event.rSetHash);
-    }
-    
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return data.hashCode();
     }
     
     @Override
-    public boolean equals(@Nullable Object obj) {
-        if (obj == null) {
-            return false;
-        } else if (obj == this) {
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
             return true;
-        } else if (obj instanceof SystemCalendarEvent) {
-            // id is unique
-            return id == ((SystemCalendarEvent) obj).id;
         }
-        return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return data.equals(((SystemCalendarEvent) o).data);
     }
     
     @NonNull
     @Override
     public String toString() {
-        return NAME + ": " + (BuildConfig.DEBUG ? title : id) + " " + associatedCalendar + " " + color;
+        return data + " from " + associatedCalendar;
     }
 }

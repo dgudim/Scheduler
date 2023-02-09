@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.utilities;
 
+import static android.provider.CalendarContract.*;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
@@ -12,13 +13,17 @@ import android.text.Spannable;
 import android.text.SpannableString;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
-import prototype.xd.scheduler.entities.SystemCalendarEvent;
+import prototype.xd.scheduler.entities.SystemCalendarData;
+import prototype.xd.scheduler.entities.SystemCalendarEventData;
 import prototype.xd.scheduler.entities.TodoEntry;
 
 public final class SystemCalendarUtils {
@@ -33,73 +38,93 @@ public final class SystemCalendarUtils {
      * List of columns to read from CalendarContract.Calendars.CONTENT_URI
      */
     public static final List<String> CALENDAR_COLUMNS = List.of(
-            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
-            CalendarContract.Calendars.ACCOUNT_NAME,
-            CalendarContract.Calendars.ACCOUNT_TYPE,
-            CalendarContract.Calendars._ID,
-            CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
-            CalendarContract.Calendars.CALENDAR_COLOR,
-            CalendarContract.Calendars.CALENDAR_TIME_ZONE);
+            Calendars.CALENDAR_DISPLAY_NAME,
+            Calendars.ACCOUNT_NAME,
+            Calendars.ACCOUNT_TYPE,
+            Calendars._ID,
+            Calendars.CALENDAR_ACCESS_LEVEL,
+            Calendars.CALENDAR_COLOR,
+            Calendars.CALENDAR_TIME_ZONE);
     
     /**
      * List of columns to read from Events.CONTENT_URI
      */
     public static final List<String> CALENDAR_EVENT_COLUMNS = List.of(
-            CalendarContract.Events.TITLE,
-            CalendarContract.Events.DISPLAY_COLOR,
-            CalendarContract.Events.DTSTART,
-            CalendarContract.Events.DTEND,
-            CalendarContract.Events.DURATION,
-            CalendarContract.Events.ALL_DAY,
-            CalendarContract.Events.RRULE,
-            CalendarContract.Events.RDATE,
-            CalendarContract.Events.EXRULE,
-            CalendarContract.Events.EXDATE,
-            CalendarContract.Events.EVENT_TIMEZONE,
+            Events._ID,
+            Events.CALENDAR_ID,
+            Events.TITLE,
+            Events.DISPLAY_COLOR,
+            Events.DTSTART,
+            Events.DTEND,
+            Events.DURATION,
+            Events.ALL_DAY,
+            Events.RRULE,
+            Events.RDATE,
+            Events.EXRULE,
+            Events.EXDATE,
+            Events.EVENT_TIMEZONE,
             // for exception events
-            CalendarContract.Events._ID,
-            CalendarContract.Events.ORIGINAL_ID,
-            CalendarContract.Events.ORIGINAL_INSTANCE_TIME);
+            Events.ORIGINAL_ID,
+            Events.ORIGINAL_INSTANCE_TIME);
     
     /**
      * Retrieve all calendars from the system
      *
-     * @param context     context, will be used to get a ContentResolver
+     * @param context context, will be used to get a ContentResolver
      * @return a list of system calendars
      */
     @NonNull
-    public static List<SystemCalendar> loadCalendars(@NonNull Context context) {
+    public static List<SystemCalendar> loadCalendars(@NonNull Context context, @Nullable List<SystemCalendar> calendars) {
         ContentResolver resolver = context.getContentResolver();
-    
-        final int MIN_EVENTS = 10;
-        final int MIN_EXCEPTIONS = 16;
-    
-        try (Cursor cursor = query(contentResolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
-                Events.CALENDAR_ID + " = " + id + " AND " + Events.DELETED + " = 0")) {
         
-            events = new ArrayList<>(max(cursor.getCount() - MIN_EXCEPTIONS, MIN_EVENTS));
-            exceptionLists = new HashMap<>(MIN_EXCEPTIONS);
+        Map<Long, SystemCalendarData> calendarDataMap;
         
+        try (Cursor cursor = query(resolver, Calendars.CONTENT_URI, CALENDAR_COLUMNS.toArray(new String[0]), null)) {
+            calendarDataMap = new ArrayMap<>(cursor.getCount());
+            
             while (cursor.moveToNext()) {
-                long originalInstanceTime = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.ORIGINAL_INSTANCE_TIME);
+                SystemCalendarData data = new SystemCalendarData(cursor);
+                calendarDataMap.put(data.id, data);
+            }
+        }
+        
+        try (Cursor cursor = query(resolver, Events.CONTENT_URI, CALENDAR_EVENT_COLUMNS.toArray(new String[0]),
+                Events.DELETED + " = 0")) {
+            
+            while (cursor.moveToNext()) {
+                
+                long event_calendar_id = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.CALENDAR_ID);
+                SystemCalendarData calendarData = calendarDataMap.get(event_calendar_id);
+                if (calendarData == null) {
+                    Logger.warning(NAME, "unknown calendar id: " + event_calendar_id);
+                    continue;
+                }
+                
+                long originalInstanceTime = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_INSTANCE_TIME);
                 if (originalInstanceTime == 0) {
-                    events.add(new SystemCalendarEvent(cursor, this));
+                    calendarData.addEventData(new SystemCalendarEventData(cursor));
                 } else {
                     // if original id is set this event is an exception to some other event
-                    exceptionLists.computeIfAbsent(getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_ID),
-                                    e -> new ArrayList<>())
-                            .add(originalInstanceTime);
+                    calendarData.addExceptionToEvent(getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_ID), originalInstanceTime);
                 }
             }
         }
         
-        List<SystemCalendar> systemCalendars;
+        calendars.removeIf(systemCalendar ->
+                calendarDataMap.containsKey(systemCalendar.data.id));
         
-        try (Cursor cursor = query(resolver, CalendarContract.Calendars.CONTENT_URI, CALENDAR_COLUMNS.toArray(new String[0]), null)) {
-            systemCalendars = new ArrayList<>(cursor.getCount());
-            
-            while (cursor.moveToNext()) {
-                systemCalendars.add(new SystemCalendar(cursor, resolver));
+        for (Map.Entry<Long, SystemCalendarData> entry : calendarDataMap.entrySet()) {
+            SystemCalendarData calendarData = entry.getValue();
+            boolean found = false;
+            for (SystemCalendar calendar : calendars) {
+                if (calendar.data.id == calendarData.id) {
+                    calendar.setNewData(calendarData);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                calendars.add(new SystemCalendar(calendarData));
             }
         }
         
@@ -111,17 +136,17 @@ public final class SystemCalendarUtils {
         ContentResolver resolver = context.getContentResolver();
         
         List<Long> previousIds = new ArrayList<>(calendars.size());
-        for(SystemCalendar cal: calendars) {
+        for (SystemCalendar cal : calendars) {
             previousIds.add(cal.id);
         }
         List<Long> newIds = new ArrayList<>(calendars.size());
         
-        try (Cursor cursor = query(resolver, CalendarContract.Calendars.CONTENT_URI, CALENDAR_COLUMNS.toArray(new String[0]), null)) {
+        try (Cursor cursor = query(resolver, Calendars.CONTENT_URI, CALENDAR_COLUMNS.toArray(new String[0]), null)) {
             while (cursor.moveToNext()) {
-                long id = getLong(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars._ID);
+                long id = getLong(cursor, CALENDAR_COLUMNS, Calendars._ID);
                 newIds.add(id);
                 int index = previousIds.indexOf(id);
-                if(index != -1) {
+                if (index != -1) {
                     // calendar already exists
                     SystemCalendar oldCalendar = calendars.get(index);
                     oldCalendar.loadMissingEvents();
@@ -136,7 +161,7 @@ public final class SystemCalendarUtils {
         
         // remove deleted calendars
         calendars.removeIf(calendar -> {
-            if(!newIds.contains(calendar.id)) {
+            if (!newIds.contains(calendar.id)) {
                 Logger.info(NAME, "Removed " + calendar);
                 return true;
             }

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         
         // switch intro activity and close current one
         if (PermissionUtilities.areEssentialPermissionsGranted(this)) {
-            BackgroundSetterService.ping(this);
+            BackgroundSetterService.ping(this, true);
             setContentView(R.layout.activity_main);
         } else {
             // switch intro activity and close current one

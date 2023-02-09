@@ -13,19 +13,22 @@ import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 public class PingReceiver extends BroadcastReceiver {
     
     private final String message;
+    private final boolean updateInstantly;
     
     public PingReceiver() {
         message = "default";
+        updateInstantly = false;
     }
     
-    public PingReceiver(@NonNull String message) {
+    public PingReceiver(@NonNull String message, boolean updateInstantly) {
         this.message = message;
+        this.updateInstantly = updateInstantly;
     }
     
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     @Override
     public void onReceive(@NonNull Context context, @NonNull Intent intent) {
         Logger.info("BroadcastReceiver", "ping (" + message + ")");
-        BackgroundSetterService.ping(context);
+        BackgroundSetterService.ping(context, updateInstantly);
     }
 }

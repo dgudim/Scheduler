@@ -39,14 +39,11 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
     @Nullable
     private TodoEntryManager todoEntryManager;
     
-    public static void ping(@NonNull Context context) {
-        context.startForegroundService(new Intent(context, BackgroundSetterService.class));
-    }
-    
-    @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-    public static void keepAlive(@NonNull Context context) {
+    public static void ping(@NonNull Context context, boolean updateInstantly) {
         Intent keepAliveIntent = new Intent(context, BackgroundSetterService.class);
-        keepAliveIntent.putExtra(SERVICE_KEEP_ALIVE_SIGNAL, 1);
+        if(!updateInstantly) {
+            keepAliveIntent.putExtra(SERVICE_KEEP_ALIVE_SIGNAL, 1);
+        }
         context.startForegroundService(keepAliveIntent);
     }
     
@@ -123,7 +120,7 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
             
             receiverHolder.registerReceiver((context, brIntent) -> {
                 if (!lastUpdateSucceeded || getBitmapUpdateFlag()) {
-                    ping(context);
+                    ping(context, false);
                     clearBitmapUpdateFlag();
                     Logger.info(NAME, "Sent ping (screen on/off)");
                 }
@@ -135,11 +132,11 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
             });
             
             receiverHolder.registerReceiver(
-                    new PingReceiver("Date changed"),
+                    new PingReceiver("Date changed", true),
                     new IntentFilter(Intent.ACTION_DATE_CHANGED));
             
             receiverHolder.registerReceiver(
-                    new PingReceiver("Calendar changed"),
+                    new PingReceiver("Calendar changed", false),
                     calendarChangedIntentFilter);
             
             scheduleRestartJob();

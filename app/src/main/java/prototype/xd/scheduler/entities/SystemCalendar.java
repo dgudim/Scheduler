@@ -36,6 +36,11 @@ public class SystemCalendar {
     public final SystemCalendarData data;
     
     @NonNull
+    public final String prefKey;
+    public final List<String> subKeys;
+    public final String visibilityKey;
+    
+    @NonNull
     public final List<SystemCalendarEvent> systemCalendarEvents;
     @NonNull
     public final ArrayMap<Integer, Integer> eventColorCountMap;
@@ -44,14 +49,17 @@ public class SystemCalendar {
         
         this.data = data;
         
+        prefKey = data.accountName + KEY_SEPARATOR + data.displayName;
+        subKeys = List.of(data.accountName, prefKey);
+        visibilityKey = prefKey + KEY_SEPARATOR + Static.VISIBLE;
+        
         //System.out.println("CALENDAR-------------------------------------------------" + name);
         //Cursor cursor_all = query(contentResolver, Events.CONTENT_EXCEPTION_URI, null,
         //        Events.CALENDAR_ID + " = " + id);
         //printTable(cursor_all);
         //cursor_all.close();
         
-        systemCalendarEvents = events;
-        addExceptions(exceptionLists);
+        systemCalendarEvents = data.makeEvents();
         eventColorCountMap = loadAvailableEventColors();
     }
     
@@ -59,35 +67,14 @@ public class SystemCalendar {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private ArrayMap<Integer, Integer> loadAvailableEventColors() {
         ArrayMap<Integer, Integer> colors = new ArrayMap<>();
-        if (accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
+        if (data.accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
             for (SystemCalendarEvent event : systemCalendarEvents) {
-                colors.put(event.color, colors.getOrDefault(event.color, 0) + 1);
+                colors.put(event.data.color, colors.getOrDefault(event.data.color, 0) + 1);
             }
         } else {
-            colors.put(color, systemCalendarEvents.size());
+            colors.put(data.color, systemCalendarEvents.size());
         }
         return colors;
-    }
-    
-    /**
-     * Add exceptions to recurrence rules
-     *
-     * @param exceptionsMap map of event ids to exception days
-     */
-    void addExceptions(@NonNull final Map<Long, List<Long>> exceptionsMap) {
-        for (Map.Entry<Long, List<Long>> exceptionList : exceptionsMap.entrySet()) {
-            boolean applied = false;
-            for (SystemCalendarEvent event : systemCalendarEvents) {
-                if (event.id == exceptionList.getKey()) {
-                    event.addExceptions(exceptionList.getValue());
-                    applied = true;
-                    break;
-                }
-            }
-            if (!applied) {
-                Logger.warning(accountName, "Couldn't find calendar event to apply exceptions to, dangling id: " + exceptionList.getKey());
-            }
-        }
     }
     
     /**
@@ -141,7 +128,7 @@ public class SystemCalendar {
      */
     protected void invalidateParameterOnEvents(@Nullable String parameterKey, int color) {
         systemCalendarEvents.forEach(event -> {
-            if (event.color != color) {
+            if (event.data.color != color) {
                 return;
             }
             if (parameterKey == null) {
@@ -178,25 +165,23 @@ public class SystemCalendar {
     @NonNull
     @Override
     public String toString() {
-        return NAME + ": " + (BuildConfig.DEBUG ? prefKey : id);
+        return data.toString();
     }
     
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return data.hashCode();
     }
     
     @Override
-    public boolean equals(@Nullable Object obj) {
-        if (obj == null) {
-            return false;
-        } else if (obj == this) {
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
             return true;
-        } else if (obj instanceof SystemCalendar) {
-            // id is unique
-            return id == ((SystemCalendar) obj).id;
         }
-        return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return data.equals(((SystemCalendar) o).data);
     }
     
     @NonNull

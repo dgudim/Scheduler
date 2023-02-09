@@ -3,22 +3,20 @@ package prototype.xd.scheduler.entities;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
-import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_COLUMNS;
 
 import android.database.Cursor;
 import android.provider.CalendarContract;
+import android.util.ArrayMap;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.utilities.Logger;
-import prototype.xd.scheduler.utilities.Static;
 
 public class SystemCalendarData {
     
@@ -29,12 +27,6 @@ public class SystemCalendarData {
     @NonNull
     public final String accountName;
     
-    @NonNull
-    protected final String prefKey;
-    @NonNull
-    protected final List<String> subKeys;
-    @NonNull
-    protected final String visibilityKey;
     public final long id;
     public final int accessLevel;
     
@@ -46,15 +38,10 @@ public class SystemCalendarData {
     public final int color;
     
     @NonNull
-    public final List<SystemCalendarEventData> systemCalendarEventsData;
-    
-    protected final List<Long> exceptions;
+    public final Map<Long, SystemCalendarEventData> systemCalendarEventsData;
     
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    SystemCalendarData(@NonNull Cursor cursor,
-                       @NonNull List<SystemCalendarEventData> eventsData) {
-        
-        exceptions = new ArrayList<>();
+    public SystemCalendarData(@NonNull Cursor cursor) {
         
         accountType = getString(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars.ACCOUNT_TYPE);
         accountName = getString(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars.ACCOUNT_NAME);
@@ -62,10 +49,6 @@ public class SystemCalendarData {
         id = getLong(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars._ID);
         accessLevel = getInt(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL);
         color = getInt(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars.CALENDAR_COLOR);
-        
-        prefKey = accountName + KEY_SEPARATOR + displayName;
-        subKeys = List.of(accountName, prefKey);
-        visibilityKey = prefKey + KEY_SEPARATOR + Static.VISIBLE;
         
         String calTimeZoneId = getString(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars.CALENDAR_TIME_ZONE);
         
@@ -76,11 +59,20 @@ public class SystemCalendarData {
             timeZoneId = calTimeZoneId;
         }
         
-        systemCalendarEventsData = eventsData;
+        systemCalendarEventsData = new ArrayMap<>();
     }
     
-    public void addException(@NonNull Long exception) {
-        exceptions.add(exception);
+    public void addEventData(@NonNull SystemCalendarEventData data) {
+        systemCalendarEventsData.put(data.id, data);
+    }
+    
+    public void addExceptionToEvent(long eventId, long exception) {
+        SystemCalendarEventData eventData = systemCalendarEventsData.get(eventId);
+        if (eventData == null) {
+            Logger.warning(NAME, "Id " + eventId + " not found in " + this);
+            return;
+        }
+        eventData.addException(exception);
     }
     
     @Override
@@ -96,19 +88,20 @@ public class SystemCalendarData {
                 accessLevel == other.accessLevel &&
                 color == other.color &&
                 accountType.equals(other.accountType) &&
-                prefKey.equals(other.prefKey) &&
+                accountName.equals(other.accountName) &&
+                displayName.equals(other.displayName) &&
                 timeZoneId.equals(other.timeZoneId) &&
                 systemCalendarEventsData.equals(other.systemCalendarEventsData);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(accountType, prefKey, id, accessLevel, timeZoneId, color, systemCalendarEventsData);
+        return Objects.hash(accountType, accountName, displayName, id, accessLevel, timeZoneId, color, systemCalendarEventsData);
     }
     
     @NonNull
     @Override
     public String toString() {
-        return NAME + ": " + (BuildConfig.DEBUG ? prefKey : id);
+        return NAME + ": " + (BuildConfig.DEBUG ? displayName + "_" + accountName : id);
     }
 }

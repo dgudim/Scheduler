@@ -6,7 +6,7 @@ import android.app.job.JobService;
 public class KeepAliveService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
-        BackgroundSetterService.keepAlive(getApplicationContext());
+        BackgroundSetterService.ping(getApplicationContext(), false);
         return false;
     }
     
