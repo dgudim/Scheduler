@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.entities;
 
+import static android.provider.CalendarContract.Events.STATUS_CANCELED;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
@@ -64,7 +65,8 @@ public class SystemCalendarData {
         systemCalendarEventsData = new ArrayMap<>();
     }
     
-    public void addEventData(@NonNull SystemCalendarEventData data) {
+    public void addEventData(@NonNull Cursor cursor) {
+        SystemCalendarEventData data = new SystemCalendarEventData(cursor);
         systemCalendarEventsData.put(data.id, data);
     }
     
@@ -76,7 +78,10 @@ public class SystemCalendarData {
             return;
         }
         eventData.addException(exception);
-        String title = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.TITLE);
+        // not canceled means that this event is an overriding exception instead of deleting
+        if(getInt(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.STATUS) != STATUS_CANCELED) {
+            addEventData(cursor);
+        }
     }
     
     @NonNull

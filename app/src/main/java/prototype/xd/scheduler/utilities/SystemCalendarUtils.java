@@ -24,7 +24,6 @@ import java.util.Map;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.SystemCalendarData;
-import prototype.xd.scheduler.entities.SystemCalendarEventData;
 import prototype.xd.scheduler.entities.TodoEntry;
 
 public final class SystemCalendarUtils {
@@ -66,7 +65,8 @@ public final class SystemCalendarUtils {
             Events.EVENT_TIMEZONE,
             // for exception events
             Events.ORIGINAL_ID,
-            Events.ORIGINAL_INSTANCE_TIME);
+            Events.ORIGINAL_INSTANCE_TIME,
+            Events.STATUS);
     
     /**
      * Retrieve all calendars from the system
@@ -105,7 +105,7 @@ public final class SystemCalendarUtils {
                 
                 long originalInstanceTime = getLong(cursor, CALENDAR_EVENT_COLUMNS, Events.ORIGINAL_INSTANCE_TIME);
                 if (originalInstanceTime == 0) {
-                    calendarData.addEventData(new SystemCalendarEventData(cursor));
+                    calendarData.addEventData(cursor);
                 } else {
                     // if original id is set this event is an exception to some other event
                     calendarData.addExceptionToEvent(cursor, originalInstanceTime);
