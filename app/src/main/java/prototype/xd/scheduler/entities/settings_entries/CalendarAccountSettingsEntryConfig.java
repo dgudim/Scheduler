@@ -42,10 +42,10 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
                                               boolean showSettings) {
         super(showSettings);
         this.systemCalendarSettings = systemCalendarSettings;
-        accountName = calendar.accountName;
+        accountName = calendar.data.accountName;
         subKeys = Collections.singletonList(accountName);
-        accountType = calendar.accountType;
-        calendarColor = calendar.color;
+        accountType = calendar.data.accountType;
+        calendarColor = calendar.data.color;
         this.containerAdapter = containerAdapter;
     }
     

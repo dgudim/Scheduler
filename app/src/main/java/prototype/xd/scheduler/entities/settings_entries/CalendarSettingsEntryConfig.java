@@ -43,11 +43,11 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
                                        boolean showSettings) {
         super(showSettings);
         systemCalendarSettings = settings;
-        calendarName = calendar.displayName;
-        calendarPrefKey = calendar.getPrefKey();
-        calendarVisibilityKey = calendar.getVisibilityKey();
-        calendarSubKeys = calendar.getSubKeys();
-        calendarColor = calendar.color;
+        calendarName = calendar.data.displayName;
+        calendarPrefKey = calendar.prefKey;
+        calendarVisibilityKey = calendar.visibilityKey;
+        calendarSubKeys = calendar.subKeys;
+        calendarColor = calendar.data.color;
         calendarEventsCount = calendar.systemCalendarEvents.size();
         
         if (!calendar.eventColorCountMap.isEmpty() && calendarEventsCount > 0) {

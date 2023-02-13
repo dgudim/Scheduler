@@ -1,28 +1,17 @@
 package prototype.xd.scheduler.entities;
 
 import static android.provider.CalendarContract.Calendars;
-import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
-import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
-import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_COLUMNS;
 
-import android.database.Cursor;
-
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import prototype.xd.scheduler.BuildConfig;
-import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Static;
 
 /**
@@ -59,7 +48,7 @@ public class SystemCalendar {
         //printTable(cursor_all);
         //cursor_all.close();
         
-        systemCalendarEvents = data.makeEvents();
+        systemCalendarEvents = data.makeEvents(this);
         eventColorCountMap = loadAvailableEventColors();
     }
     
@@ -112,7 +101,7 @@ public class SystemCalendar {
                                  @NonNull Consumer<SystemCalendarEvent> consumer) {
         if (isVisible()) {
             for (SystemCalendarEvent event : systemCalendarEvents) {
-                if ((filter != null && filter.test(event)) &&
+                if ((filter == null || filter.test(event)) &&
                         event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
                     consumer.accept(event);
                 }
@@ -147,19 +136,11 @@ public class SystemCalendar {
         });
     }
     
-    @NonNull
-    public String getPrefKey() {
-        return prefKey;
-    }
-    
-    @NonNull
-    public String getVisibilityKey() {
-        return visibilityKey;
-    }
-    
-    @NonNull
-    public List<String> getSubKeys() {
-        return subKeys;
+    public boolean setNewData(@NonNull SystemCalendarData data) {
+        if (this.data.equals(data)) {
+            return false;
+        }
+        return true;
     }
     
     @NonNull

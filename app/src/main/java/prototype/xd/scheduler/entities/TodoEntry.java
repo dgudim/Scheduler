@@ -41,7 +41,7 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
-import prototype.xd.scheduler.utilities.misc.SArrayMap;
+import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
 
@@ -331,7 +331,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 previousValue -> {
                     if (isFromSystemCalendar()) {
                         return Static.BG_COLOR.CURRENT.getOnlyBySubKeys(event.subKeys,
-                                Static.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(event.color));
+                                Static.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(getCalendarEventColor()));
                     }
                     return Static.BG_COLOR.CURRENT.get();
                 },
@@ -384,16 +384,17 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         endDayLocal = previousValue ->
                 isFromSystemCalendar() ? event.endDayLocal : Long.parseLong(params.getOrDefault(Static.END_DAY_UTC, Static.DAY_FLAG_GLOBAL_STR));
         rawTextValue = previousValue ->
-                isFromSystemCalendar() ? event.title : params.getOrDefault(Static.TEXT_VALUE, "");
+                isFromSystemCalendar() ? event.data.title : params.getOrDefault(Static.TEXT_VALUE, "");
     }
     
     // get calendar key for calendar entries and null for normal entries
     @Nullable
     private List<String> getSubKeys() {
-        if (isFromSystemCalendar()) {
-            return event.subKeys;
-        }
-        return null;
+        return isFromSystemCalendar() ? event.subKeys : null;
+    }
+    
+    public int getCalendarEventColor() {
+        return isFromSystemCalendar() ? event.data.color : 0;
     }
     
     public void listenToParameterInvalidations(@NonNull BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
@@ -620,7 +621,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 return false;
             }
             
-            if (!event.isAllDay && Static.HIDE_EXPIRED_ENTRIES_BY_TIME.get(event.subKeys)) {
+            if (!event.isAllDay() && Static.HIDE_EXPIRED_ENTRIES_BY_TIME.get(event.subKeys)) {
                 return isVisibleExact(currentDayUTC, currentTimestampUTC);
             }
         } else if (isGlobal()) {
@@ -673,7 +674,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
         TimeRange nearestMsRangeUTC = getNearestCalendarEventMsRangeUTC(targetDayUTC);
         
-        return isInRange(targetDayUTC, nearestMsRangeUTC.toDays(true, !event.isAllDay)) &&
+        return isInRange(targetDayUTC, nearestMsRangeUTC.toDays(true, !event.isAllDay())) &&
                 nearestMsRangeUTC.getEnd() >= targetMsUTC;
     }
     
@@ -837,7 +838,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             return new TimeRange(startDayLocal.get(), endDayLocal.get());
         }
         // covers recurring calendar events
-        return getNearestCalendarEventMsRangeUTC(targetDayUTC).toDays(false, !event.isAllDay);
+        return getNearestCalendarEventMsRangeUTC(targetDayUTC).toDays(false, !event.isAllDay());
     }
     
     @NonNull
@@ -881,7 +882,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     @NonNull
     public String getCalendarEntryTimeSpan(@NonNull Context context, long targetDayUTC) {
-        if (event.isAllDay) {
+        if (event.isAllDay()) {
             return context.getString(R.string.calendar_event_all_day);
         }
         
@@ -954,7 +955,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     // only callable after a call to cacheNearestStartMsUTC()
     public int getInstanceHash() {
-        return Objects.hash(event.title, cachedNearestStartMsUTC, event.durationMs);
+        return Objects.hash(event.data.title, cachedNearestStartMsUTC, event.durationMs);
     }
     
     @Override

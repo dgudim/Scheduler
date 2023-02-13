@@ -92,7 +92,7 @@ public class SystemCalendarSettings extends PopupSettingsView {
     
     public void show(@NonNull final SystemCalendarEvent event) {
         this.event = event;
-        initialize(event.getPrefKey(), event.getSubKeys(), event.color);
+        initialize(event.prefKey, event.subKeys, event.data.color);
         dialog.show();
     }
     

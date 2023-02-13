@@ -11,6 +11,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -41,7 +42,7 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
     
     public static void ping(@NonNull Context context, boolean updateInstantly) {
         Intent keepAliveIntent = new Intent(context, BackgroundSetterService.class);
-        if(!updateInstantly) {
+        if (!updateInstantly) {
             keepAliveIntent.putExtra(SERVICE_KEEP_ALIVE_SIGNAL, 1);
         }
         context.startForegroundService(keepAliveIntent);
@@ -120,7 +121,7 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
             
             receiverHolder.registerReceiver((context, brIntent) -> {
                 if (!lastUpdateSucceeded || getBitmapUpdateFlag()) {
-                    ping(context, false);
+                    ping(context, true);
                     clearBitmapUpdateFlag();
                     Logger.info(NAME, "Sent ping (screen on/off)");
                 }
@@ -135,9 +136,16 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
                     new PingReceiver("Date changed", true),
                     new IntentFilter(Intent.ACTION_DATE_CHANGED));
             
-            receiverHolder.registerReceiver(
-                    new PingReceiver("Calendar changed", false),
-                    calendarChangedIntentFilter);
+            receiverHolder.registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    ping(context, false);
+                    Logger.info(NAME, "Calendar changed!");
+                    if (todoEntryManager != null) {
+                        todoEntryManager.notifyCalendarProviderChanged(context);
+                    }
+                }
+            }, calendarChangedIntentFilter);
             
             scheduleRestartJob();
             startForeground(foregroundNotificationId, getForegroundNotification().build());

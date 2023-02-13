@@ -9,7 +9,6 @@ import static prototype.xd.scheduler.utilities.Static.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Static.setBitmapUpdateFlag;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.addMissingCalendars;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.loadCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
@@ -26,6 +25,7 @@ import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -41,7 +41,6 @@ import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.entities.TodoEntry.RangeType;
 import prototype.xd.scheduler.entities.TodoEntryList;
 import prototype.xd.scheduler.utilities.misc.DefaultedMutableLiveData;
-import prototype.xd.scheduler.utilities.misc.SArrayMap;
 import prototype.xd.scheduler.views.CalendarView;
 
 public final class TodoEntryManager implements DefaultLifecycleObserver {
@@ -135,17 +134,19 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      *
      * @param context - any context
      */
+    // we don't know the size yet
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     private void initAsync(@NonNull final Context context) {
         // load calendars and static entries in a separate thread (~300ms)
         new Thread(() -> {
             long start = System.currentTimeMillis();
             
             groups = loadGroups();
-            calendars = loadCalendars(context);
+            calendars = loadCalendars(context, new ArrayList<>());
             
             calendarVisibilityMap.ensureCapacity(calendars.size());
             for (SystemCalendar calendar : calendars) {
-                calendarVisibilityMap.put(calendar.id, calendar.isVisible());
+                calendarVisibilityMap.put(calendar.data.id, calendar.isVisible());
             }
             
             // load one panel to the right and to the left
@@ -156,8 +157,8 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
             
             updateStaticVarsAndCalendarVisibility();
             
-            Logger.info(Thread.currentThread().getName(), NAME + " cold start complete in " +
-                    (System.currentTimeMillis() - start) + "ms, loaded " + todoEntries.size() + " entries");
+            Logger.infoWithTime(Thread.currentThread().getName(),
+                    NAME + " cold start complete {time}, loaded " + todoEntries.size() + " entries", start);
             
             initFinished.postValue(Boolean.TRUE);
             
@@ -199,9 +200,9 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         
         if (!calendarVisibilityMap.isEmpty()) {
             for (SystemCalendar calendar : calendars) {
-                boolean visibilityBefore = Boolean.TRUE.equals(calendarVisibilityMap.get(calendar.id));
+                boolean visibilityBefore = Boolean.TRUE.equals(calendarVisibilityMap.get(calendar.data.id));
                 boolean visibilityNow = calendar.isVisible();
-                calendarVisibilityMap.put(calendar.id, visibilityNow);
+                calendarVisibilityMap.put(calendar.data.id, visibilityNow);
                 
                 if (visibilityNow && !visibilityBefore) {
                     // new calendar is visible now
@@ -272,7 +273,8 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     
     public void notifyCalendarProviderChanged(@NonNull Context context) {
         Logger.debug(NAME, "notifyCalendarProviderChanged called");
-        addMissingCalendars(context, calendars);
+        loadCalendars(context, calendars);
+        
         // TODO: 05.02.2023 implement
     }
     
@@ -323,6 +325,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
         // remove references to ui
+        Logger.info(NAME, "Lifecycle called onDestroy");
         calendarView = null;
     }
     

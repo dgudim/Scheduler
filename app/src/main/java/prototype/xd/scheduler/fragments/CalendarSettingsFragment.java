@@ -55,7 +55,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
             Map<String, List<SystemCalendar>> calendarGroups = new TreeMap<>();
             
             for (SystemCalendar calendar : calendars) {
-                calendarGroups.computeIfAbsent(calendar.accountName,
+                calendarGroups.computeIfAbsent(calendar.data.accountName,
                                 e -> new ArrayList<>())
                         .add(calendar);
             }

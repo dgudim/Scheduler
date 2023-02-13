@@ -39,7 +39,7 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
                                          @NonNull final SystemCalendar calendar) {
         this.systemCalendarSettings = systemCalendarSettings;
         eventColorCountMap = calendar.eventColorCountMap;
-        calendarColor = calendar.color;
+        calendarColor = calendar.data.color;
         this.calendar = calendar;
     }
     

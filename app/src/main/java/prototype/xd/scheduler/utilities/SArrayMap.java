@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.utilities.misc;
+package prototype.xd.scheduler.utilities;
 
 import androidx.annotation.NonNull;
 import androidx.collection.ArrayMap;

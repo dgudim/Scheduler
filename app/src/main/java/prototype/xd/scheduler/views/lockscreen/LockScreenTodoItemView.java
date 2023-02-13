@@ -125,7 +125,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             
             setTimeStartText(timeSplitPattern.split(timeSpan)[0]);
             setTimeTextSize(fontSizeSP);
-            setIndicatorColor(entry.event.color);
+            setIndicatorColor(entry.getCalendarEventColor());
         } else {
             hideIndicatorAndTime();
         }

@@ -1,17 +1,12 @@
 package prototype.xd.scheduler.entities;
 
-import static android.provider.CalendarContract.Events;
 import static prototype.xd.scheduler.utilities.DateManager.ONE_MINUTE_MS;
 import static prototype.xd.scheduler.utilities.DateManager.daysToMs;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
 import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
-import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
 import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.rfc2445ToMilliseconds;
-
-import android.database.Cursor;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,9 +35,9 @@ public class SystemCalendarEvent {
     protected final SystemCalendar associatedCalendar;
     
     @NonNull
-    protected final List<String> subKeys;
+    public final List<String> subKeys;
     @NonNull
-    private final String prefKey;
+    public final String prefKey;
     
     protected long startMsUTC;
     protected long endMsUTC;
@@ -52,14 +47,13 @@ public class SystemCalendarEvent {
     protected long endDayLocal;
     
     @NonNull
-    protected final SystemCalendarEventData data;
+    public final SystemCalendarEventData data;
     
     @Nullable
     protected RecurrenceSet rSet;
     private final TimeZone timeZone;
     
-    SystemCalendarEvent(@NonNull Cursor cursor,
-                        @NonNull SystemCalendarEventData data,
+    SystemCalendarEvent(@NonNull SystemCalendarEventData data,
                         @NonNull SystemCalendar associatedCalendar) {
         
         this.associatedCalendar = associatedCalendar;
@@ -74,10 +68,10 @@ public class SystemCalendarEvent {
         endMsUTC = data.refEndMsUTC;
         durationMs = endMsUTC - startMsUTC;
         
-        loadRecurrenceRules(cursor);
+        loadRecurrenceRules();
         
         // shorten the event a little because it's bounds are on midnight and that breaks stuff
-        if (data.isAllDay) {
+        if (data.allDay) {
             endMsUTC -= ONE_MINUTE_MS;
             startMsUTC += ONE_MINUTE_MS;
             durationMs -= 2 * ONE_MINUTE_MS;
@@ -86,7 +80,22 @@ public class SystemCalendarEvent {
         computeEventVisibilityDays();
     }
     
-    private void loadRecurrenceRules(@NonNull Cursor cursor) { // NOSONAR, not that complex
+    public boolean isAllDay() {
+        return data.allDay;
+    }
+    
+    public void computeEventVisibilityDays() {
+        if (data.allDay) {
+            // don't convert ms to local, all day events don't drift
+            startDayLocal = msToDays(startMsUTC);
+            endDayLocal = startDayLocal;
+        } else {
+            startDayLocal = msUTCtoDaysLocal(startMsUTC);
+            endDayLocal = msUTCtoDaysLocal(endMsUTC);
+        }
+    }
+    
+    private void loadRecurrenceRules() { // NOSONAR, not that complex
         
         if (!data.rRuleStr.isEmpty()) {
             try {
@@ -102,7 +111,7 @@ public class SystemCalendarEvent {
                         Logger.error(NAME, "Error adding rDate: " + e.getMessage());
                     }
                 }
-              
+                
                 if (!data.exRuleStr.isEmpty()) {
                     try {
                         rSet.addExceptions(new RecurrenceRuleAdapter(new RecurrenceRule(data.exRuleStr)));
@@ -120,30 +129,31 @@ public class SystemCalendarEvent {
                     }
                 }
                 
-                String durationStr = getString(cursor, CALENDAR_EVENT_COLUMNS, Events.DURATION);
-                
-                if (!durationStr.isEmpty()) {
-                    durationMs = rfc2445ToMilliseconds(durationStr);
+                if (!data.durationStr.isEmpty()) {
+                    durationMs = rfc2445ToMilliseconds(data.durationStr);
                 }
-    
+                
                 endMsUTC = rSet.isInfinite() ? Long.MAX_VALUE / 2 : rSet.getLastInstance(timeZone, startMsUTC);
-    
-                rSet.addExceptions(new RecurrenceList(Longs.toArray(data.exceptions)));
+                
+                if (!data.exceptions.isEmpty()) {
+                    rSet.addExceptions(new RecurrenceList(Longs.toArray(data.exceptions)));
+                }
             } catch (Exception e) {
                 logException(NAME, e);
             }
         }
     }
     
-    public void computeEventVisibilityDays() {
-        if (data.isAllDay) {
-            // don't convert ms to local, all day events don't drift
-            startDayLocal = msToDays(startMsUTC);
-            endDayLocal = startDayLocal;
-        } else {
-            startDayLocal = msUTCtoDaysLocal(startMsUTC);
-            endDayLocal = msUTCtoDaysLocal(endMsUTC);
+    @NonNull
+    private DateTimeZonePair getRecurrenceDates(@NonNull String datesToParse) {
+        TimeZone newTimeZone = timeZone;
+        if (datesToParse.contains(";")) {
+            Logger.warning(NAME, "Not standard dates for " + this + ", " + datesToParse + ", probably contains timezone, attempting to parse");
+            String[] split = datesToParse.split(";");
+            newTimeZone = TimeZone.getTimeZone(split[0]);
+            datesToParse = split[1];
         }
+        return new DateTimeZonePair(datesToParse, newTimeZone);
     }
     
     public boolean isAssociatedWithEntry() {
@@ -203,18 +213,6 @@ public class SystemCalendarEvent {
     // ------------------------------ METHODS FOR WORKING WITH ENTRY PARAMETERS END
     
     
-    @NonNull
-    private DateTimeZonePair getRecurrenceDates(@NonNull String datesToParse) {
-        TimeZone newTimeZone = timeZone;
-        if (datesToParse.contains(";")) {
-            Logger.warning(NAME, "Not standard dates for " + this + ", " + datesToParse + ", probably contains timezone, attempting to parse");
-            String[] split = datesToParse.split(";");
-            newTimeZone = TimeZone.getTimeZone(split[0]);
-            datesToParse = split[1];
-        }
-        return new DateTimeZonePair(datesToParse, newTimeZone);
-    }
-    
     private static class DateTimeZonePair {
         
         @NonNull
@@ -254,8 +252,8 @@ public class SystemCalendarEvent {
             instanceStartMsUTC = it.next();
             instanceEndMsUTC = instanceStartMsUTC + durationMs;
             val = recurrenceSetConsumer.processInstance(instanceStartMsUTC, instanceEndMsUTC,
-                    data.isAllDay ? msToDays(instanceStartMsUTC) : msUTCtoDaysLocal(instanceStartMsUTC),
-                    data.isAllDay ? msToDays(instanceEndMsUTC) : msUTCtoDaysLocal(instanceEndMsUTC));
+                    data.allDay ? msToDays(instanceStartMsUTC) : msUTCtoDaysLocal(instanceStartMsUTC),
+                    data.allDay ? msToDays(instanceEndMsUTC) : msUTCtoDaysLocal(instanceEndMsUTC));
             if (val != null) {
                 return val;
             }
@@ -264,7 +262,7 @@ public class SystemCalendarEvent {
     }
     
     public boolean isVisibleOnRange(long firstDayUTC, long lastDayUTC) {
-        if (rSet != null) {
+        if (isRecurring()) {
             return iterateRecurrenceSet(firstDayUTC, (instanceStartMsUTC, instanceEndMsUTC, instanceStartDayLocal, instanceEndDayLocal) -> {
                 // overshot
                 if (instanceStartDayLocal > lastDayUTC) {
@@ -278,16 +276,6 @@ public class SystemCalendarEvent {
             }, Boolean.FALSE);
         }
         return doRangesOverlap(startDayLocal, endDayLocal, firstDayUTC, lastDayUTC);
-    }
-    
-    @NonNull
-    public String getPrefKey() {
-        return prefKey;
-    }
-    
-    @NonNull
-    public List<String> getSubKeys() {
-        return subKeys;
     }
     
     @Override

@@ -18,7 +18,6 @@ import static prototype.xd.scheduler.utilities.Static.SERVICE_FAILED;
 import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Static.WALLPAPER_OBTAIN_FAILED;
-import static prototype.xd.scheduler.utilities.Static.calendarChangedIntentFilter;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
@@ -52,11 +51,10 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
+import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
-import prototype.xd.scheduler.utilities.misc.SArrayMap;
-import prototype.xd.scheduler.utilities.receivers.BroadcastReceiverHolder;
 import prototype.xd.scheduler.views.CalendarView;
 
 public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding> { // NOSONAR, this is a fragment
@@ -73,12 +71,8 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         // init date manager
         // select current day
         selectDate(LocalDate.now());
-        BroadcastReceiverHolder receiverHolder = new BroadcastReceiverHolder(requireActivity());
         todoEntryManager = TodoEntryManager.getInstance(wrapper.context);
         todoListViewAdapter = new TodoListViewAdapter(wrapper, todoEntryManager);
-        receiverHolder.registerReceiver((context, intent) ->
-                        todoEntryManager.notifyCalendarProviderChanged(context),
-                calendarChangedIntentFilter);
     }
     
     @NonNull

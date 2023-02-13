@@ -4,6 +4,7 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getInt;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_COLUMNS;
+import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
 
 import android.database.Cursor;
 import android.provider.CalendarContract;
@@ -12,6 +13,8 @@ import android.util.ArrayMap;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -40,7 +43,6 @@ public class SystemCalendarData {
     @NonNull
     public final Map<Long, SystemCalendarEventData> systemCalendarEventsData;
     
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public SystemCalendarData(@NonNull Cursor cursor) {
         
         accountType = getString(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars.ACCOUNT_TYPE);
@@ -66,13 +68,24 @@ public class SystemCalendarData {
         systemCalendarEventsData.put(data.id, data);
     }
     
-    public void addExceptionToEvent(long eventId, long exception) {
-        SystemCalendarEventData eventData = systemCalendarEventsData.get(eventId);
+    public void addExceptionToEvent(@NonNull Cursor cursor, long exception) {
+        long originalId = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.ORIGINAL_ID);
+        SystemCalendarEventData eventData = systemCalendarEventsData.get(originalId);
         if (eventData == null) {
-            Logger.warning(NAME, "Id " + eventId + " not found in " + this);
+            Logger.warning(NAME, "Id " + originalId + " not found in " + this);
             return;
         }
         eventData.addException(exception);
+        String title = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.TITLE);
+    }
+    
+    @NonNull
+    public List<SystemCalendarEvent> makeEvents(@NonNull SystemCalendar calendar) {
+        List<SystemCalendarEvent> events = new ArrayList<>(systemCalendarEventsData.size());
+        for (SystemCalendarEventData eventData : systemCalendarEventsData.values()) {
+            events.add(new SystemCalendarEvent(eventData, calendar));
+        }
+        return events;
     }
     
     @Override

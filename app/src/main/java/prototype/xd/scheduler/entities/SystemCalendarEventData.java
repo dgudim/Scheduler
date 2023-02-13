@@ -33,17 +33,19 @@ public class SystemCalendarEventData {
     protected final long refStartMsUTC;
     protected final long refEndMsUTC;
     
-    protected final boolean isAllDay;
+    protected final boolean allDay;
     
     protected final String rRuleStr;
     protected final String rDateStr;
     protected final String exRuleStr;
     protected final String exDateStr;
+    protected final String durationStr;
     
     protected final String timeZoneId;
     
     protected final List<Long> exceptions;
     
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public SystemCalendarEventData(@NonNull Cursor cursor) {
         exceptions = new ArrayList<>();
         
@@ -53,7 +55,7 @@ public class SystemCalendarEventData {
         title = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.TITLE).trim();
         refStartMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DTSTART);
         refEndMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DTEND);
-        isAllDay = getBoolean(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.ALL_DAY);
+        allDay = getBoolean(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.ALL_DAY);
         
         timeZoneId = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.EVENT_TIMEZONE);
         
@@ -62,6 +64,8 @@ public class SystemCalendarEventData {
         
         rRuleStr = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.RRULE);
         rDateStr = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.RDATE);
+        
+        durationStr = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DURATION);
     }
     
     public void addException(@NonNull Long exception) {
@@ -76,26 +80,27 @@ public class SystemCalendarEventData {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        SystemCalendarEventData that = (SystemCalendarEventData) o;
-        return id == that.id &&
-                color == that.color &&
-                refStartMsUTC == that.refStartMsUTC &&
-                refEndMsUTC == that.refEndMsUTC &&
-                isAllDay == that.isAllDay &&
-                Objects.equals(title, that.title) &&
-                Objects.equals(rRuleStr, that.rRuleStr) &&
-                Objects.equals(rDateStr, that.rDateStr) &&
-                Objects.equals(exRuleStr, that.exRuleStr) &&
-                Objects.equals(exDateStr, that.exDateStr) &&
-                Objects.equals(timeZoneId, that.timeZoneId) &&
-                Objects.equals(exceptions, that.exceptions);
+        SystemCalendarEventData event = (SystemCalendarEventData) o;
+        return id == event.id &&
+                color == event.color &&
+                refStartMsUTC == event.refStartMsUTC &&
+                refEndMsUTC == event.refEndMsUTC &&
+                allDay == event.allDay &&
+                Objects.equals(title, event.title) &&
+                Objects.equals(rRuleStr, event.rRuleStr) &&
+                Objects.equals(rDateStr, event.rDateStr) &&
+                Objects.equals(exRuleStr, event.exRuleStr) &&
+                Objects.equals(exDateStr, event.exDateStr) &&
+                Objects.equals(durationStr, event.durationStr) &&
+                Objects.equals(timeZoneId, event.timeZoneId) &&
+                Objects.equals(exceptions, event.exceptions);
     }
     
     @Override
     public int hashCode() {
         return Objects.hash(id, title, color,
-                refStartMsUTC, refEndMsUTC, isAllDay,
-                rRuleStr, rDateStr, exRuleStr, exDateStr,
+                refStartMsUTC, refEndMsUTC, allDay,
+                rRuleStr, rDateStr, exRuleStr, exDateStr, durationStr,
                 timeZoneId, exceptions);
     }
     
