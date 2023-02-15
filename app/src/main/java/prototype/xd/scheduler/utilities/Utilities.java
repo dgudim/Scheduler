@@ -37,11 +37,13 @@ import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
 import androidx.collection.ArraySet;
 import androidx.core.content.FileProvider;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.slider.Slider;
+import com.google.common.collect.Sets;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -251,7 +254,6 @@ public final class Utilities {
         chooseImage.setType("image/*");
         callback.launch(Intent.createChooser(chooseImage, null));
     }
-    
     
     public static void shareFiles(@NonNull Context context, @NonNull String mimetype, @NonNull List<File> files) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
@@ -573,6 +575,40 @@ public final class Utilities {
             substringStart = start + word.length();
         }
         return spannable;
+    }
+    
+    public enum ElementState {
+        NEW, MODIFIED, NOT_MODIFIED, DELETED
+    }
+    
+    public static <K, V> boolean processDifference(@NonNull Map<K, V> oldMap, @NonNull Map<K, V> newMap, BiConsumer<Pair<K, V>, ElementState> consumer) {
+        Set<K> oldSet = oldMap.keySet();
+        Set<K> newSet = newMap.keySet();
+        boolean changed = false;
+        for (K key : Sets.union(oldSet, newSet)) {
+            V oldValue = oldMap.get(key);
+            if (oldValue != null) {
+                V newValue = newMap.get(key);
+                if (newValue != null) {
+                    // present in both sets
+                    if (oldValue.equals(newValue)) {
+                        consumer.accept(null, ElementState.NOT_MODIFIED);
+                    } else {
+                        consumer.accept(Pair.create(key, newMap.get(key)), ElementState.MODIFIED);
+                        changed = true;
+                    }
+                    continue;
+                }
+                // not present in new set, present in old set
+                consumer.accept(Pair.create(key, null), ElementState.DELETED);
+                changed = true;
+                continue;
+            }
+            // not present in old set, present in new set
+            consumer.accept(Pair.create(key, newMap.get(key)), ElementState.NEW);
+            changed = true;
+        }
+        return changed;
     }
     
     public static long rfc2445ToMilliseconds(@NonNull String str) {

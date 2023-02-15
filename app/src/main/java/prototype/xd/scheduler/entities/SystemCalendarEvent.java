@@ -168,10 +168,16 @@ public class SystemCalendarEvent {
         associatedEntry = todoEntry;
     }
     
-    public void unlinkEntry() {
+    void unlinkEntry() {
         associatedEntry = null;
     }
     
+    SystemCalendarEvent removeFromContainer() {
+        if (associatedEntry != null) {
+            associatedEntry.removeFromContainer();
+        }
+        return this;
+    }
     
     // ------------------------------ METHODS FOR WORKING WITH ENTRY PARAMETERS START
     
@@ -210,6 +216,7 @@ public class SystemCalendarEvent {
     public void invalidateAllParametersOfConnectedEntries() {
         associatedCalendar.invalidateParameterOnEvents(null, data.color);
     }
+    
     // ------------------------------ METHODS FOR WORKING WITH ENTRY PARAMETERS END
     
     

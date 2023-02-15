@@ -14,8 +14,6 @@ import android.util.ArrayMap;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -85,10 +83,10 @@ public class SystemCalendarData {
     }
     
     @NonNull
-    public List<SystemCalendarEvent> makeEvents(@NonNull SystemCalendar calendar) {
-        List<SystemCalendarEvent> events = new ArrayList<>(systemCalendarEventsData.size());
-        for (SystemCalendarEventData eventData : systemCalendarEventsData.values()) {
-            events.add(new SystemCalendarEvent(eventData, calendar));
+    public ArrayMap<Long, SystemCalendarEvent> makeEvents(@NonNull SystemCalendar calendar) {
+        ArrayMap<Long, SystemCalendarEvent> events = new ArrayMap<>(systemCalendarEventsData.size());
+        for (Map.Entry<Long, SystemCalendarEventData> entry : systemCalendarEventsData.entrySet()) {
+            events.put(entry.getKey(), new SystemCalendarEvent(entry.getValue(), calendar));
         }
         return events;
     }

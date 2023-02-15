@@ -9,10 +9,14 @@ import androidx.collection.ArrayMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.Utilities;
 
 /**
  * Class for storing system calendars and their events
@@ -22,7 +26,7 @@ public class SystemCalendar {
     public static final String NAME = SystemCalendar.class.getSimpleName();
     
     @NonNull
-    public final SystemCalendarData data;
+    public SystemCalendarData data;
     
     @NonNull
     public final String prefKey;
@@ -30,10 +34,11 @@ public class SystemCalendar {
     public final String visibilityKey;
     
     @NonNull
-    public final List<SystemCalendarEvent> systemCalendarEvents;
+    public final Map<Long, SystemCalendarEvent> systemCalendarEventMap;
     @NonNull
-    public final ArrayMap<Integer, Integer> eventColorCountMap;
+    public final Map<Integer, Integer> eventColorCountMap;
     
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public SystemCalendar(@NonNull SystemCalendarData data) {
         
         this.data = data;
@@ -48,22 +53,21 @@ public class SystemCalendar {
         //printTable(cursor_all);
         //cursor_all.close();
         
-        systemCalendarEvents = data.makeEvents(this);
-        eventColorCountMap = loadAvailableEventColors();
+        systemCalendarEventMap = data.makeEvents(this);
+        eventColorCountMap = new ArrayMap<>();
+        loadAvailableEventColors();
     }
     
     // default capacity is fine
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private ArrayMap<Integer, Integer> loadAvailableEventColors() {
-        ArrayMap<Integer, Integer> colors = new ArrayMap<>();
+    protected void loadAvailableEventColors() {
+        eventColorCountMap.clear();
         if (data.accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
-            for (SystemCalendarEvent event : systemCalendarEvents) {
-                colors.put(event.data.color, colors.getOrDefault(event.data.color, 0) + 1);
+            for (SystemCalendarEvent event : systemCalendarEventMap.values()) {
+                eventColorCountMap.merge(event.data.color, 1, Integer::sum); // increment by 1
             }
         } else {
-            colors.put(data.color, systemCalendarEvents.size());
+            eventColorCountMap.put(data.color, systemCalendarEventMap.size());
         }
-        return colors;
     }
     
     /**
@@ -100,7 +104,7 @@ public class SystemCalendar {
                                  @Nullable Predicate<SystemCalendarEvent> filter,
                                  @NonNull Consumer<SystemCalendarEvent> consumer) {
         if (isVisible()) {
-            for (SystemCalendarEvent event : systemCalendarEvents) {
+            for (SystemCalendarEvent event : systemCalendarEventMap.values()) {
                 if ((filter == null || filter.test(event)) &&
                         event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
                     consumer.accept(event);
@@ -116,7 +120,7 @@ public class SystemCalendar {
      * @param color        target events color
      */
     protected void invalidateParameterOnEvents(@Nullable String parameterKey, int color) {
-        systemCalendarEvents.forEach(event -> {
+        systemCalendarEventMap.values().forEach(event -> {
             if (event.data.color != color) {
                 return;
             }
@@ -129,17 +133,52 @@ public class SystemCalendar {
     }
     
     public void unlinkAllTodoEntries() {
-        systemCalendarEvents.forEach(event -> {
-            if (event.associatedEntry != null) {
-                event.associatedEntry.removeFromContainer();
-            }
-        });
+        systemCalendarEventMap.values().forEach(SystemCalendarEvent::removeFromContainer);
     }
     
-    public boolean setNewData(@NonNull SystemCalendarData data) {
-        if (this.data.equals(data)) {
+    public SystemCalendarEvent addEvent(@NonNull Long id, @NonNull SystemCalendarEventData data) {
+        if (id != data.id) {
+            Logger.error(NAME, "Something has gone really wrong, id != data.id (" + id + "/" + data.id + "), " + data);
+            return null;
+        }SystemCalendarEvent event = new SystemCalendarEvent(data, this);
+        systemCalendarEventMap.put(id, event);
+        return event;
+    }
+    
+    public SystemCalendarEvent removeEvent(@NonNull Long id) {
+        return Objects.requireNonNull(systemCalendarEventMap.remove(id)).removeFromContainer();
+    }
+    
+    public boolean setNewData(@NonNull SystemCalendarData newData) {
+        if (data.equals(newData)) {
             return false;
         }
+        SystemCalendarData oldData = data;
+        
+        boolean changed = Utilities.processDifference(oldData.systemCalendarEventsData, newData.systemCalendarEventsData, (entry, elementState) -> {
+            SystemCalendarEvent event;
+            switch (elementState) {
+                case MODIFIED:
+                    event = removeEvent(entry.first);
+                    addEvent(entry.first, entry.second);
+                    Logger.info(NAME,  "Changed " + event + " in " + this);
+                    break;
+                case NEW:
+                    event = addEvent(entry.first, entry.second);
+                    Logger.info(NAME,  "Added " + event + " in " + this);
+                    break;
+                case DELETED:
+                    event = removeEvent(entry.first);
+                    Logger.info(NAME,  "Removed " + event + " in " + this);
+                    break;
+            }
+        });
+        
+        if (changed || newData.accessLevel != oldData.accessLevel) {
+            loadAvailableEventColors();
+        }
+        
+        data = newData;
         return true;
     }
     
