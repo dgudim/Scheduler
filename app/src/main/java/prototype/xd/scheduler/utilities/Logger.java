@@ -53,7 +53,7 @@ public final class Logger {
     }
     
     public static void infoWithTime(@NonNull String tag, @NonNull String message, long timeMsStart) {
-        log(INFO, tag, message.replace("{time}", " in " + (System.currentTimeMillis() - timeMsStart) + "ms"));
+        log(INFO, tag, message.replace("{time}", "in " + (System.currentTimeMillis() - timeMsStart) + "ms"));
     }
     
     public static void debug(@NonNull String tag, @NonNull String message) {

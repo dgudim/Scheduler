@@ -11,6 +11,7 @@ import static prototype.xd.scheduler.utilities.Static.UPCOMING_ITEMS_OFFSET;
 import static prototype.xd.scheduler.utilities.Static.setBitmapUpdateFlag;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.loadCalendars;
 import static prototype.xd.scheduler.utilities.Utilities.loadGroups;
+import static prototype.xd.scheduler.utilities.Utilities.remapMap;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
 import android.content.Context;
@@ -25,9 +26,10 @@ import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,7 +56,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     @Nullable
     private CalendarView calendarView;
     
-    private List<SystemCalendar> calendars;
+    private Map<Long, SystemCalendar> calendars;
     @Nullable
     private TodoEntryList todoEntries;
     private GroupList groups;
@@ -65,8 +67,8 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     public final DefaultedMutableLiveData<Boolean> initFinished = new DefaultedMutableLiveData<>(Boolean.FALSE);
     
     
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final ArrayMap<Long, Boolean> calendarVisibilityMap = new ArrayMap<>();
+    
+    private ArrayMap<Long, Boolean> calendarVisibilityMap;
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
     
@@ -142,18 +144,15 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
             long start = System.currentTimeMillis();
             
             groups = loadGroups();
-            calendars = loadCalendars(context, new ArrayList<>());
+            calendars = loadCalendars(context, new ArrayMap<>());
             
-            calendarVisibilityMap.ensureCapacity(calendars.size());
-            for (SystemCalendar calendar : calendars) {
-                calendarVisibilityMap.put(calendar.data.id, calendar.isVisible());
-            }
+            calendarVisibilityMap = remapMap(calendars, SystemCalendar::isVisible);
             
             // load one panel to the right and to the left
             todoEntries = new TodoEntryList(
                     currentDayUTC - DAYS_ON_ONE_PANEL,
                     currentDayUTC + DAYS_ON_ONE_PANEL,
-                    groups, calendars, parameterInvalidationListener);
+                    groups, calendars.values(), parameterInvalidationListener);
             
             updateStaticVarsAndCalendarVisibility();
             
@@ -199,19 +198,20 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         todoEntries.updateUpcomingExpiredVisibility();
         
         if (!calendarVisibilityMap.isEmpty()) {
-            for (SystemCalendar calendar : calendars) {
-                boolean visibilityBefore = Boolean.TRUE.equals(calendarVisibilityMap.get(calendar.data.id));
-                boolean visibilityNow = calendar.isVisible();
-                calendarVisibilityMap.put(calendar.data.id, visibilityNow);
+            for (Map.Entry<Long, SystemCalendar> entry : calendars.entrySet()) {
+                SystemCalendar cal = entry.getValue();
+                boolean visibilityBefore = Boolean.TRUE.equals(calendarVisibilityMap.get(entry.getKey()));
+                boolean visibilityNow = cal.isVisible();
+                calendarVisibilityMap.put(entry.getKey(), visibilityNow);
                 
                 if (visibilityNow && !visibilityBefore) {
                     // new calendar is visible now
-                    Logger.debug(NAME, calendar + " is now visible");
-                    addEventsFromCalendar(calendar, todoEntries.firstLoadedDay, todoEntries.lastLoadedDay);
+                    Logger.debug(NAME, cal + " is now visible");
+                    addEventsFromCalendar(cal, todoEntries.firstLoadedDay, todoEntries.lastLoadedDay);
                 } else if (visibilityBefore && !visibilityNow) {
                     // calendar became invisible
-                    Logger.debug(NAME, calendar + " is now invisible");
-                    calendar.unlinkAllTodoEntries();
+                    Logger.debug(NAME, cal + " is now invisible");
+                    cal.unlinkAllTodoEntries();
                 }
             }
         }
@@ -272,10 +272,17 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     public void notifyCalendarProviderChanged(@NonNull Context context) {
+        
+        if (todoEntries == null) {
+            Logger.error(NAME, "notifyCalendarProviderChanged called, but manager is still initializing");
+            return;
+        }
+        
         Logger.debug(NAME, "notifyCalendarProviderChanged called");
         loadCalendars(context, calendars);
-        
-        // TODO: 05.02.2023 implement
+        addEventsFromAllCalendars(todoEntries.firstLoadedDay, todoEntries.lastLoadedDay);
+        notifyCalendarChanged();
+        notifyEntryListChanged();
     }
     
     public void notifyDatasetChanged() {
@@ -325,8 +332,12 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
         // remove references to ui
-        Logger.info(NAME, "Lifecycle called onDestroy");
+        Logger.info(NAME, "Lifecycle called onDestroy, unlinked calendarView");
         calendarView = null;
+    }
+    
+    private static void initError(@NonNull String method) {
+        Logger.error(NAME, method + " called, but manager is still initializing");
     }
     
     @NonNull
@@ -344,7 +355,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     @NonNull
     public List<TodoEntry> getVisibleTodoEntries(long day, @NonNull BiPredicate<TodoEntry, TodoEntry.EntryType> filter) {
         if (todoEntries == null) {
-            Logger.error(NAME, "getVisibleTodoEntries called, but manager is still initializing");
+            initError("getVisibleTodoEntries");
             return Collections.emptyList();
         }
         return todoEntries.getOnDay(day, filter);
@@ -358,7 +369,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     public void processEventIndicators(long day, int maxIndicators, @NonNull EventIndicatorConsumer eventIndicatorConsumer) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "processEventIndicators called, but manager is still initializing");
+            initError("processEventIndicators");
             return;
         }
         
@@ -390,23 +401,30 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     @NonNull
-    public List<SystemCalendar> getCalendars() {
-        return Collections.unmodifiableList(calendars);
+    public Collection<SystemCalendar> getCalendars() {
+        return Collections.unmodifiableCollection(calendars.values());
     }
     
     public void loadCalendarEntries(long toLoadDayStart, long toLoadDayEnd) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "loadCalendarEntries called, but manager is still initializing");
+            initError("loadCalendarEntries");
             return;
         }
         
         Logger.debug(NAME, "Loading entries from " + toLoadDayStart + " to " + toLoadDayEnd);
         
         if (todoEntries.tryExtendLoadingRange(toLoadDayStart, toLoadDayEnd)) {
-            for (SystemCalendar calendar : calendars) {
-                addEventsFromCalendar(calendar, toLoadDayStart, toLoadDayEnd);
-            }
+            addEventsFromAllCalendars(toLoadDayStart, toLoadDayEnd);
+        }
+    }
+    
+    /**
+     * Adds event from all system calendars to this container if not already
+     */
+    private void addEventsFromAllCalendars(long firstDayUTC, long lastDayUTC) {
+        for (SystemCalendar calendar : calendars.values()) {
+            addEventsFromCalendar(calendar, firstDayUTC, lastDayUTC);
         }
     }
     
@@ -416,7 +434,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     private void addEventsFromCalendar(@NonNull SystemCalendar calendar, long firstDayUTC, long lastDayUTC) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "addEventsFromCalendar called, but manager is still initializing");
+            initError("addEventsFromCalendar");
             return;
         }
         
@@ -443,7 +461,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     private void notifyEntryRemovedAdded(@NonNull final TodoEntry entry) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "notifyEntryRemovedAdded called, but manager is still initializing");
+            initError("notifyEntryRemovedAdded");
             return;
         }
         
@@ -466,7 +484,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     public void addEntry(@NonNull final TodoEntry entry) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "addEntry called, but manager is still initializing");
+            initError("addEntry called");
             return;
         }
         
@@ -483,7 +501,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     public void removeEntry(@NonNull final TodoEntry entry) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "removeEntry called, but manager is still initializing");
+            initError("removeEntry called");
             return;
         }
         
@@ -496,7 +514,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     public boolean resetEntrySettings(@NonNull TodoEntry entry) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "resetEntrySettings called, but manager is still initializing");
+            initError("resetEntrySettings called");
             return false;
         }
         
@@ -523,7 +541,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     public boolean changeEntryGroup(@NonNull TodoEntry entry, @NonNull Group newGroup) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "changeEntryGroup called, but manager is still initializing");
+            initError("changeEntryGroup");
             return false;
         }
         

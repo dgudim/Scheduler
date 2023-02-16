@@ -2,10 +2,11 @@ package prototype.xd.scheduler.utilities;
 
 import static android.provider.CalendarContract.Calendars;
 import static android.provider.CalendarContract.Events;
-import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.query;
 import static prototype.xd.scheduler.utilities.Static.KEY_SEPARATOR;
+import static prototype.xd.scheduler.utilities.Utilities.processDifference;
+import static prototype.xd.scheduler.utilities.Utilities.remapMap;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -16,10 +17,10 @@ import android.text.SpannableString;
 import androidx.annotation.NonNull;
 import androidx.collection.ArrayMap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
@@ -75,7 +76,7 @@ public final class SystemCalendarUtils {
      * @return a list of system calendars
      */
     @NonNull
-    public static List<SystemCalendar> loadCalendars(@NonNull Context context, @NonNull List<SystemCalendar> calendars) {
+    public static Map<Long, SystemCalendar> loadCalendars(@NonNull Context context, @NonNull Map<Long, SystemCalendar> calendars) {
         long start = System.currentTimeMillis(); // NOSONAR
         
         ContentResolver resolver = context.getContentResolver();
@@ -112,54 +113,41 @@ public final class SystemCalendarUtils {
                 }
             }
         }
-    
-        // TODO: 15.02.2023 processDifference();
         
         final int[] deleted = {0};
+        final int[] updated = {0};
+        final int[] skipped = {0};
+        final int[] added = {0};
         
-        // remove deleted calendars
-        calendars.removeIf(systemCalendar -> {
-            if (!calendarDataMap.containsKey(systemCalendar.data.id)) {
-                systemCalendar.unlinkAllTodoEntries();
-                Logger.info(NAME, "Removed " + systemCalendar);
-                deleted[0]++;
-                return true;
-            }
-            return false;
-        });
-        
-        int updated = 0;
-        int skipped = 0;
-        int added = 0;
-        
-        for (Map.Entry<Long, SystemCalendarData> entry : calendarDataMap.entrySet()) {
-            SystemCalendar foundCalendar = null;
-            for (SystemCalendar calendar : calendars) {
-                if (calendar.data.id == entry.getKey()) {
-                    foundCalendar = calendar;
-                    break;
-                }
-            }
-            
-            if (foundCalendar == null) {
-                SystemCalendar calendar = new SystemCalendar(entry.getValue());
-                calendars.add(calendar);
-                Logger.info(NAME, "Added " + calendar);
-                added++;
-                continue;
-            }
-            
-            if (foundCalendar.setNewData(entry.getValue())) {
-                Logger.info(NAME, "Updated " + foundCalendar);
-                updated++;
-            } else {
-                Logger.info(NAME, "Skipped " + foundCalendar);
-                skipped++;
-            }
-        }
+        processDifference(remapMap(calendars, calendar -> calendar.data), calendarDataMap,
+                (newElement, elementState) -> {
+                    SystemCalendar calendar;
+                    switch (elementState) {
+                        case NEW:
+                            calendar = new SystemCalendar(newElement.second);
+                            calendars.put(newElement.first, calendar);
+                            Logger.info(NAME, "Added " + calendar);
+                            added[0]++;
+                            break;
+                        case DELETED:
+                            calendar = Objects.requireNonNull(calendars.get(newElement.first)).unlinkAllTodoEntries();
+                            Logger.info(NAME, "Removed " + calendar);
+                            deleted[0]++;
+                            break;
+                        case MODIFIED:
+                            calendar = Objects.requireNonNull(calendars.get(newElement.first));
+                            calendar.setNewData(newElement.second);
+                            Logger.info(NAME, "Updated " + calendar);
+                            updated[0]++;
+                            break;
+                        case NOT_MODIFIED:
+                            Logger.info(NAME, "Skipped " + calendars.get(newElement.first));
+                            skipped[0]++;
+                    }
+                });
         
         Logger.infoWithTime(NAME,
-                "Added: " + added + " | updated: " + updated + " | skipped: " + skipped + " | deleted: " + deleted[0] + " {time}", start);
+                "Added: " + added[0] + " | updated: " + updated[0] + " | skipped: " + skipped[0] + " | deleted: " + deleted[0] + " {time}", start);
         return calendars;
     }
     
@@ -172,7 +160,7 @@ public final class SystemCalendarUtils {
      * @param list      list to add entries to
      */
     static void addTodoEntriesFromCalendars(long dayStart, long dayEnd,
-                                            @NonNull List<SystemCalendar> calendars,
+                                            @NonNull Collection<SystemCalendar> calendars,
                                             @NonNull List<TodoEntry> list) {
         int initialSize = list.size();
         for (SystemCalendar calendar : calendars) {
@@ -204,49 +192,49 @@ public final class SystemCalendarUtils {
     }
     
     // FOR DEBUGGING
-    public static void printTable(Cursor cursor) {
-        cursor.moveToFirst();
-    
-        ArrayList<ArrayList<String>> table = new ArrayList<>();
-        ArrayList<Integer> column_sizes = new ArrayList<>();
-        String[] column_names = cursor.getColumnNames();
-        table.add(new ArrayList<>(Arrays.asList(column_names)));
-    
-        for (String column_name : column_names) {
-            column_sizes.add(column_name.length());
-        }
-    
-        for (int row = 0; row < cursor.getCount(); row++) {
-            ArrayList<String> record = new ArrayList<>();
-            for (int column = 0; column < column_names.length; column++) {
-                String column_val = cursor.getString(column) + "";
-                record.add(column_val);
-                column_sizes.set(column, max(column_sizes.get(column), column_val.length()));
-            }
-            table.add(record);
-            cursor.moveToNext();
-        }
-    
-        System.out.println("TABLE DIMENSIONS: " + table.size() + " x " + column_names.length);
-        System.out.println("TABLE DIMENSIONS_RAW: " + cursor.getCount() + " x " + cursor.getColumnNames().length);
-    
-        for (int row = 0; row < table.size(); row++) {
-            for (int column = 0; column < column_names.length; column++) {
-                System.out.print(addSpaces(table.get(row).get(column), column_sizes.get(column) + 1));
-            }
-            System.out.println();
-        }
-    
-        cursor.moveToFirst();
-    }
-    
-    public static String addSpaces(String input, int len) {
-        StringBuilder out = new StringBuilder(input);
-        for (int i = input.length(); i < len; i++) {
-            out.append(" ");
-        }
-        return out.toString();
-    }
+//    public static void printTable(Cursor cursor) {
+//        cursor.moveToFirst();
+//
+//        ArrayList<ArrayList<String>> table = new ArrayList<>();
+//        ArrayList<Integer> column_sizes = new ArrayList<>();
+//        String[] column_names = cursor.getColumnNames();
+//        table.add(new ArrayList<>(Arrays.asList(column_names)));
+//
+//        for (String column_name : column_names) {
+//            column_sizes.add(column_name.length());
+//        }
+//
+//        for (int row = 0; row < cursor.getCount(); row++) {
+//            ArrayList<String> record = new ArrayList<>();
+//            for (int column = 0; column < column_names.length; column++) {
+//                String column_val = cursor.getString(column) + "";
+//                record.add(column_val);
+//                column_sizes.set(column, max(column_sizes.get(column), column_val.length()));
+//            }
+//            table.add(record);
+//            cursor.moveToNext();
+//        }
+//
+//        System.out.println("TABLE DIMENSIONS: " + table.size() + " x " + column_names.length);
+//        System.out.println("TABLE DIMENSIONS_RAW: " + cursor.getCount() + " x " + cursor.getColumnNames().length);
+//
+//        for (int row = 0; row < table.size(); row++) {
+//            for (int column = 0; column < column_names.length; column++) {
+//                System.out.print(addSpaces(table.get(row).get(column), column_sizes.get(column) + 1));
+//            }
+//            System.out.println();
+//        }
+//
+//        cursor.moveToFirst();
+//    }
+//
+//    public static String addSpaces(String input, int len) {
+//        StringBuilder out = new StringBuilder(input);
+//        for (int i = input.length(); i < len; i++) {
+//            out.append(" ");
+//        }
+//        return out.toString();
+//    }
     
     
 }

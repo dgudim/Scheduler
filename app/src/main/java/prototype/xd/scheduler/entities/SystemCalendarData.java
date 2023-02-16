@@ -6,13 +6,14 @@ import static prototype.xd.scheduler.utilities.QueryUtilities.getLong;
 import static prototype.xd.scheduler.utilities.QueryUtilities.getString;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_COLUMNS;
 import static prototype.xd.scheduler.utilities.SystemCalendarUtils.CALENDAR_EVENT_COLUMNS;
+import static prototype.xd.scheduler.utilities.Utilities.remapMap;
 
 import android.database.Cursor;
 import android.provider.CalendarContract;
-import android.util.ArrayMap;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.collection.ArrayMap;
 
 import java.util.Map;
 import java.util.Objects;
@@ -40,8 +41,9 @@ public class SystemCalendarData {
     public final int color;
     
     @NonNull
-    public final Map<Long, SystemCalendarEventData> systemCalendarEventsData;
+    public final Map<Long, SystemCalendarEventData> systemCalendarEventsDataMap;
     
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
     public SystemCalendarData(@NonNull Cursor cursor) {
         
         accountType = getString(cursor, CALENDAR_COLUMNS, CalendarContract.Calendars.ACCOUNT_TYPE);
@@ -60,35 +62,31 @@ public class SystemCalendarData {
             timeZoneId = calTimeZoneId;
         }
         
-        systemCalendarEventsData = new ArrayMap<>();
+        systemCalendarEventsDataMap = new ArrayMap<>();
     }
     
     public void addEventData(@NonNull Cursor cursor) {
         SystemCalendarEventData data = new SystemCalendarEventData(cursor);
-        systemCalendarEventsData.put(data.id, data);
+        systemCalendarEventsDataMap.put(data.id, data);
     }
     
     public void addExceptionToEvent(@NonNull Cursor cursor, long exception) {
         long originalId = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.ORIGINAL_ID);
-        SystemCalendarEventData eventData = systemCalendarEventsData.get(originalId);
+        SystemCalendarEventData eventData = systemCalendarEventsDataMap.get(originalId);
         if (eventData == null) {
             Logger.warning(NAME, "Id " + originalId + " not found in " + this);
             return;
         }
         eventData.addException(exception);
         // not canceled means that this event is an overriding exception instead of deleting
-        if(getInt(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.STATUS) != STATUS_CANCELED) {
+        if (getInt(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.STATUS) != STATUS_CANCELED) {
             addEventData(cursor);
         }
     }
     
     @NonNull
     public ArrayMap<Long, SystemCalendarEvent> makeEvents(@NonNull SystemCalendar calendar) {
-        ArrayMap<Long, SystemCalendarEvent> events = new ArrayMap<>(systemCalendarEventsData.size());
-        for (Map.Entry<Long, SystemCalendarEventData> entry : systemCalendarEventsData.entrySet()) {
-            events.put(entry.getKey(), new SystemCalendarEvent(entry.getValue(), calendar));
-        }
-        return events;
+        return remapMap(systemCalendarEventsDataMap, data -> new SystemCalendarEvent(data, calendar));
     }
     
     @Override
@@ -107,12 +105,12 @@ public class SystemCalendarData {
                 accountName.equals(other.accountName) &&
                 displayName.equals(other.displayName) &&
                 timeZoneId.equals(other.timeZoneId) &&
-                systemCalendarEventsData.equals(other.systemCalendarEventsData);
+                systemCalendarEventsDataMap.equals(other.systemCalendarEventsDataMap);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(accountType, accountName, displayName, id, accessLevel, timeZoneId, color, systemCalendarEventsData);
+        return Objects.hash(accountType, accountName, displayName, id, accessLevel, timeZoneId, color, systemCalendarEventsDataMap);
     }
     
     @NonNull

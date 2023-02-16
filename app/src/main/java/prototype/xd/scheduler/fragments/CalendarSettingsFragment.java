@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -51,7 +52,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
         ArrayList<GenericCalendarSettingsEntryConfig> calendarConfigEntries = new ArrayList<>();
         
         new Thread(() -> {
-            List<SystemCalendar> calendars = TodoEntryManager.getInstance(wrapper.context).getCalendars();
+            Collection<SystemCalendar> calendars = TodoEntryManager.getInstance(wrapper.context).getCalendars();
             Map<String, List<SystemCalendar>> calendarGroups = new TreeMap<>();
             
             for (SystemCalendar calendar : calendars) {

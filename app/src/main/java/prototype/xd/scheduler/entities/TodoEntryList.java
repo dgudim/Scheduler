@@ -69,7 +69,7 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     public TodoEntryList(long dayStart, long dayEnd,
                          @NonNull GroupList groups,
-                         @NonNull List<SystemCalendar> calendars,
+                         @NonNull Collection<SystemCalendar> calendars,
                          @NonNull BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener) {
         super(TODO_LIST_INITIAL_CAPACITY);
         

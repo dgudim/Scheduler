@@ -36,7 +36,7 @@ public class SystemCalendar {
     @NonNull
     public final Map<Long, SystemCalendarEvent> systemCalendarEventMap;
     @NonNull
-    public final Map<Integer, Integer> eventColorCountMap;
+    public final ArrayMap<Integer, Integer> eventColorCountMap;
     
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     public SystemCalendar(@NonNull SystemCalendarData data) {
@@ -63,7 +63,8 @@ public class SystemCalendar {
         eventColorCountMap.clear();
         if (data.accessLevel >= Calendars.CAL_ACCESS_CONTRIBUTOR) {
             for (SystemCalendarEvent event : systemCalendarEventMap.values()) {
-                eventColorCountMap.merge(event.data.color, 1, Integer::sum); // increment by 1
+                // increment by 1
+                eventColorCountMap.merge(event.data.color, 1, Integer::sum);
             }
         } else {
             eventColorCountMap.put(data.color, systemCalendarEventMap.size());
@@ -103,12 +104,14 @@ public class SystemCalendar {
     public void getVisibleEvents(long firstDayUTC, long lastDayUTC,
                                  @Nullable Predicate<SystemCalendarEvent> filter,
                                  @NonNull Consumer<SystemCalendarEvent> consumer) {
-        if (isVisible()) {
-            for (SystemCalendarEvent event : systemCalendarEventMap.values()) {
-                if ((filter == null || filter.test(event)) &&
-                        event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
-                    consumer.accept(event);
-                }
+        if (!isVisible()) {
+            return;
+        }
+        
+        for (SystemCalendarEvent event : systemCalendarEventMap.values()) {
+            if ((filter == null || filter.test(event)) &&
+                    event.isVisibleOnRange(firstDayUTC, lastDayUTC)) {
+                consumer.accept(event);
             }
         }
     }
@@ -132,45 +135,49 @@ public class SystemCalendar {
         });
     }
     
-    public void unlinkAllTodoEntries() {
+    @NonNull
+    public SystemCalendar unlinkAllTodoEntries() {
         systemCalendarEventMap.values().forEach(SystemCalendarEvent::removeFromContainer);
+        return this;
     }
     
+    @Nullable
     public SystemCalendarEvent addEvent(@NonNull Long id, @NonNull SystemCalendarEventData data) {
         if (id != data.id) {
             Logger.error(NAME, "Something has gone really wrong, id != data.id (" + id + "/" + data.id + "), " + data);
             return null;
-        }SystemCalendarEvent event = new SystemCalendarEvent(data, this);
+        }
+        SystemCalendarEvent event = new SystemCalendarEvent(data, this);
         systemCalendarEventMap.put(id, event);
         return event;
     }
     
+    @NonNull
     public SystemCalendarEvent removeEvent(@NonNull Long id) {
         return Objects.requireNonNull(systemCalendarEventMap.remove(id)).removeFromContainer();
     }
     
-    public boolean setNewData(@NonNull SystemCalendarData newData) {
-        if (data.equals(newData)) {
-            return false;
-        }
+    public void setNewData(@NonNull SystemCalendarData newData) {
         SystemCalendarData oldData = data;
         
-        boolean changed = Utilities.processDifference(oldData.systemCalendarEventsData, newData.systemCalendarEventsData, (entry, elementState) -> {
+        boolean changed = Utilities.processDifference(oldData.systemCalendarEventsDataMap, newData.systemCalendarEventsDataMap, (entry, elementState) -> {
             SystemCalendarEvent event;
             switch (elementState) {
                 case MODIFIED:
                     event = removeEvent(entry.first);
                     addEvent(entry.first, entry.second);
-                    Logger.info(NAME,  "Changed " + event + " in " + this);
+                    Logger.info(NAME, "Changed " + event + " in " + this);
                     break;
                 case NEW:
                     event = addEvent(entry.first, entry.second);
-                    Logger.info(NAME,  "Added " + event + " in " + this);
+                    Logger.info(NAME, "Added " + event + " in " + this);
                     break;
                 case DELETED:
                     event = removeEvent(entry.first);
-                    Logger.info(NAME,  "Removed " + event + " in " + this);
+                    Logger.info(NAME, "Removed " + event + " in " + this);
                     break;
+                case NOT_MODIFIED:
+                    // ignore
             }
         });
         
@@ -179,7 +186,6 @@ public class SystemCalendar {
         }
         
         data = newData;
-        return true;
     }
     
     @NonNull

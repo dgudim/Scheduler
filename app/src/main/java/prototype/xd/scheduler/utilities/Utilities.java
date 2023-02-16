@@ -35,6 +35,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
+import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
 import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
@@ -54,6 +55,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -61,6 +63,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -110,7 +113,7 @@ public final class Utilities {
     @NonNull
     public static List<TodoEntry> loadTodoEntries(long dayStart, long dayEnd,
                                                   @NonNull GroupList groups,
-                                                  @NonNull List<SystemCalendar> calendars) {
+                                                  @NonNull Collection<SystemCalendar> calendars) {
         
         List<TodoEntry> readEntries = new ArrayList<>(TODO_LIST_INITIAL_CAPACITY);
         try {
@@ -581,18 +584,20 @@ public final class Utilities {
         NEW, MODIFIED, NOT_MODIFIED, DELETED
     }
     
-    public static <K, V> boolean processDifference(@NonNull Map<K, V> oldMap, @NonNull Map<K, V> newMap, BiConsumer<Pair<K, V>, ElementState> consumer) {
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
+    public static <K, V> boolean processDifference(@NonNull Map<K, V> oldMap, @NonNull Map<K, V> newMap,
+                                                   @NonNull BiConsumer<Pair<K, V>, ElementState> consumer) {
         Set<K> oldSet = oldMap.keySet();
         Set<K> newSet = newMap.keySet();
         boolean changed = false;
-        for (K key : Sets.union(oldSet, newSet)) {
+        for (K key : Sets.union(oldSet, newSet)) { // NOSONAR
             V oldValue = oldMap.get(key);
             if (oldValue != null) {
                 V newValue = newMap.get(key);
                 if (newValue != null) {
                     // present in both sets
                     if (oldValue.equals(newValue)) {
-                        consumer.accept(null, ElementState.NOT_MODIFIED);
+                        consumer.accept(Pair.create(key, null), ElementState.NOT_MODIFIED);
                     } else {
                         consumer.accept(Pair.create(key, newMap.get(key)), ElementState.MODIFIED);
                         changed = true;
@@ -609,6 +614,15 @@ public final class Utilities {
             changed = true;
         }
         return changed;
+    }
+    
+    @NonNull
+    public static <K, V1, V2> ArrayMap<K, V2> remapMap(@NonNull Map<K, V1> fromMap, @NonNull Function<? super V1, V2> transformer) {
+        ArrayMap<K, V2> newMap = new ArrayMap<>(fromMap.size());
+        for (Map.Entry<K, V1> entry : fromMap.entrySet()) {
+            newMap.put(entry.getKey(), transformer.apply(entry.getValue()));
+        }
+        return newMap;
     }
     
     public static long rfc2445ToMilliseconds(@NonNull String str) {

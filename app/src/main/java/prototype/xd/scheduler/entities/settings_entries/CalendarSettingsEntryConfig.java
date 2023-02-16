@@ -48,7 +48,7 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         calendarVisibilityKey = calendar.visibilityKey;
         calendarSubKeys = calendar.subKeys;
         calendarColor = calendar.data.color;
-        calendarEventsCount = calendar.systemCalendarEvents.size();
+        calendarEventsCount = calendar.systemCalendarEventMap.size();
         
         if (!calendar.eventColorCountMap.isEmpty() && calendarEventsCount > 0) {
             gridViewAdapter = new CalendarColorsGridViewAdapter(settings, calendar);
