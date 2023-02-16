@@ -88,37 +88,12 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         
         ContentWrapperBinding contentBnd = binding.contentWrapper;
         NavigationView navViewDrawer = binding.navViewWrapper;
-        NavigationViewBinding navViewContent = binding.navView;
         
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         contentBnd.content.recyclerView.setAdapter(todoListViewAdapter);
-        
-        // construct custom calendar view
-        CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoEntryManager);
-        todoEntryManager.attachCalendarView(calendarView, wrapper.lifecycle);
-        
-        // not called on initial startup
-        calendarView.setOnDateChangeListener((selectedDate, context) -> {
-            selectDate(selectedDate);
-            todoEntryManager.notifyEntryListChanged();
-            updateStatusText();
-        });
-        
-        todoEntryManager.listChangedSignal.observe(getViewLifecycleOwner(), status -> todoListViewAdapter.notifyEntryListChanged());
-        
-        // setup month listener, called when a new month is loaded (first month is loaded differently)
-        calendarView.setNewMonthBindListener(month ->
-                // load current month entries (with overlap of one panel) before displaying the data
-                todoEntryManager.loadCalendarEntries(
-                        getStartOfMonthDayUTC(month) - DAYS_ON_ONE_PANEL,
-                        getEndOfMonthDayUTC(month) + DAYS_ON_ONE_PANEL)
-        );
-        
-        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(DateManager.getCurrentDate()));
-        
+    
         DrawerLayout drawerLayout = binding.root;
-        
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 rootActivity, drawerLayout, contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
             @Override
@@ -134,6 +109,48 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         
+        // construct custom calendar view
+        CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoEntryManager);
+        todoEntryManager.attachCalendarView(calendarView, wrapper.lifecycle);
+        
+        // when all entries are loaded and ui is created, update current month
+        todoEntryManager.initFinished.observe(getViewLifecycleOwner(), status -> {
+            setupListeners(contentBnd, binding.navView, navViewDrawer, drawerLayout, calendarView, rootActivity);
+            // update adapter showing entries
+            todoEntryManager.notifyEntryListChanged();
+            // update calendar updating indicators
+            todoEntryManager.notifyCurrentMonthChanged();
+            // finally, update the status text with entry count
+            updateStatusText();
+        });
+    }
+    
+    private void setupListeners(@NonNull ContentWrapperBinding contentBnd,
+                                @NonNull NavigationViewBinding navViewContent,
+                                @NonNull NavigationView navViewDrawer,
+                                @NonNull DrawerLayout drawerLayout,
+                                @NonNull CalendarView calendarView,
+                                @NonNull FragmentActivity rootActivity) {
+        
+        // not called on initial startup
+        calendarView.setOnDateChangeListener((selectedDate, context) -> {
+            selectDate(selectedDate);
+            todoEntryManager.notifyEntryListChanged();
+            updateStatusText();
+        });
+    
+        todoEntryManager.listChangedSignal.observe(getViewLifecycleOwner(), status -> todoListViewAdapter.notifyEntryListChanged());
+    
+        // setup month listener, called when a new month is loaded (first month is loaded differently)
+        calendarView.setNewMonthBindListener(month ->
+                // load current month entries (with overlap of one panel) before displaying the data
+                todoEntryManager.loadCalendarEntries(
+                        getStartOfMonthDayUTC(month) - DAYS_ON_ONE_PANEL,
+                        getEndOfMonthDayUTC(month) + DAYS_ON_ONE_PANEL)
+        );
+    
+        contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(DateManager.getCurrentDate()));
+    
         rootActivity.getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -147,7 +164,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                 }
             }
         });
-        
+    
         contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoEntryManager.getGroups();
             displayEntryAdditionEditDialog(wrapper,
@@ -161,25 +178,25 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                         values.put(END_DAY_UTC, isGlobal ? DAY_FLAG_GLOBAL_STR :
                                 dialogBinding.dayToButton.getSelectedDayUTCStr());
                         values.put(IS_COMPLETED, Boolean.toString(false));
-                        
+                    
                         todoEntryManager.addEntry(new TodoEntry(values, groupList.get(selectedIndex), System.currentTimeMillis()));
                     });
         });
-        
+    
         navViewContent.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));
         navViewContent.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_ISSUES));
         navViewContent.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_RELEASES));
         navViewContent.faqClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_FAQ));
-        
+    
         navViewContent.logo.setOnClickListener(v ->
                 displayMessageDialog(wrapper, builder -> {
                     builder.setTitle(R.string.debug_menu);
                     builder.setMessage(R.string.debug_menu_description);
                     builder.setIcon(R.drawable.ic_developer_mode_24_primary);
-                    
+                
                     DebugMenuDialogBinding bnd = DebugMenuDialogBinding.inflate(LayoutInflater.from(wrapper.context));
                     bnd.shareLogcatView.setOnClickListener(v1 -> Logger.shareLog(wrapper.context));
-                    
+                
                     if (BuildConfig.DEBUG) {
                         bnd.debugLoggingSwitch.setCheckedSilent(true);
                         bnd.debugLoggingSwitch.setClickable(false);
@@ -188,29 +205,20 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                         setSwitchChangeListener(bnd.debugLoggingSwitch, Static.DEBUG_LOGGING, (switchView, isChecked) -> Logger.setDebugEnabled(isChecked));
                     }
                     builder.setView(bnd.root);
-                    
+                
                     builder.setPositiveButton(R.string.close, null);
                 })
         );
-        
+    
         navViewContent.globalSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_GlobalSettingsFragment));
-        
+    
         navViewContent.calendarSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_CalendarSettingsFragment));
-        
+    
         navViewContent.sortingSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_SortingSettingsFragment));
-        
-        // when all entries are loaded and ui is created, update current month
-        todoEntryManager.initFinished.observe(getViewLifecycleOwner(), status -> {
-            // update adapter showing entries
-            todoEntryManager.notifyEntryListChanged();
-            // update calendar updating indicators
-            todoEntryManager.notifyCurrentMonthChanged();
-            // finally, update the status text with entry count
-            updateStatusText();
-        });
+    
     }
     
     // fragment becomes visible
