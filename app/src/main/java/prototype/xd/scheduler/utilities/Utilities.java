@@ -469,6 +469,7 @@ public final class Utilities {
      * @param resId    int resource id of the string
      * @param quantity string quantity
      * @return string with the given quantity
+     * @see #getPluralString
      */
     @NonNull
     public static String getQuantityString(@NonNull Context context, @StringRes @PluralsRes int resId, int quantity) throws Resources.NotFoundException {
@@ -486,6 +487,7 @@ public final class Utilities {
      * @param resId    int resource id of the string
      * @param quantity string quantity
      * @return string with the given quantity
+     * @see #getQuantityString
      */
     @NonNull
     public static String getPluralString(@NonNull Context context, @PluralsRes int resId, int quantity) throws Resources.NotFoundException {
@@ -548,17 +550,27 @@ public final class Utilities {
         }
     }
     
+    /**
+     * Check whether two ranges overlap
+     *
+     * @param x1 start of first range
+     * @param x2 end of first range
+     * @param y1 start of second range
+     * @param y2 end of second range
+     * @return whether two integer ranges overlap
+     */
     public static boolean doRangesOverlap(long x1, long x2, long y1, long y2) {
         return x2 >= y1 && x1 <= y2;
     }
     
     /**
-     * Colorize a specific substring in a string for TextView. Use it like this: <pre>
+     * Colorize a specific substring in a string for TextView. Use it like this:
+     * <pre> {@code
      * textView.setText(
      *     Strings.colorized("This word is black.","black", Color.BLACK),
      *     TextView.BufferType.SPANNABLE
      * );
-     * </pre>
+     * }</pre>
      *
      * @param text Text that contains a substring to colorize
      * @param word Substring to colorize
@@ -584,6 +596,14 @@ public final class Utilities {
         NEW, MODIFIED, NOT_MODIFIED, DELETED
     }
     
+    /**
+     * Computes differences between 2 maps
+     *
+     * @param oldMap   old map
+     * @param newMap   new map
+     * @param consumer function to call on each difference
+     * @return where there were any changes
+     */
     @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
     public static <K, V> boolean processDifference(@NonNull Map<K, V> oldMap, @NonNull Map<K, V> newMap,
                                                    @NonNull BiConsumer<Pair<K, V>, ElementState> consumer) {
@@ -616,6 +636,16 @@ public final class Utilities {
         return changed;
     }
     
+    /**
+     * Changes values of a map based on some transformer function
+     *
+     * @param fromMap     map to map
+     * @param transformer function to transform the values
+     * @param <K>         type of key in the map
+     * @param <V1>        original value type
+     * @param <V2>        transformed value type
+     * @return a map with the new mapped values
+     */
     @NonNull
     public static <K, V1, V2> ArrayMap<K, V2> remapMap(@NonNull Map<K, V1> fromMap, @NonNull Function<? super V1, V2> transformer) {
         ArrayMap<K, V2> newMap = new ArrayMap<>(fromMap.size());

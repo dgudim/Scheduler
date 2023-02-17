@@ -156,7 +156,7 @@ public final class SystemCalendarUtils {
      *
      * @param dayStart  minimum day
      * @param dayEnd    maximum day
-     * @param calendars list of calendars to get from
+     * @param calendars list of calendars to get entries from
      * @param list      list to add entries to
      */
     static void addTodoEntriesFromCalendars(long dayStart, long dayEnd,

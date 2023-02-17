@@ -67,7 +67,6 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     public final DefaultedMutableLiveData<Boolean> initFinished = new DefaultedMutableLiveData<>(Boolean.FALSE);
     
     
-    
     private ArrayMap<Long, Boolean> calendarVisibilityMap;
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
@@ -188,10 +187,13 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         
     }
     
+    /**
+     * Update update upcomingExpiredVisibility and calendarVisibilityMap, load/unload calendars
+     */
     private void updateStaticVarsAndCalendarVisibility() {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "updateStaticVarsAndCalendarVisibility called, but manager is still initializing");
+            initError("updateStaticVarsAndCalendarVisibility");
             return;
         }
         
@@ -262,7 +264,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     /**
-     * tells calendar list that all months have changed
+     * Tells calendar that all months have changed
      */
     public void notifyCalendarChanged() {
         Logger.debug(NAME, "NotifyCalendarChanged called");
@@ -271,10 +273,15 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         }
     }
     
+    /**
+     * Tell the manager that a system calendar has changed, load missing/deleted extra events/calendars
+     *
+     * @param context any context
+     */
     public void notifyCalendarProviderChanged(@NonNull Context context) {
         
         if (todoEntries == null) {
-            Logger.error(NAME, "notifyCalendarProviderChanged called, but manager is still initializing");
+            initError("notifyCalendarProviderChanged");
             return;
         }
         
@@ -285,11 +292,17 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         notifyEntryListChanged();
     }
     
+    /**
+     * Tell the manager that system dataset has changed (no timezone changes)
+     */
     public void notifyDatasetChanged() {
         Logger.debug(NAME, "Dataset changed!");
         notifyDatasetChanged(false);
     }
     
+    /**
+     * Tell the manager that system timezone has changed, which refreshes the dataset
+     */
     private void notifyTimezoneChanged() {
         Logger.debug(NAME, "Dataset timezone changed!");
         notifyDatasetChanged(true);
@@ -302,7 +315,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      */
     private void notifyDatasetChanged(boolean timezoneChanged) {
         if (todoEntries == null) {
-            Logger.error(NAME, "notifyDatasetChanged called, but manager is still initializing");
+            initError("notifyDatasetChanged");
             return;
         }
         for (TodoEntry todoEntry : todoEntries) {
@@ -323,12 +336,23 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         setBitmapUpdateFlag();
     }
     
+    /**
+     * Attaches calendar view from the ui
+     *
+     * @param calendarView view to attach
+     * @param lifecycle    view's lifecycle to avoid leaks
+     */
     public void attachCalendarView(@NonNull CalendarView calendarView, @NonNull Lifecycle lifecycle) {
         this.calendarView = calendarView;
         // observe lifecycle to clear ui references later
         lifecycle.addObserver(this);
     }
     
+    /**
+     * Called when the attached lifecycle calls onDestroy (ui is destroyed)
+     *
+     * @param owner the component, whose state was changed
+     */
     @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
         // remove references to ui
@@ -336,6 +360,11 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         calendarView = null;
     }
     
+    /**
+     * Print an error that manager is initializing but some function was called
+     *
+     * @param method the method that was called
+     */
     private static void initError(@NonNull String method) {
         Logger.error(NAME, method + " called, but manager is still initializing");
     }

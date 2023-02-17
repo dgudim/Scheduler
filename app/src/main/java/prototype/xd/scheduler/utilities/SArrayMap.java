@@ -8,10 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-// simple serialization wrapper for array map
-
 /**
- * ArrayMap class with serialization
+ * serializable ArrayMap class
  *
  * @param <K> serializable key
  * @param <V> serializable value
