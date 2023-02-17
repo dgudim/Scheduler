@@ -1,0 +1,15 @@
+General changes:
+- Improved permissions request screen
+- Improved startup time
+- Tweaked previews of lockscreen views
+
+Bugfixes:
+- Fixed static variables sometimes being null
+- Fixed exception event handling (Not appearing sometimes)
+
+Internal changes:
+- Enabled R8 full mode and resource shrinking
+- Update list on timezone and calendar changes
+- TodoEntryManager is now a singleton
+- Removed logging to file, logcat is enough
+- Separated data from calendar and events
