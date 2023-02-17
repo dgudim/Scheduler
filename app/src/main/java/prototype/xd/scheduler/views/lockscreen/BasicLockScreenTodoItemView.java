@@ -20,29 +20,39 @@ public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEnt
         return viewBinding.backgroundOutline;
     }
     
+    @NonNull
     @Override
-    public void setBackgroundColor(@ColorInt int color) {
+    public BasicLockScreenTodoItemView setBackgroundColor(@ColorInt int color) {
         viewBinding.backgroundMain.setBackgroundColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setBorderColor(@ColorInt int color) {
+    public BasicLockScreenTodoItemView setBorderColor(@ColorInt int color) {
         viewBinding.backgroundOutline.setBackgroundColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setTitleTextColor(@ColorInt int color) {
+    public BasicLockScreenTodoItemView setTitleTextColor(@ColorInt int color) {
         viewBinding.titleText.setTextColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setIndicatorColor(@ColorInt int color) {
+    public BasicLockScreenTodoItemView setIndicatorColor(@ColorInt int color) {
         viewBinding.indicatorView.setBackgroundColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setTimeTextColor(@ColorInt int color) {
+    public BasicLockScreenTodoItemView setTimeTextColor(@ColorInt int color) {
         viewBinding.timeText.setTextColor(color);
+        return this;
     }
     
     @Override

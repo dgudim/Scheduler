@@ -22,30 +22,40 @@ public class SleekLockScreenTodoItemView extends LockScreenTodoItemView<SleekEnt
         return viewBinding.backgroundOutline;
     }
     
+    @NonNull
     @Override
-    public void setBackgroundColor(@ColorInt int color) {
+    public SleekLockScreenTodoItemView setBackgroundColor(@ColorInt int color) {
         viewBinding.backgroundMain.setCardBackgroundColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setBorderColor(@ColorInt int color) {
+    public SleekLockScreenTodoItemView setBorderColor(@ColorInt int color) {
         viewBinding.backgroundOutline.setCardBackgroundColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setTitleTextColor(@ColorInt int color) {
+    public SleekLockScreenTodoItemView setTitleTextColor(@ColorInt int color) {
         viewBinding.titleText.setTextColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setIndicatorColor(@ColorInt int color) {
+    public SleekLockScreenTodoItemView setIndicatorColor(@ColorInt int color) {
         viewBinding.indicatorView.setBackgroundTintList(ColorStateList.valueOf(color));
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setTimeTextColor(@ColorInt int color) {
+    public SleekLockScreenTodoItemView setTimeTextColor(@ColorInt int color) {
         viewBinding.timeTextStart.setTextColor(color);
         viewBinding.timeText.setTextColor(color);
+        return this;
     }
     
     @Override

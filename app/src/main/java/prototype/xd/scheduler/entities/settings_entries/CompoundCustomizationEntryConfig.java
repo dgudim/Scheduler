@@ -2,6 +2,7 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
@@ -10,6 +11,7 @@ import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.function.ObjIntConsumer;
@@ -101,8 +103,14 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             // no need to reinflate, view type is already set
             entryPreviewContainer.refreshAll(false);
             
+            int bgColor = MaterialColors.getColor(wrapper.context, R.attr.colorSurfaceVariant, Color.WHITE);
+            int borderColor = MaterialColors.getColor(wrapper.context, R.attr.colorAccent, Color.GRAY);
+            int fontColor = MaterialColors.getColor(wrapper.context, R.attr.colorOnSurfaceVariant, Color.BLACK);
+            
             for (TodoItemViewType viewType : TodoItemViewType.values()) {
                 LockScreenTodoItemView.inflateViewByType(viewType, viewSelectionDialogView, layoutInflater)
+                        .mixAndSetBgAndTextColors(true, fontColor, bgColor)
+                        .setBorderColor(borderColor)
                         .setOnClickListener(v -> {
                             entryPreviewContainer.setTodoItemViewType(viewType);
                             viewSelectionDialog.dismiss();

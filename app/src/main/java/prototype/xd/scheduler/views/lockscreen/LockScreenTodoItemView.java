@@ -33,6 +33,7 @@ import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.Static;
 
 // base class for lockscreen todolist entries
+@SuppressWarnings("UnusedReturnValue")
 public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
     @NonNull
@@ -69,15 +70,20 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         return this;
     }
     
-    public abstract void setBackgroundColor(@ColorInt int color);
+    @NonNull
+    public abstract LockScreenTodoItemView<V> setBackgroundColor(@ColorInt int color);
     
-    public abstract void setBorderColor(@ColorInt int color);
+    @NonNull
+    public abstract LockScreenTodoItemView<V> setBorderColor(@ColorInt int color);
     
-    public abstract void setTitleTextColor(@ColorInt int color);
+    @NonNull
+    public abstract LockScreenTodoItemView<V> setTitleTextColor(@ColorInt int color);
     
-    public abstract void setIndicatorColor(@ColorInt int color);
+    @NonNull
+    public abstract LockScreenTodoItemView<V> setIndicatorColor(@ColorInt int color);
     
-    public abstract void setTimeTextColor(@ColorInt int color);
+    @NonNull
+    public abstract LockScreenTodoItemView<V> setTimeTextColor(@ColorInt int color);
     
     // should not be overridden
     public void setBorderSizeDP(int sizeDP) {
@@ -156,13 +162,15 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         setBorderColor(entry.getAdaptiveColor(entry.borderColor.get(currentDayUTC)));
     }
     
-    public void mixAndSetBgAndTextColors(boolean setTimeTextColor, int fontColor, int backgroundColor) {
+    @NonNull
+    public LockScreenTodoItemView<V> mixAndSetBgAndTextColors(boolean setTimeTextColor, int fontColor, int backgroundColor) {
         // setup colors
         setBackgroundColor(backgroundColor);
         setTitleTextColor(getHarmonizedFontColorWithBg(fontColor, backgroundColor));
         if (setTimeTextColor) {
             setTimeTextColor(getHarmonizedSecondaryFontColorWithBg(fontColor, backgroundColor));
         }
+        return this;
     }
     
     public enum TodoItemViewType {

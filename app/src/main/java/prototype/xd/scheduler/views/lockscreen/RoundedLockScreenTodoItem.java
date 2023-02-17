@@ -22,29 +22,39 @@ public class RoundedLockScreenTodoItem extends LockScreenTodoItemView<RoundedEnt
         return viewBinding.backgroundOutline;
     }
     
+    @NonNull
     @Override
-    public void setBackgroundColor(@ColorInt int color) {
+    public RoundedLockScreenTodoItem setBackgroundColor(@ColorInt int color) {
         viewBinding.backgroundMain.setCardBackgroundColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setBorderColor(@ColorInt int color) {
+    public RoundedLockScreenTodoItem setBorderColor(@ColorInt int color) {
         viewBinding.backgroundOutline.setCardBackgroundColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setTitleTextColor(@ColorInt int color) {
+    public RoundedLockScreenTodoItem setTitleTextColor(@ColorInt int color) {
         viewBinding.titleText.setTextColor(color);
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setIndicatorColor(@ColorInt int color) {
+    public RoundedLockScreenTodoItem setIndicatorColor(@ColorInt int color) {
         viewBinding.indicatorView.setBackgroundTintList(ColorStateList.valueOf(color));
+        return this;
     }
     
+    @NonNull
     @Override
-    public void setTimeTextColor(@ColorInt int color) {
+    public RoundedLockScreenTodoItem setTimeTextColor(@ColorInt int color) {
         viewBinding.timeText.setTextColor(color);
+        return this;
     }
     
     @Override

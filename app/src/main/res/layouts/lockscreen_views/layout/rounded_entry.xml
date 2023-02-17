@@ -15,7 +15,7 @@
         android:id="@+id/background_outline"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:cardBackgroundColor="#7E7E7E"
+        app:cardBackgroundColor="@color/gray_harmonized"
         app:cardCornerRadius="7dp"
         app:cardElevation="0dp">
 
@@ -37,7 +37,7 @@
                     android:layout_width="10dp"
                     android:layout_height="0dp"
                     android:background="@drawable/round_bg_10dp"
-                    android:backgroundTint="#000000"
+                    android:backgroundTint="@android:color/black"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +51,6 @@
                     android:layout_marginEnd="10dp"
                     android:gravity="center"
                     android:text="@string/title"
-                    android:textColor="@android:color/black"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/indicator_view"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -64,6 +63,7 @@
                     android:layout_marginEnd="10dp"
                     android:gravity="center"
                     android:text="00:00 - 5:00"
+                    android:textColor="@color/gray_harmonized"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/indicator_view"
                     app:layout_constraintTop_toBottomOf="@+id/title_text"
