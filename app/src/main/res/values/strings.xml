@@ -108,7 +108,7 @@
     <string name="first_weekday">First day of the week:</string>
     <string name="day_default">Default</string>
     <string name="background_service_persistent_message">Background service running</string>
-    <string name="last_update_time">last update: %s</string>
+    <string name="last_update_time">Last update: %s</string>
     <string name="settings_colors">Colors</string>
     <string name="settings_preview_current">Current</string>
     <string name="settings_preview_expired">Expired</string>

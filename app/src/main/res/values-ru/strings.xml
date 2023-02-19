@@ -104,7 +104,7 @@
     <string name="first_weekday">Первый день недели:</string>
     <string name="day_default">Дефолтный</string>
     <string name="background_service_persistent_message">Фоновый сервис активен</string>
-    <string name="last_update_time">последнее обновление: %s</string>
+    <string name="last_update_time">Последнее обновление: %s</string>
     <string name="settings_colors">Цвета</string>
     <string name="settings_preview_current">Текущие</string>
     <string name="settings_preview_expired">Прошедшие</string>
