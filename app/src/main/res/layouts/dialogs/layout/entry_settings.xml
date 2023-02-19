@@ -694,9 +694,19 @@
             <Button
                 android:id="@+id/settings_reset_button"
                 style="@style/DefaultButtonStyle"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:text="@string/settings_reset_to_defaults"
+                tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+
+            <Button
+                android:id="@+id/settings_close_button"
+                style="@style/DefaultButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/close"
                 tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
         </LinearLayout>

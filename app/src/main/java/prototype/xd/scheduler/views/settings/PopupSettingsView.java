@@ -9,10 +9,10 @@ import androidx.annotation.Nullable;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.ColorUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 @MainThread
 public abstract class PopupSettingsView {
@@ -55,6 +55,8 @@ public abstract class PopupSettingsView {
                         todoEntryManager.performDeferredTasks();
                     }
                 });
+    
+        bnd.settingsCloseButton.setOnClickListener(v -> dialog.dismiss());
     }
     
     @NonNull
