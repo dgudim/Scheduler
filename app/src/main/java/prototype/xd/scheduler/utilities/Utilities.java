@@ -655,6 +655,14 @@ public final class Utilities {
         return newMap;
     }
     
+    public static int addIntFlag(int original, int flag) {
+        return original | flag;
+    }
+    
+    public static int removeIntFlag(int original, int flag) {
+        return original & (~flag);
+    }
+    
     public static long rfc2445ToMilliseconds(@NonNull String str) {
         if (str.isEmpty()) {
             throw new IllegalArgumentException("Empty RFC string");

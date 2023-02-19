@@ -1,17 +1,20 @@
 package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.ColorUtilities.dimColorToBg;
 import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedFontColorWithBg;
 import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedSecondaryFontColorWithBg;
+import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.TEXT_VALUE;
+import static prototype.xd.scheduler.utilities.Utilities.addIntFlag;
+import static prototype.xd.scheduler.utilities.Utilities.removeIntFlag;
 
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -183,8 +186,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             
             if (entry.isCompleted() || entry.isHiddenByContent()) {
                 todoText.setTextColor(dimColorToBg(fontColor, bgColor));
+                todoText.setPaintFlags(addIntFlag(todoText.getPaintFlags(), Paint.STRIKE_THRU_TEXT_FLAG));
             } else {
                 todoText.setTextColor(fontColor);
+                todoText.setPaintFlags(removeIntFlag(todoText.getPaintFlags(), Paint.STRIKE_THRU_TEXT_FLAG));
             }
             
             todoText.setText(entry.getTextOnDay(currentlySelectedDayUTC, wrapper.context, true));
