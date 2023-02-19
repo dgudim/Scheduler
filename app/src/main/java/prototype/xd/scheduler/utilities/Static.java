@@ -302,6 +302,7 @@ public final class Static {
             // init logger
             Logger.setDebugEnabled(Static.DEBUG_LOGGING.get() || BuildConfig.DEBUG);
             
+            Logger.info(NAME, "Static initialization done");
         }
     }
     
