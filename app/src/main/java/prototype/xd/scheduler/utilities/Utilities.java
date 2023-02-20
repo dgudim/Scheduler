@@ -286,6 +286,7 @@ public final class Utilities {
     
     public static <T extends Activity> void switchActivity(@NonNull Activity currentActivity,
                                                            @NonNull Class<T> newActivity) {
+        Logger.info(NAME, "Switching activity from " + currentActivity.getClass() + " to " + newActivity);
         currentActivity.startActivity(new Intent(currentActivity, newActivity));
         currentActivity.finish();
     }

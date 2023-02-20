@@ -9,7 +9,7 @@
         android:fillColor="@color/yellow_harmonized"
         android:pathData="m3.93,40.46h5.86c0.7,0 1.25,0.67 1.25,1.5v37.08c0,0.83 -0.56,1.5 -1.25,1.5L3.93,80.54c-0.7,0 -1.25,-0.67 -1.25,-1.5L2.68,41.96c0,-0.83 0.56,-1.5 1.25,-1.5z"
         android:strokeWidth="0.91565"
-        android:strokeColor="@color/yellow_outline_harmonized" />
+        android:strokeColor="@color/dark_yellow_harmonized" />
     <path
         android:fillColor="?colorSecondaryContainer"
         android:pathData="m24.5,40.5h318c3.32,0 6,2.68 6,6v28c0,3.32 -2.68,6 -6,6L24.5,80.5c-3.32,0 -6,-2.68 -6,-6L18.5,46.5c0,-3.32 2.68,-6 6,-6z"
@@ -24,7 +24,7 @@
         android:fillColor="@color/green_harmonized"
         android:pathData="M17.96,0.48L22.54,0.48c0.54,0 0.98,0.47 0.98,1.05L23.52,29.47c0,0.58 -0.44,1.05 -0.98,1.05h-4.57c-0.54,0 -0.98,-0.47 -0.98,-1.05L16.99,1.53c0,-0.58 0.44,-1.05 0.98,-1.05z"
         android:strokeWidth="0.966506"
-        android:strokeColor="@color/green_outline_harmonized" />
+        android:strokeColor="@color/dark_green_harmonized" />
     <path
         android:fillColor="?colorTertiaryContainer"
         android:pathData="m33,0.5h301c2.49,0 4.5,2.01 4.5,4.5v21c0,2.49 -2.01,4.5 -4.5,4.5L33,30.5C30.51,30.5 28.5,28.49 28.5,26L28.5,5C28.5,2.51 30.51,0.5 33,0.5Z"

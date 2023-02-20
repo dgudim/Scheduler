@@ -1,10 +1,12 @@
 package prototype.xd.scheduler.utilities;
 
+import static androidx.core.content.UnusedAppRestrictionsConstants.API_30;
+import static androidx.core.content.UnusedAppRestrictionsConstants.API_30_BACKPORT;
+import static androidx.core.content.UnusedAppRestrictionsConstants.API_31;
 import static androidx.core.content.UnusedAppRestrictionsConstants.DISABLED;
-import static androidx.core.content.UnusedAppRestrictionsConstants.ERROR;
 import static androidx.core.content.UnusedAppRestrictionsConstants.FEATURE_NOT_AVAILABLE;
-import static prototype.xd.scheduler.utilities.Static.PACKAGE_NAME;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Static.PACKAGE_NAME;
 
 import android.Manifest;
 import android.content.Context;
@@ -19,10 +21,16 @@ import androidx.fragment.app.Fragment;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public final class PermissionUtilities {
     
     public static final String NAME = PermissionUtilities.class.getSimpleName();
+    
+    public enum AutoRevokeStatus {
+        ENABLED, DISABLED, AVAILABLE, NOT_AVAILABLE
+    }
     
     private PermissionUtilities() throws InstantiationException {
         throw new InstantiationException(NAME);
@@ -43,7 +51,8 @@ public final class PermissionUtilities {
     }
     
     public static boolean isOnAndroid13OrHigher() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
+        // todo: we are targeting Android 12 for now because of the broken api, so this function shouldn't return true
+        return Build.VERSION.SDK_INT >= 1000;
     }
     
     public static boolean areEssentialPermissionsGranted(@NonNull Context context) {
@@ -77,21 +86,27 @@ public final class PermissionUtilities {
     }
     
     @NonNull
-    public static Integer getAutorevokeStatus(@NonNull Fragment fragment) {
+    public static AutoRevokeStatus getAutorevokeStatus(@NonNull Fragment fragment) {
+        Context context = fragment.requireContext();
         try {
-            return PackageManagerCompat.getUnusedAppRestrictionsStatus(fragment.requireContext()).get();
-        } catch (ExecutionException | CancellationException e) {
+            int uStatus = PackageManagerCompat.getUnusedAppRestrictionsStatus(context).get(10, TimeUnit.MILLISECONDS);
+            if (uStatus == FEATURE_NOT_AVAILABLE) {
+                return AutoRevokeStatus.NOT_AVAILABLE;
+            } else if (uStatus == API_30_BACKPORT || uStatus == API_30 || uStatus == API_31) {
+                return AutoRevokeStatus.ENABLED;
+            } else if (uStatus == DISABLED) {
+                return AutoRevokeStatus.DISABLED;
+            }
+        } catch (ExecutionException | CancellationException | TimeoutException e) {
             logException(Thread.currentThread().getName(), e);
         } catch (InterruptedException e) {
             logException(Thread.currentThread().getName(), e);
             Thread.currentThread().interrupt();
         }
-        return ERROR;
+        if (PackageManagerCompat.areUnusedAppRestrictionsAvailable(context.getPackageManager())) {
+            // trying this as a fallback
+            return AutoRevokeStatus.AVAILABLE;
+        }
+        return AutoRevokeStatus.NOT_AVAILABLE;
     }
-    
-    public static boolean isAutorevokeGranted(@NonNull Fragment fragment) {
-        int status = getAutorevokeStatus(fragment);
-        return status == FEATURE_NOT_AVAILABLE || status == DISABLED;
-    }
-    
 }

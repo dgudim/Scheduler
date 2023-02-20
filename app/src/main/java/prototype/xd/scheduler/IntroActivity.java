@@ -32,8 +32,8 @@ public class IntroActivity extends AppIntro {
                 R.color.gray_harmonized,
                 R.color.green_harmonized,
                 R.color.yellow_harmonized,
-                R.color.green_outline_harmonized,
-                R.color.yellow_outline_harmonized);
+                R.color.dark_green_harmonized,
+                R.color.dark_yellow_harmonized);
         
         setTransformer(AppIntroPageTransformerType.Depth.INSTANCE);
         addSlide(new IntroStartingFragment());
@@ -47,18 +47,18 @@ public class IntroActivity extends AppIntro {
         int surfaceColorVariant = MaterialColors.getColor(rootView, R.attr.colorSurfaceVariant);
         int primaryColor = MaterialColors.getColor(rootView, R.attr.colorPrimary);
         int secondaryColor = MaterialColors.getColor(rootView, R.attr.colorSecondary);
-        
+
         setNavBarColor(surfaceColor);
         showStatusBar(true);
         setStatusBarColor(surfaceColor);
-        
+
         setSystemBackButtonLocked(true);
         setSkipButtonEnabled(false);
-        
+
         setNextArrowColor(primaryColor);
         setSeparatorColor(secondaryColor);
         setBarColor(surfaceColor);
-        
+
         setDoneTextAppearance(R.style.MediumHeading);
         setColorDoneText(primaryColor);
         setDoneText(R.string.finish);

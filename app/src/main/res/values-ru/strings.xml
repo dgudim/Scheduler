@@ -46,9 +46,10 @@
     <string name="group">Группа</string>
     <string name="service_description">Сервис для обновления фона блокировки</string>
     <string name="service_name">Сервис фонового обоновления</string>
-    <string name="permissions_grant">Предоставить</string>
-    <string name="permissions_not_granted">не предоставлено</string>
-    <string name="permissions_granted">предоставлено</string>
+    <string name="grant_permissions">Предоставить</string>
+    <string name="permission_not_granted">не предоставлено</string>
+    <string name="permission_granted">предоставлено</string>
+    <string name="permission_state_unknown">неизвестно</string>
     <string name="file_access_description">Для чтения и сохраниения фонов с экрана блокировки</string>
     <string name="file_access">Доступ к файлам</string>
     <string name="calendar_access">Доступ к календарю</string>
@@ -59,7 +60,7 @@
     <string name="ignore_battery_optimization_description">(опционально) Чтобы фоновый сервис работал надежно, не волнуйтесь, он не будет потреблять много батареи</string>
     <string name="ignore_autorevoke">Не отзывать разрешения автоматически</string>
     <string name="ignore_autorevoke_description">(опционально) Поскольку приложение в основном работает в фоне, Android может подумать, что вы его не используете, и отозвать разрешения, добавьте приложение в список исключений, чтобы избежать случайных поломок.</string>
-    <string name="autorevoke_request_description">Найдите настройку “Удалять разрешения, если приложение не используется”</string>
+    <string name="autorevoke_request_description">Найдите настройку “Удалять разрешения (приостановить работу), если приложение не используется”</string>
     <string name="permission_request_description">Пожалуйста, предоставьте разрешения для корректной работы приложения</string>
     <string name="permission_request">Запрос разрешений</string>
     <string name="calendar_event_all_day">весь день</string>

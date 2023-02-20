@@ -17,13 +17,13 @@ import com.github.appintro.SlidePolicy;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.views.CheckBox;
 
-public class IntroStartingFragment extends Fragment implements SlidePolicy { // NOSONAR, this is a fragment
+public final class IntroStartingFragment extends Fragment implements SlidePolicy { // NOSONAR, this is a fragment
     
     private CheckBox understoodCheckbox;
     
+    @NonNull
     @Override
     @MainThread
-    @Nullable
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.intro_starting_fragment, container, false);
         understoodCheckbox = view.findViewById(R.id.understood_checkbox);

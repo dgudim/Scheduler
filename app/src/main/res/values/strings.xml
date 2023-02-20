@@ -14,11 +14,12 @@
     <string name="please_read_the_notes" type="id">Please read the notes</string>
     <string name="settings_state_symbol" translatable="false">⬧</string>
     <string name="calendar_event_all_day">all day</string>
-    <string name="permissions_granted">granted</string>
+    <string name="permission_granted">granted</string>
+    <string name="permission_state_unknown">unknown</string>
+    <string name="permission_not_granted">not granted</string>
+    <string name="grant_permissions">Grant</string>
     <string name="service_name">Background updater service</string>
     <string name="service_description">Service to update your lock screen background</string>
-    <string name="permissions_grant">Grant</string>
-    <string name="permissions_not_granted">not granted</string>
     <string name="file_access">Access to files</string>
     <string name="file_access_description">For reading and saving backgrounds from lock screen</string>
     <string name="calendar_access">Access to calendar</string>
@@ -27,7 +28,7 @@
     <string name="ignore_battery_optimization_description">(optional) For the background service to work reliably, don\'t worry, it won\'t consume much energy</string>
     <string name="ignore_autorevoke">Don\'t auto-revoke permissions</string>
     <string name="ignore_autorevoke_description">(optional) As the app mostly works in the background, Android may think that you are not using it and revoke permissions, add the app to exclusion list to avoid random breakages</string>
-    <string name="autorevoke_request_description">Find a setting called “Remove permissions if app is unused”</string>
+    <string name="autorevoke_request_description">Find a setting called “Remove permissions (pause activity) if app is unused”</string>
     <string name="notification_permission">Notifications</string>
     <string name="notification_permission_description">(optional) For showing service status notification</string>
     <string name="permission_request_description">Please grant permissions for the app to properly function</string>

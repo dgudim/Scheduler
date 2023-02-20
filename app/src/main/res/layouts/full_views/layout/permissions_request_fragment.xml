@@ -93,7 +93,7 @@
                 style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/permissions_not_granted"
+                android:text="@string/permission_not_granted"
                 app:layout_constraintStart_toEndOf="@+id/imageView4"
                 app:layout_constraintTop_toBottomOf="@+id/textView15"
                 tools:layout_conversion_absoluteHeight="19dp"
@@ -144,7 +144,7 @@
                 style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/permissions_not_granted"
+                android:text="@string/permission_not_granted"
                 app:layout_constraintStart_toEndOf="@+id/imageView5"
                 app:layout_constraintTop_toBottomOf="@+id/textView17"
                 tools:layout_conversion_absoluteHeight="19dp"
@@ -195,7 +195,7 @@
                 style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/permissions_not_granted"
+                android:text="@string/permission_not_granted"
                 app:layout_constraintStart_toEndOf="@+id/imageView6"
                 app:layout_constraintTop_toBottomOf="@+id/textView19"
                 tools:layout_conversion_absoluteHeight="19dp"
@@ -208,7 +208,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/permissions_grant"
+                android:text="@string/grant_permissions"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ignore_autorevoke_granted"
@@ -266,7 +266,7 @@
                 style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/permissions_not_granted"
+                android:text="@string/permission_not_granted"
                 app:layout_constraintStart_toEndOf="@+id/notification_permission_icon"
                 app:layout_constraintTop_toBottomOf="@+id/notification_permission_description" />
 
@@ -306,7 +306,7 @@
                 style="@style/PermissionsGrantText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/permissions_not_granted"
+                android:text="@string/permission_not_granted"
                 app:layout_constraintStart_toEndOf="@+id/ignore_autorevoke_icon"
                 app:layout_constraintTop_toBottomOf="@+id/ignore_autorevoke_description" />
 
