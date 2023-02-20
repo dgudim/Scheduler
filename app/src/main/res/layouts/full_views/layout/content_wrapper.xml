@@ -26,8 +26,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
                 android:contentDescription="@string/go_to_today"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:src="@drawable/ic_today_55"
                 tools:ignore="ContentDescription" />
 

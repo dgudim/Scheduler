@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
         android:layout_weight="1"
-        android:minHeight="55dp"
+        android:minHeight="45dp"
         app:cardCornerRadius="@dimen/card_corner_radius">
 
         <TextView
@@ -53,8 +53,10 @@
         android:id="@+id/delete_entry_button"
         style="@style/DefaultImageButton"
         android:layout_width="45dp"
-        android:layout_height="55dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:contentDescription="@string/action_delete_item"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         app:srcCompat="@drawable/ic_delete_50" />
 </LinearLayout>

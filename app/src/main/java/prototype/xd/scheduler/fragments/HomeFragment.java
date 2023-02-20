@@ -256,7 +256,8 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
     }
     
     private void updateStatusText() {
-        binding.contentWrapper.toolbar.setTitle(getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC),
-                todoListViewAdapter.getItemCount()));
+        int events = todoListViewAdapter.getItemCount();
+        binding.contentWrapper.toolbar.setTitle(getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC), events));
+        binding.contentWrapper.content.noEventsText.setVisibility(events == 0 ? View.VISIBLE : View.GONE);
     }
 }

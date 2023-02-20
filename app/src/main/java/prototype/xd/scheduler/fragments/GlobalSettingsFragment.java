@@ -75,6 +75,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                     options.aspectRatioX = DISPLAY_METRICS_WIDTH.get();
                     options.aspectRatioY = DISPLAY_METRICS_HEIGHT.get();
                     options.fixAspectRatio = true;
+                    options.progressBarColor = MaterialColors.getColor(wrapper.context, R.attr.colorPrimary, Color.GRAY);
                     options.activityBackgroundColor = Color.TRANSPARENT;
                     options.activityMenuIconColor = MaterialColors.getColor(wrapper.context, R.attr.colorControlNormal, Color.GRAY);
                     

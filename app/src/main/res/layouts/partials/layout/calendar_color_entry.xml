@@ -31,7 +31,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_margin="5dp"
-                app:cardCornerRadius="3dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
                 app:strokeWidth="0dp">
 
             </com.google.android.material.card.MaterialCardView>

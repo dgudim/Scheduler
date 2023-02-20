@@ -59,9 +59,11 @@
     <ImageButton
         android:id="@+id/open_settings_button"
         style="@style/DefaultImageButton"
-        android:layout_width="35dp"
+        android:layout_width="40dp"
         android:layout_height="match_parent"
         android:contentDescription="@string/action_settings"
-        app:srcCompat="@drawable/ic_settings_45" />
+        android:paddingEnd="5dp"
+        app:srcCompat="@drawable/ic_settings_45"
+        tools:ignore="RtlSymmetry" />
 
 </LinearLayout>

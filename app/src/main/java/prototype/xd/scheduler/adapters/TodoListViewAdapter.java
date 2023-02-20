@@ -158,11 +158,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                 todoEntryManager.performDeferredTasks();
             });
             
-            // open entry edit dialog on long click
-            bnd.backgroundLayer.setOnLongClickListener(view1 -> {
-                displayEditDialog(entry, todoEntryManager);
-                return true;
-            });
+            // open entry edit dialog on click
+            bnd.backgroundLayer.setOnClickListener(view1 -> displayEditDialog(entry, todoEntryManager));
             
             bnd.openSettingsButton.setOnClickListener(v -> entrySettings.show(entry));
         }
