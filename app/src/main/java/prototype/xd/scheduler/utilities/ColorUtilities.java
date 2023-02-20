@@ -45,6 +45,7 @@ public final class ColorUtilities {
     
     @NonNull
     public static Bitmap fingerPrintAndSaveBitmap(@NonNull Bitmap bitmap, @NonNull File output) throws IOException {
+        
         bitmap = makeMutable(bitmap);
         Bitmap cutBitmap = createScaledBitmap(bitmap,
                 DISPLAY_METRICS_WIDTH.get(),

@@ -4,22 +4,30 @@ import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LOCAL;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_ROOT;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
+import static prototype.xd.scheduler.utilities.Logger.error;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
+
+import com.canhub.cropper.CropImageContract;
+import com.canhub.cropper.CropImageContractOptions;
+import com.canhub.cropper.CropImageOptions;
+import com.canhub.cropper.CropImageView;
+import com.google.android.material.color.MaterialColors;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -38,11 +46,9 @@ import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
-import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.ColorUtilities;
+import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Static;
-import prototype.xd.scheduler.utilities.Logger;
-import prototype.xd.scheduler.utilities.Utilities;
 
 public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> { // NOSONAR, this is a fragment
     
@@ -50,8 +56,8 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBgSettingsEntry;
     
-    final ActivityResultLauncher<Intent> pickBg =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::onBgSelected);
+    final ActivityResultLauncher<CropImageContractOptions> cropBg =
+            registerForActivityResult(new CropImageContract(), this::onBgCropped);
     
     // initial window creation
     @SuppressLint("NotifyDataSetChanged")
@@ -61,7 +67,19 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         super.onCreate(savedInstanceState);
         
         adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper.context,
-                bgIndex -> Utilities.callImageFileChooser(pickBg));
+                bgIndex -> {
+                    CropImageOptions options = new CropImageOptions();
+                    
+                    options.imageSourceIncludeCamera = false;
+                    options.outputCompressFormat = Bitmap.CompressFormat.PNG;
+                    options.aspectRatioX = DISPLAY_METRICS_WIDTH.get();
+                    options.aspectRatioY = DISPLAY_METRICS_HEIGHT.get();
+                    options.fixAspectRatio = true;
+                    options.activityBackgroundColor = Color.TRANSPARENT;
+                    options.activityMenuIconColor = MaterialColors.getColor(wrapper.context, R.attr.colorControlNormal, Color.GRAY);
+                    
+                    cropBg.launch(new CropImageContractOptions(null, options));
+                });
         
         List<SettingsEntryConfig> settingsEntries = List.of(
                 
@@ -139,30 +157,24 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
     }
     
-    public void onBgSelected(@NonNull ActivityResult result) {
-        
-        Intent data = result.getData();
-        if (data == null) {
-            return;
-        }
-        Uri uri = data.getData();
-        if (uri == null) {
-            return;
-        }
-        new Thread(() -> {
-            try (InputStream stream = requireActivity().getContentResolver().openInputStream(uri)) {
-                
-                if (stream != null) {
-                    ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                            getFile(DateManager.BG_NAMES_ROOT.get(adaptiveBgSettingsEntry.getLastClickedBgIndex())));
-                    requireActivity().runOnUiThread(() -> adaptiveBgSettingsEntry.notifyBackgroundUpdated());
-                } else {
-                    Logger.error(NAME, "Stream null for uri: " + uri.getPath());
+    public void onBgCropped(@NonNull CropImageView.CropResult result) {
+        if(result.isSuccessful()) {
+            Uri uri = result.getUriContent();
+            new Thread(() -> {
+                try (InputStream stream = requireActivity().getContentResolver().openInputStream(uri)) {
+            
+                    if (stream != null) {
+                        ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
+                                getFile(DateManager.BG_NAMES_ROOT.get(adaptiveBgSettingsEntry.getLastClickedBgIndex())));
+                        requireActivity().runOnUiThread(() -> adaptiveBgSettingsEntry.notifyBackgroundUpdated());
+                    } else {
+                        error(NAME, "Stream null for uri: " + uri);
+                    }
+            
+                } catch (Exception e) {
+                    logException(Thread.currentThread().getName(), e);
                 }
-                
-            } catch (Exception e) {
-                logException(Thread.currentThread().getName(), e);
-            }
-        }, "LBCP thread").start();
+            }, "LBCP thread").start();
+        }
     }
 }

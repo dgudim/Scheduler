@@ -29,7 +29,6 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -249,13 +248,6 @@ public final class Utilities {
         } catch (IllegalArgumentException e) {
             Logger.error(NAME, "Error navigating to " + actionId + " Double click? [" + e + "]");
         }
-    }
-    
-    public static void callImageFileChooser(@NonNull ActivityResultLauncher<Intent> callback) {
-        Intent chooseImage = new Intent(Intent.ACTION_GET_CONTENT);
-        chooseImage.addCategory(Intent.CATEGORY_OPENABLE);
-        chooseImage.setType("image/*");
-        callback.launch(Intent.createChooser(chooseImage, null));
     }
     
     public static void shareFiles(@NonNull Context context, @NonNull String mimetype, @NonNull List<File> files) {

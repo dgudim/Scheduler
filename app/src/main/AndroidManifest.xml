@@ -22,7 +22,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.App"
+        android:theme="@style/Theme.App.NoActionBar"
         tools:ignore="UnusedAttribute">
 
         <service
@@ -39,6 +39,10 @@
         <activity
             android:name=".IntroActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Theme.App" />
 
         <activity
             android:name=".MainActivity"

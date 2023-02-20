@@ -12,47 +12,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="48dp">
+            android:layout_height="48dp"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/ToolbarTitleText">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/linearLayout"
-                android:layout_width="match_parent"
+            <ImageButton
+                android:id="@+id/to_current_date_button"
+                style="@style/DefaultImageButton"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                app:layout_constraintBottom_toBottomOf="@+id/status_text"
-                app:layout_constraintTop_toBottomOf="@+id/status_text">
+                android:layout_gravity="end"
+                android:contentDescription="@string/go_to_today"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:src="@drawable/ic_today_55"
+                tools:ignore="ContentDescription" />
 
-                <TextView
-                    android:id="@+id/status_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Date: 10/10 Events:1"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/to_current_date_button"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/to_current_date_button"
-                    tools:ignore="HardcodedText" />
-
-                <ImageButton
-                    android:id="@+id/to_current_date_button"
-                    style="@style/DefaultImageButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:contentDescription="@string/go_to_today"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"
-                    android:src="@drawable/ic_today_55"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 

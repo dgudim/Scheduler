@@ -1,9 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.App" parent="Theme.Material3.DayNight">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
 
+    <style name="Theme.App" parent="Theme.Material3.DayNight">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
@@ -17,8 +15,13 @@
         <item name="materialButtonStyle">@style/DefaultButtonStyle</item>
     </style>
 
+    <style name="Theme.App.NoActionBar" parent="Theme.App">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
     <!-- font styles -->
-    <style name="LargeHeading" parent="TextAppearance.Material3.HeadlineSmall">
+    <style name="LargeHeading" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textColor">?attr/colorTertiary</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">24sp</item>
@@ -28,11 +31,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="LargeHeadingSubtext" parent="TextAppearance.Material3.LabelMedium">
+    <style name="LargeHeadingSubtext" parent="TextAppearance.Material3.LabelLarge">
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="MediumHeading" parent="TextAppearance.Material3.LabelLarge">
+    <style name="MediumHeading" parent="TextAppearance.Material3.TitleMedium">
         <item name="android:textSize">18sp</item>
     </style>
 
@@ -40,12 +43,16 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="SmallHeading" parent="TextAppearance.Material3.LabelLarge">
+    <style name="SmallHeading" parent="TextAppearance.Material3.TitleSmall">
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="SmallHeadingSubtext" parent="TextAppearance.Material3.LabelMedium">
+    <style name="SmallHeadingSubtext" parent="TextAppearance.Material3.LabelSmall">
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="ToolbarTitleText" parent="TextAppearance.Material3.ActionBar.Title">
+        <item name="android:textSize">18sp</item>
     </style>
     <!-- end -->
 

@@ -92,7 +92,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         contentBnd.content.recyclerView.setAdapter(todoListViewAdapter);
-    
+        
         DrawerLayout drawerLayout = binding.root;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 rootActivity, drawerLayout, contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
@@ -138,9 +138,9 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
             todoEntryManager.notifyEntryListChanged();
             updateStatusText();
         });
-    
+        
         todoEntryManager.listChangedSignal.observe(getViewLifecycleOwner(), status -> todoListViewAdapter.notifyEntryListChanged());
-    
+        
         // setup month listener, called when a new month is loaded (first month is loaded differently)
         calendarView.setNewMonthBindListener(month ->
                 // load current month entries (with overlap of one panel) before displaying the data
@@ -148,9 +148,9 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                         getStartOfMonthDayUTC(month) - DAYS_ON_ONE_PANEL,
                         getEndOfMonthDayUTC(month) + DAYS_ON_ONE_PANEL)
         );
-    
+        
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(DateManager.getCurrentDate()));
-    
+        
         rootActivity.getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
@@ -164,7 +164,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                 }
             }
         });
-    
+        
         contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoEntryManager.getGroups();
             displayEntryAdditionEditDialog(wrapper,
@@ -178,25 +178,25 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                         values.put(END_DAY_UTC, isGlobal ? DAY_FLAG_GLOBAL_STR :
                                 dialogBinding.dayToButton.getSelectedDayUTCStr());
                         values.put(IS_COMPLETED, Boolean.toString(false));
-                    
+                        
                         todoEntryManager.addEntry(new TodoEntry(values, groupList.get(selectedIndex), System.currentTimeMillis()));
                     });
         });
-    
+        
         navViewContent.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));
         navViewContent.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_ISSUES));
         navViewContent.latestReleaseClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_RELEASES));
         navViewContent.faqClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_FAQ));
-    
+        
         navViewContent.logo.setOnClickListener(v ->
                 displayMessageDialog(wrapper, builder -> {
                     builder.setTitle(R.string.debug_menu);
                     builder.setMessage(R.string.debug_menu_description);
                     builder.setIcon(R.drawable.ic_developer_mode_24_primary);
-                
+                    
                     DebugMenuDialogBinding bnd = DebugMenuDialogBinding.inflate(LayoutInflater.from(wrapper.context));
                     bnd.shareLogcatView.setOnClickListener(v1 -> Logger.shareLog(wrapper.context));
-                
+                    
                     if (BuildConfig.DEBUG) {
                         bnd.debugLoggingSwitch.setCheckedSilent(true);
                         bnd.debugLoggingSwitch.setClickable(false);
@@ -205,20 +205,20 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                         setSwitchChangeListener(bnd.debugLoggingSwitch, Static.DEBUG_LOGGING, (switchView, isChecked) -> Logger.setDebugEnabled(isChecked));
                     }
                     builder.setView(bnd.root);
-                
+                    
                     builder.setPositiveButton(R.string.close, null);
                 })
         );
-    
+        
         navViewContent.globalSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_GlobalSettingsFragment));
-    
+        
         navViewContent.calendarSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_CalendarSettingsFragment));
-    
+        
         navViewContent.sortingSettingsClickView.setOnClickListener(v ->
                 Utilities.navigateToFragment(rootActivity, R.id.action_HomeFragment_to_SortingSettingsFragment));
-    
+        
     }
     
     // fragment becomes visible
@@ -256,8 +256,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
     }
     
     private void updateStatusText() {
-        binding.contentWrapper.statusText.setText(
-                getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC),
-                        todoListViewAdapter.getItemCount()));
+        binding.contentWrapper.toolbar.setTitle(getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC),
+                todoListViewAdapter.getItemCount()));
     }
 }
