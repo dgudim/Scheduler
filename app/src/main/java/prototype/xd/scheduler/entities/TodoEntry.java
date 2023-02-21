@@ -613,11 +613,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     public boolean isVisibleOnLockscreenToday() {
         if (isFromSystemCalendar()) {
-            if (isHiddenByContent()) {
-                return true;
-            }
-            
-            if (!Static.CALENDAR_SHOW_ON_LOCK.get(event.subKeys)) {
+            if (isHiddenByContent() || !Static.CALENDAR_SHOW_ON_LOCK.get(event.subKeys)) {
                 return false;
             }
             
