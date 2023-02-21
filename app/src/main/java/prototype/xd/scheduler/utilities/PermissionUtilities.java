@@ -9,6 +9,7 @@ import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Static.PACKAGE_NAME;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -55,28 +56,58 @@ public final class PermissionUtilities {
         return Build.VERSION.SDK_INT >= 1000;
     }
     
+    /**
+     * Checks if essential permissions (storage and calendar) are granted
+     *
+     * @param context any context
+     * @return true if essential permissions are granted
+     */
     public static boolean areEssentialPermissionsGranted(@NonNull Context context) {
         boolean granted = isStorageGranted(context) && isCalendarGranted(context);
         Logger.debug(NAME, "Essential permissions" + (granted ? "" : " not") + " granted");
         return granted;
     }
     
+    /**
+     * Checks if storage read is granted
+     *
+     * @param context any context
+     * @return true if storage read permission is granted
+     */
     public static boolean isStorageGranted(@NonNull Context context) {
         return ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED;
     }
     
+    /**
+     * Checks if calendar read permission is granted
+     *
+     * @param context any context
+     * @return true if calendar read permission is granted
+     */
     public static boolean isCalendarGranted(@NonNull Context context) {
         return ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_CALENDAR)
                 == PackageManager.PERMISSION_GRANTED;
     }
     
+    /**
+     * Checks if battery permission is granted
+     *
+     * @param fragment any fragment (to get the context from)
+     * @return true if battery permission is granted
+     */
     public static boolean isBatteryGranted(@NonNull Fragment fragment) {
         return ((PowerManager) fragment.requireActivity()
                 .getSystemService(Context.POWER_SERVICE))
                 .isIgnoringBatteryOptimizations(PACKAGE_NAME);
     }
     
+    /**
+     * Checks if notification permission is granted
+     *
+     * @param fragment any fragment (to get the context from)
+     * @return true if notification permission is granted
+     */
     public static boolean isNotificationGranted(@NonNull Fragment fragment) {
         if (!isOnAndroid13OrHigher()) {
             return true;
@@ -85,6 +116,14 @@ public final class PermissionUtilities {
                 == PackageManager.PERMISSION_GRANTED;
     }
     
+    /**
+     * Gets application autorevoke status
+     *
+     * @param fragment any fragment (to get the context from)
+     * @return {@link AutoRevokeStatus}
+     */
+    // areUnusedAppRestrictionsAvailable is a restricted API for some reason
+    @SuppressLint("RestrictedApi")
     @NonNull
     public static AutoRevokeStatus getAutorevokeStatus(@NonNull Fragment fragment) {
         Context context = fragment.requireContext();

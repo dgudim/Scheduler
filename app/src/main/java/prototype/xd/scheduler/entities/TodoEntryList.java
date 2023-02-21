@@ -24,8 +24,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
+import prototype.xd.scheduler.utilities.Static;
 
 // a list specifically for storing TodoEntries, automatically unlinks groups on remove to avoid memory leaks
 public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR, should only be initialized once, shouldn't be serialized

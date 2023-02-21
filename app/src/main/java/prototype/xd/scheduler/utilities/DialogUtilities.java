@@ -50,6 +50,18 @@ public final class DialogUtilities {
         throw new InstantiationException(NAME);
     }
     
+    /**
+     * Display a dialog to add or edit a group
+     *
+     * @param wrapper                     any context wrapper
+     * @param titleStringResource         dialog title
+     * @param messageStringResource       dialog message
+     * @param cancelButtonStringResource  cancel button text
+     * @param confirmButtonStringResource confirmation button text
+     * @param defaultEditTextValue        edit field default text value
+     * @param confirmationListener        listener to call on dialog confirmation
+     * @param deletionListener            listener to call when deletion button is pressed
+     */
     @MainThread
     public static void displayGroupAdditionEditDialog(@NonNull ContextWrapper wrapper,
                                                       @StringRes int titleStringResource,
@@ -79,6 +91,14 @@ public final class DialogUtilities {
                 }));
     }
     
+    /**
+     * Display a dialog to add or edit an entry
+     *
+     * @param wrapper              any context wrapper
+     * @param entry                TodoEntry to edit or null
+     * @param groupList            a list with all groups
+     * @param confirmationListener listener to call on dialog confirmation
+     */
     @MainThread
     public static void displayEntryAdditionEditDialog(@NonNull ContextWrapper wrapper,
                                                       @Nullable TodoEntry entry,
@@ -211,22 +231,42 @@ public final class DialogUtilities {
         void onClick(@NonNull String text, @NonNull AddOrEditEntryDialogBinding dialogBinding, int selectedIndex);
     }
     
+    /**
+     * Display a simple message dialog
+     *
+     * @param wrapper         any context wrapper
+     * @param theme           dialog theme
+     * @param builder         builder function to set dialog parameters
+     * @param dismissListener listener to call on dialog dismiss
+     */
     @MainThread
     public static void displayMessageDialog(@NonNull final ContextWrapper wrapper,
                                             @StyleRes int theme,
-                                            @NonNull Consumer<MaterialAlertDialogBuilder> builderConsumer,
+                                            @NonNull Consumer<MaterialAlertDialogBuilder> builder,
                                             @Nullable DialogInterface.OnDismissListener dismissListener) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(wrapper.context, theme);
-        builderConsumer.accept(builder);
-        wrapper.attachDialogToLifecycle(builder.show(), dismissListener);
+        MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(wrapper.context, theme);
+        builder.accept(alertDialogBuilder);
+        wrapper.attachDialogToLifecycle(alertDialogBuilder.show(), dismissListener);
     }
     
+    /**
+     * Display a simple message dialog
+     *
+     * @param wrapper         any context wrapper
+     * @param builderConsumer builder function to set dialog parameters
+     */
     @MainThread
     public static void displayMessageDialog(@NonNull final ContextWrapper wrapper,
                                             @NonNull Consumer<MaterialAlertDialogBuilder> builderConsumer) {
         displayMessageDialog(wrapper, R.style.DefaultAlertDialogTheme, builderConsumer, null);
     }
     
+    /**
+     * Display a simple deletion confirmation dialog
+     *
+     * @param wrapper              any context wrapper
+     * @param confirmationListener listener to call on dialog confirmation
+     */
     public static void displayDeletionDialog(@NonNull final ContextWrapper wrapper,
                                              @NonNull DialogInterface.OnClickListener confirmationListener) {
         displayMessageDialog(wrapper, builder -> {
@@ -278,6 +318,13 @@ public final class DialogUtilities {
                 });
     }
     
+    /**
+     * Display a dialog to pick a color
+     *
+     * @param wrapper      any context wrapper
+     * @param initialValue initial color
+     * @param listener     listener to call on dialog confirmation
+     */
     @MainThread
     public static void displayColorPicker(@NonNull final ContextWrapper wrapper,
                                           final int initialValue,
