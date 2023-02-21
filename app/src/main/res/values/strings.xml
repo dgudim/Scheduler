@@ -14,9 +14,9 @@
     <string name="please_read_the_notes" type="id">Please read the notes</string>
     <string name="settings_state_symbol" translatable="false">⬧</string>
     <string name="calendar_event_all_day">all day</string>
-    <string name="permission_granted">granted</string>
-    <string name="permission_state_unknown">unknown</string>
-    <string name="permission_not_granted">not granted</string>
+    <string name="permission_granted">Granted</string>
+    <string name="permission_state_unknown">Unknown</string>
+    <string name="permission_not_granted">Not granted</string>
     <string name="grant_permissions">Grant</string>
     <string name="service_name">Background updater service</string>
     <string name="service_description">Service to update your lock screen background</string>
@@ -103,10 +103,10 @@
     <string name="event_name_input_hint">Event</string>
     <string name="add">Add</string>
     <string name="add_current_config_as_group_prompt">Add current configuration as a group?</string>
-    <string name="add_current_config_as_group_message">(Parameters marked with green or blue rhombs(manually edited) will be added to the group)</string>
+    <string name="add_current_config_as_group_message">Parameters marked with green or blue rhombs (manually edited) will be added to the group</string>
     <string name="settings_max_rWidth_lock">Stretch event background to fill lock screen width</string>
     <string name="delete_all_saved_backgrounds_prompt">Delete all saved backgrounds?</string>
-    <string name="first_weekday">First day of the week:</string>
+    <string name="first_weekday">First day of the week</string>
     <string name="day_default">Default</string>
     <string name="background_service_persistent_message">Background service running</string>
     <string name="last_update_time">Last update: %s</string>
@@ -114,7 +114,7 @@
     <string name="settings_preview_current">Current</string>
     <string name="settings_preview_expired">Expired</string>
     <string name="settings_preview_upcoming">Upcoming</string>
-    <string name="settings_hide_expired_entries_by_time">Hide passed events on lockscreen(by time)</string>
+    <string name="settings_hide_expired_entries_by_time">Hide passed events on lockscreen (by time)</string>
     <string name="status">Date: %s  Events: %d</string>
     <string name="app_theme">App theme:</string>
     <string name="app_theme_light">Light</string>
@@ -139,7 +139,7 @@
     <string name="a_few_notes">A few notes before you go</string>
     <string name="note_animated_wallpapers">The app doesn\'t work with animated wallpapers, so if you have one consider either not using the app or setting a regular wallpaper</string>
     <string name="note_bugs">The app is still in it\'s early development so bugs are to be expected</string>
-    <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on my github</string>
+    <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on my GitHub</string>
     <string name="finish">Finish</string>
     <string name="before_you_continue">Before you continue</string>
     <string name="read_and_understood">I have read and understood all the things above</string>
@@ -147,13 +147,13 @@
     <string name="choose_how_items_look">Choose how items will look on your lockscreen</string>
     <string name="show_upcoming_and_expired_event_indicators">Show upcoming and expired events in calendar</string>
     <string name="service_error">Background service error</string>
-    <string name="service_error_description">There was an error in the background wallpaper service :( Try restarting the application. If the problem persists, open an issue on the github.</string>
+    <string name="service_error_description">There was an error in the background wallpaper service :( Try restarting the application. If the problem persists, open an issue on the GitHub.</string>
     <string name="wallpaper_obtain_error">Error getting wallpaper</string>
-    <string name="wallpaper_obtain_error_description">An error occurred while trying to get lockscreen wallpaper :( Try setting wallpaper manually and restarting the app. If the problem persists, your device probably restricts access to background or you uninstalled and reinstalled the app, but you can open an issue on github, maybe i will help.</string>
+    <string name="wallpaper_obtain_error_description">An error occurred while trying to get lockscreen wallpaper :( Try setting wallpaper manually and restarting the app. If the problem persists, your device probably restricts access to background or you uninstalled and reinstalled the app, but you can open an issue on GitHub, maybe i will help.</string>
     <string name="work_in_progress">Work in progress</string>
     <string name="debug_menu">Debug menu</string>
     <string name="debug_menu_description">This menu contains stuff useful for debugging</string>
-    <string name="global_settings_title">Global settings</string>
+    <string name="global_settings_title">Common settings</string>
     <string name="global_settings_description">Global appearance settings</string>
     <string name="calendar_settings_title">Calendar settings</string>
     <string name="calendar_settings_description">Configure parameters for each calendar individually</string>
@@ -164,10 +164,10 @@
     <string name="faq_description">View frequently asked questions</string>
     <string name="latest_release_title">Latest release</string>
     <string name="latest_release_description">Look for new version and changelog</string>
-    <string name="github_issue_title">Github issue</string>
-    <string name="github_issue_description">Submit a github issue for a bug report or a feature request</string>
-    <string name="source_code_title">Source</string>
-    <string name="source_code_description">Check out the github repository and contribute</string>
+    <string name="github_issue_title">GitHub issue</string>
+    <string name="github_issue_description">Submit a GitHub issue for a bug report or a feature request</string>
+    <string name="source_code_title">Source code</string>
+    <string name="source_code_description">Check out the GitHub repository and contribute</string>
     <string name="calendar_settings_fragment_label" translatable="false">Calendar settings fragment</string>
     <string name="reset_settings_description">This will reset ALL your settings, including calendar ones</string>
     <string name="reset_calendar_settings_description">This will reset current calendar settings</string>
@@ -184,10 +184,9 @@
     <string name="logcat_obtain_fail">Failed retrieving logs :(</string>
     <string name="share_logcat">Share logcat</string>
     <string name="share_logcat_description">Get application logs for debugging</string>
-    <string name="debug_logging">Debug logging</string>
+    <string name="debug_logging">Include additional logs</string>
     <string name="whole_calendar_settings_on_warning">Your turned on global account and calendar settings, because they override local ones, it may be confusing for you.</string>
     <string name="whole_calendar_settings_off_warning">You turned off global account and calendar settings, the ones you have already changed were not reset.</string>
-    <string name="yay">Yay!</string>
     <string name="i_understand">I understand</string>
     <string name="settings_event_vertical_bias">Vertical position of events: %d</string>
     <string name="top">Top</string>
