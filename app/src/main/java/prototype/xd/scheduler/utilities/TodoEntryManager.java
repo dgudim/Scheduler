@@ -370,7 +370,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     @NonNull
-    public List<TodoEntry> getVisibleTodoEntries(long day) {
+    public List<TodoEntry> getVisibleTodoEntriesInList(long day) {
         return getVisibleTodoEntries(day, (entry, entryType) -> {
             if (entryType == TodoEntry.EntryType.UPCOMING ||
                     entryType == TodoEntry.EntryType.EXPIRED) {
@@ -378,16 +378,18 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
             } else {
                 return true;
             }
-        });
+        }, false);
     }
     
     @NonNull
-    public List<TodoEntry> getVisibleTodoEntries(long day, @NonNull BiPredicate<TodoEntry, TodoEntry.EntryType> filter) {
+    public List<TodoEntry> getVisibleTodoEntries(long day,
+                                                 @NonNull BiPredicate<TodoEntry, TodoEntry.EntryType> filter,
+                                                 boolean includeAll) {
         if (todoEntries == null) {
             initError("getVisibleTodoEntries");
             return Collections.emptyList();
         }
-        return todoEntries.getOnDay(day, filter);
+        return todoEntries.getOnDay(day, filter, includeAll);
     }
     
     @FunctionalInterface
@@ -403,7 +405,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         }
         
         List<TodoEntry> todoEntriesOnDay = todoEntries.getOnDay(day, (entry, entryType) ->
-                entryType != TodoEntry.EntryType.GLOBAL && !entry.isCompleted());
+                entryType != TodoEntry.EntryType.GLOBAL && !entry.isCompleted(), false);
         
         int index = 0;
         

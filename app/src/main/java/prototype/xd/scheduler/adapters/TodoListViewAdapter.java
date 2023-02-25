@@ -257,7 +257,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     public void notifyEntryListChanged() {
         int prevItemsCount = currentTodoEntries.size();
         currentTodoEntries.clear();
-        currentTodoEntries.addAll(todoEntryManager.getVisibleTodoEntries(currentlySelectedDayUTC));
+        currentTodoEntries.addAll(todoEntryManager.getVisibleTodoEntriesInList(currentlySelectedDayUTC));
         notifyItemRangeChanged(0, max(prevItemsCount, currentTodoEntries.size()));
     }
     

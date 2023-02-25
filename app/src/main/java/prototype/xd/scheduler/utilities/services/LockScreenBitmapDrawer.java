@@ -132,7 +132,7 @@ class LockScreenBitmapDrawer {
             return false;
         }
         
-        if(!todoEntryManager.initFinished.getValue()) {
+        if (!todoEntryManager.initFinished.getValue()) {
             Logger.warning(NAME, "Not starting bitmap thread, todoEntryManager is still initializing");
             return false;
         }
@@ -187,7 +187,9 @@ class LockScreenBitmapDrawer {
         
         TodoItemViewType todoItemViewType = TODO_ITEM_VIEW_TYPE.get();
         
-        List<TodoEntry> toAdd = todoEntryManager.getVisibleTodoEntries(currentDayUTC, (entry, entryType) -> entry.isVisibleOnLockscreenToday());
+        List<TodoEntry> toAdd = todoEntryManager.getVisibleTodoEntries(
+                currentDayUTC,
+                (entry, entryType) -> entry.isVisibleOnLockscreenToday(), true);
         
         long currentHash =
                 getEntryListHash(toAdd) +
