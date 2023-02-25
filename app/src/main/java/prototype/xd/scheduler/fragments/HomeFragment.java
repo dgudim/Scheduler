@@ -21,10 +21,12 @@ import static prototype.xd.scheduler.utilities.Static.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.MainThread;
@@ -35,6 +37,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.divider.MaterialDividerItemDecoration;
 import com.google.android.material.navigation.NavigationView;
 
 import java.time.LocalDate;
@@ -92,6 +95,10 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         contentBnd.content.recyclerView.setAdapter(todoListViewAdapter);
+        MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
+        divider.setDividerColor(Color.TRANSPARENT);
+        divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.list_item_padding));
+        contentBnd.content.recyclerView.addItemDecoration(divider);
         
         DrawerLayout drawerLayout = binding.root;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

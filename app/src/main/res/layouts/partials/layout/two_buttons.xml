@@ -17,6 +17,7 @@
         style="@style/DefaultButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:layout_marginEnd="4dp"
         android:text="@string/add" />
 
 </LinearLayout>

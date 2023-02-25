@@ -4,4 +4,5 @@
     <dimen name="dialog_padding_right_left">6dp</dimen>
     <dimen name="dialog_padding_top">3dp</dimen>
     <dimen name="lockscreen_item_padding">2.5dp</dimen>
+    <dimen name="list_item_padding">2dp</dimen>
 </resources>

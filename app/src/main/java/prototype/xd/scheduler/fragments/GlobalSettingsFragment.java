@@ -31,7 +31,6 @@ import com.google.android.material.color.MaterialColors;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
@@ -39,6 +38,7 @@ import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.DividerEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.DoubleSliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig;
@@ -88,11 +88,14 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new AppThemeSelectorEntryConfig(),
                 new DropdownSettingsEntryConfig<>(R.string.first_weekday, FIRST_DAYS_OF_WEEK_LOCAL, FIRST_DAYS_OF_WEEK_ROOT, FIRST_DAY_OF_WEEK),
                 new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)),
+                new DividerEntryConfig(),
                 adaptiveBgSettingsEntry,
                 new CompoundCustomizationEntryConfig(),
                 
                 new SwitchSettingsEntryConfig(
                         Static.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)),
+                
+                new DividerEntryConfig(),
                 
                 new SliderSettingsEntryConfig(Static.LOCKSCREEN_VIEW_VERTICAL_BIAS,
                         0, 100, 5, value -> {
@@ -115,6 +118,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                     return baseString;
                 }),
                 
+                new DividerEntryConfig(),
                 new TitleBarSettingsEntryConfig(getString(R.string.category_event_visibility)),
                 
                 new DoubleSliderSettingsEntryConfig(wrapper.context, R.string.settings_show_events,
@@ -128,21 +132,24 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                         Static.BG_COLOR.EXPIRED.defaultValue),
                 
                 new SwitchSettingsEntryConfig(Static.MERGE_ENTRIES, getString(R.string.settings_merge_events)),
+                new DividerEntryConfig(),
                 new SwitchSettingsEntryConfig(Static.HIDE_EXPIRED_ENTRIES_BY_TIME, getString(R.string.settings_hide_expired_entries_by_time)),
-                
-                new SwitchSettingsEntryConfig(Static.SHOW_UPCOMING_EXPIRED_IN_LIST, getString(R.string.show_upcoming_and_expired_event_indicators)));
+                new DividerEntryConfig(),
+                new SwitchSettingsEntryConfig(Static.SHOW_UPCOMING_EXPIRED_IN_LIST, getString(R.string.show_upcoming_and_expired_event_indicators)),
+                new DividerEntryConfig());
         
         //                                                                      two entries (global switches)
         List<SettingsEntryConfig> globalSwitchSettingsEntries = new ArrayList<>(2);
         SettingsListViewAdapter globalSwitchSettingsListViewAdapter = new SettingsListViewAdapter(wrapper, globalSwitchSettingsEntries,
                 !Static.SHOW_GLOBAL_ITEMS_LOCK.get());
         
-        globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
-                Static.SHOW_GLOBAL_ITEMS_LOCK, getString(R.string.settings_show_global_items_lock),
-                (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked), false));
-        
-        globalSwitchSettingsEntries.add(new SwitchSettingsEntryConfig(
-                Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK, getString(R.string.settings_show_global_items_label_lock)));
+        globalSwitchSettingsEntries.addAll(List.of(
+                new SwitchSettingsEntryConfig(
+                        Static.SHOW_GLOBAL_ITEMS_LOCK, getString(R.string.settings_show_global_items_lock),
+                        (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked), false),
+                new DividerEntryConfig(),
+                new SwitchSettingsEntryConfig(
+                        Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK, getString(R.string.settings_show_global_items_label_lock))));
         
         listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
                 .setIsolateViewTypes(false)
@@ -150,7 +157,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new SettingsListViewAdapter(wrapper, settingsEntries),
                 globalSwitchSettingsListViewAdapter,
                 new SettingsListViewAdapter(wrapper,
-                        Collections.singletonList(
+                        List.of(new DividerEntryConfig(),
                                 new ResetButtonSettingsEntryConfig((dialog, which) -> {
                                     Static.clearAll();
                                     listViewAdapter.notifyDataSetChanged();
@@ -159,11 +166,11 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     }
     
     public void onBgCropped(@NonNull CropImageView.CropResult result) {
-        if(result.isSuccessful()) {
+        if (result.isSuccessful()) {
             Uri uri = result.getUriContent();
             new Thread(() -> {
                 try (InputStream stream = requireActivity().getContentResolver().openInputStream(uri)) {
-            
+                    
                     if (stream != null) {
                         ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
                                 getFile(DateManager.BG_NAMES_ROOT.get(adaptiveBgSettingsEntry.getLastClickedBgIndex())));
@@ -171,7 +178,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                     } else {
                         error(NAME, "Stream null for uri: " + uri);
                     }
-            
+                    
                 } catch (Exception e) {
                     logException(Thread.currentThread().getName(), e);
                 }

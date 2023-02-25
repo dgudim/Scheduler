@@ -4,10 +4,15 @@ import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
+import androidx.recyclerview.widget.DividerItemDecoration;
+
+import com.google.android.material.divider.MaterialDividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -115,5 +120,11 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
             listViewAdapter.notifyItemRangeChanged(staticEntries.size(), calendarConfigEntries.size());
         }, false));
         staticEntriesListViewAdapter.notifyItemInserted(staticEntries.size());
+    }
+    
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        binding.recyclerView.addItemDecoration(new MaterialDividerItemDecoration(wrapper.context, DividerItemDecoration.VERTICAL));
+        super.onViewCreated(view, savedInstanceState);
     }
 }

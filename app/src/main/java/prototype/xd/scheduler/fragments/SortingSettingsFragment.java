@@ -13,15 +13,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.divider.MaterialDividerItemDecoration;
 
 import java.util.List;
 
@@ -57,7 +58,9 @@ public class SortingSettingsFragment extends BaseSettingsFragment<SortingSetting
                         (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true));
         
         binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
-        binding.settingsRecyclerView.addItemDecoration(new DividerItemDecoration(wrapper.context, DividerItemDecoration.VERTICAL));
+        MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
+        divider.setLastItemDecorated(false);
+        binding.settingsRecyclerView.addItemDecoration(divider);
         binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
     }
     

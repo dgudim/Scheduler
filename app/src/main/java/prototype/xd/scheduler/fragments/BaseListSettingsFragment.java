@@ -5,9 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,9 +26,9 @@ public class BaseListSettingsFragment<T extends RecyclerView.Adapter<?>> extends
     
     // view creation end (fragment visible)
     @Override
+    @CallSuper
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
         binding.recyclerView.setAdapter(listViewAdapter);
     }
     
