@@ -103,21 +103,19 @@
         app:layout_constraintTop_toBottomOf="@+id/divider"
         tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/global_entry_switch" />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider2"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
-        android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/day_to_button" />

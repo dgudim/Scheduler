@@ -167,10 +167,9 @@
                 android:valueTo="10"
                 tools:ignore="SpeakableTextPresentCheck" />
 
-            <View
+            <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
-                android:layout_height="1.5dp"
-                android:background="?android:attr/listDivider" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/upcoming_border_thickness_description"
@@ -189,10 +188,9 @@
                 android:valueTo="10"
                 tools:ignore="SpeakableTextPresentCheck" />
 
-            <View
+            <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
-                android:layout_height="1.5dp"
-                android:background="?android:attr/listDivider" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/current_border_thickness_description"
@@ -212,10 +210,9 @@
                 android:valueTo="10"
                 tools:ignore="SpeakableTextPresentCheck" />
 
-            <View
+            <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
-                android:layout_height="1.5dp"
-                android:background="?android:attr/listDivider" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/expired_border_thickness_description"
@@ -235,10 +232,9 @@
                 android:valueTo="10"
                 tools:ignore="SpeakableTextPresentCheck" />
 
-            <View
+            <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
-                android:layout_height="1.5dp"
-                android:background="?android:attr/listDivider" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/font_size_description"

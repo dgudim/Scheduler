@@ -271,11 +271,10 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="TextContrastCheck" />
 
-                <View
+                <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/top_divider"
                     android:layout_width="0dp"
-                    android:layout_height="1.5dp"
-                    android:background="?android:attr/listDivider"
+                    android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/color_selection_title" />
@@ -407,11 +406,11 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <View
+                    <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/vertical_divider"
-                        android:layout_width="1.5dp"
+                        android:layout_width="1dp"
                         android:layout_height="0dp"
-                        android:background="?android:attr/listDivider"
+                        android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/color_selection_container"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -430,11 +429,10 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <View
+                <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/bottom_divider"
                     android:layout_width="0dp"
-                    android:layout_height="1.5dp"
-                    android:background="?android:attr/listDivider"
+                    android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
