@@ -16,7 +16,7 @@ import androidx.collection.ArrayMap;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
-
+// TODO: 21.02.2023 REPLACE WITH LIST 
 /**
  * Grid adapter class for displaying per color event settings
  */
