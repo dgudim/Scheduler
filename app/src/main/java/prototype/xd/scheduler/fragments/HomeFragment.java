@@ -235,7 +235,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
             displayMessageDialog(wrapper, R.style.ErrorAlertDialogTheme, builder -> {
                 builder.setTitle(R.string.service_error);
                 builder.setMessage(R.string.service_error_description);
-                builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
+                builder.setIcon(R.drawable.ic_warning_24);
                 builder.setPositiveButton(R.string.close, null);
             }, dialog -> SERVICE_FAILED.put(Boolean.FALSE));
         }
@@ -245,7 +245,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
             displayMessageDialog(wrapper, R.style.ErrorAlertDialogTheme, builder -> {
                 builder.setTitle(R.string.wallpaper_obtain_error);
                 builder.setMessage(R.string.wallpaper_obtain_error_description);
-                builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
+                builder.setIcon(R.drawable.ic_warning_24);
                 builder.setPositiveButton(R.string.close, null);
             }, dialog -> WALLPAPER_OBTAIN_FAILED.put(Boolean.FALSE));
         }

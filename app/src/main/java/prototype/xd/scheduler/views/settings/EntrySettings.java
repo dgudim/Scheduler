@@ -111,10 +111,7 @@ public class EntrySettings extends PopupSettingsView {
             
             Group selectedGroup = groupList.get(selection);
             
-            displayGroupAdditionEditDialog(wrapper,
-                    R.string.edit_group, -1,
-                    R.string.cancel, R.string.save,
-                    selectedGroup.getRawName(),
+            displayGroupAdditionEditDialog(wrapper, selectedGroup,
                     name -> {
                         int groupIndex = Group.groupIndexInList(groupList, name);
                         
@@ -143,10 +140,7 @@ public class EntrySettings extends PopupSettingsView {
             }
         });
         
-        bnd.addGroupButton.setOnClickListener(v -> displayGroupAdditionEditDialog(wrapper,
-                R.string.add_current_config_as_group_prompt,
-                R.string.add_current_config_as_group_message,
-                R.string.cancel, R.string.add, "",
+        bnd.addGroupButton.setOnClickListener(v -> displayGroupAdditionEditDialog(wrapper, null,
                 text -> {
                     Group existingGroup = findGroupInList(groupList, text);
                     if (existingGroup.isNullGroup()) {

@@ -97,14 +97,14 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
                 displayMessageDialog(wrapper, builder -> {
                     builder.setTitle(R.string.attention);
                     builder.setMessage(R.string.whole_calendar_settings_on_warning);
-                    builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
+                    builder.setIcon(R.drawable.ic_warning_24);
                     builder.setPositiveButton(R.string.i_understand, null);
                 });
             } else {
                 displayMessageDialog(wrapper, builder -> {
                     builder.setTitle(R.string.attention);
                     builder.setMessage(R.string.whole_calendar_settings_off_warning);
-                    builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
+                    builder.setIcon(R.drawable.ic_warning_24);
                     builder.setPositiveButton(R.string.i_understand, null);
                 });
             }

@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,29 +54,24 @@ public final class DialogUtilities {
     /**
      * Display a dialog to add or edit a group
      *
-     * @param wrapper                     any context wrapper
-     * @param titleStringResource         dialog title
-     * @param messageStringResource       dialog message
-     * @param cancelButtonStringResource  cancel button text
-     * @param confirmButtonStringResource confirmation button text
-     * @param defaultEditTextValue        edit field default text value
-     * @param confirmationListener        listener to call on dialog confirmation
-     * @param deletionListener            listener to call when deletion button is pressed
+     * @param wrapper              any context wrapper
+     * @param group                group to edit (or null to add)
+     * @param confirmationListener listener to call on dialog confirmation
+     * @param deletionListener     listener to call when deletion button is pressed
      */
     @MainThread
     public static void displayGroupAdditionEditDialog(@NonNull ContextWrapper wrapper,
-                                                      @StringRes int titleStringResource,
-                                                      @StringRes int messageStringResource,
-                                                      @StringRes int cancelButtonStringResource,
-                                                      @StringRes int confirmButtonStringResource,
-                                                      @NonNull String defaultEditTextValue,
+                                                      @Nullable Group group,
                                                       @NonNull Consumer<String> confirmationListener,
                                                       @Nullable Consumer<Dialog> deletionListener) {
         AddOrEditGroupDialogBinding dialogBinding = AddOrEditGroupDialogBinding.inflate(wrapper.getLayoutInflater());
         
-        Dialog dialog = buildTemplate(wrapper, titleStringResource, messageStringResource, dialogBinding);
+        Dialog dialog = buildTemplate(wrapper,
+                group == null ? R.string.add_current_config_as_group_prompt : R.string.edit_group,
+                group == null ? R.drawable.ic_library_add_24 : R.drawable.ic_edit_24,
+                group == null ? R.string.add_current_config_as_group_message : -1, dialogBinding);
         
-        setupEditText(dialogBinding.entryNameEditText, defaultEditTextValue);
+        setupEditText(dialogBinding.entryNameEditText, group == null ? "" : group.getRawName());
         
         if (deletionListener != null) {
             dialogBinding.deleteGroupButton.setOnClickListener(v -> deletionListener.accept(dialog));
@@ -84,7 +80,7 @@ public final class DialogUtilities {
         }
         
         setupButtons(dialog, dialogBinding.twoButtons,
-                cancelButtonStringResource, confirmButtonStringResource,
+                R.string.cancel, group == null ? R.string.add : R.string.save,
                 v -> callIfInputNotEmpty(dialogBinding.entryNameEditText, text -> {
                     confirmationListener.accept(text);
                     dialog.dismiss();
@@ -109,6 +105,7 @@ public final class DialogUtilities {
         
         Dialog dialog = buildTemplate(wrapper,
                 entry == null ? R.string.add_event_fab : R.string.edit_event,
+                entry == null ? R.drawable.ic_add_task_24 : R.drawable.ic_edit_24,
                 -1, dialogBinding);
         setupEditText(dialogBinding.entryNameEditText, entry == null ? "" : entry.getRawTextValue());
         
@@ -208,6 +205,7 @@ public final class DialogUtilities {
      * @param wrapper               context wrapper (context and lifecycle)
      * @param titleStringResource   dialog title string resource
      * @param messageStringResource dialog message string resource
+     * @param iconDrawableResource  icon drawable resource
      * @param viewBinding           dialog contents
      * @return dialog with title, message and target view
      */
@@ -215,10 +213,12 @@ public final class DialogUtilities {
     @MainThread
     private static Dialog buildTemplate(@NonNull final ContextWrapper wrapper,
                                         @StringRes int titleStringResource,
+                                        @DrawableRes int iconDrawableResource,
                                         @StringRes int messageStringResource,
                                         @NonNull ViewBinding viewBinding) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(wrapper.context);
         builder.setTitle(titleStringResource);
+        builder.setIcon(iconDrawableResource);
         if (messageStringResource != -1) {
             builder.setMessage(messageStringResource);
         }

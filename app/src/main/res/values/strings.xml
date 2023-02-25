@@ -144,7 +144,7 @@
     <string name="before_you_continue">Before you continue</string>
     <string name="read_and_understood">I have read and understood all the things above</string>
     <string name="select_view">Select view</string>
-    <string name="choose_how_items_look">Choose how items will look on your lockscreen</string>
+    <string name="select_view_description">Choose how items will look on your lockscreen</string>
     <string name="show_upcoming_and_expired_event_indicators">Show upcoming and expired events in calendar</string>
     <string name="service_error">Background service error</string>
     <string name="service_error_description">There was an error in the background wallpaper service :( Try restarting the application. If the problem persists, open an issue on the github.</string>

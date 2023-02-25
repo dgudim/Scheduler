@@ -1,9 +1,10 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
+import static android.widget.LinearLayout.LayoutParams.MATCH_PARENT;
+import static android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 
 import android.graphics.Color;
-import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 
 import androidx.annotation.ColorInt;
@@ -18,11 +19,10 @@ import java.util.function.ObjIntConsumer;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
-import prototype.xd.scheduler.databinding.TodoItemViewSelectionDialogBinding;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 import prototype.xd.scheduler.views.settings.EntryPreviewContainer;
@@ -46,11 +46,19 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                                         @NonNull final CompoundCustomizationSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
             
-            LayoutInflater layoutInflater = wrapper.getLayoutInflater();
-            LinearLayout viewSelectionDialogView = TodoItemViewSelectionDialogBinding.inflate(layoutInflater).getRoot();
+            int padding = wrapper.getResources().getDimensionPixelSize(R.dimen.dialog_padding_right_left);
+            int itemPadding = wrapper.getResources().getDimensionPixelSize(R.dimen.lockscreen_item_padding);
+            
+            LinearLayout viewSelectionDialogView = new LinearLayout(wrapper.context);
+            viewSelectionDialogView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+            viewSelectionDialogView.setOrientation(LinearLayout.VERTICAL);
+            viewSelectionDialogView.setPadding(padding, padding, padding, padding - itemPadding);
             
             viewSelectionDialog = wrapper.attachDialogToLifecycle(
-                    new MaterialAlertDialogBuilder(wrapper.context)
+                    new MaterialAlertDialogBuilder(wrapper.context, R.style.DefaultAlertDialogTheme)
+                            .setIcon(R.drawable.ic_view_carousel_24)
+                            .setTitle(R.string.select_view)
+                            .setMessage(R.string.select_view_description)
                             .setView(viewSelectionDialogView)
                             .create(), null);
             
@@ -108,7 +116,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
             int fontColor = MaterialColors.getColor(wrapper.context, R.attr.colorOnSurfaceVariant, Color.BLACK);
             
             for (TodoItemViewType viewType : TodoItemViewType.values()) {
-                LockScreenTodoItemView.inflateViewByType(viewType, viewSelectionDialogView, layoutInflater)
+                LockScreenTodoItemView.inflateViewByType(viewType, viewSelectionDialogView, wrapper.getLayoutInflater())
                         .mixAndSetBgAndTextColors(true, fontColor, bgColor)
                         .setBorderColor(borderColor)
                         .setOnClickListener(v -> {

@@ -141,7 +141,7 @@
     <string name="before_you_continue">Перед тем как продолжить</string>
     <string name="read_and_understood">Я прочитал и понял все вышесказанное</string>
     <string name="select_view">Выберите вид</string>
-    <string name="choose_how_items_look">Выберите, как элементы будут выглядеть на экране блокировки</string>
+    <string name="select_view_description">Выберите, как элементы будут выглядеть на экране блокировки</string>
     <string name="nav_drawer_open">Открыть боковое меню</string>
     <string name="nav_drawer_close">Закрыть боковое меню</string>
     <string name="please_read_the_notes">Пожалуйста прочитайте информацию</string>
