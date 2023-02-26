@@ -9,6 +9,7 @@ import static prototype.xd.scheduler.utilities.PermissionUtilities.AutoRevokeSta
 import static prototype.xd.scheduler.utilities.PermissionUtilities.areEssentialPermissionsGranted;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.getAutorevokeStatus;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.getPermissions;
+import static prototype.xd.scheduler.utilities.PermissionUtilities.isAutorevokeGranted;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.isBatteryGranted;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.isCalendarGranted;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.isNotificationGranted;
@@ -133,13 +134,13 @@ public final class PermissionRequestFragment extends BaseFragment<PermissionsReq
             
             case AUTOREVOKE_PERMISSIONS:
                 requestChainStatus = END;
-                if (getAutorevokeStatus(this) == AutoRevokeStatus.ENABLED) {
+                if (isAutorevokeGranted(this)) {
+                    Logger.info(NAME, "Autorevoke already granted, skipping");
+                    requestPermissions();
+                } else {
                     Logger.info(NAME, "Requesting autorevoke permissions");
                     displayToast(wrapper.context, R.string.autorevoke_request_description);
                     intentLauncher.launch(IntentCompat.createManageUnusedAppRestrictionsIntent(wrapper.context, PACKAGE_NAME));
-                } else {
-                    Logger.info(NAME, "Autorevoke already granted, skipping");
-                    requestPermissions();
                 }
                 return;
             case END:

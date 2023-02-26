@@ -148,4 +148,9 @@ public final class PermissionUtilities {
         }
         return AutoRevokeStatus.NOT_AVAILABLE;
     }
+    
+    public static boolean isAutorevokeGranted(@NonNull Fragment fragment) {
+        AutoRevokeStatus status = getAutorevokeStatus(fragment);
+        return status == AutoRevokeStatus.DISABLED || status == AutoRevokeStatus.NOT_AVAILABLE;
+    }
 }
