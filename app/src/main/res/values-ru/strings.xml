@@ -9,6 +9,7 @@
     <string name="choose_color">Выберите цвет</string>
     <string name="add_current_config_as_group_message">Параметры, которые были изменены вручную (Зеленые или синие ромбики), будут добавлены в группу</string>
     <string name="add_group">Добавить группу</string>
+    <string name="null_group_edit_message">Нечего редактировать, для начала присвойте группу</string>
     <string name="delete">Удалить</string>
     <string name="are_you_sure">Вы уверены?</string>
     <string name="save">Сохранить</string>
@@ -42,7 +43,8 @@
     <string name="reset_settings_prompt">Сбросить настройки?</string>
     <string name="cancel">Отмена</string>
     <string name="add">Добавить</string>
-    <string name="enable">Включить</string>
+    <string name="enable_per_day_wallpapers">Отдельные обои на каждый день</string>
+    <string name="dynamic_wallpaper_off_warning">Вы выбрали обои на один день, но “отдельные обои на каждый день” выключены</string>
     <string name="group">Группа</string>
     <string name="service_description">Сервис для обновления фона блокировки</string>
     <string name="service_name">Сервис фонового обоновления</string>

@@ -261,6 +261,17 @@ public final class DialogUtilities {
         displayMessageDialog(wrapper, R.style.DefaultAlertDialogTheme, builderConsumer, null);
     }
     
+    public static void displayAttentionDialog(@NonNull final ContextWrapper wrapper,
+                                              @StringRes int message,
+                                              @StringRes int buttonText) {
+        displayMessageDialog(wrapper, builder -> {
+            builder.setTitle(R.string.attention);
+            builder.setMessage(message);
+            builder.setIcon(R.drawable.ic_warning_24);
+            builder.setPositiveButton(buttonText, null);
+        });
+    }
+    
     /**
      * Display a simple deletion confirmation dialog
      *
@@ -276,6 +287,18 @@ public final class DialogUtilities {
             builder.setNegativeButton(R.string.no, null);
             builder.setPositiveButton(R.string.yes, confirmationListener);
         });
+    }
+    
+    public static void displayErrorDialog(@NonNull final ContextWrapper wrapper,
+                                          @StringRes int title,
+                                          @StringRes int message,
+                                          @Nullable DialogInterface.OnDismissListener dismissListener) {
+        displayMessageDialog(wrapper, R.style.ErrorAlertDialogTheme, builder -> {
+            builder.setTitle(title);
+            builder.setMessage(message);
+            builder.setIcon(R.drawable.ic_warning_24);
+            builder.setPositiveButton(R.string.close, null);
+        }, dismissListener);
     }
     
     /**

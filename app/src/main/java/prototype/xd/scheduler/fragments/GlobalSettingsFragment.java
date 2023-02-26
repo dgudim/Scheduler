@@ -4,7 +4,7 @@ import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LOCAL;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_ROOT;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
 import static prototype.xd.scheduler.utilities.Logger.error;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Static.ADAPTIVE_BACKGROUND_ENABLED;
@@ -72,9 +72,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 bgIndex -> {
                     
                     if (!ADAPTIVE_BACKGROUND_ENABLED.get()) {
-                        displayMessageDialog(wrapper, builder -> {
-                            // TODO: 25.02.2023 fill this
-                        });
+                        displayAttentionDialog(wrapper, R.string.dynamic_wallpaper_off_warning, R.string.close);
                     }
                     
                     CropImageOptions options = new CropImageOptions();

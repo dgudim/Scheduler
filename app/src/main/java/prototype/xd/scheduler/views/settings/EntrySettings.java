@@ -2,6 +2,7 @@ package prototype.xd.scheduler.views.settings;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayDeletionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayGroupAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
@@ -106,6 +107,7 @@ public class EntrySettings extends PopupSettingsView {
             int selection = bnd.groupSpinner.getSelectedItem();
             
             if (selection == 0) {
+                displayAttentionDialog(wrapper, R.string.null_group_edit_message, R.string.close);
                 return;
             }
             

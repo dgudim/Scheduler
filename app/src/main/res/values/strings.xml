@@ -86,9 +86,11 @@
     <string name="item_global">(Global)</string>
     <string name="group_with_same_name_exists">A group with the same name already exists</string>
     <string name="group">Group</string>
-    <string name="enable">Enable</string>
+    <string name="enable_per_day_wallpapers">Enable per day wallpapers</string>
+    <string name="dynamic_wallpaper_off_warning">You have selected a wallpaper for a single day but “per day wallpapers” is not enabled</string>
     <string name="edit_group">Edit group</string>
     <string name="add_group">Add group</string>
+    <string name="null_group_edit_message">Nothing to edit, assign a group first</string>
     <string name="delete">Delete</string>
     <string name="choose_color">Choose color</string>
     <string name="category_event_visibility">Event visibility</string>
