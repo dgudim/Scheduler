@@ -57,8 +57,8 @@
 
     <prototype.xd.scheduler.views.Switch
         android:id="@+id/debug_logging_switch"
-        android:layout_width="605dp"
-        android:layout_height="53dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/compound_menu_entry_top_margin"
         android:paddingStart="@dimen/dialog_menu_padding_left_right"
         android:paddingEnd="@dimen/dialog_menu_padding_left_right"
