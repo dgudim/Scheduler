@@ -46,8 +46,8 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
                                         @NonNull final CompoundCustomizationSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
             
-            int padding = wrapper.getResources().getDimensionPixelSize(R.dimen.dialog_padding_right_left);
-            int itemPadding = wrapper.getResources().getDimensionPixelSize(R.dimen.lockscreen_item_padding);
+            int padding = wrapper.getResources().getDimensionPixelSize(R.dimen.dialog_menu_padding_left_right);
+            int itemPadding = wrapper.getResources().getDimensionPixelSize(R.dimen.lockscreen_item_vertical_padding);
             
             LinearLayout viewSelectionDialogView = new LinearLayout(wrapper.context);
             viewSelectionDialogView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));

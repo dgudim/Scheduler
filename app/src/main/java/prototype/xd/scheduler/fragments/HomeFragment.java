@@ -97,7 +97,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         contentBnd.content.recyclerView.setAdapter(todoListViewAdapter);
         MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
         divider.setDividerColor(Color.TRANSPARENT);
-        divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.list_item_padding));
+        divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.list_item_vertical_padding));
         contentBnd.content.recyclerView.addItemDecoration(divider);
         
         DrawerLayout drawerLayout = binding.root;

@@ -4,8 +4,10 @@ import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LOCAL;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_ROOT;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Logger.error;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Static.ADAPTIVE_BACKGROUND_ENABLED;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
@@ -68,6 +70,13 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper.context,
                 bgIndex -> {
+                    
+                    if (!ADAPTIVE_BACKGROUND_ENABLED.get()) {
+                        displayMessageDialog(wrapper, builder -> {
+                            // TODO: 25.02.2023 fill this
+                        });
+                    }
+                    
                     CropImageOptions options = new CropImageOptions();
                     
                     options.imageSourceIncludeCamera = false;
@@ -85,6 +94,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         List<SettingsEntryConfig> settingsEntries = List.of(
                 
                 new TitleBarSettingsEntryConfig(getString(R.string.category_application_settings)),
+                new DividerEntryConfig(),
                 new AppThemeSelectorEntryConfig(),
                 new DropdownSettingsEntryConfig<>(R.string.first_weekday, FIRST_DAYS_OF_WEEK_LOCAL, FIRST_DAYS_OF_WEEK_ROOT, FIRST_DAY_OF_WEEK),
                 new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)),

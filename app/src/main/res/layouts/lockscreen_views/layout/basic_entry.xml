@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:paddingTop="@dimen/lockscreen_item_padding"
-    android:paddingBottom="@dimen/lockscreen_item_padding">
+    android:paddingTop="@dimen/lockscreen_item_vertical_padding"
+    android:paddingBottom="@dimen/lockscreen_item_vertical_padding">
 
     <LinearLayout
         android:id="@+id/background_outline"

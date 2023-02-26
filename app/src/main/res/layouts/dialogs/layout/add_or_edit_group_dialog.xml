@@ -9,21 +9,24 @@
     <ImageButton
         android:id="@+id/delete_group_button"
         style="@style/DefaultImageButton"
-        android:layout_width="40dp"
+        android:layout_width="@dimen/clickable_icon_width"
         android:layout_height="0dp"
+        android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
         android:contentDescription="@string/action_delete_group"
         app:layout_constraintBottom_toBottomOf="@+id/textField"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textField"
-        app:srcCompat="@drawable/ic_delete_50" />
+        app:srcCompat="@drawable/ic_delete_50"
+        tools:ignore="TouchTargetSizeCheck" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textField"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dialog_padding_top"
-        android:layout_marginEnd="@dimen/dialog_padding_right_left"
+        android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
+        android:layout_marginTop="@dimen/dialog_menu_padding_top"
+        android:layout_marginEnd="@dimen/dialog_menu_padding_left_right"
         android:hint="@string/name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/delete_group_button"

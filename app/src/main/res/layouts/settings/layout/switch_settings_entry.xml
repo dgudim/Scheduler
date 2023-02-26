@@ -4,8 +4,8 @@
     android:id="@+id/main_switch"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="3dp"
-    android:layout_marginEnd="3dp"
+    android:layout_marginStart="@dimen/settings_entries_margin_left_right"
+    android:layout_marginEnd="@dimen/settings_entries_margin_left_right"
     android:text="parameter"
     android:textAppearance="@style/SmallHeading"
     tools:ignore="HardcodedText,TouchTargetSizeCheck,VisualLintButtonSize" />
