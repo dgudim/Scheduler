@@ -34,7 +34,7 @@
     </plurals>
     <string name="add_current_config_as_group_prompt">Добавить текущую конфигурацию как группу?</string>
     <string name="name">Название</string>
-    <string name="title">Название</string>
+    <string name="title">Название события</string>
     <string name="group_with_same_name_exists">Группа с таким именем уже существует</string>
     <string name="overwrite_prompt">Перезаписать?</string>
     <string name="no">Нет</string>

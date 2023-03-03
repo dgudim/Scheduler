@@ -37,7 +37,7 @@
         <item quantity="one">One event</item>
         <item quantity="other">%d events</item>
     </plurals>
-    <string name="title_color_default">default</string>
+    <string name="title_color_default">Calendar color</string>
     <string name="add_event_fab">Add event</string>
     <string name="settings_lockscreen_background">Lock screen background settings</string>
     <string name="settings_adaptive_color_balance">Blend with background: %s</string>
@@ -56,7 +56,7 @@
     <string name="settings_reset_bg">Reset backgrounds</string>
     <string name="settings_reset_to_defaults">Reset settings</string>
     <string name="name">Name</string>
-    <string name="title">Title</string>
+    <string name="title">Event name</string>
     <string name="yes">Yes</string>
     <string name="off">Off</string>
     <string name="settings_current_border_thickness">Current events border thickness: %s</string>

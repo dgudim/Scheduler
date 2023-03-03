@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/dialog_menu_padding_top">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/textView11"
@@ -13,8 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/icon_to_text_margin"
-        android:layout_marginTop="@dimen/compound_menu_entry_top_margin"
         android:gravity="center"
+        android:paddingTop="@dimen/compound_menu_entry_top_margin"
         android:text="@string/share_logcat"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent"
@@ -37,6 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/icon_to_text_margin"
+        android:paddingBottom="@dimen/compound_menu_entry_top_margin"
         android:text="@string/share_logcat_description"
         app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintTop_toBottomOf="@+id/textView11"
@@ -47,8 +47,6 @@
         style="@style/ClickableViewFg"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/compound_menu_entry_top_margin_inverse"
-        android:layout_marginBottom="@dimen/compound_menu_entry_top_margin_inverse"
         app:layout_constraintBottom_toBottomOf="@+id/textView22"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +57,6 @@
         android:id="@+id/debug_logging_switch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/compound_menu_entry_top_margin"
         android:paddingStart="@dimen/dialog_menu_padding_left_right"
         android:paddingEnd="@dimen/dialog_menu_padding_left_right"
         android:text="@string/debug_logging"

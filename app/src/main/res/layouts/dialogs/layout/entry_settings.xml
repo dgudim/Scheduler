@@ -660,29 +660,25 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/addGroupButton"
-                style="@style/ClickableView"
+                style="@style/MaterialImageButtonStyle"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/round_bg_8dp"
-                android:backgroundTint="?colorSecondaryContainer"
                 android:contentDescription="@string/add_group"
-                app:srcCompat="@drawable/ic_add_24" />
+                app:icon="@drawable/ic_add_24" />
 
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/editGroupButton"
-                style="@style/ClickableView"
+                style="@style/MaterialImageButtonStyle"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/round_bg_8dp"
-                android:backgroundTint="?colorSecondaryContainer"
                 android:contentDescription="@string/edit_group"
-                app:srcCompat="@drawable/ic_edit_24" />
+                app:icon="@drawable/ic_edit_24" />
 
         </LinearLayout>
 
