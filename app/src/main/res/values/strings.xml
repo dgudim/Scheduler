@@ -13,7 +13,7 @@
     <string name="nav_drawer_close">Close drawer</string>
     <string name="please_read_the_notes" type="id">Please read the notes</string>
     <string name="settings_state_symbol" translatable="false">⬧</string>
-    <string name="calendar_event_all_day">all day</string>
+    <string name="calendar_event_all_day">All day</string>
     <string name="permission_granted">Granted</string>
     <string name="permission_state_unknown">Unknown</string>
     <string name="permission_not_granted">Not granted</string>
@@ -37,7 +37,7 @@
         <item quantity="one">One event</item>
         <item quantity="other">%d events</item>
     </plurals>
-    <string name="title_color_default">default</string>
+    <string name="title_color_default">Calendar color</string>
     <string name="add_event_fab">Add event</string>
     <string name="settings_lockscreen_background">Lock screen background settings</string>
     <string name="settings_adaptive_color_balance">Blend with background: %s</string>
@@ -56,7 +56,7 @@
     <string name="settings_reset_bg">Reset backgrounds</string>
     <string name="settings_reset_to_defaults">Reset settings</string>
     <string name="name">Name</string>
-    <string name="title">Title</string>
+    <string name="title">Event name</string>
     <string name="yes">Yes</string>
     <string name="off">Off</string>
     <string name="settings_current_border_thickness">Current events border thickness: %s</string>
@@ -66,7 +66,7 @@
     <string name="settings_show_items_lock">Show on lock screen</string>
     <string name="settings_show_global_items_lock">Show global events on lock screen</string>
     <string name="settings_priority">Priority: %d</string>
-    <string name="settings_font_size">Font size (Lock screen): %d</string>
+    <string name="settings_font_size">Font size (lock screen): %d</string>
     <string name="save">Save</string>
     <string name="reset_settings_prompt">Reset settings?</string>
     <string name="overwrite_prompt">Overwrite?</string>
@@ -118,22 +118,22 @@
     <string name="settings_preview_upcoming">Upcoming</string>
     <string name="settings_hide_expired_entries_by_time">Hide passed events on lockscreen (by time)</string>
     <string name="status">Date: %s  Events: %d</string>
-    <string name="app_theme">App theme:</string>
+    <string name="app_theme">App theme</string>
     <string name="app_theme_light">Light</string>
     <string name="app_theme_dark">Dark</string>
     <string name="app_theme_system">System default</string>
     <string name="xiaomi_message">It looks like you are using a xiaomi phone, some version of miui don\'t allow setting lockscreen wallpaper programmatically, so the app will most probably not work. Sorry, i can\'t do anything about it.</string>
-    <string name="blank_group_name">none</string>
-    <string name="input_cant_be_empty">input can\'t be empty</string>
+    <string name="blank_group_name">No group</string>
+    <string name="input_cant_be_empty">Input can\'t be empty</string>
     <string name="edit_event">Edit event</string>
     <string name="overwrite">Overwrite</string>
     <string name="reset">Reset</string>
     <string name="hide_by_content">Hide by content</string>
-    <string name="separate_multiple_statements_by">separate multiple statements by ||</string>
-    <string name="content">content</string>
+    <string name="separate_multiple_statements_by">Separate multiple statements by ||</string>
+    <string name="content">Content</string>
     <string name="editing_system_calendar">%1$s in %2$s</string>
     <string name="editing_system_calendar_color">Events with color: ■ from %1$s in %2$s</string>
-    <string name="calendar_main">main</string>
+    <string name="calendar_main">Main</string>
     <string name="all_set">All set!</string>
     <string name="thanks_for_installing">Thanks for installing Scheduler</string>
     <string name="choose_application_theme">Choose application theme</string>
@@ -141,7 +141,7 @@
     <string name="a_few_notes">A few notes before you go</string>
     <string name="note_animated_wallpapers">The app doesn\'t work with animated wallpapers, so if you have one consider either not using the app or setting a regular wallpaper</string>
     <string name="note_bugs">The app is still in it\'s early development so bugs are to be expected</string>
-    <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on my GitHub</string>
+    <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on GitHub</string>
     <string name="finish">Finish</string>
     <string name="before_you_continue">Before you continue</string>
     <string name="read_and_understood">I have read and understood all the things above</string>
@@ -149,9 +149,9 @@
     <string name="select_view_description">Choose how items will look on your lockscreen</string>
     <string name="show_upcoming_and_expired_event_indicators">Show upcoming and expired events in calendar</string>
     <string name="service_error">Background service error</string>
-    <string name="service_error_description">There was an error in the background wallpaper service :( Try restarting the application. If the problem persists, open an issue on the GitHub.</string>
+    <string name="service_error_description">An error occurred in the wallpaper updater service :(\nTry restarting the app, or reinstalling the current wallpaper.\nIf the problem persists, make a bug report on GitHub, this can be done using the side menu on the main screen of the app, and most likely you will get help.</string>
     <string name="wallpaper_obtain_error">Error getting wallpaper</string>
-    <string name="wallpaper_obtain_error_description">An error occurred while trying to get lockscreen wallpaper :( Try setting wallpaper manually and restarting the app. If the problem persists, your device probably restricts access to background or you uninstalled and reinstalled the app, but you can open an issue on GitHub, maybe i will help.</string>
+    <string name="wallpaper_obtain_error_description">An error occurred while trying to get lockscreen wallpaper :(\nTry setting wallpaper manually and restarting the app.\nIf the problem persists, your device probably restricts access to background or you uninstalled and reinstalled the app, but you can make a bug report on GitHub, this can be done using the side menu on the main screen of the app, and most likely you will get help.</string>
     <string name="work_in_progress">Work in progress</string>
     <string name="debug_menu">Debug menu</string>
     <string name="debug_menu_description">This menu contains stuff useful for debugging</string>
@@ -164,7 +164,7 @@
     <string name="sorting_settings_note">Note: this will change how events are sorted on the lockscreen and in the calendar</string>
     <string name="faq_title">Open FAQ</string>
     <string name="faq_description">View frequently asked questions</string>
-    <string name="latest_release_title">Latest release</string>
+    <string name="latest_release_title">Check updates</string>
     <string name="latest_release_description">Look for new version and changelog</string>
     <string name="github_issue_title">GitHub issue</string>
     <string name="github_issue_description">Submit a GitHub issue for a bug report or a feature request</string>
@@ -188,7 +188,7 @@
     <string name="share_logcat_description">Get application logs for debugging</string>
     <string name="debug_logging">Include additional logs</string>
     <string name="whole_calendar_settings_on_warning">Your turned on global account and calendar settings, because they override local ones, it may be confusing for you.</string>
-    <string name="whole_calendar_settings_off_warning">You turned off global account and calendar settings, the ones you have already changed were not reset.</string>
+    <string name="whole_calendar_settings_off_warning">You turned off global account and calendar settings. The ones you have already changed were not reset.</string>
     <string name="i_understand">I understand</string>
     <string name="settings_event_vertical_bias">Vertical position of events: %d</string>
     <string name="top">Top</string>
