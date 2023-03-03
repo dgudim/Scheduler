@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="@dimen/card_corner_radius">
+    android:layout_marginStart="@dimen/settings_entries_margin_left_right"
+    android:layout_marginEnd="@dimen/settings_entries_margin_left_right"
+    android:orientation="horizontal">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:text="@string/settings_lockscreen_background"
+        android:textAppearance="@style/SmallHeading"
+        tools:ignore="TextContrastCheck" />
+
+    <ImageButton
+        android:id="@+id/adaptive_bg_settings"
+        style="@style/DefaultImageButton"
+        android:layout_width="@dimen/clickable_icon_width"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:contentDescription="@string/action_settings"
+        app:srcCompat="@drawable/ic_settings_45"
+        tools:ignore="TouchTargetSizeCheck" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="3dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="@string/settings_lockscreen_background"
-            android:textAppearance="@style/SmallHeading"
-            tools:ignore="TextContrastCheck" />
+</LinearLayout>
 
-        <ImageButton
-            android:id="@+id/adaptive_bg_settings"
-            style="@style/DefaultImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/action_settings"
-            app:srcCompat="@drawable/ic_settings_45" />
-
-    </LinearLayout>
-
-</com.google.android.material.card.MaterialCardView>

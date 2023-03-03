@@ -23,7 +23,6 @@
         android:id="@+id/backgroundLayer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="1dp"
         android:layout_weight="1"
         app:cardCornerRadius="@dimen/card_corner_radius">
 
@@ -59,11 +58,9 @@
     <ImageButton
         android:id="@+id/open_settings_button"
         style="@style/DefaultImageButton"
-        android:layout_width="40dp"
+        android:layout_width="@dimen/clickable_icon_width"
         android:layout_height="match_parent"
         android:contentDescription="@string/action_settings"
-        android:paddingEnd="5dp"
-        app:srcCompat="@drawable/ic_settings_45"
-        tools:ignore="RtlSymmetry" />
+        app:srcCompat="@drawable/ic_settings_45" />
 
 </LinearLayout>

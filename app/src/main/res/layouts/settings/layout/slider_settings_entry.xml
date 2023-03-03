@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/settings_entries_margin_left_right"
+    android:layout_marginEnd="@dimen/settings_entries_margin_left_right"
     android:orientation="vertical">
 
     <TextView

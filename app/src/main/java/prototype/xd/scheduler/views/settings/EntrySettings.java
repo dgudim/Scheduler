@@ -2,6 +2,7 @@ package prototype.xd.scheduler.views.settings;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayDeletionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayGroupAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
@@ -106,15 +107,13 @@ public class EntrySettings extends PopupSettingsView {
             int selection = bnd.groupSpinner.getSelectedItem();
             
             if (selection == 0) {
+                displayAttentionDialog(wrapper, R.string.null_group_edit_message, R.string.close);
                 return;
             }
             
             Group selectedGroup = groupList.get(selection);
             
-            displayGroupAdditionEditDialog(wrapper,
-                    R.string.edit_group, -1,
-                    R.string.cancel, R.string.save,
-                    selectedGroup.getRawName(),
+            displayGroupAdditionEditDialog(wrapper, selectedGroup,
                     name -> {
                         int groupIndex = Group.groupIndexInList(groupList, name);
                         
@@ -143,10 +142,7 @@ public class EntrySettings extends PopupSettingsView {
             }
         });
         
-        bnd.addGroupButton.setOnClickListener(v -> displayGroupAdditionEditDialog(wrapper,
-                R.string.add_current_config_as_group_prompt,
-                R.string.add_current_config_as_group_message,
-                R.string.cancel, R.string.add, "",
+        bnd.addGroupButton.setOnClickListener(v -> displayGroupAdditionEditDialog(wrapper, null,
                 text -> {
                     Group existingGroup = findGroupInList(groupList, text);
                     if (existingGroup.isNullGroup()) {

@@ -22,6 +22,7 @@ import prototype.xd.scheduler.databinding.AppThemeSelectorSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.DividerBinding;
 import prototype.xd.scheduler.databinding.DoubleSliderSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.DropdownSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
@@ -29,6 +30,7 @@ import prototype.xd.scheduler.databinding.SliderSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
 import prototype.xd.scheduler.entities.RecycleViewEntry;
+import prototype.xd.scheduler.entities.settings_entries.DividerEntryConfig.DividerViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.DoubleSliderSettingsEntryConfig.DoubleSeekBarViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig.DropdownViewHolder;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig.ResetButtonViewHolder;
@@ -37,6 +39,7 @@ import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 enum SettingsEntryType {
     CALENDAR_ACCOUNT, CALENDAR, COMPOUND_CUSTOMIZATION,
+    DIVIDER,
     RESET_BUTTON, SLIDER, DOUBLE_SLIDER, SWITCH, DROPDOWN, TITLE_BAR, ADAPTIVE_BACKGROUND_SETTINGS, APP_THEME_SELECTOR
 }
 
@@ -71,6 +74,8 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
                 return new AppThemeSelectorViewHolder(wrapper, AppThemeSelectorSettingsEntryBinding.inflate(inflater, parent, false));
             case TITLE_BAR:
                 return new TitleBarViewHolder(wrapper, TitleSettingsEntryBinding.inflate(inflater, parent, false));
+            case DIVIDER:
+                return new DividerViewHolder(wrapper, DividerBinding.inflate(inflater, parent, false));
             default:
                 throw new IllegalArgumentException("Can't create viewHolder for " + SettingsEntryType.values()[viewType]);
         }

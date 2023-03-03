@@ -86,9 +86,11 @@
     <string name="item_global">(Global)</string>
     <string name="group_with_same_name_exists">A group with the same name already exists</string>
     <string name="group">Group</string>
-    <string name="enable">Enable</string>
+    <string name="enable_per_day_wallpapers">Enable per day wallpapers</string>
+    <string name="dynamic_wallpaper_off_warning">You have selected a wallpaper for a single day but “per day wallpapers” is not enabled</string>
     <string name="edit_group">Edit group</string>
     <string name="add_group">Add group</string>
+    <string name="null_group_edit_message">Nothing to edit, assign a group first</string>
     <string name="delete">Delete</string>
     <string name="choose_color">Choose color</string>
     <string name="category_event_visibility">Event visibility</string>
@@ -144,7 +146,7 @@
     <string name="before_you_continue">Before you continue</string>
     <string name="read_and_understood">I have read and understood all the things above</string>
     <string name="select_view">Select view</string>
-    <string name="choose_how_items_look">Choose how items will look on your lockscreen</string>
+    <string name="select_view_description">Choose how items will look on your lockscreen</string>
     <string name="show_upcoming_and_expired_event_indicators">Show upcoming and expired events in calendar</string>
     <string name="service_error">Background service error</string>
     <string name="service_error_description">There was an error in the background wallpaper service :( Try restarting the application. If the problem persists, open an issue on the GitHub.</string>

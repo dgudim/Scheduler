@@ -68,6 +68,11 @@ public class ContextWrapper {
     }
     
     @NonNull
+    public Resources getResources() {
+        return context.getResources();
+    }
+    
+    @NonNull
     @MainThread
     public <T extends Dialog> T attachDialogToLifecycle(@NonNull final T dialog,
                                                         @Nullable DialogInterface.OnDismissListener dismissListener) {

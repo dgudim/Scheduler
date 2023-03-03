@@ -11,12 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="5dp">
+        android:paddingStart="@dimen/settings_entries_margin_left_right"
+        android:paddingEnd="@dimen/settings_entries_margin_left_right">
 
         <TextView
             android:id="@+id/entry_settings_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
             android:gravity="center"
             android:text="Settings for..."
             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
@@ -27,7 +29,7 @@
             android:id="@+id/show_on_lock_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
@@ -63,7 +65,7 @@
             android:id="@+id/hide_by_content_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -146,7 +148,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -198,7 +200,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -250,7 +252,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -271,11 +273,10 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="TextContrastCheck" />
 
-                <View
+                <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/top_divider"
                     android:layout_width="0dp"
-                    android:layout_height="1.5dp"
-                    android:background="?android:attr/listDivider"
+                    android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/color_selection_title" />
@@ -407,11 +408,11 @@
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <View
+                    <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/vertical_divider"
-                        android:layout_width="1.5dp"
+                        android:layout_width="1dp"
                         android:layout_height="0dp"
-                        android:background="?android:attr/listDivider"
+                        android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/color_selection_container"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -430,11 +431,10 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <View
+                <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/bottom_divider"
                     android:layout_width="0dp"
-                    android:layout_height="1.5dp"
-                    android:background="?android:attr/listDivider"
+                    android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
@@ -497,7 +497,7 @@
             android:id="@+id/show_days_upcoming_expired_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -604,7 +604,7 @@
             android:id="@+id/hide_expired_items_by_time_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
@@ -662,26 +662,26 @@
 
             <ImageButton
                 android:id="@+id/addGroupButton"
+                style="@style/ClickableView"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/round_bg_8dp"
-                android:backgroundTint="?colorPrimaryContainer"
+                android:backgroundTint="?colorSecondaryContainer"
                 android:contentDescription="@string/add_group"
-                android:minWidth="10dp"
                 app:srcCompat="@drawable/ic_add_24" />
 
             <ImageButton
                 android:id="@+id/editGroupButton"
+                style="@style/ClickableView"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/round_bg_8dp"
-                android:backgroundTint="?colorPrimaryContainer"
+                android:backgroundTint="?colorSecondaryContainer"
                 android:contentDescription="@string/edit_group"
-                android:minWidth="10dp"
                 app:srcCompat="@drawable/ic_edit_24" />
 
         </LinearLayout>

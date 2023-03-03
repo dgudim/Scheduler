@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:paddingStart="3dp"
-    android:paddingEnd="3dp">
+    android:animateLayoutChanges="true">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textField"
@@ -14,6 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/event_name_input_hint"
+        android:paddingStart="@dimen/dialog_menu_padding_left_right"
+        android:paddingTop="@dimen/dialog_menu_padding_top"
+        android:paddingEnd="@dimen/dialog_menu_padding_left_right"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -33,6 +34,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/group"
+        android:paddingStart="@dimen/dialog_menu_padding_left_right"
+        android:paddingEnd="@dimen/dialog_menu_padding_left_right"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textField">
@@ -59,6 +62,8 @@
         android:id="@+id/global_entry_switch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:paddingStart="@dimen/dialog_menu_padding_left_right"
+        android:paddingEnd="@dimen/dialog_menu_padding_left_right"
         android:text="@string/global"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +75,7 @@
         style="@style/SecondaryButtonStyleRoundCompact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="3dp"
         app:layout_constraintEnd_toStartOf="@+id/date_from_to_arrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider"
@@ -92,27 +97,25 @@
         style="@style/SecondaryButtonStyleRoundCompact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="3dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/date_from_to_arrow"
         app:layout_constraintTop_toBottomOf="@+id/divider"
         tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/global_entry_switch" />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/divider2"
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="2dp"
-        android:background="?android:attr/listDivider"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/day_to_button" />

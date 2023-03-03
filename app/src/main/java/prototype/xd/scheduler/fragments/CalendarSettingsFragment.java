@@ -1,13 +1,18 @@
 package prototype.xd.scheduler.fragments;
 
 import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
+import androidx.recyclerview.widget.DividerItemDecoration;
+
+import com.google.android.material.divider.MaterialDividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,19 +99,9 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
                 Static.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
                 getString(R.string.settings_allow_global_calendar_account_settings), (buttonView, isChecked) -> {
             if (isChecked) {
-                displayMessageDialog(wrapper, builder -> {
-                    builder.setTitle(R.string.attention);
-                    builder.setMessage(R.string.whole_calendar_settings_on_warning);
-                    builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
-                    builder.setPositiveButton(R.string.i_understand, null);
-                });
+                displayAttentionDialog(wrapper, R.string.whole_calendar_settings_on_warning, R.string.i_understand);
             } else {
-                displayMessageDialog(wrapper, builder -> {
-                    builder.setTitle(R.string.attention);
-                    builder.setMessage(R.string.whole_calendar_settings_off_warning);
-                    builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
-                    builder.setPositiveButton(R.string.i_understand, null);
-                });
+                displayAttentionDialog(wrapper, R.string.whole_calendar_settings_off_warning, R.string.i_understand);
             }
             for (GenericCalendarSettingsEntryConfig calendarEntryConfig : calendarConfigEntries) {
                 calendarEntryConfig.setShowSettings(isChecked);
@@ -115,5 +110,11 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
             listViewAdapter.notifyItemRangeChanged(staticEntries.size(), calendarConfigEntries.size());
         }, false));
         staticEntriesListViewAdapter.notifyItemInserted(staticEntries.size());
+    }
+    
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        binding.recyclerView.addItemDecoration(new MaterialDividerItemDecoration(wrapper.context, DividerItemDecoration.VERTICAL));
+        super.onViewCreated(view, savedInstanceState);
     }
 }

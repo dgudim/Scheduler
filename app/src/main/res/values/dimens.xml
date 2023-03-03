@@ -1,4 +1,28 @@
 <resources>
+    <dimen name="permission_status_badge_top_margin">3dp</dimen>
+    <dimen name="permission_screen_padding_left_right">15dp</dimen>
+    <dimen name="permission_screen_padding_top">10dp</dimen>
+    <dimen name="permission_screen_item_separation">16dp</dimen>
+
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="card_corner_radius">5dp</dimen>
+
+    <dimen name="clickable_icon_width">37dp</dimen>
+
+    <dimen name="dialog_menu_padding_left_right">8dp</dimen>
+    <dimen name="dialog_menu_padding_top">5dp</dimen>
+
+    <dimen name="nav_menu_padding_top">8dp</dimen>
+    <dimen name="logo_size">56dp</dimen>
+    <dimen name="compound_icon_width">45dp</dimen>
+    <dimen name="icon_to_text_margin">5dp</dimen>
+    <dimen name="compound_menu_entry_top_margin">8dp</dimen>
+    <dimen name="compound_menu_entry_top_margin_inverse">-8dp</dimen>
+
+    <dimen name="lockscreen_item_vertical_padding">2.5dp</dimen>
+    <dimen name="list_item_vertical_padding">2dp</dimen>
+    <dimen name="entry_settings_vertical_padding">3dp</dimen>
+
+    <dimen name="settings_entries_margin_left_right">5dp</dimen>
+    <dimen name="settings_entries_card_padding">5dp</dimen>
 </resources>

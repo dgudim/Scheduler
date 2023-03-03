@@ -290,9 +290,12 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     // we don't know how many will be left after filtering, default capacity is fine
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     public List<TodoEntry> getOnDay(long day,
-                                    @NonNull BiPredicate<TodoEntry, TodoEntry.EntryType> filter) {
+                                    @NonNull BiPredicate<TodoEntry, TodoEntry.EntryType> filter,
+                                    boolean includeAll) {
         List<TodoEntry> filtered = new ArrayList<>();
-        Set<TodoEntry> notFiltered = displayUpcomingExpired ? entriesPerDayUpcomingExpired.get(day) : entriesPerDayCore.get(day);
+        Set<TodoEntry> notFiltered = (displayUpcomingExpired || includeAll) ?
+                entriesPerDayUpcomingExpired.get(day) :
+                entriesPerDayCore.get(day);
         Consumer<TodoEntry> consumer = entry -> {
             if (filter.test(entry, getEntryType(entry, day))) {
                 filtered.add(entry);

@@ -5,5 +5,7 @@
     style="@style/DefaultButtonStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/settings_entries_margin_left_right"
+    android:layout_marginEnd="@dimen/settings_entries_margin_left_right"
     android:text="@string/settings_reset_to_defaults"
     tools:ignore="VisualLintButtonSize" />

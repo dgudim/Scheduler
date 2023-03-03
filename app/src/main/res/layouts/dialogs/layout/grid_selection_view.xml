@@ -3,9 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/light_gray_bg_tint"
     android:orientation="vertical"
-    android:padding="5dp"
+    android:paddingStart="@dimen/dialog_menu_padding_left_right"
+    android:paddingTop="@dimen/dialog_menu_padding_top"
+    android:paddingEnd="@dimen/dialog_menu_padding_left_right"
     tools:ignore="Overdraw">
 
     <GridView

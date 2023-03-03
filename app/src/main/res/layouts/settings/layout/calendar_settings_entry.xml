@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/settings_entries_margin_left_right"
+    android:layout_marginEnd="@dimen/settings_entries_margin_left_right"
     android:orientation="horizontal">
 
     <prototype.xd.scheduler.views.CheckBox
@@ -42,7 +44,7 @@
     <ImageButton
         android:id="@+id/color_select_button"
         style="@style/DefaultImageButton"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/clickable_icon_width"
         android:layout_height="match_parent"
         android:contentDescription="@string/action_per_color_settings"
         app:srcCompat="@drawable/ic_palette_45"
@@ -51,7 +53,7 @@
     <ImageButton
         android:id="@+id/settings_button"
         style="@style/DefaultImageButton"
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/clickable_icon_width"
         android:layout_height="match_parent"
         android:contentDescription="@string/action_settings"
         app:srcCompat="@drawable/ic_settings_45"

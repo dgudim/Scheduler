@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
+import static prototype.xd.scheduler.utilities.DialogUtilities.displayErrorDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
@@ -21,10 +22,12 @@ import static prototype.xd.scheduler.utilities.Static.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.MainThread;
@@ -35,6 +38,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.divider.MaterialDividerItemDecoration;
 import com.google.android.material.navigation.NavigationView;
 
 import java.time.LocalDate;
@@ -92,6 +96,10 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         contentBnd.content.recyclerView.setAdapter(todoListViewAdapter);
+        MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
+        divider.setDividerColor(Color.TRANSPARENT);
+        divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.list_item_vertical_padding));
+        contentBnd.content.recyclerView.addItemDecoration(divider);
         
         DrawerLayout drawerLayout = binding.root;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -232,22 +240,18 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         
         if (SERVICE_FAILED.get()) {
             // display warning if the background service failed
-            displayMessageDialog(wrapper, R.style.ErrorAlertDialogTheme, builder -> {
-                builder.setTitle(R.string.service_error);
-                builder.setMessage(R.string.service_error_description);
-                builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
-                builder.setPositiveButton(R.string.close, null);
-            }, dialog -> SERVICE_FAILED.put(Boolean.FALSE));
+            displayErrorDialog(wrapper,
+                    R.string.service_error,
+                    R.string.service_error_description,
+                    dialog -> SERVICE_FAILED.put(Boolean.FALSE));
         }
         
         if (WALLPAPER_OBTAIN_FAILED.get()) {
             // display warning if there wan an error getting the wallpaper
-            displayMessageDialog(wrapper, R.style.ErrorAlertDialogTheme, builder -> {
-                builder.setTitle(R.string.wallpaper_obtain_error);
-                builder.setMessage(R.string.wallpaper_obtain_error_description);
-                builder.setIcon(R.drawable.ic_warning_24_onerrorcontainer);
-                builder.setPositiveButton(R.string.close, null);
-            }, dialog -> WALLPAPER_OBTAIN_FAILED.put(Boolean.FALSE));
+            displayErrorDialog(wrapper,
+                    R.string.wallpaper_obtain_error,
+                    R.string.wallpaper_obtain_error_description,
+                    dialog -> WALLPAPER_OBTAIN_FAILED.put(Boolean.FALSE));
         }
     }
     

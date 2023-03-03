@@ -5,8 +5,10 @@
     android:id="@+id/textInputLayout"
     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
     android:layout_width="match_parent"
-    android:hint="@string/day_default"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/settings_entries_margin_left_right"
+    android:layout_marginEnd="@dimen/settings_entries_margin_left_right"
+    android:hint="@string/day_default">
 
     <prototype.xd.scheduler.views.SelectableAutoCompleteTextView
         android:id="@+id/dropdownSpinner"
