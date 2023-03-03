@@ -125,6 +125,13 @@
         <item name="materialThemeOverlay">@style/SecondaryButtonThemeOverlay</item>
     </style>
 
+    <style name="MaterialImageButtonStyle" parent="SecondaryButtonStyleRoundCompact">
+        <item name="iconPadding">0dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconSize">26dp</item>
+        <item name="shapeAppearance">?attr/shapeAppearanceCornerSmall</item>
+    </style>
+
     <!-- overlays -->
     <style name="SecondaryButtonThemeOverlay" parent="ThemeOverlay.Material3.Button">
         <item name="colorOnContainer">?colorOnSecondaryContainer</item>
