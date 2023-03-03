@@ -670,6 +670,7 @@
                 android:background="@drawable/round_bg_8dp"
                 android:backgroundTint="?colorSecondaryContainer"
                 android:contentDescription="@string/add_group"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:srcCompat="@drawable/ic_add_24" />
 
             <ImageButton
