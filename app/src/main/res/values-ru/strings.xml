@@ -9,6 +9,7 @@
     <string name="choose_color">Выберите цвет</string>
     <string name="add_current_config_as_group_message">Параметры, которые были изменены вручную (Зеленые или синие ромбики), будут добавлены в группу</string>
     <string name="add_group">Добавить группу</string>
+    <string name="null_group_edit_message">Нечего редактировать, для начала присвойте группу</string>
     <string name="delete">Удалить</string>
     <string name="are_you_sure">Вы уверены?</string>
     <string name="save">Сохранить</string>
@@ -33,7 +34,7 @@
     </plurals>
     <string name="add_current_config_as_group_prompt">Добавить текущую конфигурацию как группу?</string>
     <string name="name">Название</string>
-    <string name="title">Название события</string>
+    <string name="title">Название</string>
     <string name="group_with_same_name_exists">Группа с таким именем уже существует</string>
     <string name="overwrite_prompt">Перезаписать?</string>
     <string name="no">Нет</string>
@@ -42,7 +43,8 @@
     <string name="reset_settings_prompt">Сбросить настройки?</string>
     <string name="cancel">Отмена</string>
     <string name="add">Добавить</string>
-    <string name="enable">Включить</string>
+    <string name="enable_per_day_wallpapers">Отдельные обои на каждый день</string>
+    <string name="dynamic_wallpaper_off_warning">Вы выбрали обои на один день, но “отдельные обои на каждый день” выключены</string>
     <string name="group">Группа</string>
     <string name="service_description">Сервис для обновления фона блокировки</string>
     <string name="service_name">Сервис фонового обоновления</string>
@@ -141,7 +143,7 @@
     <string name="before_you_continue">Перед тем как продолжить</string>
     <string name="read_and_understood">Я прочитал и понял все вышесказанное</string>
     <string name="select_view">Выберите вид</string>
-    <string name="choose_how_items_look">Выберите, как элементы будут выглядеть на экране блокировки</string>
+    <string name="select_view_description">Выберите, как элементы будут выглядеть на экране блокировки</string>
     <string name="nav_drawer_open">Открыть боковое меню</string>
     <string name="nav_drawer_close">Закрыть боковое меню</string>
     <string name="please_read_the_notes">Пожалуйста прочитайте информацию</string>
