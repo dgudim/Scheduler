@@ -7,7 +7,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="card_corner_radius">5dp</dimen>
 
-    <dimen name="clickable_icon_width">37dp</dimen>
+    <dimen name="clickable_icon_size">37dp</dimen>
 
     <dimen name="dialog_menu_padding_left_right">8dp</dimen>
     <dimen name="dialog_menu_padding_top">5dp</dimen>

@@ -59,7 +59,7 @@
         <ImageButton
             android:id="@+id/open_settings_button"
             style="@style/DefaultImageButton"
-            android:layout_width="@dimen/clickable_icon_width"
+            android:layout_width="@dimen/clickable_icon_size"
             android:layout_height="wrap_content"
             android:contentDescription="@string/action_settings"
             app:srcCompat="@drawable/ic_settings_45"

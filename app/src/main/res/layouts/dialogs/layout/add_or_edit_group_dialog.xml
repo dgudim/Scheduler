@@ -9,7 +9,7 @@
     <ImageButton
         android:id="@+id/delete_group_button"
         style="@style/DefaultImageButton"
-        android:layout_width="@dimen/clickable_icon_width"
+        android:layout_width="@dimen/clickable_icon_size"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
         android:contentDescription="@string/action_delete_group"

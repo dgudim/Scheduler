@@ -50,7 +50,7 @@
     <ImageButton
         android:id="@+id/settings_button"
         style="@style/DefaultImageButton"
-        android:layout_width="@dimen/clickable_icon_width"
+        android:layout_width="@dimen/clickable_icon_size"
         android:layout_height="0dp"
         android:contentDescription="@string/action_settings"
         android:visibility="invisible"
@@ -64,7 +64,7 @@
     <ImageButton
         android:id="@+id/expand_button"
         style="@style/DefaultImageButton"
-        android:layout_width="@dimen/clickable_icon_width"
+        android:layout_width="@dimen/clickable_icon_size"
         android:layout_height="0dp"
         android:layout_marginEnd="@dimen/settings_entries_margin_left_right"
         android:contentDescription="@string/action_expand"

@@ -41,7 +41,7 @@
     <ImageButton
         android:id="@+id/open_settings_button"
         style="@style/DefaultImageButton"
-        android:layout_width="@dimen/clickable_icon_width"
+        android:layout_width="@dimen/clickable_icon_size"
         android:layout_height="match_parent"
         android:contentDescription="@string/action_settings"
         app:srcCompat="@drawable/ic_settings_45"
@@ -50,7 +50,7 @@
     <ImageButton
         android:id="@+id/delete_entry_button"
         style="@style/DefaultImageButton"
-        android:layout_width="@dimen/clickable_icon_width"
+        android:layout_width="@dimen/clickable_icon_size"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:adjustViewBounds="false"
