@@ -95,6 +95,9 @@
     <string name="settings_hide_expired_entries_by_time">Приховувати минулі події на екрані блокування (за часом)</string>
     <string name="status">Дата: %s  Подій: %d</string>
     <string name="app_theme">Тема додатка</string>
+    <string name="import_export_data"></string>
+    <string name="import_description"></string>
+    <string name="export_description"></string>
     <string name="app_theme_light">Світла</string>
     <string name="app_theme_dark">Темна</string>
     <string name="app_theme_system">Системна</string>

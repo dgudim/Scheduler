@@ -116,6 +116,9 @@
     <string name="event_name_input_hint">Событие</string>
     <string name="status">Дата: %s  Событий: %d</string>
     <string name="app_theme">Тема приложения</string>
+    <string name="import_export_data">Импорт/экспорт настроек</string>
+    <string name="import_description">Импорт настроек приложения</string>
+    <string name="export_description">Экспорт настроек приложения</string>
     <string name="app_theme_system">Системная</string>
     <string name="app_theme_dark">Тёмная</string>
     <string name="app_theme_light">Светлая</string>
