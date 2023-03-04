@@ -245,17 +245,17 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     private transient TodoEntryList container;
     
     // ----------- supplementary stuff for sorting START
-    int sortingIndex;
+    int typeSortingIndex;
     
-    public int getSortingIndex() {
-        return sortingIndex;
+    public int getTypeSortingIndex() {
+        return typeSortingIndex;
     }
     
-    public void cacheSortingIndex(long targetDayUTC, @NonNull List<EntryType> order) {
-        sortingIndex = order.indexOf(getEntryType(targetDayUTC));
-        if (sortingIndex == -1) {
+    public void cacheTypeSortingIndex(long targetDayUTC, @NonNull List<EntryType> order) {
+        typeSortingIndex = order.indexOf(getEntryType(targetDayUTC));
+        if (typeSortingIndex == -1) {
             // fallback to treating like today's
-            sortingIndex = EntryType.TODAY.ordinal();
+            typeSortingIndex = order.indexOf(EntryType.TODAY);
         }
     }
     

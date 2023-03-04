@@ -294,19 +294,33 @@ public final class Utilities {
     @NonNull
     public static List<TodoEntry> sortEntries(@NonNull List<TodoEntry> entries, long targetDay) {
         
+        if(entries.isEmpty()) {
+            return entries;
+        }
+    
         List<TodoEntry.EntryType> sortingOrder = TODO_ITEM_SORTING_ORDER.get();
         
         for (TodoEntry entry : entries) {
-            entry.cacheSortingIndex(targetDay, sortingOrder);
+            entry.cacheTypeSortingIndex(targetDay, sortingOrder);
             if (entry.isFromSystemCalendar()) {
                 // obtain nearest start ms near a particular day for use in sorting later
                 entry.cacheNearestStartMsUTC(targetDay);
             }
         }
         
-        entries.sort(new TodoEntryGroupComparator());
-        entries.sort(new TodoEntryTypeComparator());
-        entries.sort(new TodoEntryPriorityComparator());
+        // sort by normal entries by alphabet, calendar by time
+        entries.sort((o1, o2) -> {
+            if(o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
+                return Long.compare(o1.getCachedNearestStartMsUTC(), o2.getCachedNearestStartMsUTC());
+            }
+            return String.CASE_INSENSITIVE_ORDER.compare(o1.getRawTextValue(), o2.getRawTextValue());
+        });
+        // group by group name
+        entries.sort((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getRawGroupName(), o2.getRawGroupName()));
+        // sort by priority
+        entries.sort((o1, o2) ->  Integer.compare(o2.priority.getToday(), o1.priority.getToday()));
+        // sort by type
+        entries.sort(Comparator.comparingInt(TodoEntry::getTypeSortingIndex));
         
         if (MERGE_ENTRIES.get()) {
             return mergeInstances(entries);
@@ -724,29 +738,5 @@ public final class Utilities {
                 + (60L * 60 * hours)
                 + (60L * minutes)
                 + seconds);
-    }
-}
-
-class TodoEntryTypeComparator implements Comparator<TodoEntry> {
-    @Override
-    public int compare(@NonNull TodoEntry o1, @NonNull TodoEntry o2) {
-        return Integer.compare(o1.getSortingIndex(), o2.getSortingIndex());
-    }
-}
-
-class TodoEntryPriorityComparator implements Comparator<TodoEntry> {
-    @Override
-    public int compare(@NonNull TodoEntry o1, @NonNull TodoEntry o2) {
-        return Integer.compare(o2.priority.getToday(), o1.priority.getToday());
-    }
-}
-
-class TodoEntryGroupComparator implements Comparator<TodoEntry> {
-    @Override
-    public int compare(@NonNull TodoEntry o1, @NonNull TodoEntry o2) {
-        if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
-            return Long.compare(o1.getCachedNearestStartMsUTC(), o2.getCachedNearestStartMsUTC());
-        }
-        return Integer.compare(o1.getRawGroupName().hashCode(), o2.getRawGroupName().hashCode());
     }
 }
