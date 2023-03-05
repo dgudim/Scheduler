@@ -56,9 +56,9 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
         return SLIDER.ordinal();
     }
     
-    static class SeekBarViewHolder extends SettingsEntryConfig.SettingsViewHolder<SliderSettingsEntryBinding, SliderSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<SliderSettingsEntryBinding, SliderSettingsEntryConfig> {
         
-        SeekBarViewHolder(@NonNull ContextWrapper wrapper, @NonNull SliderSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull SliderSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         

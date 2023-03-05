@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="@string/import_export_data"
+        android:text="@string/import_export_settings"
         android:textAppearance="@style/SmallHeading" />
 
     <Space
@@ -21,23 +21,25 @@
         android:layout_weight="1" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/export_settings_button"
         style="@style/DefaultImageButton"
         android:layout_width="@dimen/clickable_icon_size"
         android:layout_height="@dimen/clickable_icon_size"
         android:layout_marginEnd="@dimen/icon_to_text_margin"
         android:layout_weight="0"
-        android:contentDescription="@string/export_description"
+        android:contentDescription="@string/export_settings_description"
         app:srcCompat="@drawable/ic_upload_24"
         tools:ignore="TouchTargetSizeCheck" />
 
-    <ImageView
-        android:id="@+id/imageView"
+    <ImageButton
+        android:id="@+id/import_settings_button"
+        style="@style/DefaultImageButton"
         android:layout_width="@dimen/clickable_icon_size"
         android:layout_height="@dimen/clickable_icon_size"
         android:layout_weight="0"
-        android:contentDescription="@string/import_description"
-        app:srcCompat="@drawable/ic_download_24" />
+        android:contentDescription="@string/import_settings_description"
+        app:srcCompat="@drawable/ic_download_24"
+        tools:ignore="TouchTargetSizeCheck" />
 
 </LinearLayout>
 

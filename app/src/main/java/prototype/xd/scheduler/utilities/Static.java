@@ -475,6 +475,8 @@ public final class Static {
     public static final String ENTRIES_FILE_BACKUP = ENTRIES_FILE + ".old";
     public static final String GROUPS_FILE = "groupData";
     public static final String GROUPS_FILE_BACKUP = GROUPS_FILE + ".old";
+    public static final String SETTINGS_FILE = "settings_export.dat";
+    public static final String SETTINGS_FILE_BACKUP = SETTINGS_FILE + ".old";
     
     public static final String LOGCAT_FILE = "logcat.txt";
     

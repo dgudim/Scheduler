@@ -4,34 +4,18 @@ import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LOCAL;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_ROOT;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
-import static prototype.xd.scheduler.utilities.Logger.error;
-import static prototype.xd.scheduler.utilities.Logger.logException;
-import static prototype.xd.scheduler.utilities.Static.ADAPTIVE_BACKGROUND_ENABLED;
-import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
-import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
-import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.MainThread;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
 
 import com.canhub.cropper.CropImageContract;
 import com.canhub.cropper.CropImageContractOptions;
-import com.canhub.cropper.CropImageOptions;
-import com.canhub.cropper.CropImageView;
-import com.google.android.material.color.MaterialColors;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,27 +23,24 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
-import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationEntryConfig;
-import prototype.xd.scheduler.entities.settings_entries.DividerEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.DividerSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.DoubleSliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.DropdownSettingsEntryConfig;
+import prototype.xd.scheduler.entities.settings_entries.ImportExportSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.ResetButtonSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SliderSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
-import prototype.xd.scheduler.utilities.ColorUtilities;
-import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Static;
 
 public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> { // NOSONAR, this is a fragment
     
-    public static final String NAME = GlobalSettingsFragment.class.getSimpleName();
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBgSettingsEntry;
-    
     final ActivityResultLauncher<CropImageContractOptions> cropBg =
-            registerForActivityResult(new CropImageContract(), this::onBgCropped);
+            registerForActivityResult(new CropImageContract(), result -> adaptiveBgSettingsEntry.notifyBackgroundSelected(wrapper, result));
     
     // initial window creation
     @SuppressLint("NotifyDataSetChanged")
@@ -68,42 +49,26 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper.context,
-                bgIndex -> {
-                    
-                    if (!ADAPTIVE_BACKGROUND_ENABLED.get()) {
-                        displayAttentionDialog(wrapper, R.string.dynamic_wallpaper_off_warning, R.string.close);
-                    }
-                    
-                    CropImageOptions options = new CropImageOptions();
-                    
-                    options.imageSourceIncludeCamera = false;
-                    options.outputCompressFormat = Bitmap.CompressFormat.PNG;
-                    options.aspectRatioX = DISPLAY_METRICS_WIDTH.get();
-                    options.aspectRatioY = DISPLAY_METRICS_HEIGHT.get();
-                    options.fixAspectRatio = true;
-                    options.progressBarColor = MaterialColors.getColor(wrapper.context, R.attr.colorPrimary, Color.GRAY);
-                    options.activityBackgroundColor = Color.TRANSPARENT;
-                    options.activityMenuIconColor = MaterialColors.getColor(wrapper.context, R.attr.colorControlNormal, Color.GRAY);
-                    
-                    cropBg.launch(new CropImageContractOptions(null, options));
-                });
+        adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper, cropBg);
         
         List<SettingsEntryConfig> settingsEntries = List.of(
                 
                 new TitleBarSettingsEntryConfig(getString(R.string.category_application_settings)),
-                new DividerEntryConfig(),
+                new DividerSettingsEntryConfig(),
                 new AppThemeSelectorEntryConfig(),
+                new DividerSettingsEntryConfig(),
+                new ImportExportSettingsEntryConfig(),
                 new DropdownSettingsEntryConfig<>(R.string.first_weekday, FIRST_DAYS_OF_WEEK_LOCAL, FIRST_DAYS_OF_WEEK_ROOT, FIRST_DAY_OF_WEEK),
+                
                 new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)),
-                new DividerEntryConfig(),
+                new DividerSettingsEntryConfig(),
                 adaptiveBgSettingsEntry,
-                new CompoundCustomizationEntryConfig(),
+                new CompoundCustomizationSettingsEntryConfig(),
                 
                 new SwitchSettingsEntryConfig(
                         Static.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)),
                 
-                new DividerEntryConfig(),
+                new DividerSettingsEntryConfig(),
                 
                 new SliderSettingsEntryConfig(Static.LOCKSCREEN_VIEW_VERTICAL_BIAS,
                         0, 100, 5, value -> {
@@ -126,7 +91,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                     return baseString;
                 }),
                 
-                new DividerEntryConfig(),
+                new DividerSettingsEntryConfig(),
                 new TitleBarSettingsEntryConfig(getString(R.string.category_event_visibility)),
                 
                 new DoubleSliderSettingsEntryConfig(wrapper.context, R.string.settings_show_events,
@@ -140,11 +105,11 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                         Static.BG_COLOR.EXPIRED.defaultValue),
                 
                 new SwitchSettingsEntryConfig(Static.MERGE_ENTRIES, getString(R.string.settings_merge_events)),
-                new DividerEntryConfig(),
+                new DividerSettingsEntryConfig(),
                 new SwitchSettingsEntryConfig(Static.HIDE_EXPIRED_ENTRIES_BY_TIME, getString(R.string.settings_hide_expired_entries_by_time)),
-                new DividerEntryConfig(),
+                new DividerSettingsEntryConfig(),
                 new SwitchSettingsEntryConfig(Static.SHOW_UPCOMING_EXPIRED_IN_LIST, getString(R.string.show_upcoming_and_expired_event_indicators)),
-                new DividerEntryConfig());
+                new DividerSettingsEntryConfig());
         
         //                                                                      two entries (global switches)
         List<SettingsEntryConfig> globalSwitchSettingsEntries = new ArrayList<>(2);
@@ -155,7 +120,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new SwitchSettingsEntryConfig(
                         Static.SHOW_GLOBAL_ITEMS_LOCK, getString(R.string.settings_show_global_items_lock),
                         (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked), false),
-                new DividerEntryConfig(),
+                new DividerSettingsEntryConfig(),
                 new SwitchSettingsEntryConfig(
                         Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK, getString(R.string.settings_show_global_items_label_lock))));
         
@@ -165,32 +130,11 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new SettingsListViewAdapter(wrapper, settingsEntries),
                 globalSwitchSettingsListViewAdapter,
                 new SettingsListViewAdapter(wrapper,
-                        List.of(new DividerEntryConfig(),
+                        List.of(new DividerSettingsEntryConfig(),
                                 new ResetButtonSettingsEntryConfig((dialog, which) -> {
                                     Static.clearAll();
                                     listViewAdapter.notifyDataSetChanged();
                                 }))));
         
-    }
-    
-    public void onBgCropped(@NonNull CropImageView.CropResult result) {
-        if (result.isSuccessful()) {
-            Uri uri = result.getUriContent();
-            new Thread(() -> {
-                try (InputStream stream = requireActivity().getContentResolver().openInputStream(uri)) {
-                    
-                    if (stream != null) {
-                        ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                                getFile(DateManager.BG_NAMES_ROOT.get(adaptiveBgSettingsEntry.getLastClickedBgIndex())));
-                        requireActivity().runOnUiThread(() -> adaptiveBgSettingsEntry.notifyBackgroundUpdated());
-                    } else {
-                        error(NAME, "Stream null for uri: " + uri);
-                    }
-                    
-                } catch (Exception e) {
-                    logException(Thread.currentThread().getName(), e);
-                }
-            }, "LBCP thread").start();
-        }
     }
 }
