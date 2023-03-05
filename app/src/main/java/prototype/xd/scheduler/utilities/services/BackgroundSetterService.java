@@ -48,6 +48,12 @@ public final class BackgroundSetterService extends LifecycleService { // NOSONAR
         context.startForegroundService(keepAliveIntent);
     }
     
+    @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
+    public static void exit(@NonNull Context context) {
+        Intent intent = new Intent(context, BackgroundSetterService.class);
+        context.stopService(intent);
+    }
+    
     // Foreground service notification =========
     private final int foregroundNotificationId = (int) (System.currentTimeMillis() % 10000);
     

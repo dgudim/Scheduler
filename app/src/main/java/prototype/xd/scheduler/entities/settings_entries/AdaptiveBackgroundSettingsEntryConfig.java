@@ -3,8 +3,6 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
-import static prototype.xd.scheduler.utilities.Logger.error;
-import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Static.ADAPTIVE_BACKGROUND_ENABLED;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
@@ -14,7 +12,6 @@ import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.Uri;
 import android.widget.GridView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,8 +21,6 @@ import com.canhub.cropper.CropImageContractOptions;
 import com.canhub.cropper.CropImageOptions;
 import com.canhub.cropper.CropImageView;
 import com.google.android.material.color.MaterialColors;
-
-import java.io.InputStream;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.PerDayBgGridViewAdapter;
@@ -42,7 +37,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     
     @NonNull
     private final PerDayBgGridViewAdapter gridViewAdapter;
-    private Integer lastClickedBgIndex;
+    private int lastClickedBgIndex;
     
     public AdaptiveBackgroundSettingsEntryConfig(@NonNull final ContextWrapper wrapper,
                                                  @NonNull final ActivityResultLauncher<CropImageContractOptions> bgSelectionLauncher) {
@@ -52,9 +47,9 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
             if (!ADAPTIVE_BACKGROUND_ENABLED.get()) {
                 displayAttentionDialog(wrapper, R.string.dynamic_wallpaper_off_warning, R.string.close);
             }
-    
+            
             CropImageOptions options = new CropImageOptions();
-    
+            
             options.imageSourceIncludeCamera = false;
             options.outputCompressFormat = Bitmap.CompressFormat.PNG;
             options.aspectRatioX = DISPLAY_METRICS_WIDTH.get();
@@ -63,29 +58,18 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
             options.progressBarColor = MaterialColors.getColor(wrapper.context, R.attr.colorPrimary, Color.GRAY);
             options.activityBackgroundColor = Color.TRANSPARENT;
             options.activityMenuIconColor = MaterialColors.getColor(wrapper.context, R.attr.colorControlNormal, Color.GRAY);
-    
+            
             bgSelectionLauncher.launch(new CropImageContractOptions(null, options));
         });
     }
     
     public void notifyBackgroundSelected(@NonNull ContextWrapper wrapper, @NonNull CropImageView.CropResult result) {
         if (result.isSuccessful()) {
-            Uri uri = result.getUriContent();
-            new Thread(() -> {
-                try (InputStream stream = wrapper.activity.getContentResolver().openInputStream(uri)) {
-                
-                    if (stream != null) {
-                        ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
-                                getFile(DateManager.BG_NAMES_ROOT.get(lastClickedBgIndex)));
-                    } else {
-                        error(NAME, "Stream null for uri: " + uri);
-                    }
-                
-                } catch (Exception e) {
-                    logException(Thread.currentThread().getName(), e);
-                }
-            }, "LBCP thread").start();
-            wrapper.runOnUiThread(gridViewAdapter::notifyDataSetChanged);
+            new Thread(() -> wrapper.processUri(result.getUriContent(), stream -> {
+                ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
+                        getFile(DateManager.BG_NAMES_ROOT.get(lastClickedBgIndex)));
+                wrapper.runOnUiThread(gridViewAdapter::notifyDataSetChanged);
+            }), "LBCP thread").start();
         }
     }
     

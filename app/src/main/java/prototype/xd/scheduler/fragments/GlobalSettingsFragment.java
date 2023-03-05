@@ -1,5 +1,6 @@
 package prototype.xd.scheduler.fragments;
 
+import static androidx.activity.result.contract.ActivityResultContracts.OpenDocument;
 import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LOCAL;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_ROOT;
@@ -39,8 +40,12 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBgSettingsEntry;
-    final ActivityResultLauncher<CropImageContractOptions> cropBg =
+    
+    final ActivityResultLauncher<CropImageContractOptions> cropBgLauncher =
             registerForActivityResult(new CropImageContract(), result -> adaptiveBgSettingsEntry.notifyBackgroundSelected(wrapper, result));
+    
+    final ActivityResultLauncher<String[]> importSettingsLauncher =
+            registerForActivityResult(new OpenDocument(), result -> ImportExportSettingsEntryConfig.notifyFileChosen(wrapper, result));
     
     // initial window creation
     @SuppressLint("NotifyDataSetChanged")
@@ -49,7 +54,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper, cropBg);
+        adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper, cropBgLauncher);
         
         List<SettingsEntryConfig> settingsEntries = List.of(
                 
@@ -57,7 +62,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new DividerSettingsEntryConfig(),
                 new AppThemeSelectorEntryConfig(),
                 new DividerSettingsEntryConfig(),
-                new ImportExportSettingsEntryConfig(),
+                new ImportExportSettingsEntryConfig(importSettingsLauncher),
                 new DropdownSettingsEntryConfig<>(R.string.first_weekday, FIRST_DAYS_OF_WEEK_LOCAL, FIRST_DAYS_OF_WEEK_ROOT, FIRST_DAY_OF_WEEK),
                 
                 new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)),

@@ -72,7 +72,6 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.entities.TodoEntryList;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
@@ -127,7 +126,8 @@ public final class Utilities {
             
             Logger.info(NAME, "Read todo list: " + readEntries.size());
         } catch (IOException e) {
-            Logger.info(NAME, "No todo list: (" + e + ")");
+            Logger.info(NAME, "No todo list: (" + e + "), creating one");
+            saveEntries(readEntries);
         } catch (Exception e) {
             logException(NAME, e);
         }
@@ -136,7 +136,7 @@ public final class Utilities {
         return readEntries;
     }
     
-    public static synchronized void saveEntries(@Nullable TodoEntryList entries) {
+    public static synchronized void saveEntries(@Nullable Collection<TodoEntry> entries) {
         
         if (entries == null) {
             Logger.error(NAME, "Trying to save null entry list");
@@ -144,7 +144,7 @@ public final class Utilities {
         }
         
         try {
-            saveToEntriesFile(entries.getRegularEntries());
+            saveToEntriesFile(entries);
             Logger.info(NAME, "Saved todo list");
         } catch (IOException e) {
             Logger.error(NAME, "Missing permission, failed saving todo list: " + e);
@@ -162,14 +162,15 @@ public final class Utilities {
             groups.addAll(loadFromGroupsFile());
             return groups;
         } catch (IOException e) {
-            Logger.info(NAME, "No groups file (" + e + ")");
+            Logger.info(NAME, "No groups file (" + e + "), creating one");
+            saveGroups(groups);
         } catch (Exception e) {
             logException(NAME, e);
         }
         return groups;
     }
     
-    public static synchronized void saveGroups(@Nullable GroupList groups) {
+    public static synchronized void saveGroups(@Nullable Collection<Group> groups) {
         if (groups == null) {
             Logger.error(NAME, "Trying to save null group list");
             return;

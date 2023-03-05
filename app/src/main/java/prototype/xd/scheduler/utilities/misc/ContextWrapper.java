@@ -1,9 +1,12 @@
 package prototype.xd.scheduler.utilities.misc;
 
+import static prototype.xd.scheduler.utilities.Logger.logException;
+
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.view.LayoutInflater;
 
 import androidx.annotation.ColorInt;
@@ -19,7 +22,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import prototype.xd.scheduler.utilities.Logger;
+
 public final class ContextWrapper {
+    
+    public static final String NAME = ContextWrapper.class.getSimpleName();
     
     private LayoutInflater layoutInflater;
     
@@ -170,5 +180,22 @@ public final class ContextWrapper {
      */
     public void runOnUiThread(@NonNull Runnable action) {
         activity.runOnUiThread(action);
+    }
+    
+    @FunctionalInterface
+    public interface IOConsumer<T> {
+        void accept(T t) throws IOException;
+    }
+    
+    public void processUri(@Nullable Uri uri, @NonNull IOConsumer<InputStream> consumer) {
+        if (uri == null) {
+            Logger.error(NAME, "Uri is null");
+            return;
+        }
+        try (InputStream stream = activity.getContentResolver().openInputStream(uri)) {
+            consumer.accept(stream);
+        } catch (IOException e) {
+            logException(NAME, e);
+        }
     }
 }
