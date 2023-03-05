@@ -13,9 +13,9 @@ public class AppThemeSelectorEntryConfig extends SettingsEntryConfig {
         return APP_THEME_SELECTOR.ordinal();
     }
     
-    static class AppThemeSelectorViewHolder extends SettingsEntryConfig.SettingsViewHolder<AppThemeSelectorSettingsEntryBinding, AppThemeSelectorEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<AppThemeSelectorSettingsEntryBinding, AppThemeSelectorEntryConfig> {
         
-        AppThemeSelectorViewHolder(@NonNull ContextWrapper wrapper, @NonNull AppThemeSelectorSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull AppThemeSelectorSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         

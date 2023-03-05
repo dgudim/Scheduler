@@ -14,11 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 
-public class ContextWrapper {
+public final class ContextWrapper {
     
     private LayoutInflater layoutInflater;
     
@@ -29,17 +30,26 @@ public class ContextWrapper {
     @NonNull
     public final FragmentManager fragmentManager;
     
-    public ContextWrapper(@NonNull final Context context,
-                          @NonNull final Lifecycle lifecycle,
-                          @NonNull final FragmentManager fragmentManager) {
+    @NonNull
+    public final FragmentActivity activity;
+    
+    private ContextWrapper(@NonNull final Context context,
+                           @NonNull final Lifecycle lifecycle,
+                           @NonNull final FragmentManager fragmentManager,
+                           @NonNull final FragmentActivity activity) {
         this.context = context;
         this.lifecycle = lifecycle;
         this.fragmentManager = fragmentManager;
+        this.activity = activity;
     }
     
     @NonNull
     public static ContextWrapper from(@NonNull Fragment fragment) {
-        return new ContextWrapper(fragment.requireContext(), fragment.getLifecycle(), fragment.getChildFragmentManager());
+        return new ContextWrapper(
+                fragment.requireContext(),
+                fragment.getLifecycle(),
+                fragment.getChildFragmentManager(),
+                fragment.requireActivity());
     }
     
     @NonNull
@@ -149,5 +159,16 @@ public class ContextWrapper {
     @ColorInt
     public int getColor(@ColorRes int id) {
         return context.getResources().getColor(id, context.getTheme());
+    }
+    
+    /**
+     * Runs the specified action on the UI thread. If the current thread is the UI
+     * thread, then the action is executed immediately. If the current thread is
+     * not the UI thread, the action is posted to the event queue of the UI thread.
+     *
+     * @param action the action to run on the UI thread
+     */
+    public void runOnUiThread(@NonNull Runnable action) {
+        activity.runOnUiThread(action);
     }
 }

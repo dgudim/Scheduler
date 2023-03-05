@@ -91,7 +91,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
                 
                 calendarConfigEntries.addAll(calendarEntryList);
                 
-                requireActivity().runOnUiThread(() -> listViewAdapter.addAdapter(calendarEntryListAdapter));
+                wrapper.runOnUiThread(() -> listViewAdapter.addAdapter(calendarEntryListAdapter));
             }
         }, "SSCFetch thread").start();
         

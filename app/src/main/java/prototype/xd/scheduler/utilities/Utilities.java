@@ -116,7 +116,7 @@ public final class Utilities {
         
         List<TodoEntry> readEntries = new ArrayList<>(TODO_LIST_INITIAL_CAPACITY);
         try {
-            readEntries.addAll(loadObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP));
+            readEntries.addAll(loadFromEntriesFile());
             
             int id = 0;
             for (TodoEntry entry : readEntries) {
@@ -144,7 +144,7 @@ public final class Utilities {
         }
         
         try {
-            saveObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP, entries.getRegularEntries());
+            saveToEntriesFile(entries.getRegularEntries());
             Logger.info(NAME, "Saved todo list");
         } catch (IOException e) {
             Logger.error(NAME, "Missing permission, failed saving todo list: " + e);
@@ -159,7 +159,7 @@ public final class Utilities {
         // add "null" group
         groups.add(Group.NULL_GROUP);
         try {
-            groups.addAll(loadObjectWithBackup(GROUPS_FILE, GROUPS_FILE_BACKUP));
+            groups.addAll(loadFromGroupsFile());
             return groups;
         } catch (IOException e) {
             Logger.info(NAME, "No groups file (" + e + ")");
@@ -176,15 +176,15 @@ public final class Utilities {
         }
         try {
             
-            GroupList groupsToSave = new GroupList();
+            List<Group> groupsToSave = new ArrayList<>(groups.size() - 1);
             
             for (Group group : groups) {
                 if (!group.isNullGroup()) {
                     groupsToSave.add(group);
                 }
             }
-            
-            saveObjectWithBackup(GROUPS_FILE, GROUPS_FILE_BACKUP, groupsToSave);
+    
+            saveToGroupsFile(groupsToSave);
             
             Logger.info(NAME, "Saved group list");
         } catch (IOException e) {
@@ -198,7 +198,7 @@ public final class Utilities {
         }
     }
     
-    private static <T> T loadObjectWithBackup(@NonNull String fileName, @NonNull String backupName) throws IOException, ClassNotFoundException {
+    public static <T> T loadObjectWithBackup(@NonNull String fileName, @NonNull String backupName) throws IOException, ClassNotFoundException {
         try {
             return loadObject(fileName);
         } catch (IOException | ClassNotFoundException e) {
@@ -211,7 +211,26 @@ public final class Utilities {
         }
     }
     
-    private static void saveObjectWithBackup(@NonNull String fileName, @NonNull String backupName, @NonNull Object object) throws IOException {
+    @NonNull
+    public static Collection<Group> loadFromGroupsFile() throws IOException, ClassNotFoundException {
+        return loadObjectWithBackup(GROUPS_FILE, GROUPS_FILE_BACKUP);
+    }
+    
+    @NonNull
+    public static Collection<TodoEntry> loadFromEntriesFile() throws IOException, ClassNotFoundException {
+        return loadObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP);
+    }
+    
+    public static void saveToGroupsFile(@NonNull Collection<Group> groups) throws IOException {
+        saveObjectWithBackup(GROUPS_FILE, GROUPS_FILE_BACKUP, groups);
+    }
+    
+    public static void saveToEntriesFile(@NonNull Collection<TodoEntry> entries) throws IOException {
+        saveObjectWithBackup(ENTRIES_FILE, ENTRIES_FILE_BACKUP, entries);
+    }
+    
+    @NonNull
+    public static File saveObjectWithBackup(@NonNull String fileName, @NonNull String backupName, @NonNull Object object) throws IOException {
         File originalFile = getFile(fileName);
         Path originalPath = originalFile.toPath();
         if (originalFile.exists()) {
@@ -222,6 +241,7 @@ public final class Utilities {
         try (ObjectOutputStream stream = new ObjectOutputStream(Files.newOutputStream(originalPath))) {
             stream.writeObject(object);
         }
+        return originalFile;
     }
     
     @NonNull

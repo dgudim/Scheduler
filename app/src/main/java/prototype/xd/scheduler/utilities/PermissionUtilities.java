@@ -18,12 +18,13 @@ import android.os.PowerManager;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PackageManagerCompat;
-import androidx.fragment.app.Fragment;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public final class PermissionUtilities {
     
@@ -93,11 +94,11 @@ public final class PermissionUtilities {
     /**
      * Checks if battery permission is granted
      *
-     * @param fragment any fragment (to get the context from)
+     * @param wrapper context wrapper
      * @return true if battery permission is granted
      */
-    public static boolean isBatteryGranted(@NonNull Fragment fragment) {
-        return ((PowerManager) fragment.requireActivity()
+    public static boolean isBatteryGranted(@NonNull ContextWrapper wrapper) {
+        return ((PowerManager) wrapper.activity
                 .getSystemService(Context.POWER_SERVICE))
                 .isIgnoringBatteryOptimizations(PACKAGE_NAME);
     }
@@ -105,28 +106,28 @@ public final class PermissionUtilities {
     /**
      * Checks if notification permission is granted
      *
-     * @param fragment any fragment (to get the context from)
+     * @param wrapper context wrapper
      * @return true if notification permission is granted
      */
-    public static boolean isNotificationGranted(@NonNull Fragment fragment) {
+    public static boolean isNotificationGranted(@NonNull ContextWrapper wrapper) {
         if (!isOnAndroid13OrHigher()) {
             return true;
         }
-        return ContextCompat.checkSelfPermission(fragment.requireContext(), Manifest.permission.POST_NOTIFICATIONS)
+        return ContextCompat.checkSelfPermission(wrapper.context, Manifest.permission.POST_NOTIFICATIONS)
                 == PackageManager.PERMISSION_GRANTED;
     }
     
     /**
      * Gets application autorevoke status
      *
-     * @param fragment any fragment (to get the context from)
+     * @param wrapper context wrapper
      * @return {@link AutoRevokeStatus}
      */
     // areUnusedAppRestrictionsAvailable is a restricted API for some reason
     @SuppressLint("RestrictedApi")
     @NonNull
-    public static AutoRevokeStatus getAutorevokeStatus(@NonNull Fragment fragment) {
-        Context context = fragment.requireContext();
+    public static AutoRevokeStatus getAutorevokeStatus(@NonNull ContextWrapper wrapper) {
+        Context context = wrapper.context;
         try {
             int uStatus = PackageManagerCompat.getUnusedAppRestrictionsStatus(context).get(10, TimeUnit.MILLISECONDS);
             if (uStatus == FEATURE_NOT_AVAILABLE) {
@@ -149,8 +150,8 @@ public final class PermissionUtilities {
         return AutoRevokeStatus.NOT_AVAILABLE;
     }
     
-    public static boolean isAutorevokeGranted(@NonNull Fragment fragment) {
-        AutoRevokeStatus status = getAutorevokeStatus(fragment);
+    public static boolean isAutorevokeGranted(@NonNull ContextWrapper wrapper) {
+        AutoRevokeStatus status = getAutorevokeStatus(wrapper);
         return status == AutoRevokeStatus.DISABLED || status == AutoRevokeStatus.NOT_AVAILABLE;
     }
 }

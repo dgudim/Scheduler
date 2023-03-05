@@ -81,7 +81,7 @@ public final class PermissionRequestFragment extends BaseFragment<PermissionsReq
             binding.notificationPermissionGranted.setVisibility(View.GONE);
         }
         
-        if (getAutorevokeStatus(this) == AutoRevokeStatus.NOT_AVAILABLE) {
+        if (getAutorevokeStatus(wrapper) == AutoRevokeStatus.NOT_AVAILABLE) {
             binding.ignoreAutorevokeIcon.setVisibility(View.GONE);
             binding.ignoreAutorevokeTitle.setVisibility(View.GONE);
             binding.ignoreAutorevokeDescription.setVisibility(View.GONE);
@@ -122,7 +122,7 @@ public final class PermissionRequestFragment extends BaseFragment<PermissionsReq
                     return;
                 }
                 requestChainStatus = AUTOREVOKE_PERMISSIONS;
-                if (isBatteryGranted(this)) {
+                if (isBatteryGranted(wrapper)) {
                     Logger.info(NAME, "Battery already granted, skipping");
                     requestPermissions();
                 } else {
@@ -134,7 +134,7 @@ public final class PermissionRequestFragment extends BaseFragment<PermissionsReq
             
             case AUTOREVOKE_PERMISSIONS:
                 requestChainStatus = END;
-                if (isAutorevokeGranted(this)) {
+                if (isAutorevokeGranted(wrapper)) {
                     Logger.info(NAME, "Autorevoke already granted, skipping");
                     requestPermissions();
                 } else {
@@ -151,12 +151,12 @@ public final class PermissionRequestFragment extends BaseFragment<PermissionsReq
     
     private void displayPermissions() {
         
-        boolean notificationsGranted = isNotificationGranted(this);
+        boolean notificationsGranted = isNotificationGranted(wrapper);
         
-        boolean batteryGranted = isBatteryGranted(this);
+        boolean batteryGranted = isBatteryGranted(wrapper);
         boolean storageGranted = isStorageGranted(wrapper.context);
         boolean calendarGranted = isCalendarGranted(wrapper.context);
-        AutoRevokeStatus autorevokeStatus = getAutorevokeStatus(this);
+        AutoRevokeStatus autorevokeStatus = getAutorevokeStatus(wrapper);
         
         boolean allGranted = storageGranted && calendarGranted &&
                 batteryGranted && notificationsGranted &&

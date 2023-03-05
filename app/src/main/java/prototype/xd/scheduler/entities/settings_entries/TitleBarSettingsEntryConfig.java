@@ -21,9 +21,9 @@ public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
         return TITLE_BAR.ordinal();
     }
     
-    static class TitleBarViewHolder extends SettingsEntryConfig.SettingsViewHolder<TitleSettingsEntryBinding, TitleBarSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<TitleSettingsEntryBinding, TitleBarSettingsEntryConfig> {
         
-        TitleBarViewHolder(@NonNull ContextWrapper wrapper, @NonNull TitleSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull TitleSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         

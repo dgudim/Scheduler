@@ -119,9 +119,13 @@
     <string name="settings_hide_expired_entries_by_time">Hide passed events on lockscreen (by time)</string>
     <string name="status">Date: %s  Events: %d</string>
     <string name="app_theme">App theme</string>
-    <string name="import_export_data">Import/export settings</string>
-    <string name="import_description">Import application settings</string>
-    <string name="export_description">Export application settings</string>
+    <string name="import_export_settings">Import/export settings</string>
+    <string name="import_settings_description">Import application settings</string>
+    <string name="export_settings_description">Export application settings</string>
+    <string name="export_settings_successful">Export successful</string>
+    <string name="export_settings_failed">Export failed</string>
+    <string name="import_settings_successful">Import successful</string>
+    <string name="import_settings_failed">Import failed</string>
     <string name="app_theme_light">Light</string>
     <string name="app_theme_dark">Dark</string>
     <string name="app_theme_system">System default</string>

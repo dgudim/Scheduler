@@ -54,9 +54,9 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
         return CALENDAR_ACCOUNT.ordinal();
     }
     
-    static class CalendarAccountViewHolder extends SettingsEntryConfig.SettingsViewHolder<CalendarAccountSettingsEntryBinding, CalendarAccountSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<CalendarAccountSettingsEntryBinding, CalendarAccountSettingsEntryConfig> {
         
-        CalendarAccountViewHolder(@NonNull ContextWrapper wrapper, @NonNull CalendarAccountSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull CalendarAccountSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         

@@ -42,9 +42,9 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
         return SWITCH.ordinal();
     }
     
-    static class SwitchViewHolder extends SettingsEntryConfig.SettingsViewHolder<SwitchSettingsEntryBinding, SwitchSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<SwitchSettingsEntryBinding, SwitchSettingsEntryConfig> {
         
-        SwitchViewHolder(@NonNull ContextWrapper wrapper, @NonNull SwitchSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull SwitchSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         

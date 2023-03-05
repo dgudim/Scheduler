@@ -50,9 +50,9 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
         return DROPDOWN.ordinal();
     }
     
-    static class DropdownViewHolder extends SettingsEntryConfig.SettingsViewHolder<DropdownSettingsEntryBinding, DropdownSettingsEntryConfig<?>> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<DropdownSettingsEntryBinding, DropdownSettingsEntryConfig<?>> {
         
-        DropdownViewHolder(@NonNull ContextWrapper wrapper, @NonNull DropdownSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull DropdownSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         

@@ -60,9 +60,9 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         return CALENDAR.ordinal();
     }
     
-    static class CalendarViewHolder extends SettingsEntryConfig.SettingsViewHolder<CalendarSettingsEntryBinding, CalendarSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<CalendarSettingsEntryBinding, CalendarSettingsEntryConfig> {
         
-        CalendarViewHolder(@NonNull ContextWrapper wrapper, @NonNull CalendarSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull CalendarSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         

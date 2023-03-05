@@ -117,7 +117,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             expiredCachedGetter = new CachedGetter<>(expiredValueGetter);
             todayCachedGetter = new CachedGetter<>(previousValue -> {
                 // get parameter from group if it exists, if not, get from current parameters, if not, get from specified getter
-                String paramValue = entry.params.getOrDefault(parameterKey, entry.group.params.get(parameterKey));
+                String paramValue = entry.params.getOrDefault(parameterKey, entry.getGroup().params.get(parameterKey));
                 return paramValue != null ? loadedParameterConverter.apply(paramValue) : todayValueGetter.get();
             });
             this.loadedParameterConverter = loadedParameterConverter;
@@ -217,8 +217,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private ParameterGetter<String> rawTextValue;
     
-    @NonNull
-    private transient Group group = NULL_GROUP;
+    @Nullable
+    private transient Group group;
     // for initializing group after deserialization
     private transient String tempGroupName;
     
@@ -314,11 +314,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private void writeObject(@NonNull ObjectOutputStream out) throws IOException {
         out.writeObject(params);
-        out.writeObject(group.getRawName());
+        // group is only null when we export settings
+        out.writeObject(group == null ? tempGroupName : group.getRawName());
     }
     // ------------
     
-    // attaching group to entry is unnecessary if called from bitmap drawer as we don't need to propagate parameter invalidations
     public void initGroupAndId(@NonNull List<Group> groups, long id) {
         // id should be assigned before attaching to group
         assignRecyclerViewId(id);
@@ -452,12 +452,16 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     @NonNull
     public Group getGroup() {
-        return group;
+        return group == null ? NULL_GROUP : group;
+    }
+    
+    public boolean hasNullGroup() {
+        return group == null || group.isNullGroup();
     }
     
     @NonNull
     public String getRawGroupName() {
-        return group.getRawName();
+        return getGroup().getRawName();
     }
     
     @NonNull
@@ -466,12 +470,12 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     protected void unlinkGroupInternal(boolean invalidate) {
-        if (group.isNullGroup()) {
+        if (hasNullGroup()) {
             return;
         }
         Set<String> parameters = null;
         if (invalidate) {
-            parameters = group.getParameterKeys();
+            parameters = getGroup().getParameterKeys();
         }
         group = NULL_GROUP;
         // invalidate only after group change to avoid weird settings from cache
@@ -491,8 +495,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         if (newGroup.equals(group)) {
             return false;
         }
-        
-        group.detachEntryInternal(this);
+    
+        getGroup().detachEntryInternal(this);
         newGroup.attachEntryInternal(this);
         
         Set<String> changedKeys = Utilities.getChangedKeys(group.params, newGroup.params);
@@ -935,7 +939,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void setStateIconColor(@NonNull TextView icon, @NonNull String parameter) {
-        boolean containedInGroupParams = group.params.containsKey(parameter);
+        boolean containedInGroupParams = getGroup().params.containsKey(parameter);
         boolean containedInPersonalParams = params.containsKey(parameter);
         
         if (containedInGroupParams && containedInPersonalParams) {

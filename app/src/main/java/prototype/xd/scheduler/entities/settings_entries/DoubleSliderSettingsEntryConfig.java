@@ -46,9 +46,9 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
         return DOUBLE_SLIDER.ordinal();
     }
     
-    static class DoubleSeekBarViewHolder extends SettingsEntryConfig.SettingsViewHolder<DoubleSliderSettingsEntryBinding, DoubleSliderSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<DoubleSliderSettingsEntryBinding, DoubleSliderSettingsEntryConfig> {
         
-        DoubleSeekBarViewHolder(@NonNull ContextWrapper wrapper, @NonNull DoubleSliderSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull DoubleSliderSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         
@@ -60,8 +60,8 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
             config.leftSliderTinter.tintSlider(viewBinding.leftSlider);
             config.rightSliderTinter.tintSlider(viewBinding.rightSlider);
             
-            SliderSettingsEntryConfig.SeekBarViewHolder.bindExternal(config.leftSliderConfig, viewBinding.leftSlider, viewBinding.leftSubTitle);
-            SliderSettingsEntryConfig.SeekBarViewHolder.bindExternal(config.rightSliderConfig, viewBinding.rightSlider, viewBinding.rightSubTitle);
+            SliderSettingsEntryConfig.ViewHolder.bindExternal(config.leftSliderConfig, viewBinding.leftSlider, viewBinding.leftSubTitle);
+            SliderSettingsEntryConfig.ViewHolder.bindExternal(config.rightSliderConfig, viewBinding.rightSlider, viewBinding.rightSubTitle);
         }
     }
     

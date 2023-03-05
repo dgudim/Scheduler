@@ -24,9 +24,9 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
         return RESET_BUTTON.ordinal();
     }
     
-    static class ResetButtonViewHolder extends SettingsEntryConfig.SettingsViewHolder<ResetButtonSettingsEntryBinding, ResetButtonSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<ResetButtonSettingsEntryBinding, ResetButtonSettingsEntryConfig> {
         
-        ResetButtonViewHolder(@NonNull ContextWrapper wrapper, @NonNull ResetButtonSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull ResetButtonSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
         }
         

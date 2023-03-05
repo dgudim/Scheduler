@@ -27,23 +27,23 @@ import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
 import prototype.xd.scheduler.views.settings.EntryPreviewContainer;
 
-public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
+public class CompoundCustomizationSettingsEntryConfig extends SettingsEntryConfig {
     
     @Override
     public int getRecyclerViewType() {
         return COMPOUND_CUSTOMIZATION.ordinal();
     }
     
-    static class CompoundCustomizationViewHolder
-            extends SettingsEntryConfig.SettingsViewHolder<CompoundCustomizationSettingsEntryBinding, CompoundCustomizationEntryConfig> {
+    static class ViewHolder
+            extends SettingsEntryConfig.SettingsViewHolder<CompoundCustomizationSettingsEntryBinding, CompoundCustomizationSettingsEntryConfig> {
         
         @NonNull
         private final EntryPreviewContainer entryPreviewContainer;
         @NonNull
         private final AlertDialog viewSelectionDialog;
         
-        CompoundCustomizationViewHolder(@NonNull final ContextWrapper wrapper,
-                                        @NonNull final CompoundCustomizationSettingsEntryBinding viewBinding) {
+        ViewHolder(@NonNull final ContextWrapper wrapper,
+                   @NonNull final CompoundCustomizationSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
             
             int padding = wrapper.getResources().getDimensionPixelSize(R.dimen.dialog_menu_padding_left_right);
@@ -209,7 +209,7 @@ public class CompoundCustomizationEntryConfig extends SettingsEntryConfig {
         }
         
         @Override
-        void bind(CompoundCustomizationEntryConfig config) {
+        void bind(CompoundCustomizationSettingsEntryConfig config) {
             // nothing special required, this entry should be the only one of it's kind
         }
     }

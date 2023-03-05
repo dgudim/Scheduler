@@ -88,7 +88,6 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
     @Override
     @MainThread
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        FragmentActivity rootActivity = requireActivity();
         
         ContentWrapperBinding contentBnd = binding.contentWrapper;
         NavigationView navViewDrawer = binding.navViewWrapper;
@@ -103,7 +102,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         
         DrawerLayout drawerLayout = binding.root;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                rootActivity, drawerLayout, contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
+                wrapper.activity, drawerLayout, contentBnd.toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close) {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
@@ -123,7 +122,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         
         // when all entries are loaded and ui is created, update current month
         todoEntryManager.initFinished.observe(getViewLifecycleOwner(), status -> {
-            setupListeners(contentBnd, binding.navView, navViewDrawer, drawerLayout, calendarView, rootActivity);
+            setupListeners(contentBnd, binding.navView, navViewDrawer, drawerLayout, calendarView, wrapper.activity);
             // update adapter showing entries
             todoEntryManager.notifyEntryListChanged();
             // update calendar updating indicators
