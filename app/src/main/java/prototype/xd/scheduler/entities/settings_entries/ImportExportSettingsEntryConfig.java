@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.IMPORT_EXPORT_SETTINGS;
+import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.annotation.SuppressLint;
 import android.content.ClipDescription;
@@ -11,9 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.databinding.ImportExportSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.misc.SettingsExporter;
@@ -66,7 +69,17 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
             viewBinding.exportSettingsButton.setOnClickListener(v -> {
                 File export = SettingsExporter.tryExportSettings(wrapper.context);
                 if (export != null) {
-                    Utilities.shareFiles(wrapper.context, ClipDescription.MIMETYPE_UNKNOWN, List.of(export));
+    
+                    List<File> allFiles = new ArrayList<>(DateManager.BG_NAMES_ROOT.size() + 1);
+                    allFiles.add(export);
+                    
+                    for(String bgName: DateManager.BG_NAMES_ROOT) {
+                        File bgFile = getFile(bgName);
+                        if(bgFile.exists()) {
+                            allFiles.add(bgFile);
+                        }
+                    }
+                    Utilities.shareFiles(wrapper.context, ClipDescription.MIMETYPE_UNKNOWN, allFiles);
                 }
             });
             viewBinding.importSettingsButton.setOnClickListener(v -> config.launchPicker());
