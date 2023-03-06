@@ -3,17 +3,18 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.TITLE_BAR;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 
 import prototype.xd.scheduler.databinding.TitleSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
     
-    @NonNull
-    private final String text;
+    @StringRes
+    private final int textId;
     
-    public TitleBarSettingsEntryConfig(@NonNull String text) {
-        this.text = text;
+    public TitleBarSettingsEntryConfig(@StringRes int textId) {
+        this.textId = textId;
     }
     
     @Override
@@ -29,7 +30,7 @@ public class TitleBarSettingsEntryConfig extends SettingsEntryConfig {
         
         @Override
         void bind(@NonNull TitleBarSettingsEntryConfig config) {
-            viewBinding.textView.setText(config.text);
+            viewBinding.textView.setText(config.textId);
         }
     }
 }

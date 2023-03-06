@@ -46,7 +46,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
         
         //                                                       two entries - title and the switch
         List<SettingsEntryConfig> staticEntries = new ArrayList<>(2);
-        staticEntries.add(new TitleBarSettingsEntryConfig(getString(R.string.category_system_calendars)));
+        staticEntries.add(new TitleBarSettingsEntryConfig(R.string.category_system_calendars));
         SettingsListViewAdapter staticEntriesListViewAdapter = new SettingsListViewAdapter(wrapper, staticEntries);
         
         listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
@@ -97,7 +97,7 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
         
         staticEntries.add(new SwitchSettingsEntryConfig(
                 Static.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
-                getString(R.string.settings_allow_global_calendar_account_settings), (buttonView, isChecked) -> {
+                R.string.settings_allow_global_calendar_account_settings, (buttonView, isChecked) -> {
             if (isChecked) {
                 displayAttentionDialog(wrapper, R.string.whole_calendar_settings_on_warning, R.string.i_understand);
             } else {

@@ -6,6 +6,7 @@ import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
@@ -14,18 +15,18 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     
-    @NonNull
-    private final String text;
+    @StringRes
+    private final int textId;
     @NonNull
     private final Static.DefaultedBoolean value;
     @Nullable
     private final CompoundButton.OnCheckedChangeListener onCheckedChangeListener;
     
     public SwitchSettingsEntryConfig(@NonNull Static.DefaultedBoolean value,
-                                     @NonNull String text,
+                                     @StringRes int textId,
                                      @Nullable CompoundButton.OnCheckedChangeListener onCheckedChangeListener,
                                      boolean instantlyTriggerListener) {
-        this.text = text;
+        this.textId = textId;
         this.value = value;
         this.onCheckedChangeListener = onCheckedChangeListener;
         if (onCheckedChangeListener != null && instantlyTriggerListener) {
@@ -33,8 +34,8 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
         }
     }
     
-    public SwitchSettingsEntryConfig(@NonNull Static.DefaultedBoolean value, @NonNull String text) {
-        this(value, text, null, false);
+    public SwitchSettingsEntryConfig(@NonNull Static.DefaultedBoolean value, @StringRes int textId) {
+        this(value, textId, null, false);
     }
     
     @Override
@@ -50,7 +51,7 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
         
         @Override
         void bind(@NonNull SwitchSettingsEntryConfig config) {
-            viewBinding.mainSwitch.setText(config.text);
+            viewBinding.mainSwitch.setText(config.textId);
             Utilities.setSwitchChangeListener(
                     viewBinding.mainSwitch,
                     config.value,

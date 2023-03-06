@@ -58,20 +58,20 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         List<SettingsEntryConfig> settingsEntries = List.of(
                 
-                new TitleBarSettingsEntryConfig(getString(R.string.category_application_settings)),
+                new TitleBarSettingsEntryConfig(R.string.category_application_settings),
                 new DividerSettingsEntryConfig(),
                 new AppThemeSelectorEntryConfig(),
                 new DividerSettingsEntryConfig(),
                 new ImportExportSettingsEntryConfig(importSettingsLauncher),
                 new DropdownSettingsEntryConfig<>(R.string.first_weekday, FIRST_DAYS_OF_WEEK_LOCAL, FIRST_DAYS_OF_WEEK_ROOT, FIRST_DAY_OF_WEEK),
                 
-                new TitleBarSettingsEntryConfig(getString(R.string.category_lockscreen_appearance)),
+                new TitleBarSettingsEntryConfig(R.string.category_lockscreen_appearance),
                 new DividerSettingsEntryConfig(),
                 adaptiveBgSettingsEntry,
                 new CompoundCustomizationSettingsEntryConfig(),
                 
                 new SwitchSettingsEntryConfig(
-                        Static.ITEM_FULL_WIDTH_LOCK, getString(R.string.settings_max_rWidth_lock)),
+                        Static.ITEM_FULL_WIDTH_LOCK, R.string.settings_max_rWidth_lock),
                 
                 new DividerSettingsEntryConfig(),
                 
@@ -97,7 +97,7 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 }),
                 
                 new DividerSettingsEntryConfig(),
-                new TitleBarSettingsEntryConfig(getString(R.string.category_event_visibility)),
+                new TitleBarSettingsEntryConfig(R.string.category_event_visibility),
                 
                 new DoubleSliderSettingsEntryConfig(wrapper.context, R.string.settings_show_events,
                         
@@ -109,11 +109,11 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                                 0, Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET, 1, false, R.plurals.settings_after_n_days),
                         Static.BG_COLOR.EXPIRED.defaultValue),
                 
-                new SwitchSettingsEntryConfig(Static.MERGE_ENTRIES, getString(R.string.settings_merge_events)),
+                new SwitchSettingsEntryConfig(Static.MERGE_ENTRIES, R.string.settings_merge_events),
                 new DividerSettingsEntryConfig(),
-                new SwitchSettingsEntryConfig(Static.HIDE_EXPIRED_ENTRIES_BY_TIME, getString(R.string.settings_hide_expired_entries_by_time)),
+                new SwitchSettingsEntryConfig(Static.HIDE_EXPIRED_ENTRIES_BY_TIME, R.string.settings_hide_expired_entries_by_time),
                 new DividerSettingsEntryConfig(),
-                new SwitchSettingsEntryConfig(Static.SHOW_UPCOMING_EXPIRED_IN_LIST, getString(R.string.show_upcoming_and_expired_event_indicators)),
+                new SwitchSettingsEntryConfig(Static.SHOW_UPCOMING_EXPIRED_IN_LIST, R.string.show_upcoming_and_expired_event_indicators),
                 new DividerSettingsEntryConfig());
         
         //                                                                      two entries (global switches)
@@ -123,11 +123,11 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
         
         globalSwitchSettingsEntries.addAll(List.of(
                 new SwitchSettingsEntryConfig(
-                        Static.SHOW_GLOBAL_ITEMS_LOCK, getString(R.string.settings_show_global_items_lock),
+                        Static.SHOW_GLOBAL_ITEMS_LOCK, R.string.settings_show_global_items_lock,
                         (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked), false),
                 new DividerSettingsEntryConfig(),
                 new SwitchSettingsEntryConfig(
-                        Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK, getString(R.string.settings_show_global_items_label_lock))));
+                        Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK, R.string.settings_show_global_items_label_lock)));
         
         listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
                 .setIsolateViewTypes(false)
