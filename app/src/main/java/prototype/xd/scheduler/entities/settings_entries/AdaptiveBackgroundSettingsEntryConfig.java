@@ -69,7 +69,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
                         getFile(DateManager.BG_NAMES_ROOT.get(lastClickedBgIndex)));
                 wrapper.runOnUiThread(gridViewAdapter::notifyDataSetChanged);
-            }), "LBCP thread").start();
+            }, null), "LBCP thread").start();
         }
     }
     

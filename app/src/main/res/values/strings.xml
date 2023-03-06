@@ -125,6 +125,7 @@
     <string name="export_settings_successful">Export successful</string>
     <string name="export_settings_failed">Export failed</string>
     <string name="import_settings_successful">Import successful</string>
+    <string name="import_settings_canceled">Import canceled</string>
     <string name="import_settings_failed">Import failed</string>
     <string name="app_theme_light">Light</string>
     <string name="app_theme_dark">Dark</string>

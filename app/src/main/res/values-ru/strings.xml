@@ -123,6 +123,7 @@
     <string name="export_settings_failed">Ошибка экспорта</string>
     <string name="import_settings_successful">Успешно импортировано</string>
     <string name="import_settings_failed">Ошибка импорта</string>
+    <string name="import_settings_canceled">Импорт отменен</string>
     <string name="app_theme_system">Системная</string>
     <string name="app_theme_dark">Тёмная</string>
     <string name="app_theme_light">Светлая</string>

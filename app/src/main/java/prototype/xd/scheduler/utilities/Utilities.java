@@ -568,7 +568,9 @@ public final class Utilities {
      * @param textResId resource id of the text to show
      */
     public static void displayToast(@NonNull Context context, @StringRes int textResId) {
-        Toast.makeText(context, context.getString(textResId), Toast.LENGTH_LONG).show();
+        String str = context.getString(textResId);
+        Logger.info(NAME, "Displaying toast with message: " + str);
+        Toast.makeText(context, str, Toast.LENGTH_LONG).show();
     }
     
     public static void fancyHideUnhideView(@NonNull View view, boolean visible, boolean animate) {

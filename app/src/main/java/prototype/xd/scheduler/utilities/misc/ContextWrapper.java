@@ -187,8 +187,11 @@ public final class ContextWrapper {
         void accept(T t) throws IOException;
     }
     
-    public void processUri(@Nullable Uri uri, @NonNull IOConsumer<InputStream> consumer) {
+    public void processUri(@Nullable Uri uri, @NonNull IOConsumer<InputStream> consumer, @Nullable Runnable nullUriHandler) {
         if (uri == null) {
+            if(nullUriHandler != null) {
+                nullUriHandler.run();
+            }
             Logger.error(NAME, "Uri is null");
             return;
         }

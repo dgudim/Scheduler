@@ -102,6 +102,7 @@
     <string name="export_settings_failed">Помилка експорту</string>
     <string name="import_settings_successful">Успішно імпортовано</string>
     <string name="import_settings_failed">Помилка імпорту</string>
+    <string name="import_settings_canceled">Імпорт скасовано</string>
     <string name="app_theme_light">Світла</string>
     <string name="app_theme_dark">Темна</string>
     <string name="app_theme_system">Системна</string>

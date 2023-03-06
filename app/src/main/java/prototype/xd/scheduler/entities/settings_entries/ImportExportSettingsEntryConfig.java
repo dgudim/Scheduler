@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.IMPORT_EXPORT_SETTINGS;
+import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.annotation.SuppressLint;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ImportExportSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -52,7 +54,7 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
                 wrapper.activity.finishAndRemoveTask();
                 System.exit(0);
             }
-        });
+        }, () -> displayToast(wrapper.context, R.string.import_settings_canceled));
     }
     
     static class ViewHolder extends SettingsEntryConfig.SingleBindSettingsViewHolder<ImportExportSettingsEntryBinding, ImportExportSettingsEntryConfig> {
