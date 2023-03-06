@@ -72,6 +72,7 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.entities.TodoEntryList;
 import prototype.xd.scheduler.views.Switch;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
@@ -136,13 +137,15 @@ public final class Utilities {
         return readEntries;
     }
     
-    public static synchronized void saveEntries(@Nullable Collection<TodoEntry> entries) {
-        
+    public static synchronized void saveEntryList(@Nullable TodoEntryList entries) {
         if (entries == null) {
             Logger.error(NAME, "Trying to save null entry list");
             return;
         }
-        
+        saveEntries(entries.getRegularEntries());
+    }
+    
+    private static synchronized void saveEntries(@NonNull Collection<TodoEntry> entries) {
         try {
             saveToEntriesFile(entries);
             Logger.info(NAME, "Saved todo list");
@@ -184,7 +187,7 @@ public final class Utilities {
                     groupsToSave.add(group);
                 }
             }
-    
+            
             saveToGroupsFile(groupsToSave);
             
             Logger.info(NAME, "Saved group list");
@@ -206,7 +209,7 @@ public final class Utilities {
             T obj = loadObject(backupName);
             // restore backup if it was read successfully
             Files.copy(getPath(backupName), getPath(fileName),
-                    StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                    StandardCopyOption.REPLACE_EXISTING);
             warning(NAME, "Restored " + backupName + " to " + fileName + " (" + e + ")");
             return obj;
         }
@@ -315,10 +318,10 @@ public final class Utilities {
     @NonNull
     public static List<TodoEntry> sortEntries(@NonNull List<TodoEntry> entries, long targetDay) {
         
-        if(entries.isEmpty()) {
+        if (entries.isEmpty()) {
             return entries;
         }
-    
+        
         List<TodoEntry.EntryType> sortingOrder = TODO_ITEM_SORTING_ORDER.get();
         
         for (TodoEntry entry : entries) {
@@ -331,7 +334,7 @@ public final class Utilities {
         
         // sort by normal entries by alphabet, calendar by time
         entries.sort((o1, o2) -> {
-            if(o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
+            if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
                 return Long.compare(o1.getCachedNearestStartMsUTC(), o2.getCachedNearestStartMsUTC());
             }
             return String.CASE_INSENSITIVE_ORDER.compare(o1.getRawTextValue(), o2.getRawTextValue());
@@ -339,7 +342,7 @@ public final class Utilities {
         // group by group name
         entries.sort((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getRawGroupName(), o2.getRawGroupName()));
         // sort by priority
-        entries.sort((o1, o2) ->  Integer.compare(o2.priority.getToday(), o1.priority.getToday()));
+        entries.sort((o1, o2) -> Integer.compare(o2.priority.getToday(), o1.priority.getToday()));
         // sort by type
         entries.sort(Comparator.comparingInt(TodoEntry::getTypeSortingIndex));
         

@@ -2,6 +2,7 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.IMPORT_EXPORT_SETTINGS;
 
+import android.annotation.SuppressLint;
 import android.content.ClipDescription;
 import android.net.Uri;
 
@@ -22,8 +23,9 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
     
     private final ActivityResultLauncher<String[]> importLauncher;
     
+    @SuppressLint("InlinedApi")
     private final String[] mimetypes = {
-            "file/*"
+            ClipDescription.MIMETYPE_UNKNOWN
     };
     
     public ImportExportSettingsEntryConfig(@NonNull final ActivityResultLauncher<String[]> importLauncher) {
@@ -39,12 +41,13 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
         return IMPORT_EXPORT_SETTINGS.ordinal();
     }
     
-    @SuppressWarnings("StaticMethodOnlyUsedInOneClass")
+    @SuppressWarnings({"StaticMethodOnlyUsedInOneClass", "CallToSystemExit"})
     public static void notifyFileChosen(@NonNull ContextWrapper wrapper, @Nullable Uri uri) {
         wrapper.processUri(uri, stream -> {
             if (SettingsExporter.tryImportSettings(wrapper.context, stream)) {
                 BackgroundSetterService.exit(wrapper.context);
                 wrapper.activity.finishAndRemoveTask();
+                System.exit(0);
             }
         });
     }
@@ -57,12 +60,13 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
             super(wrapper, viewBinding);
         }
         
+        @SuppressLint("InlinedApi")
         @Override
         void bind(ImportExportSettingsEntryConfig config) {
             viewBinding.exportSettingsButton.setOnClickListener(v -> {
                 File export = SettingsExporter.tryExportSettings(wrapper.context);
                 if (export != null) {
-                    Utilities.shareFiles(wrapper.context, ClipDescription.MIMETYPE_TEXT_PLAIN, List.of(export));
+                    Utilities.shareFiles(wrapper.context, ClipDescription.MIMETYPE_UNKNOWN, List.of(export));
                 }
             });
             viewBinding.importSettingsButton.setOnClickListener(v -> config.launchPicker());

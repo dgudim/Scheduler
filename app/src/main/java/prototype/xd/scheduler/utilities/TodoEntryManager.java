@@ -173,7 +173,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
                                 Utilities.saveGroups(groups);
                                 break;
                             case ENTRIES:
-                                Utilities.saveEntries(todoEntries);
+                                Utilities.saveEntryList(todoEntries);
                                 break;
                         }
                     } catch (InterruptedException e) {
