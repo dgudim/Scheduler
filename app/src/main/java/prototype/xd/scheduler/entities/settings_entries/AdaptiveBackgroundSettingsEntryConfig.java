@@ -78,7 +78,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
         return ADAPTIVE_BACKGROUND_SETTINGS.ordinal();
     }
     
-    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<AdaptiveBackgroundSettingsEntryBinding, AdaptiveBackgroundSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SingleBindSettingsViewHolder<AdaptiveBackgroundSettingsEntryBinding, AdaptiveBackgroundSettingsEntryConfig> {
         
         ViewHolder(@NonNull ContextWrapper wrapper, @NonNull AdaptiveBackgroundSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);

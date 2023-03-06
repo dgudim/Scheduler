@@ -97,5 +97,28 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
         }
     }
     
+    public abstract static class SingleBindSettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends SettingsViewHolder<V, S> {
+        
+        private boolean bound;
+        
+        SingleBindSettingsViewHolder(@NonNull ContextWrapper wrapper, @NonNull V viewBinding) {
+            super(wrapper, viewBinding);
+        }
+        
+        private void bindInternal(S config) {
+            if (bound) {
+                return;
+            }
+            bound = true;
+            bind(config);
+        }
+        
+        @Override
+        @SuppressWarnings("unchecked")
+        public void uncheckedBind(@NonNull SettingsEntryConfig settingsEntryConfig) {
+            bindInternal((S) settingsEntryConfig);
+        }
+    }
+    
 }
 

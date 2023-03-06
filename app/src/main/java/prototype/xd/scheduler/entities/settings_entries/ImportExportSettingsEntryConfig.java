@@ -55,7 +55,7 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
         });
     }
     
-    static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<ImportExportSettingsEntryBinding, ImportExportSettingsEntryConfig> {
+    static class ViewHolder extends SettingsEntryConfig.SingleBindSettingsViewHolder<ImportExportSettingsEntryBinding, ImportExportSettingsEntryConfig> {
         
         
         ViewHolder(@NonNull final ContextWrapper wrapper,
