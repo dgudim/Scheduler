@@ -20,12 +20,12 @@ android {
         }
     }
 
-    compileSdkVersion 33
-    buildToolsVersion "33.0.0"
+    compileSdk 34
 
     defaultConfig {
         applicationId "prototype.xd.scheduler"
         minSdkVersion 26
+        //noinspection OldTargetApi
         targetSdkVersion 32
         versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}${globalSuffix}"
@@ -77,35 +77,35 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation "androidx.lifecycle:lifecycle-service:2.6.1"
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.navigation:navigation-fragment:2.5.3'
-    implementation 'androidx.navigation:navigation-ui:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment:2.7.1'
+    implementation 'androidx.navigation:navigation-ui:2.7.1'
 
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation 'com.kizitonwose.calendar:view:2.3.0'
-    implementation 'com.github.AppIntro:AppIntro:6.2.0'
-    implementation 'org.dmfs:lib-recur:0.12.2'
+    implementation 'com.github.AppIntro:AppIntro:6.3.1'
+    implementation 'org.dmfs:lib-recur:0.15.0'
 
     implementation 'com.vanniktech:android-image-cropper:4.5.0'
 
-    implementation 'com.google.guava:guava:31.1-android'
+    implementation 'com.google.guava:guava:32.1.2-android'
 
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 }
 
-task getVersionCode() {
+tasks.register('getVersionCode') {
     // only run during execution, not evaluation
     doLast {
         println getVersionCode()
     }
 }
 
-task getVersionName() {
+tasks.register('getVersionName') {
     // only run during execution, not evaluation
     doLast {
         println getVersionName()
