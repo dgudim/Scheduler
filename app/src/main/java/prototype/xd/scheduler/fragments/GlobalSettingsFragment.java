@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.fragments;
 
 import static androidx.activity.result.contract.ActivityResultContracts.OpenDocument;
-import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LOCAL;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_ROOT;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
@@ -12,12 +11,10 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.ConcatAdapter;
 
 import com.canhub.cropper.CropImageContract;
 import com.canhub.cropper.CropImageContractOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import prototype.xd.scheduler.R;
@@ -36,7 +33,7 @@ import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfi
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.Static;
 
-public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> { // NOSONAR, this is a fragment
+public class GlobalSettingsFragment extends BaseListSettingsFragment<SettingsListViewAdapter> { // NOSONAR, this is a fragment
     
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBgSettingsEntry;
@@ -114,32 +111,22 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<ConcatAdapt
                 new SwitchSettingsEntryConfig(Static.HIDE_EXPIRED_ENTRIES_BY_TIME, R.string.settings_hide_expired_entries_by_time),
                 new DividerSettingsEntryConfig(),
                 new SwitchSettingsEntryConfig(Static.SHOW_UPCOMING_EXPIRED_IN_LIST, R.string.show_upcoming_and_expired_event_indicators),
-                new DividerSettingsEntryConfig());
-        
-        //                                                                      two entries (global switches)
-        List<SettingsEntryConfig> globalSwitchSettingsEntries = new ArrayList<>(2);
-        SettingsListViewAdapter globalSwitchSettingsListViewAdapter = new SettingsListViewAdapter(wrapper, globalSwitchSettingsEntries,
-                !Static.SHOW_GLOBAL_ITEMS_LOCK.get());
-        
-        globalSwitchSettingsEntries.addAll(List.of(
-                new SwitchSettingsEntryConfig(
-                        Static.SHOW_GLOBAL_ITEMS_LOCK, R.string.settings_show_global_items_lock,
-                        (buttonView, isChecked) -> globalSwitchSettingsListViewAdapter.setCollapsed(!isChecked), false),
                 new DividerSettingsEntryConfig(),
-                new SwitchSettingsEntryConfig(
-                        Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK, R.string.settings_show_global_items_label_lock)));
+                new SwitchSettingsEntryConfig(Static.SHOW_GLOBAL_ITEMS_LOCK, R.string.settings_show_global_items_lock),
+                new DividerSettingsEntryConfig(),
+                new DropdownSettingsEntryConfig<>(
+                        R.string.global_events_show_hint,
+                        List.of(wrapper.getString(R.string.global_events_show_front),
+                                wrapper.getString(R.string.global_events_show_back),
+                                wrapper.getString(R.string.global_events_show_hidden)),
+                        List.of(Static.GlobalLabelPos.FRONT,
+                                Static.GlobalLabelPos.BACK,
+                                Static.GlobalLabelPos.HIDDEN), Static.GLOBAL_ITEMS_LABEL_POSITION),
+                new ResetButtonSettingsEntryConfig((dialog, which) -> {
+                    Static.clearAll();
+                    listViewAdapter.notifyDataSetChanged();
+                }));
         
-        listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
-                .setIsolateViewTypes(false)
-                .setStableIdMode(NO_STABLE_IDS).build(),
-                new SettingsListViewAdapter(wrapper, settingsEntries),
-                globalSwitchSettingsListViewAdapter,
-                new SettingsListViewAdapter(wrapper,
-                        List.of(new DividerSettingsEntryConfig(),
-                                new ResetButtonSettingsEntryConfig((dialog, which) -> {
-                                    Static.clearAll();
-                                    listViewAdapter.notifyDataSetChanged();
-                                }))));
-        
+        listViewAdapter = new SettingsListViewAdapter(wrapper, settingsEntries);
     }
 }

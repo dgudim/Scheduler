@@ -157,7 +157,6 @@
     <string name="reset_settings_description">Це скине ВСІ ваші налаштування, включаючи налаштування календарів</string>
     <string name="reset_calendar_settings_description">Це скине налаштування поточного календаря</string>
     <string name="reset_entry_settings_description">Це скине налаштування подій</string>
-    <string name="settings_show_global_items_label_lock">Показувати напис “Глобально” біля глобальних подій на екрані блокування</string>
     <string name="settings_allow_global_calendar_account_settings">Дозволити зміну налаштувань цілих календарів та облікових записів</string>
     <string name="global">Глобально</string>
     <string name="date_from_to">Дата від до</string>

@@ -8,6 +8,7 @@ import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayU
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
+import static prototype.xd.scheduler.utilities.Static.GLOBAL_ITEMS_LABEL_POSITION;
 import static prototype.xd.scheduler.utilities.Static.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.TEXT_VALUE;
@@ -35,6 +36,7 @@ import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DialogUtilities;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.views.settings.EntrySettings;
@@ -188,8 +190,14 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                 todoText.setTextColor(fontColor);
                 todoText.setPaintFlags(removeIntFlag(todoText.getPaintFlags(), Paint.STRIKE_THRU_TEXT_FLAG));
             }
+    
+            Static.GlobalLabelPos globalLabelPos = GLOBAL_ITEMS_LABEL_POSITION.get();
+            if (globalLabelPos == Static.GlobalLabelPos.HIDDEN) {
+                // make sure it's visible in the list
+                globalLabelPos = Static.GlobalLabelPos.BACK;
+            }
             
-            todoText.setText(entry.getTextOnDay(currentlySelectedDayUTC, wrapper.context, true));
+            todoText.setText(entry.getTextOnDay(currentlySelectedDayUTC, wrapper.context, globalLabelPos));
         }
         
         /**

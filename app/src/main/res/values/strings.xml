@@ -182,7 +182,6 @@
     <string name="reset_settings_description">This will reset ALL your settings, including calendar ones</string>
     <string name="reset_calendar_settings_description">This will reset current calendar settings</string>
     <string name="reset_entry_settings_description">This will reset current entry settings</string>
-    <string name="settings_show_global_items_label_lock">Show “Global” label near global events on the lockscreen</string>
     <string name="settings_allow_global_calendar_account_settings">Allow changing settings of whole calendars and accounts</string>
     <string name="global">Global</string>
     <string name="date_from_to">Date from to</string>
@@ -205,12 +204,13 @@
     <string name="settings_merge_events">Merge events with the same content and timeframe</string>
     <string name="upcoming_events">Upcoming events</string>
     <string name="expired_events">Expired events</string>
-    <string name="todays_events">Today\'s events</string>
+    <string name="todays_events">Today’s events</string>
     <string name="upcoming_calendar_events">Upcoming calendar events</string>
     <string name="expired_calendar_events">Expired calendar events</string>
-    <string name="todays_calendar_events">Today\'s calendar events</string>
+    <string name="todays_calendar_events">Today’s calendar events</string>
     <string name="global_events">Global events</string>
-    <string name="sorting_treat_global_as_todays">Treat global events as today\'s events</string>
+    <string name="global_events_description">Events visible on all days</string>
+    <string name="sorting_treat_global_as_todays">Treat global events as today’s events</string>
     <string name="sorting_sort_calendar_separately">Sort events from calendar separately from regular events</string>
     <string name="upcoming_events_description">Events that will begin in a few days</string>
     <string name="expired_events_description">Events that have already ended</string>
@@ -218,5 +218,8 @@
     <string name="upcoming_calendar_events_description">Events that will begin in a few days (from calendar)</string>
     <string name="expired_calendar_events_description">Events that have already ended (from calendar)</string>
     <string name="todays_calendar_events_description">Current events (from calendar)</string>
-    <string name="global_events_description">Events visible on all days</string>
+    <string name="global_events_show_hint">After the event</string>
+    <string name="global_events_show_back">After the event</string>
+    <string name="global_events_show_front">Before the event</string>
+    <string name="global_events_show_hidden">Hidden</string>
 </resources>

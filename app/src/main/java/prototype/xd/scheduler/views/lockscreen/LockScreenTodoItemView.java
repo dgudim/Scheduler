@@ -6,8 +6,8 @@ import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedSecon
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Static.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_DENSITY;
+import static prototype.xd.scheduler.utilities.Static.GLOBAL_ITEMS_LABEL_POSITION;
 import static prototype.xd.scheduler.utilities.Static.ITEM_FULL_WIDTH_LOCK;
-import static prototype.xd.scheduler.utilities.Static.SHOW_GLOBAL_ITEMS_LABEL_LOCK;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -122,7 +122,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         
         setBorderSizeDP(entry.borderThickness.get(currentDayUTC));
         
-        setTitleText(entry.getTextOnDay(currentDayUTC, context, SHOW_GLOBAL_ITEMS_LABEL_LOCK.get()));
+        setTitleText(entry.getTextOnDay(currentDayUTC, context, GLOBAL_ITEMS_LABEL_POSITION.get()));
         setTitleTextSize(fontSizeSP * DEFAULT_TITLE_FONT_SIZE_MULTIPLIER);
         
         if (entry.isFromSystemCalendar()) {

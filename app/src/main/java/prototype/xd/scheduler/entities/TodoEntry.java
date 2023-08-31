@@ -158,9 +158,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     
-    public enum EntryType {TODAY, TODAY_CALENDAR, GLOBAL, UPCOMING, UPCOMING_CALENDAR, EXPIRED, EXPIRED_CALENDAR, UNKNOWN;
+    public enum EntryType {
+        TODAY, TODAY_CALENDAR, GLOBAL, UPCOMING, UPCOMING_CALENDAR, EXPIRED, EXPIRED_CALENDAR, UNKNOWN;
+        
         public EntryType extend(final TodoEntry entry) {
-            if(entry.isFromSystemCalendar()) {
+            if (entry.isFromSystemCalendar()) {
                 switch (this) {
                     case TODAY:
                         return TODAY_CALENDAR;
@@ -513,7 +515,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         if (newGroup.equals(group)) {
             return false;
         }
-    
+        
         getGroup().detachEntryInternal(this);
         newGroup.attachEntryInternal(this);
         
@@ -916,23 +918,25 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     @NonNull
-    public String getTextOnDay(long targetDayUTC, @NonNull Context context, boolean displayGlobalLabel) {
-        return rawTextValue.get() + " " + getDayOffset(targetDayUTC, context, displayGlobalLabel);
-    }
-    
-    @NonNull
-    public String getDayOffset(long targetDayUTC, @NonNull Context context, boolean displayGlobalLabel) { // NOSONAR, not that complex
+    public String getTextOnDay(long targetDayUTC, @NonNull Context context, Static.GlobalLabelPos globalLabelPos) { // NOSONAR, not that complex
+        String base = rawTextValue.get();
+        String sep = " ";
+        
         if (isGlobal()) {
-            if (displayGlobalLabel) {
-                return context.getString(R.string.item_global);
+            switch (globalLabelPos) {
+                case BACK:
+                    return base + sep + context.getString(R.string.item_global);
+                case FRONT:
+                    return context.getString(R.string.item_global) + sep + base;
+                case HIDDEN:
+                default:
+                    return "";
             }
-            return "";
         }
         
-        int dayShift = 0;
-        
         TimeRange nearestDayRangeLocal = getNearestLocalEventDayRange(targetDayUTC);
-        
+    
+        int dayShift = 0;
         if (targetDayUTC < nearestDayRangeLocal.getStart()) {
             dayShift = (int) (nearestDayRangeLocal.getStart() - targetDayUTC);
         } else if (targetDayUTC > nearestDayRangeLocal.getEnd()) {
@@ -942,18 +946,20 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         if (dayShift == 0) {
             return "";
         }
-        
+    
+        String postfix;
         int dayShiftAbs = abs(dayShift);
         
         if (dayShiftAbs < 31) {
             if (dayShiftAbs == 1) {
-                return context.getString(dayShift > 0 ? R.string.item_tomorrow : R.string.item_yesterday);
+                postfix = context.getString(dayShift > 0 ? R.string.item_tomorrow : R.string.item_yesterday);
             } else {
-                return getPluralString(context, dayShift > 0 ? R.plurals.item_in_N_days : R.plurals.item_N_days_ago, dayShiftAbs);
+                postfix = getPluralString(context, dayShift > 0 ? R.plurals.item_in_N_days : R.plurals.item_N_days_ago, dayShiftAbs);
             }
         } else {
-            return context.getString(dayShift > 0 ? R.string.item_in_more_than_in_a_month : R.string.item_more_than_a_month_ago);
+            postfix = context.getString(dayShift > 0 ? R.string.item_in_more_than_in_a_month : R.string.item_more_than_a_month_ago);
         }
+        return base + sep + postfix;
     }
     
     public void setStateIconColor(@NonNull TextView icon, @NonNull String parameter) {

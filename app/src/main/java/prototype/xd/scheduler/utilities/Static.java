@@ -441,8 +441,12 @@ public final class Static {
     
     public static final DefaultedBoolean MERGE_ENTRIES = new DefaultedBoolean("merge_events", true);
     
+    public enum GlobalLabelPos {FRONT, BACK, HIDDEN}
     public static final DefaultedBoolean SHOW_GLOBAL_ITEMS_LOCK = new DefaultedBoolean("show_global_tasks_lock", true);
-    public static final DefaultedBoolean SHOW_GLOBAL_ITEMS_LABEL_LOCK = new DefaultedBoolean("show_global_tasks_label_lock", true);
+    public static final DefaultedEnum<GlobalLabelPos> GLOBAL_ITEMS_LABEL_POSITION = new DefaultedEnum<>(
+            "global_tasks_label_position",
+            GlobalLabelPos.BACK,
+            GlobalLabelPos.class);
     
     public static final DefaultedBoolean ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS = new DefaultedBoolean("allow_global_calendar_settings", false);
     

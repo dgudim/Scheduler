@@ -179,7 +179,6 @@
     <string name="source_code_title">Исходный код</string>
     <string name="source_code_description">Посмотреть GitHub репозиторий и внести свой вклад</string>
     <string name="reset_settings_description">Это сбросит ВСЕ ваши настройки, включая настройки календарей</string>
-    <string name="settings_show_global_items_label_lock">Показывать надпись “Глобальный” возле глобальных событий на экране блокировки</string>
     <string name="settings_allow_global_calendar_account_settings">Разрешить изменение настроек целых календарей и аккаунтов</string>
     <string name="global">Глобальное</string>
     <string name="date_from_to">Дата от до</string>
@@ -223,5 +222,9 @@
     <string name="upcoming_calendar_events_description">События, которые начнутся через несколько дней (из календаря)</string>
     <string name="expired_calendar_events_description">События, которые уже закончились (из календаря)</string>
     <string name="todays_calendar_events_description">Текущие события (из календаря)</string>
+    <string name="global_events_show_front">Перед событием</string>
+    <string name="global_events_show_hidden">Спрятано</string>
+    <string name="global_events_show_back">После события</string>
+    <string name="global_events_show_hint">"Позиция надписи “Глобальный” "</string>
     <string name="global_events_description">События, которые видны на всех днях</string>
 </resources>
