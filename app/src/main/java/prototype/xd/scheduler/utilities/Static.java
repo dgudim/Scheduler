@@ -17,6 +17,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntUnaryOperator;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import kotlin.jvm.functions.Function2;
 import prototype.xd.scheduler.BuildConfig;
@@ -221,20 +225,25 @@ public final class Static {
             String[] stringList = stringValue.split(delimiter);
             List<T> list = new ArrayList<>(stringList.length);
             for (String value : stringList) {
-                list.add(Enum.valueOf(enumClass, value));
+                try {
+                    list.add(Enum.valueOf(enumClass, value));
+                } catch (IllegalArgumentException e) {
+                    Logger.logException(NAME, e);
+                }
             }
             return list;
+        }
+    
+        @NonNull
+        public List<T> getUnique() {
+            return Lists.newArrayList(ImmutableSet.copyOf(getInternal(key, defaultValue)));
         }
         
         @Override
         public void put(@NonNull List<T> enumList) {
-            StringBuilder stringValue = new StringBuilder(enumList.get(0).name());
-            for (int i = 1; i < enumList.size(); i++) {
-                stringValue
-                        .append(delimiter)
-                        .append(enumList.get(i).name());
-            }
-            preferences.edit().putString(key, stringValue.toString()).apply();
+            preferences.edit().putString(
+                            key,
+                            enumList.stream().map(Enum::toString).collect(Collectors.joining(delimiter))).apply();
         }
         
         @Override
@@ -298,7 +307,7 @@ public final class Static {
                     Logger.info(NAME, "Created folder structure: " + rootDir.mkdirs());
                 }
             }
-    
+            
             // init logger
             Logger.setDebugEnabled(Static.DEBUG_LOGGING.get() || BuildConfig.DEBUG);
             
@@ -446,8 +455,9 @@ public final class Static {
             TodoEntry.EntryType.UPCOMING,
             TodoEntry.EntryType.TODAY,
             TodoEntry.EntryType.EXPIRED),
-            "_", TodoEntry.EntryType.class);
-    public static final DefaultedBoolean TREAT_GLOBAL_ITEMS_AS_TODAYS = new DefaultedBoolean("treat_global_as_todays", false);
+            "/", TodoEntry.EntryType.class);
+    public static final DefaultedBoolean SORTING_TREAT_GLOBAL_ITEMS_AS_TODAYS = new DefaultedBoolean("treat_global_as_todays", false);
+    public static final DefaultedBoolean SORTING_SORT_CALENDAR_SEPARATELY = new DefaultedBoolean("sort_calendar_separately", false);
     
     public static final int APP_THEME_LIGHT = MODE_NIGHT_NO;
     public static final int APP_THEME_DARK = MODE_NIGHT_YES;

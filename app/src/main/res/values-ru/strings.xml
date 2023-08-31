@@ -211,10 +211,17 @@
     <string name="upcoming_events">Предстоящие события</string>
     <string name="expired_events">Просроченные события</string>
     <string name="todays_events">Сегодняшние события</string>
+    <string name="upcoming_calendar_events">Предстоящие календарные события</string>
+    <string name="expired_calendar_events">Просроченные календарные события</string>
+    <string name="todays_calendar_events">Сегодняшние календарные события</string>
     <string name="global_events">Глобальные события</string>
-    <string name="treat_global_as_todays">Сортировать глобальные события вместе с текущими</string>
+    <string name="sorting_treat_global_as_todays">Сортировать глобальные события вместе с текущими</string>
+    <string name="sorting_sort_calendar_separately">Сортировать календарные собятия отдельно от обычных</string>
     <string name="upcoming_events_description">События, которые начнутся через несколько дней</string>
     <string name="expired_events_description">События, которые уже закончились</string>
     <string name="todays_events_description">Текущие события</string>
+    <string name="upcoming_calendar_events_description">События, которые начнутся через несколько дней (из календаря)</string>
+    <string name="expired_calendar_events_description">События, которые уже закончились (из календаря)</string>
+    <string name="todays_calendar_events_description">Текущие события (из календаря)</string>
     <string name="global_events_description">События, которые видны на всех днях</string>
 </resources>

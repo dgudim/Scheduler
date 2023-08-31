@@ -332,19 +332,28 @@ public final class Utilities {
             }
         }
         
-        // sort by normal entries by alphabet, calendar by time
-        entries.sort((o1, o2) -> {
-            if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
-                return Long.compare(o1.getCachedNearestStartMsUTC(), o2.getCachedNearestStartMsUTC());
-            }
-            return String.CASE_INSENSITIVE_ORDER.compare(o1.getRawTextValue(), o2.getRawTextValue());
-        });
-        // group by group name
-        entries.sort((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getRawGroupName(), o2.getRawGroupName()));
-        // sort by priority
-        entries.sort((o1, o2) -> Integer.compare(o2.priority.getToday(), o1.priority.getToday()));
+        Comparator<TodoEntry> priorityCompare = (o1, o2) -> Integer.compare(o2.priority.getToday(), o1.priority.getToday());
+        
+        // regular: type -> priority -> group name -> alphabet
+        // calendar: type -> time -> priority -> alphabet
+        
         // sort by type
-        entries.sort(Comparator.comparingInt(TodoEntry::getTypeSortingIndex));
+        entries.sort(Comparator.comparingInt(TodoEntry::getTypeSortingIndex)
+                // sort by priority (does nothing to calendar entries)
+                .thenComparing((o1, o2) ->
+                        (o1.isFromSystemCalendar() || o2.isFromSystemCalendar())
+                                ? 0
+                                : priorityCompare.compare(o1, o2))
+                // group by group name (does nothing to calendar entries)
+                .thenComparing((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getRawGroupName(), o2.getRawGroupName()))
+                // sort by normal entries by alphabet, calendar by time and then by priority
+                .thenComparing((o1, o2) -> {
+                    if (o1.isFromSystemCalendar() || o2.isFromSystemCalendar()) {
+                        int timeComp = Long.compare(o1.getCachedNearestStartMsUTC(), o2.getCachedNearestStartMsUTC());
+                        return timeComp == 0 ? priorityCompare.compare(o1, o2) : timeComp;
+                    }
+                    return 0;
+                }).thenComparing((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.getRawTextValue(), o2.getRawTextValue())));
         
         if (MERGE_ENTRIES.get()) {
             return mergeInstances(entries);

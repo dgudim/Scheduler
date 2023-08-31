@@ -16,6 +16,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:id="@+id/calendar_icon"
+            android:layout_width="@dimen/compound_icon_width"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_calendar_month_55"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/item_text"
             style="@style/MediumHeading"
@@ -24,7 +34,7 @@
             android:text="item_text"
             android:textAlignment="viewStart"
             app:layout_constraintEnd_toStartOf="@+id/drag_handle"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/calendar_icon"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="HardcodedText" />
 
@@ -36,7 +46,7 @@
             android:text="item_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/drag_handle"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/calendar_icon"
             app:layout_constraintTop_toBottomOf="@+id/item_text"
             tools:ignore="HardcodedText" />
 

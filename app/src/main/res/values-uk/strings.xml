@@ -182,7 +182,7 @@
     <string name="expired_events">Минулі події</string>
     <string name="todays_events">Сьогоднішні події</string>
     <string name="global_events">Глобальні події</string>
-    <string name="treat_global_as_todays">Сортувати глобальні події разом із поточними</string>
+    <string name="sorting_treat_global_as_todays">Сортувати глобальні події разом із поточними</string>
     <string name="upcoming_events_description">Події, які розпочнуться за кілька днів</string>
     <string name="expired_events_description">Події, які вже закінчились</string>
     <string name="todays_events_description">Поточні події</string>

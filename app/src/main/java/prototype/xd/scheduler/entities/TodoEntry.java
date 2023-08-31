@@ -3,12 +3,12 @@ package prototype.xd.scheduler.entities;
 import static androidx.core.math.MathUtils.clamp;
 import static java.lang.Math.abs;
 import static prototype.xd.scheduler.entities.Group.NULL_GROUP;
+import static prototype.xd.scheduler.utilities.ColorUtilities.getExpiredUpcomingColor;
+import static prototype.xd.scheduler.utilities.ColorUtilities.mixColorWithBg;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
 import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getExpiredUpcomingColor;
-import static prototype.xd.scheduler.utilities.ColorUtilities.mixColorWithBg;
 import static prototype.xd.scheduler.utilities.Static.TIME_RANGE_SEPARATOR;
 import static prototype.xd.scheduler.utilities.Utilities.doRangesOverlap;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
@@ -39,9 +39,9 @@ import java.util.regex.Pattern;
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.DateManager;
-import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
+import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.views.CalendarView;
 
@@ -158,7 +158,22 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     
-    public enum EntryType {TODAY, GLOBAL, UPCOMING, EXPIRED, UNKNOWN}
+    public enum EntryType {TODAY, TODAY_CALENDAR, GLOBAL, UPCOMING, UPCOMING_CALENDAR, EXPIRED, EXPIRED_CALENDAR, UNKNOWN;
+        public EntryType extend(final TodoEntry entry) {
+            if(entry.isFromSystemCalendar()) {
+                switch (this) {
+                    case TODAY:
+                        return TODAY_CALENDAR;
+                    case UPCOMING:
+                        return UPCOMING_CALENDAR;
+                    case EXPIRED:
+                        return EXPIRED_CALENDAR;
+                    default:
+                }
+            }
+            return this;
+        }
+    }
     
     public static class TimeRange {
         
@@ -252,11 +267,13 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void cacheTypeSortingIndex(long targetDayUTC, @NonNull List<EntryType> order) {
-        typeSortingIndex = order.indexOf(getEntryType(targetDayUTC));
-        if (typeSortingIndex == -1) {
-            // fallback to treating like today's
-            typeSortingIndex = order.indexOf(EntryType.TODAY);
-        }
+        EntryType entryType = getEntryType(targetDayUTC);
+        EntryType extendedEntryType = entryType.extend(this);
+        typeSortingIndex = order.indexOf(extendedEntryType);
+        // fallback to non-extended type
+        typeSortingIndex = typeSortingIndex == -1 ? order.indexOf(entryType) : typeSortingIndex;
+        // fallback to Today's
+        typeSortingIndex = typeSortingIndex == -1 ? order.indexOf(EntryType.TODAY) : typeSortingIndex;
     }
     
     long cachedNearestStartMsUTC;
@@ -330,6 +347,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         bgColor = new Parameter<>(this, Static.BG_COLOR.CURRENT.key,
                 previousValue -> {
                     if (isFromSystemCalendar()) {
+                        // get only by subkeys because the base key always exists, but we don't want it, and instead want calendar color
                         return Static.BG_COLOR.CURRENT.getOnlyBySubKeys(event.subKeys,
                                 Static.SETTINGS_DEFAULT_CALENDAR_EVENT_BG_COLOR.applyAsInt(getCalendarEventColor()));
                     }
