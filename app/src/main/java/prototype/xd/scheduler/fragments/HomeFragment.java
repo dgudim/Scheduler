@@ -201,7 +201,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                     builder.setMessage(R.string.debug_menu_description);
                     builder.setIcon(R.drawable.ic_developer_mode_24_primary);
                     
-                    DebugMenuDialogBinding bnd = DebugMenuDialogBinding.inflate(LayoutInflater.from(wrapper.context));
+                    DebugMenuDialogBinding bnd = DebugMenuDialogBinding.inflate(wrapper.getLayoutInflater());
                     bnd.shareLogcatView.setOnClickListener(v1 -> Logger.shareLog(wrapper.context));
                     
                     if (BuildConfig.DEBUG) {

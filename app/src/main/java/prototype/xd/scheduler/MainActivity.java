@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 R.color.entry_settings_parameter_group_and_personal,
                 R.color.entry_settings_parameter_personal);
         
-        // switch intro activity and close current one
+        
         if (PermissionUtilities.areEssentialPermissionsGranted(this)) {
             BackgroundSetterService.ping(this, true);
             setContentView(R.layout.activity_main);

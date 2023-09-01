@@ -1,34 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bg_image_container"
-    style="@style/ClickableViewFg"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="@dimen/card_corner_radius"
-    app:cardElevation="5dp">
+    android:gravity="center">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        tools:ignore="UseCompoundDrawables">
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bg_image_container"
+        style="@style/ClickableViewFg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:cardElevation="5dp">
 
-        <TextView
-            android:id="@+id/bg_title"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="bg_title"
-            tools:ignore="HardcodedText" />
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
-        <ImageView
-            android:id="@+id/bg_image"
-            android:layout_width="100dp"
-            android:layout_height="200dp"
-            tools:ignore="ContentDescription"
-            tools:srcCompat="@tools:sample/backgrounds/scenic" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/bg_title"
+                style="@style/SmallHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="bg_title"
+                tools:ignore="HardcodedText" />
 
-</com.google.android.material.card.MaterialCardView>
+            <ImageView
+                android:id="@+id/bg_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                tools:ignore="ContentDescription"
+                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

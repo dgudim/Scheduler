@@ -3,15 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingStart="@dimen/dialog_menu_padding_left_right"
+    android:paddingTop="@dimen/dialog_menu_padding_left_right"
+    android:paddingEnd="@dimen/dialog_menu_padding_left_right">
 
     <prototype.xd.scheduler.views.Switch
         android:id="@+id/adaptive_bg_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
-        android:layout_marginTop="@dimen/dialog_menu_padding_top"
-        android:layout_marginEnd="@dimen/dialog_menu_padding_left_right"
         android:text="@string/enable_per_day_wallpapers"
         android:textAppearance="@style/MediumHeading"
         tools:ignore="TouchTargetSizeCheck,VisualLintButtonSize" />
@@ -21,13 +21,14 @@
         style="@style/DefaultButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
-        android:layout_marginEnd="@dimen/dialog_menu_padding_left_right"
         android:text="@string/settings_reset_bg"
         tools:ignore="VisualLintButtonSize" />
 
-    <include
-        android:id="@+id/grid_view_include"
-        layout="@layout/grid_selection_view" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 </LinearLayout>

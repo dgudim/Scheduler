@@ -12,15 +12,18 @@ import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.widget.GridView;
+import android.widget.LinearLayout;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.canhub.cropper.CropImageContractOptions;
 import com.canhub.cropper.CropImageOptions;
 import com.canhub.cropper.CropImageView;
 import com.google.android.material.color.MaterialColors;
+import com.google.android.material.divider.MaterialDividerItemDecoration;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.PerDayBgGridViewAdapter;
@@ -108,14 +111,19 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                                     getFile(bgName).delete();
                                     getFile(bgName + "_min.png").delete();
                                 }
-                                config.gridViewAdapter.notifyDataSetChanged();
+                                config.gridViewAdapter.notifyItemRangeChanged(0, DateManager.BG_NAMES_ROOT.size() - 1);
                             });
                         }));
                 
-                GridView gridView = gridSelection.gridViewInclude.gridView;
-                gridView.setNumColumns(2);
-                gridView.setHorizontalSpacing(30);
-                gridView.setVerticalSpacing(30);
+                RecyclerView gridView = gridSelection.gridView;
+                gridView.setLayoutManager(new GridLayoutManager(wrapper.context, 3));
+                
+                MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
+                divider.setDividerColor(Color.TRANSPARENT);
+                divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.bg_list_item_vertical_padding));
+
+                gridView.addItemDecoration(divider);
+                gridView.setHasFixedSize(true);
                 gridView.setAdapter(config.gridViewAdapter);
                 
                 wrapper.attachDialogToLifecycle(

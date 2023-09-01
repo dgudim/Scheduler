@@ -16,7 +16,6 @@ import static prototype.xd.scheduler.utilities.Utilities.addIntFlag;
 import static prototype.xd.scheduler.utilities.Utilities.removeIntFlag;
 
 import android.graphics.Paint;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -274,12 +273,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     public EntryViewHolder<?> onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         if (viewType == 1) {
             // calendar entry
-            return new EntryViewHolder<>(ListSelectionCalendarBinding.inflate(
-                    LayoutInflater.from(parent.getContext()), parent, false), wrapper);
+            return new EntryViewHolder<>(ListSelectionCalendarBinding.inflate(wrapper.getLayoutInflater(), parent, false), wrapper);
         } else {
             // regular entry
-            return new EntryViewHolder<>(ListSelectionTodoBinding.inflate(
-                    LayoutInflater.from(parent.getContext()), parent, false), wrapper);
+            return new EntryViewHolder<>(ListSelectionTodoBinding.inflate(wrapper.getLayoutInflater(), parent, false), wrapper);
         }
     }
     
