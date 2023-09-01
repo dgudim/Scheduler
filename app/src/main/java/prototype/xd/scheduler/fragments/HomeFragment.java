@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.MainThread;
@@ -187,6 +188,8 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                         values.put(IS_COMPLETED, Boolean.toString(false));
                         
                         todoEntryManager.addEntry(new TodoEntry(values, groupList.get(selectedIndex), System.currentTimeMillis()));
+                        
+                        Utilities.displayToast(wrapper.context, R.string.event_created_message, Toast.LENGTH_SHORT);
                     });
         });
         

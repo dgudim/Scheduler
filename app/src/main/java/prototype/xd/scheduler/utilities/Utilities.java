@@ -570,17 +570,23 @@ public final class Utilities {
         return keys;
     }
     
+    
     /**
-     * Display long toast with a message
+     * Display toast with a message
      *
      * @param context   any context
      * @param textResId resource id of the text to show
      */
-    public static void displayToast(@NonNull Context context, @StringRes int textResId) {
+    public static void displayToast(@NonNull Context context, @StringRes int textResId, int duration) {
         String str = context.getString(textResId);
         Logger.info(NAME, "Displaying toast with message: " + str);
-        Toast.makeText(context, str, Toast.LENGTH_LONG).show();
+        Toast.makeText(context, str, duration).show();
     }
+    
+    public static void displayToast(@NonNull Context context, @StringRes int textResId) {
+        displayToast(context, textResId, Toast.LENGTH_LONG);
+    }
+    
     
     public static void fancyHideUnhideView(@NonNull View view, boolean visible, boolean animate) {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);

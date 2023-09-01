@@ -227,4 +227,6 @@
     <string name="global_events_show_back">После события</string>
     <string name="global_events_show_hint">"Позиция надписи “Глобальный” "</string>
     <string name="global_events_description">События, которые видны на всех днях</string>
+    <string name="event_created_message">Событие создано</string>
+    <string name="event_deleted_message">Событие удалено</string>
 </resources>

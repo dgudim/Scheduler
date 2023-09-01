@@ -222,4 +222,6 @@
     <string name="global_events_show_back">After the event</string>
     <string name="global_events_show_front">Before the event</string>
     <string name="global_events_show_hidden">Hidden</string>
+    <string name="event_created_message">Event created</string>
+    <string name="event_deleted_message">Event deleted</string>
 </resources>

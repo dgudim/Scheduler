@@ -19,6 +19,7 @@ import android.graphics.Paint;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,6 +38,7 @@ import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
+import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.views.settings.EntrySettings;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
@@ -73,7 +75,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
          */
         private void displayDeletionDialog(@NonNull final TodoEntry entry,
                                            @NonNull final TodoEntryManager todoEntryManager) {
-            DialogUtilities.displayDeletionDialog(wrapper, (dialog, whichButton) -> todoEntryManager.removeEntry(entry));
+            DialogUtilities.displayDeletionDialog(wrapper, (dialog, whichButton) -> {
+                todoEntryManager.removeEntry(entry);
+                Utilities.displayToast(wrapper.context, R.string.event_deleted_message, Toast.LENGTH_SHORT);
+            });
         }
         
         /**
