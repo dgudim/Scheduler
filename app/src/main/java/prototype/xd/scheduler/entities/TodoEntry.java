@@ -930,7 +930,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                     return context.getString(R.string.item_global) + sep + base;
                 case HIDDEN:
                 default:
-                    return "";
+                    return base;
             }
         }
         
@@ -944,7 +944,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
         
         if (dayShift == 0) {
-            return "";
+            return base;
         }
     
         String postfix;
