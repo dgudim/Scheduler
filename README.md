@@ -30,6 +30,8 @@ git clone https://github.com/dgudim/Scheduler
 ```
 Or just download [latest build](https://github.com/dgudim/Scheduler/releases/latest)
 
+## <a href="https://github.com/ImranR98/Obtainium"><img src="https://github.com/ImranR98/Obtainium/blob/main/assets/graphics/icon_small.png" height=80></img></a> Download with obtanium
+
 <a href="https://apt.izzysoft.de/fdroid/index/apk/prototype.xd.scheduler"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height=100></img></a>
 
 ## Have any questions? 
