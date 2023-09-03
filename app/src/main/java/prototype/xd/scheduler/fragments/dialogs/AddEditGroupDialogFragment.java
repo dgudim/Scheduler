@@ -44,7 +44,7 @@ public class AddEditGroupDialogFragment extends BaseCachedDialogFragment<AddEdit
     protected void buildDialogDynamic(@NonNull AddEditGroupDialogFragmentBinding binding, @NonNull AlertDialog dialog) {
         dialog.setTitle(group == null ? R.string.add_current_config_as_group_prompt : R.string.edit_group);
         dialog.setIcon(group == null ? R.drawable.ic_library_add_24 : R.drawable.ic_edit_24);
-        dialog.setMessage(group == null ? wrapper.getString(R.string.add_current_config_as_group_message) : "");
+        dialog.setMessage(wrapper.getString(group == null ? R.string.add_current_config_as_group_message : R.string.edit_group_message));
         
         setupEditText(binding.entryNameEditText, group == null ? "" : group.getRawName());
         

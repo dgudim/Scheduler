@@ -92,6 +92,7 @@
     <string name="enable_per_day_wallpapers">Enable per day wallpapers</string>
     <string name="dynamic_wallpaper_off_warning">You have selected a wallpaper for a single day but “per day wallpapers” is not enabled</string>
     <string name="edit_group">Edit group</string>
+    <string name="edit_group_message">The group will be renamed, no parameters will be changed</string>
     <string name="add_group">Add group</string>
     <string name="null_group_edit_message">Nothing to edit, assign a group first</string>
     <string name="delete">Delete</string>
@@ -135,7 +136,7 @@
     <string name="app_theme_system">System default</string>
     <string name="xiaomi_message">It looks like you are using a xiaomi phone, some version of miui don\'t allow setting lockscreen wallpaper programmatically, so the app will most probably not work. Sorry, i can\'t do anything about it.</string>
     <string name="blank_group_name">No group</string>
-    <string name="input_cant_be_empty">Input can\'t be empty</string>
+    <string name="input_cant_be_empty">Input can’t be empty</string>
     <string name="edit_event">Edit event</string>
     <string name="overwrite">Overwrite</string>
     <string name="reset">Reset</string>

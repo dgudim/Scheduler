@@ -21,6 +21,7 @@ import prototype.xd.scheduler.utilities.ColorUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
+// TODO: use ViewModel and savedInstanceState to transfer data instead of using the constructor for proper config updates
 @MainThread
 public abstract class PopupSettingsView extends BaseCachedDialogFragment<EntrySettingsBinding, ComponentDialog> {
     

@@ -14,6 +14,7 @@
     <string name="are_you_sure">Вы уверены?</string>
     <string name="save">Сохранить</string>
     <string name="edit_group">Редактировать группу</string>
+    <string name="edit_group_message">Группа будет переименована без изменения параметров</string>
     <string name="edit_event">Редактировать событие</string>
     <string name="item_global">(Глобальное)</string>
     <plurals name="item_N_days_ago">
