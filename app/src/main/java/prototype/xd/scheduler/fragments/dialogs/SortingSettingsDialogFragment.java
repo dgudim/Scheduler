@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.fragments;
+package prototype.xd.scheduler.fragments.dialogs;
 
 import static prototype.xd.scheduler.utilities.ColorUtilities.getExpiredUpcomingColor;
 import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedFontColorWithBg;
@@ -7,13 +7,13 @@ import static prototype.xd.scheduler.utilities.ColorUtilities.getOnBgColor;
 
 import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.activity.ComponentDialog;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -29,44 +29,45 @@ import java.util.List;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.DraggableListEntryBinding;
-import prototype.xd.scheduler.databinding.SortingSettingsFragmentBinding;
+import prototype.xd.scheduler.databinding.SortingSettingsDialogFragmentBinding;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.entities.settings_entries.DividerSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Static;
 
-public class SortingSettingsFragment extends BaseSettingsFragment<SortingSettingsFragmentBinding> {
+public class SortingSettingsDialogFragment extends FullScreenSettingsDialogFragment<SortingSettingsDialogFragmentBinding> {
     
     @NonNull
     @Override
-    public SortingSettingsFragmentBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return SortingSettingsFragmentBinding.inflate(inflater, container, false);
+    protected SortingSettingsDialogFragmentBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return SortingSettingsDialogFragmentBinding.inflate(inflater, container, false);
     }
     
-    // view creation end (fragment visible)
     @Override
-    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
-        
+    protected void buildDialogStatic(@NonNull SortingSettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
         EntryTypeAdapter entryTypeAdapter = new EntryTypeAdapter();
         binding.orderRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         binding.orderRecyclerView.setAdapter(entryTypeAdapter);
         entryTypeAdapter.attachDragToRecyclerView(binding.orderRecyclerView);
-        
+    
         List<SettingsEntryConfig> settingsEntries = List.of(
                 new SwitchSettingsEntryConfig(
                         Static.SORTING_TREAT_GLOBAL_ITEMS_AS_TODAYS, R.string.sorting_treat_global_as_todays,
                         (buttonView, isChecked) -> entryTypeAdapter.setGlobalEventsVisible(!isChecked), true),
-                new DividerSettingsEntryConfig(),
                 new SwitchSettingsEntryConfig(Static.SORTING_SORT_CALENDAR_SEPARATELY, R.string.sorting_sort_calendar_separately,
                         (buttonView, isChecked) -> entryTypeAdapter.setCalendarEventsVisible(isChecked), true));
-        
+    
         binding.settingsRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
         divider.setLastItemDecorated(false);
         binding.settingsRecyclerView.addItemDecoration(divider);
         binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
+    }
+    
+    @Override
+    protected void buildDialogDynamic(@NonNull SortingSettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
+        // None of it is dynamic
     }
     
     private static final class EntryTypeAdapter extends RecyclerView.Adapter<EntryTypeAdapter.CardViewHolder> {

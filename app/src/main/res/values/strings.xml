@@ -7,8 +7,11 @@
     <string name="action_delete_item">Delete item</string>
     <string name="action_drag_item">Drag item</string>
     <string name="home_fragment_label" translatable="false">Home Fragment</string>
-    <string name="global_settings_fragment_label" translatable="false">Settings Fragment</string>
-    <string name="sorting_settings_fragment_label" translatable="false">Sorting settings fragment</string>
+    <string name="global_settings_dialog_fragment_label" translatable="false">Settings dialog fragment</string>
+    <string name="sorting_settings_dialog_fragment_label" translatable="false">Sorting settings dialog fragment</string>
+    <string name="calendar_settings_dialog_fragment_label" translatable="false">Calendar settings dialog fragment</string>
+    <string name="add_edit_entry_dialog_fragment_label" translatable="false">Add/edit entry dialog fragment</string>
+    <string name="add_edit_group_dialog_fragment_label" translatable="false">Add/edit group dialog fragment</string>
     <string name="nav_drawer_open">Open drawer</string>
     <string name="nav_drawer_close">Close drawer</string>
     <string name="please_read_the_notes" type="id">Please read the notes</string>
@@ -26,7 +29,7 @@
     <string name="calendar_access_description">For sync with system calendars</string>
     <string name="ignore_battery_optimization">Ignore battery optimization</string>
     <string name="ignore_battery_optimization_description">(optional) For the background service to work reliably, don\'t worry, it won\'t consume much energy</string>
-    <string name="ignore_autorevoke">Don\'t auto-revoke permissions</string>
+    <string name="ignore_autorevoke">Don’t auto-revoke permissions</string>
     <string name="ignore_autorevoke_description">(optional) As the app mostly works in the background, Android may think that you are not using it and revoke permissions, add the app to exclusion list to avoid random breakages</string>
     <string name="autorevoke_request_description">Find a setting called “Remove permissions (pause activity) if app is unused”</string>
     <string name="notification_permission">Notifications</string>
@@ -147,8 +150,8 @@
     <string name="choose_application_theme">Choose application theme</string>
     <string name="change_theme_later">You will be able to change it later</string>
     <string name="a_few_notes">A few notes before you go</string>
-    <string name="note_animated_wallpapers">The app doesn\'t work with animated wallpapers, so if you have one consider either not using the app or setting a regular wallpaper</string>
-    <string name="note_bugs">The app is still in it\'s early development so bugs are to be expected</string>
+    <string name="note_animated_wallpapers">The app doesn’t work with animated wallpapers, so if you have one consider either not using the app or setting a regular wallpaper</string>
+    <string name="note_bugs">The app is still in it’s early development so bugs are to be expected</string>
     <string name="note_contribute">If you have any suggestions or want to contribute, please kindly do so on GitHub</string>
     <string name="finish">Finish</string>
     <string name="before_you_continue">Before you continue</string>
@@ -178,7 +181,6 @@
     <string name="github_issue_description">Submit a GitHub issue for a bug report or a feature request</string>
     <string name="source_code_title">Source code</string>
     <string name="source_code_description">Check out the GitHub repository and contribute</string>
-    <string name="calendar_settings_fragment_label" translatable="false">Calendar settings fragment</string>
     <string name="reset_settings_description">This will reset ALL your settings, including calendar ones</string>
     <string name="reset_calendar_settings_description">This will reset current calendar settings</string>
     <string name="reset_entry_settings_description">This will reset current entry settings</string>

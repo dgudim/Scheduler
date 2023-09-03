@@ -1,66 +1,86 @@
 package prototype.xd.scheduler.views.settings;
 
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.activity.ComponentDialog;
+import androidx.annotation.CallSuper;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
+import prototype.xd.scheduler.fragments.dialogs.BaseCachedDialogFragment;
 import prototype.xd.scheduler.utilities.ColorUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 @MainThread
-public abstract class PopupSettingsView {
+public abstract class PopupSettingsView extends BaseCachedDialogFragment<EntrySettingsBinding, ComponentDialog> {
+    
+    @SuppressLint("UnknownNullness")
+    protected EntryPreviewContainer entryPreviewContainer;
+    
+    protected int defaultTextColor;
+    @Nullable
+    private final TodoEntryManager todoEntryManager;
     
     @NonNull
-    protected final EntrySettingsBinding bnd;
+    @Override
+    protected EntrySettingsBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return EntrySettingsBinding.inflate(inflater, container, false);
+    }
     
-    protected final EntryPreviewContainer entryPreviewContainer;
+    // fragment creation begin
+    @Override
+    @MainThread
+    @CallSuper
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
+    }
     
-    @NonNull
-    protected final ContextWrapper wrapper;
-    @NonNull
-    protected final AlertDialog dialog;
-    protected final int defaultTextColor;
+    PopupSettingsView(@Nullable final TodoEntryManager todoEntryManager) {
+        this.todoEntryManager = todoEntryManager;
+    }
     
-    PopupSettingsView(@NonNull final ContextWrapper wrapper,
-                      @Nullable final TodoEntryManager todoEntryManager) {
-        
-        this.wrapper = wrapper;
-        
-        bnd = EntrySettingsBinding.inflate(wrapper.getLayoutInflater());
+    @Override
+    protected void buildDialogStatic(@NonNull EntrySettingsBinding bnd, @NonNull ComponentDialog dialog) {
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
+        entryPreviewContainer = getEntryPreviewContainer(bnd);
         
         bnd.showDaysUpcomingSlider.setValueTo(Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         bnd.showDaysExpiredSlider.setValueTo(Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
-        
+    
         new ColorUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
         new ColorUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
         
-        entryPreviewContainer = getEntryPreviewContainer();
         entryPreviewContainer.attachCurrentSelectors(
                 bnd.currentFontColorSelector,
                 bnd.currentBorderColorSelector,
                 bnd.currentBackgroundColorSelector);
         
-        dialog = wrapper.attachDialogToLifecycle(
-                new AlertDialog.Builder(wrapper.context, R.style.FullScreenDialog).setView(bnd.getRoot()).create(),
-                dialogInterface -> {
-                    if (todoEntryManager != null) {
-                        todoEntryManager.performDeferredTasks();
-                    }
-                });
+        bnd.settingsCloseButton.setOnClickListener(v -> dismiss());
+    }
     
-        bnd.settingsCloseButton.setOnClickListener(v -> dialog.dismiss());
+    protected void rebuild() {
+        buildDialogDynamic(requireBinding(), (ComponentDialog) requireDialog());
     }
     
     @NonNull
-    public abstract EntryPreviewContainer getEntryPreviewContainer();
+    @Override
+    protected ComponentDialog buildDialog() {
+        return getBaseDialog();
+    }
+    
+    @NonNull
+    public abstract EntryPreviewContainer getEntryPreviewContainer(@NonNull EntrySettingsBinding bnd);
     
     /**
      * public method that should be called when some parameter changes, for example from a switch listener
@@ -83,7 +103,15 @@ public abstract class PopupSettingsView {
      */
     protected abstract void setStateIconColor(@NonNull TextView icon, @NonNull String parameterKey);
     
-    protected void updateAllIndicators() {
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        if (todoEntryManager != null) {
+            todoEntryManager.performDeferredTasks();
+        }
+        super.onDismiss(dialog);
+    }
+    
+    protected void updateAllIndicators(@NonNull EntrySettingsBinding bnd) {
         setStateIconColor(bnd.fontColorState, Static.FONT_COLOR.CURRENT.key);
         setStateIconColor(bnd.backgroundColorState, Static.BG_COLOR.CURRENT.key);
         setStateIconColor(bnd.borderColorState, Static.BORDER_COLOR.CURRENT.key);

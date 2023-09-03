@@ -4,7 +4,6 @@ import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayDeletionDialog;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayGroupAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Static.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Static.BG_COLOR;
@@ -18,17 +17,20 @@ import static prototype.xd.scheduler.utilities.Static.UPCOMING_ITEMS_OFFSET;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.activity.ComponentDialog;
 import androidx.annotation.ColorInt;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 
 import java.util.List;
 
 import prototype.xd.scheduler.R;
+import prototype.xd.scheduler.databinding.EntrySettingsBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
+import prototype.xd.scheduler.fragments.dialogs.AddEditGroupDialogFragment;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -37,65 +39,68 @@ public class EntrySettings extends PopupSettingsView {
     
     @NonNull
     public final TodoEntryManager todoEntryManager;
-    private TodoEntry todoEntry;
+    private TodoEntry entry;
+    private final AddEditGroupDialogFragment addEditGroupDialog;
     
-    public EntrySettings(@NonNull final ContextWrapper wrapper,
-                         @NonNull final TodoEntryManager todoEntryManager) {
-        super(wrapper, todoEntryManager);
-        
-        bnd.hideExpiredItemsByTimeContainer.setVisibility(View.GONE);
-        bnd.hideByContentContainer.setVisibility(View.GONE);
-        bnd.entrySettingsTitle.setVisibility(View.GONE);
-        bnd.showOnLockContainer.setVisibility(View.GONE);
-        
+    public EntrySettings(@NonNull final TodoEntryManager todoEntryManager) {
+        super(todoEntryManager);
         this.todoEntryManager = todoEntryManager;
+        addEditGroupDialog = new AddEditGroupDialogFragment();
     }
     
     @NonNull
     @Override
-    public EntryPreviewContainer getEntryPreviewContainer() {
+    public EntryPreviewContainer getEntryPreviewContainer(@NonNull EntrySettingsBinding bnd) {
         return new EntryPreviewContainer(wrapper, bnd.previewContainer, false) {
             @ColorInt
             @Override
             protected int currentFontColorGetter() {
-                return todoEntry.fontColor.getToday();
+                return entry.fontColor.getToday();
             }
             
             @ColorInt
             @Override
             protected int currentBgColorGetter() {
-                return todoEntry.bgColor.getToday();
+                return entry.bgColor.getToday();
             }
             
             @ColorInt
             @Override
             protected int currentBorderColorGetter() {
-                return todoEntry.borderColor.getToday();
+                return entry.borderColor.getToday();
             }
             
             @Override
             protected int currentBorderThicknessGetter() {
-                return todoEntry.borderThickness.getToday();
+                return entry.borderThickness.getToday();
             }
             
             @IntRange(from = 0, to = 10)
             @Override
             protected int adaptiveColorBalanceGetter() {
-                return todoEntry.adaptiveColorBalance.getToday();
+                return entry.adaptiveColorBalance.getToday();
             }
         };
     }
     
-    public void show(@NonNull final TodoEntry entry) {
-        initialise(entry);
-        dialog.show();
+    public void show(@NonNull final TodoEntry entry, @NonNull FragmentManager manager) {
+        this.entry = entry;
+        show(manager, "entry_settings: " + entry);
     }
     
-    private void initialise(@NonNull TodoEntry entry) {
-        
-        todoEntry = entry;
-        
-        updateAllIndicators();
+    @Override
+    protected void buildDialogStatic(@NonNull EntrySettingsBinding bnd, @NonNull ComponentDialog dialog) {
+        bnd.hideExpiredItemsByTimeContainer.setVisibility(View.GONE);
+        bnd.hideByContentContainer.setVisibility(View.GONE);
+        bnd.entrySettingsTitle.setVisibility(View.GONE);
+        bnd.showOnLockContainer.setVisibility(View.GONE);
+        super.buildDialogStatic(bnd, dialog);
+    }
+    
+    
+    @Override
+    public void buildDialogDynamic(@NonNull EntrySettingsBinding bnd, @NonNull ComponentDialog dialog) {
+        updateAllIndicators(bnd);
         entryPreviewContainer.refreshAll(true);
         
         final List<Group> groupList = todoEntryManager.getGroups();
@@ -111,9 +116,9 @@ public class EntrySettings extends PopupSettingsView {
                 return;
             }
             
-            Group selectedGroup = groupList.get(selection);
+            var selectedGroup = groupList.get(selection);
             
-            displayGroupAdditionEditDialog(wrapper, selectedGroup,
+            addEditGroupDialog.show(selectedGroup,
                     name -> {
                         int groupIndex = Group.groupIndexInList(groupList, name);
                         
@@ -132,7 +137,7 @@ public class EntrySettings extends PopupSettingsView {
                                 additionDialog.dismiss();
                                 todoEntryManager.removeGroup(selection);
                                 rebuild();
-                            }));
+                            }), wrapper);
             
         });
         
@@ -142,9 +147,9 @@ public class EntrySettings extends PopupSettingsView {
             }
         });
         
-        bnd.addGroupButton.setOnClickListener(v -> displayGroupAdditionEditDialog(wrapper, null,
+        bnd.addGroupButton.setOnClickListener(v -> addEditGroupDialog.show(null,
                 text -> {
-                    Group existingGroup = findGroupInList(groupList, text);
+                    var existingGroup = findGroupInList(groupList, text);
                     if (existingGroup.isNullGroup()) {
                         addGroupToGroupList(text, null);
                     } else {
@@ -158,7 +163,7 @@ public class EntrySettings extends PopupSettingsView {
                                     addGroupToGroupList(text, existingGroup));
                         });
                     }
-                }, null));
+                }, null, wrapper));
         
         bnd.settingsResetButton.setOnClickListener(v ->
                 displayMessageDialog(wrapper, builder -> {
@@ -215,7 +220,7 @@ public class EntrySettings extends PopupSettingsView {
                 parameterKey -> entry.adaptiveColorBalance.getToday(),
                 (slider, value, fromUser) -> entryPreviewContainer.setPreviewAdaptiveColorBalance((int) value));
         
-        if (todoEntry.isGlobal()) {
+        if (entry.isGlobal()) {
             // global entries can't have upcoming / expired days
             bnd.showDaysUpcomingExpiredContainer.setVisibility(View.GONE);
         } else {
@@ -242,33 +247,29 @@ public class EntrySettings extends PopupSettingsView {
         boolean rebuild;
         if (existingGroup != null) {
             // automatically handles parameter invalidation on other entries and saving of the group
-            rebuild = todoEntryManager.setNewGroupParams(existingGroup, todoEntry.getDisplayParams());
+            rebuild = todoEntryManager.setNewGroupParams(existingGroup, entry.getDisplayParams());
         } else {
-            Group newGroup = new Group(groupName, todoEntry.getDisplayParams());
+            var newGroup = new Group(groupName, entry.getDisplayParams());
             todoEntryManager.addGroup(newGroup);
-            todoEntry.changeGroup(newGroup);
+            entry.changeGroup(newGroup);
             rebuild = true;
         }
-        
-        todoEntry.removeDisplayParams();
+    
+        entry.removeDisplayParams();
         if (rebuild) {
             rebuild();
         }
     }
     
-    private void rebuild() {
-        initialise(todoEntry);
-    }
-    
     @Override
     public <T> void notifyParameterChanged(@NonNull TextView displayTo, @NonNull String
             parameterKey, @NonNull T value) {
-        todoEntry.changeParameters(parameterKey, String.valueOf(value));
+        entry.changeParameters(parameterKey, String.valueOf(value));
         setStateIconColor(displayTo, parameterKey);
     }
     
     @Override
     protected void setStateIconColor(@NonNull TextView icon, @NonNull String parameterKey) {
-        todoEntry.setStateIconColor(icon, parameterKey);
+        entry.setStateIconColor(icon, parameterKey);
     }
 }

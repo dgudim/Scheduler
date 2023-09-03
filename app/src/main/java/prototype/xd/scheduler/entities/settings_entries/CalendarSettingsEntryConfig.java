@@ -40,7 +40,8 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
     
     public CalendarSettingsEntryConfig(@NonNull final SystemCalendarSettings settings,
                                        @NonNull final SystemCalendar calendar,
-                                       boolean showSettings) {
+                                       boolean showSettings,
+                                       @NonNull final ContextWrapper wrapper) {
         super(showSettings);
         systemCalendarSettings = settings;
         calendarName = calendar.data.displayName;
@@ -51,7 +52,7 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         calendarEventsCount = calendar.systemCalendarEventMap.size();
         
         if (!calendar.eventColorCountMap.isEmpty() && calendarEventsCount > 0) {
-            gridViewAdapter = new CalendarColorsGridViewAdapter(settings, calendar);
+            gridViewAdapter = new CalendarColorsGridViewAdapter(settings, calendar, wrapper);
         }
     }
     
@@ -77,7 +78,9 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
                     Static.edit().putBoolean(config.calendarVisibilityKey, isChecked).apply());
             
             viewBinding.settingsButton.setOnClickListener(view ->
-                    config.systemCalendarSettings.show(config.calendarPrefKey, config.calendarSubKeys, config.calendarColor));
+                    config.systemCalendarSettings.show(
+                            config.calendarPrefKey, config.calendarSubKeys,
+                            config.calendarColor, wrapper));
             config.updateSettingsButtonVisibility(viewBinding.settingsButton);
             
             if (config.gridViewAdapter != null) {

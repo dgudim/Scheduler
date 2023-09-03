@@ -43,6 +43,8 @@ import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.utilities.misc.CachedGetter;
+import prototype.xd.scheduler.utilities.misc.ParameterGetter;
 import prototype.xd.scheduler.views.CalendarView;
 
 @SuppressLint("UnknownNullness")
@@ -52,59 +54,17 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     public static final String NAME = TodoEntry.class.getSimpleName();
     private static final Pattern hideByContentSplitPattern = Pattern.compile("\\|\\|");
     
-    static class CachedGetter<T> {
-        
-        final ParameterGetter<T> parameterGetter;
-        
-        T value;
-        boolean valid;
-        
-        CachedGetter(ParameterGetter<T> parameterGetter) {
-            this.parameterGetter = parameterGetter;
-        }
-        
-        void invalidate() {
-            valid = false;
-        }
-        
-        T get(T previousValue) {
-            if (!valid) {
-                value = parameterGetter.get(previousValue);
-                valid = true;
-            }
-            return value;
-        }
-        
-        T get() {
-            return get(null);
-        }
-        
-    }
-    
-    @FunctionalInterface
-    public interface ParameterGetter<T> { // NOSONAR, will be confusing if replaced by UnaryOperator<T>
-        T get(T previousValue);
-        
-        default T get() {
-            return get(null);
-        }
-    }
-    
     public static class Parameter<T> {
         
         @NonNull
-        final TodoEntry entry;
+        private final TodoEntry entry;
         
         @NonNull
-        final CachedGetter<T> todayCachedGetter;
+        private final CachedGetter<T> todayCachedGetter;
         @NonNull
-        final Function<String, T> loadedParameterConverter;
-        @Nullable
-        final
-        CachedGetter<T> upcomingCachedGetter;
-        @Nullable
-        final
-        CachedGetter<T> expiredCachedGetter;
+        private final CachedGetter<T> upcomingCachedGetter;
+        @NonNull
+        private final CachedGetter<T> expiredCachedGetter;
         
         Parameter(@NonNull TodoEntry entry,
                   @NonNull String parameterKey,
@@ -120,16 +80,15 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 String paramValue = entry.params.getOrDefault(parameterKey, entry.getGroup().params.get(parameterKey));
                 return paramValue != null ? loadedParameterConverter.apply(paramValue) : todayValueGetter.get();
             });
-            this.loadedParameterConverter = loadedParameterConverter;
         }
         
         public T get(@NonNull EntryType entryType) {
             T todayValue = todayCachedGetter.get();
             switch (entryType) {
                 case EXPIRED:
-                    return expiredCachedGetter == null ? todayValue : expiredCachedGetter.get(todayValue);
+                    return expiredCachedGetter.get(todayValue);
                 case UPCOMING:
-                    return upcomingCachedGetter == null ? todayValue : upcomingCachedGetter.get(todayValue);
+                    return upcomingCachedGetter.get(todayValue);
                 case TODAY:
                 case GLOBAL:
                 default:
@@ -147,12 +106,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
         public void invalidate() {
             todayCachedGetter.invalidate();
-            if (upcomingCachedGetter != null) {
-                upcomingCachedGetter.invalidate();
-            }
-            if (expiredCachedGetter != null) {
-                expiredCachedGetter.invalidate();
-            }
+            upcomingCachedGetter.invalidate();
+            expiredCachedGetter.invalidate();
         }
         
     }
@@ -262,7 +217,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     private transient TodoEntryList container;
     
     // ----------- supplementary stuff for sorting START
-    int typeSortingIndex;
+    private int typeSortingIndex;
+    private long cachedNearestStartMsUTC;
     
     public int getTypeSortingIndex() {
         return typeSortingIndex;
@@ -277,8 +233,6 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         // fallback to Today's
         typeSortingIndex = typeSortingIndex == -1 ? order.indexOf(EntryType.TODAY) : typeSortingIndex;
     }
-    
-    long cachedNearestStartMsUTC;
     
     public long getCachedNearestStartMsUTC() {
         return cachedNearestStartMsUTC;

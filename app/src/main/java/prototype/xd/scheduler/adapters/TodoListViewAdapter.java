@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.ColorUtilities.dimColorToBg;
 import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedFontColorWithBg;
 import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedSecondaryFontColorWithBg;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.GLOBAL_ITEMS_LABEL_POSITION;
@@ -35,6 +34,7 @@ import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
 import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.fragments.dialogs.AddEditEntryDialogFragment;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
@@ -60,11 +60,15 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         @NonNull
         private final ContextWrapper wrapper;
         
+        private final AddEditEntryDialogFragment addEditEntryDialog;
+        
         EntryViewHolder(@NonNull final V viewBinding,
-                        @NonNull final ContextWrapper wrapper) {
+                        @NonNull final ContextWrapper wrapper,
+                        @NonNull final AddEditEntryDialogFragment addEditEntryDialog) {
             super(viewBinding.getRoot());
             this.viewBinding = viewBinding;
             this.wrapper = wrapper;
+            this.addEditEntryDialog = addEditEntryDialog;
         }
         
         /**
@@ -91,8 +95,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                                        @NonNull final TodoEntryManager todoEntryManager) {
             final List<Group> groupList = todoEntryManager.getGroups();
             
-            displayEntryAdditionEditDialog(wrapper,
-                    entry, groupList,
+            addEditEntryDialog.show(entry, groupList,
                     (text, dialogBinding, selectedIndex) -> {
                         entry.changeGroup(groupList.get(selectedIndex));
                         boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();
@@ -112,7 +115,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                         }
                         // save stuff, notify days changed, etc.
                         todoEntryManager.performDeferredTasks();
-                    });
+                    }, wrapper);
         }
         
         /**
@@ -130,7 +133,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             bnd.timeText.setTextColor(getHarmonizedSecondaryFontColorWithBg(
                     entry.fontColor.get(currentlySelectedDayUTC),
                     entry.bgColor.get(currentlySelectedDayUTC)));
-            bnd.openSettingsButton.setOnClickListener(v -> systemCalendarSettings.show(entry.event));
+            bnd.openSettingsButton.setOnClickListener(v -> systemCalendarSettings.show(entry.event, wrapper));
         }
         
         /**
@@ -167,7 +170,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             // open entry edit dialog on click
             bnd.backgroundLayer.setOnClickListener(view1 -> displayEditDialog(entry, todoEntryManager));
             
-            bnd.openSettingsButton.setOnClickListener(v -> entrySettings.show(entry));
+            bnd.openSettingsButton.setOnClickListener(v -> entrySettings.show(entry, wrapper.fragmentManager));
         }
         
         /**
@@ -194,7 +197,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                 todoText.setTextColor(fontColor);
                 todoText.setPaintFlags(removeIntFlag(todoText.getPaintFlags(), Paint.STRIKE_THRU_TEXT_FLAG));
             }
-    
+            
             Static.GlobalLabelPos globalLabelPos = GLOBAL_ITEMS_LABEL_POSITION.get();
             if (globalLabelPos == Static.GlobalLabelPos.HIDDEN) {
                 // make sure it's visible in the list
@@ -239,6 +242,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     @NonNull
     private final ContextWrapper wrapper;
     
+    public final AddEditEntryDialogFragment addEditEntryDialog;
+    
     // default capacity is fine
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     public TodoListViewAdapter(@NonNull final ContextWrapper wrapper,
@@ -247,8 +252,9 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         this.todoEntryManager = todoEntryManager;
         this.wrapper = wrapper;
         currentTodoEntries = new ArrayList<>();
-        entrySettings = new EntrySettings(wrapper, todoEntryManager);
-        systemCalendarSettings = new SystemCalendarSettings(wrapper, todoEntryManager);
+        entrySettings = new EntrySettings(todoEntryManager);
+        systemCalendarSettings = new SystemCalendarSettings(todoEntryManager);
+        addEditEntryDialog = new AddEditEntryDialogFragment();
         // each entry has a unique id
         setHasStableIds(true);
     }
@@ -278,10 +284,14 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     public EntryViewHolder<?> onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         if (viewType == 1) {
             // calendar entry
-            return new EntryViewHolder<>(ListSelectionCalendarBinding.inflate(wrapper.getLayoutInflater(), parent, false), wrapper);
+            return new EntryViewHolder<>(
+                    ListSelectionCalendarBinding.inflate(wrapper.getLayoutInflater(), parent, false),
+                    wrapper, addEditEntryDialog);
         } else {
             // regular entry
-            return new EntryViewHolder<>(ListSelectionTodoBinding.inflate(wrapper.getLayoutInflater(), parent, false), wrapper);
+            return new EntryViewHolder<>(
+                    ListSelectionTodoBinding.inflate(wrapper.getLayoutInflater(), parent, false),
+                    wrapper, addEditEntryDialog);
         }
     }
     

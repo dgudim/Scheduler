@@ -2,7 +2,7 @@ package prototype.xd.scheduler.utilities.misc;
 
 public class MutableObject<T> {
     
-    T obj;
+    private T obj;
     
     public T get() {
         return obj;

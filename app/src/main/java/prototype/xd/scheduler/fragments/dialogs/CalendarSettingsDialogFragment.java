@@ -1,16 +1,17 @@
-package prototype.xd.scheduler.fragments;
+package prototype.xd.scheduler.fragments.dialogs;
 
 import static androidx.recyclerview.widget.ConcatAdapter.Config.StableIdMode.NO_STABLE_IDS;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
 
-import android.os.Bundle;
-import android.view.View;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
-import androidx.annotation.MainThread;
+import androidx.activity.ComponentDialog;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.divider.MaterialDividerItemDecoration;
 
@@ -22,6 +23,7 @@ import java.util.TreeMap;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
+import prototype.xd.scheduler.databinding.SettingsDialogFragmentBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CalendarSettingsEntryConfig;
@@ -33,23 +35,25 @@ import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAdapter> {
+public class CalendarSettingsDialogFragment extends FullScreenSettingsDialogFragment<SettingsDialogFragmentBinding> {
     
-    // initial window creation
-    @MainThread
+    @NonNull
+    @Override
+    protected SettingsDialogFragmentBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return SettingsDialogFragmentBinding.inflate(inflater, container, false);
+    }
+    
     @Override
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        SystemCalendarSettings systemCalendarSettings = new SystemCalendarSettings(wrapper, null);
+    protected void buildDialogDynamic(@NonNull SettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
+        SystemCalendarSettings systemCalendarSettings = new SystemCalendarSettings(null);
         
         //                                                       two entries - title and the switch
         List<SettingsEntryConfig> staticEntries = new ArrayList<>(2);
         staticEntries.add(new TitleBarSettingsEntryConfig(R.string.category_system_calendars));
         SettingsListViewAdapter staticEntriesListViewAdapter = new SettingsListViewAdapter(wrapper, staticEntries);
         
-        listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
+        var listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
                 .setIsolateViewTypes(false)
                 .setStableIdMode(NO_STABLE_IDS).build(),
                 staticEntriesListViewAdapter);
@@ -86,7 +90,8 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
                     calendarEntryList.add(new CalendarSettingsEntryConfig(
                             systemCalendarSettings,
                             currentCalendar,
-                            showSettings));
+                            showSettings,
+                            wrapper));
                 }
                 
                 calendarConfigEntries.addAll(calendarEntryList);
@@ -110,11 +115,12 @@ public class CalendarSettingsFragment extends BaseListSettingsFragment<ConcatAda
             listViewAdapter.notifyItemRangeChanged(staticEntries.size(), calendarConfigEntries.size());
         }, false));
         staticEntriesListViewAdapter.notifyItemInserted(staticEntries.size());
+        binding.recyclerView.setAdapter(listViewAdapter);
     }
     
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    protected void buildDialogStatic(@NonNull SettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
         binding.recyclerView.addItemDecoration(new MaterialDividerItemDecoration(wrapper.context, DividerItemDecoration.VERTICAL));
-        super.onViewCreated(view, savedInstanceState);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
     }
 }

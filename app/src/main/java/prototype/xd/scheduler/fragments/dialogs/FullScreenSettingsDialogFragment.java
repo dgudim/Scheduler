@@ -1,14 +1,14 @@
-package prototype.xd.scheduler.fragments;
+package prototype.xd.scheduler.fragments.dialogs;
 
 import static prototype.xd.scheduler.utilities.Utilities.findFragmentInNavHost;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.ComponentDialog;
 import androidx.annotation.CallSuper;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -19,20 +19,13 @@ import androidx.viewbinding.ViewBinding;
 import java.util.Map;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
+import prototype.xd.scheduler.fragments.HomeFragment;
 import prototype.xd.scheduler.utilities.Static;
 
 // base dialog class that refreshes main screen on settings changes
-public abstract class BaseSettingsFragment<T extends ViewBinding> extends DialogFragment {
-    
-    protected T binding;
-    
-    @SuppressLint("UnknownNullness")
-    protected ContextWrapper wrapper;
+public abstract class FullScreenSettingsDialogFragment<T extends ViewBinding> extends BaseCachedDialogFragment<T, ComponentDialog> {
     
     private Map<String, ?> preferenceStateBefore;
-    
-    public abstract T inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
     
     // view creation begin
     @Override
@@ -40,9 +33,14 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     @Nullable
     @CallSuper
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = inflate(inflater, container);
         preferenceStateBefore = Static.getAll();
-        return binding.getRoot();
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+    
+    @NonNull
+    @Override
+    public ComponentDialog buildDialog() {
+        return getBaseDialog();
     }
     
     // fragment creation begin
@@ -51,7 +49,6 @@ public abstract class BaseSettingsFragment<T extends ViewBinding> extends Dialog
     @CallSuper
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        wrapper = ContextWrapper.from(this);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
     }
     

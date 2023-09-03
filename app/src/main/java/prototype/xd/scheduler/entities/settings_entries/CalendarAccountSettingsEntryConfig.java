@@ -67,7 +67,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
             viewBinding.calendarName.setText(config.accountName);
             viewBinding.accountType.setText(config.accountType);
             viewBinding.settingsButton.setOnClickListener(v ->
-                    config.systemCalendarSettings.show(config.accountName, config.subKeys, config.calendarColor));
+                    config.systemCalendarSettings.show(config.accountName, config.subKeys, config.calendarColor, wrapper));
             config.updateSettingsButtonVisibility(viewBinding.settingsButton);
             View.OnClickListener expandListener = v -> {
                 config.containerAdapter.toggleCollapsed();

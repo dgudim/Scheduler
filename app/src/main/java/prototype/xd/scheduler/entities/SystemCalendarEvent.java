@@ -223,9 +223,9 @@ public class SystemCalendarEvent {
     private static class DateTimeZonePair {
         
         @NonNull
-        final String dateList;
+        private final String dateList;
         @NonNull
-        final TimeZone timeZone;
+        private final TimeZone timeZone;
         
         DateTimeZonePair(@NonNull String dateList, @NonNull TimeZone timeZone) {
             this.dateList = dateList;

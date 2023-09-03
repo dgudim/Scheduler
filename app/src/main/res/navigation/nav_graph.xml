@@ -12,38 +12,55 @@
 
         <action
             android:id="@+id/action_HomeFragment_to_GlobalSettingsFragment"
-            app:destination="@id/GlobalSettingsFragment" />
+            app:destination="@id/GlobalSettingsDialogFragment" />
         <action
             android:id="@+id/action_HomeFragment_to_CalendarSettingsFragment"
-            app:destination="@id/CalendarSettingsFragment" />
+            app:destination="@id/CalendarSettingsDialogFragment" />
         <action
             android:id="@+id/action_HomeFragment_to_SortingSettingsFragment"
-            app:destination="@id/SortingSettingsFragment" />
+            app:destination="@id/SortingSettingsDialogFragment" />
+        <action
+            android:id="@+id/action_HomeFragment_to_AddEditEntryDialogFragment"
+            app:destination="@id/AddEditEntryDialogFragment" />
+        <action
+            android:id="@+id/action_HomeFragment_to_AddEditGroupDialogFragment"
+            app:destination="@id/AddEditGroupDialogFragment" />
     </fragment>
 
     <dialog
-        android:id="@+id/GlobalSettingsFragment"
-        android:name="prototype.xd.scheduler.fragments.GlobalSettingsFragment"
-        android:label="@string/global_settings_fragment_label"
-        tools:layout="@layout/settings_fragment">
+        android:id="@+id/GlobalSettingsDialogFragment"
+        android:name="prototype.xd.scheduler.fragments.dialogs.GlobalSettingsDialogFragment"
+        android:label="@string/global_settings_dialog_fragment_label"
+        tools:layout="@layout/settings_dialog_fragment">
 
     </dialog>
 
     <dialog
-        android:id="@+id/CalendarSettingsFragment"
-        android:name="prototype.xd.scheduler.fragments.CalendarSettingsFragment"
-        android:label="@string/calendar_settings_fragment_label"
-        tools:layout="@layout/settings_fragment">
-
+        android:id="@+id/CalendarSettingsDialogFragment"
+        android:name="prototype.xd.scheduler.fragments.dialogs.CalendarSettingsDialogFragment"
+        android:label="@string/calendar_settings_dialog_fragment_label"
+        tools:layout="@layout/settings_dialog_fragment">
     </dialog>
 
     <dialog
-        android:id="@+id/SortingSettingsFragment"
-        android:name="prototype.xd.scheduler.fragments.SortingSettingsFragment"
-        android:label="@string/sorting_settings_fragment_label"
-        tools:layout="@layout/sorting_settings_fragment">
-
+        android:id="@+id/SortingSettingsDialogFragment"
+        android:name="prototype.xd.scheduler.fragments.dialogs.SortingSettingsDialogFragment"
+        android:label="@string/sorting_settings_dialog_fragment_label"
+        tools:layout="@layout/sorting_settings_dialog_fragment">
     </dialog>
 
+    <dialog
+        android:id="@+id/AddEditEntryDialogFragment"
+        android:name="prototype.xd.scheduler.fragments.dialogs.AddEditEntryDialogFragment"
+        android:label="@string/add_edit_entry_dialog_fragment_label"
+        tools:layout="@layout/add_edit_entry_dialog_fragment">
+    </dialog>
+
+    <dialog
+        android:id="@+id/AddEditGroupDialogFragment"
+        android:name="prototype.xd.scheduler.fragments.dialogs.AddEditGroupDialogFragment"
+        android:label="@string/add_edit_group_dialog_fragment_label"
+        tools:layout="@layout/add_edit_group_dialog_fragment">
+    </dialog>
 
 </navigation>

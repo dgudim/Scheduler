@@ -1,11 +1,5 @@
 package prototype.xd.scheduler.utilities;
 
-import static java.lang.Math.max;
-import static prototype.xd.scheduler.entities.Group.groupIndexInList;
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
-import static prototype.xd.scheduler.utilities.Utilities.fancyHideUnhideView;
-
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.View;
@@ -14,33 +8,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
-import androidx.viewbinding.ViewBinding;
+import androidx.fragment.app.DialogFragment;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.ObjIntConsumer;
 import java.util.function.ToIntFunction;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.databinding.AddOrEditEntryDialogBinding;
-import prototype.xd.scheduler.databinding.AddOrEditGroupDialogBinding;
 import prototype.xd.scheduler.databinding.TwoButtonsBinding;
-import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.views.DateSelectButton;
-import prototype.xd.scheduler.views.SelectableAutoCompleteTextView;
 import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
 public final class DialogUtilities {
@@ -52,105 +38,13 @@ public final class DialogUtilities {
     }
     
     /**
-     * Display a dialog to add or edit a group
-     *
-     * @param wrapper              any context wrapper
-     * @param group                group to edit (or null to add)
-     * @param confirmationListener listener to call on dialog confirmation
-     * @param deletionListener     listener to call when deletion button is pressed
-     */
-    @MainThread
-    public static void displayGroupAdditionEditDialog(@NonNull ContextWrapper wrapper,
-                                                      @Nullable Group group,
-                                                      @NonNull Consumer<String> confirmationListener,
-                                                      @Nullable Consumer<Dialog> deletionListener) {
-        AddOrEditGroupDialogBinding dialogBinding = AddOrEditGroupDialogBinding.inflate(wrapper.getLayoutInflater());
-        
-        Dialog dialog = buildTemplate(wrapper,
-                group == null ? R.string.add_current_config_as_group_prompt : R.string.edit_group,
-                group == null ? R.drawable.ic_library_add_24 : R.drawable.ic_edit_24,
-                group == null ? R.string.add_current_config_as_group_message : -1, dialogBinding);
-        
-        setupEditText(dialogBinding.entryNameEditText, group == null ? "" : group.getRawName());
-        
-        if (deletionListener != null) {
-            dialogBinding.deleteGroupButton.setOnClickListener(v -> deletionListener.accept(dialog));
-        } else {
-            dialogBinding.deleteGroupButton.setVisibility(View.GONE);
-        }
-        
-        setupButtons(dialog, dialogBinding.twoButtons,
-                R.string.cancel, group == null ? R.string.add : R.string.save,
-                v -> callIfInputNotEmpty(dialogBinding.entryNameEditText, text -> {
-                    confirmationListener.accept(text);
-                    dialog.dismiss();
-                }));
-    }
-    
-    /**
-     * Display a dialog to add or edit an entry
-     *
-     * @param wrapper              any context wrapper
-     * @param entry                TodoEntry to edit or null
-     * @param groupList            a list with all groups
-     * @param confirmationListener listener to call on dialog confirmation
-     */
-    @MainThread
-    public static void displayEntryAdditionEditDialog(@NonNull ContextWrapper wrapper,
-                                                      @Nullable TodoEntry entry,
-                                                      @NonNull List<Group> groupList,
-                                                      @NonNull EditEntryConfirmationListener confirmationListener) {
-        
-        AddOrEditEntryDialogBinding dialogBinding = AddOrEditEntryDialogBinding.inflate(wrapper.getLayoutInflater());
-        
-        Dialog dialog = buildTemplate(wrapper,
-                entry == null ? R.string.add_event_fab : R.string.edit_event,
-                entry == null ? R.drawable.ic_add_task_24 : R.drawable.ic_edit_24,
-                -1, dialogBinding);
-        setupEditText(dialogBinding.entryNameEditText, entry == null ? "" : entry.getRawTextValue());
-        
-        String[] items = Group.groupListToNames(groupList, wrapper);
-        SelectableAutoCompleteTextView groupSpinner = dialogBinding.groupSpinner;
-        groupSpinner.setSimpleItems(items);
-        
-        int initialGroupIndex = entry == null ? 0 : max(groupIndexInList(groupList, entry.getRawGroupName()), 0);
-        
-        final int[] selectedIndex = {initialGroupIndex};
-        
-        groupSpinner.setSelectedItem(initialGroupIndex);
-        groupSpinner.setOnItemClickListener((parent, view, position, id) -> selectedIndex[0] = position);
-        
-        dialogBinding.dayFromButton.setup(wrapper.fragmentManager, entry == null ? currentlySelectedDayUTC : entry.startDayLocal.get());
-        dialogBinding.dayToButton.setup(wrapper.fragmentManager, entry == null ? currentlySelectedDayUTC : entry.endDayLocal.get());
-        
-        // for date validation
-        dialogBinding.dayFromButton.setRole(DateSelectButton.Role.START_DAY, dialogBinding.dayToButton);
-        dialogBinding.dayToButton.setRole(DateSelectButton.Role.END_DAY, dialogBinding.dayFromButton);
-        
-        dialogBinding.globalEntrySwitch.setOnCheckedChangeListener((buttonView, isChecked, fromUser) -> {
-            fancyHideUnhideView(dialogBinding.dayFromButton, !isChecked, fromUser);
-            fancyHideUnhideView(dialogBinding.dayToButton, !isChecked, fromUser);
-            fancyHideUnhideView(dialogBinding.dateFromToArrow, !isChecked, fromUser);
-            fancyHideUnhideView(dialogBinding.divider2, !isChecked, fromUser);
-        });
-        dialogBinding.globalEntrySwitch.setChecked(entry != null && entry.isGlobal());
-        
-        setupButtons(dialog, dialogBinding.twoButtons,
-                R.string.cancel, entry == null ? R.string.add : R.string.save,
-                v -> callIfInputNotEmpty(dialogBinding.entryNameEditText, text -> {
-                    confirmationListener.onClick(text, dialogBinding, selectedIndex[0]);
-                    dialog.dismiss();
-                }));
-    }
-    
-    /**
      * Sets up edit text field on the dialog
      *
      * @param editText             edit text field
      * @param defaultEditTextValue default (starting) value
      */
-    private static void setupEditText(@NonNull EditText editText,
-                                      @NonNull String defaultEditTextValue) {
+    public static void setupEditText(@NonNull EditText editText,
+                                     @NonNull String defaultEditTextValue) {
         editText.setText(defaultEditTextValue);
         editText.setOnFocusChangeListener((v, hasFocus) -> editText.postDelayed(() ->
                         ((InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
@@ -162,17 +56,17 @@ public final class DialogUtilities {
     /**
      * Sets up buttons on the dialog
      *
-     * @param dialog                      target dialog
+     * @param dialogFragment              target dialog fragment
      * @param buttonContainer             view binding for two buttons
      * @param cancelButtonStringResource  cancel button string resource
      * @param confirmButtonStringResource confirm button string resource
      * @param confirmationListener        listener to call when the dialog is confirmed
      */
-    private static void setupButtons(@NonNull Dialog dialog,
-                                     @NonNull TwoButtonsBinding buttonContainer,
-                                     @StringRes int cancelButtonStringResource,
-                                     @StringRes int confirmButtonStringResource,
-                                     @NonNull View.OnClickListener confirmationListener) {
+    public static void setupButtons(@NonNull DialogFragment dialogFragment,
+                                    @NonNull TwoButtonsBinding buttonContainer,
+                                    @StringRes int cancelButtonStringResource,
+                                    @StringRes int confirmButtonStringResource,
+                                    @NonNull View.OnClickListener confirmationListener) {
         
         Button confirmButton = buttonContainer.confirmButton;
         Button cancelButton = buttonContainer.cancelButton;
@@ -180,7 +74,7 @@ public final class DialogUtilities {
         cancelButton.setText(cancelButtonStringResource);
         confirmButton.setText(confirmButtonStringResource);
         
-        cancelButton.setOnClickListener(v -> dialog.dismiss());
+        cancelButton.setOnClickListener(v -> dialogFragment.dismiss());
         confirmButton.setOnClickListener(confirmationListener);
     }
     
@@ -190,45 +84,13 @@ public final class DialogUtilities {
      * @param editText        text input field
      * @param successCallback callback to invoke
      */
-    private static void callIfInputNotEmpty(@NonNull EditText editText, @NonNull Consumer<String> successCallback) {
+    public static void callIfInputNotEmpty(@NonNull EditText editText, @NonNull Consumer<String> successCallback) {
         String text = editText.getText() == null ? "" : editText.getText().toString().trim();
         if (text.isEmpty()) {
             editText.setError(editText.getContext().getString(R.string.input_cant_be_empty));
         } else {
             successCallback.accept(text);
         }
-    }
-    
-    /**
-     * Build dialog template
-     *
-     * @param wrapper               context wrapper (context and lifecycle)
-     * @param titleStringResource   dialog title string resource
-     * @param messageStringResource dialog message string resource
-     * @param iconDrawableResource  icon drawable resource
-     * @param viewBinding           dialog contents
-     * @return dialog with title, message and target view
-     */
-    @NonNull
-    @MainThread
-    private static Dialog buildTemplate(@NonNull final ContextWrapper wrapper,
-                                        @StringRes int titleStringResource,
-                                        @DrawableRes int iconDrawableResource,
-                                        @StringRes int messageStringResource,
-                                        @NonNull ViewBinding viewBinding) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(wrapper.context);
-        builder.setTitle(titleStringResource);
-        builder.setIcon(iconDrawableResource);
-        if (messageStringResource != -1) {
-            builder.setMessage(messageStringResource);
-        }
-        builder.setView(viewBinding.getRoot());
-        return wrapper.attachDialogToLifecycle(builder.show(), null);
-    }
-    
-    @FunctionalInterface
-    public interface EditEntryConfirmationListener {
-        void onClick(@NonNull String text, @NonNull AddOrEditEntryDialogBinding dialogBinding, int selectedIndex);
     }
     
     /**

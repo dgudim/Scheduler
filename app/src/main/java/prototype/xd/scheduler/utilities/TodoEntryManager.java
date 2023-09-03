@@ -188,7 +188,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     /**
-     * Update update upcomingExpiredVisibility and calendarVisibilityMap, load/unload calendars
+     * Update upcomingExpiredVisibility and calendarVisibilityMap, load/unload calendars
      */
     private void updateStaticVarsAndCalendarVisibility() {
         

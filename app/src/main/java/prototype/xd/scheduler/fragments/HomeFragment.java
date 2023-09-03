@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.DateManager.dateStringUTCFromMsUT
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayEntryAdditionEditDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayErrorDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
@@ -175,8 +174,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         
         contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoEntryManager.getGroups();
-            displayEntryAdditionEditDialog(wrapper,
-                    null, groupList,
+            todoListViewAdapter.addEditEntryDialog.show(null, groupList,
                     (text, dialogBinding, selectedIndex) -> {
                         SArrayMap<String, String> values = new SArrayMap<>();
                         values.put(TEXT_VALUE, text);
@@ -190,7 +188,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                         todoEntryManager.addEntry(new TodoEntry(values, groupList.get(selectedIndex), System.currentTimeMillis()));
                         
                         Utilities.displayToast(wrapper.context, R.string.event_created_message, Toast.LENGTH_SHORT);
-                    });
+                    }, wrapper);
         });
         
         navViewContent.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));

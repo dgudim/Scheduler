@@ -15,6 +15,7 @@ import androidx.collection.ArrayMap;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 // TODO: 21.02.2023 REPLACE WITH LIST 
 /**
@@ -35,12 +36,17 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
     @NonNull
     private final SystemCalendar calendar;
     
+    @NonNull
+    private final ContextWrapper wrapper;
+    
     public CalendarColorsGridViewAdapter(@NonNull final SystemCalendarSettings systemCalendarSettings,
-                                         @NonNull final SystemCalendar calendar) {
+                                         @NonNull final SystemCalendar calendar,
+                                         @NonNull final ContextWrapper wrapper) {
         this.systemCalendarSettings = systemCalendarSettings;
         eventColorCountMap = calendar.eventColorCountMap;
         calendarColor = calendar.data.color;
         this.calendar = calendar;
+        this.wrapper = wrapper;
     }
     
     @Override
@@ -75,7 +81,9 @@ public class CalendarColorsGridViewAdapter extends BaseAdapter {
         view.findViewById(R.id.title_default).setVisibility(calendarColor == eventColor ? View.VISIBLE : View.GONE);
         ((TextView) view.findViewById(R.id.event_count)).setText(getPluralString(view.getContext(), R.plurals.calendar_event_count, eventCount));
         view.findViewById(R.id.open_settings_button).setOnClickListener(v ->
-                systemCalendarSettings.show(eventPrefKey, calendar.makeEventSubKeys(eventPrefKey), eventColor));
+                systemCalendarSettings.show(
+                        eventPrefKey, calendar.makeEventSubKeys(eventPrefKey),
+                        eventColor, wrapper));
         
         return view;
     }

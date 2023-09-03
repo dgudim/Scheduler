@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.fragments;
+package prototype.xd.scheduler.fragments.dialogs;
 
 import static androidx.activity.result.contract.ActivityResultContracts.OpenDocument;
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_LOCAL;
@@ -6,19 +6,24 @@ import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAYS_OF_WEEK_RO
 import static prototype.xd.scheduler.utilities.DateManager.FIRST_DAY_OF_WEEK;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
+import androidx.activity.ComponentDialog;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.canhub.cropper.CropImageContract;
 import com.canhub.cropper.CropImageContractOptions;
 
 import java.util.List;
+import java.util.Objects;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
+import prototype.xd.scheduler.databinding.SettingsDialogFragmentBinding;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationSettingsEntryConfig;
@@ -33,24 +38,26 @@ import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfi
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.Static;
 
-public class GlobalSettingsFragment extends BaseListSettingsFragment<SettingsListViewAdapter> { // NOSONAR, this is a fragment
+public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragment<SettingsDialogFragmentBinding> { // NOSONAR, this is a fragment
     
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBgSettingsEntry;
     
-    final ActivityResultLauncher<CropImageContractOptions> cropBgLauncher =
+    private final ActivityResultLauncher<CropImageContractOptions> cropBgLauncher =
             registerForActivityResult(new CropImageContract(), result -> adaptiveBgSettingsEntry.notifyBackgroundSelected(wrapper, result));
     
-    final ActivityResultLauncher<String[]> importSettingsLauncher =
+    private final ActivityResultLauncher<String[]> importSettingsLauncher =
             registerForActivityResult(new OpenDocument(), result -> ImportExportSettingsEntryConfig.notifyFileChosen(wrapper, result));
     
-    // initial window creation
-    @SuppressLint("NotifyDataSetChanged")
+    @NonNull
     @Override
-    @MainThread
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
+    protected SettingsDialogFragmentBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return SettingsDialogFragmentBinding.inflate(inflater, container, false);
+    }
+    
+    @Override
+    @SuppressLint("NotifyDataSetChanged")
+    protected void buildDialogStatic(@NonNull SettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
         adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper, cropBgLauncher);
         
         List<SettingsEntryConfig> settingsEntries = List.of(
@@ -122,11 +129,17 @@ public class GlobalSettingsFragment extends BaseListSettingsFragment<SettingsLis
                         List.of(Static.GlobalLabelPos.FRONT,
                                 Static.GlobalLabelPos.BACK,
                                 Static.GlobalLabelPos.HIDDEN), Static.GLOBAL_ITEMS_LABEL_POSITION),
-                new ResetButtonSettingsEntryConfig((dialog, which) -> {
+                new ResetButtonSettingsEntryConfig((dialogInterface, which) -> {
                     Static.clearAll();
-                    listViewAdapter.notifyDataSetChanged();
+                    Objects.requireNonNull(binding.recyclerView.getAdapter()).notifyDataSetChanged();
                 }));
         
-        listViewAdapter = new SettingsListViewAdapter(wrapper, settingsEntries);
+        binding.recyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
+    }
+    
+    @Override
+    protected void buildDialogDynamic(@NonNull SettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
+        // None of it is dynamic
     }
 }
