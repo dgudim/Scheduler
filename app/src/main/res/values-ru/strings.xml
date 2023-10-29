@@ -216,7 +216,7 @@
     <string name="todays_calendar_events">Сегодняшние календарные события</string>
     <string name="global_events">Глобальные события</string>
     <string name="sorting_treat_global_as_todays">Сортировать глобальные события вместе с текущими</string>
-    <string name="sorting_sort_calendar_separately">Сортировать календарные собятия отдельно от обычных</string>
+    <string name="sorting_sort_calendar_separately">Сортировать календарные события отдельно от обычных</string>
     <string name="upcoming_events_description">События, которые начнутся через несколько дней</string>
     <string name="expired_events_description">События, которые уже закончились</string>
     <string name="todays_events_description">Текущие события</string>

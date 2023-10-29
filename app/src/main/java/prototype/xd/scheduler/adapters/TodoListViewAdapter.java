@@ -133,7 +133,13 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             bnd.timeText.setTextColor(getHarmonizedSecondaryFontColorWithBg(
                     entry.fontColor.get(currentlySelectedDayUTC),
                     entry.bgColor.get(currentlySelectedDayUTC)));
+    
+            // open calendar settings on settings icon click and on entry long click
             bnd.openSettingsButton.setOnClickListener(v -> systemCalendarSettings.show(entry.event, wrapper));
+            bnd.backgroundLayer.setOnLongClickListener(v -> {
+                systemCalendarSettings.show(entry.event, wrapper);
+                return true;
+            });
         }
         
         /**
@@ -170,6 +176,11 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             // open entry edit dialog on click
             bnd.backgroundLayer.setOnClickListener(view1 -> displayEditDialog(entry, todoEntryManager));
             
+            // open entry settings on settings icon click and on entry long click
+            bnd.backgroundLayer.setOnLongClickListener(v -> {
+                entrySettings.show(entry, wrapper.fragmentManager);
+                return true;
+            });
             bnd.openSettingsButton.setOnClickListener(v -> entrySettings.show(entry, wrapper.fragmentManager));
         }
         
