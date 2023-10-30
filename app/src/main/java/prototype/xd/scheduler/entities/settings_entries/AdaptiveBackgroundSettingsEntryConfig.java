@@ -3,6 +3,7 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.ADAPTIVE_BACKGROUND_SETTINGS;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
+import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Static.ADAPTIVE_BACKGROUND_ENABLED;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
@@ -25,7 +26,9 @@ import com.canhub.cropper.CropImageView;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.divider.MaterialDividerItemDecoration;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.PerDayBgGridViewAdapter;
@@ -89,7 +92,6 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
             super(wrapper, viewBinding);
         }
         
-        @SuppressWarnings("ResultOfMethodCallIgnored")
         @Override
         void bind(@NonNull AdaptiveBackgroundSettingsEntryConfig config) {
             viewBinding.adaptiveBgSettings.setOnClickListener(v -> {
@@ -110,8 +112,12 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                             builder.setPositiveButton(R.string.delete, (dialogInterface, whichButton) -> {
                                 for (int dayIndex = 0; dayIndex < DateManager.BG_NAMES_ROOT.size() - 1; dayIndex++) {
                                     String bgName = DateManager.BG_NAMES_ROOT.get(dayIndex);
-                                    getFile(bgName).delete();
-                                    getFile(bgName + "_min.png").delete();
+                                    try {
+                                        Files.deleteIfExists(getFile(bgName).toPath());
+                                        Files.deleteIfExists(getFile(bgName + "_min.png").toPath());
+                                    } catch (IOException e) { // NOSONAR
+                                        logException(NAME, e);
+                                    }
                                 }
                                 config.gridViewAdapter.notifyItemRangeChanged(0, DateManager.BG_NAMES_ROOT.size() - 1);
                             });
