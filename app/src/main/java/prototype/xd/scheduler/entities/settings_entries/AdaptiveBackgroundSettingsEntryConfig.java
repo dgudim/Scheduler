@@ -25,6 +25,8 @@ import com.canhub.cropper.CropImageView;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.divider.MaterialDividerItemDecoration;
 
+import java.io.InputStream;
+
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.PerDayBgGridViewAdapter;
 import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding;
@@ -68,7 +70,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     
     public void notifyBackgroundSelected(@NonNull ContextWrapper wrapper, @NonNull CropImageView.CropResult result) {
         if (result.isSuccessful()) {
-            new Thread(() -> wrapper.processUri(result.getUriContent(), stream -> {
+            new Thread(() -> wrapper.uriToStream(result.getUriContent(), InputStream.class, stream -> {
                 ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
                         getFile(DateManager.BG_NAMES_ROOT.get(lastClickedBgIndex)));
                 wrapper.runOnUiThread(gridViewAdapter::notifyDataSetChanged);

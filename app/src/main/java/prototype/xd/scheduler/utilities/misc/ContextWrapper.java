@@ -16,6 +16,7 @@ import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -24,6 +25,7 @@ import androidx.lifecycle.LifecycleObserver;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import prototype.xd.scheduler.utilities.Logger;
 
@@ -184,20 +186,36 @@ public final class ContextWrapper {
     
     @FunctionalInterface
     public interface IOConsumer<T> {
-        void accept(T t) throws IOException;
+        void accept(T t) throws IOException, ClassNotFoundException;
     }
     
-    public void processUri(@Nullable Uri uri, @NonNull IOConsumer<InputStream> consumer, @Nullable Runnable nullUriHandler) {
+    /** @noinspection unchecked*/
+    public <T> void uriToStream(@Nullable Uri uri,
+                                @NonNull Class<T> klass,
+                                @NonNull IOConsumer<T> consumer,
+                                @Nullable Consumer<Boolean> nullFailUriHandler) {
         if (uri == null) {
-            if(nullUriHandler != null) {
-                nullUriHandler.run();
+            if (nullFailUriHandler != null) {
+                nullFailUriHandler.accept(false);
             }
-            Logger.error(NAME, "Uri is null");
+            Logger.warning(NAME, "Uri is null");
             return;
         }
-        try (InputStream stream = activity.getContentResolver().openInputStream(uri)) {
-            consumer.accept(stream);
-        } catch (IOException e) {
+    
+        try {
+            if(klass == InputStream.class) {
+                try(InputStream stream = activity.getContentResolver().openInputStream(uri)) {
+                    consumer.accept((T)stream);
+                }
+            } else if(klass == OutputStream.class) {
+                try(OutputStream stream = activity.getContentResolver().openOutputStream(uri)) {
+                    consumer.accept((T)stream);
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            if (nullFailUriHandler != null) {
+                nullFailUriHandler.accept(true);
+            }
             logException(NAME, e);
         }
     }

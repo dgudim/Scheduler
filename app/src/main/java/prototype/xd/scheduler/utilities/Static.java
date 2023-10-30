@@ -233,7 +233,7 @@ public final class Static {
             }
             return list;
         }
-    
+        
         @NonNull
         public List<T> getUnique() {
             return Lists.newArrayList(ImmutableSet.copyOf(getInternal(key, defaultValue)));
@@ -242,8 +242,8 @@ public final class Static {
         @Override
         public void put(@NonNull List<T> enumList) {
             preferences.edit().putString(
-                            key,
-                            enumList.stream().map(Enum::toString).collect(Collectors.joining(delimiter))).apply();
+                    key,
+                    enumList.stream().map(Enum::toString).collect(Collectors.joining(delimiter))).apply();
         }
         
         @Override
@@ -296,7 +296,7 @@ public final class Static {
             servicePreferences = context.getSharedPreferences(PREFERENCES_SERVICE, Context.MODE_PRIVATE);
             
             // init root dir
-            File rootDir = context.getExternalFilesDir("");
+            File rootDir = context.getExternalFilesDir(null);
             if (rootDir == null) {
                 Log.e(NAME, "Shared storage not available wtf");
                 killProcess(myPid());
@@ -315,20 +315,28 @@ public final class Static {
         }
     }
     
-    public static <T> void putAny(@NonNull String key, @NonNull T value) {
+    @NonNull
+    public static <T> SharedPreferences.Editor putAnyEditor(@NonNull SharedPreferences.Editor editor,
+                                                            @NonNull String key,
+                                                            @NonNull T value) {
         if (value.getClass() == Integer.class) {
-            preferences.edit().putInt(key, (Integer) value).apply();
+            return editor.putInt(key, (Integer) value);
         } else if (value.getClass() == String.class) {
-            preferences.edit().putString(key, (String) value).apply();
+            return editor.putString(key, (String) value);
         } else if (value.getClass() == Boolean.class) {
-            preferences.edit().putBoolean(key, (Boolean) value).apply();
+            return editor.putBoolean(key, (Boolean) value);
         } else if (value.getClass() == Long.class) {
-            preferences.edit().putLong(key, (Long) value).apply();
+            return editor.putLong(key, (Long) value);
         } else if (value.getClass() == Float.class) {
-            preferences.edit().putFloat(key, (Float) value).apply();
+            return editor.putFloat(key, (Float) value);
         } else {
             Logger.error(NAME, "Can't put key: " + key + " with value " + value);
+            return editor;
         }
+    }
+    
+    public static <T> void putAny(@NonNull String key, @NonNull T value) {
+        putAnyEditor(preferences.edit(), key, value).apply();
     }
     
     public static boolean getBoolean(@NonNull String key, boolean defaultValue) {
@@ -345,8 +353,9 @@ public final class Static {
         return preferences.edit();
     }
     
-    public static void clearAll() {
-        preferences.edit().clear().apply();
+    @NonNull
+    public static SharedPreferences.Editor clearAll() {
+        return preferences.edit().clear();
     }
     
     public static <T> T getFirstValidKey(@Nullable List<String> subKeys, @NonNull String parameter, @NonNull Function2<String, Integer, T> converter) {
@@ -442,6 +451,7 @@ public final class Static {
     public static final DefaultedBoolean MERGE_ENTRIES = new DefaultedBoolean("merge_events", true);
     
     public enum GlobalLabelPos {FRONT, BACK, HIDDEN}
+    
     public static final DefaultedBoolean SHOW_GLOBAL_ITEMS_LOCK = new DefaultedBoolean("show_global_tasks_lock", true);
     public static final DefaultedEnum<GlobalLabelPos> GLOBAL_ITEMS_LABEL_POSITION = new DefaultedEnum<>(
             "global_tasks_label_position",
@@ -493,6 +503,7 @@ public final class Static {
     public static final String SETTINGS_FILE_BACKUP = SETTINGS_FILE + ".old";
     
     public static final String LOGCAT_FILE = "logcat.txt";
+    public static final String EXPORT_FILE = "export.zip";
     
     public static final String PACKAGE_NAME = BuildConfig.APPLICATION_ID;
     public static final String PACKAGE_PROVIDER_NAME = PACKAGE_NAME + ".provider";

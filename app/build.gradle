@@ -99,6 +99,8 @@ dependencies {
 
     implementation 'com.google.guava:guava:32.1.3-android'
 
+    implementation 'net.lingala.zip4j:zip4j:2.11.5'
+
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 }
 

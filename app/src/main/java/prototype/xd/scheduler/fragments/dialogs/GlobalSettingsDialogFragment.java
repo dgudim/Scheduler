@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import androidx.activity.ComponentDialog;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,7 +48,12 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
             registerForActivityResult(new CropImageContract(), result -> adaptiveBgSettingsEntry.notifyBackgroundSelected(wrapper, result));
     
     private final ActivityResultLauncher<String[]> importSettingsLauncher =
-            registerForActivityResult(new OpenDocument(), result -> ImportExportSettingsEntryConfig.notifyFileChosen(wrapper, result));
+            registerForActivityResult(new OpenDocument(),
+                    result -> ImportExportSettingsEntryConfig.notifyFileChosen(wrapper, result));
+    
+    private final ActivityResultLauncher<String> exportSettingsLauncher =
+            registerForActivityResult(new ActivityResultContracts.CreateDocument(ImportExportSettingsEntryConfig.MIMETYPE),
+                    result -> ImportExportSettingsEntryConfig.notifySaveLocationChosen(wrapper, result));
     
     @NonNull
     @Override
@@ -66,7 +72,7 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
                 new DividerSettingsEntryConfig(),
                 new AppThemeSelectorEntryConfig(),
                 new DividerSettingsEntryConfig(),
-                new ImportExportSettingsEntryConfig(importSettingsLauncher),
+                new ImportExportSettingsEntryConfig(importSettingsLauncher, exportSettingsLauncher),
                 new DropdownSettingsEntryConfig<>(R.string.first_weekday, FIRST_DAYS_OF_WEEK_LOCAL, FIRST_DAYS_OF_WEEK_ROOT, FIRST_DAY_OF_WEEK),
                 
                 new TitleBarSettingsEntryConfig(R.string.category_lockscreen_appearance),
@@ -130,7 +136,8 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
                                 Static.GlobalLabelPos.BACK,
                                 Static.GlobalLabelPos.HIDDEN), Static.GLOBAL_ITEMS_LABEL_POSITION),
                 new ResetButtonSettingsEntryConfig((dialogInterface, which) -> {
-                    Static.clearAll();
+                    // Erase immediately
+                    Static.clearAll().commit();
                     Objects.requireNonNull(binding.recyclerView.getAdapter()).notifyDataSetChanged();
                 }));
         
