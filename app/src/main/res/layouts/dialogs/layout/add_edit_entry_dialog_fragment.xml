@@ -90,7 +90,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/day_from_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider"
+        app:layout_constraintTop_toTopOf="@+id/day_from_button"
         app:srcCompat="@drawable/ic_arrow_right_24" />
 
     <prototype.xd.scheduler.views.DateSelectButton

@@ -54,6 +54,7 @@ public final class SystemCalendarUtils {
             Events._ID,
             Events.CALENDAR_ID,
             Events.TITLE,
+            Events.DESCRIPTION,
             Events.DISPLAY_COLOR,
             Events.DTSTART,
             Events.DTEND,

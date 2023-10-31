@@ -35,6 +35,7 @@ import prototype.xd.scheduler.databinding.ListSelectionTodoBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.fragments.dialogs.AddEditEntryDialogFragment;
+import prototype.xd.scheduler.fragments.dialogs.CalendarEventInfoDialogFragment;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
@@ -61,14 +62,17 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         private final ContextWrapper wrapper;
         
         private final AddEditEntryDialogFragment addEditEntryDialog;
+        private final CalendarEventInfoDialogFragment calendarEventInfoDialog;
         
         EntryViewHolder(@NonNull final V viewBinding,
                         @NonNull final ContextWrapper wrapper,
-                        @NonNull final AddEditEntryDialogFragment addEditEntryDialog) {
+                        @NonNull final AddEditEntryDialogFragment addEditEntryDialog,
+                        @NonNull final CalendarEventInfoDialogFragment calendarEventInfoDialog) {
             super(viewBinding.getRoot());
             this.viewBinding = viewBinding;
             this.wrapper = wrapper;
             this.addEditEntryDialog = addEditEntryDialog;
+            this.calendarEventInfoDialog = calendarEventInfoDialog;
         }
         
         /**
@@ -133,13 +137,16 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             bnd.timeText.setTextColor(getHarmonizedSecondaryFontColorWithBg(
                     entry.fontColor.get(currentlySelectedDayUTC),
                     entry.bgColor.get(currentlySelectedDayUTC)));
-    
+            
             // open calendar settings on settings icon click and on entry long click
             bnd.openSettingsButton.setOnClickListener(v -> systemCalendarSettings.show(entry.event, wrapper));
             bnd.backgroundLayer.setOnLongClickListener(v -> {
                 systemCalendarSettings.show(entry.event, wrapper);
                 return true;
             });
+            
+            // Open event info on entry click
+            bnd.backgroundLayer.setOnClickListener(v -> calendarEventInfoDialog.show(entry, wrapper));
         }
         
         /**
@@ -254,6 +261,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     private final ContextWrapper wrapper;
     
     public final AddEditEntryDialogFragment addEditEntryDialog;
+    public final CalendarEventInfoDialogFragment calendarEventInfoDialog;
     
     // default capacity is fine
     @SuppressWarnings("CollectionWithoutInitialCapacity")
@@ -266,6 +274,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         entrySettings = new EntrySettings(todoEntryManager);
         systemCalendarSettings = new SystemCalendarSettings(todoEntryManager);
         addEditEntryDialog = new AddEditEntryDialogFragment();
+        calendarEventInfoDialog = new CalendarEventInfoDialogFragment();
         // each entry has a unique id
         setHasStableIds(true);
     }
@@ -297,12 +306,12 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             // calendar entry
             return new EntryViewHolder<>(
                     ListSelectionCalendarBinding.inflate(wrapper.getLayoutInflater(), parent, false),
-                    wrapper, addEditEntryDialog);
+                    wrapper, addEditEntryDialog, calendarEventInfoDialog);
         } else {
             // regular entry
             return new EntryViewHolder<>(
                     ListSelectionTodoBinding.inflate(wrapper.getLayoutInflater(), parent, false),
-                    wrapper, addEditEntryDialog);
+                    wrapper, addEditEntryDialog, calendarEventInfoDialog);
         }
     }
     

@@ -92,6 +92,7 @@
     <string name="enable_per_day_wallpapers">Enable per day wallpapers</string>
     <string name="dynamic_wallpaper_off_warning">You have selected a wallpaper for a single day but “per day wallpapers” is not enabled</string>
     <string name="edit_group">Edit group</string>
+    <string name="no_description">This event has no description</string>
     <string name="edit_group_message">The group will be renamed, no parameters will be changed</string>
     <string name="add_group">Add group</string>
     <string name="null_group_edit_message">Nothing to edit, assign a group first</string>

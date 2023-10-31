@@ -23,10 +23,11 @@ public class SystemCalendarEventData {
     
     public static final String NAME = SystemCalendarEvent.class.getSimpleName();
     
-    final long id;
+    protected final long id;
     
     @Nullable
-    protected String title;
+    public final String title;
+    public final String description;
     @ColorInt
     public final int color;
     
@@ -51,8 +52,9 @@ public class SystemCalendarEventData {
         
         color = getInt(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DISPLAY_COLOR);
         id = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events._ID);
-        
-        title = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.TITLE).trim();
+    
+        title = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.TITLE);
+        description = getString(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DESCRIPTION);
         refStartMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DTSTART);
         refEndMsUTC = getLong(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.DTEND);
         allDay = getBoolean(cursor, CALENDAR_EVENT_COLUMNS, CalendarContract.Events.ALL_DAY);
@@ -87,6 +89,7 @@ public class SystemCalendarEventData {
                 refEndMsUTC == event.refEndMsUTC &&
                 allDay == event.allDay &&
                 Objects.equals(title, event.title) &&
+                Objects.equals(description, event.description) &&
                 Objects.equals(rRuleStr, event.rRuleStr) &&
                 Objects.equals(rDateStr, event.rDateStr) &&
                 Objects.equals(exRuleStr, event.exRuleStr) &&
@@ -98,7 +101,7 @@ public class SystemCalendarEventData {
     
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, color,
+        return Objects.hash(id, title, description, color,
                 refStartMsUTC, refEndMsUTC, allDay,
                 rRuleStr, rDateStr, exRuleStr, exDateStr, durationStr,
                 timeZoneId, exceptions);
