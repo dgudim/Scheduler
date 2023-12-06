@@ -34,8 +34,8 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.PerDayBgGridViewAdapter;
 import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.BgGridSelectionViewBinding;
-import prototype.xd.scheduler.utilities.ColorUtilities;
 import prototype.xd.scheduler.utilities.DateManager;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
@@ -52,7 +52,8 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
         gridViewAdapter = new PerDayBgGridViewAdapter(wrapper.context, bgIndex -> {
             lastClickedBgIndex = bgIndex;
             
-            if (!ADAPTIVE_BACKGROUND_ENABLED.get()) {
+            if (!ADAPTIVE_BACKGROUND_ENABLED.get() && bgIndex != 7) {
+                // 7 is the bg index of default background
                 displayAttentionDialog(wrapper, R.string.dynamic_wallpaper_off_warning, R.string.close);
             }
             
@@ -74,7 +75,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
     public void notifyBackgroundSelected(@NonNull ContextWrapper wrapper, @NonNull CropImageView.CropResult result) {
         if (result.isSuccessful()) {
             new Thread(() -> wrapper.uriToStream(result.getUriContent(), InputStream.class, stream -> {
-                ColorUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
+                ImageUtilities.fingerPrintAndSaveBitmap(BitmapFactory.decodeStream(stream),
                         getFile(DateManager.BG_NAMES_ROOT.get(lastClickedBgIndex)));
                 wrapper.runOnUiThread(gridViewAdapter::notifyDataSetChanged);
             }, null), "LBCP thread").start();
@@ -129,7 +130,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
                 divider.setDividerColor(Color.TRANSPARENT);
                 divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.bg_list_item_vertical_padding));
-
+                
                 gridView.addItemDecoration(divider);
                 gridView.setHasFixedSize(true);
                 gridView.setAdapter(config.gridViewAdapter);

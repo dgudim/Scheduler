@@ -223,7 +223,7 @@
     <string name="upcoming_calendar_events_description">Events that will begin in a few days (from calendar)</string>
     <string name="expired_calendar_events_description">Events that have already ended (from calendar)</string>
     <string name="todays_calendar_events_description">Current events (from calendar)</string>
-    <string name="global_events_show_hint">After the event</string>
+    <string name="global_events_show_hint">“Global” label position</string>
     <string name="global_events_show_back">After the event</string>
     <string name="global_events_show_front">Before the event</string>
     <string name="global_events_show_hidden">Hidden</string>
