@@ -1,6 +1,6 @@
 New features:
 - Ability to crop the image before setting it as a background
-- Ability to soft calendar and regular events separately
+- Ability to sort calendar and regular events separately
 - Added settings export
 - Added support for android 13 per-app languages
 - Added blur and transparency effects to the lockscreen items
