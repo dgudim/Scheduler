@@ -1,17 +1,21 @@
 New features:
-    - Ability to crop the image before setting it as a background
-    - Ability to soft calendar and regular events separately
-    - Added settings export
-    - Added support for android 13 per-app languages
-    - Added blur and transparency effects to the lockscreen items
+- Ability to crop the image before setting it as a background
+- Ability to soft calendar and regular events separately
+- Added settings export
+- Added support for android 13 per-app languages
+- Added blur and transparency effects to the lockscreen items
+
 Ui changes:
-    - Added status toasts, better visual feedback and consistency
-    - Minor typo fixes
-    - Changed some menus and dialogs
+- Added status toasts, better visual feedback and consistency
+- Minor typo fixes
+- Changed some menus and dialogs
+
 Bugfixes:
-    - Fixed "hide by content" not working
-    - Fixed entry sorting
+- Fixed "hide by content" not working
+- Fixed entry sorting
+
 Misc:
-    - Open calendar settings on entry long-click
+- Open calendar settings on entry long-click
+
 Internal changes:
-    - Replaced dialogs with dialog fragments
+- Replaced dialogs with dialog fragments
