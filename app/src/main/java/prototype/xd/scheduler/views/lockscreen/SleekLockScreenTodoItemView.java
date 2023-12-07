@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.views.lockscreen;
 
 import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -78,6 +79,11 @@ public class SleekLockScreenTodoItemView extends LockScreenTodoItemView<SleekEnt
     @Override
     public void setTimeSpanText(@NonNull String text) {
         viewBinding.timeText.setText(text);
+    }
+    
+    @Override
+    public void setBackgroundDrawable(@NonNull Drawable drawable) {
+        viewBinding.constraintContainer.setBackground(drawable);
     }
     
     @Override

@@ -16,7 +16,7 @@ import java.util.Locale;
 
 import prototype.xd.scheduler.fragments.IntroStartingFragment;
 import prototype.xd.scheduler.fragments.PermissionRequestFragment;
-import prototype.xd.scheduler.utilities.ColorUtilities;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
 
@@ -28,7 +28,7 @@ public class IntroActivity extends AppIntro {
         
         Static.init(this);
         
-        ColorUtilities.harmonizeColorsForActivity(this,
+        ImageUtilities.harmonizeColorsForActivity(this,
                 R.color.gray_harmonized,
                 R.color.green_harmonized,
                 R.color.yellow_harmonized,

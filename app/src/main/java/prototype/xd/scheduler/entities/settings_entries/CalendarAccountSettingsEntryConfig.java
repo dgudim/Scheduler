@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR_ACCOUNT;
-import static prototype.xd.scheduler.utilities.ColorUtilities.dimColorToBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.dimColorToBg;
 
 import android.view.View;
 
@@ -16,8 +16,8 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {

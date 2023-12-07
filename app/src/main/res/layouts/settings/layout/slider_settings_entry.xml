@@ -9,12 +9,11 @@
 
     <TextView
         android:id="@+id/slider_description"
+        style="@style/SliderTitle"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="3dp"
         android:layout_weight="1"
         android:text="parameter"
-        android:textAppearance="@style/SmallHeading"
         tools:ignore="HardcodedText" />
 
     <com.google.android.material.slider.Slider

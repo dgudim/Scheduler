@@ -19,6 +19,7 @@ import java.util.function.ObjIntConsumer;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CompoundCustomizationSettingsEntryBinding;
+import prototype.xd.scheduler.databinding.EntryEffectsDialogBinding;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -42,6 +43,9 @@ public class CompoundCustomizationSettingsEntryConfig extends SettingsEntryConfi
         @NonNull
         private final AlertDialog viewSelectionDialog;
         
+        @NonNull
+        private final AlertDialog effectSettingsDialog;
+        
         ViewHolder(@NonNull final ContextWrapper wrapper,
                    @NonNull final CompoundCustomizationSettingsEntryBinding viewBinding) {
             super(wrapper, viewBinding);
@@ -54,12 +58,46 @@ public class CompoundCustomizationSettingsEntryConfig extends SettingsEntryConfi
             viewSelectionDialogView.setOrientation(LinearLayout.VERTICAL);
             viewSelectionDialogView.setPadding(padding, padding, padding, padding - itemPadding);
             
+            EntryEffectsDialogBinding effectsDialogBinding = EntryEffectsDialogBinding.inflate(wrapper.getLayoutInflater());
+            
+            Utilities.setSliderChangeListener(
+                    effectsDialogBinding.effectTransparencyDescription,
+                    effectsDialogBinding.effectTransparencySlider,
+                    null,
+                    R.string.settings_effects_transparency,
+                    Static.EFFECT_TRANSPARENCY,
+                    false);
+            
+            Utilities.setSliderChangeListener(
+                    effectsDialogBinding.effectBlurRadiusDescription,
+                    effectsDialogBinding.effectBlurRadiusSlider,
+                    null,
+                    R.string.settings_effects_blur_radius,
+                    Static.EFFECT_BLUR_RADIUS,
+                    false);
+            
+            Utilities.setSliderChangeListener(
+                    effectsDialogBinding.effectBlurGrainDescription,
+                    effectsDialogBinding.effectBlurGrainSlider,
+                    null,
+                    R.string.settings_effects_blur_grain,
+                    Static.EFFECT_BLUR_GRAIN,
+                    false);
+            
             viewSelectionDialog = wrapper.attachDialogToLifecycle(
                     new MaterialAlertDialogBuilder(wrapper.context, R.style.DefaultAlertDialogTheme)
                             .setIcon(R.drawable.ic_view_carousel_24)
                             .setTitle(R.string.select_view)
                             .setMessage(R.string.select_view_description)
                             .setView(viewSelectionDialogView)
+                            .create(), null);
+            
+            effectSettingsDialog = wrapper.attachDialogToLifecycle(
+                    new MaterialAlertDialogBuilder(wrapper.context, R.style.DefaultAlertDialogTheme)
+                            .setIcon(R.drawable.ic_effects_45)
+                            .setTitle(R.string.settings_effects_title)
+                            .setMessage(R.string.settings_effects_description)
+                            .setView(effectsDialogBinding.getRoot())
                             .create(), null);
             
             entryPreviewContainer = new EntryPreviewContainer(wrapper, viewBinding.previewContainer, true) {
@@ -117,7 +155,7 @@ public class CompoundCustomizationSettingsEntryConfig extends SettingsEntryConfi
             
             for (TodoItemViewType viewType : TodoItemViewType.values()) {
                 LockScreenTodoItemView.inflateViewByType(viewType, viewSelectionDialogView, wrapper.getLayoutInflater())
-                        .mixAndSetBgAndTextColors(true, fontColor, bgColor)
+                        .mixAndSetBgAndTextColors(fontColor, bgColor)
                         .setBorderColor(borderColor)
                         .setOnClickListener(v -> {
                             entryPreviewContainer.setTodoItemViewType(viewType);
@@ -127,6 +165,9 @@ public class CompoundCustomizationSettingsEntryConfig extends SettingsEntryConfi
             
             viewBinding.previewContainer.setOnClickListener(v ->
                     viewSelectionDialog.show());
+            
+            viewBinding.openEffectsButton.setOnClickListener(v ->
+                    effectSettingsDialog.show());
             
             ObjIntConsumer<Static.DefaultedInteger> colorPickerColorSelectedListener = (value, selectedColor) -> {
                 value.put(selectedColor);

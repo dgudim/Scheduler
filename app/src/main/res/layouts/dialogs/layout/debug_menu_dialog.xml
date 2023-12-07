@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/dialog_menu_padding_left_right"
+    android:paddingEnd="@dimen/dialog_menu_padding_left_right">
 
     <TextView
         android:id="@+id/textView11"
@@ -23,7 +25,6 @@
         android:id="@+id/imageView2"
         android:layout_width="@dimen/compound_icon_width"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
         app:layout_constraintBottom_toBottomOf="@+id/textView22"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textView11"
@@ -57,8 +58,6 @@
         android:id="@+id/debug_logging_switch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/dialog_menu_padding_left_right"
-        android:paddingEnd="@dimen/dialog_menu_padding_left_right"
         android:text="@string/debug_logging"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

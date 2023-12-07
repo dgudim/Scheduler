@@ -87,7 +87,7 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
                 
                 new SliderSettingsEntryConfig(Static.LOCKSCREEN_VIEW_VERTICAL_BIAS,
                         0, 100, 5, value -> {
-                    String baseString = wrapper.getString(R.string.settings_event_vertical_bias, value) + "%";
+                    String baseString = wrapper.getString(R.string.settings_event_vertical_bias, value);
                     if (value == 0) {
                         return baseString + " (" + wrapper.getString(R.string.top) + ")";
                     }

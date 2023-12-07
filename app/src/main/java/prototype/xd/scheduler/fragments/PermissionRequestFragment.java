@@ -4,7 +4,7 @@ import static prototype.xd.scheduler.fragments.PermissionRequestFragment.Permiss
 import static prototype.xd.scheduler.fragments.PermissionRequestFragment.PermissionsRequestChainStatus.BATTERY_PERMISSIONS;
 import static prototype.xd.scheduler.fragments.PermissionRequestFragment.PermissionsRequestChainStatus.CORE_PERMISSIONS;
 import static prototype.xd.scheduler.fragments.PermissionRequestFragment.PermissionsRequestChainStatus.END;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getOnBgColor;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getOnBgColor;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.AutoRevokeStatus;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.areEssentialPermissionsGranted;
 import static prototype.xd.scheduler.utilities.PermissionUtilities.getAutorevokeStatus;
@@ -42,7 +42,7 @@ import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.PermissionsRequestFragmentBinding;
-import prototype.xd.scheduler.utilities.ColorUtilities;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.Logger;
 
 
@@ -187,8 +187,8 @@ public final class PermissionRequestFragment extends BaseFragment<PermissionsReq
         int onContainerColor = MaterialColors.getColor(permissionText, R.attr.colorOnErrorContainer, Color.RED);
         
         if (permissionGranted) {
-            containerColor = ColorUtilities.swapRedAndGreenChannels(containerColor);
-            onContainerColor = ColorUtilities.swapRedAndGreenChannels(onContainerColor);
+            containerColor = ImageUtilities.swapRedAndGreenChannels(containerColor);
+            onContainerColor = ImageUtilities.swapRedAndGreenChannels(onContainerColor);
         }
         
         permissionText.setTextColor(onContainerColor);

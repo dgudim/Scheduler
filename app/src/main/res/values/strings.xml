@@ -70,6 +70,11 @@
     <string name="settings_show_global_items_lock">Show global events on lock screen</string>
     <string name="settings_priority">Priority: %d</string>
     <string name="settings_font_size">Font size (lock screen): %d</string>
+    <string name="settings_effects_title">Additional effects</string>
+    <string name="settings_effects_description">Add some visual flare! Note: these effects are experimental and may not work on all devices</string>
+    <string name="settings_effects_transparency">Background transparency: %s%%</string>
+    <string name="settings_effects_blur_radius">Blur radius: %spx</string>
+    <string name="settings_effects_blur_grain">Blur grain: %s%%</string>
     <string name="save">Save</string>
     <string name="reset_settings_prompt">Reset settings?</string>
     <string name="overwrite_prompt">Overwrite?</string>
@@ -202,7 +207,7 @@
     <string name="whole_calendar_settings_on_warning">Your turned on global account and calendar settings, because they override local ones, it may be confusing for you.</string>
     <string name="whole_calendar_settings_off_warning">You turned off global account and calendar settings. The ones you have already changed were not reset.</string>
     <string name="i_understand">I understand</string>
-    <string name="settings_event_vertical_bias">Vertical position of events: %d</string>
+    <string name="settings_event_vertical_bias">Vertical position of events: %d%%</string>
     <string name="top">Top</string>
     <string name="bottom">Bottom</string>
     <string name="middle">Middle</string>

@@ -54,6 +54,11 @@
     <style name="ToolbarTitleText" parent="TextAppearance.Material3.ActionBar.Title">
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="SliderTitle">
+        <item name="android:layout_marginStart">@dimen/slider_title_padding_left</item>
+        <item name="android:textAppearance">@style/SmallHeading</item>
+    </style>
     <!-- end -->
 
 

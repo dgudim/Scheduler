@@ -1,9 +1,9 @@
 package prototype.xd.scheduler.fragments.dialogs;
 
-import static prototype.xd.scheduler.utilities.ColorUtilities.getExpiredUpcomingColor;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedFontColorWithBg;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedSecondaryFontColorWithBg;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getOnBgColor;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getExpiredUpcomingColor;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getHarmonizedFontColorWithBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getHarmonizedSecondaryFontColorWithBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getOnBgColor;
 
 import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;

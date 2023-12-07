@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/dialog_menu_padding_left_right"
+    android:paddingEnd="@dimen/dialog_menu_padding_left_right">
+
+    <TextView
+        android:id="@+id/effect_transparency_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_effects_transparency"
+        style="@style/SliderTitle" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/effect_transparency_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:valueFrom="0"
+        android:stepSize="2.0"
+        android:valueTo="100" />
+
+    <TextView
+        android:id="@+id/effect_blur_radius_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_effects_blur_radius"
+        style="@style/SliderTitle" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/effect_blur_radius_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stepSize="1.0"
+        android:valueFrom="0"
+        android:valueTo="35" />
+
+    <TextView
+        android:id="@+id/effect_blur_grain_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_effects_blur_grain"
+        style="@style/SliderTitle" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/effect_blur_grain_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stepSize="5.0"
+        android:valueFrom="0"
+        android:valueTo="50" />
+
+</LinearLayout>

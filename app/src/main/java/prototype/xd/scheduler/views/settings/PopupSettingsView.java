@@ -17,7 +17,7 @@ import androidx.fragment.app.DialogFragment;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
 import prototype.xd.scheduler.fragments.dialogs.BaseCachedDialogFragment;
-import prototype.xd.scheduler.utilities.ColorUtilities;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
@@ -58,9 +58,9 @@ public abstract class PopupSettingsView extends BaseCachedDialogFragment<EntrySe
         
         bnd.showDaysUpcomingSlider.setValueTo(Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
         bnd.showDaysExpiredSlider.setValueTo(Static.SETTINGS_MAX_EXPIRED_UPCOMING_ITEMS_OFFSET);
-    
-        new ColorUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
-        new ColorUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
+        
+        new ImageUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.UPCOMING.defaultValue).tintSlider(bnd.showDaysUpcomingSlider);
+        new ImageUtilities.SliderTinter(wrapper.context, Static.BG_COLOR.EXPIRED.defaultValue).tintSlider(bnd.showDaysExpiredSlider);
         
         entryPreviewContainer.attachCurrentSelectors(
                 bnd.currentFontColorSelector,

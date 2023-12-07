@@ -1,6 +1,6 @@
 package prototype.xd.scheduler.adapters;
 
-import static prototype.xd.scheduler.utilities.ColorUtilities.readBitmapFromFile;
+import static prototype.xd.scheduler.utilities.ImageUtilities.readBitmapFromFile;
 import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 

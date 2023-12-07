@@ -129,7 +129,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 
                 MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
                 divider.setDividerColor(Color.TRANSPARENT);
-                divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.bg_list_item_vertical_padding));
+                divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.bg_grid_item_padding));
                 
                 gridView.addItemDecoration(divider);
                 gridView.setHasFixedSize(true);

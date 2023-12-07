@@ -9,23 +9,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import prototype.xd.scheduler.databinding.DoubleSliderSettingsEntryBinding;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.utilities.ColorUtilities;
 
 public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
     
     @StringRes
-    final int titleId;
+    private final int titleId;
     
     @NonNull
     protected final SliderSettingsEntryConfig leftSliderConfig;
     @NonNull
-    protected final ColorUtilities.SliderTinter leftSliderTinter;
+    protected final ImageUtilities.SliderTinter leftSliderTinter;
     
     @NonNull
     protected final SliderSettingsEntryConfig rightSliderConfig;
     @NonNull
-    protected final ColorUtilities.SliderTinter rightSliderTinter;
+    protected final ImageUtilities.SliderTinter rightSliderTinter;
     
     public DoubleSliderSettingsEntryConfig(@NonNull Context context,
                                            @StringRes int titleId,
@@ -37,8 +37,8 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
         this.leftSliderConfig = leftSliderConfig;
         this.rightSliderConfig = rightSliderConfig;
         
-        leftSliderTinter = new ColorUtilities.SliderTinter(context, leftSliderAccentColor);
-        rightSliderTinter = new ColorUtilities.SliderTinter(context, rightSliderAccentColor);
+        leftSliderTinter = new ImageUtilities.SliderTinter(context, leftSliderAccentColor);
+        rightSliderTinter = new ImageUtilities.SliderTinter(context, rightSliderAccentColor);
     }
     
     @Override

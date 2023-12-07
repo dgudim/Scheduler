@@ -6,7 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
-import prototype.xd.scheduler.utilities.ColorUtilities;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.PermissionUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         // init theme
         AppCompatDelegate.setDefaultNightMode(Static.APP_THEME.get());
         
-        ColorUtilities.harmonizeColorsForActivity(this,
+        ImageUtilities.harmonizeColorsForActivity(this,
                 R.color.gray_harmonized,
                 R.color.entry_settings_parameter_default,
                 R.color.entry_settings_parameter_group,

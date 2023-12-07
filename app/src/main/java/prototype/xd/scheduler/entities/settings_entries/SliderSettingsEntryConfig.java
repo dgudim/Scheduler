@@ -14,9 +14,9 @@ import com.google.android.material.slider.Slider;
 import java.util.function.IntFunction;
 
 import prototype.xd.scheduler.databinding.SliderSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     
@@ -30,7 +30,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
     private int stringResource;
     
     @Nullable
-    IntFunction<String> textFormatter;
+    private IntFunction<String> textFormatter;
     
     public SliderSettingsEntryConfig(@NonNull Static.DefaultedInteger value, int seekMin, int seekMax, int stepSize, boolean zeroIsOff,
                                      @StringRes @PluralsRes int stringResource) {

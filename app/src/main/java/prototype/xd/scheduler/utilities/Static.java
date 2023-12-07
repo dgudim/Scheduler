@@ -5,7 +5,7 @@ import static android.os.Process.myPid;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
-import static prototype.xd.scheduler.utilities.ColorUtilities.mixTwoColors;
+import static prototype.xd.scheduler.utilities.ImageUtilities.mixTwoColors;
 
 import android.content.Context;
 import android.content.Intent;
@@ -434,6 +434,10 @@ public final class Static {
     public static final DefaultedInteger FONT_SIZE = new DefaultedInteger("fontSize", 15);
     public static final DefaultedBoolean ADAPTIVE_BACKGROUND_ENABLED = new DefaultedBoolean("adaptive_background_enabled", false);
     public static final DefaultedInteger ADAPTIVE_COLOR_BALANCE = new DefaultedInteger("adaptive_color_balance", 3);
+    
+    public static final DefaultedInteger EFFECT_TRANSPARENCY = new DefaultedInteger("effect_transparency", 0);
+    public static final DefaultedInteger EFFECT_BLUR_RADIUS = new DefaultedInteger("effect_blur_radius", 0);
+    public static final DefaultedInteger EFFECT_BLUR_GRAIN = new DefaultedInteger("effect_blur_grain", 0);
     
     public static final DefaultedInteger LOCKSCREEN_VIEW_VERTICAL_BIAS = new DefaultedInteger("lockscreen_view_vertical_bias", 50);
     

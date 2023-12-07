@@ -1,16 +1,19 @@
 package prototype.xd.scheduler.views.lockscreen;
 
-import static prototype.xd.scheduler.utilities.ColorUtilities.getAverageColor;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedFontColorWithBg;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedSecondaryFontColorWithBg;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
+import static prototype.xd.scheduler.utilities.ImageUtilities.dpToPx;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getAverageColor;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getHarmonizedFontColorWithBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getHarmonizedSecondaryFontColorWithBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.pxToDp;
 import static prototype.xd.scheduler.utilities.Static.DEFAULT_TITLE_FONT_SIZE_MULTIPLIER;
-import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Static.GLOBAL_ITEMS_LABEL_POSITION;
 import static prototype.xd.scheduler.utilities.Static.ITEM_FULL_WIDTH_LOCK;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +24,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.viewbinding.ViewBinding;
 
 import java.util.regex.Pattern;
@@ -30,6 +35,7 @@ import prototype.xd.scheduler.databinding.BasicEntryBinding;
 import prototype.xd.scheduler.databinding.RoundedEntryBinding;
 import prototype.xd.scheduler.databinding.SleekEntryBinding;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.Static;
 
 // base class for lockscreen todolist entries
@@ -88,10 +94,10 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     // should not be overridden
     public void setBorderSizeDP(int sizeDP) {
         // convert to dp to pixels
-        setBorderSizePX((int) (sizeDP * DISPLAY_METRICS_DENSITY.get()));
+        setBorderSizePX(dpToPx(sizeDP));
     }
     
-    public abstract void setBorderSizePX(int sizePX);
+    protected abstract void setBorderSizePX(int sizePX);
     
     
     public abstract void setTitleTextSize(float sizeSP);
@@ -110,6 +116,16 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     public abstract void setTitleText(@NonNull String text);
     
     public abstract void setTimeSpanText(@NonNull String text);
+    
+    public abstract void setBackgroundDrawable(@NonNull Drawable bitmapDrawable);
+    
+    void setBackgroundBitmap(@NonNull Bitmap bgBitmap) {
+        Resources resources = viewBinding.getRoot().getResources();
+        RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, ImageUtilities.makeMutable(bgBitmap));
+        roundedBitmapDrawable.setCornerRadius(resources.getDimensionPixelSize(R.dimen.card_corner_radius) - dpToPx(1));
+        // For some reason -1dp is needed
+        setBackgroundDrawable(roundedBitmapDrawable);
+    }
     
     
     public abstract void hideIndicatorAndTime();
@@ -138,34 +154,77 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         
         viewBinding.getRoot().setLayoutParams(new LinearLayout.LayoutParams(
                 ITEM_FULL_WIDTH_LOCK.get() ?
-                        LinearLayout.LayoutParams.MATCH_PARENT : LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
+                        ViewGroup.LayoutParams.MATCH_PARENT : ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
         
         return this;
     }
     
     public void applyLayoutDependentParameters(@NonNull TodoEntry entry, @NonNull Bitmap bgBitmap, @NonNull ViewGroup container) {
         
-        if (entry.isAdaptiveColorEnabled()) {
-            int width = root.getWidth();
-            int height = root.getHeight();
+        int blurRadiusPx = Static.EFFECT_BLUR_RADIUS.get();
+        int blurGrainPercent = Static.EFFECT_BLUR_GRAIN.get();
+        int transparencyPercent = Static.EFFECT_TRANSPARENCY.get();
+        boolean effectsEnabled =
+                (blurRadiusPx != 0 || blurGrainPercent != 0 || transparencyPercent != 0)
+                        // With this we will be blurring a solid color, so turn off effects
+                        && !(transparencyPercent == 1 && blurGrainPercent == 0);
+        
+        int averageBgColor = entry.bgColor.get(currentDayUTC);
+        
+        if (effectsEnabled || entry.isAdaptiveColorEnabled()) {
+            int borderThicknessDp = entry.borderThickness.get(currentDayUTC);
+            double verticalPaddingDp = pxToDp(container.getResources().getDimension(R.dimen.lockscreen_item_vertical_padding));
+            int topBottom = dpToPx(verticalPaddingDp + borderThicknessDp);
+            int leftRight = dpToPx(borderThicknessDp);
             
-            int[] pixels = new int[width * height];
-            //                                                                                 add container y offset
-            bgBitmap.getPixels(pixels, 0, width, (int) root.getX(), (int) (root.getY() + container.getY()), width, height);
+            float outerX = root.getX();
+            float outerY = root.getY() + container.getY();
+            int innerX = (int) (outerX + leftRight);
+            int innerY = (int) (outerY + topBottom);
+            
+            int outerWidth = root.getWidth();
+            int outerHeight = root.getHeight();
+            int innerWidth = outerWidth - leftRight * 2;
+            int innerHeight = outerHeight - topBottom * 2;
+            
+            int[] pixels = new int[outerWidth * outerHeight];
+            bgBitmap.getPixels(pixels, 0, outerWidth, innerX, innerY, innerWidth, innerHeight);
             entry.setAverageBackgroundColor(getAverageColor(pixels));
+            
+            averageBgColor = entry.getAdaptiveColor(averageBgColor);
+            
+            if (effectsEnabled) {
+                setBackgroundBitmap(
+                        ImageUtilities.applyEffectsToBitmap(
+                                Bitmap.createBitmap(bgBitmap, innerX, innerY, innerWidth, innerHeight),
+                                blurRadiusPx,
+                                blurGrainPercent,
+                                averageBgColor,
+                                transparencyPercent));
+            }
         }
         
-        mixAndSetBgAndTextColors(entry.isFromSystemCalendar(),
+        mixAndSetBgAndTextColors(
+                entry.isFromSystemCalendar(),
+                !effectsEnabled,
                 entry.fontColor.get(currentDayUTC),
-                entry.getAdaptiveColor(entry.bgColor.get(currentDayUTC)));
+                averageBgColor);
         setBorderColor(entry.getAdaptiveColor(entry.borderColor.get(currentDayUTC)));
     }
     
     @NonNull
-    public LockScreenTodoItemView<V> mixAndSetBgAndTextColors(boolean setTimeTextColor, int fontColor, int backgroundColor) {
+    public LockScreenTodoItemView<V> mixAndSetBgAndTextColors(int fontColor, int backgroundColor) {
+        return mixAndSetBgAndTextColors(true, true, fontColor, backgroundColor);
+    }
+    
+    @NonNull
+    public LockScreenTodoItemView<V> mixAndSetBgAndTextColors(boolean setTimeTextColor, boolean setBgColor,
+                                                              int fontColor, int backgroundColor) {
         // setup colors
-        setBackgroundColor(backgroundColor);
+        if (setBgColor) {
+            setBackgroundColor(backgroundColor);
+        }
         setTitleTextColor(getHarmonizedFontColorWithBg(fontColor, backgroundColor));
         if (setTimeTextColor) {
             setTimeTextColor(getHarmonizedSecondaryFontColorWithBg(fontColor, backgroundColor));

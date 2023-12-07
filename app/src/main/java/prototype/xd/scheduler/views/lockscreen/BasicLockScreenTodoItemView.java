@@ -1,5 +1,8 @@
 package prototype.xd.scheduler.views.lockscreen;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -7,6 +10,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import prototype.xd.scheduler.databinding.BasicEntryBinding;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 
 public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEntryBinding> {
     
@@ -53,6 +57,16 @@ public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEnt
     public BasicLockScreenTodoItemView setTimeTextColor(@ColorInt int color) {
         viewBinding.timeText.setTextColor(color);
         return this;
+    }
+    
+    @Override
+    public void setBackgroundDrawable(@NonNull Drawable drawable) {
+        viewBinding.backgroundMain.setBackground(drawable);
+    }
+    
+    @Override
+    void setBackgroundBitmap(@NonNull Bitmap bgBitmap) {
+        setBackgroundDrawable(new BitmapDrawable(viewBinding.getRoot().getResources(), ImageUtilities.makeMutable(bgBitmap)));
     }
     
     @Override

@@ -1,10 +1,10 @@
 package prototype.xd.scheduler.adapters;
 
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.utilities.ColorUtilities.dimColorToBg;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedFontColorWithBg;
-import static prototype.xd.scheduler.utilities.ColorUtilities.getHarmonizedSecondaryFontColorWithBg;
 import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
+import static prototype.xd.scheduler.utilities.ImageUtilities.dimColorToBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getHarmonizedFontColorWithBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getHarmonizedSecondaryFontColorWithBg;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.GLOBAL_ITEMS_LABEL_POSITION;

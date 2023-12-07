@@ -6,11 +6,14 @@
 
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="card_corner_radius">5dp</dimen>
+    <dimen name="lockscreen_border_card_corner_radius">7dp</dimen>
 
     <dimen name="clickable_icon_size">37dp</dimen>
 
     <dimen name="dialog_menu_padding_left_right">8dp</dimen>
     <dimen name="dialog_menu_padding_top">5dp</dimen>
+
+    <dimen name="slider_title_padding_left">3dp</dimen>
 
     <dimen name="nav_menu_padding_top">8dp</dimen>
     <dimen name="logo_size">56dp</dimen>
@@ -20,8 +23,8 @@
 
     <dimen name="lockscreen_item_vertical_padding">2.5dp</dimen>
     <dimen name="list_item_vertical_padding">2dp</dimen>
-    <dimen name="bg_list_item_vertical_padding">9dp</dimen>
-    <dimen name="entry_settings_vertical_padding">3dp</dimen>
+    <dimen name="bg_grid_item_padding">9dp</dimen>
+    <dimen name="entry_settings_item_vertical_padding">3dp</dimen>
 
     <dimen name="settings_entries_margin_left_right">5dp</dimen>
     <dimen name="settings_entries_card_padding">5dp</dimen>

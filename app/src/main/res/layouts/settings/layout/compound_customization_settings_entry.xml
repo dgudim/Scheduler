@@ -31,7 +31,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="@string/settings_bg_color"
@@ -40,7 +39,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="@string/settings_text_color"
@@ -139,14 +137,38 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/preview_container"
-            style="@style/ClickableViewBg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="5dp"
-            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:id="@+id/preview_container"
+                style="@style/ClickableViewBg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingEnd="3dp"
+                tools:ignore="RtlSymmetry,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/open_effects_button"
+                    style="@style/DefaultImageButton"
+                    android:layout_width="@dimen/clickable_icon_size"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_effects_45"
+                    android:contentDescription="@string/settings_effects_title" />
+
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -155,11 +177,10 @@
 
             <TextView
                 android:id="@+id/adaptive_color_balance_description"
+                style="@style/SliderTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:text="@string/settings_adaptive_color_balance"
-                android:textAppearance="@style/SmallHeading" />
+                android:text="@string/settings_adaptive_color_balance" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/adaptive_color_balance_slider"
@@ -176,11 +197,10 @@
 
             <TextView
                 android:id="@+id/upcoming_border_thickness_description"
+                style="@style/SliderTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:text="@string/settings_upcoming_border_thickness"
-                android:textAppearance="@style/SmallHeading" />
+                android:text="@string/settings_upcoming_border_thickness" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/upcoming_border_thickness_slider"
@@ -197,11 +217,10 @@
 
             <TextView
                 android:id="@+id/current_border_thickness_description"
+                style="@style/SliderTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:text="@string/settings_current_border_thickness"
-                android:textAppearance="@style/SmallHeading" />
+                android:text="@string/settings_current_border_thickness" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/current_border_thickness_slider"
@@ -219,11 +238,10 @@
 
             <TextView
                 android:id="@+id/expired_border_thickness_description"
+                style="@style/SliderTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:text="@string/settings_expired_border_thickness"
-                android:textAppearance="@style/SmallHeading" />
+                android:text="@string/settings_expired_border_thickness" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/expired_border_thickness_slider"
@@ -241,11 +259,10 @@
 
             <TextView
                 android:id="@+id/font_size_description"
+                style="@style/SliderTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="3dp"
-                android:text="@string/settings_font_size"
-                android:textAppearance="@style/SmallHeading" />
+                android:text="@string/settings_font_size" />
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/font_size_slider"

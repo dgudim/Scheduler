@@ -19,7 +19,7 @@
             android:id="@+id/entry_settings_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
+            android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
             android:gravity="center"
             android:text="Settings for..."
             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
@@ -30,7 +30,7 @@
             android:id="@+id/show_on_lock_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
+            android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
@@ -66,7 +66,7 @@
             android:id="@+id/hide_by_content_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
+            android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -149,7 +149,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
+            android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -201,7 +201,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
+            android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -253,7 +253,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
+            android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -498,7 +498,7 @@
             android:id="@+id/show_days_upcoming_expired_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
+            android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -605,7 +605,7 @@
             android:id="@+id/hide_expired_items_by_time_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/entry_settings_vertical_padding"
+            android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout

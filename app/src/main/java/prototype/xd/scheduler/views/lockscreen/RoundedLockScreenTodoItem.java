@@ -1,6 +1,7 @@
 package prototype.xd.scheduler.views.lockscreen;
 
 import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -55,6 +56,11 @@ public class RoundedLockScreenTodoItem extends LockScreenTodoItemView<RoundedEnt
     public RoundedLockScreenTodoItem setTimeTextColor(@ColorInt int color) {
         viewBinding.timeText.setTextColor(color);
         return this;
+    }
+    
+    @Override
+    public void setBackgroundDrawable(@NonNull Drawable drawable) {
+        viewBinding.content.setBackground(drawable);
     }
     
     @Override

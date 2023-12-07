@@ -15,8 +15,8 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
 
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.misc.Triplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView;
 
@@ -184,15 +184,15 @@ public abstract class EntryPreviewContainer {
         fontColor.applyTo(fontColorSelector, EntryPreviewContainer::updateSelector);
         bgColor.applyTo(bgColorSelector, EntryPreviewContainer::updateSelector);
         
-        entryPreview.upcoming.mixAndSetBgAndTextColors(true,
+        entryPreview.upcoming.mixAndSetBgAndTextColors(
                 fontColor.getUpcoming(),
                 bgColor.getUpcomingMixed(surfaceColor, adaptiveColorBalance));
         
-        entryPreview.current.mixAndSetBgAndTextColors(true,
+        entryPreview.current.mixAndSetBgAndTextColors(
                 fontColor.current,
                 bgColor.getCurrentMixed(surfaceColor, adaptiveColorBalance));
         
-        entryPreview.expired.mixAndSetBgAndTextColors(true,
+        entryPreview.expired.mixAndSetBgAndTextColors(
                 fontColor.getExpired(),
                 bgColor.getExpiredMixed(surfaceColor, adaptiveColorBalance));
     }

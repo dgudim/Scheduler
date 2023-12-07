@@ -2,6 +2,7 @@ package prototype.xd.scheduler.utilities;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.utilities.Static.DEFAULT_TIME_OFFSET_COLOR_MIX_FACTOR;
+import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_DENSITY;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_HEIGHT;
 import static prototype.xd.scheduler.utilities.Static.DISPLAY_METRICS_WIDTH;
 
@@ -12,8 +13,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.HardwareRenderer;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.RenderEffect;
+import android.graphics.RenderNode;
+import android.graphics.Shader;
+import android.hardware.HardwareBuffer;
+import android.media.ImageReader;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
@@ -32,15 +40,81 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
+import java.util.function.IntUnaryOperator;
 
 import prototype.xd.scheduler.R;
 
-public final class ColorUtilities {
+public final class ImageUtilities {
     
     public static final String NAME = Utilities.class.getSimpleName();
     
-    private ColorUtilities() throws InstantiationException {
+    private ImageUtilities() throws InstantiationException {
         throw new InstantiationException(NAME);
+    }
+    
+    /**
+     * @noinspection UnsecureRandomNumberGeneration
+     */
+    @NonNull
+    public static Bitmap applyEffectsToBitmap(@NonNull Bitmap bitmap,
+                                              float blurRadiusPx,
+                                              int noisePercent,
+                                              int mixinColor,
+                                              float transparencyPercent) {
+        
+        if (transparencyPercent < 100) {
+            double transparencyVal = 1 - (transparencyPercent / 100.0);
+            mutatePixels(bitmap, pixel -> mixTwoColors(pixel, mixinColor, transparencyVal));
+        }
+        
+        if (android.os.Build.VERSION.SDK_INT >= 31 && blurRadiusPx > 0) {
+            
+            var imageReader = ImageReader.newInstance(
+                    bitmap.getWidth(), bitmap.getHeight(),
+                    PixelFormat.RGBA_8888, 1,
+                    HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE | HardwareBuffer.USAGE_GPU_COLOR_OUTPUT
+            );
+            var renderNode = new RenderNode("BlurEffect");
+            var hardwareRenderer = new HardwareRenderer();
+            
+            hardwareRenderer.setSurface(imageReader.getSurface());
+            hardwareRenderer.setContentRoot(renderNode);
+            renderNode.setPosition(0, 0, imageReader.getWidth(), imageReader.getHeight());
+            var blurRenderEffect = RenderEffect.createBlurEffect(
+                    blurRadiusPx, blurRadiusPx,
+                    Shader.TileMode.MIRROR
+            );
+            renderNode.setRenderEffect(blurRenderEffect);
+            
+            var renderCanvas = renderNode.beginRecording();
+            renderCanvas.drawBitmap(bitmap, 0F, 0F, null);
+            renderNode.endRecording();
+            hardwareRenderer.createRenderRequest()
+                    .setWaitForPresent(true)
+                    .syncAndDraw();
+            
+            var image = imageReader.acquireNextImage();
+            var hardwareBuffer = image.getHardwareBuffer();
+            var resBitmap = Bitmap.wrapHardwareBuffer(hardwareBuffer, null);
+            hardwareBuffer.close();
+            image.close();
+            
+            imageReader.close();
+            renderNode.discardDisplayList();
+            hardwareRenderer.destroy();
+            
+            bitmap = resBitmap;
+        }
+        
+        if (noisePercent > 0) {
+            Random random = new Random();
+            
+            double noiseVal = noisePercent / 100.0;
+            mutatePixels(bitmap, pixel -> mixTwoColors(pixel, mixinColor, noiseVal * random.nextFloat()));
+        }
+        
+        return bitmap;
     }
     
     @NonNull
@@ -57,13 +131,28 @@ public final class ColorUtilities {
             cutBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         }
         
-        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4F), (int) (cutBitmap.getHeight() / 4F), ColorUtilities.ScalingLogic.FIT);
+        Bitmap resizedBitmap = createScaledBitmap(cutBitmap, (int) (cutBitmap.getWidth() / 4F), (int) (cutBitmap.getHeight() / 4F), ImageUtilities.ScalingLogic.FIT);
         
         try (FileOutputStream outputStreamMin = new FileOutputStream(output.getAbsolutePath() + "_min.png")) {
             resizedBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStreamMin);
         }
         
         return cutBitmap;
+    }
+    
+    private static void mutatePixels(@NonNull Bitmap source, @NonNull IntUnaryOperator mutator) {
+        source = makeMutable(source);
+        
+        int width = source.getWidth();
+        int height = source.getHeight();
+        int[] pixels = new int[width * height];
+        
+        // get pixel array from source
+        source.getPixels(pixels, 0, width, 0, 0, width, height);
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = mutator.applyAsInt(pixels[i]);
+        }
+        source.setPixels(pixels, 0, width, 0, 0, width, height);
     }
     
     @NonNull
@@ -178,10 +267,19 @@ public final class ColorUtilities {
         }
     }
     
+    public static int dpToPx(double sizeDp) {
+        return (int) Math.round(sizeDp * DISPLAY_METRICS_DENSITY.get());
+    }
+    
+    public static double pxToDp(double sizePx) {
+        return sizePx / DISPLAY_METRICS_DENSITY.get();
+    }
+    
     public static int swapRedAndGreenChannels(@ColorInt int color) {
         Color col = Color.valueOf(color);
         return Color.rgb(col.green(), col.red(), col.blue());
     }
+    
     
     public static int getOnBgColor(@ColorInt int surfaceColor) {
         // get a color that will look good on the specified surfaceColor
@@ -334,5 +432,4 @@ public final class ColorUtilities {
         bitmap.getPixels(buffer, 0, bitmap.getWidth() / 4, 0, 0, bitmap.getWidth() / 4, bitmap.getHeight() / 4);
         return Arrays.hashCode(buffer);
     }
-    
 }

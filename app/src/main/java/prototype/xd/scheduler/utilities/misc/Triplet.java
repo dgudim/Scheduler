@@ -1,7 +1,7 @@
 package prototype.xd.scheduler.utilities.misc;
 
-import static prototype.xd.scheduler.utilities.ColorUtilities.getExpiredUpcomingColor;
-import static prototype.xd.scheduler.utilities.ColorUtilities.mixColorWithBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getExpiredUpcomingColor;
+import static prototype.xd.scheduler.utilities.ImageUtilities.mixColorWithBg;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.IntRange;
