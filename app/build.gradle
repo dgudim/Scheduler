@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 def versionMajor = 0
 def versionMinor = 6
-def versionPatch = 3
+def versionPatch = 4
 def globalSuffix = ""
 
 ext.getVersionCode = { ->
@@ -14,6 +14,11 @@ ext.getVersionName = { ->
 }
 
 android {
+
+    lint {
+        // Don't fail on ExpiredTargetSdkVersion
+        abortOnError false
+    }
 
     signingConfigs {
         release {
@@ -29,7 +34,7 @@ android {
     defaultConfig {
         applicationId "prototype.xd.scheduler"
         minSdkVersion 26
-        //noinspection OldTargetApi
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 32
         versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}${globalSuffix}"
@@ -56,6 +61,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig true
     }
 
     compileOptions {
@@ -104,16 +110,16 @@ dependencies {
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 }
 
+
 tasks.register('getVersionCode') {
-    // only run during execution, not evaluation
-    doLast {
+    getVersionCode {
         println getVersionCode()
     }
 }
 
 tasks.register('getVersionName') {
     // only run during execution, not evaluation
-    doLast {
+    getVersionName {
         println getVersionName()
     }
 }

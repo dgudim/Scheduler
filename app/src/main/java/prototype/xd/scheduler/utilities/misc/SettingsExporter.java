@@ -47,9 +47,7 @@ public final class SettingsExporter implements Serializable {
         Utilities.saveToEntriesFile(exporter.entries);
         Utilities.saveToGroupsFile(exporter.groups);
         SharedPreferences.Editor editor = Static.clearAll();
-        for (Map.Entry<String, ?> entry : exporter.prefs.entrySet()) {
-            Static.putAnyEditor(editor, entry.getKey(), entry.getValue());
-        }
+        exporter.prefs.forEach((key, value) -> Static.putAnyEditor(editor, key, value));
         // Overwrite immediately
         editor.commit();
         Logger.info(NAME, ">>>>>>>>> Settings imported: "

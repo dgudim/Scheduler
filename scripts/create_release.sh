@@ -9,8 +9,8 @@ printf "\nBuilding debug apk\n"
 printf "\nBuilding release apk\n"
 ./gradlew assembleRelease
 
-VERSION_NAME=$(./gradlew -q getVersionName | tail -n 1)
-VERSION_CODE=$(./gradlew -q getVersionCode | tail -n 1)
+VERSION_NAME=$(./gradlew -q :app:getVersionName --no-configuration-cache | tail -n 1)
+VERSION_CODE=$(./gradlew -q :app:getVersionCode --no-configuration-cache | tail -n 1)
 
 CHANGELOG=./fastlane/metadata/android/en-US/changelogs/$VERSION_CODE.txt
 
