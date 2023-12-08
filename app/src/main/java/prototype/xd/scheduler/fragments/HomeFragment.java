@@ -206,9 +206,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                     bnd.shareLogcatView.setOnClickListener(v1 -> Logger.shareLog(wrapper.context));
                     
                     if (BuildConfig.DEBUG) {
-                        bnd.debugLoggingSwitch.setCheckedSilent(true);
-                        bnd.debugLoggingSwitch.setClickable(false);
-                        bnd.debugLoggingSwitch.setAlpha(0.5F);
+                        bnd.debugLoggingSwitch.freezeState(true);
                     } else {
                         setSwitchChangeListener(bnd.debugLoggingSwitch, Static.DEBUG_LOGGING, (switchView, isChecked) -> Logger.setDebugEnabled(isChecked));
                     }

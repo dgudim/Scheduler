@@ -56,6 +56,12 @@ public class Switch extends MaterialSwitch {
         }
     }
     
+    public void freezeState(boolean state) {
+        setCheckedSilent(state);
+        setAlpha(0.5F);
+        setClickable(false);
+    }
+    
     @FunctionalInterface
     public interface OnSilentCheckedChangeListener {
         void onCheckedChanged(@NonNull CompoundButton buttonView, boolean isChecked, boolean fromUser);

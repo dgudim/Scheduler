@@ -5,6 +5,7 @@ import static android.widget.LinearLayout.LayoutParams.WRAP_CONTENT;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.COMPOUND_CUSTOMIZATION;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.widget.LinearLayout;
 
 import androidx.annotation.ColorInt;
@@ -84,8 +85,14 @@ public class CompoundCustomizationSettingsEntryConfig extends SettingsEntryConfi
                     Static.EFFECT_BLUR_GRAIN,
                     false);
             
-            Utilities.setSwitchChangeListener(effectsDialogBinding.glowSwitch, Static.EFFECT_GLOW, null);
-            Utilities.setSwitchChangeListener(effectsDialogBinding.highlightEdgesSwitch, Static.EFFECT_HIGHLIGHT_EDGE, null);
+            if (Build.VERSION.SDK_INT >= 31) {
+                Utilities.setSwitchChangeListener(effectsDialogBinding.glowSwitch, Static.EFFECT_GLOW, null);
+                Utilities.setSwitchChangeListener(effectsDialogBinding.highlightEdgesSwitch, Static.EFFECT_HIGHLIGHT_EDGE, null);
+            } else {
+                effectsDialogBinding.glowSwitch.freezeState(false);
+                effectsDialogBinding.highlightEdgesSwitch.freezeState(false);
+            }
+            
             
             viewSelectionDialog = wrapper.attachDialogToLifecycle(
                     new MaterialAlertDialogBuilder(wrapper.context, R.style.DefaultAlertDialogTheme)
