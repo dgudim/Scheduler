@@ -51,6 +51,11 @@
     <string name="settings_show_global_items_lock">Показувати глобальні події на екрані блокування</string>
     <string name="settings_priority">Пріоритет: %d</string>
     <string name="settings_font_size">Розмір шрифту (екран блокування): %d</string>
+    <string name="settings_effects_title">Додаткові ефекти</string>
+    <string name="settings_effects_description">Додати трохи візуального блиску! Примітка. Ці ефекти є експериментальними та можуть працювати не на всіх пристроях.</string>
+    <string name="settings_effects_transparency">Прозорість фону: %s%%</string>
+    <string name="settings_effects_blur_radius">Радіус розмиття: %spx</string>
+    <string name="settings_effects_blur_grain">Зернистість розмиття: %s%%</string>
     <string name="save">Зберегти</string>
     <string name="reset_settings_prompt">Скинути налаштування?</string>
     <string name="overwrite_prompt">Перезаписати?</string>
@@ -65,6 +70,8 @@
     <string name="enable_per_day_wallpapers">Окремі фони на кожен день</string>
     <string name="dynamic_wallpaper_off_warning">Ви вибрали шпалери на один день, але “окремі шпалери на кожен день” вимкнені</string>
     <string name="edit_group">Редагувати групу</string>
+    <string name="no_description">Ця подія не має опису</string>
+    <string name="edit_group_message">Група буде перейменована без зміни параметрів</string>
     <string name="add_group">Додати групу</string>
     <string name="null_group_edit_message">Нема що редагувати, спочатку привласніть групу</string>
     <string name="delete">Видалити</string>
@@ -100,6 +107,7 @@
     <string name="export_settings_description">Експорт налаштувань додатка</string>
     <string name="export_settings_successful">Успішно експортовано</string>
     <string name="export_settings_failed">Помилка експорту</string>
+    <string name="export_settings_canceled">Експорт скасовано</string>
     <string name="import_settings_successful">Успішно імпортовано</string>
     <string name="import_settings_failed">Помилка імпорту</string>
     <string name="import_settings_canceled">Імпорт скасовано</string>
@@ -176,12 +184,16 @@
     <string name="top">Зверху</string>
     <string name="bottom">Знизу</string>
     <string name="middle">По центру</string>
-    <string name="settings_merge_events">Об\'єднувати події з однаковим змістом та часом</string>
+    <string name="settings_merge_events">Об’єднувати події з однаковим змістом та часом</string>
     <string name="upcoming_events">Майбутні події</string>
     <string name="expired_events">Минулі події</string>
     <string name="todays_events">Сьогоднішні події</string>
+    <string name="upcoming_calendar_events">Майбутні календарні події</string>
+    <string name="expired_calendar_events">Минулі календарні події</string>
+    <string name="todays_calendar_events">Сьогоднішні календарні події</string>
     <string name="global_events">Глобальні події</string>
     <string name="sorting_treat_global_as_todays">Сортувати глобальні події разом із поточними</string>
+    <string name="sorting_sort_calendar_separately">Сортувати календарні події окремо від звичайних</string>
     <string name="upcoming_events_description">Події, які розпочнуться за кілька днів</string>
     <string name="expired_events_description">Події, які вже закінчились</string>
     <string name="todays_events_description">Поточні події</string>
@@ -216,4 +228,15 @@
         <item quantity="few">за %d дні</item>
         <item quantity="other">за %d дні</item>
     </plurals>
+    <string name="upcoming_calendar_events_description">Події, які розпочнуться за кілька днів (з календаря)</string>
+    <string name="expired_calendar_events_description">Події, що вже закінчилися (з календаря)</string>
+    <string name="todays_calendar_events_description">Поточні події (з календаря)</string>
+    <string name="global_events_show_hint">Позиція напису “Глобальний”</string>
+    <string name="global_events_show_back">Після події</string>
+    <string name="global_events_show_front">Перед подією</string>
+    <string name="global_events_show_hidden">Заховано</string>
+    <string name="event_created_message">Подія створена</string>
+    <string name="event_deleted_message">Подія видалена</string>
+    <string name="settings_effects_glow">Додати свічення до прозорості</string>
+    <string name="settings_effects_highlight_edges">Виділити внутрішні краї</string>
 </resources>

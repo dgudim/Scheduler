@@ -12,8 +12,14 @@
     <string name="null_group_edit_message">Нечего редактировать, для начала присвойте группу</string>
     <string name="delete">Удалить</string>
     <string name="are_you_sure">Вы уверены?</string>
+    <string name="settings_effects_title">Дополнительные эффекты</string>
+    <string name="settings_effects_description">Добавьте немного визуального блеска! Примечание. Эти эффекты являются экспериментальными и могут работать не на всех устройствах.</string>
+    <string name="settings_effects_transparency">Прозрачность фона: %s%%</string>
+    <string name="settings_effects_blur_radius">Радиус размытия: %spx</string>
+    <string name="settings_effects_blur_grain">Зернистость размытия: %s%%</string>
     <string name="save">Сохранить</string>
     <string name="edit_group">Редактировать группу</string>
+    <string name="no_description">У этого события нет описания</string>
     <string name="edit_group_message">Группа будет переименована без изменения параметров</string>
     <string name="edit_event">Редактировать событие</string>
     <string name="item_global">(Глобальное)</string>
@@ -122,6 +128,7 @@
     <string name="export_settings_description">Экспорт настроек приложения</string>
     <string name="export_settings_successful">Успешно экспортировано</string>
     <string name="export_settings_failed">Ошибка экспорта</string>
+    <string name="export_settings_canceled">Экспорт отменен</string>
     <string name="import_settings_successful">Успешно импортировано</string>
     <string name="import_settings_failed">Ошибка импорта</string>
     <string name="import_settings_canceled">Импорт отменен</string>
@@ -230,4 +237,6 @@
     <string name="global_events_description">События, которые видны на всех днях</string>
     <string name="event_created_message">Событие создано</string>
     <string name="event_deleted_message">Событие удалено</string>
+    <string name="settings_effects_glow">Добавить свечение к прозрачности</string>
+    <string name="settings_effects_highlight_edges">Выделить внутренние края</string>
 </resources>
