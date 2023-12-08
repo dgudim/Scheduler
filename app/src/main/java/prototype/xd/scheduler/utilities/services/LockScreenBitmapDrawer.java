@@ -46,6 +46,7 @@ import java.util.List;
 import prototype.xd.scheduler.databinding.LockscreenRootContainerBinding;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.DateManager;
+import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
@@ -235,8 +236,9 @@ class LockScreenBitmapDrawer {
         rootView.layout(0, 0, rootView.getMeasuredWidth(), rootView.getMeasuredHeight());
         
         // second pass, apply layout dependent parameters
+        ImageUtilities.BitmapEffectsPipe effectsPipe = new ImageUtilities.BitmapEffectsPipe();
         for (int i = 0; i < itemViews.size(); i++) {
-            itemViews.get(i).applyLayoutDependentParameters(toAdd.get(i), bitmap, containerView);
+            itemViews.get(i).applyLayoutDependentParameters(toAdd.get(i), bitmap, effectsPipe, containerView);
         }
         
         Canvas canvas = new Canvas(bitmap);

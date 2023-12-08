@@ -84,6 +84,9 @@ public class CompoundCustomizationSettingsEntryConfig extends SettingsEntryConfi
                     Static.EFFECT_BLUR_GRAIN,
                     false);
             
+            Utilities.setSwitchChangeListener(effectsDialogBinding.glowSwitch, Static.EFFECT_GLOW, null);
+            Utilities.setSwitchChangeListener(effectsDialogBinding.highlightEdgesSwitch, Static.EFFECT_HIGHLIGHT_EDGE, null);
+            
             viewSelectionDialog = wrapper.attachDialogToLifecycle(
                     new MaterialAlertDialogBuilder(wrapper.context, R.style.DefaultAlertDialogTheme)
                             .setIcon(R.drawable.ic_view_carousel_24)

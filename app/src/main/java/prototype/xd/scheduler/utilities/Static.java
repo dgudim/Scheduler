@@ -438,6 +438,8 @@ public final class Static {
     public static final DefaultedInteger EFFECT_TRANSPARENCY = new DefaultedInteger("effect_transparency", 0);
     public static final DefaultedInteger EFFECT_BLUR_RADIUS = new DefaultedInteger("effect_blur_radius", 0);
     public static final DefaultedInteger EFFECT_BLUR_GRAIN = new DefaultedInteger("effect_blur_grain", 0);
+    public static final DefaultedBoolean EFFECT_GLOW = new DefaultedBoolean("effect_glow", false);
+    public static final DefaultedBoolean EFFECT_HIGHLIGHT_EDGE = new DefaultedBoolean("effect_highlight_edge", false);
     
     public static final DefaultedInteger LOCKSCREEN_VIEW_VERTICAL_BIAS = new DefaultedInteger("lockscreen_view_vertical_bias", 50);
     

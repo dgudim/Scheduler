@@ -160,19 +160,14 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         return this;
     }
     
-    public void applyLayoutDependentParameters(@NonNull TodoEntry entry, @NonNull Bitmap bgBitmap, @NonNull ViewGroup container) {
-        
-        int blurRadiusPx = Static.EFFECT_BLUR_RADIUS.get();
-        int blurGrainPercent = Static.EFFECT_BLUR_GRAIN.get();
-        int transparencyPercent = Static.EFFECT_TRANSPARENCY.get();
-        boolean effectsEnabled =
-                (blurRadiusPx != 0 || blurGrainPercent != 0 || transparencyPercent != 0)
-                        // With this we will be blurring a solid color, so turn off effects
-                        && !(transparencyPercent == 1 && blurGrainPercent == 0);
+    public void applyLayoutDependentParameters(@NonNull TodoEntry entry,
+                                               @NonNull Bitmap bgBitmap,
+                                               @NonNull ImageUtilities.BitmapEffectsPipe effectsPipe,
+                                               @NonNull ViewGroup container) {
         
         int averageBgColor = entry.bgColor.get(currentDayUTC);
         
-        if (effectsEnabled || entry.isAdaptiveColorEnabled()) {
+        if (effectsPipe.isActive() || entry.isAdaptiveColorEnabled()) {
             int borderThicknessDp = entry.borderThickness.get(currentDayUTC);
             double verticalPaddingDp = pxToDp(container.getResources().getDimension(R.dimen.lockscreen_item_vertical_padding));
             int topBottom = dpToPx(verticalPaddingDp + borderThicknessDp);
@@ -194,20 +189,17 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             
             averageBgColor = entry.getAdaptiveColor(averageBgColor);
             
-            if (effectsEnabled) {
-                setBackgroundBitmap(
-                        ImageUtilities.applyEffectsToBitmap(
-                                Bitmap.createBitmap(bgBitmap, innerX, innerY, innerWidth, innerHeight),
-                                blurRadiusPx,
-                                blurGrainPercent,
-                                averageBgColor,
-                                transparencyPercent));
+            if (effectsPipe.isActive()) {
+                setBackgroundBitmap(effectsPipe.processBitmap(
+                        Bitmap.createBitmap(bgBitmap, innerX, innerY, innerWidth, innerHeight),
+                        averageBgColor,
+                        container.getContext()));
             }
         }
         
         mixAndSetBgAndTextColors(
                 entry.isFromSystemCalendar(),
-                !effectsEnabled,
+                !effectsPipe.isActive(),
                 entry.fontColor.get(currentDayUTC),
                 averageBgColor);
         setBorderColor(entry.getAdaptiveColor(entry.borderColor.get(currentDayUTC)));

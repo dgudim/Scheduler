@@ -36,6 +36,7 @@ android {
         minSdkVersion 26
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 32
+        renderscriptSupportModeEnabled true
         versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}${globalSuffix}"
         signingConfig signingConfigs.debug

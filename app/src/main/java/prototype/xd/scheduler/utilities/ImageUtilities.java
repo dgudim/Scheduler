@@ -16,18 +16,26 @@ import android.graphics.Color;
 import android.graphics.HardwareRenderer;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RenderEffect;
 import android.graphics.RenderNode;
 import android.graphics.Shader;
 import android.hardware.HardwareBuffer;
 import android.media.ImageReader;
+import android.os.Build;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.FloatRange;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.google.android.material.color.DynamicColors;
 import com.google.android.material.color.HarmonizedColors;
@@ -40,6 +48,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 import java.util.function.IntUnaryOperator;
 
@@ -53,68 +62,162 @@ public final class ImageUtilities {
         throw new InstantiationException(NAME);
     }
     
-    /**
-     * @noinspection UnsecureRandomNumberGeneration
-     */
-    @NonNull
-    public static Bitmap applyEffectsToBitmap(@NonNull Bitmap bitmap,
-                                              float blurRadiusPx,
-                                              int noisePercent,
-                                              int mixinColor,
-                                              float transparencyPercent) {
+    public static final class BitmapEffectsPipe {
         
-        if (transparencyPercent < 100) {
-            double transparencyVal = 1 - (transparencyPercent / 100.0);
-            mutatePixels(bitmap, pixel -> mixTwoColors(pixel, mixinColor, transparencyVal));
+        private final int blurRadiusPx;
+        private final int noisePercent;
+        private final int transparencyPercent;
+        private final float transparencyVal;
+        private final boolean glow;
+        private final boolean highlightEdge;
+        private final boolean active;
+        
+        public BitmapEffectsPipe() {
+            
+            transparencyPercent = Static.EFFECT_TRANSPARENCY.get();
+            transparencyVal = (float) (1 - (transparencyPercent / 100.0));
+            blurRadiusPx = Static.EFFECT_BLUR_RADIUS.get();
+            noisePercent = Static.EFFECT_BLUR_GRAIN.get();
+            glow = Static.EFFECT_GLOW.get();
+            highlightEdge = Static.EFFECT_HIGHLIGHT_EDGE.get();
+            
+            if (blurRadiusPx == 0 && (transparencyPercent == 0 || transparencyPercent == 100)) {
+                active = false;
+                Logger.warning(NAME, "Not initializing bitmap processing pipeline, conditions not met");
+                return;
+            }
+            
+            active = true;
+            
+            Logger.info(NAME, "Initialized bitmap processing pipeline");
         }
         
-        if (android.os.Build.VERSION.SDK_INT >= 31 && blurRadiusPx > 0) {
-            
-            var imageReader = ImageReader.newInstance(
-                    bitmap.getWidth(), bitmap.getHeight(),
-                    PixelFormat.RGBA_8888, 1,
-                    HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE | HardwareBuffer.USAGE_GPU_COLOR_OUTPUT
-            );
-            var renderNode = new RenderNode("BlurEffect");
-            var hardwareRenderer = new HardwareRenderer();
-            
-            hardwareRenderer.setSurface(imageReader.getSurface());
-            hardwareRenderer.setContentRoot(renderNode);
-            renderNode.setPosition(0, 0, imageReader.getWidth(), imageReader.getHeight());
-            var blurRenderEffect = RenderEffect.createBlurEffect(
-                    blurRadiusPx, blurRadiusPx,
-                    Shader.TileMode.MIRROR
-            );
-            renderNode.setRenderEffect(blurRenderEffect);
-            
-            var renderCanvas = renderNode.beginRecording();
-            renderCanvas.drawBitmap(bitmap, 0F, 0F, null);
-            renderNode.endRecording();
-            hardwareRenderer.createRenderRequest()
-                    .setWaitForPresent(true)
-                    .syncAndDraw();
-            
-            var image = imageReader.acquireNextImage();
-            var hardwareBuffer = image.getHardwareBuffer();
-            var resBitmap = Bitmap.wrapHardwareBuffer(hardwareBuffer, null);
-            hardwareBuffer.close();
-            image.close();
-            
-            imageReader.close();
-            renderNode.discardDisplayList();
-            hardwareRenderer.destroy();
-            
-            bitmap = resBitmap;
+        public boolean isActive() {
+            return active;
         }
         
-        if (noisePercent > 0) {
-            Random random = new Random();
+        @RequiresApi(api = Build.VERSION_CODES.S)
+        @NonNull
+        private RenderEffect getEffects(final int mixinColor) {
+            RenderEffect blurRenderEffect;
+            RenderEffect tintRenderEffect = null;
             
-            double noiseVal = noisePercent / 100.0;
-            mutatePixels(bitmap, pixel -> mixTwoColors(pixel, mixinColor, noiseVal * random.nextFloat()));
+            RenderEffect finalRenderEffect = null;
+            
+            if (transparencyPercent > 0 && transparencyPercent < 100) {
+                Color col = Color.valueOf(mixinColor);
+                tintRenderEffect = RenderEffect.createColorFilterEffect(
+                        new PorterDuffColorFilter(
+                                Color.argb(transparencyVal, col.red(), col.green(), col.blue()),
+                                glow ? PorterDuff.Mode.ADD : PorterDuff.Mode.SRC_OVER)
+                );
+                finalRenderEffect = tintRenderEffect;
+            }
+            if (blurRadiusPx > 0) {
+                blurRenderEffect = RenderEffect.createBlurEffect(
+                        blurRadiusPx, blurRadiusPx,
+                        Shader.TileMode.MIRROR
+                );
+                if (finalRenderEffect != null) {
+                    if (highlightEdge) {
+                        finalRenderEffect = RenderEffect.createChainEffect(blurRenderEffect, tintRenderEffect);
+                    } else {
+                        finalRenderEffect = RenderEffect.createChainEffect(tintRenderEffect, blurRenderEffect);
+                    }
+                } else {
+                    finalRenderEffect = blurRenderEffect;
+                }
+            }
+            
+            return Objects.requireNonNull(finalRenderEffect);
         }
         
-        return bitmap;
+        private static Bitmap mutatePixels(@NonNull Bitmap source, @NonNull IntUnaryOperator mutator) {
+            source = makeMutable(source);
+            
+            int width = source.getWidth();
+            int height = source.getHeight();
+            int[] pixels = new int[width * height];
+            
+            // get pixel array from source
+            source.getPixels(pixels, 0, width, 0, 0, width, height);
+            for (int i = 0; i < pixels.length; i++) {
+                pixels[i] = mutator.applyAsInt(pixels[i]);
+            }
+            source.setPixels(pixels, 0, width, 0, 0, width, height);
+            return source;
+        }
+        
+        /**
+         * @noinspection UnsecureRandomNumberGeneration, deprecation
+         */
+        @NonNull
+        public Bitmap processBitmap(@NonNull Bitmap bitmap, final int mixinColor, @NonNull Context context) {
+            
+            if (!active) {
+                return bitmap;
+            }
+            
+            if (Build.VERSION.SDK_INT >= 31) {
+                var imageReader = ImageReader.newInstance(
+                        bitmap.getWidth(), bitmap.getHeight(),
+                        PixelFormat.RGBA_8888, 1,
+                        HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE | HardwareBuffer.USAGE_GPU_COLOR_OUTPUT
+                );
+                
+                var renderNode = new RenderNode("BlurEffect");
+                var hardwareRenderer = new HardwareRenderer();
+                
+                hardwareRenderer.setSurface(imageReader.getSurface());
+                hardwareRenderer.setContentRoot(renderNode);
+                renderNode.setPosition(0, 0, imageReader.getWidth(), imageReader.getHeight());
+                
+                renderNode.setRenderEffect(getEffects(mixinColor));
+                
+                var renderCanvas = renderNode.beginRecording();
+                renderCanvas.drawBitmap(bitmap, 0F, 0F, null);
+                renderNode.endRecording();
+                hardwareRenderer.createRenderRequest().setWaitForPresent(true).syncAndDraw();
+                
+                var image = imageReader.acquireNextImage();
+                var hardwareBuffer = image.getHardwareBuffer();
+                Bitmap resBitmap = Bitmap.wrapHardwareBuffer(hardwareBuffer, null);
+                hardwareBuffer.close();
+                image.close();
+                
+                imageReader.close();
+                renderNode.discardDisplayList();
+                hardwareRenderer.destroy();
+                
+                bitmap = resBitmap;
+            } else {
+                if (transparencyPercent > 0 && transparencyPercent < 100) {
+                    bitmap = mutatePixels(bitmap, pixel -> mixTwoColors(pixel, mixinColor, transparencyVal));
+                }
+                
+                RenderScript rs = RenderScript.create(context);  // NOSONAR
+                // use this constructor for best performance, because it uses
+                // USAGE_SHARED mode which reuses memory
+                final Allocation input = Allocation.createFromBitmap(rs, bitmap); // NOSONAR
+                final Allocation output = Allocation.createTyped(rs, input.getType()); // NOSONAR
+                final ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs)); // NOSONAR
+                
+                script.setRadius(blurRadiusPx);// NOSONAR
+                script.setInput(input); // NOSONAR
+                script.forEach(output); // NOSONAR
+                
+                output.copyTo(bitmap); // NOSONAR
+            }
+            
+            if (noisePercent > 0) {
+                Random random = new Random();
+                
+                double noiseVal = noisePercent / 100.0;
+                bitmap = mutatePixels(bitmap, pixel -> mixTwoColors(pixel, mixinColor, noiseVal * random.nextFloat()));
+            }
+            
+            return bitmap;
+        }
     }
     
     @NonNull
@@ -140,20 +243,6 @@ public final class ImageUtilities {
         return cutBitmap;
     }
     
-    private static void mutatePixels(@NonNull Bitmap source, @NonNull IntUnaryOperator mutator) {
-        source = makeMutable(source);
-        
-        int width = source.getWidth();
-        int height = source.getHeight();
-        int[] pixels = new int[width * height];
-        
-        // get pixel array from source
-        source.getPixels(pixels, 0, width, 0, 0, width, height);
-        for (int i = 0; i < pixels.length; i++) {
-            pixels[i] = mutator.applyAsInt(pixels[i]);
-        }
-        source.setPixels(pixels, 0, width, 0, 0, width, height);
-    }
     
     @NonNull
     public static Bitmap readBitmapFromFile(@NonNull File file) throws IOException {

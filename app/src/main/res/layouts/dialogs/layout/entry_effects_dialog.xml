@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:stepSize="1.0"
         android:valueFrom="0"
-        android:valueTo="35" />
+        android:valueTo="25" />
 
     <TextView
         android:id="@+id/effect_blur_grain_description"
@@ -50,5 +50,17 @@
         android:stepSize="5.0"
         android:valueFrom="0"
         android:valueTo="50" />
+
+    <prototype.xd.scheduler.views.Switch
+        android:id="@+id/glow_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_effects_glow" />
+
+    <prototype.xd.scheduler.views.Switch
+        android:id="@+id/highlight_edges_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_effects_highlight_edges" />
 
 </LinearLayout>
