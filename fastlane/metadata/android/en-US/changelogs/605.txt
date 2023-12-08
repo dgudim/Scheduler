@@ -1,0 +1,4 @@
+General changes:
+- Added missing translations
+- Made blur work on older devices via RenderScript
+- Added 2 additional effects for newer devices
