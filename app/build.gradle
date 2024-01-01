@@ -88,14 +88,14 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation "androidx.lifecycle:lifecycle-service:2.6.2"
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.navigation:navigation-fragment:2.7.5'
-    implementation 'androidx.navigation:navigation-ui:2.7.5'
+    implementation 'androidx.navigation:navigation-fragment:2.7.6'
+    implementation 'androidx.navigation:navigation-ui:2.7.6'
 
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
     implementation 'com.kizitonwose.calendar:view:2.4.0'
