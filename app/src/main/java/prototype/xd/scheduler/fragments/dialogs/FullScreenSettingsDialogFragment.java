@@ -17,6 +17,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.viewbinding.ViewBinding;
 
 import java.util.Map;
+import java.util.Objects;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.fragments.HomeFragment;
@@ -56,7 +57,7 @@ public abstract class FullScreenSettingsDialogFragment<T extends ViewBinding> ex
     @Override
     @CallSuper
     public void onDismiss(@NonNull DialogInterface dialog) {
-        if (!preferenceStateBefore.equals(Static.getAll())) {
+        if (!Objects.equals(preferenceStateBefore, Static.getAll())) {
             findFragmentInNavHost(requireActivity(), HomeFragment.class).notifyDatesetChanged();
         }
         super.onDismiss(dialog);

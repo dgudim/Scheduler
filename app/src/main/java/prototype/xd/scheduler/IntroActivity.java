@@ -44,7 +44,7 @@ public class IntroActivity extends AppIntro {
         
         View rootView = findViewById(android.R.id.content).getRootView();
         int surfaceColor = MaterialColors.getColor(rootView, R.attr.colorSurface);
-        int surfaceColorVariant = MaterialColors.getColor(rootView, R.attr.colorSurfaceVariant);
+        int surfaceColor2 = MaterialColors.getColor(rootView, R.attr.colorSurfaceContainerHighest);
         int primaryColor = MaterialColors.getColor(rootView, R.attr.colorPrimary);
         int secondaryColor = MaterialColors.getColor(rootView, R.attr.colorSecondary);
 
@@ -62,7 +62,7 @@ public class IntroActivity extends AppIntro {
         setDoneTextAppearance(R.style.MediumHeading);
         setColorDoneText(primaryColor);
         setDoneText(R.string.finish);
-        setIndicatorColor(primaryColor, surfaceColorVariant);
+        setIndicatorColor(primaryColor, surfaceColor2);
     }
     
     private static boolean isXiaomiPhone() {

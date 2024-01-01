@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray_bg_tint"
     tools:context=".views.settings.PopupSettingsView"
     tools:ignore="Overdraw">
 
@@ -31,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
+            app:cardBackgroundColor="?colorSurfaceContainerLow"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
@@ -67,6 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
+            app:cardBackgroundColor="?colorSurfaceContainerLow"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -150,6 +151,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
+            app:cardBackgroundColor="?colorSurfaceContainerLow"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -202,6 +204,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
+            app:cardBackgroundColor="?colorSurfaceContainerLow"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -254,6 +257,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
+            app:cardBackgroundColor="?colorSurfaceContainerLow"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -499,6 +503,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
+            app:cardBackgroundColor="?colorSurfaceContainerLow"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -606,6 +611,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/entry_settings_item_vertical_padding"
+            app:cardBackgroundColor="?colorSurfaceContainerLow"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout

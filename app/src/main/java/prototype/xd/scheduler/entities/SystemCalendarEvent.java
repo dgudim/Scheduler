@@ -88,7 +88,7 @@ public class SystemCalendarEvent {
         if (data.allDay) {
             // don't convert ms to local, all day events don't drift
             startDayLocal = msToDays(startMsUTC);
-            endDayLocal = startDayLocal;
+            endDayLocal = msToDays(endMsUTC);
         } else {
             startDayLocal = msUTCtoDaysLocal(startMsUTC);
             endDayLocal = msUTCtoDaysLocal(endMsUTC);

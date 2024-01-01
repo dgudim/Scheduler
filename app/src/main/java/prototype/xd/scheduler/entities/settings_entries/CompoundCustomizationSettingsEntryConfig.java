@@ -159,7 +159,7 @@ public class CompoundCustomizationSettingsEntryConfig extends SettingsEntryConfi
             // no need to reinflate, view type is already set
             entryPreviewContainer.refreshAll(false);
             
-            int bgColor = MaterialColors.getColor(wrapper.context, R.attr.colorSurfaceVariant, Color.WHITE);
+            int bgColor = MaterialColors.getColor(wrapper.context, R.attr.colorSurfaceContainerHighest, Color.WHITE);
             int borderColor = MaterialColors.getColor(wrapper.context, R.attr.colorAccent, Color.GRAY);
             int fontColor = MaterialColors.getColor(wrapper.context, R.attr.colorOnSurfaceVariant, Color.BLACK);
             

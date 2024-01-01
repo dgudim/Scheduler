@@ -27,7 +27,8 @@
         android:layout_marginStart="1dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="1.5dp"
-        android:background="@drawable/round_bg_10dp" />
+        android:background="@drawable/round_bg_10dp"
+        android:backgroundTint="@color/transparent" />
 
     <View
         android:id="@+id/event_indicator2"
@@ -36,7 +37,8 @@
         android:layout_marginStart="1dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="1.5dp"
-        android:background="@drawable/round_bg_10dp" />
+        android:background="@drawable/round_bg_10dp"
+        android:backgroundTint="@color/transparent" />
 
     <View
         android:id="@+id/event_indicator3"
@@ -45,7 +47,8 @@
         android:layout_marginStart="1dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="1.5dp"
-        android:background="@drawable/round_bg_10dp" />
+        android:background="@drawable/round_bg_10dp"
+        android:backgroundTint="@color/transparent" />
 
     <View
         android:id="@+id/event_indicator4"
@@ -54,6 +57,7 @@
         android:layout_marginStart="1dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="1.5dp"
-        android:background="@drawable/round_bg_10dp" />
+        android:background="@drawable/round_bg_10dp"
+        android:backgroundTint="@color/transparent" />
 
 </LinearLayout>

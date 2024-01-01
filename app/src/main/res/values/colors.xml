@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="transparent">#00000000</color>
+    <color name="white">#FFF</color>
     <color name="light_gray_bg_tint">#55555555</color>
 
     <!-- harmonized at runtime -->

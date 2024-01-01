@@ -664,7 +664,7 @@ public final class Utilities {
                 V newValue = newMap.get(key);
                 if (newValue != null) {
                     // present in both sets
-                    if (oldValue.equals(newValue)) {
+                    if (newValue.equals(oldValue)) {
                         consumer.accept(Pair.create(key, null), ElementState.NOT_MODIFIED);
                     } else {
                         consumer.accept(Pair.create(key, newMap.get(key)), ElementState.MODIFIED);

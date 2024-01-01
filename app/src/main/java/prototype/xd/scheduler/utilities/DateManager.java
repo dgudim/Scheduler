@@ -8,13 +8,16 @@ import android.icu.text.DateFormatSymbols;
 import androidx.annotation.NonNull;
 import androidx.core.os.LocaleListCompat;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -26,7 +29,6 @@ import prototype.xd.scheduler.utilities.misc.DefaultedMutableLiveData;
 
 @SuppressWarnings({
         "StaticNonFinalField",
-        "SynchronizationOnStaticField",
         "PublicStaticCollectionField",
         "NonPrivateFieldAccessedInSynchronizedContext",
         "FieldAccessedSynchronizedAndUnsynchronized"})
@@ -41,7 +43,6 @@ public final class DateManager {
     public static final long ONE_MINUTE_MS = 60000L;
     
     public static final DefaultedMutableLiveData<TimeZone> systemTimeZone = new DefaultedMutableLiveData<>(TimeZone.getDefault());
-    public static final TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     
     public static long currentDayUTC = DAY_FLAG_GLOBAL;
     public static long currentTimestampUTC = DAY_FLAG_GLOBAL;
@@ -52,10 +53,11 @@ public final class DateManager {
     
     @NonNull
     public static final Locale systemLocale = Objects.requireNonNull(LocaleListCompat.getDefault().get(0));
-    private static final DateFormat dateTimeFormatLocal = new SimpleDateFormat("dd/MM HH:mm", systemLocale); // NOSONAR, method is synchronized
-    private static final DateFormat dateFormatUTC = new SimpleDateFormat("dd/MM", systemLocale); // NOSONAR
-    private static final DateFormat dateFormatMonthNamesUTC = new SimpleDateFormat("MMM d", systemLocale); // NOSONAR
-    private static final DateFormat timeFormatLocal = new SimpleDateFormat("HH:mm", systemLocale); // NOSONAR
+    private static final DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("dd/MM HH:mm", systemLocale);
+    private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM", systemLocale);
+    private static final DateTimeFormatter dateFormatMonthNames = DateTimeFormatter.ofPattern("MMM d", systemLocale);
+    private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm", systemLocale);
+    private static final DateTimeFormatter daytimeFormat = DateTimeFormatter.ofPattern("d HH:mm", systemLocale);
     
     @NonNull
     public static final List<String> BG_NAMES_ROOT;
@@ -98,22 +100,16 @@ public final class DateManager {
         }
         
         FIRST_DAYS_OF_WEEK_LOCAL = List.of(localizedWeekdays);
-        
-        dateFormatUTC.setTimeZone(utcTimeZone);
-        dateFormatMonthNamesUTC.setTimeZone(utcTimeZone);
     }
     
     public static synchronized void updateTimeZone() {
         TimeZone newTimeZone = TimeZone.getDefault();
-        if (systemTimeZone.getValue().equals(newTimeZone)) {
+        if (Objects.equals(systemTimeZone.getValue(), newTimeZone)) {
             return;
         }
         Logger.debug(NAME, "Timezone changed to " + newTimeZone.getID());
         // reinitialize all the stuff
         systemTimeZone.postValue(newTimeZone);
-        // update timezones of calendar and formatters
-        timeFormatLocal.setTimeZone(newTimeZone);
-        dateTimeFormatLocal.setTimeZone(newTimeZone);
     }
     
     public static synchronized void updateDate() {
@@ -143,43 +139,34 @@ public final class DateManager {
     
     @NonNull
     public static String getTimeSpan(long timeFromMsUTC, long timeToMsUTC) {
-        if (timeFromMsUTC == timeToMsUTC) {
-            return datetimeStringLocalFromMsUTC(timeFromMsUTC);
-        }
-        String dateFrom = datetimeStringLocalFromMsUTC(timeFromMsUTC);
-        String dateTo = datetimeStringLocalFromMsUTC(timeToMsUTC);
-        String[] dateFromSplit = dateFrom.split(" ");
-        String[] dateToSplit = dateTo.split(" ");
         
-        String dateFromDayMonth = dateFromSplit[0];
-        String dateFromHourMinute = dateFromSplit[1];
-        
-        String dateToDayMonth = dateToSplit[0];
-        String dateToHourMinute = dateToSplit[1];
+        LocalDateTime from = msUTCtoLocalDateTime(timeFromMsUTC);
+        LocalDateTime to = msUTCtoLocalDateTime(timeToMsUTC);
         
         // month and day is the same
-        if (dateFrom.equals(dateTo) || dateFromDayMonth.equals(dateToDayMonth)) {
+        if (Objects.equals(from.toLocalDate(), to.toLocalDate())) {
             // 20:30 - 23:10
-            return dateFromHourMinute + TIME_RANGE_SEPARATOR + dateToHourMinute;
+            return timeFormat.format(from) + TIME_RANGE_SEPARATOR + timeFormat.format(to);
         } else {
-            String[] dateFromDayMonthSplit = dateFromDayMonth.split("/");
-            String[] dateToDayMonthSplit = dateToDayMonth.split("/");
-            
-            String dateFromDay = dateFromDayMonthSplit[0];
-            String dateFromMonth = dateFromDayMonthSplit[1];
-            
-            String dateToDay = dateToDayMonthSplit[0];
-            String dateToMonth = dateToDayMonthSplit[1];
-            
             //month is the same
-            if (dateFromMonth.equals(dateToMonth)) {
+            if (from.getMonth() == to.getMonth()) {
                 //24 20:40 - 30 21:30
-                return dateFromDay + " " + dateFromHourMinute + TIME_RANGE_SEPARATOR + dateToDay + " " + dateToHourMinute;
+                return daytimeFormat.format(from) + TIME_RANGE_SEPARATOR + daytimeFormat.format(to);
             } else {
                 //24/10 10:40 - 10/11 12:30
-                return dateFrom + TIME_RANGE_SEPARATOR + dateTo;
+                return dateTimeFormat.format(from) + TIME_RANGE_SEPARATOR + dateTimeFormat.format(to);
             }
         }
+    }
+    
+    @NonNull
+    public static LocalDate msUTCtoLocalDate(long msUTC, @NonNull ZoneId zone) {
+        return LocalDate.ofInstant(Instant.ofEpochMilli(msUTC), zone);
+    }
+    
+    @NonNull
+    public static LocalDateTime msUTCtoLocalDateTime(long msUTC) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(msUTC), ZoneId.systemDefault());
     }
     
     public static long msUTCtoDaysLocal(long msUTC) {
@@ -198,36 +185,22 @@ public final class DateManager {
         return TimeUnit.MILLISECONDS.convert(daysUTC, TimeUnit.DAYS) + ONE_MINUTE_MS;
     }
     
-    // return date and time given a UTC timestamp
-    @NonNull
-    public static String datetimeStringLocalFromMsUTC(long msUTC) {
-        synchronized (dateTimeFormatLocal) {
-            return dateTimeFormatLocal.format(new Date(msUTC));
-        }
-    }
-    
     // return date given a UTC timestamp
     @NonNull
     public static String dateStringUTCFromMsUTC(long msUTC) {
-        synchronized (dateFormatUTC) {
-            return dateFormatUTC.format(new Date(msUTC));
-        }
+        return dateFormat.format(msUTCtoLocalDate(msUTC, ZoneOffset.UTC));
     }
     
     // return date (months are 3 letters instead of numbers) and time given a UTC timestamp
     @NonNull
     public static String dateStringMonthNamesUTCFromMsUTC(long msUTC) {
-        synchronized (dateFormatMonthNamesUTC) {
-            return dateFormatMonthNamesUTC.format(new Date(msUTC));
-        }
+        return dateFormatMonthNames.format(msUTCtoLocalDate(msUTC, ZoneOffset.UTC));
     }
     
     // returns current time
     @NonNull
     public static String getCurrentTimeStringLocal() {
-        synchronized (timeFormatLocal) {
-            return timeFormatLocal.format(new Date());
-        }
+        return timeFormat.format(LocalTime.now());
     }
     
     // returns current timestamp in UTC
