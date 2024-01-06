@@ -1,0 +1,7 @@
+Ui changes:
+- Bumped ui libs
+- Delete/reset buttons are now red
+- Minor tweaks/fixes
+
+Other changes:
+- Don't display upcoming/expired entries marked as hidden by content
