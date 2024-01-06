@@ -15,8 +15,9 @@
 
     <dimen name="slider_title_padding_left">3dp</dimen>
 
+    <dimen name="nav_menu_divider_height">3dp</dimen>
     <dimen name="nav_menu_padding_top">8dp</dimen>
-    <dimen name="logo_size">56dp</dimen>
+    <dimen name="nav_menu_logo_size">56dp</dimen>
     <dimen name="compound_icon_size">45dp</dimen>
     <dimen name="icon_to_text_margin">5dp</dimen>
     <dimen name="compound_menu_entry_top_margin">8dp</dimen>

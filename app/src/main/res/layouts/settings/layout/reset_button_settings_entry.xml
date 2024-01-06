@@ -2,7 +2,7 @@
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/resetSettingsButton"
-    style="@style/DefaultButtonStyle"
+    style="@style/DangerButtonStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/settings_entries_margin_left_right"

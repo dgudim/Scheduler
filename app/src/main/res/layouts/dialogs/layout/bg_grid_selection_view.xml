@@ -18,7 +18,7 @@
 
     <Button
         android:id="@+id/resetBgButton"
-        style="@style/DefaultButtonStyle"
+        style="@style/DangerButtonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_reset_bg"

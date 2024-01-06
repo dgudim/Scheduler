@@ -109,7 +109,6 @@
 
     <!-- secondary button styles -->
     <style name="ButtonStyleRound" parent="Widget.Material3.Button">
-        <item name="backgroundColor">?colorSecondaryContainer</item>
         <item name="android:paddingLeft">10dp</item>
         <item name="android:paddingRight">10dp</item>
         <item name="iconPadding">3dp</item>
@@ -131,6 +130,10 @@
         <item name="materialThemeOverlay">@style/SecondaryButtonThemeOverlay</item>
     </style>
 
+    <style name="DangerButtonStyle" parent="DefaultButtonStyle">
+        <item name="materialThemeOverlay">@style/DangerButtonThemeOverlay</item>
+    </style>
+
     <style name="MaterialImageButtonStyle" parent="SecondaryButtonStyleRoundCompact">
         <item name="iconPadding">0dp</item>
         <item name="iconGravity">textStart</item>
@@ -139,14 +142,19 @@
     </style>
 
     <!-- overlays -->
+    <style name="PrimaryButtonThemeOverlay" parent="ThemeOverlay.Material3.Button">
+        <item name="colorOnContainer">?colorOnPrimaryContainer</item>
+        <item name="colorContainer">?colorPrimaryContainer</item>
+    </style>
+
     <style name="SecondaryButtonThemeOverlay" parent="ThemeOverlay.Material3.Button">
         <item name="colorOnContainer">?colorOnSecondaryContainer</item>
         <item name="colorContainer">?colorSecondaryContainer</item>
     </style>
 
-    <style name="PrimaryButtonThemeOverlay" parent="ThemeOverlay.Material3.Button">
-        <item name="colorOnContainer">?colorOnPrimaryContainer</item>
-        <item name="colorContainer">?colorPrimaryContainer</item>
+    <style name="DangerButtonThemeOverlay" parent="ThemeOverlay.Material3.Button">
+        <item name="colorOnContainer">?colorOnErrorContainer</item>
+        <item name="colorContainer">?colorErrorContainer</item>
     </style>
     <!-- end -->
 

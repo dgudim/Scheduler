@@ -21,8 +21,8 @@
     <ImageButton
         android:id="@+id/logo"
         style="@style/DefaultImageButton"
-        android:layout_width="@dimen/logo_size"
-        android:layout_height="@dimen/logo_size"
+        android:layout_width="@dimen/nav_menu_logo_size"
+        android:layout_height="@dimen/nav_menu_logo_size"
         android:layout_marginTop="@dimen/nav_menu_padding_top"
         android:layout_marginEnd="@dimen/dialog_menu_padding_left_right"
         android:scaleType="center"
@@ -31,14 +31,13 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription,SpeakableTextPresentCheck,ImageContrastCheck" />
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/top_divider"
         android:layout_width="0dp"
-        android:layout_height="3dp"
+        android:layout_height="@dimen/nav_menu_divider_height"
         android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="@dimen/dialog_menu_padding_left_right"
-        android:background="@color/light_gray_bg_tint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo" />
@@ -404,14 +403,13 @@
 
     </ScrollView>
 
-    <View
+    <com.google.android.material.divider.MaterialDivider
         android:id="@+id/bottom_divider"
         android:layout_width="0dp"
-        android:layout_height="3dp"
+        android:layout_height="@dimen/nav_menu_divider_height"
         android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
         android:layout_marginEnd="@dimen/dialog_menu_padding_left_right"
         android:layout_marginBottom="8dp"
-        android:background="@color/light_gray_bg_tint"
         app:layout_constraintBottom_toTopOf="@+id/textView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

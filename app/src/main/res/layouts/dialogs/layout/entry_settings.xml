@@ -696,7 +696,7 @@
 
             <Button
                 android:id="@+id/settings_reset_button"
-                style="@style/DefaultButtonStyle"
+                style="@style/DangerButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
