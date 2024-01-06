@@ -31,13 +31,12 @@ public class BroadcastReceiverHolder implements DefaultLifecycleObserver {
     }
     
     public void registerReceiver(@NonNull BiConsumer<Context, Intent> callback, @NonNull UnaryOperator<IntentFilter> builder) {
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 callback.accept(context, intent);
             }
-        };
-        registerReceiver(receiver, builder.apply(new IntentFilter()));
+        }, builder.apply(new IntentFilter()));
     }
     
     public void registerReceiver(@Nullable BroadcastReceiver receiver, @NonNull IntentFilter filter) {

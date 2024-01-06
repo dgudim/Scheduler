@@ -21,7 +21,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,21 +72,6 @@ public final class ContextWrapper {
     }
     
     // ------------------------ METHODS FOR LIFECYCLE PART
-    
-    /**
-     * Adds a LifecycleObserver that will be notified when the LifecycleOwner changes
-     * state.
-     * <p>
-     * The given observer will be brought to the current state of the LifecycleOwner.
-     * For example, if the LifecycleOwner is in {@link Lifecycle.State#STARTED} state, the given observer
-     * will receive {@link Lifecycle.Event#ON_CREATE}, {@link Lifecycle.Event#ON_START} events.
-     *
-     * @param observer The observer to notify.
-     */
-    @MainThread
-    public void addLifecycleObserver(@NonNull LifecycleObserver observer) {
-        lifecycle.addObserver(observer);
-    }
     
     @NonNull
     public Resources getResources() {

@@ -56,8 +56,8 @@ public class Switch extends MaterialSwitch {
         }
     }
     
-    public void freezeState(boolean state) {
-        setCheckedSilent(state);
+    public void freezeState(boolean checked) {
+        setCheckedSilent(checked);
         setAlpha(0.5F);
         setClickable(false);
     }

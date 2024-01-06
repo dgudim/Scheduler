@@ -74,7 +74,7 @@ public final class SystemCalendarUtils {
      * Retrieve all calendars from the system
      *
      * @param context context, will be used to get a ContentResolver
-     * @return a list of system calendars
+     * @return a map of system calendars
      */
     @NonNull
     public static Map<Long, SystemCalendar> loadCalendars(@NonNull Context context, @NonNull Map<Long, SystemCalendar> calendars) {

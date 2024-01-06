@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
+import org.apache.commons.lang3.mutable.MutableObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +35,6 @@ import java.util.stream.Collectors;
 import kotlin.jvm.functions.Function2;
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.utilities.misc.MutableObject;
 import prototype.xd.scheduler.utilities.misc.Triplet;
 import prototype.xd.scheduler.utilities.misc.Triplet.DefaultedValueTriplet;
 import prototype.xd.scheduler.views.lockscreen.LockScreenTodoItemView.TodoItemViewType;
@@ -301,7 +302,7 @@ public final class Static {
                 Log.e(NAME, "Shared storage not available wtf");
                 killProcess(myPid());
             } else {
-                Static.ROOT_DIR.set(rootDir.getAbsolutePath());
+                Static.ROOT_DIR.setValue(rootDir.getAbsolutePath());
                 Logger.info(NAME, "Root dir: " + rootDir);
                 if (!rootDir.exists()) {
                     Logger.info(NAME, "Created folder structure: " + rootDir.mkdirs());

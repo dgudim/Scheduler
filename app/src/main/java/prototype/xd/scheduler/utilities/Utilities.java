@@ -87,7 +87,7 @@ public final class Utilities {
     
     @NonNull
     public static File getFile(@NonNull String filename) {
-        return new File(ROOT_DIR.get(), filename);
+        return new File(ROOT_DIR.getValue(), filename);
     }
     
     @NonNull

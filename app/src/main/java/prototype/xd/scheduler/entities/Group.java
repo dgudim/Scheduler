@@ -16,10 +16,10 @@ import java.util.Set;
 
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.R;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 /**
  * Class for storing a bunch of parameters
@@ -96,7 +96,7 @@ public class Group implements Serializable {
     
     public static int groupIndexInList(@NonNull List<Group> groups, @NonNull String groupName) {
         for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).groupName.equals(groupName)) {
+            if (Objects.equals(groups.get(i).groupName, groupName)) {
                 return i;
             }
         }

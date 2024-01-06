@@ -2,7 +2,7 @@ package prototype.xd.scheduler.utilities.misc;
 
 import androidx.annotation.Nullable;
 
-public class CachedGetter<T> {
+public class CachedGetter<T> implements Ephemeral {
     
     private final ParameterGetter<T> parameterGetter;
     

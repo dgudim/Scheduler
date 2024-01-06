@@ -133,7 +133,7 @@ class LockScreenBitmapDrawer {
             return false;
         }
         
-        if (!todoEntryManager.initFinished.getValue()) {
+        if (!todoEntryManager.isInitialized()) {
             Logger.warning(NAME, "Not starting bitmap thread, todoEntryManager is still initializing");
             return false;
         }

@@ -4,7 +4,7 @@ package prototype.xd.scheduler.entities;
  * Class providing necessary methods for use with recycle view (stable ids)
  */
 public abstract class RecycleViewEntry {
-    long recyclerViewId = -1;
+    private long recyclerViewId = -1;
     
     public abstract int getRecyclerViewType();
     
@@ -12,7 +12,7 @@ public abstract class RecycleViewEntry {
         this.recyclerViewId = recyclerViewId;
     }
     
-    public long getRecyclerViewId() {
+    public long getRecyclerViewId() throws IllegalArgumentException {
         if (recyclerViewId == -1) {
             throw new IllegalStateException("Can't get unset id");
         }

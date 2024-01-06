@@ -101,10 +101,10 @@ public class SystemCalendarData {
         return id == other.id &&
                 accessLevel == other.accessLevel &&
                 color == other.color &&
-                accountType.equals(other.accountType) &&
-                accountName.equals(other.accountName) &&
-                displayName.equals(other.displayName) &&
-                timeZoneId.equals(other.timeZoneId) &&
+                Objects.equals(accountType, other.accountType) &&
+                Objects.equals(accountName, other.accountName) &&
+                Objects.equals(displayName, other.displayName) &&
+                Objects.equals(timeZoneId, other.timeZoneId) &&
                 systemCalendarEventsDataMap.equals(other.systemCalendarEventsDataMap);
     }
     

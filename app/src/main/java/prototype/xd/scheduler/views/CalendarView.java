@@ -175,11 +175,11 @@ public class CalendarView {
     private long maxVisibleDayUTC;
     
     @NonNull
-    final com.kizitonwose.calendar.view.CalendarView rootCalendarView;
+    private final com.kizitonwose.calendar.view.CalendarView rootCalendarView;
     @Nullable
-    BiConsumer<LocalDate, Context> dateChangeListener;
+    private BiConsumer<LocalDate, Context> dateChangeListener;
     @Nullable
-    Consumer<YearMonth> newMonthBindListener;
+    private Consumer<YearMonth> newMonthBindListener;
     
     public CalendarView(@NonNull com.kizitonwose.calendar.view.CalendarView rootCalendarView, @NonNull TodoEntryManager todoEntryManager) {
         this.rootCalendarView = rootCalendarView;

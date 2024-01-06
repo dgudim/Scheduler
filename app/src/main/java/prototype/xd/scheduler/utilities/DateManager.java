@@ -4,9 +4,9 @@ import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Static.TIME_RANGE_SEPARATOR;
 
 import android.icu.text.DateFormatSymbols;
+import android.os.LocaleList;
 
 import androidx.annotation.NonNull;
-import androidx.core.os.LocaleListCompat;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -52,7 +52,7 @@ public final class DateManager {
     public static long currentlySelectedTimestampUTC = DAY_FLAG_GLOBAL;
     
     @NonNull
-    public static final Locale systemLocale = Objects.requireNonNull(LocaleListCompat.getDefault().get(0));
+    public static final Locale systemLocale = Objects.requireNonNull(LocaleList.getDefault().get(0));
     private static final DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("dd/MM HH:mm", systemLocale);
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM", systemLocale);
     private static final DateTimeFormatter dateFormatMonthNames = DateTimeFormatter.ofPattern("MMM d", systemLocale);
