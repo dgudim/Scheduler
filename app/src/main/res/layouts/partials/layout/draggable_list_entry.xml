@@ -18,19 +18,20 @@
 
         <ImageView
             android:id="@+id/calendar_icon"
-            android:layout_width="@dimen/compound_icon_width"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/compound_icon_size"
+            android:layout_height="@dimen/compound_icon_size"
             android:visibility="gone"
-            app:srcCompat="@drawable/ic_calendar_month_55"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_calendar_month_55" />
 
         <TextView
             android:id="@+id/item_text"
             style="@style/MediumHeading"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/icon_to_text_margin"
             android:text="item_text"
             android:textAlignment="viewStart"
             app:layout_constraintEnd_toStartOf="@+id/drag_handle"
@@ -43,6 +44,7 @@
             style="@style/MediumHeadingSubtext"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/icon_to_text_margin"
             android:text="item_description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/drag_handle"

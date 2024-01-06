@@ -47,7 +47,7 @@
 
             <ImageView
                 android:id="@+id/imageView4"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:contentDescription="@string/calendar_access_description"
                 app:layout_constraintBottom_toBottomOf="@+id/calendar_permission_granted"
@@ -94,7 +94,7 @@
 
             <ImageView
                 android:id="@+id/imageView5"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:contentDescription="@string/file_access_description"
                 app:layout_constraintBottom_toBottomOf="@+id/storage_permission_granted"
@@ -141,7 +141,7 @@
 
             <ImageView
                 android:id="@+id/imageView6"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:contentDescription="@string/file_access_description"
                 app:layout_constraintBottom_toBottomOf="@+id/battery_permission_granted"
@@ -235,7 +235,7 @@
 
             <ImageView
                 android:id="@+id/notification_permission_icon"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:contentDescription="@string/notification_permission_description"
                 app:layout_constraintBottom_toBottomOf="@+id/notification_permission_granted"
@@ -268,7 +268,7 @@
 
             <ImageView
                 android:id="@+id/ignore_autorevoke_icon"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:contentDescription="@string/ignore_autorevoke_description"
                 app:layout_constraintBottom_toBottomOf="@+id/ignore_autorevoke_granted"

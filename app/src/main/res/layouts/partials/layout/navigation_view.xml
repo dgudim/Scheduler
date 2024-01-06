@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
-    android:background="?colorSurfaceContainerLow"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -86,7 +85,7 @@
 
             <ImageView
                 android:id="@+id/source_code_image"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
                 app:layout_constraintBottom_toBottomOf="@+id/source_description"
@@ -98,7 +97,7 @@
 
             <ImageView
                 android:id="@+id/github_issue_image"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
                 app:layout_constraintBottom_toBottomOf="@+id/github_issue_decription"
@@ -136,7 +135,7 @@
 
             <ImageView
                 android:id="@+id/latest_release_image"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
                 app:layout_constraintBottom_toBottomOf="@+id/latest_release_description"
@@ -174,7 +173,7 @@
 
             <ImageView
                 android:id="@+id/calendar_settings_image"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
                 app:layout_constraintBottom_toBottomOf="@+id/calendar_settings_description"
@@ -212,7 +211,7 @@
 
             <ImageView
                 android:id="@+id/sorting_settings_image"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
                 app:layout_constraintBottom_toBottomOf="@+id/sorting_settings_description"
@@ -250,7 +249,7 @@
 
             <ImageView
                 android:id="@+id/global_settings_image"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
                 app:layout_constraintBottom_toBottomOf="@+id/textView24"
@@ -288,7 +287,7 @@
 
             <ImageView
                 android:id="@+id/faq_image"
-                android:layout_width="@dimen/compound_icon_width"
+                android:layout_width="@dimen/compound_icon_size"
                 android:layout_height="0dp"
                 android:layout_marginStart="@dimen/dialog_menu_padding_left_right"
                 app:layout_constraintBottom_toBottomOf="@+id/faq_description"

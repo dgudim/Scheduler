@@ -23,8 +23,8 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="@dimen/compound_icon_width"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/compound_icon_size"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/textView22"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/textView11"
