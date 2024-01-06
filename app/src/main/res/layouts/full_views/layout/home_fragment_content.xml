@@ -50,4 +50,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/calendar" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/no_events_text"
+        app:layout_constraintStart_toStartOf="@+id/no_events_text"
+        app:layout_constraintTop_toBottomOf="@+id/no_events_text" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
