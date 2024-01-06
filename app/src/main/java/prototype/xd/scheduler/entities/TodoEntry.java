@@ -44,6 +44,7 @@ import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.utilities.misc.CachedGetter;
+import prototype.xd.scheduler.utilities.misc.Ephemeral;
 import prototype.xd.scheduler.utilities.misc.ParameterGetter;
 import prototype.xd.scheduler.views.CalendarView;
 
@@ -54,7 +55,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     public static final String NAME = TodoEntry.class.getSimpleName();
     private static final Pattern hideByContentSplitPattern = Pattern.compile("\\|\\|");
     
-    public static class Parameter<T> {
+    public static class Parameter<T> implements Ephemeral {
         
         @NonNull
         private final TodoEntry entry;
@@ -206,9 +207,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     public transient Parameter<Integer> adaptiveColorBalance;
     
+    public transient CachedGetter<Boolean> isHiddenByContent;
+    
     private transient int averageBackgroundColor = 0xff_FFFFFF;
     
-    private transient ArrayMap<String, Parameter<?>> parameterMap;
+    private transient ArrayMap<String, Ephemeral> parameterMap;
     // for listening to parameter changes
     @Nullable
     private transient BiConsumer<TodoEntry, Set<String>> parameterInvalidationListener;
@@ -245,8 +248,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     // ----------- supplementary stuff for sorting END
     
     @NonNull
-    private static ArrayMap<String, Parameter<?>> mapParameters(@NonNull TodoEntry entry) {
-        ArrayMap<String, Parameter<?>> parameterMap = new ArrayMap<>(8);
+    private static ArrayMap<String, Ephemeral> mapParameters(@NonNull TodoEntry entry) {
+        ArrayMap<String, Ephemeral> parameterMap = new ArrayMap<>(10);
         parameterMap.put(Static.BG_COLOR.CURRENT.key, entry.bgColor);
         parameterMap.put(Static.FONT_COLOR.CURRENT.key, entry.fontColor);
         parameterMap.put(Static.BORDER_COLOR.CURRENT.key, entry.borderColor);
@@ -254,7 +257,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         parameterMap.put(Static.PRIORITY.key, entry.priority);
         parameterMap.put(Static.EXPIRED_ITEMS_OFFSET.key, entry.expiredDayOffset);
         parameterMap.put(Static.UPCOMING_ITEMS_OFFSET.key, entry.upcomingDayOffset);
-        parameterMap.put(Static.ADAPTIVE_COLOR_BALANCE.key, entry.adaptiveColorBalance);
+        parameterMap.put(Static.HIDE_ENTRIES_BY_CONTENT.key, entry.isHiddenByContent);
+        parameterMap.put(Static.HIDE_ENTRIES_BY_CONTENT_CONTENT.key, entry.isHiddenByContent);
         return parameterMap;
     }
     
@@ -299,9 +303,9 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         group.attachEntryInternal(this);
     }
     
-    public void initParameters() {
+    public void initParameters() { // NOSONAR, complexity is fine
         bgColor = new Parameter<>(this, Static.BG_COLOR.CURRENT.key,
-                previousValue -> {
+                none -> {
                     if (isFromSystemCalendar()) {
                         // get only by subkeys because the base key always exists, but we don't want it, and instead want calendar color
                         return Static.BG_COLOR.CURRENT.getOnlyBySubKeys(event.subKeys,
@@ -313,22 +317,22 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 todayValue -> getExpiredUpcomingColor(todayValue, Static.BG_COLOR.UPCOMING.get()),
                 todayValue -> getExpiredUpcomingColor(todayValue, Static.BG_COLOR.EXPIRED.get()));
         fontColor = new Parameter<>(this, Static.FONT_COLOR.CURRENT.key,
-                previousValue -> Static.FONT_COLOR.CURRENT.get(getSubKeys()),
+                none -> Static.FONT_COLOR.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
                 todayValue -> getExpiredUpcomingColor(todayValue, Static.FONT_COLOR.UPCOMING.get()),
                 todayValue -> getExpiredUpcomingColor(todayValue, Static.FONT_COLOR.EXPIRED.get()));
         borderColor = new Parameter<>(this, Static.BORDER_COLOR.CURRENT.key,
-                previousValue -> Static.BORDER_COLOR.CURRENT.get(getSubKeys()),
+                none -> Static.BORDER_COLOR.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
                 todayValue -> getExpiredUpcomingColor(todayValue, Static.BORDER_COLOR.UPCOMING.get()),
                 todayValue -> getExpiredUpcomingColor(todayValue, Static.BORDER_COLOR.EXPIRED.get()));
         borderThickness = new Parameter<>(this, Static.BORDER_THICKNESS.CURRENT.key,
-                previousValue -> Static.BORDER_THICKNESS.CURRENT.get(getSubKeys()),
+                none -> Static.BORDER_THICKNESS.CURRENT.get(getSubKeys()),
                 Integer::parseInt,
                 todayValue -> Static.BORDER_THICKNESS.UPCOMING.get(),
                 todayValue -> Static.BORDER_THICKNESS.EXPIRED.get());
         priority = new Parameter<>(this, Static.PRIORITY.key,
-                previousValue -> isFromSystemCalendar() ?
+                none -> isFromSystemCalendar() ?
                         Static.PRIORITY.get(event.subKeys) :
                         // there is no default setting for priority
                         Static.PRIORITY.defaultValue,
@@ -336,28 +340,47 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 null,
                 null);
         expiredDayOffset = new Parameter<>(this, Static.EXPIRED_ITEMS_OFFSET.key,
-                previousValue -> Static.EXPIRED_ITEMS_OFFSET.get(getSubKeys()),
+                none -> Static.EXPIRED_ITEMS_OFFSET.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
         upcomingDayOffset = new Parameter<>(this, Static.UPCOMING_ITEMS_OFFSET.key,
-                previousValue -> Static.UPCOMING_ITEMS_OFFSET.get(getSubKeys()),
+                none -> Static.UPCOMING_ITEMS_OFFSET.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
         adaptiveColorBalance = new Parameter<>(this, Static.ADAPTIVE_COLOR_BALANCE.key,
-                previousValue -> Static.ADAPTIVE_COLOR_BALANCE.get(getSubKeys()),
+                none -> Static.ADAPTIVE_COLOR_BALANCE.get(getSubKeys()),
                 Integer::parseInt,
                 null,
                 null);
         
+        isHiddenByContent = new CachedGetter<>(none -> {
+            if (!isFromSystemCalendar()) {
+                return false;
+            }
+            if (Static.HIDE_ENTRIES_BY_CONTENT.get(event.subKeys)) {
+                String matchString = Static.HIDE_ENTRIES_BY_CONTENT_CONTENT.get(event.subKeys);
+                if (matchString.isEmpty()) {
+                    return false;
+                }
+                String[] split = hideByContentSplitPattern.split(matchString);
+                for (String str : split) {
+                    if (rawTextValue.get().contains(str)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+        
         parameterMap = mapParameters(this);
         
-        startDayLocal = previousValue ->
+        startDayLocal = none ->
                 isFromSystemCalendar() ? event.startDayLocal : Long.parseLong(params.getOrDefault(Static.START_DAY_UTC, Static.DAY_FLAG_GLOBAL_STR));
-        endDayLocal = previousValue ->
+        endDayLocal = none ->
                 isFromSystemCalendar() ? event.endDayLocal : Long.parseLong(params.getOrDefault(Static.END_DAY_UTC, Static.DAY_FLAG_GLOBAL_STR));
-        rawTextValue = previousValue ->
+        rawTextValue = none ->
                 isFromSystemCalendar() ? event.data.title : params.getOrDefault(Static.TEXT_VALUE, "");
     }
     
@@ -485,7 +508,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     protected void invalidateParameter(@NonNull String parameterKey, boolean reportInvalidated) {
-        Parameter<?> param = parameterMap.get(parameterKey);
+        Ephemeral param = parameterMap.get(parameterKey);
         if (param != null) {
             param.invalidate();
         }
@@ -589,9 +612,13 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         return Boolean.parseBoolean(params.get(Static.IS_COMPLETED));
     }
     
+    public boolean isCompletedOrHiddenByContent() {
+        return isCompleted() || isHiddenByContent.get();
+    }
+    
     public boolean isVisibleOnLockscreenToday() {
         if (isFromSystemCalendar()) {
-            if (isHiddenByContent() || !Static.CALENDAR_SHOW_ON_LOCK.get(event.subKeys)) {
+            if (isHiddenByContent.get() || !Static.CALENDAR_SHOW_ON_LOCK.get(event.subKeys)) {
                 return false;
             }
             
@@ -772,25 +799,6 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
     }
     
-    public boolean isHiddenByContent() {
-        if (!isFromSystemCalendar()) {
-            return false;
-        }
-        if (Static.HIDE_ENTRIES_BY_CONTENT.get(event.subKeys)) {
-            String matchString = Static.HIDE_ENTRIES_BY_CONTENT_CONTENT.get(event.subKeys);
-            if (matchString.isEmpty()) {
-                return false;
-            }
-            String[] split = hideByContentSplitPattern.split(matchString);
-            for (String str : split) {
-                if (rawTextValue.get().contains(str)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
     private TimeRange getNearestCalendarEventMsRangeUTC(long targetDayUTC) {
         if (!isRecurring()) {
             // covers local and non-recurring calendar events
@@ -889,7 +897,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         }
         
         TimeRange nearestDayRangeLocal = getNearestLocalEventDayRange(targetDayUTC);
-    
+        
         int dayShift = 0;
         if (targetDayUTC < nearestDayRangeLocal.getStart()) {
             dayShift = (int) (nearestDayRangeLocal.getStart() - targetDayUTC);
@@ -900,7 +908,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         if (dayShift == 0) {
             return base;
         }
-    
+        
         String postfix;
         int dayShiftAbs = abs(dayShift);
         
