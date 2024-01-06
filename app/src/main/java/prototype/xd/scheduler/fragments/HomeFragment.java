@@ -116,26 +116,32 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         
+        wrapper.activity.getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(navViewDrawer)) {
+                    drawerLayout.closeDrawer(navViewDrawer);
+                } else {
+                    // prevent stack overflow
+                    setEnabled(false);
+                    wrapper.activity.getOnBackPressedDispatcher().onBackPressed();
+                    setEnabled(true);
+                }
+            }
+        });
+        
         // construct custom calendar view
         CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoEntryManager);
         todoEntryManager.attachCalendarView(calendarView, wrapper.lifecycle);
-        
-        // when all entries are loaded and ui is created, update current month
-        todoEntryManager.initFinished.observe(getViewLifecycleOwner(), status -> {
-            setupListeners(contentBnd, binding.navView, navViewDrawer, drawerLayout, calendarView, wrapper.activity);
-            // update adapter showing entries
-            todoEntryManager.notifyEntryListChanged();
-            // update calendar updating indicators
-            todoEntryManager.notifyCurrentMonthChanged();
-            // finally, update the status text with entry count
-            updateStatusText();
+        // when all entries are loaded and ui is created, setup listeners, todoEntryManager also updates the data
+        todoEntryManager.onInitFinished(this, el -> {
+            setupListeners(contentBnd, binding.navView, calendarView, wrapper.activity);
+            binding.contentWrapper.content.progressBar.setVisibility(View.GONE);
         });
     }
     
     private void setupListeners(@NonNull ContentWrapperBinding contentBnd,
                                 @NonNull NavigationViewBinding navViewContent,
-                                @NonNull NavigationView navViewDrawer,
-                                @NonNull DrawerLayout drawerLayout,
                                 @NonNull CalendarView calendarView,
                                 @NonNull FragmentActivity rootActivity) {
         
@@ -143,10 +149,15 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         calendarView.setOnDateChangeListener((selectedDate, context) -> {
             selectDate(selectedDate);
             todoEntryManager.notifyEntryListChanged();
-            updateStatusText();
         });
         
-        todoEntryManager.listChangedSignal.observe(getViewLifecycleOwner(), status -> todoListViewAdapter.notifyEntryListChanged());
+        todoEntryManager.onListChanged(this, status -> {
+            todoListViewAdapter.notifyEntryListChanged();
+            // update the status text with entry count
+            int events = todoListViewAdapter.getItemCount();
+            binding.contentWrapper.toolbar.setTitle(getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC), events));
+            binding.contentWrapper.content.noEventsText.setVisibility(events == 0 ? View.VISIBLE : View.GONE);
+        });
         
         // setup month listener, called when a new month is loaded (first month is loaded differently)
         calendarView.setNewMonthBindListener(month ->
@@ -157,20 +168,6 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         );
         
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(DateManager.getCurrentDate()));
-        
-        rootActivity.getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(navViewDrawer)) {
-                    drawerLayout.closeDrawer(navViewDrawer);
-                } else {
-                    // prevent stack overflow
-                    setEnabled(false);
-                    rootActivity.onBackPressed();
-                    setEnabled(true);
-                }
-            }
-        });
         
         contentBnd.fab.setOnClickListener(view1 -> {
             final List<Group> groupList = todoEntryManager.getGroups();
@@ -255,11 +252,5 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
     
     public void notifyDatesetChanged() {
         todoEntryManager.notifyDatasetChanged();
-    }
-    
-    private void updateStatusText() {
-        int events = todoListViewAdapter.getItemCount();
-        binding.contentWrapper.toolbar.setTitle(getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC), events));
-        binding.contentWrapper.content.noEventsText.setVisibility(events == 0 ? View.VISIBLE : View.GONE);
     }
 }

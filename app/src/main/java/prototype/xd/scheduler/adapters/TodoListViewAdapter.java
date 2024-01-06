@@ -165,7 +165,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             
             bnd.isDone.setCheckedSilent(entry.isCompleted());
             
-            bnd.isDone.setOnClickListener(view12 -> {
+            bnd.isDone.setOnClickListener(v -> {
                 if (entry.isGlobal()) {
                     String selectedDay = String.valueOf(currentlySelectedDayUTC);
                     // global entries become current entries
@@ -208,7 +208,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             backgroundLayer.setCardBackgroundColor(bgColor);
             backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDayUTC));
             
-            if (entry.isCompleted() || entry.isHiddenByContent()) {
+            if (entry.isCompletedOrHiddenByContent()) {
                 todoText.setTextColor(dimColorToBg(fontColor, bgColor));
                 todoText.setPaintFlags(addIntFlag(todoText.getPaintFlags(), Paint.STRIKE_THRU_TEXT_FLAG));
             } else {

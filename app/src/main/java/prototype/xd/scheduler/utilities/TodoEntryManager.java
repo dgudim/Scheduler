@@ -5,6 +5,8 @@ import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.Static.BG_COLOR;
 import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.EXPIRED_ITEMS_OFFSET;
+import static prototype.xd.scheduler.utilities.Static.HIDE_ENTRIES_BY_CONTENT;
+import static prototype.xd.scheduler.utilities.Static.HIDE_ENTRIES_BY_CONTENT_CONTENT;
 import static prototype.xd.scheduler.utilities.Static.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.UPCOMING_ITEMS_OFFSET;
@@ -22,9 +24,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -64,14 +68,14 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     @NonNull
     private final BlockingQueue<SaveType> saveQueue = new LinkedBlockingQueue<>();
     
-    public final DefaultedMutableLiveData<Boolean> initFinished = new DefaultedMutableLiveData<>(Boolean.FALSE);
+    private final DefaultedMutableLiveData<Boolean> initFinished = new DefaultedMutableLiveData<>(Boolean.FALSE);
     
     
     private ArrayMap<Long, Boolean> calendarVisibilityMap;
     private final Set<Long> daysToRebind = new ArraySet<>();
     private boolean shouldSaveEntries;
     
-    public final DefaultedMutableLiveData<Boolean> listChangedSignal = new DefaultedMutableLiveData<>(Boolean.FALSE);
+    private final DefaultedMutableLiveData<Boolean> listChanged = new DefaultedMutableLiveData<>(Boolean.FALSE);
     
     /**
      * Listener that is called when parameters change on any TodoEntry
@@ -99,14 +103,17 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
                         // include all days if BG_COLOR changed, else include just the difference
                         !parameters.contains(BG_COLOR.CURRENT.key));
                 
-            } else if ((parameters.contains(BG_COLOR.CURRENT.key) || parameters.contains(IS_COMPLETED)) && calendarView != null) {
-                // entry didn't move but BG_COLOR changed
+            } else if ((parameters.contains(BG_COLOR.CURRENT.key)
+                    || parameters.contains(IS_COMPLETED)
+                    || parameters.contains(HIDE_ENTRIES_BY_CONTENT.key)
+                    || parameters.contains(HIDE_ENTRIES_BY_CONTENT_CONTENT.key)) && calendarView != null) {
+                // entry didn't move but BG_COLOR / COMPLETION / HIDE_BY_CONTENT changed
                 entry.getVisibleDaysOnCalendar(
                         calendarView, daysToRebind,
                         todoEntries.displayUpcomingExpired ? RangeType.EXPIRED_UPCOMING : RangeType.CORE);
             }
             
-            // we should save the entries but now now because sometimes we change parameters frequently
+            // we should save the entries now because sometimes we change parameters frequently
             // and we don't want to call save function 10 time when we use a slider
             shouldSaveEntries = true;
             setBitmapUpdateFlag();
@@ -128,6 +135,24 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     private TodoEntryManager(@NonNull final Context context) {
         DateManager.systemTimeZone.observeForever(timeZone -> notifyTimezoneChanged());
         initAsync(context);
+    }
+    
+    public boolean isInitialized() {
+        return initFinished.getValue();
+    }
+    
+    public void onInitFinished(@NonNull Fragment frag, @NonNull Observer<Boolean> observer) {
+        initFinished.observe(frag.getViewLifecycleOwner(), el -> {
+            observer.onChanged(el);
+            // update adapter showing entries
+            notifyEntryListChanged();
+            // update calendar updating indicators
+            notifyCurrentMonthChanged();
+        });
+    }
+    
+    public void onListChanged(@NonNull Fragment frag, @NonNull Observer<Boolean> observer) {
+        listChanged.observe(frag.getViewLifecycleOwner(), observer);
     }
     
     /**
@@ -250,7 +275,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      */
     public void notifyEntryListChanged() {
         Logger.debug(NAME, "NotifyEntryListChanged called");
-        listChangedSignal.setValue(Boolean.TRUE);
+        listChanged.setValue(Boolean.TRUE);
     }
     
     /**
@@ -374,7 +399,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         return getVisibleTodoEntries(day, (entry, entryType) -> {
             if (entryType == TodoEntry.EntryType.UPCOMING ||
                     entryType == TodoEntry.EntryType.EXPIRED) {
-                return !entry.isCompleted();
+                return !entry.isCompletedOrHiddenByContent();
             } else {
                 return true;
             }
@@ -405,7 +430,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         }
         
         List<TodoEntry> todoEntriesOnDay = todoEntries.getOnDay(day, (entry, entryType) ->
-                entryType != TodoEntry.EntryType.GLOBAL && !entry.isCompleted(), false);
+                entryType != TodoEntry.EntryType.GLOBAL && !entry.isCompletedOrHiddenByContent(), false);
         
         int index = 0;
         
