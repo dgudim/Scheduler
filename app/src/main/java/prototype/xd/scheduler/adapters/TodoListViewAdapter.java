@@ -5,6 +5,7 @@ import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayU
 import static prototype.xd.scheduler.utilities.ImageUtilities.dimColorToBg;
 import static prototype.xd.scheduler.utilities.ImageUtilities.getHarmonizedFontColorWithBg;
 import static prototype.xd.scheduler.utilities.ImageUtilities.getHarmonizedSecondaryFontColorWithBg;
+import static prototype.xd.scheduler.utilities.ImageUtilities.getOnBgColor;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.GLOBAL_ITEMS_LABEL_POSITION;
@@ -14,9 +15,11 @@ import static prototype.xd.scheduler.utilities.Static.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Utilities.addIntFlag;
 import static prototype.xd.scheduler.utilities.Utilities.removeIntFlag;
 
+import android.content.res.ColorStateList;
 import android.graphics.Paint;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -204,9 +207,16 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             
             int bgColor = entry.bgColor.get(currentlySelectedDayUTC);
             int fontColor = getHarmonizedFontColorWithBg(entry.fontColor.get(currentlySelectedDayUTC), bgColor);
+            int strokeColor = entry.borderColor.get(currentlySelectedDayUTC);
+            ColorStateList iconColor = ColorStateList.valueOf(getOnBgColor(bgColor));
             
             backgroundLayer.setCardBackgroundColor(bgColor);
-            backgroundLayer.setStrokeColor(entry.borderColor.get(currentlySelectedDayUTC));
+            backgroundLayer.setStrokeColor(strokeColor);
+            
+            ((ImageView) root.findViewById(R.id.open_settings_button)).setImageTintList(iconColor);
+            if (!entry.isFromSystemCalendar()) {
+                ((ImageView) root.findViewById(R.id.delete_entry_button)).setImageTintList(iconColor);
+            }
             
             if (entry.isCompletedOrHiddenByContent()) {
                 todoText.setTextColor(dimColorToBg(fontColor, bgColor));
