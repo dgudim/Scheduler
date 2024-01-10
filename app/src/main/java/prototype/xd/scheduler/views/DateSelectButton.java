@@ -1,9 +1,8 @@
 package prototype.xd.scheduler.views;
 
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.dateStringMonthNamesUTCFromMsUTC;
-import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 import static prototype.xd.scheduler.utilities.DateManager.daysToMs;
+import static prototype.xd.scheduler.utilities.DateManager.msToDays;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -21,8 +20,8 @@ import prototype.xd.scheduler.utilities.misc.RangeDateValidator;
 
 public class DateSelectButton extends MaterialButton {
     
-    private Long selectedDayUTC;
-    private Long selectedMsUTC;
+    private volatile Long selectedDayUTC;
+    private volatile Long selectedMsUTC;
     
     private MaterialDatePicker.Builder<Long> datePickerBuilder;
     
@@ -49,13 +48,10 @@ public class DateSelectButton extends MaterialButton {
     }
     
     public void setup(@NonNull FragmentManager fragmentManager, long initialDay) {
-        if(initialDay == -1) {
-            initialDay = currentlySelectedDayUTC;
-        }
         long initialMsUTC = daysToMs(initialDay);
         selectedDayUTC = initialDay;
         selectedMsUTC = initialMsUTC;
-    
+        
         datePickerBuilder.setSelection(initialMsUTC);
     
         MaterialDatePicker<Long> datePicker = datePickerBuilder.build();

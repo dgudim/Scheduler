@@ -94,11 +94,12 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
                     && todoEntries.displayUpcomingExpired;
             
             // parameters that change event range
-            if (extendedDaysChanged || coreDaysChanged) {
+            if (coreDaysChanged || extendedDaysChanged) {
                 
                 todoEntries.notifyEntryVisibilityChanged(
                         entry,
                         coreDaysChanged,
+                        extendedDaysChanged,
                         daysToRebind,
                         // include all days if BG_COLOR changed, else include just the difference
                         !parameters.contains(BG_COLOR.CURRENT.key));
@@ -350,6 +351,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
                 // entry moved because timezone changed
                 todoEntries.notifyEntryVisibilityChanged(
                         todoEntry,
+                        true,
                         true,
                         daysToRebind,
                         true);

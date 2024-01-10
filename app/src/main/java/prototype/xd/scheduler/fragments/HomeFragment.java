@@ -1,7 +1,6 @@
 package prototype.xd.scheduler.fragments;
 
-import static prototype.xd.scheduler.utilities.DateManager.currentlySelectedTimestampUTC;
-import static prototype.xd.scheduler.utilities.DateManager.dateStringUTCFromMsUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getCurrentlySelectedDate;
 import static prototype.xd.scheduler.utilities.DateManager.getEndOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
@@ -155,7 +154,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
             todoListViewAdapter.notifyEntryListChanged();
             // update the status text with entry count
             int events = todoListViewAdapter.getItemCount();
-            binding.contentWrapper.toolbar.setTitle(getString(R.string.status, dateStringUTCFromMsUTC(currentlySelectedTimestampUTC), events));
+            binding.contentWrapper.toolbar.setTitle(getString(R.string.status, getCurrentlySelectedDate(), events));
             binding.contentWrapper.content.noEventsText.setVisibility(events == 0 ? View.VISIBLE : View.GONE);
         });
         

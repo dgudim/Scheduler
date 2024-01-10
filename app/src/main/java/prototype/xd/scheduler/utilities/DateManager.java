@@ -49,7 +49,6 @@ public final class DateManager {
     private static LocalDate currentDate = LocalDate.now();
     
     public static long currentlySelectedDayUTC = DAY_FLAG_GLOBAL;
-    public static long currentlySelectedTimestampUTC = DAY_FLAG_GLOBAL;
     
     @NonNull
     public static final Locale systemLocale = Objects.requireNonNull(LocaleList.getDefault().get(0));
@@ -121,7 +120,6 @@ public final class DateManager {
     public static synchronized void selectDate(@NonNull LocalDate date) {
         updateDate();
         currentlySelectedDayUTC = date.toEpochDay();
-        currentlySelectedTimestampUTC = daysToMs(currentlySelectedDayUTC);
     }
     
     public static long getStartOfMonthDayUTC(@NonNull YearMonth month) {
@@ -182,13 +180,13 @@ public final class DateManager {
     }
     
     public static long daysToMs(long daysUTC) {
-        return TimeUnit.MILLISECONDS.convert(daysUTC, TimeUnit.DAYS) + ONE_MINUTE_MS;
+        return TimeUnit.MILLISECONDS.convert(daysUTC, TimeUnit.DAYS);
     }
     
-    // return date given a UTC timestamp
+    // return currently selected date date
     @NonNull
-    public static String dateStringUTCFromMsUTC(long msUTC) {
-        return dateFormat.format(msUTCtoLocalDate(msUTC, ZoneOffset.UTC));
+    public static String getCurrentlySelectedDate() {
+        return dateFormat.format(msUTCtoLocalDate(daysToMs(currentlySelectedDayUTC), ZoneOffset.UTC));
     }
     
     // return date (months are 3 letters instead of numbers) and time given a UTC timestamp

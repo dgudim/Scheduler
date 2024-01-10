@@ -316,10 +316,11 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     
     public void notifyEntryVisibilityChanged(@NonNull TodoEntry entry,
                                              boolean coreDaysChanged,
+                                             boolean extendedDaysChanged,
                                              @NonNull Set<Long> invalidatedDaySet,
                                              boolean onlyAddDifference) {
         // if the entry is currently marked as global in the list and is global now
-        if (globalEntries.contains(entry) && entry.isGlobal() && !coreDaysChanged) {
+        if (globalEntries.contains(entry) && entry.isGlobal()) {
             Logger.warning(NAME, "Trying to change visibility range of a global entry");
             return;
         }
@@ -350,12 +351,20 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
         TodoEntry.FullDaySet newDaySet = entry.getFullDaySet(firstLoadedDay, lastLoadedDay);
         
         if (onlyAddDifference) {
-            Logger.debug(NAME, "Added difference to invalidatedDaySet");
-            invalidatedDaySet.addAll(displayUpcomingExpired ?
-                    Sets.symmetricDifference(prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()) :
-                    Sets.symmetricDifference(prevCoreDays, newDaySet.getCoreDaySet()));
+            if (displayUpcomingExpired && extendedDaysChanged) {
+                invalidatedDaySet.addAll(Sets.symmetricDifference(prevExpiredUpcomingDays, newDaySet.getUpcomingExpiredDaySet()));
+            }
+            // Sometimes the extended days may change in a way, that a new core day is on an old extended day, like this
+            // Before: _ _ _ _ E - - - -
+            // After:  _ _ _ _ E E - - - -
+            // In this case the only changed extended day will be the last one, so we also need to add the difference from the core days
+            if (coreDaysChanged) {
+                invalidatedDaySet.addAll(Sets.symmetricDifference(prevCoreDays, newDaySet.getCoreDaySet()));
+            }
             
+            Logger.debug(NAME, "Added difference to invalidatedDaySet");
         } else {
+            // Add both new and old sets
             invalidatedDaySet.addAll(displayUpcomingExpired ? prevExpiredUpcomingDays : prevCoreDays);
             invalidatedDaySet.addAll(displayUpcomingExpired ? newDaySet.getUpcomingExpiredDaySet() : newDaySet.getCoreDaySet());
             
