@@ -236,4 +236,6 @@
     <string name="event_deleted_message">Event deleted</string>
     <string name="settings_effects_glow">Add glow to transparency overlay</string>
     <string name="settings_effects_highlight_edges">Highlight inner edges</string>
+    <string name="title_edit_events_with_color">Settings for specific colors</string>
+    <string name="title_edit_events_with_color_description">A calendar can have events with different colors, here you can set separate styles for each color</string>
 </resources>

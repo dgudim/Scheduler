@@ -3,7 +3,6 @@ package prototype.xd.scheduler.entities.settings_entries;
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.CALENDAR;
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 
-import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.view.View;
 import android.widget.GridView;
@@ -17,8 +16,9 @@ import prototype.xd.scheduler.adapters.CalendarColorsGridViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.GridSelectionViewBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
+import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
@@ -85,19 +85,22 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
             
             if (config.gridViewAdapter != null) {
                 viewBinding.colorSelectButton.setVisibility(View.VISIBLE);
-                viewBinding.colorSelectButton.setOnClickListener(v -> {
-                    final AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
-                    
-                    GridSelectionViewBinding gridSelection = GridSelectionViewBinding.inflate(wrapper.getLayoutInflater());
-                    GridView gridView = gridSelection.gridView;
-                    gridView.setNumColumns(2);
-                    gridView.setHorizontalSpacing(5);
-                    gridView.setVerticalSpacing(5);
-                    gridView.setAdapter(config.gridViewAdapter);
-                    
-                    alert.setView(gridSelection.getRoot());
-                    alert.show();
-                });
+                viewBinding.colorSelectButton.setOnClickListener(v -> DialogUtilities.displayMessageDialog(
+                        wrapper, builder -> {
+                            GridSelectionViewBinding gridSelection = GridSelectionViewBinding.inflate(wrapper.getLayoutInflater());
+                            GridView gridView = gridSelection.gridView;
+                            gridView.setNumColumns(2);
+                            gridView.setHorizontalSpacing(5);
+                            gridView.setVerticalSpacing(5);
+                            gridView.setAdapter(config.gridViewAdapter);
+                            
+                            builder.setIcon(R.drawable.ic_palette_45);
+                            builder.setTitle(R.string.title_edit_events_with_color);
+                            builder.setMessage(R.string.title_edit_events_with_color_description);
+                            builder.setNegativeButton(R.string.close, null);
+                            builder.setView(gridSelection.getRoot());
+                        }
+                ));
             } else {
                 viewBinding.colorSelectButton.setVisibility(View.GONE);
             }
