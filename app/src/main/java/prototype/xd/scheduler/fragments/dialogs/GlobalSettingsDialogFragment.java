@@ -24,7 +24,7 @@ import java.util.Objects;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
-import prototype.xd.scheduler.databinding.SettingsDialogFragmentBinding;
+import prototype.xd.scheduler.databinding.ListViewBinding;
 import prototype.xd.scheduler.entities.settings_entries.AdaptiveBackgroundSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.AppThemeSelectorEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CompoundCustomizationSettingsEntryConfig;
@@ -39,7 +39,7 @@ import prototype.xd.scheduler.entities.settings_entries.SwitchSettingsEntryConfi
 import prototype.xd.scheduler.entities.settings_entries.TitleBarSettingsEntryConfig;
 import prototype.xd.scheduler.utilities.Static;
 
-public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragment<SettingsDialogFragmentBinding> { // NOSONAR, this is a fragment
+public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragment<ListViewBinding> { // NOSONAR, this is a fragment
     
     
     private AdaptiveBackgroundSettingsEntryConfig adaptiveBgSettingsEntry;
@@ -57,13 +57,13 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
     
     @NonNull
     @Override
-    protected SettingsDialogFragmentBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return SettingsDialogFragmentBinding.inflate(inflater, container, false);
+    protected ListViewBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return ListViewBinding.inflate(inflater, container, false);
     }
     
     @Override
     @SuppressLint("NotifyDataSetChanged")
-    protected void buildDialogStatic(@NonNull SettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
+    protected void buildDialogStatic(@NonNull ListViewBinding binding, @NonNull ComponentDialog dialog) {
         adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper, cropBgLauncher);
         
         List<SettingsEntryConfig> settingsEntries = List.of(
@@ -144,7 +144,7 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
     }
     
     @Override
-    protected void buildDialogDynamic(@NonNull SettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
+    protected void buildDialogDynamic(@NonNull ListViewBinding binding, @NonNull ComponentDialog dialog) {
         // None of it is dynamic
     }
 }

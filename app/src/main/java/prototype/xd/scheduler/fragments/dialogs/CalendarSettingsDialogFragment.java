@@ -23,7 +23,7 @@ import java.util.TreeMap;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
-import prototype.xd.scheduler.databinding.SettingsDialogFragmentBinding;
+import prototype.xd.scheduler.databinding.ListViewBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.settings_entries.CalendarAccountSettingsEntryConfig;
 import prototype.xd.scheduler.entities.settings_entries.CalendarSettingsEntryConfig;
@@ -35,30 +35,33 @@ import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
-public class CalendarSettingsDialogFragment extends FullScreenSettingsDialogFragment<SettingsDialogFragmentBinding> {
+public class CalendarSettingsDialogFragment extends FullScreenSettingsDialogFragment<ListViewBinding> { // NOSONAR
+    
+    private ConcatAdapter listViewAdapter;
+    private final SystemCalendarSettings systemCalendarSettings = new SystemCalendarSettings(null);
+    
+    /**
+     * @noinspection CollectionWithoutInitialCapacity
+     */
+    private final ArrayList<GenericCalendarSettingsEntryConfig> calendarConfigEntries = new ArrayList<>();
+    private final List<SettingsEntryConfig> staticEntries = new ArrayList<>(2);
     
     @NonNull
     @Override
-    protected SettingsDialogFragmentBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return SettingsDialogFragmentBinding.inflate(inflater, container, false);
+    protected ListViewBinding inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return ListViewBinding.inflate(inflater, container, false);
     }
     
     @Override
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    protected void buildDialogDynamic(@NonNull SettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
-        SystemCalendarSettings systemCalendarSettings = new SystemCalendarSettings(null);
+    protected void buildDialogDynamic(@NonNull ListViewBinding binding, @NonNull ComponentDialog dialog) {
+        calendarConfigEntries.clear();
         
-        //                                                       two entries - title and the switch
-        List<SettingsEntryConfig> staticEntries = new ArrayList<>(2);
-        staticEntries.add(new TitleBarSettingsEntryConfig(R.string.category_system_calendars));
-        SettingsListViewAdapter staticEntriesListViewAdapter = new SettingsListViewAdapter(wrapper, staticEntries);
-        
-        var listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
+        listViewAdapter = new ConcatAdapter(new ConcatAdapter.Config.Builder()
                 .setIsolateViewTypes(false)
                 .setStableIdMode(NO_STABLE_IDS).build(),
-                staticEntriesListViewAdapter);
-        
-        ArrayList<GenericCalendarSettingsEntryConfig> calendarConfigEntries = new ArrayList<>();
+                new SettingsListViewAdapter(wrapper, staticEntries));
+        binding.recyclerView.setAdapter(listViewAdapter);
         
         new Thread(() -> {
             Collection<SystemCalendar> calendars = TodoEntryManager.getInstance(wrapper.context).getCalendars();
@@ -90,8 +93,7 @@ public class CalendarSettingsDialogFragment extends FullScreenSettingsDialogFrag
                     calendarEntryList.add(new CalendarSettingsEntryConfig(
                             systemCalendarSettings,
                             currentCalendar,
-                            showSettings,
-                            wrapper));
+                            showSettings));
                 }
                 
                 calendarConfigEntries.addAll(calendarEntryList);
@@ -99,7 +101,12 @@ public class CalendarSettingsDialogFragment extends FullScreenSettingsDialogFrag
                 wrapper.runOnUiThread(() -> listViewAdapter.addAdapter(calendarEntryListAdapter));
             }
         }, "SSCFetch thread").start();
-        
+    }
+    
+    @Override
+    protected void buildDialogStatic(@NonNull ListViewBinding binding, @NonNull ComponentDialog dialog) {
+        //                                                       two entries - title and the switch
+        staticEntries.add(new TitleBarSettingsEntryConfig(R.string.category_system_calendars));
         staticEntries.add(new SwitchSettingsEntryConfig(
                 Static.ALLOW_GLOBAL_CALENDAR_ACCOUNT_SETTINGS,
                 R.string.settings_allow_global_calendar_account_settings, (buttonView, isChecked) -> {
@@ -114,12 +121,7 @@ public class CalendarSettingsDialogFragment extends FullScreenSettingsDialogFrag
             // almost all the list is updated (except first entry)
             listViewAdapter.notifyItemRangeChanged(staticEntries.size(), calendarConfigEntries.size());
         }, false));
-        staticEntriesListViewAdapter.notifyItemInserted(staticEntries.size());
-        binding.recyclerView.setAdapter(listViewAdapter);
-    }
-    
-    @Override
-    protected void buildDialogStatic(@NonNull SettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
+        
         binding.recyclerView.addItemDecoration(new MaterialDividerItemDecoration(wrapper.context, DividerItemDecoration.VERTICAL));
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
     }

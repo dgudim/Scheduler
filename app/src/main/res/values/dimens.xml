@@ -24,7 +24,8 @@
 
     <dimen name="lockscreen_item_vertical_padding">2.5dp</dimen>
     <dimen name="list_item_vertical_padding">2dp</dimen>
-    <dimen name="bg_grid_item_padding">9dp</dimen>
+    <dimen name="grid_item_padding">9dp</dimen>
+    <dimen name="grid_item_padding_half">4.5dp</dimen>
     <dimen name="entry_settings_item_vertical_padding">3dp</dimen>
 
     <dimen name="settings_entries_margin_left_right">5dp</dimen>

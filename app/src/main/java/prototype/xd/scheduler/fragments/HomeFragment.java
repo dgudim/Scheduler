@@ -6,6 +6,7 @@ import static prototype.xd.scheduler.utilities.DateManager.getStartOfMonthDayUTC
 import static prototype.xd.scheduler.utilities.DateManager.selectDate;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayErrorDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
+import static prototype.xd.scheduler.utilities.DialogUtilities.getRecyclerviewGap;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
 import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.GITHUB_FAQ;
@@ -20,7 +21,6 @@ import static prototype.xd.scheduler.utilities.Static.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +37,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.material.divider.MaterialDividerItemDecoration;
 import com.google.android.material.navigation.NavigationView;
 
 import java.time.LocalDate;
@@ -94,10 +93,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         contentBnd.content.recyclerView.setItemAnimator(null);
         contentBnd.content.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         contentBnd.content.recyclerView.setAdapter(todoListViewAdapter);
-        MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
-        divider.setDividerColor(Color.TRANSPARENT);
-        divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.list_item_vertical_padding));
-        contentBnd.content.recyclerView.addItemDecoration(divider);
+        contentBnd.content.recyclerView.addItemDecoration(getRecyclerviewGap(wrapper, LinearLayout.VERTICAL, R.dimen.list_item_vertical_padding));
         
         DrawerLayout drawerLayout = binding.root;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

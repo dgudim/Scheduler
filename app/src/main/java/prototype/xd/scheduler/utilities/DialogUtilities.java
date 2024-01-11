@@ -2,12 +2,14 @@ package prototype.xd.scheduler.utilities;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.DimenRes;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +21,7 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.divider.MaterialDividerItemDecoration;
 
 import java.util.function.Consumer;
 import java.util.function.ObjIntConsumer;
@@ -225,5 +228,15 @@ public final class DialogUtilities {
                 .setPositiveButton(wrapper.getString(R.string.apply), listener)
                 .setNegativeButton(R.string.cancel, (dialog, which) -> {
                 }).build(), null).show();
+    }
+    
+    @NonNull
+    public static MaterialDividerItemDecoration getRecyclerviewGap(@NonNull ContextWrapper wrapper,
+                                                                   int orientation, @DimenRes int thickness) {
+        MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, orientation);
+        divider.setDividerColor(Color.TRANSPARENT);
+        divider.setLastItemDecorated(false);
+        divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(thickness));
+        return divider;
     }
 }

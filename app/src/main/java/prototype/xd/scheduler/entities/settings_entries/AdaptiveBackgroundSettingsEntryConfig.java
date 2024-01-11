@@ -13,7 +13,6 @@ import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.widget.LinearLayout;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
@@ -24,7 +23,6 @@ import com.canhub.cropper.CropImageContractOptions;
 import com.canhub.cropper.CropImageOptions;
 import com.canhub.cropper.CropImageView;
 import com.google.android.material.color.MaterialColors;
-import com.google.android.material.divider.MaterialDividerItemDecoration;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -127,11 +125,6 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
                 RecyclerView gridView = gridSelection.gridView;
                 gridView.setLayoutManager(new GridLayoutManager(wrapper.context, 3));
                 
-                MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
-                divider.setDividerColor(Color.TRANSPARENT);
-                divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(R.dimen.bg_grid_item_padding));
-                
-                gridView.addItemDecoration(divider);
                 gridView.setHasFixedSize(true);
                 gridView.setAdapter(config.gridViewAdapter);
                 

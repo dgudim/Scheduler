@@ -31,7 +31,7 @@
         android:id="@+id/GlobalSettingsDialogFragment"
         android:name="prototype.xd.scheduler.fragments.dialogs.GlobalSettingsDialogFragment"
         android:label="@string/global_settings_dialog_fragment_label"
-        tools:layout="@layout/settings_dialog_fragment">
+        tools:layout="@layout/list_view">
 
     </dialog>
 
@@ -39,8 +39,7 @@
         android:id="@+id/CalendarSettingsDialogFragment"
         android:name="prototype.xd.scheduler.fragments.dialogs.CalendarSettingsDialogFragment"
         android:label="@string/calendar_settings_dialog_fragment_label"
-        tools:layout="@layout/settings_dialog_fragment">
-    </dialog>
+        tools:layout="@layout/list_view"></dialog>
 
     <dialog
         android:id="@+id/SortingSettingsDialogFragment"

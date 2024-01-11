@@ -5,7 +5,6 @@ import static prototype.xd.scheduler.utilities.Logger.logException;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -47,13 +46,7 @@ public class PerDayBgGridViewAdapter extends RecyclerView.Adapter<PerDayBgGridVi
             
             try {
                 // load bitmap from file
-                Bitmap bitmap = readBitmapFromFile(getFile(DateManager.BG_NAMES_ROOT.get(dayId) + "_min.png"));
-                viewBinding.bgImage.setImageBitmap(bitmap);
-                
-                ViewGroup.LayoutParams params = viewBinding.bgImage.getLayoutParams();
-                params.width = (int)(bitmap.getWidth() * 1.2F);
-                params.height = (int)(bitmap.getHeight() * 1.2F);
-                viewBinding.bgImage.setLayoutParams(params);
+                viewBinding.bgImage.setImageBitmap(readBitmapFromFile(getFile(DateManager.BG_NAMES_ROOT.get(dayId) + "_min.png")));
             } catch (FileNotFoundException e) { // NOSONAR, this is fine, bg just doesn't exist
                 // set default empty image
                 viewBinding.bgImage.setImageResource(R.drawable.ic_not_90);

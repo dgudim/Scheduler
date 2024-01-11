@@ -62,6 +62,7 @@ public class SortingSettingsDialogFragment extends FullScreenSettingsDialogFragm
         MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, LinearLayout.VERTICAL);
         divider.setLastItemDecorated(false);
         binding.settingsRecyclerView.addItemDecoration(divider);
+        binding.settingsRecyclerView.setHasFixedSize(true);
         binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
     }
     
