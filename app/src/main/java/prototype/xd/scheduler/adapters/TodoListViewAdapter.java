@@ -30,7 +30,9 @@ import androidx.viewbinding.ViewBinding;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
@@ -39,13 +41,13 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.fragments.dialogs.AddEditEntryDialogFragment;
 import prototype.xd.scheduler.fragments.dialogs.CalendarEventInfoDialogFragment;
+import prototype.xd.scheduler.fragments.dialogs.CalendarSettingsDialogFragment;
+import prototype.xd.scheduler.fragments.dialogs.EntrySettingsDialogFragment;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.views.settings.EntrySettings;
-import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 /**
  * List adapter class for displaying todos and calendar entries
@@ -57,10 +59,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
      *
      * @param <V> ListSelectionTodoBinding or ListSelectionCalendarBinding
      */
-    static class EntryViewHolder<V extends ViewBinding> extends RecyclerView.ViewHolder {
+    static class EntryViewHolder<V extends ViewBinding> extends BindingViewHolder<V> {
         
-        @NonNull
-        private final V viewBinding;
         @NonNull
         private final ContextWrapper wrapper;
         
@@ -71,8 +71,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                         @NonNull final ContextWrapper wrapper,
                         @NonNull final AddEditEntryDialogFragment addEditEntryDialog,
                         @NonNull final CalendarEventInfoDialogFragment calendarEventInfoDialog) {
-            super(viewBinding.getRoot());
-            this.viewBinding = viewBinding;
+            super(viewBinding);
             this.wrapper = wrapper;
             this.addEditEntryDialog = addEditEntryDialog;
             this.calendarEventInfoDialog = calendarEventInfoDialog;
@@ -128,12 +127,12 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         /**
          * Set view parameters for a calendar entry
          *
-         * @param entry                  target entry
-         * @param systemCalendarSettings settings to open when user clicks the settings button
+         * @param entry                          target entry
+         * @param calendarSettingsDialogFragment settings to open when user clicks the settings button
          */
         private void bindToSystemCalendarEntry(@NonNull final TodoEntry entry,
-                                               @NonNull final SystemCalendarSettings systemCalendarSettings) {
-            ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding) viewBinding;
+                                               @NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment) {
+            ListSelectionCalendarBinding bnd = (ListSelectionCalendarBinding) binding;
             
             bnd.eventColor.setCardBackgroundColor(entry.getCalendarEventColor());
             bnd.timeText.setText(entry.getCalendarEntryTimeSpan(wrapper.context, currentlySelectedDayUTC));
@@ -142,9 +141,9 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
                     entry.bgColor.get(currentlySelectedDayUTC)));
             
             // open calendar settings on settings icon click and on entry long click
-            bnd.openSettingsButton.setOnClickListener(v -> systemCalendarSettings.show(entry.event, wrapper));
+            bnd.openSettingsButton.setOnClickListener(v -> calendarSettingsDialogFragment.show(entry.event, wrapper));
             bnd.backgroundLayer.setOnLongClickListener(v -> {
-                systemCalendarSettings.show(entry.event, wrapper);
+                calendarSettingsDialogFragment.show(entry.event, wrapper);
                 return true;
             });
             
@@ -155,14 +154,14 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         /**
          * Set view parameters for a regular entry
          *
-         * @param entry            target entry
-         * @param todoEntryManager entry manager (containing the entry)
-         * @param entrySettings    settings to open when user clicks the settings button
+         * @param entry                       target entry
+         * @param todoEntryManager            entry manager (containing the entry)
+         * @param entrySettingsDialogFragment settings to open when user clicks the settings button
          */
         private void bindToRegularEntry(@NonNull final TodoEntry entry,
                                         @NonNull final TodoEntryManager todoEntryManager,
-                                        @NonNull final EntrySettings entrySettings) {
-            ListSelectionTodoBinding bnd = (ListSelectionTodoBinding) viewBinding;
+                                        @NonNull final EntrySettingsDialogFragment entrySettingsDialogFragment) {
+            ListSelectionTodoBinding bnd = (ListSelectionTodoBinding) binding;
             
             bnd.deleteEntryButton.setOnClickListener(view1 -> displayDeletionDialog(entry, todoEntryManager));
             
@@ -188,10 +187,10 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
             
             // open entry settings on settings icon click and on entry long click
             bnd.backgroundLayer.setOnLongClickListener(v -> {
-                entrySettings.show(entry, wrapper.fragmentManager);
+                entrySettingsDialogFragment.show(entry, wrapper.childFragmentManager);
                 return true;
             });
-            bnd.openSettingsButton.setOnClickListener(v -> entrySettings.show(entry, wrapper.fragmentManager));
+            bnd.openSettingsButton.setOnClickListener(v -> entrySettingsDialogFragment.show(entry, wrapper.childFragmentManager));
         }
         
         /**
@@ -201,8 +200,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
          */
         private void bindToCommonPart(@NonNull final TodoEntry entry) {
             // fallback to get view by id because this part is common and we can't cast to any binding
-            View root = viewBinding.getRoot();
-            TextView todoText = root.findViewById(R.id.todoText);
+            View root = binding.getRoot();
+            TextView todoText = root.findViewById(R.id.eventText);
             MaterialCardView backgroundLayer = root.findViewById(R.id.backgroundLayer);
             
             int bgColor = entry.bgColor.get(currentlySelectedDayUTC);
@@ -238,20 +237,20 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         /**
          * Outer binding method
          *
-         * @param currentEntry           target entry
-         * @param todoEntryManager       entry manager (containing the entry)
-         * @param entrySettings          settings to open when user clicks the settings button on a regular entry
-         * @param systemCalendarSettings settings to open when user clicks the settings button on a calendar entry
+         * @param currentEntry                   target entry
+         * @param todoEntryManager               entry manager (containing the entry)
+         * @param entrySettingsDialogFragment    settings to open when user clicks the settings button on a regular entry
+         * @param calendarSettingsDialogFragment settings to open when user clicks the settings button on a calendar entry
          */
         void bindTo(@NonNull final TodoEntry currentEntry,
                     @NonNull final TodoEntryManager todoEntryManager,
-                    @NonNull final EntrySettings entrySettings,
-                    @NonNull final SystemCalendarSettings systemCalendarSettings) {
+                    @NonNull final EntrySettingsDialogFragment entrySettingsDialogFragment,
+                    @NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment) {
             
             if (currentEntry.isFromSystemCalendar()) {
-                bindToSystemCalendarEntry(currentEntry, systemCalendarSettings);
+                bindToSystemCalendarEntry(currentEntry, calendarSettingsDialogFragment);
             } else {
-                bindToRegularEntry(currentEntry, todoEntryManager, entrySettings);
+                bindToRegularEntry(currentEntry, todoEntryManager, entrySettingsDialogFragment);
             }
             
             bindToCommonPart(currentEntry);
@@ -264,29 +263,36 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     private final List<TodoEntry> currentTodoEntries;
     
     @NonNull
-    private final EntrySettings entrySettings;
+    private final EntrySettingsDialogFragment entrySettingsDialogFragment;
     @NonNull
-    private final SystemCalendarSettings systemCalendarSettings;
+    private final CalendarSettingsDialogFragment calendarSettingsDialogFragment;
     @NonNull
     private final ContextWrapper wrapper;
     
     public final AddEditEntryDialogFragment addEditEntryDialog;
     public final CalendarEventInfoDialogFragment calendarEventInfoDialog;
     
+    private Supplier<Collection<TodoEntry>> todoEntryListSupplier;
+    
     // default capacity is fine
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    public TodoListViewAdapter(@NonNull final ContextWrapper wrapper,
-                               @NonNull final TodoEntryManager todoEntryManager) {
+    public TodoListViewAdapter(@NonNull final ContextWrapper wrapper) {
         
-        this.todoEntryManager = todoEntryManager;
+        todoEntryManager = TodoEntryManager.getInstance(wrapper.context);
         this.wrapper = wrapper;
         currentTodoEntries = new ArrayList<>();
-        entrySettings = new EntrySettings(todoEntryManager);
-        systemCalendarSettings = new SystemCalendarSettings(todoEntryManager);
+        entrySettingsDialogFragment = new EntrySettingsDialogFragment(todoEntryManager);
+        calendarSettingsDialogFragment = new CalendarSettingsDialogFragment(todoEntryManager);
         addEditEntryDialog = new AddEditEntryDialogFragment();
         calendarEventInfoDialog = new CalendarEventInfoDialogFragment();
+        todoEntryListSupplier = () -> todoEntryManager.getVisibleTodoEntriesInList(currentlySelectedDayUTC);
         // each entry has a unique id
         setHasStableIds(true);
+    }
+    
+    public void setListSupplier(@NonNull Supplier<Collection<TodoEntry>> todoEntryListSupplier) {
+        this.todoEntryListSupplier = todoEntryListSupplier;
+        notifyEntryListChanged();
     }
     
     @Override
@@ -305,7 +311,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     public void notifyEntryListChanged() {
         int prevItemsCount = currentTodoEntries.size();
         currentTodoEntries.clear();
-        currentTodoEntries.addAll(todoEntryManager.getVisibleTodoEntriesInList(currentlySelectedDayUTC));
+        currentTodoEntries.addAll(todoEntryListSupplier.get());
         notifyItemRangeChanged(0, max(prevItemsCount, currentTodoEntries.size()));
     }
     
@@ -327,7 +333,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     
     @Override
     public void onBindViewHolder(@NonNull EntryViewHolder<?> holder, int position) {
-        holder.bindTo(currentTodoEntries.get(position), todoEntryManager, entrySettings, systemCalendarSettings);
+        holder.bindTo(currentTodoEntries.get(position), todoEntryManager, entrySettingsDialogFragment, calendarSettingsDialogFragment);
     }
     
     @Override

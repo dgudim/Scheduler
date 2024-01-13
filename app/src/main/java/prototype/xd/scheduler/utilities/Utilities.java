@@ -73,8 +73,8 @@ import prototype.xd.scheduler.entities.GroupList;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.entities.TodoEntryList;
+import prototype.xd.scheduler.fragments.dialogs.PopupSettingsDialogFragment;
 import prototype.xd.scheduler.views.Switch;
-import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
 @SuppressWarnings("unchecked")
 public final class Utilities {
@@ -427,7 +427,7 @@ public final class Utilities {
     public static void setSliderChangeListener(@NonNull final TextView displayTo,
                                                @NonNull final Slider slider,
                                                @NonNull final TextView stateIcon,
-                                               @NonNull final PopupSettingsView settingsView,
+                                               @NonNull final PopupSettingsDialogFragment settingsView,
                                                @StringRes @PluralsRes final int stringResource,
                                                @NonNull final Static.DefaultedInteger value,
                                                @NonNull final ToIntFunction<Static.DefaultedInteger> initialValueFactory,
@@ -468,7 +468,7 @@ public final class Utilities {
     public static void setSliderChangeListener(@NonNull final TextView displayTo,
                                                @NonNull final Slider slider,
                                                @NonNull final TextView stateIcon,
-                                               @NonNull final PopupSettingsView systemCalendarSettings,
+                                               @NonNull final PopupSettingsDialogFragment systemCalendarSettings,
                                                @StringRes @PluralsRes final int stringResource,
                                                @NonNull final Static.DefaultedInteger value,
                                                @NonNull final ToIntFunction<Static.DefaultedInteger> initialValueFactory,
@@ -494,7 +494,7 @@ public final class Utilities {
     //switch listener for calendar settings and entry settings
     public static void setSwitchChangeListener(@NonNull final Switch tSwitch,
                                                @NonNull final TextView stateIcon,
-                                               @NonNull final PopupSettingsView settingsView,
+                                               @NonNull final PopupSettingsDialogFragment settingsView,
                                                @NonNull final Static.DefaultedBoolean value,
                                                @NonNull final Predicate<Static.DefaultedBoolean> initialValueFactory) {
         tSwitch.setCheckedSilent(initialValueFactory.test(value));

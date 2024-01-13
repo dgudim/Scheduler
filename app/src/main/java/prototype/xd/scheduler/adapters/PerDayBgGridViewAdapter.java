@@ -26,39 +26,6 @@ public class PerDayBgGridViewAdapter extends RecyclerView.Adapter<PerDayBgGridVi
     
     public static final String NAME = PerDayBgGridViewAdapter.class.getSimpleName();
     
-    
-    /**
-     * View holder for this adapter
-     */
-    static class EntryViewHolder extends RecyclerView.ViewHolder {
-        
-        @NonNull
-        private final BackgroundImageEntryBinding viewBinding;
-        
-        EntryViewHolder(@NonNull final BackgroundImageEntryBinding viewBinding) {
-            super(viewBinding.getRoot());
-            this.viewBinding = viewBinding;
-        }
-        
-        private void bind(final int dayId, @NonNull String defaultDay, @NonNull IntConsumer bgSelectionClickedCallback) {
-
-            viewBinding.bgTitle.setText(DateManager.getLocalWeekdayByIndex(dayId, defaultDay));
-            
-            try {
-                // load bitmap from file
-                viewBinding.bgImage.setImageBitmap(readBitmapFromFile(getFile(DateManager.BG_NAMES_ROOT.get(dayId) + "_min.png")));
-            } catch (FileNotFoundException e) { // NOSONAR, this is fine, bg just doesn't exist
-                // set default empty image
-                viewBinding.bgImage.setImageResource(R.drawable.ic_not_90);
-            } catch (IOException e) {
-                logException(NAME, e);
-            }
-    
-            viewBinding.bgImageContainer.setOnClickListener(v -> bgSelectionClickedCallback.accept(dayId));
-        }
-    }
-    
-    
     // called when a user clicks on an image to select a new one
     @NonNull
     private final IntConsumer bgSelectionClickedCallback;
@@ -71,6 +38,33 @@ public class PerDayBgGridViewAdapter extends RecyclerView.Adapter<PerDayBgGridVi
         this.bgSelectionClickedCallback = bgSelectionClickedCallback;
         // each day has a unique id
         setHasStableIds(true);
+    }
+    
+    /**
+     * View holder for this adapter
+     */
+    static class EntryViewHolder extends BindingViewHolder<BackgroundImageEntryBinding> {
+        
+        EntryViewHolder(@NonNull BackgroundImageEntryBinding binding) {
+            super(binding);
+        }
+        
+        private void bind(final int dayId, @NonNull String defaultDay, @NonNull IntConsumer bgSelectionClickedCallback) {
+            
+            binding.bgTitle.setText(DateManager.getLocalWeekdayByIndex(dayId, defaultDay));
+            
+            try {
+                // load bitmap from file
+                binding.bgImage.setImageBitmap(readBitmapFromFile(getFile(DateManager.BG_NAMES_ROOT.get(dayId) + "_min.png")));
+            } catch (FileNotFoundException e) { // NOSONAR, this is fine, bg just doesn't exist
+                // set default empty image
+                binding.bgImage.setImageResource(R.drawable.ic_not_90);
+            } catch (IOException e) {
+                logException(NAME, e);
+            }
+            
+            binding.bgImageContainer.setOnClickListener(v -> bgSelectionClickedCallback.accept(dayId));
+        }
     }
     
     @NonNull

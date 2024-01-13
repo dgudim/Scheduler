@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.views.settings;
+package prototype.xd.scheduler.fragments.dialogs;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -16,14 +16,14 @@ import androidx.fragment.app.DialogFragment;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
-import prototype.xd.scheduler.fragments.dialogs.BaseCachedDialogFragment;
+import prototype.xd.scheduler.entities.settings_entries.EntryPreviewContainer;
 import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
 // TODO: use ViewModel and savedInstanceState to transfer data instead of using the constructor for proper config updates
 @MainThread
-public abstract class PopupSettingsView extends BaseCachedDialogFragment<EntrySettingsBinding, ComponentDialog> {
+public abstract class PopupSettingsDialogFragment extends BaseCachedDialogFragment<EntrySettingsBinding, ComponentDialog> {
     
     @SuppressLint("UnknownNullness")
     protected EntryPreviewContainer entryPreviewContainer;
@@ -47,7 +47,7 @@ public abstract class PopupSettingsView extends BaseCachedDialogFragment<EntrySe
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
     }
     
-    PopupSettingsView(@Nullable final TodoEntryManager todoEntryManager) {
+    PopupSettingsDialogFragment(@Nullable final TodoEntryManager todoEntryManager) {
         this.todoEntryManager = todoEntryManager;
     }
     

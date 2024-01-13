@@ -37,7 +37,7 @@
 
     <dialog
         android:id="@+id/CalendarSettingsDialogFragment"
-        android:name="prototype.xd.scheduler.fragments.dialogs.CalendarSettingsDialogFragment"
+        android:name="prototype.xd.scheduler.fragments.dialogs.AllCalendarSettingsDialogFragment"
         android:label="@string/calendar_settings_dialog_fragment_label"
         tools:layout="@layout/list_view"></dialog>
 

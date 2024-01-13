@@ -21,7 +21,7 @@ public class CalendarEventInfoDialogFragment extends BaseCachedDialogFragment<Ca
     public void show(@Nullable TodoEntry entry,
                      @NonNull ContextWrapper wrapper) {
         this.entry = entry;
-        show(wrapper.fragmentManager, entry + " info");
+        show(wrapper.childFragmentManager, entry + " info");
     }
     
     @Override

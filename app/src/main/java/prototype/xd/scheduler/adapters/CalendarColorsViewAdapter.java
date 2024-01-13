@@ -2,6 +2,7 @@ package prototype.xd.scheduler.adapters;
 
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -11,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CalendarColorEntryBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.fragments.dialogs.CalendarSettingsDialogFragment;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 /**
  * Grid adapter class for displaying per color event settings
@@ -20,41 +21,40 @@ import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 public class CalendarColorsViewAdapter extends RecyclerView.Adapter<CalendarColorsViewAdapter.EntryViewHolder> {
     
     @NonNull
-    private final SystemCalendarSettings systemCalendarSettings;
+    private final CalendarSettingsDialogFragment calendarSettingsDialogFragment;
     
-    @NonNull
-    private final SystemCalendar calendar;
+    private SystemCalendar calendar;
     
     @NonNull
     private final ContextWrapper wrapper;
     
-    public CalendarColorsViewAdapter(@NonNull final SystemCalendarSettings systemCalendarSettings,
-                                     @NonNull final SystemCalendar calendar,
+    public CalendarColorsViewAdapter(@NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment,
                                      @NonNull final ContextWrapper wrapper) {
-        this.systemCalendarSettings = systemCalendarSettings;
-        this.calendar = calendar;
+        this.calendarSettingsDialogFragment = calendarSettingsDialogFragment;
         this.wrapper = wrapper;
         // No colors repeat
         setHasStableIds(true);
     }
     
+    @SuppressLint("NotifyDataSetChanged")
+    public void setCalendar(@NonNull SystemCalendar calendar) {
+        this.calendar = calendar;
+        notifyDataSetChanged();
+    }
+    
     /**
      * View holder for this adapter
      */
-    static class EntryViewHolder extends RecyclerView.ViewHolder {
+    static class EntryViewHolder extends BindingViewHolder<CalendarColorEntryBinding> {
         
-        @NonNull
-        private final CalendarColorEntryBinding binding;
-        
-        EntryViewHolder(@NonNull final CalendarColorEntryBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
+        EntryViewHolder(@NonNull CalendarColorEntryBinding binding) {
+            super(binding);
         }
         
         private void bind(int eventColor, int eventCount,
                           @NonNull ContextWrapper wrapper,
                           @NonNull final SystemCalendar calendar,
-                          @NonNull final SystemCalendarSettings systemCalendarSettings) {
+                          @NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment) {
             
             String eventPrefKey = calendar.makeEventPrefKey(eventColor);
             
@@ -62,7 +62,7 @@ public class CalendarColorsViewAdapter extends RecyclerView.Adapter<CalendarColo
             binding.titleDefault.setVisibility(eventCount == calendar.data.color ? View.VISIBLE : View.GONE);
             binding.eventCount.setText(getPluralString(binding.getRoot().getContext(), R.plurals.calendar_event_count, eventCount));
             binding.openSettingsButton.setOnClickListener(v ->
-                    systemCalendarSettings.show(
+                    calendarSettingsDialogFragment.show(
                             eventPrefKey, calendar.makeEventSubKeys(eventPrefKey),
                             eventColor, wrapper));
         }
@@ -80,7 +80,7 @@ public class CalendarColorsViewAdapter extends RecyclerView.Adapter<CalendarColo
         holder.bind(
                 calendar.eventColorCountMap.keyAt(position),
                 calendar.eventColorCountMap.valueAt(position),
-                wrapper, calendar, systemCalendarSettings);
+                wrapper, calendar, calendarSettingsDialogFragment);
     }
     
     @Override

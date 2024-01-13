@@ -116,8 +116,8 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
         @SuppressLint("InlinedApi")
         @Override
         void bind(ImportExportSettingsEntryConfig config) {
-            viewBinding.exportSettingsButton.setOnClickListener(v -> config.launchExportPicker());
-            viewBinding.importSettingsButton.setOnClickListener(v -> config.launchImportPicker());
+            binding.exportSettingsButton.setOnClickListener(v -> config.launchExportPicker());
+            binding.importSettingsButton.setOnClickListener(v -> config.launchImportPicker());
         }
     }
 }

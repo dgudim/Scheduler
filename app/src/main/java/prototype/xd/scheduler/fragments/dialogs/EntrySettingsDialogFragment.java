@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.views.settings;
+package prototype.xd.scheduler.fragments.dialogs;
 
 import static java.lang.Math.max;
 import static prototype.xd.scheduler.entities.Group.findGroupInList;
@@ -30,21 +30,21 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
 import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
-import prototype.xd.scheduler.fragments.dialogs.AddEditGroupDialogFragment;
+import prototype.xd.scheduler.entities.settings_entries.EntryPreviewContainer;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
 
-public class EntrySettings extends PopupSettingsView {
+public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment {
     
     @NonNull
-    public final TodoEntryManager todoEntryManager;
+    public final TodoEntryManager nntodoEntryManager;
     private TodoEntry entry;
     private final AddEditGroupDialogFragment addEditGroupDialog;
     
-    public EntrySettings(@NonNull final TodoEntryManager todoEntryManager) {
+    public EntrySettingsDialogFragment(@NonNull final TodoEntryManager todoEntryManager) {
         super(todoEntryManager);
-        this.todoEntryManager = todoEntryManager;
+        nntodoEntryManager = todoEntryManager;
         addEditGroupDialog = new AddEditGroupDialogFragment();
     }
     
@@ -103,7 +103,7 @@ public class EntrySettings extends PopupSettingsView {
         updateAllIndicators(bnd);
         entryPreviewContainer.refreshAll(true);
         
-        final List<Group> groupList = todoEntryManager.getGroups();
+        final List<Group> groupList = nntodoEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, wrapper));
         bnd.groupSpinner.setSelectedItem(max(Group.groupIndexInList(groupList, entry.getRawGroupName()), 0));
         
@@ -130,19 +130,19 @@ public class EntrySettings extends PopupSettingsView {
                             groupIndex = Group.groupIndexInList(groupList, newName);
                         }
                         
-                        todoEntryManager.setNewGroupName(selectedGroup, newName);
+                        nntodoEntryManager.setNewGroupName(selectedGroup, newName);
                         bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
                     }, additionDialog ->
                             displayDeletionDialog(wrapper, (deletionDialog, whichButton) -> {
                                 additionDialog.dismiss();
-                                todoEntryManager.removeGroup(selection);
+                                nntodoEntryManager.removeGroup(selection);
                                 rebuild();
                             }), wrapper);
             
         });
         
         bnd.groupSpinner.setOnItemClickListener((parent, view, position, id) -> {
-            if (todoEntryManager.changeEntryGroup(entry, groupList.get(position))) {
+            if (nntodoEntryManager.changeEntryGroup(entry, groupList.get(position))) {
                 rebuild();
             }
         });
@@ -173,7 +173,7 @@ public class EntrySettings extends PopupSettingsView {
                     builder.setNegativeButton(R.string.cancel, null);
                     
                     builder.setPositiveButton(R.string.reset, (dialogInterface, whichButton) -> {
-                        if (todoEntryManager.resetEntrySettings(entry)) {
+                        if (nntodoEntryManager.resetEntrySettings(entry)) {
                             rebuild();
                         }
                     });
@@ -247,10 +247,10 @@ public class EntrySettings extends PopupSettingsView {
         boolean rebuild;
         if (existingGroup != null) {
             // automatically handles parameter invalidation on other entries and saving of the group
-            rebuild = todoEntryManager.setNewGroupParams(existingGroup, entry.getDisplayParams());
+            rebuild = nntodoEntryManager.setNewGroupParams(existingGroup, entry.getDisplayParams());
         } else {
             var newGroup = new Group(groupName, entry.getDisplayParams());
-            todoEntryManager.addGroup(newGroup);
+            nntodoEntryManager.addGroup(newGroup);
             entry.changeGroup(newGroup);
             rebuild = true;
         }

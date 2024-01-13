@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 
 import prototype.xd.scheduler.utilities.Logger;
+import prototype.xd.scheduler.utilities.TimeRange;
 
 public class SystemCalendarEvent {
     
@@ -156,6 +157,11 @@ public class SystemCalendarEvent {
         return new DateTimeZonePair(datesToParse, newTimeZone);
     }
     
+    @NonNull
+    public TimeRange getFirstInstanceTimeRange() {
+        return new TimeRange(startMsUTC, startMsUTC + durationMs);
+    }
+    
     public boolean isAssociatedWithEntry() {
         return associatedEntry != null;
     }
@@ -233,7 +239,7 @@ public class SystemCalendarEvent {
         }
     }
     
-    protected boolean isRecurring() {
+    public boolean isRecurring() {
         return rSet != null;
     }
     

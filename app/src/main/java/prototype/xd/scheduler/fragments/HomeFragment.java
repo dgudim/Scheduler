@@ -74,7 +74,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         // select current day
         selectDate(LocalDate.now());
         todoEntryManager = TodoEntryManager.getInstance(wrapper.context);
-        todoListViewAdapter = new TodoListViewAdapter(wrapper, todoEntryManager);
+        todoListViewAdapter = new TodoListViewAdapter(wrapper);
     }
     
     @NonNull
@@ -245,7 +245,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         }
     }
     
-    public void notifyDatesetChanged() {
+    public void notifyDatasetChanged() {
         todoEntryManager.notifyDatasetChanged();
     }
 }

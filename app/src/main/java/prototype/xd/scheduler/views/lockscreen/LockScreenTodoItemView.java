@@ -43,7 +43,7 @@ import prototype.xd.scheduler.utilities.Static;
 public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
     @NonNull
-    protected final V viewBinding;
+    protected final V binding;
     @NonNull
     private final View root;
     private final Context context;
@@ -51,7 +51,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     private static final Pattern timeSplitPattern = Pattern.compile(Static.TIME_RANGE_SEPARATOR);
     
     LockScreenTodoItemView(@NonNull V binding) {
-        viewBinding = binding;
+        this.binding = binding;
         root = binding.getRoot();
         context = binding.getRoot().getContext();
     }
@@ -120,7 +120,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     public abstract void setBackgroundDrawable(@NonNull Drawable bitmapDrawable);
     
     void setBackgroundBitmap(@NonNull Bitmap bgBitmap) {
-        Resources resources = viewBinding.getRoot().getResources();
+        Resources resources = binding.getRoot().getResources();
         RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, ImageUtilities.makeMutable(bgBitmap));
         roundedBitmapDrawable.setCornerRadius(resources.getDimensionPixelSize(R.dimen.card_corner_radius) - dpToPx(1));
         // For some reason -1dp is needed
@@ -152,7 +152,7 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
             hideIndicatorAndTime();
         }
         
-        viewBinding.getRoot().setLayoutParams(new LinearLayout.LayoutParams(
+        binding.getRoot().setLayoutParams(new LinearLayout.LayoutParams(
                 ITEM_FULL_WIDTH_LOCK.get() ?
                         ViewGroup.LayoutParams.MATCH_PARENT : ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT));

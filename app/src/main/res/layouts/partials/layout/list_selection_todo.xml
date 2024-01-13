@@ -58,7 +58,7 @@
                 tools:ignore="RtlSymmetry" />
 
             <TextView
-                android:id="@+id/todoText"
+                android:id="@+id/eventText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"

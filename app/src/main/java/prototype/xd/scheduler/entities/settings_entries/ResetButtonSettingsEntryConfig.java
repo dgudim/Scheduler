@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ResetButtonSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.DialogUtilities;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
     
@@ -32,7 +32,7 @@ public class ResetButtonSettingsEntryConfig extends SettingsEntryConfig {
         
         @Override
         void bind(@NonNull ResetButtonSettingsEntryConfig config) {
-            viewBinding.resetSettingsButton.setOnClickListener(v ->
+            binding.resetSettingsButton.setOnClickListener(v ->
                     DialogUtilities.displayMessageDialog(wrapper, builder -> {
                         builder.setTitle(R.string.reset_settings_prompt);
                         builder.setMessage(R.string.reset_settings_description);

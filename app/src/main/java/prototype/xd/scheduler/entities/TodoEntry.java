@@ -5,8 +5,6 @@ import static java.lang.Math.abs;
 import static prototype.xd.scheduler.entities.Group.NULL_GROUP;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
-import static prototype.xd.scheduler.utilities.DateManager.msToDays;
-import static prototype.xd.scheduler.utilities.DateManager.msUTCtoDaysLocal;
 import static prototype.xd.scheduler.utilities.ImageUtilities.getExpiredUpcomingColor;
 import static prototype.xd.scheduler.utilities.ImageUtilities.mixColorWithBg;
 import static prototype.xd.scheduler.utilities.Static.TIME_RANGE_SEPARATOR;
@@ -42,6 +40,7 @@ import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.TimeRange;
 import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.utilities.misc.CachedGetter;
 import prototype.xd.scheduler.utilities.misc.Ephemeral;
@@ -130,52 +129,6 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
                 }
             }
             return this;
-        }
-    }
-    
-    public static class TimeRange {
-        
-        public static final String NAME = TimeRange.class.getSimpleName();
-        
-        public static final TimeRange NullRange = new TimeRange(-1, -1);
-        
-        private boolean inDays;
-        
-        private long start;
-        private long end;
-        
-        TimeRange(long startMsUTC, long endMsUTC) {
-            start = startMsUTC;
-            end = endMsUTC;
-        }
-        
-        @NonNull
-        public TimeRange toDays(boolean clone, boolean local) {
-            if (clone) {
-                return new TimeRange(start, end).toDays(false, local);
-            }
-            if (inDays) {
-                Logger.warning(NAME, "Trying to convert range to days but it's already in days");
-                return this;
-            }
-            start = local ? msUTCtoDaysLocal(start) : msToDays(start);
-            end = local ? msUTCtoDaysLocal(end) : msToDays(end);
-            inDays = true;
-            return this;
-        }
-        
-        public long getStart() {
-            return start;
-        }
-        
-        public long getEnd() {
-            return end;
-        }
-        
-        @NonNull
-        @Override
-        public String toString() {
-            return "Time range in " + (inDays ? "days" : "ms") + " from " + start + " to " + end;
         }
     }
     

@@ -8,8 +8,8 @@ import androidx.annotation.StringRes;
 import java.util.List;
 
 import prototype.xd.scheduler.databinding.DropdownSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
     
@@ -58,10 +58,10 @@ public class DropdownSettingsEntryConfig<T> extends SettingsEntryConfig {
         
         @Override
         void bind(@NonNull DropdownSettingsEntryConfig<?> config) {
-            viewBinding.textInputLayout.setHint(config.hintId);
-            viewBinding.dropdownSpinner.setSimpleItems(config.displayItems);
-            viewBinding.dropdownSpinner.setSelectedItem(config.getValueIndex());
-            viewBinding.dropdownSpinner.setOnItemClickListener((parent, view, position, id) -> config.putValueIndex(position));
+            binding.textInputLayout.setHint(config.hintId);
+            binding.dropdownSpinner.setSimpleItems(config.displayItems);
+            binding.dropdownSpinner.setSelectedItem(config.getValueIndex());
+            binding.dropdownSpinner.setOnItemClickListener((parent, view, position, id) -> config.putValueIndex(position));
         }
     }
     

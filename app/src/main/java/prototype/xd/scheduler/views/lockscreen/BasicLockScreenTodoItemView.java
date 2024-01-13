@@ -21,82 +21,82 @@ public class BasicLockScreenTodoItemView extends LockScreenTodoItemView<BasicEnt
     @NonNull
     @Override
     public View getClickableRoot() {
-        return viewBinding.backgroundOutline;
+        return binding.backgroundOutline;
     }
     
     @NonNull
     @Override
     public BasicLockScreenTodoItemView setBackgroundColor(@ColorInt int color) {
-        viewBinding.backgroundMain.setBackgroundColor(color);
+        binding.backgroundMain.setBackgroundColor(color);
         return this;
     }
     
     @NonNull
     @Override
     public BasicLockScreenTodoItemView setBorderColor(@ColorInt int color) {
-        viewBinding.backgroundOutline.setBackgroundColor(color);
+        binding.backgroundOutline.setBackgroundColor(color);
         return this;
     }
     
     @NonNull
     @Override
     public BasicLockScreenTodoItemView setTitleTextColor(@ColorInt int color) {
-        viewBinding.titleText.setTextColor(color);
+        binding.titleText.setTextColor(color);
         return this;
     }
     
     @NonNull
     @Override
     public BasicLockScreenTodoItemView setIndicatorColor(@ColorInt int color) {
-        viewBinding.indicatorView.setBackgroundColor(color);
+        binding.indicatorView.setBackgroundColor(color);
         return this;
     }
     
     @NonNull
     @Override
     public BasicLockScreenTodoItemView setTimeTextColor(@ColorInt int color) {
-        viewBinding.timeText.setTextColor(color);
+        binding.timeText.setTextColor(color);
         return this;
     }
     
     @Override
     public void setBackgroundDrawable(@NonNull Drawable drawable) {
-        viewBinding.backgroundMain.setBackground(drawable);
+        binding.backgroundMain.setBackground(drawable);
     }
     
     @Override
     void setBackgroundBitmap(@NonNull Bitmap bgBitmap) {
-        setBackgroundDrawable(new BitmapDrawable(viewBinding.getRoot().getResources(), ImageUtilities.makeMutable(bgBitmap)));
+        setBackgroundDrawable(new BitmapDrawable(binding.getRoot().getResources(), ImageUtilities.makeMutable(bgBitmap)));
     }
     
     @Override
     public void setBorderSizePX(int sizePX) {
-        viewBinding.backgroundOutline.setPadding(sizePX, sizePX, sizePX, sizePX);
+        binding.backgroundOutline.setPadding(sizePX, sizePX, sizePX, sizePX);
     }
     
     @Override
     public void setTitleText(@NonNull String text) {
-        viewBinding.titleText.setText(text);
+        binding.titleText.setText(text);
     }
     
     @Override
     public void setTitleTextSize(float sizeSP) {
-        viewBinding.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizeSP);
+        binding.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizeSP);
     }
     
     @Override
     public void setTimeSpanText(@NonNull String text) {
-        viewBinding.timeText.setText(text);
+        binding.timeText.setText(text);
     }
     
     @Override
     public void setTimeTextSize(float sizeSP) {
-        viewBinding.timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizeSP);
+        binding.timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, sizeSP);
     }
     
     @Override
     public void hideIndicatorAndTime() {
-        viewBinding.timeText.setVisibility(View.GONE);
-        viewBinding.indicatorView.setVisibility(View.GONE);
+        binding.timeText.setVisibility(View.GONE);
+        binding.indicatorView.setVisibility(View.GONE);
     }
 }

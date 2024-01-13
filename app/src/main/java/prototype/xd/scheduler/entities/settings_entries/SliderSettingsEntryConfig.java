@@ -84,7 +84,7 @@ public class SliderSettingsEntryConfig extends SettingsEntryConfig {
         
         @Override
         void bind(@NonNull SliderSettingsEntryConfig config) {
-            bindExternal(config, viewBinding.slider, viewBinding.sliderDescription);
+            bindExternal(config, binding.slider, binding.sliderDescription);
         }
     }
 }

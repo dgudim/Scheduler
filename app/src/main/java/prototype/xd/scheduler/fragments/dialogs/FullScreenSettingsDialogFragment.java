@@ -58,7 +58,7 @@ public abstract class FullScreenSettingsDialogFragment<T extends ViewBinding> ex
     @CallSuper
     public void onDismiss(@NonNull DialogInterface dialog) {
         if (!Objects.equals(preferenceStateBefore, Static.getAll())) {
-            findFragmentInNavHost(requireActivity(), HomeFragment.class).notifyDatesetChanged();
+            findFragmentInNavHost(requireActivity(), HomeFragment.class).notifyDatasetChanged();
         }
         super.onDismiss(dialog);
     }

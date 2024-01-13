@@ -9,9 +9,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import prototype.xd.scheduler.databinding.SwitchSettingsEntryBinding;
-import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
     
@@ -51,9 +51,9 @@ public class SwitchSettingsEntryConfig extends SettingsEntryConfig {
         
         @Override
         void bind(@NonNull SwitchSettingsEntryConfig config) {
-            viewBinding.mainSwitch.setText(config.textId);
+            binding.mainSwitch.setText(config.textId);
             Utilities.setSwitchChangeListener(
-                    viewBinding.mainSwitch,
+                    binding.mainSwitch,
                     config.value,
                     config.onCheckedChangeListener);
         }

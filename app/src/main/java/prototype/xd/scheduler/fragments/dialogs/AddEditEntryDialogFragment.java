@@ -37,7 +37,7 @@ public class AddEditEntryDialogFragment extends BaseCachedDialogFragment<AddEdit
         this.entry = entry;
         this.groupList = groupList;
         this.confirmationListener = confirmationListener;
-        show(wrapper.fragmentManager, "add_edit" + entry);
+        show(wrapper.childFragmentManager, "add_edit" + entry);
     }
     
     @Override
@@ -76,8 +76,8 @@ public class AddEditEntryDialogFragment extends BaseCachedDialogFragment<AddEdit
                     dismiss();
                 }));
         
-        binding.dayFromButton.setup(wrapper.fragmentManager, entry == null ? currentlySelectedDayUTC : entry.startDayLocal.get());
-        binding.dayToButton.setup(wrapper.fragmentManager, entry == null ? currentlySelectedDayUTC : entry.endDayLocal.get());
+        binding.dayFromButton.setup(wrapper.childFragmentManager, entry == null ? currentlySelectedDayUTC : entry.startDayLocal.get());
+        binding.dayToButton.setup(wrapper.childFragmentManager, entry == null ? currentlySelectedDayUTC : entry.endDayLocal.get());
         
         binding.globalEntrySwitch.setChecked(entry != null && entry.isGlobal());
         

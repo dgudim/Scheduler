@@ -14,15 +14,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.Objects;
 
+import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public abstract class BaseCachedDialogFragment<T extends ViewBinding, D extends Dialog> extends DialogFragment {
+    
+    public static final String NAME = BaseCachedDialogFragment.class.getSimpleName();
     
     @SuppressLint("UnknownNullness")
     protected ContextWrapper wrapper;
@@ -33,8 +37,16 @@ public abstract class BaseCachedDialogFragment<T extends ViewBinding, D extends 
     
     @NonNull
     protected abstract T inflate(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
+    
     @NonNull
     protected abstract D buildDialog();
+    
+    @Override
+    public void show(@NonNull FragmentManager manager, @Nullable String tag) {
+        // TODO: handle double invocation
+        Logger.debug(NAME, "Showing dialog fragment: " + tag + " using fragment manager: " + manager + " with " + manager.getFragments().size() + " fragments");
+        super.show(manager, tag);
+    }
     
     @NonNull
     public AlertDialog getAlertDialog() {
@@ -69,12 +81,16 @@ public abstract class BaseCachedDialogFragment<T extends ViewBinding, D extends 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         boolean initialStart = binding == null;
         if (initialStart) {
+            long time = System.currentTimeMillis();
             binding = inflate(inflater, container);
             buildDialogStatic(binding, dialog);
+            Logger.infoWithTime(NAME, "Build dialog static + inflation {time}", time);
         }
+        long time = System.currentTimeMillis();
         buildDialogDynamic(binding, dialog);
+        Logger.infoWithTime(NAME, "Build dialog dynamic {time}", time);
         if (initialStart) {
-            if (dialog instanceof AlertDialog){
+            if (dialog instanceof AlertDialog) {
                 ((AlertDialog) dialog).setView(binding.getRoot());
             } else {
                 dialog.setContentView(binding.getRoot());
@@ -82,7 +98,6 @@ public abstract class BaseCachedDialogFragment<T extends ViewBinding, D extends 
         }
         return null;
     }
-    
     
     
     // fragment creation begin

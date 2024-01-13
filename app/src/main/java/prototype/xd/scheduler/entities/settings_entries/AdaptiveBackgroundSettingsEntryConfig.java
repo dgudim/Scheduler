@@ -93,7 +93,7 @@ public class AdaptiveBackgroundSettingsEntryConfig extends SettingsEntryConfig {
         
         @Override
         void bind(@NonNull AdaptiveBackgroundSettingsEntryConfig config) {
-            viewBinding.adaptiveBgSettings.setOnClickListener(v -> {
+            binding.adaptiveBgSettings.setOnClickListener(v -> {
                 
                 BgGridSelectionViewBinding gridSelection = BgGridSelectionViewBinding.inflate(wrapper.getLayoutInflater());
                 

@@ -60,7 +60,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     @Nullable
     private CalendarView calendarView;
     
-    private Map<Long, SystemCalendar> calendars;
+    private ArrayMap<Long, SystemCalendar> calendars;
     @Nullable
     private TodoEntryList todoEntries;
     private GroupList groups;

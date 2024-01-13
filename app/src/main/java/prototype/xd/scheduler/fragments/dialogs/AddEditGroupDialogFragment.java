@@ -32,7 +32,7 @@ public class AddEditGroupDialogFragment extends BaseCachedDialogFragment<AddEdit
         this.confirmationListener = confirmationListener;
         this.deletionListener = deletionListener;
         this.group = group;
-        show(wrapper.fragmentManager, "add_edit" + group);
+        show(wrapper.childFragmentManager, "add_edit" + group);
     }
     
     @Override

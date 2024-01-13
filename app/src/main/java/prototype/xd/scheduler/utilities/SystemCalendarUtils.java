@@ -77,7 +77,7 @@ public final class SystemCalendarUtils {
      * @return a map of system calendars
      */
     @NonNull
-    public static Map<Long, SystemCalendar> loadCalendars(@NonNull Context context, @NonNull Map<Long, SystemCalendar> calendars) {
+    public static ArrayMap<Long, SystemCalendar> loadCalendars(@NonNull Context context, @NonNull ArrayMap<Long, SystemCalendar> calendars) {
         long start = System.currentTimeMillis(); // NOSONAR
         
         ContentResolver resolver = context.getContentResolver();

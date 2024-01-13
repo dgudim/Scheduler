@@ -29,8 +29,8 @@ import java.util.function.ToIntFunction;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.TwoButtonsBinding;
+import prototype.xd.scheduler.fragments.dialogs.PopupSettingsDialogFragment;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.views.settings.PopupSettingsView;
 
 public final class DialogUtilities {
     
@@ -196,7 +196,7 @@ public final class DialogUtilities {
     @MainThread
     public static void displayColorPicker(@NonNull final ContextWrapper wrapper,
                                           @NonNull final TextView stateIcon,
-                                          @NonNull final PopupSettingsView settingsView,
+                                          @NonNull final PopupSettingsDialogFragment settingsView,
                                           @NonNull final Static.DefaultedInteger defaultedInteger,
                                           @NonNull final ToIntFunction<Static.DefaultedInteger> initialValueFactory) {
         displayColorPicker(wrapper,
@@ -236,7 +236,7 @@ public final class DialogUtilities {
         MaterialDividerItemDecoration divider = new MaterialDividerItemDecoration(wrapper.context, orientation);
         divider.setDividerColor(Color.TRANSPARENT);
         divider.setLastItemDecorated(false);
-        divider.setDividerThickness(wrapper.getResources().getDimensionPixelSize(thickness));
+        divider.setDividerThickness(wrapper.getDimensionPixelSize(thickness));
         return divider;
     }
 }

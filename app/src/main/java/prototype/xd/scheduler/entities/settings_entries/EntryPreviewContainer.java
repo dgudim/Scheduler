@@ -1,4 +1,4 @@
-package prototype.xd.scheduler.views.settings;
+package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.utilities.Static.TODO_ITEM_VIEW_TYPE;
 

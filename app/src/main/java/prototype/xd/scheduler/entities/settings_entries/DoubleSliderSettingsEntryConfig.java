@@ -55,13 +55,13 @@ public class DoubleSliderSettingsEntryConfig extends SettingsEntryConfig {
         @Override
         void bind(@NonNull DoubleSliderSettingsEntryConfig config) {
             
-            viewBinding.title.setText(config.titleId);
+            binding.title.setText(config.titleId);
             
-            config.leftSliderTinter.tintSlider(viewBinding.leftSlider);
-            config.rightSliderTinter.tintSlider(viewBinding.rightSlider);
+            config.leftSliderTinter.tintSlider(binding.leftSlider);
+            config.rightSliderTinter.tintSlider(binding.rightSlider);
             
-            SliderSettingsEntryConfig.ViewHolder.bindExternal(config.leftSliderConfig, viewBinding.leftSlider, viewBinding.leftSubTitle);
-            SliderSettingsEntryConfig.ViewHolder.bindExternal(config.rightSliderConfig, viewBinding.rightSlider, viewBinding.rightSubTitle);
+            SliderSettingsEntryConfig.ViewHolder.bindExternal(config.leftSliderConfig, binding.leftSlider, binding.leftSubTitle);
+            SliderSettingsEntryConfig.ViewHolder.bindExternal(config.rightSliderConfig, binding.rightSlider, binding.rightSubTitle);
         }
     }
     

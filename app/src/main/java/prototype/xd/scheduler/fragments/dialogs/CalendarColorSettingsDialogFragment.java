@@ -13,17 +13,19 @@ import prototype.xd.scheduler.adapters.CalendarColorsViewAdapter;
 import prototype.xd.scheduler.databinding.ListViewBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarColorSettingsDialogFragment extends BaseCachedDialogFragment<ListViewBinding, AlertDialog> { // NOSONAR this is a fragment
     
+    private CalendarSettingsDialogFragment calendarSettingsDialogFragment;
     private CalendarColorsViewAdapter listViewAdapter;
+    private SystemCalendar calendar;
     
-    public void show(@NonNull final SystemCalendarSettings systemCalendarSettings,
+    public void show(@NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment,
                      @NonNull final SystemCalendar calendar,
                      @NonNull final ContextWrapper wrapper) {
-        listViewAdapter = new CalendarColorsViewAdapter(systemCalendarSettings, calendar, wrapper);
-        show(wrapper.fragmentManager, "edit_color" + calendar);
+        this.calendar = calendar;
+        this.calendarSettingsDialogFragment = calendarSettingsDialogFragment;
+        show(wrapper.childFragmentManager, "edit_color" + calendar);
     }
     
     @NonNull
@@ -34,12 +36,14 @@ public class CalendarColorSettingsDialogFragment extends BaseCachedDialogFragmen
     
     @Override
     protected void buildDialogStatic(@NonNull ListViewBinding binding, @NonNull AlertDialog dialog) {
+        listViewAdapter = new CalendarColorsViewAdapter(calendarSettingsDialogFragment, wrapper);
+        
         dialog.setIcon(R.drawable.ic_palette_45);
         dialog.setTitle(R.string.title_edit_events_with_color);
         dialog.setMessage(wrapper.getString(R.string.title_edit_events_with_color_description));
         
-        int pad = wrapper.getResources().getDimensionPixelSize(R.dimen.grid_item_padding);
-        int padHalf = wrapper.getResources().getDimensionPixelSize(R.dimen.grid_item_padding_half);
+        int pad = wrapper.getDimensionPixelSize(R.dimen.grid_item_padding);
+        int padHalf = wrapper.getDimensionPixelSize(R.dimen.grid_item_padding_half);
         binding.recyclerView.setPadding(padHalf, 0, padHalf, pad);
         binding.recyclerView.setAdapter(listViewAdapter);
         binding.recyclerView.setHasFixedSize(true);
@@ -48,7 +52,7 @@ public class CalendarColorSettingsDialogFragment extends BaseCachedDialogFragmen
     
     @Override
     protected void buildDialogDynamic(@NonNull ListViewBinding binding, @NonNull AlertDialog dialog) {
-        // None of it is dynamic
+        listViewAdapter.setCalendar(calendar);
     }
     
     @NonNull

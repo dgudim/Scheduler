@@ -16,14 +16,14 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.SettingsListViewAdapter;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
+import prototype.xd.scheduler.fragments.dialogs.CalendarSettingsDialogFragment;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
     
     @NonNull
-    private final SystemCalendarSettings systemCalendarSettings;
+    private final CalendarSettingsDialogFragment calendarSettingsDialogFragment;
     @NonNull
     private final String accountName;
     @NonNull
@@ -36,12 +36,12 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
     @NonNull
     private final SettingsListViewAdapter containerAdapter;
     
-    public CalendarAccountSettingsEntryConfig(@NonNull final SystemCalendarSettings systemCalendarSettings,
+    public CalendarAccountSettingsEntryConfig(@NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment,
                                               @NonNull final SystemCalendar calendar,
                                               @NonNull final SettingsListViewAdapter containerAdapter,
                                               boolean showSettings) {
         super(showSettings);
-        this.systemCalendarSettings = systemCalendarSettings;
+        this.calendarSettingsDialogFragment = calendarSettingsDialogFragment;
         accountName = calendar.data.accountName;
         subKeys = Collections.singletonList(accountName);
         accountType = calendar.data.accountType;
@@ -56,38 +56,38 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
     
     static class ViewHolder extends SettingsEntryConfig.SettingsViewHolder<CalendarAccountSettingsEntryBinding, CalendarAccountSettingsEntryConfig> {
         
-        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull CalendarAccountSettingsEntryBinding viewBinding) {
-            super(wrapper, viewBinding);
+        ViewHolder(@NonNull ContextWrapper wrapper, @NonNull CalendarAccountSettingsEntryBinding binding) {
+            super(wrapper, binding);
         }
         
         @Override
         void bind(@NonNull CalendarAccountSettingsEntryConfig config) {
-            viewBinding.accountIcon.setImageResource(getIconFromAccountType(config.accountType));
-            viewBinding.root.setBackgroundColor(dimColorToBg(config.calendarColor, viewBinding.root.getContext(), Static.CALENDAR_SETTINGS_DIM_FACTOR));
-            viewBinding.calendarName.setText(config.accountName);
-            viewBinding.accountType.setText(config.accountType);
-            viewBinding.settingsButton.setOnClickListener(v ->
-                    config.systemCalendarSettings.show(config.accountName, config.subKeys, config.calendarColor, wrapper));
-            config.updateSettingsButtonVisibility(viewBinding.settingsButton);
+            binding.accountIcon.setImageResource(getIconFromAccountType(config.accountType));
+            binding.root.setBackgroundColor(dimColorToBg(config.calendarColor, binding.root.getContext(), Static.CALENDAR_SETTINGS_DIM_FACTOR));
+            binding.calendarName.setText(config.accountName);
+            binding.accountType.setText(config.accountType);
+            binding.settingsButton.setOnClickListener(v ->
+                    config.calendarSettingsDialogFragment.show(config.accountName, config.subKeys, config.calendarColor, wrapper));
+            config.updateSettingsButtonVisibility(binding.settingsButton);
             View.OnClickListener expandListener = v -> {
                 config.containerAdapter.toggleCollapsed();
                 updateCollapseIcon(config, true);
             };
-            viewBinding.expandButton.setOnClickListener(expandListener);
-            viewBinding.root.setOnClickListener(expandListener);
+            binding.expandButton.setOnClickListener(expandListener);
+            binding.root.setOnClickListener(expandListener);
             updateCollapseIcon(config, false);
         }
         
         private void updateCollapseIcon(@NonNull CalendarAccountSettingsEntryConfig config, boolean animate) {
             int rotation = config.containerAdapter.isCollapsed() ? 0 : -90;
             if (animate) {
-                viewBinding.expandButton
+                binding.expandButton
                         .animate()
                         .rotation(rotation)
                         .setDuration(wrapper.getInteger(R.integer.material_motion_duration_short_2))
                         .start();
             } else {
-                viewBinding.expandButton.setRotation(rotation);
+                binding.expandButton.setRotation(rotation);
             }
         }
         

@@ -6,9 +6,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import prototype.xd.scheduler.adapters.BindingViewHolder;
 import prototype.xd.scheduler.databinding.AdaptiveBackgroundSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.AppThemeSelectorSettingsEntryBinding;
 import prototype.xd.scheduler.databinding.CalendarAccountSettingsEntryBinding;
@@ -74,17 +74,14 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
         }
     }
     
-    public abstract static class SettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends RecyclerView.ViewHolder {
+    public abstract static class SettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends BindingViewHolder<V> {
         
-        @NonNull
-        protected final V viewBinding;
         @NonNull
         protected final ContextWrapper wrapper;
         
         SettingsViewHolder(@NonNull final ContextWrapper wrapper,
                            @NonNull final V viewBinding) {
-            super(viewBinding.getRoot());
-            this.viewBinding = viewBinding;
+            super(viewBinding);
             this.wrapper = wrapper;
         }
         

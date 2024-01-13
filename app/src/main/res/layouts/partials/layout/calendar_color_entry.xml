@@ -7,7 +7,7 @@
     android:layout_marginStart="@dimen/grid_item_padding_half"
     android:layout_marginTop="@dimen/grid_item_padding"
     android:layout_marginEnd="@dimen/grid_item_padding_half"
-    app:cardBackgroundColor="?colorSurfaceContainerLow"
+    app:cardBackgroundColor="?colorSurfaceContainer"
     app:cardCornerRadius="@dimen/card_corner_radius">
 
     <LinearLayout

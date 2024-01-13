@@ -9,7 +9,6 @@ import androidx.collection.ArrayMap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -34,7 +33,7 @@ public class SystemCalendar {
     public final String visibilityKey;
     
     @NonNull
-    public final Map<Long, SystemCalendarEvent> systemCalendarEventMap;
+    public final ArrayMap<Long, SystemCalendarEvent> systemCalendarEventMap;
     @NonNull
     public final ArrayMap<Integer, Integer> eventColorCountMap;
     

@@ -42,6 +42,15 @@
     </LinearLayout>
 
     <ImageButton
+        android:id="@+id/view_events_button"
+        style="@style/DefaultImageButton"
+        android:layout_width="@dimen/clickable_icon_size"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/action_view_calendar_events"
+        app:srcCompat="@drawable/ic_calendar_month_55"
+        tools:ignore="ImageContrastCheck,TouchTargetSizeCheck" />
+
+    <ImageButton
         android:id="@+id/color_select_button"
         style="@style/DefaultImageButton"
         android:layout_width="@dimen/clickable_icon_size"

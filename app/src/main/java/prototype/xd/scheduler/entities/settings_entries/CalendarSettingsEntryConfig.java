@@ -16,14 +16,15 @@ import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.CalendarSettingsEntryBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.fragments.dialogs.CalendarColorSettingsDialogFragment;
+import prototype.xd.scheduler.fragments.dialogs.CalendarEventListDialogFragment;
+import prototype.xd.scheduler.fragments.dialogs.CalendarSettingsDialogFragment;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.views.settings.SystemCalendarSettings;
 
 public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
     
     @NonNull
-    private final SystemCalendarSettings systemCalendarSettings;
+    private final CalendarSettingsDialogFragment calendarSettingsDialogFragment;
     @NonNull
     private final SystemCalendar calendar;
     @NonNull
@@ -39,12 +40,15 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
     
     @Nullable
     private final CalendarColorSettingsDialogFragment colorSettingsDialogFragment;
+    private final CalendarEventListDialogFragment eventListDialogFragment;
     
-    public CalendarSettingsEntryConfig(@NonNull final SystemCalendarSettings settings,
+    public CalendarSettingsEntryConfig(@NonNull final CalendarSettingsDialogFragment settings,
+                                       @NonNull final CalendarColorSettingsDialogFragment colorSettingsDialogFragment,
+                                       @NonNull final CalendarEventListDialogFragment eventListDialogFragment,
                                        @NonNull final SystemCalendar calendar,
                                        boolean showSettings) {
         super(showSettings);
-        systemCalendarSettings = settings;
+        calendarSettingsDialogFragment = settings;
         this.calendar = calendar;
         calendarName = calendar.data.displayName;
         calendarPrefKey = calendar.prefKey;
@@ -54,14 +58,20 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         calendarEventsCount = calendar.systemCalendarEventMap.size();
         
         if (!calendar.eventColorCountMap.isEmpty() && calendarEventsCount > 0) {
-            colorSettingsDialogFragment = new CalendarColorSettingsDialogFragment();
+            this.colorSettingsDialogFragment = colorSettingsDialogFragment;
         } else {
-            colorSettingsDialogFragment = null;
+            this.colorSettingsDialogFragment = null;
         }
+        
+        this.eventListDialogFragment = eventListDialogFragment;
     }
     
     private void showColorSettingsDialog(@NonNull ContextWrapper wrapper) {
-        Objects.requireNonNull(colorSettingsDialogFragment).show(systemCalendarSettings, calendar, wrapper);
+        Objects.requireNonNull(colorSettingsDialogFragment).show(calendarSettingsDialogFragment, calendar, wrapper);
+    }
+    
+    private void showEventListDialog(@NonNull ContextWrapper wrapper) {
+        eventListDialogFragment.show(calendar, wrapper);
     }
     
     @Override
@@ -77,25 +87,32 @@ public class CalendarSettingsEntryConfig extends GenericCalendarSettingsEntryCon
         
         @Override
         void bind(@NonNull CalendarSettingsEntryConfig config) {
-            viewBinding.calendarName.setText(config.calendarName);
-            viewBinding.eventCount.setText(getPluralString(wrapper.context, R.plurals.calendar_event_count, config.calendarEventsCount));
+            binding.calendarName.setText(config.calendarName);
+            binding.eventCount.setText(getPluralString(wrapper.context, R.plurals.calendar_event_count, config.calendarEventsCount));
             
-            viewBinding.checkBox.setButtonTintList(ColorStateList.valueOf(config.calendarColor));
-            viewBinding.checkBox.setCheckedSilent(Static.getBoolean(config.calendarVisibilityKey, Static.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
-            viewBinding.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
+            binding.checkBox.setButtonTintList(ColorStateList.valueOf(config.calendarColor));
+            binding.checkBox.setCheckedSilent(Static.getBoolean(config.calendarVisibilityKey, Static.CALENDAR_SETTINGS_DEFAULT_VISIBLE));
+            binding.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->
                     Static.edit().putBoolean(config.calendarVisibilityKey, isChecked).apply());
             
-            viewBinding.settingsButton.setOnClickListener(view ->
-                    config.systemCalendarSettings.show(
+            binding.settingsButton.setOnClickListener(view ->
+                    config.calendarSettingsDialogFragment.show(
                             config.calendarPrefKey, config.calendarSubKeys,
                             config.calendarColor, wrapper));
-            config.updateSettingsButtonVisibility(viewBinding.settingsButton);
+            config.updateSettingsButtonVisibility(binding.settingsButton);
             
             if (config.colorSettingsDialogFragment != null) {
-                viewBinding.colorSelectButton.setVisibility(View.VISIBLE);
-                viewBinding.colorSelectButton.setOnClickListener(v -> config.showColorSettingsDialog(wrapper));
+                binding.colorSelectButton.setVisibility(View.VISIBLE);
+                binding.colorSelectButton.setOnClickListener(v -> config.showColorSettingsDialog(wrapper));
             } else {
-                viewBinding.colorSelectButton.setVisibility(View.GONE);
+                binding.colorSelectButton.setVisibility(View.GONE);
+            }
+            
+            if (config.calendarEventsCount > 0) {
+                binding.viewEventsButton.setVisibility(View.VISIBLE);
+                binding.viewEventsButton.setOnClickListener(v -> config.showEventListDialog(wrapper));
+            } else {
+                binding.viewEventsButton.setVisibility(View.GONE);
             }
         }
     }

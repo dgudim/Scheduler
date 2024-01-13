@@ -24,7 +24,6 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.utilities.misc.DefaultedMutableLiveData;
 
 @SuppressWarnings({
@@ -131,7 +130,7 @@ public final class DateManager {
     }
     
     @NonNull
-    public static String getTimeSpan(@NonNull TodoEntry.TimeRange timeRange) {
+    public static String getTimeSpan(@NonNull TimeRange timeRange) {
         return getTimeSpan(timeRange.getStart(), timeRange.getEnd());
     }
     

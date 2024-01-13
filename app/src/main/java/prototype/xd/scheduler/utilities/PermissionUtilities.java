@@ -53,7 +53,7 @@ public final class PermissionUtilities {
     }
     
     public static boolean isOnAndroid13OrHigher() {
-        // todo: we are targeting Android 12 for now because of the broken api, so this function shouldn't return true
+        // TODO: we are targeting Android 12 for now because of the broken api, so this function shouldn't return true
         return Build.VERSION.SDK_INT >= 1000;
     }
     
