@@ -2,10 +2,17 @@ package prototype.xd.scheduler.entities.settings_entries;
 
 import static prototype.xd.scheduler.entities.settings_entries.SettingsEntryType.IMPORT_EXPORT_SETTINGS;
 import static prototype.xd.scheduler.utilities.Logger.logException;
+import static prototype.xd.scheduler.utilities.Static.ENTRIES_FILE;
+import static prototype.xd.scheduler.utilities.Static.ENTRIES_FILE_BACKUP;
+import static prototype.xd.scheduler.utilities.Static.GROUPS_FILE;
+import static prototype.xd.scheduler.utilities.Static.GROUPS_FILE_BACKUP;
+import static prototype.xd.scheduler.utilities.Static.SETTINGS_FILE;
+import static prototype.xd.scheduler.utilities.Static.SETTINGS_FILE_BACKUP;
 import static prototype.xd.scheduler.utilities.Utilities.displayToast;
 import static prototype.xd.scheduler.utilities.Utilities.getFile;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.net.Uri;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -19,13 +26,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ImportExportSettingsEntryBinding;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Static;
+import prototype.xd.scheduler.utilities.Utilities;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
-import prototype.xd.scheduler.utilities.misc.SettingsExporter;
 import prototype.xd.scheduler.utilities.services.BackgroundSetterService;
 
 public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
@@ -60,13 +68,20 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
     public static void notifyFileChosen(@NonNull ContextWrapper wrapper, @Nullable Uri uri) {
         wrapper.uriToStream(uri, InputStream.class, stream -> {
             File tempFile = getFile(Static.EXPORT_FILE);
+            // Copy from user's directory to internal
             Files.copy(stream, tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             
+            // Extract everything
             try (var zip = new ZipFile(tempFile)) {
                 zip.extractAll(wrapper.context.getExternalFilesDir(null).getPath());
             }
             
-            SettingsExporter.importSettings();
+            // Load prefs
+            SharedPreferences.Editor editor = Static.clearAll();
+            Map<String, ?> prefs = Utilities.loadObjectWithBackup(SETTINGS_FILE, SETTINGS_FILE_BACKUP);
+            prefs.forEach((key, value) -> Static.putAnyEditor(editor, key, value));
+            // Overwrite immediately
+            editor.commit();
             
             displayToast(wrapper.context, R.string.import_settings_successful);
             try {
@@ -90,8 +105,14 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
             File tempFile = getFile(Static.EXPORT_FILE);
             Files.deleteIfExists(tempFile.toPath());
             try (var zip = new ZipFile(tempFile)) {
-                zip.addFile(SettingsExporter.exportSettings());
+                // Add preferences
+                zip.addFile(Utilities.saveObjectWithBackup(SETTINGS_FILE, SETTINGS_FILE_BACKUP, Static.getAll()));
+                zip.addFile(getFile(GROUPS_FILE));
+                zip.addFile(getFile(GROUPS_FILE_BACKUP));
+                zip.addFile(getFile(ENTRIES_FILE));
+                zip.addFile(getFile(ENTRIES_FILE_BACKUP));
                 
+                // Add all backgrounds
                 for (String bgName : DateManager.BG_NAMES_ROOT) {
                     File bgFile = getFile(bgName);
                     if (bgFile.exists()) {
@@ -99,6 +120,7 @@ public class ImportExportSettingsEntryConfig extends SettingsEntryConfig {
                     }
                 }
                 
+                // Copy from internal temp file to target
                 Files.copy(tempFile.toPath(), stream);
                 
                 displayToast(wrapper.context, R.string.export_settings_successful);

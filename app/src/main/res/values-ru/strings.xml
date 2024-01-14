@@ -236,7 +236,14 @@
     <string name="global_events_show_hint">"Позиция надписи “Глобальный” "</string>
     <string name="global_events_description">События, которые видны на всех днях</string>
     <string name="event_created_message">Событие создано</string>
+    <string name="event_saved_message">Событие сохранено</string>
     <string name="event_deleted_message">Событие удалено</string>
     <string name="settings_effects_glow">Добавить свечение к прозрачности</string>
     <string name="settings_effects_highlight_edges">Выделить внутренние края</string>
+    <string name="recurring">Повторяется</string>
+    <string name="action_view_calendar_events">Посмотреть события календаля</string>
+    <string name="title_all_calendar_events">Все события календаря</string>
+    <string name="title_all_calendar_events_description">Это все события из календаря</string>
+    <string name="title_edit_events_with_color">Настройки для определенных цветов</string>
+    <string name="title_edit_events_with_color_description">В календаре могут быть события разного цвета, здесь можно задать отдельные стили для каждого цвета.</string>
 </resources>

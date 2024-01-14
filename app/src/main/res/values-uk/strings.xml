@@ -236,7 +236,14 @@
     <string name="global_events_show_front">Перед подією</string>
     <string name="global_events_show_hidden">Заховано</string>
     <string name="event_created_message">Подія створена</string>
+    <string name="event_saved_message">Подія збережена</string>
     <string name="event_deleted_message">Подія видалена</string>
     <string name="settings_effects_glow">Додати свічення до прозорості</string>
     <string name="settings_effects_highlight_edges">Виділити внутрішні краї</string>
+    <string name="recurring">Повторюється</string>
+    <string name="action_view_calendar_events">Подивитись події календалю</string>
+    <string name="title_all_calendar_events">Усі події календаря</string>
+    <string name="title_all_calendar_events_description">Це всі події з календаря</string>
+    <string name="title_edit_events_with_color">Налаштування для певних кольорів</string>
+    <string name="title_edit_events_with_color_description">У календарі можуть бути події різних кольорів, тут ви можете встановити окремі стилі для кожного кольору</string>
 </resources>
