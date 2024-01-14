@@ -5,6 +5,7 @@ import static java.lang.Math.abs;
 import static prototype.xd.scheduler.entities.Group.NULL_GROUP;
 import static prototype.xd.scheduler.utilities.DateManager.currentDayUTC;
 import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
+import static prototype.xd.scheduler.utilities.DateManager.daysToMs;
 import static prototype.xd.scheduler.utilities.ImageUtilities.getExpiredUpcomingColor;
 import static prototype.xd.scheduler.utilities.ImageUtilities.mixColorWithBg;
 import static prototype.xd.scheduler.utilities.Static.TIME_RANGE_SEPARATOR;
@@ -51,6 +52,7 @@ import prototype.xd.scheduler.views.CalendarView;
 @SuppressLint("UnknownNullness")
 public class TodoEntry extends RecycleViewEntry implements Serializable {
     
+    @Serial
     private static final long serialVersionUID = 3578172096594611826L;
     public static final String NAME = TodoEntry.class.getSimpleName();
     private static final Pattern hideByContentSplitPattern = Pattern.compile("\\|\\|");
@@ -78,7 +80,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
             expiredCachedGetter = new CachedGetter<>(expiredValueGetter);
             todayCachedGetter = new CachedGetter<>(previousValue -> {
                 // get parameter from group if it exists, if not, get from current parameters, if not, get from specified getter
-                String paramValue = entry.params.getOrDefault(parameterKey, entry.getGroup().params.get(parameterKey));
+                String paramValue = entry.params.getOrDefault(parameterKey, entry.group.params.get(parameterKey));
                 return paramValue != null ? loadedParameterConverter.apply(paramValue) : todayValueGetter.get();
             });
         }
@@ -114,15 +116,12 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
         public EntryType extend(final TodoEntry entry) {
             if (entry.isFromSystemCalendar()) {
-                switch (this) {
-                    case TODAY:
-                        return TODAY_CALENDAR;
-                    case UPCOMING:
-                        return UPCOMING_CALENDAR;
-                    case EXPIRED:
-                        return EXPIRED_CALENDAR;
-                    default:
-                }
+                return switch (this) {
+                    case TODAY -> TODAY_CALENDAR;
+                    case UPCOMING -> UPCOMING_CALENDAR;
+                    case EXPIRED -> EXPIRED_CALENDAR;
+                    default -> this;
+                };
             }
             return this;
         }
@@ -139,8 +138,8 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     private ParameterGetter<String> rawTextValue;
     
-    @Nullable
-    private transient Group group;
+    @NonNull
+    private transient Group group = NULL_GROUP;
     // for initializing group after deserialization
     private transient String tempGroupName;
     
@@ -241,8 +240,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     @Serial
     private void writeObject(@NonNull ObjectOutputStream out) throws IOException {
         out.writeObject(params);
-        // group is only null when we export settings
-        out.writeObject(group == null ? tempGroupName : group.getRawName());
+        out.writeObject(group.getRawName());
     }
     // ------------
     
@@ -397,18 +395,13 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         event.computeEventVisibilityDays();
     }
     
-    @NonNull
-    public Group getGroup() {
-        return group == null ? NULL_GROUP : group;
-    }
-    
     public boolean hasNullGroup() {
-        return group == null || group.isNull();
+        return group.isNull();
     }
     
     @NonNull
     public String getRawGroupName() {
-        return getGroup().getRawName();
+        return group.getRawName();
     }
     
     @NonNull
@@ -420,15 +413,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         if (hasNullGroup()) {
             return;
         }
-        Set<String> parameters = null;
-        if (invalidate) {
-            parameters = getGroup().getParameterKeys();
-        }
+        Set<String> parameters = invalidate ? group.getParameterKeys() : Collections.emptySet();
+        Logger.debug(NAME, "Reset group of " + this + " (was " + group + ")");
         group = NULL_GROUP;
         // invalidate only after group change to avoid weird settings from cache
-        if (invalidate) {
-            invalidateParameters(parameters);
-        }
+        invalidateParameters(parameters);
     }
     
     /**
@@ -439,11 +428,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
      */
     @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
     public boolean changeGroup(@NonNull Group newGroup) {
-        if (newGroup.equals(group)) {
+        if (Objects.equals(newGroup, group)) {
             return false;
         }
         
-        getGroup().detachEntryInternal(this);
+        group.detachEntryInternal(this);
         newGroup.attachEntryInternal(this);
         
         Set<String> changedKeys = Utilities.getChangedKeys(group.params, newGroup.params);
@@ -814,11 +803,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     
     @NonNull
     public String getCalendarEntryTimeSpan(@NonNull Context context, long targetDayUTC) {
-        if (event.isAllDay()) {
-            return context.getString(R.string.calendar_event_all_day);
-        }
-        
-        return DateManager.getTimeSpan(getNearestCalendarEventMsRangeUTC(targetDayUTC));
+        return DateManager.getTimeSpan(getNearestCalendarEventMsRangeUTC(targetDayUTC), daysToMs(targetDayUTC), event.isAllDay(), context);
     }
     
     public boolean isAdaptiveColorEnabled() {
@@ -871,7 +856,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public void setStateIconColor(@NonNull TextView icon, @NonNull String parameter) {
-        boolean containedInGroupParams = getGroup().params.containsKey(parameter);
+        boolean containedInGroupParams = group.params.containsKey(parameter);
         boolean containedInPersonalParams = params.containsKey(parameter);
         
         if (containedInGroupParams && containedInPersonalParams) {

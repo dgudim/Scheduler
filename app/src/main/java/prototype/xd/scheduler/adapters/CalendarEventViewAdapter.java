@@ -1,26 +1,34 @@
 package prototype.xd.scheduler.adapters;
 
+import static prototype.xd.scheduler.utilities.DateManager.currentTimestampUTC;
+import static prototype.xd.scheduler.utilities.DateManager.getTimeSpan;
+
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import prototype.xd.scheduler.R;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import prototype.xd.scheduler.databinding.ListSelectionEventBinding;
 import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.SystemCalendarEvent;
-import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class CalendarEventViewAdapter extends RecyclerView.Adapter<CalendarEventViewAdapter.EntryViewHolder> {
     
-    private final SystemCalendar calendar;
+    private final List<SystemCalendarEvent> events;
     private final ContextWrapper wrapper;
     
     public CalendarEventViewAdapter(@NonNull ContextWrapper wrapper, @NonNull SystemCalendar calendar) {
         this.wrapper = wrapper;
-        this.calendar = calendar;
+        events = new ArrayList<>(calendar.systemCalendarEventMap.values());
+        events.sort(Collections.reverseOrder(Comparator.comparingLong(SystemCalendarEvent::getStartMsUTC)));
         // Each event is unique
         setHasStableIds(true);
     }
@@ -31,16 +39,11 @@ public class CalendarEventViewAdapter extends RecyclerView.Adapter<CalendarEvent
             super(binding);
         }
         
-        private void bind(@NonNull SystemCalendarEvent event, @NonNull ContextWrapper wrapper) {
+        private void bind(@NonNull SystemCalendarEvent event, @NonNull Context context) {
             binding.eventText.setText(event.data.title);
             binding.eventColor.setCardBackgroundColor(event.data.color);
             binding.recurrenceText.setVisibility(event.isRecurring() ? View.VISIBLE : View.GONE);
-            String timeSpan = DateManager.getTimeSpan(event.getFirstInstanceTimeRange());
-            if (event.isAllDay()) {
-                binding.timeText.setText(wrapper.getString(R.string.calendar_event_all_day) + " (" + timeSpan + ")");
-            } else {
-                binding.timeText.setText(timeSpan);
-            }
+            binding.timeText.setText(getTimeSpan(event.getFirstInstanceTimeRange(), currentTimestampUTC, event.isAllDay(), context));
         }
         
     }
@@ -53,16 +56,16 @@ public class CalendarEventViewAdapter extends RecyclerView.Adapter<CalendarEvent
     
     @Override
     public void onBindViewHolder(@NonNull EntryViewHolder holder, int position) {
-        holder.bind(calendar.systemCalendarEventMap.valueAt(position), wrapper);
+        holder.bind(events.get(position), wrapper.context);
     }
     
     @Override
     public int getItemCount() {
-        return calendar.systemCalendarEventMap.size();
+        return events.size();
     }
     
     @Override
     public long getItemId(int position) {
-        return calendar.systemCalendarEventMap.valueAt(position).hashCode();
+        return events.get(position).hashCode();
     }
 }

@@ -3,6 +3,7 @@ package prototype.xd.scheduler.utilities;
 import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL;
 import static prototype.xd.scheduler.utilities.Static.TIME_RANGE_SEPARATOR;
 
+import android.content.Context;
 import android.icu.text.DateFormatSymbols;
 import android.os.LocaleList;
 
@@ -24,6 +25,7 @@ import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.utilities.misc.DefaultedMutableLiveData;
 
 @SuppressWarnings({
@@ -51,11 +53,19 @@ public final class DateManager {
     
     @NonNull
     public static final Locale systemLocale = Objects.requireNonNull(LocaleList.getDefault().get(0));
-    private static final DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("dd/MM HH:mm", systemLocale);
-    private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM", systemLocale);
-    private static final DateTimeFormatter dateFormatMonthNames = DateTimeFormatter.ofPattern("MMM d", systemLocale);
+    private static final DateTimeFormatter dayMonthTimeFormat = DateTimeFormatter.ofPattern("dd/MM HH:mm", systemLocale);
+    private static final DateTimeFormatter dayMonthFormat = DateTimeFormatter.ofPattern("dd/MM", systemLocale);
+    private static final DateTimeFormatter dayMonthNameFormat = DateTimeFormatter.ofPattern("d MMM", systemLocale);
+    private static final DateTimeFormatter monthNameFormat = DateTimeFormatter.ofPattern("MMM", systemLocale);
+    private static final DateTimeFormatter dayTimeFormat = DateTimeFormatter.ofPattern("d HH:mm", systemLocale);
+    private static final DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("d", systemLocale);
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm", systemLocale);
-    private static final DateTimeFormatter daytimeFormat = DateTimeFormatter.ofPattern("d HH:mm", systemLocale);
+    
+    private static final DateTimeFormatter fullFormat = DateTimeFormatter.ofPattern("HH:mm dd/MM yyyy", systemLocale);
+    private static final DateTimeFormatter dayMonthNameYearFormat = DateTimeFormatter.ofPattern("dd MMM yyyy", systemLocale);
+    private static final DateTimeFormatter monthNameYearFormat = DateTimeFormatter.ofPattern("MMM yyyy", systemLocale);
+    private static final DateTimeFormatter yearFormat = DateTimeFormatter.ofPattern("yyyy", systemLocale);
+    
     
     @NonNull
     public static final List<String> BG_NAMES_ROOT;
@@ -130,40 +140,13 @@ public final class DateManager {
     }
     
     @NonNull
-    public static String getTimeSpan(@NonNull TimeRange timeRange) {
-        return getTimeSpan(timeRange.getStart(), timeRange.getEnd());
-    }
-    
-    @NonNull
-    public static String getTimeSpan(long timeFromMsUTC, long timeToMsUTC) {
-        
-        LocalDateTime from = msUTCtoLocalDateTime(timeFromMsUTC);
-        LocalDateTime to = msUTCtoLocalDateTime(timeToMsUTC);
-        
-        // month and day is the same
-        if (Objects.equals(from.toLocalDate(), to.toLocalDate())) {
-            // 20:30 - 23:10
-            return timeFormat.format(from) + TIME_RANGE_SEPARATOR + timeFormat.format(to);
-        } else {
-            //month is the same
-            if (from.getMonth() == to.getMonth()) {
-                //24 20:40 - 30 21:30
-                return daytimeFormat.format(from) + TIME_RANGE_SEPARATOR + daytimeFormat.format(to);
-            } else {
-                //24/10 10:40 - 10/11 12:30
-                return dateTimeFormat.format(from) + TIME_RANGE_SEPARATOR + dateTimeFormat.format(to);
-            }
-        }
-    }
-    
-    @NonNull
     public static LocalDate msUTCtoLocalDate(long msUTC, @NonNull ZoneId zone) {
         return LocalDate.ofInstant(Instant.ofEpochMilli(msUTC), zone);
     }
     
     @NonNull
-    public static LocalDateTime msUTCtoLocalDateTime(long msUTC) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(msUTC), ZoneId.systemDefault());
+    public static LocalDateTime msUTCtoLocalDateTime(long msUTC, @NonNull ZoneId zone) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(msUTC), zone);
     }
     
     public static long msUTCtoDaysLocal(long msUTC) {
@@ -185,13 +168,89 @@ public final class DateManager {
     // return currently selected date date
     @NonNull
     public static String getCurrentlySelectedDate() {
-        return dateFormat.format(msUTCtoLocalDate(daysToMs(currentlySelectedDayUTC), ZoneOffset.UTC));
+        return dayMonthFormat.format(msUTCtoLocalDate(daysToMs(currentlySelectedDayUTC), ZoneOffset.UTC));
     }
     
     // return date (months are 3 letters instead of numbers) and time given a UTC timestamp
     @NonNull
     public static String dateStringMonthNamesUTCFromMsUTC(long msUTC) {
-        return dateFormatMonthNames.format(msUTCtoLocalDate(msUTC, ZoneOffset.UTC));
+        return dayMonthNameFormat.format(msUTCtoLocalDate(msUTC, ZoneOffset.UTC));
+    }
+    
+    @NonNull
+    public static String getTimeSpan(@NonNull TimeRange timeRange, long referenceMsUTC, boolean isAllDay, @NonNull Context context) {
+        ZoneId zone = isAllDay ? ZoneOffset.UTC : ZoneId.systemDefault();
+        LocalDateTime from = msUTCtoLocalDateTime(timeRange.getStart(), zone);
+        LocalDateTime to = msUTCtoLocalDateTime(timeRange.getEnd(), zone);
+        LocalDate reference = msUTCtoLocalDateTime(referenceMsUTC, ZoneOffset.UTC).toLocalDate();
+        
+        String allDayStrBare = context.getString(R.string.calendar_event_all_day);
+        String allDayStr = " (" + allDayStrBare + ")";
+        
+        if (from.getYear() == to.getYear()) {
+            if (from.getMonth() == to.getMonth()) {
+                if (from.getDayOfMonth() == to.getDayOfMonth()) {
+                    // day, month and year are the same
+                    if (isAllDay) {
+                        if (Objects.equals(from.toLocalDate(), reference)) {
+                            // All day
+                            return allDayStrBare;
+                        }
+                        if (reference.getYear() == from.getYear()) {
+                            // 24 Jan (All day)
+                            return dayMonthNameFormat.format(from) + allDayStr;
+                        }
+                        // 24 Jan 2023 (All day)
+                        return dayMonthNameYearFormat.format(from) + allDayStr;
+                    }
+                    String timeStr = timeFormat.format(from) + TIME_RANGE_SEPARATOR + timeFormat.format(to);
+                    if (Objects.equals(from.toLocalDate(), reference)) {
+                        // 20:30 - 23:10
+                        return timeStr;
+                    }
+                    if (reference.getYear() == from.getYear()) {
+                        // (20:30 - 23:10) 24 Jan
+                        return "(" + timeStr + ") " + dayMonthNameFormat.format(from);
+                    }
+                    // (20:30 - 23:10) 24 Jan 2023
+                    return "(" + timeStr + ") " + dayMonthNameYearFormat.format(from);
+                } else {
+                    // month and year are the same
+                    String coreStr = isAllDay ?
+                            dayFormat.format(from) + TIME_RANGE_SEPARATOR + dayFormat.format(to) :
+                            dayTimeFormat.format(from) + TIME_RANGE_SEPARATOR + dayTimeFormat.format(to);
+                    
+                    if (reference.getYear() == from.getYear()) {
+                        // (20 - 30) Jan (All day)
+                        // (20 20:40 - 30 19:20) Jan
+                        return "(" + coreStr + ") " + monthNameFormat.format(from) + (isAllDay ? allDayStr : "");
+                    }
+                    // (20 - 30) Jan 2023 (All day)
+                    // (20 20:40 - 30 19:20) 2023 Jan
+                    return "(" + coreStr + ") " + monthNameYearFormat.format(from) + (isAllDay ? allDayStr : "");
+                }
+            } else {
+                // year is the same
+                String coreStr = isAllDay ?
+                        dayMonthFormat.format(from) + TIME_RANGE_SEPARATOR + dayMonthFormat.format(to) :
+                        dayMonthTimeFormat.format(from) + TIME_RANGE_SEPARATOR + dayMonthTimeFormat.format(to);
+                
+                if (reference.getYear() == from.getYear()) {
+                    // 20/01 - 30/02 (All day)
+                    // 20/01 20:30 - 30/02 23:10
+                    return coreStr + (isAllDay ? allDayStr : "");
+                }
+                // (20/01 - 30/02) 2023 (All day)
+                // (20/01 20:30 - 30/02 23:10) 2023
+                return "(" + coreStr + ") " + yearFormat.format(from) + allDayStr;
+            }
+        }
+        if (isAllDay) {
+            // 24/10 2023 - 30/10 2024 (All day)
+            return dayMonthNameYearFormat.format(from) + TIME_RANGE_SEPARATOR + dayMonthNameYearFormat.format(to) + allDayStr;
+        }
+        // 20:40 24/10 2023 - 13:40 30/10 2024
+        return fullFormat.format(from) + TIME_RANGE_SEPARATOR + fullFormat.format(to);
     }
     
     // returns current time

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +27,7 @@ import prototype.xd.scheduler.utilities.misc.ContextWrapper;
  */
 public class Group implements Serializable {
     
+    @Serial
     private static final long serialVersionUID = -5159688717810769428L;
     
     public static final String NAME = Group.class.getSimpleName();
@@ -49,6 +51,7 @@ public class Group implements Serializable {
         associatedEntries = new ArraySet<>();
     }
     
+    @Serial
     private void readObject(@NonNull ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         in.defaultReadObject();

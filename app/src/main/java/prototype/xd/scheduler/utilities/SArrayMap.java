@@ -6,6 +6,7 @@ import androidx.collection.ArrayMap;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,15 +17,18 @@ import java.io.Serializable;
  */
 public class SArrayMap<K extends Serializable, V extends Serializable> extends ArrayMap<K, V> implements Serializable {
     
+    @Serial
     private static final long serialVersionUID = 6114227458943730012L;
     
-    public SArrayMap() {}
+    public SArrayMap() {
+    }
     
     public SArrayMap(@NonNull SArrayMap<K, V> map) {
         super(map);
     }
     
     @SuppressWarnings("unchecked")
+    @Serial
     private void writeObject(@NonNull ObjectOutputStream oos)
             throws IOException {
         oos.defaultWriteObject();
@@ -33,6 +37,7 @@ public class SArrayMap<K extends Serializable, V extends Serializable> extends A
     }
     
     @SuppressWarnings("unchecked")
+    @Serial
     private void readObject(@NonNull ObjectInputStream ois)
             throws ClassNotFoundException, IOException {
         ois.defaultReadObject();

@@ -3,11 +3,14 @@ package prototype.xd.scheduler.entities;
 
 import androidx.annotation.Nullable;
 
+import java.io.Serial;
+
 /**
  * A list specifically for storing TodoEntry groups, automatically unlinks entries on remove to avoid memory leaks
  */
 public class GroupList extends BaseCleanupList<Group> {
     
+    @Serial
     private static final long serialVersionUID = -2396032769321844877L;
     
     @Nullable

@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
@@ -22,8 +23,9 @@ import prototype.xd.scheduler.utilities.Utilities;
 
 public final class SettingsExporter implements Serializable {
     
+    @Serial
     private static final long serialVersionUID = 123123123L;
-    
+    // TODO: fix exporter, use fields from TodoManager
     public static final String NAME = SettingsExporter.class.getSimpleName();
     
     private final Collection<TodoEntry> entries;

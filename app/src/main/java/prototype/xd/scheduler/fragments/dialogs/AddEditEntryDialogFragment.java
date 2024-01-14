@@ -133,8 +133,7 @@ public class AddEditEntryDialogFragment extends AlertSettingsDialogFragment<AddE
             Utilities.displayToast(wrapper.context, R.string.event_created_message, Toast.LENGTH_SHORT);
         } else {
             entry.changeGroup(groupList.get(selectedIndex));
-            boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();
-            if (isGlobal) {
+            if (dialogBinding.globalEntrySwitch.isChecked()) {
                 // change entry type to global
                 entry.changeParameters(
                         TEXT_VALUE, text,

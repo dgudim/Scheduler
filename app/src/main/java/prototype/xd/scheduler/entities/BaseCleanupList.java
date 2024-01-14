@@ -3,6 +3,7 @@ package prototype.xd.scheduler.entities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Predicate;
@@ -15,6 +16,7 @@ import java.util.function.UnaryOperator;
  */
 public abstract class BaseCleanupList<T> extends ArrayList<T> {
     
+    @Serial
     private static final long serialVersionUID = -7450793963107268853L;
     
     BaseCleanupList() {

@@ -157,6 +157,10 @@ public class SystemCalendarEvent {
         return new DateTimeZonePair(datesToParse, newTimeZone);
     }
     
+    public long getStartMsUTC() {
+        return startMsUTC;
+    }
+    
     @NonNull
     public TimeRange getFirstInstanceTimeRange() {
         return new TimeRange(startMsUTC, startMsUTC + durationMs);

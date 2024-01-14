@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,11 +58,13 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
     public long firstLoadedDay;
     public long lastLoadedDay;
     
+    @Serial
     private void readObject(@NonNull ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         throw new NotSerializableException(NAME + " should not be serialized");
     }
     
+    @Serial
     private void writeObject(@NonNull ObjectOutputStream out) throws IOException {
         throw new NotSerializableException(NAME + " should not be serialized");
     }
