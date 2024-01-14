@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // for enabling all warnings
-        //StrictMode.enableDefaults();
+        //StrictMode.enableDefaults(); NOSONAR
         
         // init static stuff
         Static.init(this);

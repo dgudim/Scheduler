@@ -115,10 +115,9 @@ public final class Static {
             if (obj == this) {
                 return true;
             }
-            if (obj instanceof DefaultedValue<?>) {
-                DefaultedValue<?> val = (DefaultedValue<?>) obj;
+            if (obj instanceof DefaultedValue<?> val) {
                 return Objects.equals(val.defaultValue, defaultValue) &&
-                        val.key.equals(key) &&
+                        Objects.equals(val.key, key) &&
                         val.type == type;
             }
             return false;

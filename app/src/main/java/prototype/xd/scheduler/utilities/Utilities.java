@@ -183,7 +183,7 @@ public final class Utilities {
             List<Group> groupsToSave = new ArrayList<>(groups.size() - 1);
             
             for (Group group : groups) {
-                if (!group.isNullGroup()) {
+                if (!group.isNull()) {
                     groupsToSave.add(group);
                 }
             }

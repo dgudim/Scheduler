@@ -18,7 +18,6 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -43,7 +42,7 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment { /
     @NonNull
     protected static MutableLiveData<Group> deletedGroup = new MutableLiveData<>();
     
-    public record GroupConfirmationData(@Nullable Group selectedGroup, @NonNull String name,
+    public record GroupConfirmationData(@NonNull Group selectedGroup, @NonNull String name,
                                         @NonNull Group existingGroup) {
     }
     
@@ -149,7 +148,7 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment { /
             }
         });
         
-        bnd.addGroupButton.setOnClickListener(v -> AddEditGroupDialogFragment.show(null, wrapper));
+        bnd.addGroupButton.setOnClickListener(v -> AddEditGroupDialogFragment.show(wrapper));
         confirmedGroupName.setValue(null);
         confirmedGroupName.removeObservers(this);
         confirmedGroupName.observe(this, confirmationData -> {
@@ -158,24 +157,26 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment { /
             }
             Group selectedGroup = confirmationData.selectedGroup;
             String name = confirmationData.name;
-            if (selectedGroup != null) {
-                // We are editing a group
-                int groupIndex = Group.groupIndexInList(groupList, name);
-                
-                String newName = name;
-                int i = 0;
-                while (groupIndex > 0) {
-                    i++;
-                    newName = name + "(" + i + ")";
-                    groupIndex = Group.groupIndexInList(groupList, newName);
-                }
-                
-                todoEntryManager.setNewGroupName(selectedGroup, newName);
-                bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
-            } else {
+            if (selectedGroup.isNull()) {
                 // We are adding a new group
                 // pair.getRight() - existing group with this name
                 addGroupToGroupList(name, confirmationData.existingGroup);
+            } else {
+                // We are editing a group
+                
+                int groupIndex;
+                int i = 0;
+                String newName = name;
+                do {
+                    i++;
+                    groupIndex = Group.groupIndexInList(groupList, newName);
+                    if (groupIndex > 0) {
+                        newName = name + "(" + i + ")";
+                    }
+                } while (groupIndex > 0);
+                
+                todoEntryManager.setNewGroupName(selectedGroup, newName);
+                bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
             }
         });
         
@@ -258,7 +259,7 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment { /
     
     private void addGroupToGroupList(@NonNull String groupName, @NonNull Group existingGroup) {
         boolean rebuild;
-        if (existingGroup.isNullGroup()) {
+        if (existingGroup.isNull()) {
             var newGroup = new Group(groupName, entry.getDisplayParams());
             todoEntryManager.addGroup(newGroup);
             entry.changeGroup(newGroup);

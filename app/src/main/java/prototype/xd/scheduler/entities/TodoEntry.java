@@ -24,6 +24,7 @@ import androidx.collection.ArraySet;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
@@ -84,16 +85,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         
         public T get(@NonNull EntryType entryType) {
             T todayValue = todayCachedGetter.get();
-            switch (entryType) {
-                case EXPIRED:
-                    return expiredCachedGetter.get(todayValue);
-                case UPCOMING:
-                    return upcomingCachedGetter.get(todayValue);
-                case TODAY:
-                case GLOBAL:
-                default:
-                    return todayValue;
-            }
+            return switch (entryType) {
+                case EXPIRED -> expiredCachedGetter.get(todayValue);
+                case UPCOMING -> upcomingCachedGetter.get(todayValue);
+                default -> todayValue;
+            };
         }
         
         public T get(long day) {
@@ -233,6 +229,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     // ------------ serialization
+    @Serial
     @SuppressWarnings("unchecked")
     private void readObject(@NonNull ObjectInputStream in)
             throws IOException, ClassNotFoundException {
@@ -241,7 +238,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         initParameters();
     }
     
-    
+    @Serial
     private void writeObject(@NonNull ObjectOutputStream out) throws IOException {
         out.writeObject(params);
         // group is only null when we export settings
@@ -406,7 +403,7 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
     }
     
     public boolean hasNullGroup() {
-        return group == null || group.isNullGroup();
+        return group == null || group.isNull();
     }
     
     @NonNull
@@ -838,15 +835,11 @@ public class TodoEntry extends RecycleViewEntry implements Serializable {
         String sep = " ";
         
         if (isGlobal()) {
-            switch (globalLabelPos) {
-                case BACK:
-                    return base + sep + context.getString(R.string.item_global);
-                case FRONT:
-                    return context.getString(R.string.item_global) + sep + base;
-                case HIDDEN:
-                default:
-                    return base;
-            }
+            return switch (globalLabelPos) {
+                case BACK -> base + sep + context.getString(R.string.item_global);
+                case FRONT -> context.getString(R.string.item_global) + sep + base;
+                default -> base;
+            };
         }
         
         TimeRange nearestDayRangeLocal = getNearestLocalEventDayRange(targetDayUTC);

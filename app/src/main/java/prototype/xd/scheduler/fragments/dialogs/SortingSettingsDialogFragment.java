@@ -163,34 +163,32 @@ public class SortingSettingsDialogFragment extends FullScreenSettingsDialogFragm
                 int fontColor = Static.FONT_COLOR.CURRENT.get();
                 int borderColor = Static.BORDER_COLOR.CURRENT.get();
                 switch (entryType) {
-                    case UPCOMING:
-                    case UPCOMING_CALENDAR:
+                    case UPCOMING, UPCOMING_CALENDAR -> {
                         titleTextRes = R.string.upcoming_events;
                         descriptionTextRes = R.string.upcoming_events_description;
                         bgColor = getExpiredUpcomingColor(bgColor, Static.BG_COLOR.UPCOMING.get());
                         fontColor = getExpiredUpcomingColor(fontColor, Static.FONT_COLOR.UPCOMING.get());
                         borderColor = getExpiredUpcomingColor(borderColor, Static.BORDER_COLOR.UPCOMING.get());
-                        break;
-                    case EXPIRED:
-                    case EXPIRED_CALENDAR:
+                    }
+                    case EXPIRED, EXPIRED_CALENDAR -> {
                         titleTextRes = R.string.expired_events;
                         descriptionTextRes = R.string.expired_events_description;
                         bgColor = getExpiredUpcomingColor(bgColor, Static.BG_COLOR.EXPIRED.get());
                         fontColor = getExpiredUpcomingColor(fontColor, Static.FONT_COLOR.EXPIRED.get());
                         borderColor = getExpiredUpcomingColor(borderColor, Static.BORDER_COLOR.EXPIRED.get());
-                        break;
-                    case TODAY:
+                    }
+                    case TODAY -> {
                         titleTextRes = R.string.todays_events;
                         descriptionTextRes = R.string.todays_events_description;
-                        break;
-                    case GLOBAL:
+                    }
+                    case GLOBAL -> {
                         titleTextRes = R.string.global_events;
                         descriptionTextRes = R.string.global_events_description;
-                        break;
-                    case UNKNOWN:
-                    default:
+                    }
+                    default -> {
                         titleTextRes = -1;
                         descriptionTextRes = -1;
+                    }
                 }
                 
                 // extra stuff for calendar entries

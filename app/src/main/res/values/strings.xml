@@ -77,6 +77,7 @@
     <string name="settings_effects_blur_grain">Blur grain: %s%%</string>
     <string name="save">Save</string>
     <string name="reset_settings_prompt">Reset settings?</string>
+    <string name="rename_prompt">Rename?</string>
     <string name="overwrite_prompt">Overwrite?</string>
     <string name="no">No</string>
     <plurals name="item_N_days_ago">
@@ -146,6 +147,7 @@
     <string name="input_cant_be_empty">Input can’t be empty</string>
     <string name="edit_event">Edit event</string>
     <string name="overwrite">Overwrite</string>
+    <string name="rename">Rename</string>
     <string name="reset">Reset</string>
     <string name="hide_by_content">Hide by content</string>
     <string name="separate_multiple_statements_by">Separate multiple statements by ||</string>

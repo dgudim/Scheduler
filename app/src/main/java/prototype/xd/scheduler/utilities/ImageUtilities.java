@@ -413,7 +413,7 @@ public final class ImageUtilities {
         return MaterialColors.harmonize(color, getOnBgColor(backgroundColor));
     }
     
-    // mix and harmonize (25% background color, 75% font color + harmonized with background);
+    // mix and harmonize (25% background color, 75% font color + harmonized with background); NOSONAR
     public static int getHarmonizedSecondaryFontColorWithBg(@ColorInt int color, @ColorInt int backgroundColor) {
         return getHarmonizedFontColorWithBg(mixTwoColors(color, backgroundColor, Static.DEFAULT_SECONDARY_TEXT_COLOR_MIX_FACTOR), backgroundColor);
     }

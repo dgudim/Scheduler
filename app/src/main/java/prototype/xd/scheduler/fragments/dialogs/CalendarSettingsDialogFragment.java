@@ -36,7 +36,7 @@ import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
-public class CalendarSettingsDialogFragment extends PopupSettingsDialogFragment {
+public class CalendarSettingsDialogFragment extends PopupSettingsDialogFragment { // NOSONAR
     
     public static class CalendarSettingsDialogData extends ViewModel {
         

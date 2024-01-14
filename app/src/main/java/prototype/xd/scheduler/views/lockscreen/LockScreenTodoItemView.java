@@ -230,14 +230,13 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
     
     @NonNull
     public static LockScreenTodoItemView<?> inflateViewByType(@NonNull TodoItemViewType todoItemViewType, @Nullable ViewGroup parent, @NonNull LayoutInflater layoutInflater) {
-        switch (todoItemViewType) {
-            case SLEEK:
-                return new SleekLockScreenTodoItemView(SleekEntryBinding.inflate(layoutInflater, parent, false));
-            case ROUNDED:
-                return new RoundedLockScreenTodoItem(RoundedEntryBinding.inflate(layoutInflater, parent, false));
-            case BASIC:
-            default:
-                return new BasicLockScreenTodoItemView(BasicEntryBinding.inflate(layoutInflater, parent, false));
-        }
+        return switch (todoItemViewType) {
+            case SLEEK ->
+                    new SleekLockScreenTodoItemView(SleekEntryBinding.inflate(layoutInflater, parent, false));
+            case ROUNDED ->
+                    new RoundedLockScreenTodoItem(RoundedEntryBinding.inflate(layoutInflater, parent, false));
+            default ->
+                    new BasicLockScreenTodoItemView(BasicEntryBinding.inflate(layoutInflater, parent, false));
+        };
     }
 }

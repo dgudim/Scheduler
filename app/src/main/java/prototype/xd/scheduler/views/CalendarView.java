@@ -157,9 +157,9 @@ public class CalendarView {
     private List<DayOfWeek> daysOfWeek;
     
     @Nullable
-    LocalDate selectedDate;
+    private LocalDate selectedDate;
     @Nullable
-    YearMonth selectedMonth;
+    private YearMonth selectedMonth;
     
     // initial capacity is fine
     @SuppressWarnings("CollectionWithoutInitialCapacity")

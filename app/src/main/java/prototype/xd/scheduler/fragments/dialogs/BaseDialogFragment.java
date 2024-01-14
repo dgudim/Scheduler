@@ -85,8 +85,8 @@ public abstract class BaseDialogFragment<T extends ViewBinding> extends DialogFr
         long time = System.currentTimeMillis();
         binding = inflate(inflater, container);
         buildDialogBody(binding);
-        if (dialog instanceof AlertDialog) {
-            ((AlertDialog) dialog).setView(binding.getRoot());
+        if (dialog instanceof AlertDialog alertDialog) {
+            alertDialog.setView(binding.getRoot());
         } else {
             dialog.setContentView(binding.getRoot());
         }

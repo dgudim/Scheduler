@@ -52,7 +52,7 @@ public class Group implements Serializable {
     private void readObject(@NonNull ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        if (isNullGroup()) {
+        if (isNull()) {
             associatedEntries = Collections.emptySet();
         } else {
             associatedEntries = new ArraySet<>();
@@ -61,7 +61,7 @@ public class Group implements Serializable {
     
     // to be called only by TodoEntry
     protected void attachEntryInternal(@NonNull TodoEntry todoEntry) {
-        if (isNullGroup()) {
+        if (isNull()) {
             // don't attach to empty group
             return;
         }
@@ -72,7 +72,7 @@ public class Group implements Serializable {
     
     // to be called only by TodoEntry
     protected void detachEntryInternal(@NonNull TodoEntry todoEntry) {
-        if (isNullGroup()) {
+        if (isNull()) {
             // don't detach from empty group
             return;
         }
@@ -82,7 +82,7 @@ public class Group implements Serializable {
     }
     
     public void detachAllEntries() {
-        if (isNullGroup()) {
+        if (isNull()) {
             // don't detach from empty group
             return;
         }
@@ -90,7 +90,7 @@ public class Group implements Serializable {
         associatedEntries.clear();
     }
     
-    public boolean isNullGroup() {
+    public boolean isNull() {
         return groupName.isEmpty();
     }
     
@@ -129,7 +129,7 @@ public class Group implements Serializable {
      */
     @NonNull
     public String getLocalizedName(@NonNull Context context) {
-        return isNullGroup() ? context.getString(R.string.blank_group_name) : groupName;
+        return isNull() ? context.getString(R.string.blank_group_name) : groupName;
     }
     
     @NonNull
@@ -139,7 +139,7 @@ public class Group implements Serializable {
     
     @NonNull
     public Set<String> getParameterKeys() {
-        if (isNullGroup()) {
+        if (isNull()) {
             return Collections.emptySet();
         } else {
             return params.keySet();
@@ -201,8 +201,7 @@ public class Group implements Serializable {
             return false;
         } else if (obj == this) {
             return true;
-        } else if (obj instanceof Group) {
-            Group group = (Group) obj;
+        } else if (obj instanceof Group group) {
             return params.equals(group.params) && groupName.equals(group.groupName);
         }
         return false;

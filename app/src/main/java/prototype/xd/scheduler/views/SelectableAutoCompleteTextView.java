@@ -3,7 +3,6 @@ package prototype.xd.scheduler.views;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.AdapterView;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,7 +11,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 public class SelectableAutoCompleteTextView extends MaterialAutoCompleteTextView {
     
-    int selectedItemPosition = ListView.INVALID_POSITION;
+    private int selectedItemPosition = AdapterView.INVALID_POSITION;
     
     public SelectableAutoCompleteTextView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);

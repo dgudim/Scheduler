@@ -41,37 +41,35 @@ public abstract class SettingsEntryConfig extends RecycleViewEntry {
                                                                                         int viewType) {
         LayoutInflater inflater = wrapper.getLayoutInflater();
         // we should make sure to return appropriate holders, otherwise it will crash in @onBindViewHolder
-        switch (SettingsEntryType.values()[viewType]) {
-            case CALENDAR_ACCOUNT:
-                return new CalendarAccountSettingsEntryConfig.ViewHolder(wrapper, CalendarAccountSettingsEntryBinding.inflate(inflater, parent, false));
-            case CALENDAR:
-                return new CalendarSettingsEntryConfig.ViewHolder(wrapper, CalendarSettingsEntryBinding.inflate(inflater, parent, false));
-            case COMPOUND_CUSTOMIZATION:
-                return new CompoundCustomizationSettingsEntryConfig.ViewHolder(wrapper,
-                        CompoundCustomizationSettingsEntryBinding.inflate(inflater, parent, false));
-            case RESET_BUTTON:
-                return new ResetButtonSettingsEntryConfig.ViewHolder(wrapper, ResetButtonSettingsEntryBinding.inflate(inflater, parent, false));
-            case SLIDER:
-                return new SliderSettingsEntryConfig.ViewHolder(wrapper, SliderSettingsEntryBinding.inflate(inflater, parent, false));
-            case DOUBLE_SLIDER:
-                return new DoubleSliderSettingsEntryConfig.ViewHolder(wrapper, DoubleSliderSettingsEntryBinding.inflate(inflater, parent, false));
-            case SWITCH:
-                return new SwitchSettingsEntryConfig.ViewHolder(wrapper, SwitchSettingsEntryBinding.inflate(inflater, parent, false));
-            case DROPDOWN:
-                return new DropdownSettingsEntryConfig.ViewHolder(wrapper, DropdownSettingsEntryBinding.inflate(inflater, parent, false));
-            case ADAPTIVE_BACKGROUND_SETTINGS:
-                return new AdaptiveBackgroundSettingsEntryConfig.ViewHolder(wrapper, AdaptiveBackgroundSettingsEntryBinding.inflate(inflater, parent, false));
-            case APP_THEME_SELECTOR:
-                return new AppThemeSelectorEntryConfig.ViewHolder(wrapper, AppThemeSelectorSettingsEntryBinding.inflate(inflater, parent, false));
-            case IMPORT_EXPORT_SETTINGS:
-                return new ImportExportSettingsEntryConfig.ViewHolder(wrapper, ImportExportSettingsEntryBinding.inflate(inflater, parent, false));
-            case TITLE_BAR:
-                return new TitleBarSettingsEntryConfig.ViewHolder(wrapper, TitleSettingsEntryBinding.inflate(inflater, parent, false));
-            case DIVIDER:
-                return new DividerSettingsEntryConfig.ViewHolder(wrapper, DividerSettingsEntryBinding.inflate(inflater, parent, false));
-            default:
-                throw new IllegalArgumentException("Can't create viewHolder for " + SettingsEntryType.values()[viewType]);
-        }
+        return switch (SettingsEntryType.values()[viewType]) {
+            case CALENDAR_ACCOUNT ->
+                    new CalendarAccountSettingsEntryConfig.ViewHolder(wrapper, CalendarAccountSettingsEntryBinding.inflate(inflater, parent, false));
+            case CALENDAR ->
+                    new CalendarSettingsEntryConfig.ViewHolder(wrapper, CalendarSettingsEntryBinding.inflate(inflater, parent, false));
+            case COMPOUND_CUSTOMIZATION ->
+                    new CompoundCustomizationSettingsEntryConfig.ViewHolder(wrapper,
+                            CompoundCustomizationSettingsEntryBinding.inflate(inflater, parent, false));
+            case RESET_BUTTON ->
+                    new ResetButtonSettingsEntryConfig.ViewHolder(wrapper, ResetButtonSettingsEntryBinding.inflate(inflater, parent, false));
+            case SLIDER ->
+                    new SliderSettingsEntryConfig.ViewHolder(wrapper, SliderSettingsEntryBinding.inflate(inflater, parent, false));
+            case DOUBLE_SLIDER ->
+                    new DoubleSliderSettingsEntryConfig.ViewHolder(wrapper, DoubleSliderSettingsEntryBinding.inflate(inflater, parent, false));
+            case SWITCH ->
+                    new SwitchSettingsEntryConfig.ViewHolder(wrapper, SwitchSettingsEntryBinding.inflate(inflater, parent, false));
+            case DROPDOWN ->
+                    new DropdownSettingsEntryConfig.ViewHolder(wrapper, DropdownSettingsEntryBinding.inflate(inflater, parent, false));
+            case ADAPTIVE_BACKGROUND_SETTINGS ->
+                    new AdaptiveBackgroundSettingsEntryConfig.ViewHolder(wrapper, AdaptiveBackgroundSettingsEntryBinding.inflate(inflater, parent, false));
+            case APP_THEME_SELECTOR ->
+                    new AppThemeSelectorEntryConfig.ViewHolder(wrapper, AppThemeSelectorSettingsEntryBinding.inflate(inflater, parent, false));
+            case IMPORT_EXPORT_SETTINGS ->
+                    new ImportExportSettingsEntryConfig.ViewHolder(wrapper, ImportExportSettingsEntryBinding.inflate(inflater, parent, false));
+            case TITLE_BAR ->
+                    new TitleBarSettingsEntryConfig.ViewHolder(wrapper, TitleSettingsEntryBinding.inflate(inflater, parent, false));
+            case DIVIDER ->
+                    new DividerSettingsEntryConfig.ViewHolder(wrapper, DividerSettingsEntryBinding.inflate(inflater, parent, false));
+        };
     }
     
     public abstract static class SettingsViewHolder<V extends ViewBinding, S extends SettingsEntryConfig> extends BindingViewHolder<V> {
