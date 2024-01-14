@@ -14,25 +14,50 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.activity.ComponentDialog;
 import androidx.annotation.ColorInt;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.List;
 import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.EntrySettingsBinding;
+import prototype.xd.scheduler.entities.SystemCalendar;
 import prototype.xd.scheduler.entities.SystemCalendarEvent;
 import prototype.xd.scheduler.entities.settings_entries.EntryPreviewContainer;
 import prototype.xd.scheduler.utilities.DialogUtilities;
 import prototype.xd.scheduler.utilities.Static;
-import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class CalendarSettingsDialogFragment extends PopupSettingsDialogFragment {
+    
+    public static class CalendarSettingsDialogData extends ViewModel {
+        
+        @NonNull
+        public MutableObject<List<String>> subKeys = new MutableObject<>();
+        @NonNull
+        public MutableObject<String> prefKey = new MutableObject<>();
+        
+        @NonNull
+        public MutableInt color = new MutableInt();
+        
+        @NonNull
+        public MutableObject<SystemCalendarEvent> event = new MutableObject<>();
+        
+        @NonNull
+        public static CalendarSettingsDialogData getInstance(@NonNull ContextWrapper wrapper) {
+            return new ViewModelProvider(wrapper.activity).get(CalendarSettingsDialogData.class);
+        }
+    }
+    
+    private static final String TAG = "system_calendar_settings";
     
     // if called from regular settings
     private List<String> subKeys;
@@ -44,10 +69,39 @@ public class CalendarSettingsDialogFragment extends PopupSettingsDialogFragment 
     @Nullable
     private SystemCalendarEvent event;
     
-    private TextWatcher currentListener;
+    public static void show(@NonNull final SystemCalendar calendar, @NonNull ContextWrapper wrapper) {
+        show(calendar.prefKey, calendar.subKeys, calendar.data.color, wrapper);
+    }
     
-    public CalendarSettingsDialogFragment(@Nullable final TodoEntryManager todoEntryManager) {
-        super(todoEntryManager);
+    public static void show(@NonNull final String prefKey,
+                            @NonNull final List<String> subKeys,
+                            @ColorInt int color,
+                            @NonNull ContextWrapper wrapper) {
+        var inst = CalendarSettingsDialogData.getInstance(wrapper);
+        inst.event.setValue(null);
+        inst.prefKey.setValue(prefKey);
+        inst.color.setValue(color);
+        inst.subKeys.setValue(subKeys);
+        new CalendarSettingsDialogFragment().show(wrapper.childFragmentManager, TAG);
+    }
+    
+    public static void show(@NonNull final SystemCalendarEvent event,
+                            @NonNull ContextWrapper wrapper) {
+        var inst = CalendarSettingsDialogData.getInstance(wrapper);
+        inst.event.setValue(event);
+        inst.prefKey.setValue(event.prefKey);
+        inst.color.setValue(event.data.color);
+        inst.subKeys.setValue(event.subKeys);
+        new CalendarSettingsDialogFragment().show(wrapper.childFragmentManager, TAG);
+    }
+    
+    @Override
+    protected void setVariablesFromData() {
+        var inst = CalendarSettingsDialogData.getInstance(wrapper);
+        subKeys = inst.subKeys.getValue();
+        prefKey = inst.prefKey.getValue();
+        color = inst.color.getValue();
+        event = inst.event.getValue();
     }
     
     @NonNull
@@ -85,34 +139,14 @@ public class CalendarSettingsDialogFragment extends PopupSettingsDialogFragment 
         };
     }
     
-    public void show(@NonNull final String prefKey,
-                     @NonNull final List<String> subKeys,
-                     @ColorInt int color,
-                     @NonNull ContextWrapper wrapper) {
-        event = null;
-        this.prefKey = prefKey;
-        this.color = color;
-        this.subKeys = subKeys;
-        show(wrapper.childFragmentManager, "system_calendar_settings: " + prefKey);
-    }
-    
-    public void show(@NonNull final SystemCalendarEvent event,
-                     @NonNull ContextWrapper wrapper) {
-        this.event = event;
-        prefKey = event.prefKey;
-        color = event.data.color;
-        subKeys = event.subKeys;
-        show(wrapper.childFragmentManager, "system_calendar_settings: " + event);
-    }
-    
     @Override
-    public void buildDialogStatic(@NonNull EntrySettingsBinding bnd, @NonNull ComponentDialog dialog) {
-        super.buildDialogStatic(bnd, dialog);
+    public void buildDialogBodyStatic(@NonNull EntrySettingsBinding bnd) {
+        super.buildDialogBodyStatic(bnd);
         bnd.groupSelector.setVisibility(View.GONE);
     }
     
     @Override
-    protected void buildDialogDynamic(@NonNull EntrySettingsBinding bnd, @NonNull ComponentDialog dialog) {
+    protected void buildDialogBodyDynamic(@NonNull EntrySettingsBinding bnd) {
         bnd.entrySettingsTitle.setText(calendarKeyToReadable(wrapper.context, prefKey));
         
         updateAllIndicators(bnd);
@@ -220,10 +254,8 @@ public class CalendarSettingsDialogFragment extends PopupSettingsDialogFragment 
                 value -> value.get(subKeys));
         
         bnd.hideByContentField.setText(Static.HIDE_ENTRIES_BY_CONTENT_CONTENT.get(subKeys));
-        if (currentListener != null) {
-            bnd.hideByContentField.removeTextChangedListener(currentListener);
-        }
-        currentListener = new TextWatcher() {
+        
+        bnd.hideByContentField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 //ignore
@@ -241,8 +273,7 @@ public class CalendarSettingsDialogFragment extends PopupSettingsDialogFragment 
             public void afterTextChanged(Editable s) {
                 //ignore
             }
-        };
-        bnd.hideByContentField.addTextChangedListener(currentListener);
+        });
     }
     
     @Override

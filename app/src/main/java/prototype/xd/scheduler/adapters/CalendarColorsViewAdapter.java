@@ -2,7 +2,6 @@ package prototype.xd.scheduler.adapters;
 
 import static prototype.xd.scheduler.utilities.Utilities.getPluralString;
 
-import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -20,26 +19,17 @@ import prototype.xd.scheduler.utilities.misc.ContextWrapper;
  */
 public class CalendarColorsViewAdapter extends RecyclerView.Adapter<CalendarColorsViewAdapter.EntryViewHolder> {
     
-    @NonNull
-    private final CalendarSettingsDialogFragment calendarSettingsDialogFragment;
-    
-    private SystemCalendar calendar;
+    private final SystemCalendar calendar;
     
     @NonNull
     private final ContextWrapper wrapper;
     
-    public CalendarColorsViewAdapter(@NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment,
-                                     @NonNull final ContextWrapper wrapper) {
-        this.calendarSettingsDialogFragment = calendarSettingsDialogFragment;
+    public CalendarColorsViewAdapter(@NonNull final ContextWrapper wrapper,
+                                     @NonNull final SystemCalendar calendar) {
         this.wrapper = wrapper;
+        this.calendar = calendar;
         // No colors repeat
         setHasStableIds(true);
-    }
-    
-    @SuppressLint("NotifyDataSetChanged")
-    public void setCalendar(@NonNull SystemCalendar calendar) {
-        this.calendar = calendar;
-        notifyDataSetChanged();
     }
     
     /**
@@ -53,8 +43,7 @@ public class CalendarColorsViewAdapter extends RecyclerView.Adapter<CalendarColo
         
         private void bind(int eventColor, int eventCount,
                           @NonNull ContextWrapper wrapper,
-                          @NonNull final SystemCalendar calendar,
-                          @NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment) {
+                          @NonNull final SystemCalendar calendar) {
             
             String eventPrefKey = calendar.makeEventPrefKey(eventColor);
             
@@ -62,7 +51,7 @@ public class CalendarColorsViewAdapter extends RecyclerView.Adapter<CalendarColo
             binding.titleDefault.setVisibility(eventCount == calendar.data.color ? View.VISIBLE : View.GONE);
             binding.eventCount.setText(getPluralString(binding.getRoot().getContext(), R.plurals.calendar_event_count, eventCount));
             binding.openSettingsButton.setOnClickListener(v ->
-                    calendarSettingsDialogFragment.show(
+                    CalendarSettingsDialogFragment.show(
                             eventPrefKey, calendar.makeEventSubKeys(eventPrefKey),
                             eventColor, wrapper));
         }
@@ -80,7 +69,7 @@ public class CalendarColorsViewAdapter extends RecyclerView.Adapter<CalendarColo
         holder.bind(
                 calendar.eventColorCountMap.keyAt(position),
                 calendar.eventColorCountMap.valueAt(position),
-                wrapper, calendar, calendarSettingsDialogFragment);
+                wrapper, calendar);
     }
     
     @Override

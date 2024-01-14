@@ -9,7 +9,6 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import androidx.activity.ComponentDialog;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -63,7 +62,7 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
     
     @Override
     @SuppressLint("NotifyDataSetChanged")
-    protected void buildDialogStatic(@NonNull ListViewBinding binding, @NonNull ComponentDialog dialog) {
+    protected void buildDialogBody(@NonNull ListViewBinding binding) {
         adaptiveBgSettingsEntry = new AdaptiveBackgroundSettingsEntryConfig(wrapper, cropBgLauncher);
         
         List<SettingsEntryConfig> settingsEntries = List.of(
@@ -141,10 +140,5 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
         
         binding.recyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
-    }
-    
-    @Override
-    protected void buildDialogDynamic(@NonNull ListViewBinding binding, @NonNull ComponentDialog dialog) {
-        // None of it is dynamic
     }
 }

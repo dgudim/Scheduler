@@ -45,23 +45,11 @@ public final class ContextWrapper {
     @NonNull
     public final FragmentActivity activity;
     
-    private ContextWrapper(@NonNull final Context context,
-                           @NonNull final Lifecycle lifecycle,
-                           @NonNull final FragmentManager childFragmentManager,
-                           @NonNull final FragmentActivity activity) {
-        this.context = context;
-        this.lifecycle = lifecycle;
-        this.childFragmentManager = childFragmentManager;
-        this.activity = activity;
-    }
-    
-    @NonNull
-    public static ContextWrapper from(@NonNull Fragment fragment) {
-        return new ContextWrapper(
-                fragment.requireContext(),
-                fragment.getLifecycle(),
-                fragment.getChildFragmentManager(),
-                fragment.requireActivity());
+    public ContextWrapper(@NonNull Fragment fragment) {
+        context = fragment.requireContext();
+        lifecycle = fragment.getLifecycle();
+        childFragmentManager = fragment.getChildFragmentManager();
+        activity = fragment.requireActivity();
     }
     
     @NonNull

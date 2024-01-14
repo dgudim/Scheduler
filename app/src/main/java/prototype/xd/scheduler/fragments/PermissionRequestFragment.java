@@ -98,7 +98,7 @@ public final class PermissionRequestFragment extends BaseFragment<PermissionsReq
     
     @SuppressLint("BatteryLife")
     private void requestPermissions() {
-        
+        // TODO: shouldShowRequestPermissionRationale()
         boolean essentialsGranted = areEssentialPermissionsGranted(wrapper.context);
         
         switch (requestChainStatus) {

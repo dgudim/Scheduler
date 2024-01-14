@@ -7,16 +7,11 @@ import static prototype.xd.scheduler.utilities.DateManager.selectDate;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayErrorDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.getRecyclerviewGap;
-import static prototype.xd.scheduler.utilities.Static.DAY_FLAG_GLOBAL_STR;
-import static prototype.xd.scheduler.utilities.Static.END_DAY_UTC;
 import static prototype.xd.scheduler.utilities.Static.GITHUB_FAQ;
 import static prototype.xd.scheduler.utilities.Static.GITHUB_ISSUES;
 import static prototype.xd.scheduler.utilities.Static.GITHUB_RELEASES;
 import static prototype.xd.scheduler.utilities.Static.GITHUB_REPO;
-import static prototype.xd.scheduler.utilities.Static.IS_COMPLETED;
 import static prototype.xd.scheduler.utilities.Static.SERVICE_FAILED;
-import static prototype.xd.scheduler.utilities.Static.START_DAY_UTC;
-import static prototype.xd.scheduler.utilities.Static.TEXT_VALUE;
 import static prototype.xd.scheduler.utilities.Static.WALLPAPER_OBTAIN_FAILED;
 import static prototype.xd.scheduler.utilities.Utilities.setSwitchChangeListener;
 import static prototype.xd.scheduler.views.CalendarView.DAYS_ON_ONE_PANEL;
@@ -26,7 +21,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.MainThread;
@@ -40,7 +34,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.navigation.NavigationView;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import prototype.xd.scheduler.BuildConfig;
 import prototype.xd.scheduler.R;
@@ -49,11 +42,9 @@ import prototype.xd.scheduler.databinding.ContentWrapperBinding;
 import prototype.xd.scheduler.databinding.DebugMenuDialogBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.databinding.NavigationViewBinding;
-import prototype.xd.scheduler.entities.Group;
-import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.fragments.dialogs.AddEditEntryDialogFragment;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
-import prototype.xd.scheduler.utilities.SArrayMap;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
@@ -164,24 +155,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         
         contentBnd.toCurrentDateButton.setOnClickListener(v -> calendarView.selectDate(DateManager.getCurrentDate()));
         
-        contentBnd.fab.setOnClickListener(view1 -> {
-            final List<Group> groupList = todoEntryManager.getGroups();
-            todoListViewAdapter.addEditEntryDialog.show(null, groupList,
-                    (text, dialogBinding, selectedIndex) -> {
-                        SArrayMap<String, String> values = new SArrayMap<>();
-                        values.put(TEXT_VALUE, text);
-                        boolean isGlobal = dialogBinding.globalEntrySwitch.isChecked();
-                        values.put(START_DAY_UTC, isGlobal ? DAY_FLAG_GLOBAL_STR :
-                                dialogBinding.dayFromButton.getSelectedDayUTCStr());
-                        values.put(END_DAY_UTC, isGlobal ? DAY_FLAG_GLOBAL_STR :
-                                dialogBinding.dayToButton.getSelectedDayUTCStr());
-                        values.put(IS_COMPLETED, Boolean.toString(false));
-                        
-                        todoEntryManager.addEntry(new TodoEntry(values, groupList.get(selectedIndex), System.currentTimeMillis()));
-                        
-                        Utilities.displayToast(wrapper.context, R.string.event_created_message, Toast.LENGTH_SHORT);
-                    }, wrapper);
-        });
+        contentBnd.fab.setOnClickListener(view1 -> AddEditEntryDialogFragment.show(null, wrapper));
         
         navViewContent.sourceCodeClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_REPO));
         navViewContent.githubIssueClickView.setOnClickListener(v -> Utilities.openUrl(wrapper.context, GITHUB_ISSUES));

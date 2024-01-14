@@ -1,9 +1,7 @@
 package prototype.xd.scheduler.fragments.dialogs;
 
 import static java.lang.Math.max;
-import static prototype.xd.scheduler.entities.Group.findGroupInList;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayAttentionDialog;
-import static prototype.xd.scheduler.utilities.DialogUtilities.displayDeletionDialog;
 import static prototype.xd.scheduler.utilities.DialogUtilities.displayMessageDialog;
 import static prototype.xd.scheduler.utilities.Static.ADAPTIVE_COLOR_BALANCE;
 import static prototype.xd.scheduler.utilities.Static.BG_COLOR;
@@ -17,12 +15,15 @@ import static prototype.xd.scheduler.utilities.Static.UPCOMING_ITEMS_OFFSET;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.activity.ComponentDialog;
 import androidx.annotation.ColorInt;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
+import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.List;
 
@@ -32,20 +33,40 @@ import prototype.xd.scheduler.entities.Group;
 import prototype.xd.scheduler.entities.TodoEntry;
 import prototype.xd.scheduler.entities.settings_entries.EntryPreviewContainer;
 import prototype.xd.scheduler.utilities.DialogUtilities;
-import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.Utilities;
+import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
-public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment {
+public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment { // NOSONAR
     
     @NonNull
-    public final TodoEntryManager nntodoEntryManager;
-    private TodoEntry entry;
-    private final AddEditGroupDialogFragment addEditGroupDialog;
+    protected static MutableLiveData<GroupConfirmationData> confirmedGroupName = new MutableLiveData<>();
+    @NonNull
+    protected static MutableLiveData<Group> deletedGroup = new MutableLiveData<>();
     
-    public EntrySettingsDialogFragment(@NonNull final TodoEntryManager todoEntryManager) {
-        super(todoEntryManager);
-        nntodoEntryManager = todoEntryManager;
-        addEditGroupDialog = new AddEditGroupDialogFragment();
+    public record GroupConfirmationData(@Nullable Group selectedGroup, @NonNull String name,
+                                        @NonNull Group existingGroup) {
+    }
+    
+    public static class EntrySettingsDialogData extends ViewModel {
+        
+        public final MutableObject<TodoEntry> entry = new MutableObject<>();
+        
+        @NonNull
+        public static EntrySettingsDialogData getInstance(@NonNull ContextWrapper wrapper) {
+            return new ViewModelProvider(wrapper.activity).get(EntrySettingsDialogData.class);
+        }
+    }
+    
+    private TodoEntry entry;
+    
+    public static void show(@NonNull final TodoEntry entry, @NonNull ContextWrapper wrapper) {
+        EntrySettingsDialogData.getInstance(wrapper).entry.setValue(entry);
+        new EntrySettingsDialogFragment().show(wrapper.childFragmentManager, "entry_settings");
+    }
+    
+    @Override
+    protected void setVariablesFromData() {
+        entry = EntrySettingsDialogData.getInstance(wrapper).entry.getValue();
     }
     
     @NonNull
@@ -83,27 +104,21 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment {
         };
     }
     
-    public void show(@NonNull final TodoEntry entry, @NonNull FragmentManager manager) {
-        this.entry = entry;
-        show(manager, "entry_settings: " + entry);
-    }
-    
     @Override
-    protected void buildDialogStatic(@NonNull EntrySettingsBinding bnd, @NonNull ComponentDialog dialog) {
+    public void buildDialogBodyStatic(@NonNull EntrySettingsBinding bnd) {
         bnd.hideExpiredItemsByTimeContainer.setVisibility(View.GONE);
         bnd.hideByContentContainer.setVisibility(View.GONE);
         bnd.entrySettingsTitle.setVisibility(View.GONE);
         bnd.showOnLockContainer.setVisibility(View.GONE);
-        super.buildDialogStatic(bnd, dialog);
+        super.buildDialogBodyStatic(bnd);
     }
     
-    
     @Override
-    public void buildDialogDynamic(@NonNull EntrySettingsBinding bnd, @NonNull ComponentDialog dialog) {
+    public void buildDialogBodyDynamic(@NonNull EntrySettingsBinding bnd) {
         updateAllIndicators(bnd);
         entryPreviewContainer.refreshAll(true);
         
-        final List<Group> groupList = nntodoEntryManager.getGroups();
+        final List<Group> groupList = todoEntryManager.getGroups();
         bnd.groupSpinner.setSimpleItems(Group.groupListToNames(groupList, wrapper));
         bnd.groupSpinner.setSelectedItem(max(Group.groupIndexInList(groupList, entry.getRawGroupName()), 0));
         
@@ -116,54 +131,53 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment {
                 return;
             }
             
-            var selectedGroup = groupList.get(selection);
-            
-            addEditGroupDialog.show(selectedGroup,
-                    name -> {
-                        int groupIndex = Group.groupIndexInList(groupList, name);
-                        
-                        String newName = name;
-                        int i = 0;
-                        while (groupIndex > 0) {
-                            i++;
-                            newName = name + "(" + i + ")";
-                            groupIndex = Group.groupIndexInList(groupList, newName);
-                        }
-                        
-                        nntodoEntryManager.setNewGroupName(selectedGroup, newName);
-                        bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
-                    }, additionDialog ->
-                            displayDeletionDialog(wrapper, (deletionDialog, whichButton) -> {
-                                additionDialog.dismiss();
-                                nntodoEntryManager.removeGroup(selection);
-                                rebuild();
-                            }), wrapper);
+            AddEditGroupDialogFragment.show(groupList.get(selection), wrapper);
             
         });
-        
-        bnd.groupSpinner.setOnItemClickListener((parent, view, position, id) -> {
-            if (nntodoEntryManager.changeEntryGroup(entry, groupList.get(position))) {
+        deletedGroup.setValue(null);
+        deletedGroup.removeObservers(this);
+        deletedGroup.observe(this, group -> {
+            if (group != null) {
+                todoEntryManager.removeGroup(group);
                 rebuild();
             }
         });
         
-        bnd.addGroupButton.setOnClickListener(v -> addEditGroupDialog.show(null,
-                text -> {
-                    var existingGroup = findGroupInList(groupList, text);
-                    if (existingGroup.isNullGroup()) {
-                        addGroupToGroupList(text, null);
-                    } else {
-                        displayMessageDialog(wrapper, builder -> {
-                            builder.setTitle(R.string.group_with_same_name_exists);
-                            builder.setMessage(R.string.overwrite_prompt);
-                            builder.setIcon(R.drawable.ic_settings_45);
-                            builder.setNegativeButton(R.string.cancel, null);
-                            
-                            builder.setPositiveButton(R.string.overwrite, (dialogInterface, whichButton) ->
-                                    addGroupToGroupList(text, existingGroup));
-                        });
-                    }
-                }, null, wrapper));
+        bnd.groupSpinner.setOnItemClickListener((parent, view, position, id) -> {
+            if (todoEntryManager.changeEntryGroup(entry, groupList.get(position))) {
+                rebuild();
+            }
+        });
+        
+        bnd.addGroupButton.setOnClickListener(v -> AddEditGroupDialogFragment.show(null, wrapper));
+        confirmedGroupName.setValue(null);
+        confirmedGroupName.removeObservers(this);
+        confirmedGroupName.observe(this, confirmationData -> {
+            if (confirmationData == null) {
+                return;
+            }
+            Group selectedGroup = confirmationData.selectedGroup;
+            String name = confirmationData.name;
+            if (selectedGroup != null) {
+                // We are editing a group
+                int groupIndex = Group.groupIndexInList(groupList, name);
+                
+                String newName = name;
+                int i = 0;
+                while (groupIndex > 0) {
+                    i++;
+                    newName = name + "(" + i + ")";
+                    groupIndex = Group.groupIndexInList(groupList, newName);
+                }
+                
+                todoEntryManager.setNewGroupName(selectedGroup, newName);
+                bnd.groupSpinner.setNewItemNames(Group.groupListToNames(groupList, wrapper));
+            } else {
+                // We are adding a new group
+                // pair.getRight() - existing group with this name
+                addGroupToGroupList(name, confirmationData.existingGroup);
+            }
+        });
         
         bnd.settingsResetButton.setOnClickListener(v ->
                 displayMessageDialog(wrapper, builder -> {
@@ -173,7 +187,7 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment {
                     builder.setNegativeButton(R.string.cancel, null);
                     
                     builder.setPositiveButton(R.string.reset, (dialogInterface, whichButton) -> {
-                        if (nntodoEntryManager.resetEntrySettings(entry)) {
+                        if (todoEntryManager.resetEntrySettings(entry)) {
                             rebuild();
                         }
                     });
@@ -242,19 +256,18 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment {
         }
     }
     
-    private void addGroupToGroupList(String groupName,
-                                     @Nullable Group existingGroup) {
+    private void addGroupToGroupList(@NonNull String groupName, @NonNull Group existingGroup) {
         boolean rebuild;
-        if (existingGroup != null) {
-            // automatically handles parameter invalidation on other entries and saving of the group
-            rebuild = nntodoEntryManager.setNewGroupParams(existingGroup, entry.getDisplayParams());
-        } else {
+        if (existingGroup.isNullGroup()) {
             var newGroup = new Group(groupName, entry.getDisplayParams());
-            nntodoEntryManager.addGroup(newGroup);
+            todoEntryManager.addGroup(newGroup);
             entry.changeGroup(newGroup);
             rebuild = true;
+        } else {
+            // automatically handles parameter invalidation on other entries and saving of the group
+            rebuild = todoEntryManager.setNewGroupParams(existingGroup, entry.getDisplayParams());
         }
-    
+        
         entry.removeDisplayParams();
         if (rebuild) {
             rebuild();

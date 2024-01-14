@@ -31,7 +31,7 @@ public abstract class BaseFragment<T extends ViewBinding> extends Fragment {
     @CallSuper
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        wrapper = ContextWrapper.from(this);
+        wrapper = new ContextWrapper(this);
     }
     
     // fragment view created

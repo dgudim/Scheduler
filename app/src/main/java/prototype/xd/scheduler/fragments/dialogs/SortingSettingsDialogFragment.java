@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import androidx.activity.ComponentDialog;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -45,12 +44,12 @@ public class SortingSettingsDialogFragment extends FullScreenSettingsDialogFragm
     }
     
     @Override
-    protected void buildDialogStatic(@NonNull SortingSettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
+    protected void buildDialogBody(@NonNull SortingSettingsDialogFragmentBinding binding) {
         EntryTypeAdapter entryTypeAdapter = new EntryTypeAdapter();
         binding.orderRecyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
         binding.orderRecyclerView.setAdapter(entryTypeAdapter);
         entryTypeAdapter.attachDragToRecyclerView(binding.orderRecyclerView);
-    
+        
         List<SettingsEntryConfig> settingsEntries = List.of(
                 new SwitchSettingsEntryConfig(
                         Static.SORTING_TREAT_GLOBAL_ITEMS_AS_TODAYS, R.string.sorting_treat_global_as_todays,
@@ -64,11 +63,6 @@ public class SortingSettingsDialogFragment extends FullScreenSettingsDialogFragm
         binding.settingsRecyclerView.addItemDecoration(divider);
         binding.settingsRecyclerView.setHasFixedSize(true);
         binding.settingsRecyclerView.setAdapter(new SettingsListViewAdapter(wrapper, settingsEntries));
-    }
-    
-    @Override
-    protected void buildDialogDynamic(@NonNull SortingSettingsDialogFragmentBinding binding, @NonNull ComponentDialog dialog) {
-        // None of it is dynamic
     }
     
     private static final class EntryTypeAdapter extends RecyclerView.Adapter<EntryTypeAdapter.CardViewHolder> {

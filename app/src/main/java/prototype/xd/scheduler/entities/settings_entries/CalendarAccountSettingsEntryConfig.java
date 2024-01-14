@@ -23,8 +23,6 @@ import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsEntryConfig {
     
     @NonNull
-    private final CalendarSettingsDialogFragment calendarSettingsDialogFragment;
-    @NonNull
     private final String accountName;
     @NonNull
     private final List<String> subKeys;
@@ -36,12 +34,10 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
     @NonNull
     private final SettingsListViewAdapter containerAdapter;
     
-    public CalendarAccountSettingsEntryConfig(@NonNull final CalendarSettingsDialogFragment calendarSettingsDialogFragment,
-                                              @NonNull final SystemCalendar calendar,
+    public CalendarAccountSettingsEntryConfig(@NonNull final SystemCalendar calendar,
                                               @NonNull final SettingsListViewAdapter containerAdapter,
                                               boolean showSettings) {
         super(showSettings);
-        this.calendarSettingsDialogFragment = calendarSettingsDialogFragment;
         accountName = calendar.data.accountName;
         subKeys = Collections.singletonList(accountName);
         accountType = calendar.data.accountType;
@@ -67,7 +63,7 @@ public class CalendarAccountSettingsEntryConfig extends GenericCalendarSettingsE
             binding.calendarName.setText(config.accountName);
             binding.accountType.setText(config.accountType);
             binding.settingsButton.setOnClickListener(v ->
-                    config.calendarSettingsDialogFragment.show(config.accountName, config.subKeys, config.calendarColor, wrapper));
+                    CalendarSettingsDialogFragment.show(config.accountName, config.subKeys, config.calendarColor, wrapper));
             config.updateSettingsButtonVisibility(binding.settingsButton);
             View.OnClickListener expandListener = v -> {
                 config.containerAdapter.toggleCollapsed();

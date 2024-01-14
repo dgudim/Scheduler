@@ -265,6 +265,10 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
      * @param days days that changed
      */
     private void notifyDaysChanged(@NonNull Set<Long> days) {
+        if (days.isEmpty()) {
+            Logger.debug(NAME, "Nothing to do, no days have changed");
+            return;
+        }
         Logger.debug(NAME, days.size() + " days changed");
         if (calendarView != null) {
             calendarView.notifyDaysChanged(days);
@@ -563,9 +567,13 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
             return;
         }
         
-        todoEntries.remove(entry);
-        Logger.debug(NAME, "Removed " + entry);
-        notifyEntryRemovedAdded(entry);
+        boolean removed = todoEntries.remove(entry);
+        if (removed) {
+            Logger.debug(NAME, "Removed " + entry);
+            notifyEntryRemovedAdded(entry);
+        } else {
+            Logger.error(NAME, entry + " not found in list, removal failed");
+        }
     }
     
     @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
@@ -659,13 +667,15 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     /**
-     * Removes a group from the list by index, handles all entry unlinking
-     *
-     * @param index index of the group to remove
+     * Removes a group from the list, handles all entry unlinking
      */
-    public void removeGroup(int index) {
-        Group old = groups.remove(index);
-        Logger.debug(NAME, "Removed " + old);
-        saveGroupsAsync();
+    public void removeGroup(@NonNull Group group) {
+        boolean removed = groups.remove(group);
+        if (removed) {
+            Logger.debug(NAME, "Removed " + group);
+            saveGroupsAsync();
+        } else {
+            Logger.error(NAME, group + " not found in list, removal failed");
+        }
     }
 }

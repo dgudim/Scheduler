@@ -1,6 +1,5 @@
 package prototype.xd.scheduler.adapters;
 
-import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,19 +15,14 @@ import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
 public class CalendarEventViewAdapter extends RecyclerView.Adapter<CalendarEventViewAdapter.EntryViewHolder> {
     
-    private SystemCalendar calendar;
+    private final SystemCalendar calendar;
     private final ContextWrapper wrapper;
     
-    public CalendarEventViewAdapter(@NonNull ContextWrapper wrapper) {
+    public CalendarEventViewAdapter(@NonNull ContextWrapper wrapper, @NonNull SystemCalendar calendar) {
         this.wrapper = wrapper;
+        this.calendar = calendar;
         // Each event is unique
         setHasStableIds(true);
-    }
-    
-    @SuppressLint("NotifyDataSetChanged")
-    public void setCalendar(@NonNull SystemCalendar calendar) {
-        this.calendar = calendar;
-        notifyDataSetChanged();
     }
     
     static class EntryViewHolder extends BindingViewHolder<ListSelectionEventBinding> {

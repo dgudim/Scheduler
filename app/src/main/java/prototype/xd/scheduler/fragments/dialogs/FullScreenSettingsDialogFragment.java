@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.activity.ComponentDialog;
 import androidx.annotation.CallSuper;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -24,7 +23,7 @@ import prototype.xd.scheduler.fragments.HomeFragment;
 import prototype.xd.scheduler.utilities.Static;
 
 // base dialog class that refreshes main screen on settings changes
-public abstract class FullScreenSettingsDialogFragment<T extends ViewBinding> extends BaseCachedDialogFragment<T, ComponentDialog> {
+public abstract class FullScreenSettingsDialogFragment<T extends ViewBinding> extends BaseDialogFragment<T> {
     
     private Map<String, ?> preferenceStateBefore;
     
@@ -38,10 +37,9 @@ public abstract class FullScreenSettingsDialogFragment<T extends ViewBinding> ex
         return super.onCreateView(inflater, container, savedInstanceState);
     }
     
-    @NonNull
     @Override
-    public ComponentDialog buildDialog() {
-        return getBaseDialog();
+    protected void setVariablesFromData() {
+        // No variables
     }
     
     // fragment creation begin

@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.activity.ComponentDialog;
 import androidx.annotation.CallSuper;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
@@ -21,16 +20,16 @@ import prototype.xd.scheduler.utilities.ImageUtilities;
 import prototype.xd.scheduler.utilities.Static;
 import prototype.xd.scheduler.utilities.TodoEntryManager;
 
-// TODO: use ViewModel and savedInstanceState to transfer data instead of using the constructor for proper config updates
 @MainThread
-public abstract class PopupSettingsDialogFragment extends BaseCachedDialogFragment<EntrySettingsBinding, ComponentDialog> {
+public abstract class PopupSettingsDialogFragment extends BaseDialogFragment<EntrySettingsBinding> {
     
     @SuppressLint("UnknownNullness")
     protected EntryPreviewContainer entryPreviewContainer;
     
     protected int defaultTextColor;
-    @Nullable
-    private final TodoEntryManager todoEntryManager;
+    
+    @SuppressLint("UnknownNullness")
+    protected TodoEntryManager todoEntryManager;
     
     @NonNull
     @Override
@@ -45,14 +44,18 @@ public abstract class PopupSettingsDialogFragment extends BaseCachedDialogFragme
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialog);
-    }
-    
-    PopupSettingsDialogFragment(@Nullable final TodoEntryManager todoEntryManager) {
-        this.todoEntryManager = todoEntryManager;
+        todoEntryManager = TodoEntryManager.getInstance(wrapper.context);
     }
     
     @Override
-    protected void buildDialogStatic(@NonNull EntrySettingsBinding bnd, @NonNull ComponentDialog dialog) {
+    public void buildDialogBody(@NonNull EntrySettingsBinding bnd) {
+        buildDialogBodyStatic(bnd);
+        buildDialogBodyDynamic(bnd);
+    }
+    
+    protected abstract void buildDialogBodyDynamic(@NonNull EntrySettingsBinding bnd);
+    
+    protected void buildDialogBodyStatic(@NonNull EntrySettingsBinding bnd) {
         defaultTextColor = bnd.hideExpiredItemsByTimeSwitch.getCurrentTextColor();
         entryPreviewContainer = getEntryPreviewContainer(bnd);
         
@@ -71,13 +74,7 @@ public abstract class PopupSettingsDialogFragment extends BaseCachedDialogFragme
     }
     
     protected void rebuild() {
-        buildDialogDynamic(requireBinding(), (ComponentDialog) requireDialog());
-    }
-    
-    @NonNull
-    @Override
-    protected ComponentDialog buildDialog() {
-        return getBaseDialog();
+        buildDialogBodyDynamic(requireBinding());
     }
     
     @NonNull
@@ -106,9 +103,7 @@ public abstract class PopupSettingsDialogFragment extends BaseCachedDialogFragme
     
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
-        if (todoEntryManager != null) {
-            todoEntryManager.performDeferredTasks();
-        }
+        todoEntryManager.performDeferredTasks();
         super.onDismiss(dialog);
     }
     
