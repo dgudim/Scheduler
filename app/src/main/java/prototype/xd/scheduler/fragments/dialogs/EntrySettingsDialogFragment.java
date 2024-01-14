@@ -183,7 +183,7 @@ public class EntrySettingsDialogFragment extends PopupSettingsDialogFragment { /
         bnd.settingsResetButton.setOnClickListener(v ->
                 displayMessageDialog(wrapper, builder -> {
                     builder.setTitle(R.string.reset_settings_prompt);
-                    builder.setMessage(R.string.reset_entry_settings_description);
+                    builder.setMessage(R.string.reset_event_settings_description);
                     builder.setIcon(R.drawable.ic_clear_all_24);
                     builder.setNegativeButton(R.string.cancel, null);
                     

@@ -119,7 +119,7 @@
     <string name="settings_preview_current">Текущие</string>
     <string name="settings_preview_expired">Прошедшие</string>
     <string name="settings_preview_upcoming">Будущие</string>
-    <string name="settings_hide_expired_entries_by_time">Скрывать прошедшие события на экране блокировки (по времени)</string>
+    <string name="settings_hide_expired_events_by_time">Скрывать прошедшие события на экране блокировки (по времени)</string>
     <string name="event_name_input_hint">Событие</string>
     <string name="status">Дата: %s  Событий: %d</string>
     <string name="app_theme">Тема приложения</string>
@@ -191,7 +191,7 @@
     <string name="global">Глобальное</string>
     <string name="date_from_to">Дата от до</string>
     <string name="reset_calendar_settings_description">Это сбросит настройки текущего календаря</string>
-    <string name="reset_entry_settings_description">Это сбросит настройки события</string>
+    <string name="reset_event_settings_description">Это сбросит настройки события</string>
     <string name="delete_all_saved_backgrounds_description">Это сбросит все пользовательские фоны по дням</string>
     <string name="select_date">Выберите дату</string>
     <string name="attention">Внимание</string>
@@ -246,4 +246,8 @@
     <string name="title_all_calendar_events_description">Это все события из календаря</string>
     <string name="title_edit_events_with_color">Настройки для определенных цветов</string>
     <string name="title_edit_events_with_color_description">В календаре могут быть события разного цвета, здесь можно задать отдельные стили для каждого цвета.</string>
+    <string name="uncompleted_events">Незавершенные события</string>
+    <string name="view_uncompleted_events">Просмотреть незавершенные события</string>
+    <string name="view_uncompleted_events_description">Получить список всех незавершенных событий</string>
+    <string name="view_uncompleted_events_description_dialog">События, отмеченные/измененные здесь, будут завершены/изменены после закрытия диалога</string>
 </resources>

@@ -43,6 +43,7 @@ import prototype.xd.scheduler.databinding.DebugMenuDialogBinding;
 import prototype.xd.scheduler.databinding.HomeFragmentWrapperBinding;
 import prototype.xd.scheduler.databinding.NavigationViewBinding;
 import prototype.xd.scheduler.fragments.dialogs.AddEditEntryDialogFragment;
+import prototype.xd.scheduler.fragments.dialogs.UncompletedEntryListDialogFragment;
 import prototype.xd.scheduler.utilities.DateManager;
 import prototype.xd.scheduler.utilities.Logger;
 import prototype.xd.scheduler.utilities.Static;
@@ -170,6 +171,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
                     
                     DebugMenuDialogBinding bnd = DebugMenuDialogBinding.inflate(wrapper.getLayoutInflater());
                     bnd.shareLogcatView.setOnClickListener(v1 -> Logger.shareLog(wrapper.context));
+                    bnd.uncompletedTodosView.setOnClickListener(v1 -> UncompletedEntryListDialogFragment.show(wrapper));
                     
                     if (BuildConfig.DEBUG) {
                         bnd.debugLoggingSwitch.freezeState(true);

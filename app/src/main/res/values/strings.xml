@@ -127,7 +127,7 @@
     <string name="settings_preview_current">Current</string>
     <string name="settings_preview_expired">Expired</string>
     <string name="settings_preview_upcoming">Upcoming</string>
-    <string name="settings_hide_expired_entries_by_time">Hide passed events on lockscreen (by time)</string>
+    <string name="settings_hide_expired_events_by_time">Hide passed events on lockscreen (by time)</string>
     <string name="status">Date: %s  Events: %d</string>
     <string name="app_theme">App theme</string>
     <string name="import_export_settings">Import/export settings</string>
@@ -193,7 +193,7 @@
     <string name="source_code_description">Check out the GitHub repository and contribute</string>
     <string name="reset_settings_description">This will reset ALL your settings, including calendar ones</string>
     <string name="reset_calendar_settings_description">This will reset current calendar settings</string>
-    <string name="reset_entry_settings_description">This will reset current entry settings</string>
+    <string name="reset_event_settings_description">This will reset current event settings</string>
     <string name="settings_allow_global_calendar_account_settings">Allow changing settings of whole calendars and accounts</string>
     <string name="global">Global</string>
     <string name="date_from_to">Date from to</string>
@@ -245,4 +245,8 @@
     <string name="title_all_calendar_events_description">These are all the events from the calendar</string>
     <string name="title_edit_events_with_color">Settings for specific colors</string>
     <string name="title_edit_events_with_color_description">A calendar can have events with different colors, here you can set separate styles for each color</string>
+    <string name="uncompleted_events">Uncompleted events</string>
+    <string name="view_uncompleted_events">View uncompleted events</string>
+    <string name="view_uncompleted_events_description">Get a list of all uncompleted events</string>
+    <string name="view_uncompleted_events_description_dialog">Events marked/changed here will be completed/changed after closing the dialog</string>
 </resources>

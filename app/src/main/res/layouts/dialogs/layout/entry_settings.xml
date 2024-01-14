@@ -636,7 +636,7 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="3dp"
                     android:paddingEnd="5dp"
-                    android:text="@string/settings_hide_expired_entries_by_time"
+                    android:text="@string/settings_hide_expired_events_by_time"
                     android:textAppearance="@style/SmallHeading"
                     tools:ignore="VisualLintButtonSize" />
             </LinearLayout>

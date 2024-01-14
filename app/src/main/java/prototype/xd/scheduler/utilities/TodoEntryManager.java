@@ -413,6 +413,15 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
     }
     
     @NonNull
+    public Collection<TodoEntry> getRegularTodoEntries() {
+        if (todoEntries == null) {
+            initError("getRegularTodoEntries");
+            return Collections.emptyList();
+        }
+        return todoEntries.getRegularEntries();
+    }
+    
+    @NonNull
     public List<TodoEntry> getVisibleTodoEntries(long day,
                                                  @NonNull BiPredicate<TodoEntry, TodoEntry.EntryType> filter,
                                                  boolean includeAll) {

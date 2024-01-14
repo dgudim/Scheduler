@@ -30,7 +30,7 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.databinding.ListSelectionCalendarBinding;
@@ -213,7 +213,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     @NonNull
     private final ContextWrapper wrapper;
     
-    private Supplier<Collection<TodoEntry>> todoEntryListSupplier;
+    private Function<TodoEntryManager, Collection<TodoEntry>> todoEntryListSupplier;
     
     // default capacity is fine
     @SuppressWarnings("CollectionWithoutInitialCapacity")
@@ -222,12 +222,12 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         todoEntryManager = TodoEntryManager.getInstance(wrapper.context);
         this.wrapper = wrapper;
         currentTodoEntries = new ArrayList<>();
-        todoEntryListSupplier = () -> todoEntryManager.getVisibleTodoEntriesInList(currentlySelectedDayUTC);
+        todoEntryListSupplier = (manager) -> manager.getVisibleTodoEntriesInList(currentlySelectedDayUTC);
         // each entry has a unique id
         setHasStableIds(true);
     }
     
-    public void setListSupplier(@NonNull Supplier<Collection<TodoEntry>> todoEntryListSupplier) {
+    public void setListSupplier(@NonNull Function<TodoEntryManager, Collection<TodoEntry>> todoEntryListSupplier) {
         this.todoEntryListSupplier = todoEntryListSupplier;
         notifyEntryListChanged();
     }
@@ -248,7 +248,7 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
     public void notifyEntryListChanged() {
         int prevItemsCount = currentTodoEntries.size();
         currentTodoEntries.clear();
-        currentTodoEntries.addAll(todoEntryListSupplier.get());
+        currentTodoEntries.addAll(todoEntryListSupplier.apply(todoEntryManager));
         notifyItemRangeChanged(0, max(prevItemsCount, currentTodoEntries.size()));
     }
     

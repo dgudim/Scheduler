@@ -99,7 +99,7 @@
     <string name="settings_preview_current">Поточні</string>
     <string name="settings_preview_expired">Минулі</string>
     <string name="settings_preview_upcoming">Майбутні</string>
-    <string name="settings_hide_expired_entries_by_time">Приховувати минулі події на екрані блокування (за часом)</string>
+    <string name="settings_hide_expired_events_by_time">Приховувати минулі події на екрані блокування (за часом)</string>
     <string name="status">Дата: %s  Подій: %d</string>
     <string name="app_theme">Тема додатка</string>
     <string name="import_export_settings">Імпорт/експорт налаштувань</string>
@@ -164,7 +164,7 @@
     <string name="source_code_description">Переглянути GitHub репозиторій і зробити свій внесок</string>
     <string name="reset_settings_description">Це скине ВСІ ваші налаштування, включаючи налаштування календарів</string>
     <string name="reset_calendar_settings_description">Це скине налаштування поточного календаря</string>
-    <string name="reset_entry_settings_description">Це скине налаштування подій</string>
+    <string name="reset_event_settings_description">Це скине налаштування подій</string>
     <string name="settings_allow_global_calendar_account_settings">Дозволити зміну налаштувань цілих календарів та облікових записів</string>
     <string name="global">Глобально</string>
     <string name="date_from_to">Дата від до</string>
@@ -246,4 +246,8 @@
     <string name="title_all_calendar_events_description">Це всі події з календаря</string>
     <string name="title_edit_events_with_color">Налаштування для певних кольорів</string>
     <string name="title_edit_events_with_color_description">У календарі можуть бути події різних кольорів, тут ви можете встановити окремі стилі для кожного кольору</string>
+    <string name="uncompleted_events">Незавершені події</string>
+    <string name="view_uncompleted_events">Переглянути незавершені події</string>
+    <string name="view_uncompleted_events_description">Отримати список усіх незавершених подій</string>
+    <string name="view_uncompleted_events_description_dialog">Події, зазначені/змінені тут, будуть завершені/змінені після закриття діалогу</string>
 </resources>

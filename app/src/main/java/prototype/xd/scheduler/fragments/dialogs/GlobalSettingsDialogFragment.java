@@ -112,7 +112,7 @@ public class GlobalSettingsDialogFragment extends FullScreenSettingsDialogFragme
                 
                 new SwitchSettingsEntryConfig(Static.MERGE_ENTRIES, R.string.settings_merge_events),
                 new DividerSettingsEntryConfig(),
-                new SwitchSettingsEntryConfig(Static.HIDE_EXPIRED_ENTRIES_BY_TIME, R.string.settings_hide_expired_entries_by_time),
+                new SwitchSettingsEntryConfig(Static.HIDE_EXPIRED_ENTRIES_BY_TIME, R.string.settings_hide_expired_events_by_time),
                 new DividerSettingsEntryConfig(),
                 new SwitchSettingsEntryConfig(Static.SHOW_UPCOMING_EXPIRED_IN_LIST, R.string.show_upcoming_and_expired_event_indicators),
                 new DividerSettingsEntryConfig(),
