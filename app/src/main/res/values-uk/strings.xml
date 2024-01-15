@@ -249,5 +249,5 @@
     <string name="uncompleted_events">Незавершені події</string>
     <string name="view_uncompleted_events">Переглянути незавершені події</string>
     <string name="view_uncompleted_events_description">Отримати список усіх незавершених подій</string>
-    <string name="view_uncompleted_events_description_dialog">Події, зазначені/змінені тут, будуть завершені/змінені після закриття діалогу</string>
+    <string name="view_uncompleted_events_description_dialog">Тут ви можете керувати всіма своїми, можливо, забутими незавершеними подіями.</string>
 </resources>

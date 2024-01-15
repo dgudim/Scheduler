@@ -24,7 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.collection.ArraySet;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
@@ -142,8 +141,8 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         return initFinished.getValue();
     }
     
-    public void onInitFinished(@NonNull Fragment frag, @NonNull Observer<Boolean> observer) {
-        initFinished.observe(frag.getViewLifecycleOwner(), el -> {
+    public void onInitFinished(@NonNull LifecycleOwner owner, @NonNull Observer<Boolean> observer) {
+        initFinished.observe(owner, el -> {
             observer.onChanged(el);
             // update adapter showing entries
             notifyEntryListChanged();
@@ -152,8 +151,8 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         });
     }
     
-    public void onListChanged(@NonNull Fragment frag, @NonNull Observer<Boolean> observer) {
-        listChanged.observe(frag.getViewLifecycleOwner(), observer);
+    public void onListChanged(@NonNull LifecycleOwner owner, @NonNull Observer<Boolean> observer) {
+        listChanged.observe(owner, observer);
     }
     
     /**

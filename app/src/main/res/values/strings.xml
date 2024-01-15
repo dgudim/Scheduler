@@ -248,5 +248,5 @@
     <string name="uncompleted_events">Uncompleted events</string>
     <string name="view_uncompleted_events">View uncompleted events</string>
     <string name="view_uncompleted_events_description">Get a list of all uncompleted events</string>
-    <string name="view_uncompleted_events_description_dialog">Events marked/changed here will be completed/changed after closing the dialog</string>
+    <string name="view_uncompleted_events_description_dialog">Here you can manage all your maybe-forgotten uncompleted events</string>
 </resources>

@@ -492,6 +492,8 @@ public final class Static {
     
     private static final DefaultedBoolean SERVICE_UPDATE_SIGNAL = new DefaultedBoolean("update_lockscreen", false);
     public static final DefaultedBoolean DEBUG_LOGGING = new DefaultedBoolean("debug_logging", false);
+    public static final DefaultedBoolean DEBUG_UNCOMPLETED_UPDATE_IMMEDIATELY = new DefaultedBoolean("debug_uncompleted_display_immediately", false);
+    
     public static final String SERVICE_KEEP_ALIVE_SIGNAL = "keep_alive";
     public static final DefaultedBoolean SERVICE_FAILED = new DefaultedBoolean("service_failed", false);
     public static final DefaultedBoolean WALLPAPER_OBTAIN_FAILED = new DefaultedBoolean("wallpaper_obtain_failed", false);

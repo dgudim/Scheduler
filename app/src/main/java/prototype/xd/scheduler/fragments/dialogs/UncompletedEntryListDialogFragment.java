@@ -9,25 +9,29 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.collection.ArraySet;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import prototype.xd.scheduler.R;
 import prototype.xd.scheduler.adapters.TodoListViewAdapter;
 import prototype.xd.scheduler.databinding.ListViewBinding;
 import prototype.xd.scheduler.entities.TodoEntry;
+import prototype.xd.scheduler.utilities.TodoEntryManager;
 import prototype.xd.scheduler.utilities.misc.ContextWrapper;
 
-public class UncompletedEntryListDialogFragment extends AlertSettingsDialogFragment<ListViewBinding> {
+public class UncompletedEntryListDialogFragment extends AlertSettingsDialogFragment<ListViewBinding> { // NOSONAR
     
     public static void show(@NonNull ContextWrapper wrapper) {
         new UncompletedEntryListDialogFragment().show(wrapper.childFragmentManager, "uncompleted_entry_list");
     }
+    
+    @NonNull
+    private final Set<TodoEntry> originalEntries = new ArraySet<>();
     
     @Override
     protected void setVariablesFromData() {
@@ -40,28 +44,32 @@ public class UncompletedEntryListDialogFragment extends AlertSettingsDialogFragm
         return ListViewBinding.inflate(inflater, container, false);
     }
     
-    /**
-     * @noinspection CollectionWithoutInitialCapacity
-     */
     @Override
     protected void buildDialogBody(@NonNull ListViewBinding binding) {
         int pad = dpToPx(9);
         binding.recyclerView.setPadding(0, 0, 0, pad);
         binding.recyclerView.addItemDecoration(getRecyclerviewGap(wrapper, LinearLayout.VERTICAL, R.dimen.list_item_vertical_padding));
-        var adapter = new TodoListViewAdapter(wrapper);
-        adapter.setListSupplier(todoEntryManager -> {
+        var entryAdapter = new TodoListViewAdapter(wrapper);
+        entryAdapter.setListSupplier(todoEntryManager -> {
             Collection<TodoEntry> entryList = todoEntryManager.getRegularTodoEntries();
-            List<TodoEntry> filteredEntryList = new ArrayList<>();
+            Set<TodoEntry> filteredEntryList = new ArraySet<>();
             for (var entry : entryList) {
-                if (!entry.isCompleted() && !entry.isGlobal()) {
+                if ((!entry.isCompleted() && !entry.isGlobal())
+                        || originalEntries.contains(entry)) {
                     filteredEntryList.add(entry);
                 }
             }
+            if (originalEntries.isEmpty()) {
+                originalEntries.addAll(filteredEntryList);
+            }
             return filteredEntryList;
         });
-        binding.recyclerView.setAdapter(adapter);
-        binding.recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setAdapter(entryAdapter);
+        binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(wrapper.context));
+        
+        // Update adapter after list update
+        TodoEntryManager.getInstance(wrapper.context).onListChanged(this, aBoolean -> entryAdapter.notifyEntryListChanged());
     }
     
     @Override

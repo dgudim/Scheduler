@@ -121,7 +121,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
         CalendarView calendarView = new CalendarView(contentBnd.content.calendar, todoEntryManager);
         todoEntryManager.attachCalendarView(calendarView, wrapper.lifecycle);
         // when all entries are loaded and ui is created, setup listeners, todoEntryManager also updates the data
-        todoEntryManager.onInitFinished(this, el -> {
+        todoEntryManager.onInitFinished(getViewLifecycleOwner(), el -> {
             setupListeners(contentBnd, binding.navView, calendarView, wrapper.activity);
             binding.contentWrapper.content.progressBar.setVisibility(View.GONE);
         });
@@ -138,7 +138,7 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
             todoEntryManager.notifyEntryListChanged();
         });
         
-        todoEntryManager.onListChanged(this, status -> {
+        todoEntryManager.onListChanged(getViewLifecycleOwner(), status -> {
             todoListViewAdapter.notifyEntryListChanged();
             // update the status text with entry count
             int events = todoListViewAdapter.getItemCount();

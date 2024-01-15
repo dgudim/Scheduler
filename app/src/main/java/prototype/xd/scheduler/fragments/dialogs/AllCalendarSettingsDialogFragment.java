@@ -94,6 +94,7 @@ public class AllCalendarSettingsDialogFragment extends FullScreenSettingsDialogF
                 
                 ArrayList<GenericCalendarSettingsEntryConfig> calendarEntryList = new ArrayList<>(calendarGroup.size() + 1);
                 SettingsListViewAdapter calendarEntryListAdapter = new SettingsListViewAdapter(wrapper, calendarEntryList, true);
+                // TODO: enable stable ids + fixedSize for recyclerview everywhere
                 
                 calendarEntryList.add(new CalendarAccountSettingsEntryConfig(
                         calendarGroup.get(0),

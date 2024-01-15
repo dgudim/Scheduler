@@ -249,5 +249,5 @@
     <string name="uncompleted_events">Незавершенные события</string>
     <string name="view_uncompleted_events">Просмотреть незавершенные события</string>
     <string name="view_uncompleted_events_description">Получить список всех незавершенных событий</string>
-    <string name="view_uncompleted_events_description_dialog">События, отмеченные/измененные здесь, будут завершены/изменены после закрытия диалога</string>
+    <string name="view_uncompleted_events_description_dialog">Здесь вы можете управлять всеми своими, возможно, забытыми незавершенными событиями.</string>
 </resources>
