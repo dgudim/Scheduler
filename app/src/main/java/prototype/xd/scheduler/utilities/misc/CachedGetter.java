@@ -2,6 +2,8 @@ package prototype.xd.scheduler.utilities.misc;
 
 import androidx.annotation.Nullable;
 
+import java.util.Objects;
+
 public class CachedGetter<T> implements Ephemeral {
     
     private final ParameterGetter<T> parameterGetter;
@@ -30,6 +32,10 @@ public class CachedGetter<T> implements Ephemeral {
     
     public T get() {
         return get(null);
+    }
+    
+    public boolean getBool() {
+        return Objects.equals(get(null), Boolean.TRUE);
     }
     
 }
