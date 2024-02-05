@@ -128,7 +128,7 @@
     <string name="settings_preview_expired">Expired</string>
     <string name="settings_preview_upcoming">Upcoming</string>
     <string name="settings_hide_expired_events_by_time">Hide passed events on lockscreen (by time)</string>
-    <string name="status">Date: %s  Events: %d</string>
+    <string name="status">Date: %s  Events: %d (%d)</string>
     <string name="app_theme">App theme</string>
     <string name="import_export_settings">Import/export settings</string>
     <string name="import_settings_description">Import application settings</string>

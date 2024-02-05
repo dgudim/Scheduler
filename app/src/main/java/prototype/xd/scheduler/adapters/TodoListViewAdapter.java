@@ -109,8 +109,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         /**
          * Set view parameters for a regular entry
          *
-         * @param entry                       target entry
-         * @param todoEntryManager            entry manager (containing the entry)
+         * @param entry            target entry
+         * @param todoEntryManager entry manager (containing the entry)
          */
         private void bindToRegularEntry(@NonNull final TodoEntry entry,
                                         @NonNull final TodoEntryManager todoEntryManager) {
@@ -190,8 +190,8 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         /**
          * Outer binding method
          *
-         * @param currentEntry                   target entry
-         * @param todoEntryManager               entry manager (containing the entry)
+         * @param currentEntry     target entry
+         * @param todoEntryManager entry manager (containing the entry)
          */
         void bindTo(@NonNull final TodoEntry currentEntry, @NonNull final TodoEntryManager todoEntryManager) {
             
@@ -242,11 +242,21 @@ public class TodoListViewAdapter extends RecyclerView.Adapter<TodoListViewAdapte
         return currentTodoEntries.size();
     }
     
+    public int getUncompletedItemCount() {
+        int eventCount = 0;
+        for (TodoEntry todoEntry : currentTodoEntries) {
+            if (!todoEntry.isCompleted() && !todoEntry.isGlobal() && !todoEntry.isHiddenByContent.getBool()) {
+                eventCount++;
+            }
+        }
+        return eventCount;
+    }
+    
     /**
      * Notifies the adapter that the list contents have changed
      */
     public void notifyEntryListChanged() {
-        int prevItemsCount = currentTodoEntries.size();
+        int prevItemsCount = getItemCount();
         currentTodoEntries.clear();
         currentTodoEntries.addAll(todoEntryListSupplier.apply(todoEntryManager));
         notifyItemRangeChanged(0, max(prevItemsCount, currentTodoEntries.size()));

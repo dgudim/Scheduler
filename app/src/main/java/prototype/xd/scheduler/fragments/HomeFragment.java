@@ -142,7 +142,8 @@ public final class HomeFragment extends BaseFragment<HomeFragmentWrapperBinding>
             todoListViewAdapter.notifyEntryListChanged();
             // update the status text with entry count
             int events = todoListViewAdapter.getItemCount();
-            binding.contentWrapper.toolbar.setTitle(getString(R.string.status, getCurrentlySelectedDate(), events));
+            int uncompletedEvents = todoListViewAdapter.getUncompletedItemCount();
+            binding.contentWrapper.toolbar.setTitle(getString(R.string.status, getCurrentlySelectedDate(), events, uncompletedEvents));
             binding.contentWrapper.content.noEventsText.setVisibility(events == 0 ? View.VISIBLE : View.GONE);
         });
         

@@ -121,7 +121,7 @@
     <string name="settings_preview_upcoming">Будущие</string>
     <string name="settings_hide_expired_events_by_time">Скрывать прошедшие события на экране блокировки (по времени)</string>
     <string name="event_name_input_hint">Событие</string>
-    <string name="status">Дата: %s  Событий: %d</string>
+    <string name="status">Дата: %s  Событий: %d (%d)</string>
     <string name="app_theme">Тема приложения</string>
     <string name="import_export_settings">Импорт/экспорт настроек</string>
     <string name="import_settings_description">Импорт настроек приложения</string>
