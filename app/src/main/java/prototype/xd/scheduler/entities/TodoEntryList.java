@@ -324,6 +324,7 @@ public final class TodoEntryList extends BaseCleanupList<TodoEntry> { // NOSONAR
                                              boolean onlyAddDifference) {
         // if the entry is currently marked as global in the list and is global now
         if (globalEntries.contains(entry) && entry.isGlobal()) {
+            // This may happen when assigning a group with "show before" or "show after" to a global entry
             Logger.warning(NAME, "Trying to change visibility range of a global entry");
             return;
         }

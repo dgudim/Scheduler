@@ -83,7 +83,7 @@ public final class TodoEntryManager implements DefaultLifecycleObserver {
         @Override
         public void accept(@NonNull TodoEntry entry, @NonNull Set<String> parameters) {
             
-            Logger.debug(NAME, entry + " parameters changed: " + parameters);
+            Logger.debug(NAME, entry + " parameters changed: " + String.join(", ", parameters));
             
             // entry moved to a new day
             boolean coreDaysChanged = parameters.contains(START_DAY_UTC) ||
