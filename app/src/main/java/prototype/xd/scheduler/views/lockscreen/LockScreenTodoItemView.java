@@ -143,9 +143,10 @@ public abstract class LockScreenTodoItemView<V extends ViewBinding> {
         
         if (entry.isFromSystemCalendar()) {
             String timeSpan = entry.getCalendarEntryTimeSpan(context, currentDayUTC);
+            String[] splitTime = timeSplitPattern.split(timeSpan);
             setTimeSpanText(timeSpan);
             
-            setTimeStartText(timeSplitPattern.split(timeSpan)[0]);
+            setTimeStartText(splitTime.length > 1 ? timeSplitPattern.split(timeSpan)[0] : context.getString(R.string.calendar_event_all_day));
             setTimeTextSize(fontSizeSP);
             setIndicatorColor(entry.getCalendarEventColor());
         } else {
