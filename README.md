@@ -28,11 +28,17 @@ Clone this repository and import into **Android Studio**
 ```bash
 git clone https://github.com/dgudim/Scheduler
 ```
-Or just download [latest build](https://github.com/dgudim/Scheduler/releases/latest)
+Or just download from one of the sources
 
-## <a href="https://github.com/ImranR98/Obtainium"><img src="https://github.com/ImranR98/Obtainium/blob/main/assets/graphics/icon_small.png" height=80></img></a> Download with obtanium
-
-<a href="https://apt.izzysoft.de/fdroid/index/apk/prototype.xd.scheduler"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" height=100></img></a>
+[<img src="https://github.com/dgudim/Scheduler/assets/34401005/ac5eedd1-69cd-4837-98ce-b7aef390d589"
+      alt='Get it on Obtainium'
+      height="60">](http://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22prototype.xd.scheduler%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fdgudim%2FScheduler%22%2C%22author%22%3A%22github.com%22%2C%22name%22%3A%22Scheduler%22%7D)
+[<img src="https://github.com/dgudim/Scheduler/assets/34401005/c64c168b-b602-490b-b8a4-3b007dbc7e26"
+      alt='Get it on GitHub'
+      height="60">](https://github.com/dgudim/Scheduler/releases/latest)
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
+      alt='Get it on IzzyOnDroid'
+      height="60">](https://apt.izzysoft.de/fdroid/index/apk/prototype.xd.scheduler)
 
 ## Have any questions? 
 
