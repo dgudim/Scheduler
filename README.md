@@ -16,12 +16,12 @@ Then this app is for you, take **full advantage of your lockscreen real estate**
 - Sync with your system calendars (google, samsung, local)
 - Configurable per-day wallpapers
 - Material you theming
-- Plethora of settings
+- Plethora of functional and visual settings
 - Low memory and cpu consumption
 
 ## Requirements
 - Device running at least android 8.0 (Sdk 26)
-- A rom that does not restrict usage of `wallpaperManager` api (some versions of miui restrict that)
+- A rom that does not restrict usage of `wallpaperManager` api (some versions of miui (xiaomi) restrict that)
 
 ## Installation
 Clone this repository and import into **Android Studio**
@@ -55,6 +55,6 @@ Or just download from one of the sources
 | ------------------------- | -------------------------- |
 | ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/03.jpg?raw=true) | ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/04.jpg?raw=true) |
 
-| Per-day wallpapers        | Material you theming       |
+| Per-day wallpapers        | Different effects          |
 | ------------------------- | -------------------------- |
-| ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/05.jpg?raw=true) | ![](https://user-images.githubusercontent.com/34401005/205037183-94a75dc1-0d35-40d5-bfbb-e34913ff457b.gif) |
+| ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/05.jpg?raw=true) | ![](https://github.com/dgudim/Scheduler/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/06.jpg?raw=true) |
